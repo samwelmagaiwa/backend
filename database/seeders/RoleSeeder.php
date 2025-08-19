@@ -21,10 +21,10 @@ class RoleSeeder extends Seeder
         // Role::firstOrCreate(['name' => 'nurse']);
         // Role::firstOrCreate(['name' => 'ict']);
 
-        $roles = ['admin', 'divisional_director','head of department', 'ict director', 'head of it', 'staff', 'ict officer',];
+        // $roles = ['admin', 'divisional_director','head of department', 'ict director', 'head of it', 'staff', 'ict officer',];
 
-        foreach ($roles as $role) {
-            Role::firstOrCreate(['name' => $role]);
-        }
+        // foreach ($roles as $role) {
+        //     Role::firstOrCreate(['name' => $role]);
+        // }
      }
 }

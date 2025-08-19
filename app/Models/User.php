@@ -58,6 +58,37 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Role::class);
     }
+
+    public function onboarding()
+    {
+        return $this->hasOne(UserOnboarding::class);
+    }
+
+    /**
+     * Check if user needs onboarding (non-admin users who haven't completed it)
+     */
+    public function needsOnboarding(): bool
+    {
+        // Admin users don't need onboarding
+        if ($this->role && $this->role->name === 'admin') {
+            return false;
+        }
+
+        // Check if onboarding record exists and is completed
+        $onboarding = $this->onboarding;
+        return !$onboarding || !$onboarding->completed;
+    }
+
+    /**
+     * Get or create onboarding record for user
+     */
+    public function getOrCreateOnboarding(): UserOnboarding
+    {
+        return $this->onboarding()->firstOrCreate(
+            ['user_id' => $this->id],
+            ['current_step' => 'terms-popup']
+        );
+    }
 }
 
     

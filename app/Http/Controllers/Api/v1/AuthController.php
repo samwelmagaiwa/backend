@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Models\User;
+use App\Models\UserOnboarding;
 
 class AuthController extends Controller
 {
@@ -39,10 +40,13 @@ class AuthController extends Controller
         }
       
         $user = User::find(Auth::id());
-        $user->load('role');
+        $user->load(['role', 'onboarding']);
         $token = $user->createToken('auth_token')->plainTextToken;
         
-        // Return user data and token, including role name
+        // Get onboarding status
+        $onboarding = $user->getOrCreateOnboarding();
+        
+        // Return user data and token, including role name and onboarding status
         return response()->json([
             'user'  => [
                 'id' => $user->id,
@@ -52,50 +56,46 @@ class AuthController extends Controller
                 'pf_number' => $user->pf_number,
                 'role_id' => $user->role_id,
                 'role_name' => $user->role ? $user->role->name : null,
+                'needs_onboarding' => $user->needsOnboarding(),
+                'onboarding_step' => $onboarding->current_step,
             ],
             'token' => $token,
         ], 200);
     }
 
-    /**
-     * Handle user registration and assign staff role by default.
-     */
-    public function register(Request $request)
-    {
-        $logData = $request->except(['password', 'password_confirmation']);
-        Log::info('register() called', ['request' => $logData]);
-        $request->validate([
-            'name' => 'required|string',
-            'phone' => ['required','regex:/^255[0-9]{9}$/','unique:users,phone'],
-            'pf_number' => ['required','regex:/^MLG\.\d{4}$/','unique:users,pf_number'],
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
-        ]);
-
-        // Find staff role
-        $staffRole = \App\Models\Role::where('name', 'staff')->first();
-        if (!$staffRole) {
-            return response()->json(['message' => 'Staff role not found.'], 500);
-        }
-
-        $user = User::create([
-            'name' => $request->name,
-            'phone' => $request->phone,
-            'pf_number' => $request->pf_number,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-            'role_id' => $staffRole->id,
-        ]);
-
-        return response()->json([
-            'message' => 'Registration successful. Please login.',
-        ], 201);
-    }
-
     public function logout(Request $request)
     {
-        Log::info('logout called', ['user_id' => $request->user() ? $request->user()->id : null]);
-        $request->user()->currentAccessToken()->delete();
-        return response()->json(['message' => 'Logged out successfully']);
+        try {
+            $user = $request->user();
+            Log::info('logout called', ['user_id' => $user ? $user->id : null]);
+            
+            if ($user) {
+                // Delete the current access token
+                $user->currentAccessToken()->delete();
+                
+                Log::info('User logged out successfully', ['user_id' => $user->id]);
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Logged out successfully'
+                ], 200);
+            }
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'No authenticated user found'
+            ], 401);
+            
+        } catch (\Exception $e) {
+            Log::error('Logout error', [
+                'user_id' => $request->user() ? $request->user()->id : null,
+                'error' => $e->getMessage()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Logout failed'
+            ], 500);
+        }
     }
 }

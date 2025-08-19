@@ -3,38 +3,101 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Role;
-use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
+    /**
+     * Run the database seeds.
+     */
     public function run(): void
     {
-        $users = [
-            ['name' => 'Admin', 'email' => 'admin@gmail.com', 'role' => 'admin', 'pf_number' => 'MLG.1234'],
-            ['name' => 'HoD', 'email' => 'hod@gmail.com', 'role' => 'head of department', 'pf_number' => 'MLG.3435'],
-            ['name' => 'divisional_director', 'email' => 'division@gmail.com', 'role' => 'divisional_director', 'pf_number' => 'MLG.3432'],
-            ['name' => 'ICT Director', 'email' => 'ictdirector@gmail.com', 'role' => 'ict director', 'pf_number' => 'MLG.3439'],
-            ['name' => 'Head of IT', 'email' => 'headofit@gmail.com', 'role' => 'head of it', 'pf_number' => 'MLG.3438'],
-            ['name' => 'Ict Officer', 'email' => 'itassigned@gmail.com', 'role' => 'ict officer', 'pf_number' => 'MLG.3437'],
+        // Create roles first
+        $roles = [
+            ['name' => 'admin'],
+            ['name' => 'divisional_director'],
+            ['name' => 'head_of_department'],
+            ['name' => 'hod_it'],
+            ['name' => 'ict_director'],
+            ['name' => 'staff'],
+            ['name' => 'ict_officer'],
         ];
 
-        foreach ($users as $index => $u) {
-            $role = Role::where('name', $u['role'])->first();
+        foreach ($roles as $role) {
+            Role::firstOrCreate($role);
+        }
 
-            $phone = '255743' . str_pad($index + 1000, 4, '0', STR_PAD_LEFT); // generates unique: 2557431000, 2557431001, etc.
+        // Create test users
+        $users = [
+            [
+                'name' => 'System Administrator',
+                'email' => 'admin@mnh.go.tz',
+                'phone' => '255712000001',
+                'pf_number' => 'MLG.0001',
+                'password' => Hash::make('password123'),
+                'role_name' => 'admin'
+            ],
+            [
+                'name' => 'Divisional Director',
+                'email' => 'divisional@mnh.go.tz',
+                'phone' => '255712000002',
+                'pf_number' => 'MLG.0002',
+                'password' => Hash::make('password123'),
+                'role_name' => 'divisional_director'
+            ],
+            [
+                'name' => 'Head of Department',
+                'email' => 'hod@mnh.go.tz',
+                'phone' => '255712000003',
+                'pf_number' => 'MLG.0003',
+                'password' => Hash::make('password123'),
+                'role_name' => 'head_of_department'
+            ],
+            [
+                'name' => 'Head of IT Department',
+                'email' => 'hod.it@mnh.go.tz',
+                'phone' => '255712000004',
+                'pf_number' => 'MLG.0004',
+                'password' => Hash::make('hodit2024'),
+                'role_name' => 'hod_it'
+            ],
+            [
+                'name' => 'ICT Director',
+                'email' => 'ict.director@mnh.go.tz',
+                'phone' => '255712000005',
+                'pf_number' => 'MLG.0005',
+                'password' => Hash::make('password123'),
+                'role_name' => 'ict_director'
+            ],
+            [
+                'name' => 'Hospital Staff',
+                'email' => 'staff@mnh.go.tz',
+                'phone' => '255712000006',
+                'pf_number' => 'MLG.0006',
+                'password' => Hash::make('password123'),
+                'role_name' => 'staff'
+            ],
+            [
+                'name' => 'ICT Officer',
+                'email' => 'ict.officer@mnh.go.tz',
+                'phone' => '255712000007',
+                'pf_number' => 'MLG.0007',
+                'password' => Hash::make('password123'),
+                'role_name' => 'ict_officer'
+            ],
+        ];
 
-            User::firstOrCreate(
-                ['email' => $u['email']],
-                [
-                    'name' => $u['name'],
-                    'password' => Hash::make('12345678'),
-                    'pf_number' => $u['pf_number'],
-                    'phone' => $phone,
-                    'role_id' => $role?->id,
-                ]
-            );
+        foreach ($users as $userData) {
+            $roleName = $userData['role_name'];
+            unset($userData['role_name']);
+            
+            $role = Role::where('name', $roleName)->first();
+            if ($role) {
+                $userData['role_id'] = $role->id;
+                User::firstOrCreate(['email' => $userData['email']], $userData);
+            }
         }
     }
 }
