@@ -1,0 +1,378 @@
+/* Responsive Utilities for Muhimbili Hospital Frontend */
+
+/* Container utilities */
+.container-responsive {
+  @apply w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.container-responsive-sm {
+  @apply w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8;
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.container-responsive-lg {
+  @apply w-full max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12;
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+/* Responsive text sizes */
+.text-responsive-xs {
+  @apply text-xs sm:text-sm;
+}
+
+.text-responsive-sm {
+  @apply text-sm sm:text-base;
+}
+
+.text-responsive-base {
+  @apply text-base sm:text-lg;
+}
+
+.text-responsive-lg {
+  @apply text-lg sm:text-xl lg:text-2xl;
+}
+
+.text-responsive-xl {
+  @apply text-xl sm:text-2xl lg:text-3xl;
+}
+
+.text-responsive-2xl {
+  @apply text-2xl sm:text-3xl lg:text-4xl;
+}
+
+.text-responsive-3xl {
+  @apply text-3xl sm:text-4xl lg:text-5xl;
+}
+
+/* Responsive spacing */
+.spacing-responsive {
+  @apply p-4 sm:p-6 lg:p-8;
+}
+
+.spacing-responsive-sm {
+  @apply p-2 sm:p-4 lg:p-6;
+}
+
+.spacing-responsive-lg {
+  @apply p-6 sm:p-8 lg:p-12;
+}
+
+.spacing-responsive-x {
+  @apply px-4 sm:px-6 lg:px-8;
+}
+
+.spacing-responsive-y {
+  @apply py-4 sm:py-6 lg:py-8;
+}
+
+/* Responsive margins */
+.margin-responsive {
+  @apply m-4 sm:m-6 lg:m-8;
+}
+
+.margin-responsive-b {
+  @apply mb-4 sm:mb-6 lg:mb-8;
+}
+
+.margin-responsive-t {
+  @apply mt-4 sm:mt-6 lg:mt-8;
+}
+
+/* Responsive gaps */
+.gap-responsive {
+  @apply gap-4 sm:gap-6 lg:gap-8;
+}
+
+.gap-responsive-sm {
+  @apply gap-2 sm:gap-4 lg:gap-6;
+}
+
+/* Form responsive utilities */
+.form-input-responsive {
+  @apply w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:border-primary focus:outline-none text-sm sm:text-base bg-gray-50 focus:bg-white transition-all;
+}
+
+.form-label-responsive {
+  @apply block text-xs sm:text-sm font-bold text-gray-700 mb-1 sm:mb-2;
+}
+
+.form-button-responsive {
+  @apply px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base font-semibold rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2;
+}
+
+/* Grid responsive utilities */
+.grid-responsive-1-2 {
+  @apply grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6;
+}
+
+.grid-responsive-1-2-3 {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6;
+}
+
+.grid-responsive-1-2-4 {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6;
+}
+
+.grid-responsive-2-4 {
+  @apply grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4;
+}
+
+/* Card responsive utilities */
+.card-responsive {
+  @apply bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-md transition-shadow;
+}
+
+.card-responsive-lg {
+  @apply bg-white rounded-lg sm:rounded-xl lg:rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8 lg:p-10 hover:shadow-md transition-shadow;
+}
+
+/* Navigation responsive utilities */
+.nav-item-responsive {
+  @apply flex items-center px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base font-medium rounded-md transition-colors;
+}
+
+.nav-link-responsive {
+  @apply text-gray-700 hover:text-primary hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2;
+}
+
+/* Button responsive utilities */
+.btn-primary-responsive {
+  @apply bg-primary text-white hover:bg-blue-700 focus:ring-primary;
+}
+
+.btn-secondary-responsive {
+  @apply bg-gray-500 text-white hover:bg-gray-600 focus:ring-gray-500;
+}
+
+.btn-success-responsive {
+  @apply bg-green-600 text-white hover:bg-green-700 focus:ring-green-500;
+}
+
+.btn-danger-responsive {
+  @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+}
+
+/* Focus utilities */
+.focus-visible-responsive {
+  @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded;
+}
+
+/* Hide/show utilities for different screen sizes */
+.mobile-only {
+  @apply block sm:hidden;
+}
+
+.tablet-up {
+  @apply hidden sm:block;
+}
+
+.desktop-only {
+  @apply hidden lg:block;
+}
+
+.mobile-tablet {
+  @apply block lg:hidden;
+}
+
+/* Responsive flexbox utilities */
+.flex-responsive-col {
+  @apply flex flex-col sm:flex-row;
+}
+
+.flex-responsive-col-reverse {
+  @apply flex flex-col-reverse sm:flex-row;
+}
+
+.flex-responsive-center {
+  @apply flex flex-col sm:flex-row sm:items-center sm:justify-between;
+}
+
+/* Responsive positioning */
+.position-responsive {
+  @apply relative sm:absolute;
+}
+
+.position-responsive-fixed {
+  @apply fixed bottom-4 right-4 sm:bottom-6 sm:right-6 lg:bottom-8 lg:right-8;
+}
+
+/* Responsive widths */
+.width-responsive-full {
+  @apply w-full sm:w-auto;
+}
+
+.width-responsive-auto {
+  @apply w-auto sm:w-full;
+}
+
+/* Responsive heights */
+.height-responsive-screen {
+  @apply h-screen sm:h-auto;
+}
+
+.height-responsive-auto {
+  @apply h-auto sm:h-screen;
+}
+
+/* Responsive overflow */
+.overflow-responsive {
+  @apply overflow-hidden sm:overflow-visible;
+}
+
+.overflow-responsive-scroll {
+  @apply overflow-auto sm:overflow-visible;
+}
+
+/* Responsive z-index */
+.z-responsive-high {
+  @apply z-40 sm:z-50;
+}
+
+.z-responsive-modal {
+  @apply z-50 sm:z-40;
+}
+
+/* Print utilities */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-only {
+    display: block !important;
+  }
+  
+  .print-break-before {
+    page-break-before: always;
+  }
+  
+  .print-break-after {
+    page-break-after: always;
+  }
+  
+  .print-break-inside-avoid {
+    page-break-inside: avoid;
+  }
+}
+
+/* Prevent horizontal overflow globally */
+.overflow-x-hidden {
+  overflow-x: hidden !important;
+}
+
+.max-w-full {
+  max-width: 100% !important;
+}
+
+/* Custom scrollbar for responsive design */
+.scrollbar-responsive {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+.scrollbar-responsive::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scrollbar-responsive::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.scrollbar-responsive::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.scrollbar-responsive::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Responsive animations */
+@media (prefers-reduced-motion: reduce) {
+  .animate-responsive {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Touch-friendly sizing for mobile */
+@media (max-width: 640px) {
+  .touch-friendly {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  .touch-friendly-sm {
+    min-height: 36px;
+    min-width: 36px;
+  }
+}
+
+/* High DPI display optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .high-dpi-optimized {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Dark mode support (if needed in future) */
+@media (prefers-color-scheme: dark) {
+  .dark-mode-responsive {
+    @apply bg-gray-900 text-white;
+  }
+}
+
+/* Responsive table utilities */
+.table-responsive {
+  @apply overflow-x-auto;
+  max-width: 100%;
+}
+
+.table-responsive table {
+  @apply min-w-full;
+}
+
+@media (max-width: 640px) {
+  .table-stack {
+    display: block;
+  }
+  
+  .table-stack thead {
+    display: none;
+  }
+  
+  .table-stack tbody,
+  .table-stack tr,
+  .table-stack td {
+    display: block;
+  }
+  
+  .table-stack tr {
+    border: 1px solid #e5e7eb;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+  }
+  
+  .table-stack td {
+    border: none;
+    padding: 0.25rem 0;
+  }
+  
+  .table-stack td:before {
+    content: attr(data-label) ": ";
+    font-weight: bold;
+    display: inline-block;
+    width: 100px;
+  }
+}

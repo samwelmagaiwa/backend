@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Component layer: reusable dashboard card styles */
+@layer components {
+  /* Base card for dashboards – no background to allow tinted cards */
+  .dashboard-card {
+    @apply rounded-xl p-6 border border-gray-100 shadow-lg transform-gpu transition-transform transition-shadow duration-300 ease-out cursor-pointer;
+  }
+  .dashboard-card:hover {
+    @apply shadow-2xl scale-[1.02];
+  }
+  .dashboard-card:active {
+    @apply scale-[0.995];
+  }
+  /* Optional white variant for neutral cards */
+  .dashboard-card--white {
+    @apply bg-white;
+  }
+
+  /* Lightweight hover-only effect that doesn't rely on box-shadow overrides */
+  .hover-card {
+    @apply transform-gpu transition-transform duration-200 ease-out cursor-pointer;
+  }
+  .hover-card:hover {
+    @apply -translate-y-0.5 scale-[1.02];
+  }
+  .hover-card:active {
+    @apply scale-[0.995];
+  }
+}
+
+/* Custom utility classes for legacy widths/margins used in views */
+@layer utilities {
+  .max-w-500 { max-width: 500px; }
+  .max-h-500 { max-height: 500px; }
+  .w-30 { width: 7.5rem; }
+  .w-40 { width: 10rem; }
+  .w-65 { width: 16.25rem; }
+  .w-90 { width: 22.5rem; }
+  .w-200 { width: 50rem; }
+  .max-w-24 { max-width: 6rem; }
+  .max-h-16 { max-height: 4rem; }
+  .max-w-30 { max-width: 7.5rem; }
+  .max-h-30 { max-height: 7.5rem; }
+  .border-1 { border-width: 1px; }
+  .border-t-3 { border-top-width: 3px; }
+  .gap-100 { gap: 25rem; }
+  .pr-98 { padding-right: 24.5rem; }
+  .ml-90 { margin-left: 22.5rem; }
+}
+
+/* Make oversized spacing responsive to avoid overflow on small screens */
+@media (max-width: 768px) {
+  .ml-90 { margin-left: 0 !important; }
+  .pr-98 { padding-right: 0 !important; }
+  .gap-100 { gap: 1rem !important; }
+  .w-200 { width: 100% !important; }
+  .w-65 { width: 100% !important; }
+  .w-40 { width: 100% !important; }
+}
