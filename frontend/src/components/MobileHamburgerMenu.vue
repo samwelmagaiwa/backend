@@ -150,6 +150,8 @@
             
             <!-- Forms Submenu -->
             <div class="space-y-1">
+              <!-- COMMENTED OUT: Individual forms - now using Combined Access Form only -->
+              <!-- 
               <!-- Jeeva Access Form -->
               <router-link 
                 :to="getFormRoute('jeeva')"
@@ -203,6 +205,7 @@
                 </div>
                 <i class="fas fa-chevron-right text-blue-300 group-hover:text-white text-sm transition-all duration-300 group-hover:translate-x-1"></i>
               </router-link>
+              -->
 
               <!-- Combined Access Form -->
               <router-link 
@@ -310,9 +313,10 @@ export default {
       const isStaff = userRole.value === ROLES.STAFF
       
       const formRoutes = {
-        jeeva: isStaff ? '/user-jeeva-form' : '/jeeva-access',
-        wellsoft: isStaff ? '/user-wellsoft-form' : '/wellsoft-access',
-        internet: isStaff ? '/user-internet-form' : '/internet-access',
+        // COMMENTED OUT: Individual forms - now using Combined Access Form only
+        // jeeva: isStaff ? '/user-jeeva-form' : '/jeeva-access',
+        // wellsoft: isStaff ? '/user-wellsoft-form' : '/wellsoft-access',
+        // internet: isStaff ? '/user-internet-form' : '/internet-access',
         combined: isStaff ? '/user-combined-form' : '/both-service-form'
       }
       
@@ -322,9 +326,10 @@ export default {
     function isFormActive(formType) {
       const currentPath = window.location.pathname
       const formPaths = {
-        jeeva: ['/user-jeeva-form', '/jeeva-access'],
-        wellsoft: ['/user-wellsoft-form', '/wellsoft-access'],
-        internet: ['/user-internet-form', '/internet-access'],
+        // COMMENTED OUT: Individual forms - now using Combined Access Form only
+        // jeeva: ['/user-jeeva-form', '/jeeva-access'],
+        // wellsoft: ['/user-wellsoft-form', '/wellsoft-access'],
+        // internet: ['/user-internet-form', '/internet-access'],
         combined: ['/user-combined-form', '/both-service-form']
       }
       

@@ -6,11 +6,16 @@ module.exports = {
   },
   extends: [
     'eslint:recommended',
-    '@vue/eslint-config-prettier',
+    'plugin:vue/vue3-essential',
+  ],
+  plugins: [
+    'vue',
   ],
   parserOptions: {
     ecmaVersion: 'latest',
     sourceType: 'module',
+    parser: '@babel/eslint-parser',
+    requireConfigFile: false,
   },
   rules: {
     // Allow unused variables that start with underscore

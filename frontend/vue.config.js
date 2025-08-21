@@ -36,7 +36,6 @@ module.exports = defineConfig({
       'Access-Control-Allow-Origin': '*'
     },
     client: {
-      webSocketURL: false,  // Completely disable WebSocket URL
       overlay: false,
       progress: false,
       reconnect: false,

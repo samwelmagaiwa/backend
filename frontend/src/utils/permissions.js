@@ -101,15 +101,20 @@ export const ROLE_PERMISSIONS = {
   [ROLES.STAFF]: {
     routes: [
       '/user-dashboard',
-      '/user-jeeva-form',
-      '/user-wellsoft-form',
-      '/user-internet-form',
+      // COMMENTED OUT: Individual forms - now using Combined Access Form only
+      // '/user-jeeva-form',
+      // '/user-wellsoft-form', 
+      // '/user-internet-form',
       '/user-combined-form',
       '/booking-service',
       '/onboarding'
     ],
     dashboards: ['user-dashboard'],
-    forms: ['user-jeeva-form', 'user-wellsoft-form', 'user-internet-form', 'user-combined-form', 'booking-service'],
+    forms: [
+      // COMMENTED OUT: Individual forms - now using Combined Access Form only
+      // 'user-jeeva-form', 'user-wellsoft-form', 'user-internet-form', 
+      'user-combined-form', 'booking-service'
+    ],
     userManagement: []
   },
 

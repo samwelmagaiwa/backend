@@ -644,6 +644,8 @@
           
           <!-- Form Options -->
           <div class="space-y-3">
+            <!-- COMMENTED OUT: Individual forms - now using Combined Access Form only -->
+            <!-- 
             <button
               @click="selectJeevaForm"
               :disabled="formLoading"
@@ -670,6 +672,7 @@
               <i class="fas fa-wifi mr-2 drop-shadow-sm"></i>
               <span class="drop-shadow-sm">Internet Access Form</span>
             </button>
+            -->
             
             <button
               @click="selectBothServices"
@@ -790,6 +793,8 @@ export default {
     })
     
     // Methods
+    // COMMENTED OUT: Individual form methods - now using Combined Access Form only
+    /*
     const selectJeevaForm = async () => {
       formLoading.value = true
       selectedForm.value = 'jeeva'
@@ -834,6 +839,7 @@ export default {
       // Navigate to User Internet Access Form
       router.push('/user-internet-form')
     }
+    */
     
     const selectBothServices = async () => {
       formLoading.value = true
@@ -959,9 +965,9 @@ export default {
       totalRequests,
       progressWidth,
       progressPercentage,
-      selectJeevaForm,
-      selectWellsoftForm,
-      requestPasswordRenew,
+      // selectJeevaForm, // COMMENTED OUT
+      // selectWellsoftForm, // COMMENTED OUT  
+      // requestPasswordRenew, // COMMENTED OUT
       selectBothServices,
       selectBookingService,
       cancelFormSelection,

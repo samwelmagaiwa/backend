@@ -3,7 +3,7 @@
     <AppHeader />
     <div class="flex flex-1 overflow-hidden">
       <DynamicSidebar v-model:collapsed="sidebarCollapsed" />
-      <main class="flex-1 p-6 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative">
+      <main class="flex-1 p-4 bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 overflow-y-auto relative">
         <!-- Medical Background Pattern -->
         <div class="absolute inset-0 overflow-hidden">
           <!-- Medical Cross Pattern -->
@@ -23,77 +23,77 @@
                    animationDuration: (Math.random() * 3 + 2) + 's',
                    fontSize: (Math.random() * 20 + 10) + 'px'
                  }">
-              <i :class="['fas', ['fa-heartbeat', 'fa-user-md', 'fa-hospital', 'fa-stethoscope', 'fa-plus'][Math.floor(Math.random() * 5)]]"></i>
+              <i :class="['fas', ['fa-cog', 'fa-server', 'fa-network-wired', 'fa-desktop', 'fa-database'][Math.floor(Math.random() * 5)]]"></i>
             </div>
           </div>
         </div>
         
-        <div class="max-w-12xl mx-auto relative z-10">
+        <div class="max-w-10xl mx-auto relative z-10">
           <!-- Header Section -->
-          <div class="medical-glass-card rounded-t-3xl p-6 mb-0 border-b border-blue-300/30">
+          <div class="medical-glass-card rounded-t-2xl p-4 mb-0 border-b border-blue-300/30">
             <div class="flex justify-between items-center">
               <!-- Left Logo -->
-              <div class="w-28 h-28 mr-6 transform hover:scale-110 transition-transform duration-300">
-                <div class="w-full h-full bg-gradient-to-br from-blue-500/20 to-teal-500/20 rounded-2xl backdrop-blur-sm border-2 border-blue-300/40 flex items-center justify-center shadow-2xl hover:shadow-blue-500/25">
-                  <img src="/assets/images/ngao2.png" alt="National Shield" class="max-w-18 max-h-18 object-contain" />
+              <div class="w-20 h-20 mr-4 transform hover:scale-110 transition-transform duration-300">
+                <div class="w-full h-full bg-gradient-to-br from-blue-500/20 to-blue-600/20 rounded-xl backdrop-blur-sm border-2 border-blue-300/40 flex items-center justify-center shadow-xl hover:shadow-blue-500/25">
+                  <img src="/assets/images/ngao2.png" alt="National Shield" class="max-w-14 max-h-14 object-contain" />
                 </div>
               </div>
 
               <!-- Center Content -->
               <div class="text-center flex-1">
-                <h1 class="text-2xl font-bold text-white mb-4 tracking-wide drop-shadow-lg animate-fade-in">
+                <h1 class="text-xl font-bold text-white mb-2 tracking-wide drop-shadow-lg animate-fade-in">
                   MUHIMBILI NATIONAL HOSPITAL
                 </h1>
-                <div class="relative inline-block mb-4">
-                  <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-3 rounded-full text-lg font-bold shadow-2xl transform hover:scale-105 transition-all duration-300 border-2 border-blue-400/60">
+                <div class="relative inline-block mb-2">
+                  <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2 rounded-full text-base font-bold shadow-xl transform hover:scale-105 transition-all duration-300 border-2 border-blue-400/60">
                     <span class="relative z-10 flex items-center gap-2">
-                      <i class="fas fa-layer-group"></i>
+                      <i class="fas fa-layer-group text-blue-200"></i>
                       COMBINED ACCESS REQUEST
                     </span>
                     <div class="absolute inset-0 bg-gradient-to-r from-blue-700 to-blue-800 rounded-full opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
                   </div>
                 </div>
-                <h2 class="text-lg font-bold text-blue-100 tracking-wide drop-shadow-md animate-fade-in-delay">
+                <h2 class="text-base font-bold text-blue-100 tracking-wide drop-shadow-md animate-fade-in-delay">
                   COMPREHENSIVE SYSTEM ACCESS
                 </h2>
               </div>
               
               <!-- Right Logo -->
-              <div class="w-28 h-28 ml-6 transform hover:scale-110 transition-transform duration-300">
-                <div class="w-full h-full bg-gradient-to-br from-teal-500/20 to-blue-500/20 rounded-2xl backdrop-blur-sm border-2 border-teal-300/40 flex items-center justify-center shadow-2xl hover:shadow-teal-500/25">
-                  <img src="/assets/images/logo2.png" alt="Muhimbili Logo" class="max-w-18 max-h-18 object-contain" />
+              <div class="w-20 h-20 ml-4 transform hover:scale-110 transition-transform duration-300">
+                <div class="w-full h-full bg-gradient-to-br from-blue-500/20 to-blue-600/20 rounded-xl backdrop-blur-sm border-2 border-blue-300/40 flex items-center justify-center shadow-xl hover:shadow-blue-500/25">
+                  <img src="/assets/images/logo2.png" alt="Muhimbili Logo" class="max-w-14 max-h-14 object-contain" />
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Main Form -->
-          <div class="medical-glass-card rounded-b-3xl overflow-hidden">
-        <form @submit.prevent="submitForm" class="p-6 space-y-6">
+          <div class="medical-glass-card rounded-b-2xl overflow-hidden">
+        <form @submit.prevent="submitForm" class="p-4 space-y-4">
           
           <!-- Form Description -->
            
           <!-- Applicant Details Section -->
-          <div class="medical-card bg-gradient-to-r from-teal-600/25 to-blue-600/25 border-2 border-teal-400/40 p-8 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-teal-500/20 transition-all duration-500 group relative overflow-hidden">
+          <div class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-4 rounded-xl backdrop-blur-sm hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-500 group relative overflow-hidden">
             <!-- Animated Background Layers -->
-            <div class="absolute inset-0 bg-gradient-to-r from-teal-500/10 via-blue-500/5 to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-teal-400/20 to-transparent rounded-full blur-2xl group-hover:scale-150 transition-transform duration-1000"></div>
-            <div class="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-blue-400/15 to-transparent rounded-full blur-xl group-hover:scale-125 transition-transform duration-800"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-blue-600/5 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+            <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-400/20 to-transparent rounded-full blur-xl group-hover:scale-150 transition-transform duration-1000"></div>
+            <div class="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-tr from-blue-400/15 to-transparent rounded-full blur-lg group-hover:scale-125 transition-transform duration-800"></div>
             
             <div class="relative z-10">
-              <div class="flex items-center space-x-4 mb-6">
-                <div class="w-16 h-16 bg-gradient-to-br from-teal-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-teal-300/50 relative overflow-hidden">
-                  <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-xl"></div>
-                  <i class="fas fa-user-md text-white text-xl relative z-10 drop-shadow-lg"></i>
+              <div class="flex items-center space-x-3 mb-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50 relative overflow-hidden">
+                  <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-lg"></div>
+                  <i class="fas fa-user text-white text-lg relative z-10 drop-shadow-lg"></i>
                   <div class="absolute top-1 right-1 w-1 h-1 bg-white/60 rounded-full animate-ping"></div>
                 </div>
                 <div>
-                  <h3 class="text-2xl font-bold text-white flex items-center">
-                    <i class="fas fa-id-card mr-3 text-teal-300"></i>
+                  <h3 class="text-lg font-bold text-white flex items-center">
+                    <i class="fas fa-id-card mr-2 text-blue-300"></i>
                     Applicant Details
                   </h3>
                   <div class="flex items-center space-x-2 mt-1">
-                    <span class="text-sm text-red-400 font-medium bg-red-500/20 px-2 py-1 rounded-full border border-red-400/30">
+                    <span class="text-xs text-red-400 font-medium bg-red-500/20 px-2 py-1 rounded-full border border-red-400/30">
                       <i class="fas fa-asterisk mr-1 text-xs"></i>
                       Required Information
                     </span>
@@ -102,29 +102,35 @@
               </div>
 
               <!-- Attractive Field Layout -->
-              <div class="space-y-6 mb-6">
+              <div class="space-y-4 mb-4">
                 <!-- Row 1: Basic Information -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <!-- PF Number -->
                   <div class="group">
-                    <label class="block text-sm font-bold text-blue-100 mb-3 flex items-center">
-                      <i class="fas fa-id-badge mr-2 text-teal-300"></i>
+                    <label class="block text-sm font-bold text-blue-100 mb-2 flex items-center">
+                      <i class="fas fa-id-badge mr-2 text-blue-300"></i>
                       PF Number <span class="text-red-400 ml-1">*</span>
                     </label>
                     <div class="relative">
                       <input 
                         v-model="formData.pfNumber" 
                         type="text" 
-                        class="medical-input w-full px-4 py-4 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-teal-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-teal-500/20 group-hover:border-teal-400/50"
+                        :class="`medical-input w-full px-3 py-3 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50 ${getFieldErrorClass('pfNumber')}`"
                         placeholder="Enter PF Number"
+                        @input="onPfNumberInput"
+                        @blur="fieldTouched.pfNumber = true; validatePfNumber()"
                         required
                       />
-                      <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-teal-500/10 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                      <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-teal-300/50">
+                      <div class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/10 to-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                      <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-300/50">
                         <i class="fas fa-hashtag"></i>
                       </div>
                     </div>
-                    <p class="text-xs text-blue-200/60 mt-1 italic flex items-center">
+                    <p v-if="fieldTouched.pfNumber && fieldErrors.pfNumber" class="text-xs text-red-400 mt-1 flex items-center">
+                      <i class="fas fa-exclamation-circle mr-1"></i>
+                      {{ fieldErrors.pfNumber }}
+                    </p>
+                    <p v-else class="text-xs text-blue-200/60 mt-1 italic flex items-center">
                       <i class="fas fa-info-circle mr-1"></i>
                       e.g. 12345
                     </p>
@@ -132,24 +138,30 @@
 
                   <!-- Staff Name -->
                   <div class="group">
-                    <label class="block text-sm font-bold text-blue-100 mb-3 flex items-center">
-                      <i class="fas fa-user mr-2 text-teal-300"></i>
+                    <label class="block text-sm font-bold text-blue-100 mb-2 flex items-center">
+                      <i class="fas fa-user mr-2 text-blue-300"></i>
                       Staff Name <span class="text-red-400 ml-1">*</span>
                     </label>
                     <div class="relative">
                       <input 
                         v-model="formData.staffName" 
                         type="text" 
-                        class="medical-input w-full px-4 py-4 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-teal-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-teal-500/20 group-hover:border-teal-400/50"
+                        :class="`medical-input w-full px-3 py-3 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50 ${getFieldErrorClass('staffName')}`"
                         placeholder="Enter full name"
+                        @input="onStaffNameInput"
+                        @blur="fieldTouched.staffName = true; validateStaffName()"
                         required
                       />
-                      <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-teal-500/10 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                      <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-teal-300/50">
+                      <div class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/10 to-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                      <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-300/50">
                         <i class="fas fa-user-circle"></i>
                       </div>
                     </div>
-                    <p class="text-xs text-blue-200/60 mt-1 italic flex items-center">
+                    <p v-if="fieldTouched.staffName && fieldErrors.staffName" class="text-xs text-red-400 mt-1 flex items-center">
+                      <i class="fas fa-exclamation-circle mr-1"></i>
+                      {{ fieldErrors.staffName }}
+                    </p>
+                    <p v-else class="text-xs text-blue-200/60 mt-1 italic flex items-center">
                       <i class="fas fa-info-circle mr-1"></i>
                       e.g. Jane Doe
                     </p>
@@ -160,24 +172,30 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <!-- Phone Number -->
                   <div class="group">
-                    <label class="block text-sm font-bold text-blue-100 mb-3 flex items-center">
-                      <i class="fas fa-phone mr-2 text-teal-300"></i>
+                    <label class="block text-sm font-bold text-blue-100 mb-2 flex items-center">
+                      <i class="fas fa-phone mr-2 text-blue-300"></i>
                       Phone Number <span class="text-red-400 ml-1">*</span>
                     </label>
                     <div class="relative">
                       <input 
                         v-model="formData.phoneNumber" 
                         type="tel" 
-                        class="medical-input w-full px-4 py-4 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-teal-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-teal-500/20 group-hover:border-teal-400/50"
+                        :class="`medical-input w-full px-3 py-3 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50 ${getFieldErrorClass('phoneNumber')}`"
                         placeholder="Enter phone number"
+                        @input="onPhoneNumberInput"
+                        @blur="fieldTouched.phoneNumber = true; validatePhoneNumber()"
                         required
                       />
-                      <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-teal-500/10 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                      <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-teal-300/50">
+                      <div class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/10 to-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                      <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-300/50">
                         <i class="fas fa-mobile-alt"></i>
                       </div>
                     </div>
-                    <p class="text-xs text-blue-200/60 mt-1 italic flex items-center">
+                    <p v-if="fieldTouched.phoneNumber && fieldErrors.phoneNumber" class="text-xs text-red-400 mt-1 flex items-center">
+                      <i class="fas fa-exclamation-circle mr-1"></i>
+                      {{ fieldErrors.phoneNumber }}
+                    </p>
+                    <p v-else class="text-xs text-blue-200/60 mt-1 italic flex items-center">
                       <i class="fas fa-info-circle mr-1"></i>
                       e.g. 0712 000 000
                     </p>
@@ -185,25 +203,31 @@
 
                   <!-- Department -->
                   <div class="group">
-                    <label class="block text-sm font-bold text-blue-100 mb-3 flex items-center">
-                      <i class="fas fa-building mr-2 text-teal-300"></i>
+                    <label class="block text-sm font-bold text-blue-100 mb-2 flex items-center">
+                      <i class="fas fa-building mr-2 text-blue-300"></i>
                       Department <span class="text-red-400 ml-1">*</span>
                     </label>
                     <div class="relative">
                       <select 
                         v-model="formData.department" 
-                        class="medical-input w-full px-4 py-4 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-teal-400 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-teal-500/20 appearance-none cursor-pointer group-hover:border-teal-400/50"
+                        :class="`medical-input w-full px-3 py-3 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 appearance-none cursor-pointer group-hover:border-blue-400/50 ${getFieldErrorClass('department')}`"
+                        @change="onDepartmentChange"
+                        @blur="fieldTouched.department = true; validateDepartment()"
                         required
                       >
                         <option value="" class="bg-blue-800 text-blue-300">Select Department</option>
-                        <option v-for="dept in departments" :key="dept" :value="dept" class="bg-blue-800 text-white">{{ dept }}</option>
+                        <option v-for="dept in departments" :key="dept.id" :value="dept.id" class="bg-blue-800 text-white">{{ dept.name }}</option>
                       </select>
-                      <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-teal-300/50 pointer-events-none">
+                      <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-300/50 pointer-events-none">
                         <i class="fas fa-chevron-down"></i>
                       </div>
-                      <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-teal-500/10 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                      <div class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/10 to-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                     </div>
-                    <p class="text-xs text-blue-200/60 mt-1 italic flex items-center">
+                    <p v-if="fieldTouched.department && fieldErrors.department" class="text-xs text-red-400 mt-1 flex items-center">
+                      <i class="fas fa-exclamation-circle mr-1"></i>
+                      {{ fieldErrors.department }}
+                    </p>
+                    <p v-else class="text-xs text-blue-200/60 mt-1 italic flex items-center">
                       <i class="fas fa-info-circle mr-1"></i>
                       Select your department
                     </p>
@@ -211,17 +235,17 @@
                 </div>
 
                 <!-- Row 3: Digital Signature (Full Width) -->
-                <div class="bg-gradient-to-r from-teal-500/10 to-blue-500/10 p-6 rounded-2xl border border-teal-300/20 backdrop-blur-sm">
+                <div class="bg-gradient-to-r from-blue-500/10 to-blue-600/10 p-4 rounded-xl border border-blue-300/20 backdrop-blur-sm">
                   <div class="group">
-                    <label class="block text-sm font-bold text-blue-100 mb-4 flex items-center">
-                      <i class="fas fa-signature mr-2 text-teal-300"></i>
+                    <label class="block text-sm font-bold text-blue-100 mb-3 flex items-center">
+                      <i class="fas fa-signature mr-2 text-blue-300"></i>
                       Digital Signature <span class="text-red-400 ml-1">*</span>
-                      <span class="ml-2 text-xs text-teal-300/70 font-normal">(PNG, JPG, JPEG)</span>
+                      <span class="ml-2 text-xs text-blue-300/70 font-normal">(PNG, JPG, JPEG)</span>
                     </label>
                     
-                    <div class="flex flex-col md:flex-row gap-4 items-start">
+                    <div class="flex flex-col md:flex-row gap-3 items-start">
                       <!-- Signature Display Box -->
-                      <div class="relative w-full md:w-80 h-20 border-2 border-blue-300/30 rounded-xl bg-blue-100/20 focus-within:bg-blue-100/30 focus-within:border-teal-400 overflow-hidden backdrop-blur-sm group-hover:border-teal-400/50 transition-all duration-300">
+                      <div class="relative w-full md:w-64 h-16 border-2 border-blue-300/30 rounded-lg bg-blue-100/20 focus-within:bg-blue-100/30 focus-within:border-blue-400 overflow-hidden backdrop-blur-sm group-hover:border-blue-400/50 transition-all duration-300">
                         <!-- Signature Image Display -->
                         <div v-if="signaturePreview" class="w-full h-full flex items-center justify-center p-2">
                           <img 
@@ -234,7 +258,7 @@
                         <!-- Placeholder Text -->
                         <div v-else class="w-full h-full flex items-center justify-center">
                           <div class="text-center">
-                            <i class="fas fa-signature text-teal-400/50 text-2xl mb-1"></i>
+                            <i class="fas fa-signature text-blue-400/50 text-xl mb-1"></i>
                             <p class="text-xs text-blue-400 italic">Signature will appear here</p>
                           </div>
                         </div>
@@ -264,15 +288,19 @@
                         <button
                           type="button"
                           @click="triggerFileUpload"
-                          class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-teal-500 to-blue-600 text-white text-sm font-medium rounded-xl hover:from-teal-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-1 transition duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border border-teal-400/30"
+                          class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-medium rounded-lg hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/30"
                         >
                           <span class="flex items-center">
-                            <i class="fas fa-upload mr-2"></i>
-                            Press to load your signature 
+                            <i class="fas fa-upload mr-2 text-blue-200"></i>
+                            Load Signature 
                           </span>
                         </button>
                         
-                        <p class="text-xs text-blue-200/70 italic flex items-center">
+                        <p v-if="fieldTouched.signature && fieldErrors.signature" class="text-xs text-red-400 italic flex items-center">
+                          <i class="fas fa-exclamation-circle mr-1"></i>
+                          {{ fieldErrors.signature }}
+                        </p>
+                        <p v-else class="text-xs text-blue-200/70 italic flex items-center">
                           <i class="fas fa-info-circle mr-1"></i>
                           Max size: 5MB
                         </p>
@@ -285,29 +313,29 @@
           </div>
 
           <!-- Module Selection Section -->
-          <div class="medical-card bg-gradient-to-r from-emerald-600/25 to-green-600/25 border-2 border-emerald-400/40 p-8 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-500 group relative overflow-hidden">
+          <div class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-4 rounded-xl backdrop-blur-sm hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-500 group relative overflow-hidden">
             <!-- Animated Background Layers -->
-            <div class="absolute inset-0 bg-gradient-to-r from-emerald-500/10 via-green-500/5 to-emerald-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-emerald-400/20 to-transparent rounded-full blur-2xl group-hover:scale-150 transition-transform duration-1000"></div>
-            <div class="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-green-400/15 to-transparent rounded-full blur-xl group-hover:scale-125 transition-transform duration-800"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-blue-600/5 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+            <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-400/20 to-transparent rounded-full blur-xl group-hover:scale-150 transition-transform duration-1000"></div>
+            <div class="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-tr from-blue-400/15 to-transparent rounded-full blur-lg group-hover:scale-125 transition-transform duration-800"></div>
             
             <div class="relative z-10">
-              <div class="flex items-center space-x-4 mb-6">
-                <div class="w-16 h-16 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-emerald-300/50 relative overflow-hidden">
-                  <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-xl"></div>
-                  <i class="fas fa-layer-group text-white text-xl relative z-10 drop-shadow-lg"></i>
+              <div class="flex items-center space-x-3 mb-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50 relative overflow-hidden">
+                  <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-lg"></div>
+                  <i class="fas fa-layer-group text-white text-lg relative z-10 drop-shadow-lg"></i>
                   <div class="absolute top-1 right-1 w-1 h-1 bg-white/60 rounded-full animate-ping"></div>
                 </div>
                 <div>
-                  <h3 class="text-2xl font-bold text-white flex items-center">
-                    <i class="fas fa-cogs mr-3 text-emerald-300"></i>
+                  <h3 class="text-lg font-bold text-white flex items-center">
+                    <i class="fas fa-cogs mr-2 text-blue-300"></i>
                     Select Services
                   </h3>
-                  <p class="text-sm text-emerald-100/80">Choose which services you need access to</p>
+                  <p class="text-sm text-blue-100/80">Choose which services you need access to</p>
                 </div>
               </div>
 
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <!-- Jeeva Service -->
                 <div class="relative group/service">
                   <input 
@@ -315,43 +343,44 @@
                     type="checkbox" 
                     id="jeeva-service"
                     class="sr-only"
+                    @change="onServiceChange"
                   />
                   <label 
                     for="jeeva-service"
-                    class="block p-6 border-2 rounded-2xl cursor-pointer transition-all duration-300 hover:shadow-xl backdrop-blur-sm relative overflow-hidden transform hover:scale-105"
-                    :class="formData.services.jeeva ? 'border-emerald-400 bg-emerald-500/20 shadow-lg shadow-emerald-500/25' : 'border-white/30 bg-white/10 hover:border-emerald-300/50 hover:bg-emerald-500/10'"
+                    class="block p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 hover:shadow-lg backdrop-blur-sm relative overflow-hidden transform hover:scale-105"
+                    :class="formData.services.jeeva ? 'border-blue-400 bg-blue-500/20 shadow-lg shadow-blue-500/25' : 'border-white/30 bg-white/10 hover:border-blue-300/50 hover:bg-blue-500/10'"
                   >
                     <!-- Service Card Background Effects -->
-                    <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover/service:opacity-100 transition-opacity duration-300"></div>
-                    <div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-emerald-400/20 to-transparent rounded-full blur-xl"></div>
+                    <div class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover/service:opacity-100 transition-opacity duration-300"></div>
+                    <div class="absolute top-0 right-0 w-12 h-12 bg-gradient-to-br from-blue-400/20 to-transparent rounded-full blur-lg"></div>
                     
                     <div class="relative z-10">
-                      <div class="flex items-center justify-between mb-3">
+                      <div class="flex items-center justify-between mb-2">
                         <div class="flex items-center">
-                          <div class="w-12 h-12 rounded-xl flex items-center justify-center mr-4 transition-all duration-300 relative overflow-hidden"
-                               :class="formData.services.jeeva ? 'bg-emerald-500 text-white shadow-lg' : 'bg-white/20 text-emerald-300'">
+                          <div class="w-10 h-10 rounded-lg flex items-center justify-center mr-3 transition-all duration-300 relative overflow-hidden"
+                               :class="formData.services.jeeva ? 'bg-blue-500 text-white shadow-lg' : 'bg-white/20 text-blue-300'">
                             <div v-if="formData.services.jeeva" class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
-                            <i class="fas fa-file-medical text-lg relative z-10"></i>
+                            <i class="fas fa-file-medical text-base relative z-10"></i>
                           </div>
                           <div>
-                            <h4 class="font-bold text-white text-lg">Jeeva Access</h4>
-                            <p class="text-xs text-emerald-200/80">Medical records system</p>
+                            <h4 class="font-bold text-white text-base">Jeeva Access</h4>
+                            <p class="text-xs text-blue-200/80">Medical records system</p>
                           </div>
                         </div>
-                        <div class="w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all duration-300"
-                             :class="formData.services.jeeva ? 'border-emerald-400 bg-emerald-500 shadow-lg' : 'border-white/40'">
-                          <i v-if="formData.services.jeeva" class="fas fa-check text-white text-sm"></i>
+                        <div class="w-5 h-5 rounded border-2 flex items-center justify-center transition-all duration-300"
+                             :class="formData.services.jeeva ? 'border-blue-400 bg-blue-500 shadow-lg' : 'border-white/40'">
+                          <i v-if="formData.services.jeeva" class="fas fa-check text-white text-xs"></i>
                         </div>
                       </div>
                       
                       <!-- Service Features -->
                       <div class="space-y-1">
-                        <div class="flex items-center text-xs text-emerald-100/70">
-                          <i class="fas fa-check-circle mr-2 text-emerald-400"></i>
+                        <div class="flex items-center text-xs text-blue-100/70">
+                          <i class="fas fa-check-circle mr-2 text-blue-400"></i>
                           Patient Records
                         </div>
-                        <div class="flex items-center text-xs text-emerald-100/70">
-                          <i class="fas fa-check-circle mr-2 text-emerald-400"></i>
+                        <div class="flex items-center text-xs text-blue-100/70">
+                          <i class="fas fa-check-circle mr-2 text-blue-400"></i>
                           Medical History
                         </div>
                       </div>
@@ -366,43 +395,44 @@
                     type="checkbox" 
                     id="wellsoft-service"
                     class="sr-only"
+                    @change="onServiceChange"
                   />
                   <label 
                     for="wellsoft-service"
-                    class="block p-6 border-2 rounded-2xl cursor-pointer transition-all duration-300 hover:shadow-xl backdrop-blur-sm relative overflow-hidden transform hover:scale-105"
-                    :class="formData.services.wellsoft ? 'border-purple-400 bg-purple-500/20 shadow-lg shadow-purple-500/25' : 'border-white/30 bg-white/10 hover:border-purple-300/50 hover:bg-purple-500/10'"
+                    class="block p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 hover:shadow-lg backdrop-blur-sm relative overflow-hidden transform hover:scale-105"
+                    :class="formData.services.wellsoft ? 'border-blue-400 bg-blue-500/20 shadow-lg shadow-blue-500/25' : 'border-white/30 bg-white/10 hover:border-blue-300/50 hover:bg-blue-500/10'"
                   >
                     <!-- Service Card Background Effects -->
-                    <div class="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent opacity-0 group-hover/service:opacity-100 transition-opacity duration-300"></div>
-                    <div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-purple-400/20 to-transparent rounded-full blur-xl"></div>
+                    <div class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover/service:opacity-100 transition-opacity duration-300"></div>
+                    <div class="absolute top-0 right-0 w-12 h-12 bg-gradient-to-br from-blue-400/20 to-transparent rounded-full blur-lg"></div>
                     
                     <div class="relative z-10">
-                      <div class="flex items-center justify-between mb-3">
+                      <div class="flex items-center justify-between mb-2">
                         <div class="flex items-center">
-                          <div class="w-12 h-12 rounded-xl flex items-center justify-center mr-4 transition-all duration-300 relative overflow-hidden"
-                               :class="formData.services.wellsoft ? 'bg-purple-500 text-white shadow-lg' : 'bg-white/20 text-purple-300'">
+                          <div class="w-10 h-10 rounded-lg flex items-center justify-center mr-3 transition-all duration-300 relative overflow-hidden"
+                               :class="formData.services.wellsoft ? 'bg-blue-500 text-white shadow-lg' : 'bg-white/20 text-blue-300'">
                             <div v-if="formData.services.wellsoft" class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
-                            <i class="fas fa-laptop-medical text-lg relative z-10"></i>
+                            <i class="fas fa-laptop-medical text-base relative z-10"></i>
                           </div>
                           <div>
-                            <h4 class="font-bold text-white text-lg">Wellsoft Access</h4>
-                            <p class="text-xs text-purple-200/80">Hospital management</p>
+                            <h4 class="font-bold text-white text-base">Wellsoft Access</h4>
+                            <p class="text-xs text-blue-200/80">Hospital management</p>
                           </div>
                         </div>
-                        <div class="w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all duration-300"
-                             :class="formData.services.wellsoft ? 'border-purple-400 bg-purple-500 shadow-lg' : 'border-white/40'">
-                          <i v-if="formData.services.wellsoft" class="fas fa-check text-white text-sm"></i>
+                        <div class="w-5 h-5 rounded border-2 flex items-center justify-center transition-all duration-300"
+                             :class="formData.services.wellsoft ? 'border-blue-400 bg-blue-500 shadow-lg' : 'border-white/40'">
+                          <i v-if="formData.services.wellsoft" class="fas fa-check text-white text-xs"></i>
                         </div>
                       </div>
                       
                       <!-- Service Features -->
                       <div class="space-y-1">
-                        <div class="flex items-center text-xs text-purple-100/70">
-                          <i class="fas fa-check-circle mr-2 text-purple-400"></i>
+                        <div class="flex items-center text-xs text-blue-100/70">
+                          <i class="fas fa-check-circle mr-2 text-blue-400"></i>
                           Patient Management
                         </div>
-                        <div class="flex items-center text-xs text-purple-100/70">
-                          <i class="fas fa-check-circle mr-2 text-purple-400"></i>
+                        <div class="flex items-center text-xs text-blue-100/70">
+                          <i class="fas fa-check-circle mr-2 text-blue-400"></i>
                           Hospital Operations
                         </div>
                       </div>
@@ -417,43 +447,44 @@
                     type="checkbox" 
                     id="internet-service"
                     class="sr-only"
+                    @change="onServiceChange"
                   />
                   <label 
                     for="internet-service"
-                    class="block p-6 border-2 rounded-2xl cursor-pointer transition-all duration-300 hover:shadow-xl backdrop-blur-sm relative overflow-hidden transform hover:scale-105"
-                    :class="formData.services.internet ? 'border-orange-400 bg-orange-500/20 shadow-lg shadow-orange-500/25' : 'border-white/30 bg-white/10 hover:border-orange-300/50 hover:bg-orange-500/10'"
+                    class="block p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 hover:shadow-lg backdrop-blur-sm relative overflow-hidden transform hover:scale-105"
+                    :class="formData.services.internet ? 'border-blue-400 bg-blue-500/20 shadow-lg shadow-blue-500/25' : 'border-white/30 bg-white/10 hover:border-blue-300/50 hover:bg-blue-500/10'"
                   >
                     <!-- Service Card Background Effects -->
-                    <div class="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-transparent opacity-0 group-hover/service:opacity-100 transition-opacity duration-300"></div>
-                    <div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-orange-400/20 to-transparent rounded-full blur-xl"></div>
+                    <div class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover/service:opacity-100 transition-opacity duration-300"></div>
+                    <div class="absolute top-0 right-0 w-12 h-12 bg-gradient-to-br from-blue-400/20 to-transparent rounded-full blur-lg"></div>
                     
                     <div class="relative z-10">
-                      <div class="flex items-center justify-between mb-3">
+                      <div class="flex items-center justify-between mb-2">
                         <div class="flex items-center">
-                          <div class="w-12 h-12 rounded-xl flex items-center justify-center mr-4 transition-all duration-300 relative overflow-hidden"
-                               :class="formData.services.internet ? 'bg-orange-500 text-white shadow-lg' : 'bg-white/20 text-orange-300'">
+                          <div class="w-10 h-10 rounded-lg flex items-center justify-center mr-3 transition-all duration-300 relative overflow-hidden"
+                               :class="formData.services.internet ? 'bg-blue-500 text-white shadow-lg' : 'bg-white/20 text-blue-300'">
                             <div v-if="formData.services.internet" class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
-                            <i class="fas fa-wifi text-lg relative z-10"></i>
+                            <i class="fas fa-wifi text-base relative z-10"></i>
                           </div>
                           <div>
-                            <h4 class="font-bold text-white text-lg">Internet Access</h4>
-                            <p class="text-xs text-orange-200/80">Internet connectivity</p>
+                            <h4 class="font-bold text-white text-base">Internet Access</h4>
+                            <p class="text-xs text-blue-200/80">Internet connectivity</p>
                           </div>
                         </div>
-                        <div class="w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all duration-300"
-                             :class="formData.services.internet ? 'border-orange-400 bg-orange-500 shadow-lg' : 'border-white/40'">
-                          <i v-if="formData.services.internet" class="fas fa-check text-white text-sm"></i>
+                        <div class="w-5 h-5 rounded border-2 flex items-center justify-center transition-all duration-300"
+                             :class="formData.services.internet ? 'border-blue-400 bg-blue-500 shadow-lg' : 'border-white/40'">
+                          <i v-if="formData.services.internet" class="fas fa-check text-white text-xs"></i>
                         </div>
                       </div>
                       
                       <!-- Service Features -->
                       <div class="space-y-1">
-                        <div class="flex items-center text-xs text-orange-100/70">
-                          <i class="fas fa-check-circle mr-2 text-orange-400"></i>
+                        <div class="flex items-center text-xs text-blue-100/70">
+                          <i class="fas fa-check-circle mr-2 text-blue-400"></i>
                           Web Access
                         </div>
-                        <div class="flex items-center text-xs text-orange-100/70">
-                          <i class="fas fa-check-circle mr-2 text-orange-400"></i>
+                        <div class="flex items-center text-xs text-blue-100/70">
+                          <i class="fas fa-check-circle mr-2 text-blue-400"></i>
                           Email & Communication
                         </div>
                       </div>
@@ -463,53 +494,58 @@
               </div>
 
               <!-- Service Selection Validation -->
-              <div v-if="!hasSelectedService" class="mt-6 p-4 bg-red-500/20 border-2 border-red-400/40 rounded-xl backdrop-blur-sm">
+              <div v-if="fieldTouched.services && fieldErrors.services" class="mt-6 p-4 bg-red-500/20 border-2 border-red-400/40 rounded-xl backdrop-blur-sm">
                 <p class="text-red-300 text-sm font-medium flex items-center">
                   <i class="fas fa-exclamation-triangle mr-2 text-red-400"></i>
-                  Please select at least one service to continue.
+                  {{ fieldErrors.services }}
                 </p>
               </div>
             </div>
           </div>
 
           <!-- Internet Purpose Section (Only show when Internet is selected) -->
-          <div v-if="formData.services.internet" class="medical-card bg-gradient-to-r from-orange-600/25 to-amber-600/25 border-2 border-orange-400/40 p-8 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-orange-500/20 transition-all duration-500 group relative overflow-hidden">
+          <div v-if="formData.services.internet" class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-3 rounded-lg backdrop-blur-sm hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 group relative overflow-hidden">
             <!-- Animated Background Layers -->
-            <div class="absolute inset-0 bg-gradient-to-r from-orange-500/10 via-amber-500/5 to-orange-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-orange-400/20 to-transparent rounded-full blur-2xl group-hover:scale-150 transition-transform duration-1000"></div>
-            <div class="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-amber-400/15 to-transparent rounded-full blur-xl group-hover:scale-125 transition-transform duration-800"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-blue-600/5 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-blue-400/20 to-transparent rounded-full blur-lg group-hover:scale-125 transition-transform duration-700"></div>
+            <div class="absolute bottom-0 left-0 w-12 h-12 bg-gradient-to-tr from-blue-400/15 to-transparent rounded-full blur-md group-hover:scale-110 transition-transform duration-600"></div>
             
             <div class="relative z-10">
-              <div class="flex items-center space-x-4 mb-6">
-                <div class="w-16 h-16 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-orange-300/50 relative overflow-hidden">
-                  <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-xl"></div>
-                  <i class="fas fa-wifi text-white text-xl relative z-10 drop-shadow-lg"></i>
-                  <div class="absolute top-1 right-1 w-1 h-1 bg-white/60 rounded-full animate-ping"></div>
+              <div class="flex items-center space-x-2 mb-3">
+                <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-md flex items-center justify-center shadow-md group-hover:scale-105 transition-transform duration-300 border border-blue-300/50 relative overflow-hidden">
+                  <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-md"></div>
+                  <i class="fas fa-wifi text-white text-sm relative z-10 drop-shadow-lg"></i>
                 </div>
                 <div>
-                  <h3 class="text-2xl font-bold text-white flex items-center">
-                    <i class="fas fa-globe mr-3 text-orange-300"></i>
+                  <h3 class="text-base font-bold text-white flex items-center">
+                    <i class="fas fa-globe mr-2 text-blue-300"></i>
                     Internet Purpose
                   </h3>
-                  <p class="text-sm text-orange-100/80">Specify the purposes for internet access</p>
+                  <p class="text-xs text-blue-100/80">Specify the purposes for internet access</p>
                 </div>
               </div>
 
-              <div class="space-y-4">
-                <div v-for="(purpose, index) in formData.internetPurposes" :key="index" class="flex items-center gap-3">
-                  <div class="flex items-center justify-center w-8 h-8 bg-orange-100/20 text-orange-300 rounded-full font-bold text-sm">
-                    {{ index + 1 }}.
+              <div class="space-y-2">
+                <div v-for="(purpose, index) in formData.internetPurposes" :key="index" class="flex items-center gap-2">
+                  <div class="flex items-center justify-center w-5 h-5 bg-blue-500/40 text-blue-200 rounded-full font-bold text-xs border-2 border-blue-400/70">
+                    {{ index + 1 }}
                   </div>
                   <input 
                     v-model="formData.internetPurposes[index]" 
                     type="text" 
-                    class="medical-input flex-1 px-4 py-3 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20"
+                    :class="`medical-input flex-1 px-2 py-1.5 bg-white/15 border-2 border-blue-400/70 rounded-md focus:border-blue-500 hover:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-md focus:shadow-blue-500/20 text-sm hover:border-blue-500/80 ${fieldTouched.internetPurposes && fieldErrors.internetPurposes ? 'border-red-500' : ''}`"
                     :placeholder="`Purpose ${index + 1}`"
+                    @input="onInternetPurposeInput"
+                    @blur="fieldTouched.internetPurposes = true; validateInternetPurposes()"
                     :required="index === 0 && formData.services.internet"
                   />
                 </div>
-                <p class="text-xs text-orange-200 mt-2 italic">
-                  <i class="fas fa-info-circle mr-1"></i>
+                <p v-if="fieldTouched.internetPurposes && fieldErrors.internetPurposes" class="text-xs text-red-400 mt-1 flex items-center">
+                  <i class="fas fa-exclamation-circle mr-1"></i>
+                  {{ fieldErrors.internetPurposes }}
+                </p>
+                <p v-else class="text-xs text-blue-200 mt-1 italic flex items-center">
+                  <i class="fas fa-info-circle mr-1 text-blue-400"></i>
                   Please provide at least one purpose for internet access. You can add up to 4 purposes.
                 </p>
               </div>
@@ -517,37 +553,55 @@
           </div>
 
           <!-- Form Actions -->
-          <div class="medical-card bg-gradient-to-r from-indigo-600/25 to-purple-600/25 border-2 border-indigo-400/40 p-8 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-indigo-500/20 transition-all duration-500 group relative overflow-hidden">
+          <div class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-3 rounded-lg backdrop-blur-sm hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 group relative overflow-hidden">
             <!-- Animated Background Layers -->
-            <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/10 via-purple-500/5 to-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-indigo-400/20 to-transparent rounded-full blur-2xl group-hover:scale-150 transition-transform duration-1000"></div>
-            <div class="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-purple-400/15 to-transparent rounded-full blur-xl group-hover:scale-125 transition-transform duration-800"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-blue-600/5 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-blue-400/20 to-transparent rounded-full blur-lg group-hover:scale-125 transition-transform duration-700"></div>
+            <div class="absolute bottom-0 left-0 w-12 h-12 bg-gradient-to-tr from-blue-400/15 to-transparent rounded-full blur-md group-hover:scale-110 transition-transform duration-600"></div>
             
             <div class="relative z-10">
-              <div class="text-center mb-8">
-                <div class="inline-block bg-white/15 backdrop-blur-sm px-6 py-4 rounded-2xl border border-indigo-300/40 shadow-lg">
-                  <p class="font-bold text-xl text-white mb-1">Directorate of ICT</p>
-                  <p class="text-sm text-indigo-200/80">Muhimbili National Hospital</p>
-                </div>
-              </div>
-
               <div class="flex justify-between items-center">
+                <!-- Left: Enhanced Back Button -->
                 <button 
                   type="button" 
                   @click="goBack"
-                  class="px-6 py-3 bg-gray-500 text-white rounded-xl hover:bg-gray-600 transition-all duration-300 font-semibold flex items-center shadow-lg hover:shadow-xl text-sm transform hover:scale-105"
+                  class="group relative inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-gray-600 via-gray-700 to-gray-800 text-white font-bold rounded-xl shadow-xl hover:shadow-gray-500/25 transform hover:scale-105 transition-all duration-300 border border-gray-500/50 overflow-hidden"
                 >
-                  <i class="fas fa-arrow-left mr-2"></i>
-                  Back to Dashboard
+                  <!-- Button background animation -->
+                  <div class="absolute inset-0 bg-gradient-to-r from-gray-500 via-gray-600 to-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  
+                  <!-- Button content -->
+                  <div class="relative z-10 flex items-center">
+                    <i class="fas fa-arrow-left mr-3 text-lg group-hover:-translate-x-1 transition-transform duration-300"></i>
+                    <span class="text-base">Back to Dashboard</span>
+                  </div>
+                  
+                  <!-- Button shine effect -->
+                  <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
                 </button>
+                
+                <!-- Center: ICT Info -->
+      
+                <!-- Right: Enhanced Submit Button -->
                 <button 
                   type="submit" 
-                  :disabled="isSubmitting || !hasSelectedService"
-                  class="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 font-semibold flex items-center shadow-lg hover:shadow-xl text-sm transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  :disabled="isSubmitting || !isFormValid"
+                  class="group relative inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white font-bold rounded-xl shadow-xl hover:shadow-blue-500/25 transform hover:scale-105 transition-all duration-300 border border-blue-500/50 overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:hover:scale-100"
                 >
-                  <i v-if="isSubmitting" class="fas fa-spinner fa-spin mr-2"></i>
-                  <i v-else class="fas fa-paper-plane mr-2"></i>
-                  {{ isSubmitting ? 'Submitting...' : 'Submit Request' }}
+                  <!-- Button background animation -->
+                  <div class="absolute inset-0 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  
+                  <!-- Button content -->
+                  <div class="relative z-10 flex items-center">
+                    <i v-if="isSubmitting" class="fas fa-spinner fa-spin mr-3 text-lg"></i>
+                    <i v-else class="fas fa-paper-plane mr-3 text-lg group-hover:translate-x-1 transition-transform duration-300"></i>
+                    <span class="text-base">{{ isSubmitting ? 'Submitting...' : 'Submit Request' }}</span>
+                  </div>
+                  
+                  <!-- Button shine effect (only when not disabled) -->
+                  <div v-if="!isSubmitting && isFormValid" class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
                 </button>
               </div>
             </div>
@@ -559,52 +613,189 @@
     </div>
     <AppFooter />
 
-    <!-- Success Modal -->
-    <div v-if="showSuccessModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div class="bg-white rounded-xl shadow-2xl max-w-md w-full transform transition-all duration-300 scale-100">
-        <div class="p-6 text-center">
-          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <i class="fas fa-check text-green-600 text-2xl"></i>
-          </div>
-          <h3 class="text-xl font-bold text-gray-800 mb-2">Request Submitted!</h3>
-          <p class="text-gray-600 mb-4">Your Combined Access Request has been submitted successfully.</p>
-          <div class="bg-blue-50 rounded-lg p-3 mb-6">
-            <p class="text-sm text-blue-800 font-medium">Selected Services:</p>
-            <div class="flex flex-wrap gap-2 mt-2">
-              <span v-if="formData.services.jeeva" class="px-2 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-medium">
-                <i class="fas fa-file-medical mr-1"></i>Jeeva
-              </span>
-              <span v-if="formData.services.wellsoft" class="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium">
-                <i class="fas fa-laptop-medical mr-1"></i>Wellsoft
-              </span>
-              <span v-if="formData.services.internet" class="px-2 py-1 bg-orange-100 text-orange-800 rounded-full text-xs font-medium">
-                <i class="fas fa-wifi mr-1"></i>Internet
-              </span>
+    <!-- Enhanced Success Modal -->
+    <transition
+      enter-active-class="transition ease-out duration-500"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-active-class="transition ease-in duration-300"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
+    >
+      <div v-if="showSuccessModal" class="fixed inset-0 z-50 overflow-y-auto">
+        <!-- Multi-layer backdrop -->
+        <div class="fixed inset-0 bg-gradient-to-br from-blue-900/80 via-blue-800/70 to-blue-700/60 backdrop-blur-md"></div>
+        <div class="fixed inset-0 bg-black/30"></div>
+        
+        <!-- Modal container -->
+        <div class="flex min-h-full items-center justify-center p-4">
+          <transition
+            enter-active-class="transition ease-out duration-500 delay-150"
+            enter-from-class="opacity-0 transform scale-75 translate-y-8"
+            enter-to-class="opacity-100 transform scale-100 translate-y-0"
+            leave-active-class="transition ease-in duration-200"
+            leave-from-class="opacity-100 transform scale-100 translate-y-0"
+            leave-to-class="opacity-0 transform scale-75 translate-y-8"
+          >
+            <div v-if="showSuccessModal" class="relative w-full max-w-md">
+              <!-- Outer glow layer -->
+              <div class="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-blue-600/20 rounded-3xl blur-xl scale-110"></div>
+              <!-- Main modal card -->
+              <div class="relative bg-gradient-to-br from-blue-50 via-white to-blue-50 rounded-3xl shadow-2xl border-2 border-blue-200/50 overflow-hidden">
+                <!-- Animated background pattern -->
+                <div class="absolute inset-0 opacity-5">
+                  <div class="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-blue-800/20"></div>
+                  <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-400 to-transparent animate-pulse"></div>
+                </div>
+                
+                <!-- Header section -->
+                <div class="relative bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 px-6 py-6">
+                  <!-- Floating particles effect -->
+                  <div class="absolute inset-0 overflow-hidden">
+                    <div v-for="i in 8" :key="i" 
+                         class="absolute w-2 h-2 bg-white/20 rounded-full animate-float"
+                         :style="{
+                           left: Math.random() * 100 + '%',
+                           top: Math.random() * 100 + '%',
+                           animationDelay: Math.random() * 3 + 's',
+                           animationDuration: (Math.random() * 2 + 3) + 's'
+                         }">
+                    </div>
+                  </div>
+                  
+                  <!-- Success icon with animation -->
+                  <div class="relative z-10 text-center">
+                    <div class="mx-auto w-16 h-16 bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600 rounded-full flex items-center justify-center mb-4 shadow-2xl border-4 border-white/30 relative overflow-hidden">
+                      <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-full"></div>
+                      <i class="fas fa-check text-white text-2xl drop-shadow-lg relative z-10 animate-bounce"></i>
+                      
+                      <!-- Success ripple effect -->
+                      <div class="absolute inset-0 rounded-full border-4 border-white/50 animate-ping"></div>
+                    </div>
+                    
+                    <h3 class="text-xl font-bold text-white mb-2 drop-shadow-lg">
+                      Request Submitted!
+                    </h3>
+                  </div>
+                </div>
+                
+                <!-- Content section -->
+                <div class="relative px-6 py-6">
+                  <div class="text-center mb-6">
+                    <p class="text-gray-600 mb-4">Your Combined Access Request has been submitted successfully.</p>
+          <div class="bg-blue-50 rounded-lg p-4 mb-6">
+            <p class="text-sm text-blue-800 font-medium mb-3 flex items-center">
+              <i class="fas fa-check-circle mr-2 text-green-600"></i>
+              Selected Services:
+            </p>
+            
+            <!-- Services List -->
+            <div class="space-y-3">
+              <!-- Jeeva Service -->
+              <div v-if="submittedServices && submittedServices.jeeva" class="flex items-center p-2 bg-emerald-50 rounded-lg border border-emerald-200">
+                <div class="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center mr-3">
+                  <i class="fas fa-file-medical text-white text-sm"></i>
+                </div>
+                <div class="flex-1">
+                  <h4 class="font-semibold text-emerald-800 text-sm">Jeeva Access</h4>
+                  <p class="text-xs text-emerald-600">Medical records system - Patient Records, Medical History</p>
+                </div>
+                <span class="px-2 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-medium">
+                  ✓ Selected
+                </span>
+              </div>
+              
+              <!-- Wellsoft Service -->
+              <div v-if="submittedServices && submittedServices.wellsoft" class="flex items-center p-2 bg-purple-50 rounded-lg border border-purple-200">
+                <div class="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center mr-3">
+                  <i class="fas fa-laptop-medical text-white text-sm"></i>
+                </div>
+                <div class="flex-1">
+                  <h4 class="font-semibold text-purple-800 text-sm">Wellsoft Access</h4>
+                  <p class="text-xs text-purple-600">Hospital management - Patient Management, Hospital Operations</p>
+                </div>
+                <span class="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium">
+                  ✓ Selected
+                </span>
+              </div>
+              
+              <!-- Internet Service -->
+              <div v-if="submittedServices && submittedServices.internet" class="flex items-center p-2 bg-orange-50 rounded-lg border border-orange-200">
+                <div class="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center mr-3">
+                  <i class="fas fa-wifi text-white text-sm"></i>
+                </div>
+                <div class="flex-1">
+                  <h4 class="font-semibold text-orange-800 text-sm">Internet Access</h4>
+                  <p class="text-xs text-orange-600">Internet connectivity - Web Access, Email & Communication</p>
+                </div>
+                <span class="px-2 py-1 bg-orange-100 text-orange-800 rounded-full text-xs font-medium">
+                  ✓ Selected
+                </span>
+              </div>
             </div>
             
             <!-- Show Internet Purposes if Internet service is selected -->
-            <div v-if="formData.services.internet && hasInternetPurposes" class="mt-3 pt-3 border-t border-blue-200">
-              <p class="text-sm text-blue-800 font-medium mb-2">Internet Purposes:</p>
-              <div class="space-y-1">
-                <div v-for="(purpose, index) in filledInternetPurposes" :key="index" class="flex items-center text-xs text-blue-700">
-                  <span class="w-4 h-4 bg-orange-200 text-orange-800 rounded-full flex items-center justify-center mr-2 font-bold text-xs">
-                    {{ index + 1 }}
-                  </span>
-                  {{ purpose }}
+            <div v-if="submittedServices && submittedServices.internet && hasInternetPurposes" class="mt-4 pt-3 border-t border-blue-200">
+              <p class="text-sm text-blue-800 font-medium mb-2 flex items-center">
+                <i class="fas fa-list-ul mr-2 text-orange-600"></i>
+                Internet Access Purposes:
+              </p>
+              <div class="bg-orange-50 rounded-lg p-3 border border-orange-200">
+                <div class="space-y-2">
+                  <div v-for="(purpose, index) in filledInternetPurposes" :key="index" class="flex items-start text-sm text-orange-800">
+                    <span class="w-5 h-5 bg-orange-200 text-orange-800 rounded-full flex items-center justify-center mr-3 font-bold text-xs mt-0.5 flex-shrink-0">
+                      {{ index + 1 }}
+                    </span>
+                    <span class="flex-1">{{ purpose }}</span>
+                  </div>
                 </div>
               </div>
             </div>
+            
+            <!-- Summary -->
+            <div class="mt-4 pt-3 border-t border-blue-200">
+              <p class="text-xs text-blue-600 italic text-center">
+                <i class="fas fa-info-circle mr-1"></i>
+                Total services requested: {{ getSelectedServicesCount() }}
+              </p>
+            </div>
           </div>
-          <button 
-            @click="closeSuccessModal"
-            class="w-full bg-green-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-200"
-          >
-            <i class="fas fa-home mr-2"></i>
-            Return to Dashboard
-          </button>
+                    <!-- Action button -->
+                    <div class="text-center">
+                      <button
+                        @click="closeSuccessModal"
+                        class="group relative inline-flex items-center justify-center w-full px-8 py-4 bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white font-bold rounded-2xl shadow-2xl hover:shadow-blue-500/25 transform hover:scale-105 transition-all duration-300 border border-blue-500/50 overflow-hidden"
+                      >
+                        <!-- Button background animation -->
+                        <div class="absolute inset-0 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        
+                        <!-- Button content -->
+                        <div class="relative z-10 flex items-center">
+                          <i class="fas fa-home mr-3 text-xl group-hover:translate-x-1 transition-transform duration-300"></i>
+                          <span class="text-lg">Return to Dashboard</span>
+                        </div>
+                        
+                        <!-- Button shine effect -->
+                        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                      </button>
+                    </div>
+                    
+                    <!-- Additional info -->
+                    <div class="mt-6 text-center">
+                      <p class="text-xs text-blue-500 flex items-center justify-center">
+                        <i class="fas fa-shield-alt mr-2"></i>
+                        Your request has been securely submitted and logged
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </transition>
         </div>
       </div>
-    </div>
+    </transition>
   </div>
 </template>
 
@@ -613,6 +804,7 @@ import { ref } from 'vue'
 import AppHeader from '@/components/header.vue'
 import DynamicSidebar from '@/components/DynamicSidebar.vue'
 import AppFooter from '@/components/footer.vue'
+import userCombinedAccessService from '@/services/userCombinedAccessService.js'
 
 export default {
   name: 'UserCombinedAccessForm',
@@ -634,36 +826,11 @@ export default {
       showSuccessModal: false,
       signaturePreview: '',
       signatureFileName: '',
-      departments: [
-        'Administration',
-        'Cardiology',
-        'Dermatology',
-        'Emergency Medicine',
-        'Endocrinology',
-        'Finance',
-        'Gastroenterology',
-        'General Surgery',
-        'Gynecology',
-        'Hematology',
-        'Human Resources',
-        'ICT Department',
-        'Internal Medicine',
-        'Laboratory',
-        'Nephrology',
-        'Neurology',
-        'Nursing',
-        'Obstetrics',
-        'Oncology',
-        'Ophthalmology',
-        'Orthopedics',
-        'Pediatrics',
-        'Pharmacy',
-        'Psychiatry',
-        'Pulmonology',
-        'Radiology',
-        'Rheumatology',
-        'Urology'
-      ],
+      departments: [],
+      validationErrors: {},
+      fieldErrors: {},
+      fieldTouched: {},
+      submittedServices: null, // Store services that were actually submitted
       formData: {
         // Applicant Details
         pfNumber: '',
@@ -692,12 +859,218 @@ export default {
     },
     filledInternetPurposes() {
       return this.formData.internetPurposes.filter(purpose => purpose.trim() !== '')
+    },
+    isFormValid() {
+      return Object.keys(this.fieldErrors).length === 0 && 
+             this.formData.pfNumber && 
+             this.formData.staffName && 
+             this.formData.phoneNumber && 
+             this.formData.department && 
+             this.formData.signature && 
+             this.hasSelectedService &&
+             (!this.formData.services.internet || this.hasInternetPurposes)
+    },
+    getSelectedServicesCount() {
+      if (!this.submittedServices) return 0
+      let count = 0
+      if (this.submittedServices.jeeva) count++
+      if (this.submittedServices.wellsoft) count++
+      if (this.submittedServices.internet) count++
+      return count
     }
   },
 
+  async mounted() {
+    // Load departments when component mounts
+    await this.loadDepartments()
+  },
+
   methods: {
+    // Real-time validation methods
+    validatePfNumber() {
+      const pfNumber = this.formData.pfNumber.trim()
+      
+      if (!pfNumber) {
+        this.fieldErrors.pfNumber = 'PF Number is required'
+        return false
+      }
+      
+      if (pfNumber.length < 2) {
+        this.fieldErrors.pfNumber = 'PF Number must be at least 2 characters'
+        return false
+      }
+      
+      if (!/^[A-Za-z0-9\-\/]+$/.test(pfNumber)) {
+        this.fieldErrors.pfNumber = 'PF Number can only contain letters, numbers, hyphens, and slashes'
+        return false
+      }
+      
+      delete this.fieldErrors.pfNumber
+      return true
+    },
+
+    validateStaffName() {
+      const staffName = this.formData.staffName.trim()
+      
+      if (!staffName) {
+        this.fieldErrors.staffName = 'Staff name is required'
+        return false
+      }
+      
+      if (staffName.length < 2) {
+        this.fieldErrors.staffName = 'Staff name must be at least 2 characters'
+        return false
+      }
+      
+      if (!/^[a-zA-Z\s\.\-\']+$/.test(staffName)) {
+        this.fieldErrors.staffName = 'Staff name can only contain letters, spaces, dots, hyphens, and apostrophes'
+        return false
+      }
+      
+      delete this.fieldErrors.staffName
+      return true
+    },
+
+    validatePhoneNumber() {
+      const phoneNumber = this.formData.phoneNumber.trim()
+      
+      if (!phoneNumber) {
+        this.fieldErrors.phoneNumber = 'Phone number is required'
+        return false
+      }
+      
+      if (phoneNumber.length < 10) {
+        this.fieldErrors.phoneNumber = 'Phone number must be at least 10 digits'
+        return false
+      }
+      
+      if (phoneNumber.length > 20) {
+        this.fieldErrors.phoneNumber = 'Phone number must not exceed 20 characters'
+        return false
+      }
+      
+      if (!/^[\+]?[0-9\s\-\(\)]+$/.test(phoneNumber)) {
+        this.fieldErrors.phoneNumber = 'Please enter a valid phone number'
+        return false
+      }
+      
+      delete this.fieldErrors.phoneNumber
+      return true
+    },
+
+    validateDepartment() {
+      if (!this.formData.department) {
+        this.fieldErrors.department = 'Please select a department'
+        return false
+      }
+      
+      delete this.fieldErrors.department
+      return true
+    },
+
+    validateServices() {
+      if (!this.hasSelectedService) {
+        this.fieldErrors.services = 'Please select at least one service'
+        return false
+      }
+      
+      delete this.fieldErrors.services
+      return true
+    },
+
+    validateInternetPurposes() {
+      if (this.formData.services.internet) {
+        const validPurposes = this.formData.internetPurposes.filter(purpose => purpose.trim())
+        
+        if (validPurposes.length === 0) {
+          this.fieldErrors.internetPurposes = 'Please provide at least one internet purpose'
+          return false
+        }
+        
+        // Validate each purpose length
+        for (let i = 0; i < this.formData.internetPurposes.length; i++) {
+          const purpose = this.formData.internetPurposes[i]
+          if (purpose && purpose.length > 255) {
+            this.fieldErrors.internetPurposes = `Purpose ${i + 1} must not exceed 255 characters`
+            return false
+          }
+        }
+      }
+      
+      delete this.fieldErrors.internetPurposes
+      return true
+    },
+
+    validateSignature() {
+      if (!this.formData.signature) {
+        this.fieldErrors.signature = 'Digital signature is required'
+        return false
+      }
+      
+      delete this.fieldErrors.signature
+      return true
+    },
+
+    // Field event handlers
+    onPfNumberInput() {
+      this.fieldTouched.pfNumber = true
+      this.validatePfNumber()
+    },
+
+    onStaffNameInput() {
+      this.fieldTouched.staffName = true
+      this.validateStaffName()
+    },
+
+    onPhoneNumberInput() {
+      this.fieldTouched.phoneNumber = true
+      this.validatePhoneNumber()
+    },
+
+    onDepartmentChange() {
+      this.fieldTouched.department = true
+      this.validateDepartment()
+    },
+
+    onServiceChange() {
+      this.fieldTouched.services = true
+      this.validateServices()
+      this.validateInternetPurposes() // Re-validate purposes when services change
+    },
+
+    onInternetPurposeInput() {
+      this.fieldTouched.internetPurposes = true
+      this.validateInternetPurposes()
+    },
+
+    // Get field error class
+    getFieldErrorClass(fieldName) {
+      if (this.fieldTouched[fieldName] && this.fieldErrors[fieldName]) {
+        return 'border-red-500 focus:border-red-500'
+      }
+      if (this.fieldTouched[fieldName] && !this.fieldErrors[fieldName]) {
+        return 'border-green-500 focus:border-green-500'
+      }
+      return ''
+    },
+
+    async loadDepartments() {
+      try {
+        const response = await userCombinedAccessService.getDepartments()
+        if (response.success) {
+          this.departments = response.data
+        }
+      } catch (error) {
+        console.error('Error loading departments:', error)
+        this.showNotification('Failed to load departments', 'error')
+      }
+    },
+
     async submitForm() {
-      // Validate required fields
+      // Clear previous validation errors
+      this.validationErrors = {}
+      
+      // Basic client-side validation
       if (!this.formData.pfNumber || !this.formData.staffName || !this.formData.department || !this.formData.phoneNumber) {
         this.showNotification('Please fill in all required applicant details', 'error')
         return
@@ -714,7 +1087,7 @@ export default {
       }
 
       // Validate internet purposes if internet service is selected
-      if (this.formData.services.internet && !this.formData.internetPurposes[0]) {
+      if (this.formData.services.internet && !this.formData.internetPurposes.some(purpose => purpose.trim())) {
         this.showNotification('Please provide at least one internet purpose', 'error')
         return
       }
@@ -722,17 +1095,64 @@ export default {
       this.isSubmitting = true
 
       try {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 2000))
+        // 🔹 Create clean payload to avoid Proxy serialization issues
+        const payload = {
+          pfNumber: this.formData.pfNumber,
+          staffName: this.formData.staffName,
+          phoneNumber: this.formData.phoneNumber,
+          department: this.formData.department,
+          signature: this.formData.signature,
+          services: {
+            jeeva: this.formData.services.jeeva,
+            wellsoft: this.formData.services.wellsoft,
+            internet: this.formData.services.internet
+          },
+          internetPurposes: this.formData.internetPurposes
+        }
+
+        console.log('Payload being sent:', payload)
+        console.log('Services object:', payload.services)
+
+        // Submit to backend
+        const response = await userCombinedAccessService.submitCombinedAccessRequest(payload)
         
-        // Here you would typically send the data to your backend
-        console.log('Combined Access Form submitted:', this.formData)
-        
-        this.showSuccessModal = true
-        this.resetForm()
+        if (response.success) {
+          console.log('Combined Access Form submitted successfully:', response.data)
+          
+          // Store the submitted services before resetting the form
+          this.submittedServices = {
+            jeeva: this.formData.services.jeeva,
+            wellsoft: this.formData.services.wellsoft,
+            internet: this.formData.services.internet
+          }
+          
+          this.showSuccessModal = true
+          this.resetForm()
+          this.showNotification('Request submitted successfully!', 'success')
+        } else {
+          this.showNotification(response.message || 'Failed to submit request', 'error')
+        }
       } catch (error) {
         console.error('Error submitting form:', error)
-        this.showNotification('Error submitting request. Please try again.', 'error')
+        
+        if (error.type === 'validation') {
+          this.validationErrors = error.errors
+          console.error('Validation errors received:', error.errors)
+          
+          // Show specific validation errors
+          const errorMessages = []
+          Object.keys(error.errors).forEach(field => {
+            if (Array.isArray(error.errors[field])) {
+              errorMessages.push(...error.errors[field])
+            } else {
+              errorMessages.push(error.errors[field])
+            }
+          })
+          
+          this.showNotification(`Validation errors: ${errorMessages.join(', ')}`, 'error')
+        } else {
+          this.showNotification(error.message || 'Error submitting request. Please try again.', 'error')
+        }
       } finally {
         this.isSubmitting = false
       }
@@ -752,8 +1172,11 @@ export default {
         },
         internetPurposes: ['', '', '', '']
       }
+      this.validationErrors = {}
+      this.fieldErrors = {}
+      this.fieldTouched = {}
+      this.submittedServices = null
       this.clearSignature()
-      this.showNotification('Form has been reset', 'info')
     },
 
     triggerFileUpload() {
@@ -763,23 +1186,27 @@ export default {
     onSignatureChange(e) {
       const file = e.target.files[0]
       this.formData.signature = file || null
+      this.fieldTouched.signature = true
       
       if (!file) {
         this.signaturePreview = ''
         this.signatureFileName = ''
+        this.validateSignature()
         return
       }
 
       // Validate file type
-      const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf']
+      const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg']
       if (!allowedTypes.includes(file.type)) {
-        this.showNotification('Please select a valid file (PNG, JPG, or PDF)', 'error')
+        this.fieldErrors.signature = 'Please select a valid image file (PNG, JPG, or JPEG)'
+        this.showNotification('Please select a valid image file (PNG, JPG, or JPEG)', 'error')
         this.clearSignature()
         return
       }
 
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
+        this.fieldErrors.signature = 'File size must be less than 5MB'
         this.showNotification('File size must be less than 5MB', 'error')
         this.clearSignature()
         return
@@ -787,15 +1214,15 @@ export default {
 
       this.signatureFileName = file.name
       
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader()
-        reader.onload = () => {
-          this.signaturePreview = reader.result
-        }
-        reader.readAsDataURL(file)
-      } else {
-        this.signaturePreview = 'pdf'
+      // Preview image
+      const reader = new FileReader()
+      reader.onload = () => {
+        this.signaturePreview = reader.result
       }
+      reader.readAsDataURL(file)
+      
+      // Validate after successful file selection
+      this.validateSignature()
     },
 
     isImage(preview) {
@@ -806,6 +1233,8 @@ export default {
       this.formData.signature = null
       this.signaturePreview = ''
       this.signatureFileName = ''
+      this.fieldTouched.signature = false
+      delete this.fieldErrors.signature
       if (this.$refs.signatureInput) {
         this.$refs.signatureInput.value = ''
       }
@@ -1006,9 +1435,90 @@ button:active:not(:disabled) {
 }
 
 /* Service card hover effects */
+/* Enhanced button hover effects */
 label:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Enhanced Modal Animations */
+@keyframes bounce {
+  0%, 20%, 53%, 80%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  40%, 43% {
+    transform: translate3d(0, -8px, 0);
+  }
+  70% {
+    transform: translate3d(0, -4px, 0);
+  }
+  90% {
+    transform: translate3d(0, -2px, 0);
+  }
+}
+
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-bounce {
+  animation: bounce 1s infinite;
+}
+
+.animate-ping {
+  animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Modal backdrop blur effect */
+.backdrop-blur-md {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Enhanced shadow effects */
+.shadow-2xl {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Enhanced button hover effects */
+.group:hover .group-hover\:translate-x-1 {
+  transform: translateX(0.25rem);
+}
+
+.group:hover .group-hover\:translate-x-\[100\%\] {
+  transform: translateX(100%);
+}
+
+/* Floating particles animation */
+@keyframes float-particles {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+    opacity: 0.7;
+  }
+  33% {
+    transform: translateY(-10px) rotate(120deg);
+    opacity: 1;
+  }
+  66% {
+    transform: translateY(5px) rotate(240deg);
+    opacity: 0.8;
+  }
 }
 
 /* Checkbox animations */
@@ -1123,6 +1633,15 @@ input:invalid {
 
 input:valid {
   border-color: #10b981;
+}
+
+/* Override validation styles for Internet Purpose fields */
+.medical-input:valid {
+  border-color: rgba(96, 165, 250, 0.7) !important;
+}
+
+.medical-input:invalid {
+  border-color: rgba(96, 165, 250, 0.7) !important;
 }
 
 /* Smooth transitions for all interactive elements */

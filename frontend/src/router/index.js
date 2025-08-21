@@ -193,6 +193,8 @@ const routes = [
   },
 
   // User submission forms
+  // COMMENTED OUT: Individual forms - now using Combined Access Form only
+  /*
   {
     path: '/user-jeeva-form',
     name: 'UserJeevaForm',
@@ -220,6 +222,7 @@ const routes = [
       roles: [ROLES.STAFF]
     }
   },
+  */
   {
     path: '/user-combined-form',
     name: 'UserCombinedForm',

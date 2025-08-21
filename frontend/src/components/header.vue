@@ -260,28 +260,29 @@ export default {
     const showDropdown = ref(false)
     const showLogoutModal = ref(false)
     
-    // Navigation items for desktop menu
+    // Navigation items for desktop menu - REMOVED: Dashboard, Forms, Requests, Help
     const navigationItems = ref([
-      {
-        name: 'Dashboard',
-        path: '/user-dashboard',
-        icon: 'fas fa-tachometer-alt'
-      },
-      {
-        name: 'Forms',
-        path: '/forms',
-        icon: 'fas fa-file-alt'
-      },
-      {
-        name: 'Requests',
-        path: '/requests',
-        icon: 'fas fa-list-alt'
-      },
-      {
-        name: 'Help',
-        path: '/help',
-        icon: 'fas fa-question-circle'
-      }
+      // COMMENTED OUT: Navigation items removed as requested
+      // {
+      //   name: 'Dashboard',
+      //   path: '/user-dashboard',
+      //   icon: 'fas fa-tachometer-alt'
+      // },
+      // {
+      //   name: 'Forms',
+      //   path: '/forms',
+      //   icon: 'fas fa-file-alt'
+      // },
+      // {
+      //   name: 'Requests',
+      //   path: '/requests',
+      //   icon: 'fas fa-list-alt'
+      // },
+      // {
+      //   name: 'Help',
+      //   path: '/help',
+      //   icon: 'fas fa-question-circle'
+      // }
     ])
     
     return {
