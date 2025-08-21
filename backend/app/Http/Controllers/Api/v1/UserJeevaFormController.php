@@ -80,7 +80,7 @@ class UserJeevaFormController extends Controller
                 'phone_number' => $validatedData['phone_number'],
                 'department_id' => $validatedData['department_id'],
                 'signature_path' => $signaturePath,
-                'request_type' => 'jeeva_access',
+                'request_type' => ['jeeva_access'], // Store as array
                 'status' => 'pending',
             ]);
 
@@ -151,7 +151,7 @@ class UserJeevaFormController extends Controller
 
             $query = UserAccess::with(['user', 'department'])
                 ->where('user_id', $user->id)
-                ->where('request_type', 'jeeva_access');
+                ->ofType('jeeva_access');
 
             // Apply filters
             if ($request->has('status') && $request->status !== '') {
@@ -208,7 +208,7 @@ class UserJeevaFormController extends Controller
             $user = Auth::user();
             
             // Check if user owns this request and it's a Jeeva access request
-            if ($userAccess->user_id !== $user->id || $userAccess->request_type !== 'jeeva_access') {
+            if ($userAccess->user_id !== $user->id || !$userAccess->hasRequestType('jeeva_access')) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Unauthorized access to this request.'

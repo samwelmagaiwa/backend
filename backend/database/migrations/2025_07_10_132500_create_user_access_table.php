@@ -20,12 +20,12 @@ return new class extends Migration
             $table->foreignId('department_id')->constrained('departments')->onDelete('cascade');
             $table->string('signature_path')->nullable();
             $table->text('purpose')->nullable();
-            $table->enum('request_type', ['jeeva_access', 'wellsoft', 'internet_access_request']);
+            $table->json('request_type'); // changed from enum
             $table->enum('status', ['pending', 'approved', 'rejected', 'in_review'])->default('pending');
             $table->timestamps();
 
             // Add indexes for better performance
-            $table->index(['pf_number', 'request_type']);
+            $table->index(['pf_number']);
             $table->index(['status', 'created_at']);
             $table->index('department_id');
         });

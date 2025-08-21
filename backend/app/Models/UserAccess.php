@@ -36,7 +36,11 @@ class UserAccess extends Model
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'request_type' => 'array',
+        'purpose' => 'array',
     ];
+
+    // Removed custom accessors and mutators since we're using Laravel's built-in array casting
 
     /**
      * Request type constants
@@ -78,7 +82,7 @@ class UserAccess extends Model
      */
     public function scopeOfType($query, string $type)
     {
-        return $query->where('request_type', $type);
+        return $query->whereJsonContains('request_type', $type);
     }
 
     /**
@@ -102,6 +106,9 @@ class UserAccess extends Model
      */
     public function getRequestTypeNameAttribute(): string
     {
+        if (is_array($this->request_type)) {
+            return implode(', ', array_map(fn($type) => self::REQUEST_TYPES[$type] ?? $type, $this->request_type));
+        }
         return self::REQUEST_TYPES[$this->request_type] ?? $this->request_type;
     }
 
@@ -143,5 +150,27 @@ class UserAccess extends Model
     public function isInReview(): bool
     {
         return $this->status === 'in_review';
+    }
+
+    /**
+     * Check if the request contains a specific request type.
+     */
+    public function hasRequestType(string $type): bool
+    {
+        if (is_array($this->request_type)) {
+            return in_array($type, $this->request_type);
+        }
+        return $this->request_type === $type;
+    }
+
+    /**
+     * Get all request types as an array.
+     */
+    public function getRequestTypesArray(): array
+    {
+        if (is_array($this->request_type)) {
+            return $this->request_type;
+        }
+        return [$this->request_type];
     }
 }

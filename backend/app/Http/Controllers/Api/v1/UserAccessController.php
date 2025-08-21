@@ -44,7 +44,7 @@ class UserAccessController extends Controller
             }
 
             if ($request->has('request_type') && $request->request_type !== '') {
-                $query->where('request_type', $request->request_type);
+                $query->whereJsonContains('request_type', $request->request_type);
             }
 
             if ($request->has('search') && $request->search !== '') {
@@ -90,7 +90,7 @@ class UserAccessController extends Controller
     }
 
     /**
-     * Store a newly created user access request.
+     * Store a newly created combined user access request.
      */
     public function store(UserAccessRequest $request): JsonResponse
     {
@@ -98,72 +98,101 @@ class UserAccessController extends Controller
         
         try {
             $user = Auth::user();
+            
+            // Debug: Log incoming request data
+            Log::info('Incoming request data:', [
+                'request_type' => $request->input('request_type'),
+                'services' => $request->input('services'),
+                'internetPurposes' => $request->input('internetPurposes')
+            ]);
+            
             $validatedData = $request->validated();
             
-            // Get signature path (existing or uploaded)
-            $signaturePath = $this->signatureService->getSignaturePath(
-                $validatedData['pf_number'],
-                $request->file('digital_signature')
+            // Upload and store the digital signature
+            $signaturePath = $this->storeSignature(
+                $request->file('signature'),
+                $validatedData['pf_number']
             );
 
-            $createdRequests = [];
-            $requestTypes = $validatedData['request_type'];
-
-            // Create a separate record for each request type
-            foreach ($requestTypes as $requestType) {
-                $userAccess = UserAccess::create([
-                    'user_id' => $user->id,
-                    'pf_number' => $validatedData['pf_number'],
-                    'staff_name' => $validatedData['staff_name'],
-                    'phone_number' => $validatedData['phone_number'],
-                    'department_id' => $validatedData['department_id'],
-                    'signature_path' => $signaturePath,
-                    'request_type' => $requestType,
-                    'status' => 'pending',
-                ]);
-
-                // Load relationships for response
-                $userAccess->load(['user', 'department']);
-                
-                // Add signature info
-                $userAccess->signature_url = $this->signatureService->getSignatureUrl($userAccess->signature_path);
-                $userAccess->signature_info = $this->signatureService->getSignatureInfo($userAccess->signature_path);
-                
-                $createdRequests[] = $userAccess;
-
-                // Forward to HOD queue based on request type
-                $this->forwardToHodQueue($userAccess);
-                
-                Log::info("User access request created", [
-                    'user_id' => $user->id,
-                    'pf_number' => $validatedData['pf_number'],
-                    'request_type' => $requestType,
-                    'request_id' => $userAccess->id
-                ]);
+            // Get selected services directly from request_type
+            $selectedServices = $validatedData['request_type'];
+            
+            // Process internet purposes if internet access is selected
+            $purposes = null;
+            if (in_array('internet_access_request', $selectedServices) && isset($validatedData['internetPurposes'])) {
+                $purposes = array_filter($validatedData['internetPurposes'], function($purpose) {
+                    return !empty(trim($purpose));
+                });
+                $purposes = array_values($purposes); // Re-index array
             }
+            
+            Log::info('Creating combined user access request', [
+                'selected_services' => $selectedServices,
+                'purposes' => $purposes
+            ]);
+            
+            // Create the combined access request - store multiple services in one row
+            $userAccess = UserAccess::create([
+                'user_id' => $user->id,
+                'pf_number' => $validatedData['pf_number'],
+                'staff_name' => $validatedData['staff_name'],
+                'phone_number' => $validatedData['phone_number'],
+                'department_id' => $validatedData['department_id'],
+                'signature_path' => $signaturePath,
+                'purpose' => $purposes,
+                'request_type' => $selectedServices, // Array stored as JSON
+                'status' => 'pending',
+            ]);
+            
+            Log::info('Successfully created combined request', [
+                'request_id' => $userAccess->id,
+                'request_types' => $selectedServices,
+                'pf_number' => $validatedData['pf_number']
+            ]);
+
+            // Load relationships for response
+            $userAccess->load(['user', 'department']);
+            
+            // Add signature info
+            $userAccess->signature_url = $this->signatureService->getSignatureUrl($userAccess->signature_path);
+            $userAccess->signature_info = $this->signatureService->getSignatureInfo($userAccess->signature_path);
+            
+            // Forward to appropriate queues for each service type
+            foreach ($selectedServices as $serviceType) {
+                $this->forwardToHodQueue($userAccess, $serviceType);
+            }
+            
+            Log::info("Combined user access request created", [
+                'user_id' => $user->id,
+                'request_id' => $userAccess->id,
+                'pf_number' => $validatedData['pf_number'],
+                'request_types' => $selectedServices,
+                'service_count' => count($selectedServices),
+                'has_purposes' => !empty($purposes)
+            ]);
 
             DB::commit();
 
             return response()->json([
                 'success' => true,
-                'data' => $createdRequests,
-                'message' => count($createdRequests) > 1 
-                    ? 'User access requests submitted successfully.' 
-                    : 'User access request submitted successfully.',
-                'signature_info' => $signaturePath ? $this->signatureService->getSignatureInfo($signaturePath) : null
+                'data' => $userAccess,
+                'message' => 'Combined access request submitted successfully with ' . count($selectedServices) . ' service type(s).',
+                'signature_info' => $this->signatureService->getSignatureInfo($signaturePath),
+                'services_requested' => $selectedServices
             ], 201);
 
         } catch (\Exception $e) {
             DB::rollBack();
             
-            Log::error('Error creating user access request: ' . $e->getMessage(), [
+            Log::error('Error creating combined user access request: ' . $e->getMessage(), [
                 'user_id' => Auth::id(),
-                'request_data' => $request->except(['digital_signature'])
+                'request_data' => $request->except(['signature']),
+                'error_trace' => $e->getTraceAsString()
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to submit user access request.',
+                'message' => 'Failed to submit combined access request.',
                 'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
             ], 500);
         }
@@ -392,32 +421,82 @@ class UserAccessController extends Controller
     }
 
     /**
-     * Forward request to HOD queue based on request type.
+     * Store uploaded signature file.
      */
-    private function forwardToHodQueue(UserAccess $userAccess): void
+    private function storeSignature($signatureFile, string $pfNumber): string
     {
         try {
-            // This is where you would implement the queue logic
-            // For now, we'll just log the action
+            // Create directory path based on PF number
+            $directory = 'signatures/' . strtoupper($pfNumber);
             
-            $queueName = $this->getHodQueueName($userAccess->request_type);
+            // Generate unique filename
+            $filename = 'signature_' . time() . '.' . $signatureFile->getClientOriginalExtension();
             
-            Log::info("Forwarding request to HOD queue", [
-                'request_id' => $userAccess->id,
-                'request_type' => $userAccess->request_type,
-                'queue_name' => $queueName,
-                'department_id' => $userAccess->department_id
+            // Store file in storage/app/public/signatures/{PF_NUMBER}/
+            $path = $signatureFile->storeAs($directory, $filename, 'public');
+            
+            Log::info('Signature uploaded successfully', [
+                'pf_number' => $pfNumber,
+                'filename' => $filename,
+                'path' => $path
             ]);
+            
+            return $path;
+            
+        } catch (\Exception $e) {
+            Log::error('Error storing signature: ' . $e->getMessage(), [
+                'pf_number' => $pfNumber
+            ]);
+            throw $e;
+        }
+    }
 
-            // TODO: Implement actual queue dispatch
-            // dispatch(new ProcessUserAccessRequest($userAccess))->onQueue($queueName);
+
+
+    /**
+     * Forward request to HOD queue based on request type.
+     */
+    private function forwardToHodQueue(UserAccess $userAccess, string $serviceType = null): void
+    {
+        try {
+            // If no specific service type provided, process all request types
+            if ($serviceType) {
+                $requestTypes = [$serviceType];
+            } else {
+                // Get request types from the model (already handled as array by casting)
+                $requestTypes = $userAccess->getRequestTypesArray();
+            }
+            
+            Log::info("Processing request types for HOD queue", [
+                'request_id' => $userAccess->id,
+                'service_type_param' => $serviceType,
+                'request_types_to_process' => $requestTypes
+            ]);
+            
+            foreach ($requestTypes as $requestType) {
+                $queueName = $this->getHodQueueName($requestType);
+                
+                Log::info("Forwarding request to HOD queue", [
+                    'request_id' => $userAccess->id,
+                    'request_type' => $requestType,
+                    'queue_name' => $queueName,
+                    'department_id' => $userAccess->department_id
+                ]);
+
+                // TODO: Implement actual queue dispatch
+                // dispatch(new ProcessUserAccessRequest($userAccess, $requestType))->onQueue($queueName);
+            }
             
         } catch (\Exception $e) {
             Log::error('Error forwarding to HOD queue: ' . $e->getMessage(), [
-                'request_id' => $userAccess->id
+                'request_id' => $userAccess->id,
+                'service_type' => $serviceType,
+                'error_trace' => $e->getTraceAsString()
             ]);
         }
     }
+
+
 
     /**
      * Get HOD queue name based on request type.

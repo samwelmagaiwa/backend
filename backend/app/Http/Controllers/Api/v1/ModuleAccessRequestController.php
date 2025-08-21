@@ -82,7 +82,7 @@ class ModuleAccessRequestController extends Controller
     public function exportPdf(Request $request)
     {
         $user = $request->user();
-        $authorizedRoles = ['Head of Department', 'Director of ICT', 'Head of IT', 'ICT Officer', 'Admin'];
+        $authorizedRoles = ['Head of Department', 'Director of ICT', 'Head of IT', 'ICT Officer', 'staff', 'Admin'];
         if (!$user || !in_array($user->role ? $user->role->name : '', $authorizedRoles)) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }

@@ -81,7 +81,7 @@ class UserInternetAccessFormController extends Controller
                 'department_id' => $validatedData['department_id'],
                 'signature_path' => $signaturePath,
                 'purpose' => $validatedData['purpose'],
-                'request_type' => 'internet_access_request',
+                'request_type' => ['internet_access_request'], // Store as array
                 'status' => 'pending',
             ]);
 
@@ -153,7 +153,7 @@ class UserInternetAccessFormController extends Controller
 
             $query = UserAccess::with(['user', 'department'])
                 ->where('user_id', $user->id)
-                ->where('request_type', 'internet_access_request');
+                ->ofType('internet_access_request');
 
             // Apply filters
             if ($request->has('status') && $request->status !== '') {
@@ -211,7 +211,7 @@ class UserInternetAccessFormController extends Controller
             $user = Auth::user();
             
             // Check if user owns this request and it's an Internet access request
-            if ($userAccess->user_id !== $user->id || $userAccess->request_type !== 'internet_access_request') {
+            if ($userAccess->user_id !== $user->id || !$userAccess->hasRequestType('internet_access_request')) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Unauthorized access to this request.'

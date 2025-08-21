@@ -6,9 +6,11 @@ use App\Http\Controllers\Api\v1\ModuleAccessRequestController;
 use App\Http\Controllers\Api\v1\OnboardingController;
 use App\Http\Controllers\Api\v1\AdminController;
 use App\Http\Controllers\Api\V1\UserAccessController;
-use App\Http\Controllers\Api\v1\UserJeevaFormController;
-use App\Http\Controllers\Api\v1\UserWellsoftFormController;
-use App\Http\Controllers\Api\v1\UserInternetAccessFormController;
+use App\Http\Controllers\Api\v1\BookingServiceController;
+// COMMENTED OUT: Individual form controllers - now using Combined Access Form only
+// use App\Http\Controllers\Api\v1\UserJeevaFormController;
+// use App\Http\Controllers\Api\v1\UserWellsoftFormController;
+// use App\Http\Controllers\Api\v1\UserInternetAccessFormController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -59,11 +61,66 @@ Route::middleware('auth:sanctum')->group(function () {
         // User Access Request CRUD operations
         Route::apiResource('user-access', UserAccessController::class);
         
+        // Combined Access Request route
+        Route::post('combined-access', [UserAccessController::class, 'store'])->name('combined-access.store');
+        
         // Additional utility routes
         Route::get('departments', [UserAccessController::class, 'getDepartments']);
         Route::post('check-signature', [UserAccessController::class, 'checkSignature']);
     });
 
+    // Booking Service routes
+    Route::prefix('booking-service')->group(function () {
+        // CRUD operations
+        Route::apiResource('bookings', BookingServiceController::class);
+        
+        // Utility routes
+        Route::get('device-types', [BookingServiceController::class, 'getDeviceTypes'])->name('booking-service.device-types');
+        Route::get('departments', [BookingServiceController::class, 'getDepartments'])->name('booking-service.departments');
+        Route::get('statistics', [BookingServiceController::class, 'getStatistics'])->name('booking-service.statistics');
+        
+        // Test route for debugging
+        Route::post('test-validation', function(\Illuminate\Http\Request $request) {
+            \Log::info('Test validation endpoint called', $request->all());
+            
+            try {
+                $validated = $request->validate([
+                    'booking_date' => 'required|date',
+                    'borrower_name' => 'required|string|max:255',
+                    'device_type' => 'required|string',
+                    'department' => 'required|integer',
+                    'phone_number' => 'required|string',
+                    'return_date' => 'required|date',
+                    'return_time' => 'required|string',
+                    'reason' => 'required|string|min:10',
+                    'signature' => 'required|file'
+                ]);
+                
+                \Log::info('Basic validation passed', $validated);
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Basic validation passed',
+                    'data' => $validated
+                ]);
+            } catch (\Illuminate\Validation\ValidationException $e) {
+                \Log::error('Basic validation failed', $e->errors());
+                
+                return response()->json([
+                    'success' => false,
+                    'errors' => $e->errors(),
+                    'message' => 'Basic validation failed'
+                ], 422);
+            }
+        })->name('booking-service.test-validation');
+        
+        // Admin actions
+        Route::post('bookings/{bookingService}/approve', [BookingServiceController::class, 'approve'])->name('booking-service.approve');
+        Route::post('bookings/{bookingService}/reject', [BookingServiceController::class, 'reject'])->name('booking-service.reject');
+    });
+
+    // COMMENTED OUT: Individual form routes - now using Combined Access Form only
+    /*
     // User Jeeva Form routes (Staff only)
     Route::prefix('user-jeeva')->group(function () {
         Route::post('submit', [UserJeevaFormController::class, 'store'])->name('user-jeeva.submit');
@@ -90,4 +147,5 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('departments', [UserInternetAccessFormController::class, 'getDepartments'])->name('user-internet-access.departments');
         Route::post('check-signature', [UserInternetAccessFormController::class, 'checkSignature'])->name('user-internet-access.check-signature');
     });
+    */
 });

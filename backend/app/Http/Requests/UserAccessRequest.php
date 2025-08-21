@@ -20,7 +20,7 @@ class UserAccessRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rules = [
             'pf_number' => [
                 'required',
                 'string',
@@ -45,8 +45,8 @@ class UserAccessRequest extends FormRequest
                 'integer',
                 'exists:departments,id',
             ],
-            'digital_signature' => [
-                'nullable', // Made nullable since we'll auto-load from storage
+            'signature' => [
+                'required',
                 'file',
                 'mimes:png,jpg,jpeg',
                 'max:5120', // 5MB max
@@ -59,9 +59,24 @@ class UserAccessRequest extends FormRequest
             'request_type.*' => [
                 'required',
                 'string',
-                Rule::in(['jeeva_access', 'wellsoft', 'internet_access_request']),
+                'in:jeeva_access,wellsoft,internet_access_request',
             ],
         ];
+
+        // Internet purposes validation will be handled in withValidator method
+        // after prepareForValidation has run
+        $rules['internetPurposes'] = [
+            'nullable',
+            'array',
+            'max:4',
+        ];
+        $rules['internetPurposes.*'] = [
+            'nullable',
+            'string',
+            'max:255',
+        ];
+
+        return $rules;
     }
 
     /**
@@ -79,11 +94,17 @@ class UserAccessRequest extends FormRequest
             'phone_number.min' => 'Phone number must be at least 10 digits.',
             'department_id.required' => 'Department selection is required.',
             'department_id.exists' => 'Selected department does not exist.',
-            'digital_signature.mimes' => 'Digital signature must be a PNG, JPG, or JPEG file.',
-            'digital_signature.max' => 'Digital signature file size must not exceed 5MB.',
-            'request_type.required' => 'At least one request type must be selected.',
-            'request_type.min' => 'At least one request type must be selected.',
-            'request_type.*.in' => 'Invalid request type selected.',
+            'signature.required' => 'Digital signature is required.',
+            'signature.mimes' => 'Digital signature must be a PNG, JPG, or JPEG file.',
+            'signature.max' => 'Digital signature file size must not exceed 5MB.',
+            'request_type.required' => 'At least one service must be selected.',
+            'request_type.min' => 'At least one service must be selected.',
+            'request_type.*.required' => 'Service type is required.',
+            'request_type.*.in' => 'Invalid service type selected.',
+            'internetPurposes.required' => 'Internet purposes are required when internet access is selected.',
+            'internetPurposes.min' => 'At least one internet purpose must be provided.',
+            'internetPurposes.max' => 'Maximum 4 internet purposes are allowed.',
+            'internetPurposes.*.max' => 'Each internet purpose must not exceed 255 characters.',
         ];
     }
 
@@ -97,8 +118,9 @@ class UserAccessRequest extends FormRequest
             'staff_name' => 'Staff Name',
             'phone_number' => 'Phone Number',
             'department_id' => 'Department',
-            'digital_signature' => 'Digital Signature',
-            'request_type' => 'Request Type',
+            'signature' => 'Digital Signature',
+            'request_type' => 'Services',
+            'internetPurposes' => 'Internet Purposes',
         ];
     }
 
@@ -107,18 +129,69 @@ class UserAccessRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
-        // Ensure request_type is always an array
-        if ($this->has('request_type') && !is_array($this->request_type)) {
-            $this->merge([
-                'request_type' => [$this->request_type]
-            ]);
-        }
-
+        \Log::info('prepareForValidation - Raw input:', [
+            'all' => $this->all(),
+            'request_type' => $this->input('request_type'),
+            'services' => $this->input('services')
+        ]);
+        
         // Clean and format the data
         $this->merge([
             'pf_number' => $this->cleanPfNumber($this->pf_number),
             'staff_name' => $this->cleanStaffName($this->staff_name),
             'phone_number' => $this->cleanPhoneNumber($this->phone_number),
+        ]);
+
+        // Convert services object to request_type array if services are provided and request_type is not already set
+        if ($this->has('services') && is_array($this->services) && !$this->has('request_type')) {
+            $requestTypes = [];
+            
+            if ($this->convertToBoolean($this->services['jeeva'] ?? false)) {
+                $requestTypes[] = 'jeeva_access';
+            }
+            if ($this->convertToBoolean($this->services['wellsoft'] ?? false)) {
+                $requestTypes[] = 'wellsoft';
+            }
+            if ($this->convertToBoolean($this->services['internet'] ?? false)) {
+                $requestTypes[] = 'internet_access_request';
+            }
+            
+            $this->merge(['request_type' => $requestTypes]);
+        }
+        
+        // If request_type exists but services doesn't, create services from request_type
+        if ($this->has('request_type') && is_array($this->request_type) && !$this->has('services')) {
+            $services = [
+                'jeeva' => in_array('jeeva_access', $this->request_type),
+                'wellsoft' => in_array('wellsoft', $this->request_type),
+                'internet' => in_array('internet_access_request', $this->request_type)
+            ];
+            
+            $this->merge(['services' => $services]);
+        }
+        
+        // Ensure services array has all keys with proper boolean values
+        if ($this->has('services') && is_array($this->services)) {
+            $services = [
+                'jeeva' => $this->convertToBoolean($this->services['jeeva'] ?? false),
+                'wellsoft' => $this->convertToBoolean($this->services['wellsoft'] ?? false),
+                'internet' => $this->convertToBoolean($this->services['internet'] ?? false)
+            ];
+            
+            $this->merge(['services' => $services]);
+        }
+
+        // Clean internet purposes - remove empty values
+        if ($this->has('internetPurposes') && is_array($this->internetPurposes)) {
+            $cleanPurposes = array_filter($this->internetPurposes, function($purpose) {
+                return !empty(trim($purpose));
+            });
+            $this->merge(['internetPurposes' => array_values($cleanPurposes)]);
+        }
+        
+        \Log::info('prepareForValidation - After processing:', [
+            'request_type' => $this->input('request_type'),
+            'internetPurposes' => $this->input('internetPurposes')
         ]);
     }
 
@@ -151,5 +224,55 @@ class UserAccessRequest extends FormRequest
         
         // Remove extra spaces and format consistently
         return preg_replace('/\s+/', ' ', trim($phoneNumber));
+    }
+
+    /**
+     * Convert string boolean values to actual booleans.
+     */
+    private function convertToBoolean($value): bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+        
+        if (is_string($value)) {
+            return in_array(strtolower($value), ['true', '1', 'yes', 'on']);
+        }
+        
+        return (bool) $value;
+    }
+
+    /**
+     * Additional validation logic.
+     */
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            // Check if at least one service is selected in request_type
+            $requestTypes = $this->input('request_type', []);
+            
+            if (empty($requestTypes)) {
+                $validator->errors()->add('request_type', 'At least one service must be selected.');
+            }
+            
+            // Validate that all request types are valid
+            $validTypes = ['jeeva_access', 'wellsoft', 'internet_access_request'];
+            foreach ($requestTypes as $type) {
+                if (!in_array($type, $validTypes)) {
+                    $validator->errors()->add('request_type', "Invalid service type: {$type}");
+                }
+            }
+            
+            // Validate internet purposes if internet access is selected
+            if (in_array('internet_access_request', $requestTypes)) {
+                $internetPurposes = $this->input('internetPurposes', []);
+                
+                if (empty($internetPurposes) || !array_filter($internetPurposes, function($purpose) {
+                    return !empty(trim($purpose));
+                })) {
+                    $validator->errors()->add('internetPurposes', 'Internet purposes are required when internet access is selected.');
+                }
+            }
+        });
     }
 }

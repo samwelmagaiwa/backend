@@ -80,7 +80,7 @@ class UserWellsoftFormController extends Controller
                 'phone_number' => $validatedData['phone_number'],
                 'department_id' => $validatedData['department_id'],
                 'signature_path' => $signaturePath,
-                'request_type' => 'wellsoft', // Set request type to 'wellsoft'
+                'request_type' => ['wellsoft'], // Store as array // Set request type to 'wellsoft'
                 'status' => 'pending',
             ]);
 
@@ -151,7 +151,7 @@ class UserWellsoftFormController extends Controller
 
             $query = UserAccess::with(['user', 'department'])
                 ->where('user_id', $user->id)
-                ->where('request_type', 'wellsoft');
+                ->ofType('wellsoft');
 
             // Apply filters
             if ($request->has('status') && $request->status !== '') {
@@ -208,7 +208,7 @@ class UserWellsoftFormController extends Controller
             $user = Auth::user();
             
             // Check if user owns this request and it's a Wellsoft access request
-            if ($userAccess->user_id !== $user->id || $userAccess->request_type !== 'wellsoft') {
+            if ($userAccess->user_id !== $user->id || !$userAccess->hasRequestType('wellsoft')) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Unauthorized access to this request.'
