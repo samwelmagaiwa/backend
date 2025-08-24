@@ -1,7 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import LoginPage from '../components/LoginPage.vue'
 import { getDefaultDashboard, ROLES } from '../utils/permissions'
 import auth from '../utils/auth'
+import { preloadRouteBasedImages } from '../utils/imagePreloader'
+
+// Lazy load LoginPage as well for better initial bundle size
+const LoginPage = () => import(/* webpackChunkName: "auth" */ '../components/LoginPage.vue')
 
 const routes = [
   // Public routes
@@ -26,7 +29,7 @@ const routes = [
   {
     path: '/ict-policy',
     name: 'IctPolicy',
-    component: () => import('../components/IctPolicy.vue'),
+    component: () => import(/* webpackChunkName: "public" */ '../components/IctPolicy.vue'),
     meta: { 
       requiresAuth: false,
       isPublic: true
@@ -35,7 +38,7 @@ const routes = [
   {
     path: '/terms-of-service',
     name: 'TermsOfService',
-    component: () => import('../components/TermsOfService.vue'),
+    component: () => import(/* webpackChunkName: "public" */ '../components/TermsOfService.vue'),
     meta: { 
       requiresAuth: false,
       isPublic: true
@@ -43,15 +46,30 @@ const routes = [
   },
 
   // Dashboard routes
-  {
-    path: '/admin-dashboard',
-    name: 'AdminDashboard',
-    component: () => import('../components/AdminDashboard.vue'),
-    meta: {
-      requiresAuth: true,
-      roles: [ROLES.ADMIN]
-    }
-  },
+    {
+      path: '/admin-dashboard',
+      name: 'AdminDashboard',
+      component: () => import('../components/admin/AdminDashboard.vue'),
+      meta: { requiresAuth: true, roles: ['admin'] }
+    },
+    {
+      path: '/admin/roles',
+      name: 'RoleManagement',
+      component: () => import('../components/admin/RoleManagement.vue'),
+      meta: { requiresAuth: true, roles: ['admin', 'super_admin'] }
+    },
+    {
+      path: '/admin/user-roles',
+      name: 'UserRoleAssignment',
+      component: () => import('../components/admin/UserRoleAssignment.vue'),
+      meta: { requiresAuth: true, roles: ['admin', 'super_admin'] }
+    },
+    {
+      path: '/admin/department-hods',
+      name: 'DepartmentHodAssignment',
+      component: () => import('../components/admin/DepartmentHodAssignment.vue'),
+      meta: { requiresAuth: true, roles: ['admin', 'super_admin'] }
+    },
   {
     path: '/user-dashboard',
     name: 'UserDashboard',
@@ -70,15 +88,7 @@ const routes = [
       roles: [ROLES.ICT_DIRECTOR]
     }
   },
-  {
-    path: '/hod-dashboard',
-    name: 'HodDashboard',
-    component: () => import('../components/HodDashboard.vue'),
-    meta: {
-      requiresAuth: true,
-      roles: [ROLES.HEAD_OF_DEPARTMENT]
-    }
-  },
+  // HOD Dashboard removed - HOD users now use hod-dashboard/request-list as their dashboard
   {
     path: '/hod-it-dashboard',
     name: 'HodItDashboard',
@@ -118,30 +128,6 @@ const routes = [
     }
   },
 
-  // Multi-session demo page (for testing)
-
-  // Onboarding demo page (for testing)
-  // {
-  //   path: '/onboarding-demo',
-  //   name: 'OnboardingDemo',
-  //   component: () => import('../components/OnboardingDemo.vue'),
-  //   meta: {
-  //     requiresAuth: true,
-  //     roles: Object.values(ROLES)
-  //   }
-  // },
-
-  // Auth test page (for debugging) - DISABLED: Component not found
-  // {
-  //   path: '/auth-test',
-  //   name: 'AuthTest',
-  //   component: () => import('../components/AuthTest.vue'),
-  //   meta: {
-  //     requiresAuth: true,
-  //     roles: Object.values(ROLES)
-  //   }
-  // },
-
   // Settings (accessible to all authenticated users)
   {
     path: '/settings',
@@ -152,6 +138,10 @@ const routes = [
       roles: Object.values(ROLES)
     }
   },
+
+
+
+
 
   // Access approval forms
   {
@@ -192,37 +182,6 @@ const routes = [
     alias: ['/both-service-from']
   },
 
-  // User submission forms
-  // COMMENTED OUT: Individual forms - now using Combined Access Form only
-  /*
-  {
-    path: '/user-jeeva-form',
-    name: 'UserJeevaForm',
-    component: () => import('../components/views/forms/userjeevaform.vue'),
-    meta: {
-      requiresAuth: true,
-      roles: [ROLES.STAFF]
-    }
-  },
-  {
-    path: '/user-wellsoft-form',
-    name: 'UserWellSoftForm',
-    component: () => import('../components/views/forms/userWellSoftForm.vue'),
-    meta: {
-      requiresAuth: true,
-      roles: [ROLES.STAFF]
-    }
-  },
-  {
-    path: '/user-internet-form',
-    name: 'UserInternetForm',
-    component: () => import('../components/views/forms/UserInternetAccessForm.vue'),
-    meta: {
-      requiresAuth: true,
-      roles: [ROLES.STAFF]
-    }
-  },
-  */
   {
     path: '/user-combined-form',
     name: 'UserCombinedForm',
@@ -264,14 +223,32 @@ const routes = [
 
   // Internal Access Requests Dashboard (for approvers)
   {
-    path: '/internal-access/list',
-    name: 'InternalAccessList',
+    path: '/hod-dashboard/request-list',
+    name: 'HODDashboardRequestList',
     component: () => import('../components/views/requests/InternalAccessList.vue'),
     meta: {
       requiresAuth: true,
-      roles: [ROLES.DIVISIONAL_DIRECTOR, ROLES.HEAD_OF_DEPARTMENT, ROLES.HOD_IT, ROLES.ICT_DIRECTOR, ROLES.ICT_OFFICER]
+      roles: [ROLES.HEAD_OF_DEPARTMENT, ROLES.DIVISIONAL_DIRECTOR, ROLES.ICT_DIRECTOR, ROLES.HOD_IT, ROLES.ICT_OFFICER]
     }
   },
+  
+  // Simple version for debugging (if needed)
+  {
+    path: '/hod-dashboard/request-list-simple',
+    name: 'HODDashboardRequestListSimple',
+    component: () => import('../components/views/requests/InternalAccessListSimple.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: [ROLES.HEAD_OF_DEPARTMENT, ROLES.DIVISIONAL_DIRECTOR, ROLES.ICT_DIRECTOR, ROLES.HOD_IT, ROLES.ICT_OFFICER]
+    }
+  },
+  
+  // Redirect old route to new route for backward compatibility
+  {
+    path: '/internal-access/list',
+    redirect: '/hod-dashboard/request-list'
+  },
+  
   {
     path: '/internal-access/details',
     name: 'InternalAccessDetails',
@@ -353,11 +330,28 @@ const router = createRouter({
 // Navigation guards
 router.beforeEach(async (to, from, next) => {
   try {
-    // Initialize authentication state
-    await auth.initializeAuth()
-
-    const isAuthenticated = auth.isAuthenticated
-    const userRole = auth.userRole
+    // Initialize authentication state from store
+    const store = await import('@/store')
+    
+    // Initialize auth state from localStorage if available
+    const token = localStorage.getItem('auth_token')
+    const userData = localStorage.getItem('user_data')
+    
+    if (token && userData && !store.default.getters['auth/isAuthenticated']) {
+      try {
+        const user = JSON.parse(userData)
+        store.default.commit('auth/SET_TOKEN', token)
+        store.default.commit('auth/SET_USER', user)
+        console.log('🔄 Restored auth state from localStorage:', user.role)
+      } catch (error) {
+        console.error('Failed to restore auth state:', error)
+        localStorage.removeItem('auth_token')
+        localStorage.removeItem('user_data')
+      }
+    }
+    
+    const isAuthenticated = store.default.getters['auth/isAuthenticated']
+    const userRole = store.default.getters['auth/userRole']
     const requiresAuth = to.meta.requiresAuth !== false
     const isPublicRoute = to.meta.isPublic === true
 
@@ -365,14 +359,54 @@ router.beforeEach(async (to, from, next) => {
   if (isPublicRoute) {
     // If user is authenticated and trying to access login page, redirect appropriately
     if (isAuthenticated && (to.name === 'LoginPage' || to.name === 'Login')) {
-      // Check if user needs onboarding
-      if (auth.needsOnboarding()) {
+      console.log('🔍 User is authenticated with role:', userRole)
+      
+      // Check if user needs onboarding (skip for admin)
+      const user = store.default.getters['auth/user']
+      if (user && user.needs_onboarding && userRole !== 'admin') {
+        console.log('🔄 User needs onboarding, redirecting...')
         return next('/onboarding')
       }
       
+      // Check if there's a redirect query parameter
+      if (to.query.redirect) {
+        console.log('🔄 Redirect parameter found:', to.query.redirect)
+        const redirectPath = to.query.redirect
+        
+        // Find the route that matches the redirect path
+        const targetRoute = router.resolve(redirectPath)
+        
+        // Check if the user has access to the redirect route
+        if (targetRoute && targetRoute.meta && targetRoute.meta.roles) {
+          if (targetRoute.meta.roles.includes(userRole)) {
+            console.log('✅ User has access to redirect path:', redirectPath)
+            return next(redirectPath)
+          } else {
+            console.warn('⚠️ User does not have access to redirect path:', redirectPath)
+            console.log('🔄 Redirecting to default dashboard instead')
+            // Fall through to default dashboard logic
+          }
+        } else {
+          // If no role restrictions, allow the redirect
+          console.log('🔄 No role restrictions on redirect path, allowing:', redirectPath)
+          return next(redirectPath)
+        }
+      }
+      
       const defaultDashboard = getDefaultDashboard(userRole)
+      console.log('🏠 Default dashboard for', userRole, ':', defaultDashboard)
+      
       if (defaultDashboard) {
+        console.log('🔄 Redirecting to default dashboard:', defaultDashboard)
         return next(defaultDashboard)
+      } else {
+        console.error('❌ No default dashboard found for role:', userRole)
+        // Fallback based on role
+        if (userRole === 'admin') {
+          return next('/admin-dashboard')
+        } else {
+          return next('/user-dashboard')
+        }
       }
     }
     return next()
@@ -389,7 +423,8 @@ router.beforeEach(async (to, from, next) => {
     }
 
     // Check if user needs onboarding (except for onboarding route itself)
-    if (to.name !== 'Onboarding' && userRole !== ROLES.ADMIN && auth.needsOnboarding()) {
+    const user = store.default.getters['auth/user']
+    if (to.name !== 'Onboarding' && userRole !== ROLES.ADMIN && user && user.needs_onboarding) {
       return next('/onboarding')
     }
 
@@ -399,7 +434,7 @@ router.beforeEach(async (to, from, next) => {
         const defaultDashboard = getDefaultDashboard(userRole)
         return next(defaultDashboard || '/admin-dashboard')
       }
-      if (!auth.needsOnboarding()) {
+      if (!user || !user.needs_onboarding) {
         const defaultDashboard = getDefaultDashboard(userRole)
         return next(defaultDashboard || '/')
       }
@@ -426,6 +461,9 @@ router.beforeEach(async (to, from, next) => {
     }
   }
 
+    // Preload images for the target route
+    preloadRouteBasedImages(to.path)
+    
     next()
   } catch (error) {
     console.error('Router navigation error:', error)
@@ -437,10 +475,24 @@ router.beforeEach(async (to, from, next) => {
 // After navigation guard for error handling
 router.afterEach((to, from, failure) => {
   if (failure) {
-    console.error('Navigation failed:', failure)
-    // Log additional details for debugging
-    console.error('Failed route:', to)
-    console.error('Previous route:', from)
+    // Only log actual navigation failures, not expected ones
+    if (failure.type === 8) {
+      // Navigation was cancelled (type 8), this is normal behavior
+      console.log('Navigation cancelled:', failure.message)
+    } else if (failure.type === 16) {
+      // Navigation was duplicated (type 16), user is already on target route
+      console.log('Navigation duplicated - already on target route')
+    } else {
+      // Log actual navigation errors
+      console.error('Navigation failed:', failure)
+      console.error('Failed route:', to)
+      console.error('Previous route:', from)
+      
+      // Provide user-friendly error message for critical failures
+      if (failure.type === 2) {
+        console.error('Route not found - this might indicate a missing route definition')
+      }
+    }
   }
 })
 

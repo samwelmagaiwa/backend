@@ -709,7 +709,7 @@
 </template>
 
 <script>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onBeforeUnmount, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import AppHeader from './header.vue'
 import DynamicSidebar from './DynamicSidebar.vue'
@@ -778,7 +778,17 @@ export default {
     
     // Guard this route - only staff can access
     onMounted(() => {
+      console.log('UserDashboard mounted - Route:', router.currentRoute.value.path)
       requireRole([ROLES.STAFF])
+    })
+    
+    // Add debugging for unmount
+    onBeforeUnmount(() => {
+      console.log('UserDashboard beforeUnmount - Route:', router.currentRoute.value.path)
+    })
+    
+    onUnmounted(() => {
+      console.log('UserDashboard unmounted')
     })
     
     // Computed properties

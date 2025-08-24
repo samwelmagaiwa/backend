@@ -211,6 +211,24 @@ export const userCombinedAccessService = {
         details: error.response?.data
       }
     }
+  },
+
+  /**
+   * Check if user has pending requests
+   * @returns {Promise} Pending request status
+   */
+  async checkPendingRequests() {
+    try {
+      const response = await apiClient.get('/v1/user-access/pending-status')
+      return response.data
+    } catch (error) {
+      console.error('Error checking pending requests:', error)
+      throw {
+        type: 'error',
+        message: 'Failed to check pending requests.',
+        details: error.response?.data
+      }
+    }
   }
 }
 

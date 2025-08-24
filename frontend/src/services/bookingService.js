@@ -69,15 +69,7 @@ const bookingService = {
         console.log(key, value)
       }
 
-      // Test with simpler validation first
-      console.log('Testing with basic validation endpoint...')
-      const testResponse = await apiClient.post('/booking-service/test-validation', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
-      
-      console.log('Basic validation test response:', testResponse.data)
+
       
       // If basic validation passes, try the full endpoint
       const response = await apiClient.post('/booking-service/bookings', formData, {

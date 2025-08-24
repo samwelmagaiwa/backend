@@ -69,7 +69,56 @@
 
           <!-- Main Form -->
           <div class="medical-glass-card rounded-b-2xl overflow-hidden">
-        <form @submit.prevent="submitForm" class="p-4 space-y-4">
+            <!-- Pending Request Warning Banner -->
+            <div v-if="hasPendingRequest" class="bg-gradient-to-r from-yellow-600/90 to-orange-600/90 border-2 border-yellow-400/60 p-4 m-4 rounded-xl backdrop-blur-sm relative overflow-hidden">
+              <!-- Animated Background -->
+              <div class="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 animate-pulse"></div>
+              <div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-yellow-400/30 to-transparent rounded-full blur-xl"></div>
+              
+              <div class="relative z-10 flex items-start space-x-4">
+                <div class="flex-shrink-0">
+                  <div class="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg border border-yellow-300/50">
+                    <i class="fas fa-exclamation-triangle text-white text-xl animate-pulse"></i>
+                  </div>
+                </div>
+                <div class="flex-1">
+                  <h3 class="text-lg font-bold text-white mb-2 flex items-center">
+                    <i class="fas fa-clock mr-2 text-yellow-300"></i>
+                    Pending Request Found
+                  </h3>
+                  <p class="text-yellow-100 text-sm mb-3">
+                    You have a pending {{ pendingRequestInfo?.request_type || 'access' }} request that is currently being processed. 
+                    You cannot submit new requests until your current request is approved or rejected.
+                  </p>
+                  <div class="flex items-center space-x-4">
+                    <div class="bg-yellow-500/20 px-3 py-1 rounded-full border border-yellow-400/30">
+                      <span class="text-xs text-yellow-200 font-medium">
+                        <i class="fas fa-calendar mr-1"></i>
+                        Submitted: {{ pendingRequestInfo?.created_at ? new Date(pendingRequestInfo.created_at).toLocaleDateString() : 'Unknown' }}
+                      </span>
+                    </div>
+                    <div class="bg-orange-500/20 px-3 py-1 rounded-full border border-orange-400/30">
+                      <span class="text-xs text-orange-200 font-medium">
+                        <i class="fas fa-hourglass-half mr-1"></i>
+                        Status: {{ pendingRequestInfo?.status || 'Pending' }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Loading Banner -->
+            <div v-if="checkingPendingStatus" class="bg-gradient-to-r from-blue-600/90 to-blue-700/90 border-2 border-blue-400/60 p-4 m-4 rounded-xl backdrop-blur-sm">
+              <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+                  <i class="fas fa-spinner fa-spin text-white"></i>
+                </div>
+                <span class="text-white font-medium">Checking for pending requests...</span>
+              </div>
+            </div>
+            
+        <form @submit.prevent="submitForm" class="p-4 space-y-4" :class="{ 'opacity-50 pointer-events-none': hasPendingRequest }">
           
           <!-- Form Description -->
            
@@ -115,15 +164,28 @@
                       <input 
                         v-model="formData.pfNumber" 
                         type="text" 
-                        :class="`medical-input w-full px-3 py-3 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50 ${getFieldErrorClass('pfNumber')}`"
+                        :class="`medical-input w-full px-3 py-3 pr-12 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50 ${getFieldValidationClass('pfNumber')}`"
                         placeholder="Enter PF Number"
                         @input="onPfNumberInput"
                         @blur="fieldTouched.pfNumber = true; validatePfNumber()"
                         required
                       />
                       <div class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/10 to-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                      <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-300/50">
-                        <i class="fas fa-hashtag"></i>
+                      
+                      <!-- Validation Icon -->
+                      <div class="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
+                        <!-- Success Icon -->
+                        <div v-if="isFieldValid('pfNumber')" class="text-green-400 animate-bounce">
+                          <i class="fas fa-check-circle text-lg"></i>
+                        </div>
+                        <!-- Error Icon -->
+                        <div v-else-if="fieldTouched.pfNumber && fieldErrors.pfNumber" class="text-red-400 animate-pulse">
+                          <i class="fas fa-exclamation-circle text-lg"></i>
+                        </div>
+                        <!-- Default Icon -->
+                        <div v-else class="text-blue-300/50">
+                          <i class="fas fa-hashtag"></i>
+                        </div>
                       </div>
                     </div>
                     <p v-if="fieldTouched.pfNumber && fieldErrors.pfNumber" class="text-xs text-red-400 mt-1 flex items-center">
@@ -146,15 +208,28 @@
                       <input 
                         v-model="formData.staffName" 
                         type="text" 
-                        :class="`medical-input w-full px-3 py-3 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50 ${getFieldErrorClass('staffName')}`"
+                        :class="`medical-input w-full px-3 py-3 pr-12 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50 ${getFieldValidationClass('staffName')}`"
                         placeholder="Enter full name"
                         @input="onStaffNameInput"
                         @blur="fieldTouched.staffName = true; validateStaffName()"
                         required
                       />
                       <div class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/10 to-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                      <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-300/50">
-                        <i class="fas fa-user-circle"></i>
+                      
+                      <!-- Validation Icon -->
+                      <div class="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
+                        <!-- Success Icon -->
+                        <div v-if="isFieldValid('staffName')" class="text-green-400 animate-bounce">
+                          <i class="fas fa-check-circle text-lg"></i>
+                        </div>
+                        <!-- Error Icon -->
+                        <div v-else-if="fieldTouched.staffName && fieldErrors.staffName" class="text-red-400 animate-pulse">
+                          <i class="fas fa-exclamation-circle text-lg"></i>
+                        </div>
+                        <!-- Default Icon -->
+                        <div v-else class="text-blue-300/50">
+                          <i class="fas fa-user-circle"></i>
+                        </div>
                       </div>
                     </div>
                     <p v-if="fieldTouched.staffName && fieldErrors.staffName" class="text-xs text-red-400 mt-1 flex items-center">
@@ -180,15 +255,28 @@
                       <input 
                         v-model="formData.phoneNumber" 
                         type="tel" 
-                        :class="`medical-input w-full px-3 py-3 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50 ${getFieldErrorClass('phoneNumber')}`"
+                        :class="`medical-input w-full px-3 py-3 pr-12 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50 ${getFieldValidationClass('phoneNumber')}`"
                         placeholder="Enter phone number"
                         @input="onPhoneNumberInput"
                         @blur="fieldTouched.phoneNumber = true; validatePhoneNumber()"
                         required
                       />
                       <div class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/10 to-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                      <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-300/50">
-                        <i class="fas fa-mobile-alt"></i>
+                      
+                      <!-- Validation Icon -->
+                      <div class="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
+                        <!-- Success Icon -->
+                        <div v-if="isFieldValid('phoneNumber')" class="text-green-400 animate-bounce">
+                          <i class="fas fa-check-circle text-lg"></i>
+                        </div>
+                        <!-- Error Icon -->
+                        <div v-else-if="fieldTouched.phoneNumber && fieldErrors.phoneNumber" class="text-red-400 animate-pulse">
+                          <i class="fas fa-exclamation-circle text-lg"></i>
+                        </div>
+                        <!-- Default Icon -->
+                        <div v-else class="text-blue-300/50">
+                          <i class="fas fa-mobile-alt"></i>
+                        </div>
                       </div>
                     </div>
                     <p v-if="fieldTouched.phoneNumber && fieldErrors.phoneNumber" class="text-xs text-red-400 mt-1 flex items-center">
@@ -210,7 +298,7 @@
                     <div class="relative">
                       <select 
                         v-model="formData.department" 
-                        :class="`medical-input w-full px-3 py-3 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 appearance-none cursor-pointer group-hover:border-blue-400/50 ${getFieldErrorClass('department')}`"
+                        :class="`medical-input w-full px-3 py-3 pr-16 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 appearance-none cursor-pointer group-hover:border-blue-400/50 ${getFieldValidationClass('department')}`"
                         @change="onDepartmentChange"
                         @blur="fieldTouched.department = true; validateDepartment()"
                         required
@@ -218,8 +306,21 @@
                         <option value="" class="bg-blue-800 text-blue-300">Select Department</option>
                         <option v-for="dept in departments" :key="dept.id" :value="dept.id" class="bg-blue-800 text-white">{{ dept.name }}</option>
                       </select>
-                      <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-300/50 pointer-events-none">
-                        <i class="fas fa-chevron-down"></i>
+                      
+                      <!-- Validation and Dropdown Icons -->
+                      <div class="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2 pointer-events-none">
+                        <!-- Success Icon -->
+                        <div v-if="isFieldValid('department')" class="text-green-400 animate-bounce">
+                          <i class="fas fa-check-circle text-lg"></i>
+                        </div>
+                        <!-- Error Icon -->
+                        <div v-else-if="fieldTouched.department && fieldErrors.department" class="text-red-400 animate-pulse">
+                          <i class="fas fa-exclamation-circle text-lg"></i>
+                        </div>
+                        <!-- Dropdown Icon -->
+                        <div class="text-blue-300/50">
+                          <i class="fas fa-chevron-down"></i>
+                        </div>
                       </div>
                       <div class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/10 to-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                     </div>
@@ -586,22 +687,37 @@
                 <!-- Right: Enhanced Submit Button -->
                 <button 
                   type="submit" 
-                  :disabled="isSubmitting || !isFormValid"
-                  class="group relative inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white font-bold rounded-xl shadow-xl hover:shadow-blue-500/25 transform hover:scale-105 transition-all duration-300 border border-blue-500/50 overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:hover:scale-100"
+                  :disabled="isSubmitting || !isFormValid || hasPendingRequest || checkingPendingStatus"
+                  :class="[
+                    'group relative inline-flex items-center justify-center px-6 py-3 text-white font-bold rounded-xl shadow-xl transform transition-all duration-300 border overflow-hidden',
+                    hasPendingRequest 
+                      ? 'bg-gradient-to-r from-gray-500 via-gray-600 to-gray-700 border-gray-400/50 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 border-blue-500/50 hover:shadow-blue-500/25 hover:scale-105',
+                    'disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:hover:scale-100'
+                  ]"
                 >
                   <!-- Button background animation -->
-                  <div class="absolute inset-0 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div v-if="!hasPendingRequest" class="absolute inset-0 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div v-if="!hasPendingRequest" class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   
                   <!-- Button content -->
                   <div class="relative z-10 flex items-center">
                     <i v-if="isSubmitting" class="fas fa-spinner fa-spin mr-3 text-lg"></i>
+                    <i v-else-if="hasPendingRequest" class="fas fa-ban mr-3 text-lg"></i>
+                    <i v-else-if="checkingPendingStatus" class="fas fa-spinner fa-spin mr-3 text-lg"></i>
                     <i v-else class="fas fa-paper-plane mr-3 text-lg group-hover:translate-x-1 transition-transform duration-300"></i>
-                    <span class="text-base">{{ isSubmitting ? 'Submitting...' : 'Submit Request' }}</span>
+                    <span class="text-base">
+                      {{ 
+                        isSubmitting ? 'Submitting...' : 
+                        hasPendingRequest ? 'Request Blocked - Pending Request Exists' :
+                        checkingPendingStatus ? 'Checking Status...' :
+                        'Submit Request' 
+                      }}
+                    </span>
                   </div>
                   
                   <!-- Button shine effect (only when not disabled) -->
-                  <div v-if="!isSubmitting && isFormValid" class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                  <div v-if="!isSubmitting && isFormValid && !hasPendingRequest" class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
                 </button>
               </div>
             </div>
@@ -831,6 +947,9 @@ export default {
       fieldErrors: {},
       fieldTouched: {},
       submittedServices: null, // Store services that were actually submitted
+      hasPendingRequest: false, // Track if user has pending requests
+      pendingRequestInfo: null, // Store pending request details
+      checkingPendingStatus: true, // Loading state for pending check
       formData: {
         // Applicant Details
         pfNumber: '',
@@ -868,7 +987,8 @@ export default {
              this.formData.department && 
              this.formData.signature && 
              this.hasSelectedService &&
-             (!this.formData.services.internet || this.hasInternetPurposes)
+             (!this.formData.services.internet || this.hasInternetPurposes) &&
+             !this.hasPendingRequest // Prevent submission if there are pending requests
     },
     getSelectedServicesCount() {
       if (!this.submittedServices) return 0
@@ -881,8 +1001,20 @@ export default {
   },
 
   async mounted() {
-    // Load departments when component mounts
-    await this.loadDepartments()
+    console.log('UserCombinedAccessForm mounted - Route:', this.$route.path)
+    // Load departments and check for pending requests when component mounts
+    await Promise.all([
+      this.loadDepartments(),
+      this.checkPendingRequestStatus()
+    ])
+  },
+
+  beforeUnmount() {
+    console.log('UserCombinedAccessForm beforeUnmount - Route:', this.$route.path)
+  },
+
+  unmounted() {
+    console.log('UserCombinedAccessForm unmounted')
   },
 
   methods: {
@@ -1043,7 +1175,23 @@ export default {
       this.validateInternetPurposes()
     },
 
-    // Get field error class
+    // Check if a field is valid (used in template)
+    isFieldValid(fieldName) {
+      return this.fieldTouched[fieldName] && !this.fieldErrors[fieldName] && this.formData[fieldName]
+    },
+
+    // Get field validation CSS class (used in template)
+    getFieldValidationClass(fieldName) {
+      if (this.fieldTouched[fieldName] && this.fieldErrors[fieldName]) {
+        return 'border-red-500 focus:border-red-500'
+      }
+      if (this.fieldTouched[fieldName] && !this.fieldErrors[fieldName] && this.formData[fieldName]) {
+        return 'border-green-500 focus:border-green-500'
+      }
+      return ''
+    },
+
+    // Get field error class (legacy method)
     getFieldErrorClass(fieldName) {
       if (this.fieldTouched[fieldName] && this.fieldErrors[fieldName]) {
         return 'border-red-500 focus:border-red-500'
@@ -1066,9 +1214,44 @@ export default {
       }
     },
 
+    async checkPendingRequestStatus() {
+      try {
+        this.checkingPendingStatus = true
+        const response = await userCombinedAccessService.checkPendingRequests()
+        
+        if (response.success) {
+          this.hasPendingRequest = response.data.has_pending
+          this.pendingRequestInfo = response.data.pending_request
+          
+          if (this.hasPendingRequest) {
+            console.log('User has pending request:', this.pendingRequestInfo)
+            this.showNotification(
+              `You have a pending request (${this.pendingRequestInfo?.request_type || 'Unknown'}). Please wait for approval before submitting a new request.`,
+              'warning'
+            )
+          }
+        }
+      } catch (error) {
+        console.error('Error checking pending requests:', error)
+        // Don't block the form if we can't check pending status
+        this.hasPendingRequest = false
+      } finally {
+        this.checkingPendingStatus = false
+      }
+    },
+
     async submitForm() {
       // Clear previous validation errors
       this.validationErrors = {}
+      
+      // Check for pending requests before allowing submission
+      if (this.hasPendingRequest) {
+        this.showNotification(
+          `You cannot submit a new request while you have a pending request. Please wait for approval.`,
+          'error'
+        )
+        return
+      }
       
       // Basic client-side validation
       if (!this.formData.pfNumber || !this.formData.staffName || !this.formData.department || !this.formData.phoneNumber) {
@@ -1119,16 +1302,20 @@ export default {
         if (response.success) {
           console.log('Combined Access Form submitted successfully:', response.data)
           
-          // Store the submitted services before resetting the form
-          this.submittedServices = {
-            jeeva: this.formData.services.jeeva,
-            wellsoft: this.formData.services.wellsoft,
-            internet: this.formData.services.internet
-          }
+          // Show success notification
+          this.showNotification('Request submitted successfully! Redirecting to dashboard...', 'success')
           
-          this.showSuccessModal = true
+          // Reset form
           this.resetForm()
-          this.showNotification('Request submitted successfully!', 'success')
+          
+          // Redirect to dashboard after a short delay
+          setTimeout(() => {
+            this.$router.replace('/user-dashboard').catch(err => {
+              console.log('Navigation after submission:', err.name)
+              // Fallback to window.location if router navigation fails
+              window.location.href = '/user-dashboard'
+            })
+          }, 2000) // 2 second delay to show the success message
         } else {
           this.showNotification(response.message || 'Failed to submit request', 'error')
         }
@@ -1241,12 +1428,41 @@ export default {
     },
 
     goBack() {
-      this.$router.push('/user-dashboard')
+      console.log('goBack called - Current route:', this.$route.path)
+      console.log('goBack called - Target route: /user-dashboard')
+      
+      // Force navigation to user dashboard with replace to avoid history issues
+      this.$router.replace('/user-dashboard').then(() => {
+        console.log('Navigation successful to:', this.$route.path)
+      }).catch(err => {
+        console.log('Navigation failed:', err.name, err.message)
+        // Handle navigation failures gracefully
+        if (err.name === 'NavigationDuplicated') {
+          // User is already on the target route, force a page reload
+          console.log('Already on user dashboard, forcing reload')
+          window.location.href = '/user-dashboard'
+        } else if (err.name === 'NavigationAborted' || err.name === 'NavigationCancelled') {
+          // Navigation was aborted or cancelled, try alternative approach
+          console.log('Navigation was cancelled, trying alternative approach')
+          // Try using window.location as fallback
+          window.location.href = '/user-dashboard'
+        } else {
+          // Only log actual errors and provide fallback
+          console.error('Navigation error:', err)
+          // Fallback to window.location
+          window.location.href = '/user-dashboard'
+        }
+      })
     },
 
     closeSuccessModal() {
       this.showSuccessModal = false
-      this.$router.push('/user-dashboard')
+      // Use replace to ensure proper navigation
+      this.$router.replace('/user-dashboard').catch(err => {
+        console.log('Navigation from success modal:', err.name)
+        // Fallback to window.location if router navigation fails
+        window.location.href = '/user-dashboard'
+      })
     },
 
     showNotification(message, type = 'info') {
@@ -1254,13 +1470,26 @@ export default {
       const colors = {
         success: 'green',
         error: 'red',
+        warning: 'yellow',
         info: 'blue'
       }
       
       // Create a simple toast notification
       const toast = document.createElement('div')
-      toast.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white font-semibold z-50 bg-${colors[type]}-600 transform transition-all duration-300`
-      toast.textContent = message
+      toast.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white font-semibold z-50 bg-${colors[type]}-600 transform transition-all duration-300 max-w-md`
+      toast.innerHTML = `
+        <div class="flex items-start space-x-3">
+          <i class="fas ${
+            type === 'success' ? 'fa-check-circle' :
+            type === 'error' ? 'fa-exclamation-circle' :
+            type === 'warning' ? 'fa-exclamation-triangle' :
+            'fa-info-circle'
+          } text-lg mt-0.5"></i>
+          <div class="flex-1">
+            <p class="text-sm leading-relaxed">${message}</p>
+          </div>
+        </div>
+      `
       document.body.appendChild(toast)
       
       // Animate in
@@ -1268,7 +1497,8 @@ export default {
         toast.style.transform = 'translateX(0)'
       }, 100)
       
-      // Remove after 3 seconds
+      // Remove after longer time for warnings
+      const duration = type === 'warning' ? 6000 : 3000
       setTimeout(() => {
         toast.style.transform = 'translateX(100%)'
         setTimeout(() => {
@@ -1276,7 +1506,7 @@ export default {
             document.body.removeChild(toast)
           }
         }, 300)
-      }, 3000)
+      }, duration)
     }
   }
 }

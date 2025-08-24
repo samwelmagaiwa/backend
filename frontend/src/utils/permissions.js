@@ -21,13 +21,17 @@ export const ROLE_PERMISSIONS = {
   [ROLES.ADMIN]: {
     routes: [
       '/admin-dashboard',
+      '/admin/roles',
+      '/admin/user-roles',
+      '/admin/department-hods',
       '/jeeva-users',
       '/wellsoft-users', 
       '/internet-users'
     ],
     dashboards: ['admin-dashboard'],
     forms: [],
-    userManagement: ['jeeva-users', 'wellsoft-users', 'internet-users']
+    userManagement: ['jeeva-users', 'wellsoft-users', 'internet-users'],
+    roleManagement: ['admin/roles', 'admin/user-roles', 'admin/department-hods']
   },
 
   [ROLES.DIVISIONAL_DIRECTOR]: {
@@ -37,31 +41,27 @@ export const ROLE_PERMISSIONS = {
       '/wellsoft-access', 
       '/internet-access',
       '/both-service-form',
-      '/internal-access/list',
+      '/hod-dashboard/request-list',
       '/internal-access/details',
       '/onboarding'
     ],
     dashboards: ['divisional-dashboard'],
     forms: ['jeeva-access', 'wellsoft-access', 'internet-access', 'both-service-form'],
     userManagement: [],
-    requestsManagement: ['internal-access/list', 'internal-access/details']
+    requestsManagement: ['hod-dashboard/request-list', 'internal-access/details']
   },
 
   [ROLES.HEAD_OF_DEPARTMENT]: {
     routes: [
-      '/hod-dashboard',
-      '/jeeva-access',
-      '/wellsoft-access',
-      '/internet-access',
-      '/both-service-form',
-      '/internal-access/list',
+      '/hod-dashboard/request-list',
       '/internal-access/details',
+      '/both-service-form',
       '/onboarding'
     ],
-    dashboards: ['hod-dashboard'],
-    forms: ['jeeva-access', 'wellsoft-access', 'internet-access', 'both-service-form'],
+    dashboards: ['hod-dashboard-request-list'],
+    forms: ['both-service-form'],
     userManagement: [],
-    requestsManagement: ['internal-access/list', 'internal-access/details']
+    requestsManagement: ['hod-dashboard/request-list', 'internal-access/details']
   },
 
   [ROLES.HOD_IT]: {
@@ -71,14 +71,14 @@ export const ROLE_PERMISSIONS = {
       '/wellsoft-access',
       '/internet-access',
       '/both-service-form',
-      '/internal-access/list',
+      '/hod-dashboard/request-list',
       '/internal-access/details',
       '/onboarding'
     ],
     dashboards: ['hod-it-dashboard'],
     forms: ['jeeva-access', 'wellsoft-access', 'internet-access', 'both-service-form'],
     userManagement: [],
-    requestsManagement: ['internal-access/list', 'internal-access/details']
+    requestsManagement: ['hod-dashboard/request-list', 'internal-access/details']
   },
 
   [ROLES.ICT_DIRECTOR]: {
@@ -88,14 +88,14 @@ export const ROLE_PERMISSIONS = {
       '/wellsoft-access',
       '/internet-access',
       '/both-service-form',
-      '/internal-access/list',
+      '/hod-dashboard/request-list',
       '/internal-access/details',
       '/onboarding'
     ],
     dashboards: ['dict-dashboard'],
     forms: ['jeeva-access', 'wellsoft-access', 'internet-access', 'both-service-form'],
     userManagement: [],
-    requestsManagement: ['internal-access/list', 'internal-access/details']
+    requestsManagement: ['hod-dashboard/request-list', 'internal-access/details']
   },
 
   [ROLES.STAFF]: {
@@ -127,15 +127,14 @@ export const ROLE_PERMISSIONS = {
       '/both-service-form',
       '/ict-approval/requests',
       '/ict-approval/request/:id',
-      '/internal-access/list',
+      '/hod-dashboard/request-list',
       '/internal-access/details',
       '/onboarding'
     ],
     dashboards: ['ict-dashboard'],
     forms: ['jeeva-access', 'wellsoft-access', 'internet-access', 'both-service-form'],
-    userManagement: [],
-    deviceManagement: ['ict-approval/requests', 'ict-approval/request/:id'],
-    requestsManagement: ['internal-access/list', 'internal-access/details']
+    userManagement: ['user-management'],
+    requestsManagement: ['hod-dashboard/request-list', 'internal-access/details']
   }
 }
 
@@ -221,26 +220,35 @@ export function getAllowedRoutes(userRole) {
  * @returns {string|null} - Default dashboard route or null
  */
 export function getDefaultDashboard(userRole) {
+  console.log('🔍 getDefaultDashboard called with role:', userRole)
+  
   const permissions = ROLE_PERMISSIONS[userRole]
+  console.log('📊 Permissions for role:', permissions)
+  
   if (!permissions || !permissions.dashboards.length) {
+    console.log('⚠️ No permissions or dashboards found for role:', userRole)
     return null
   }
 
   // Return the first dashboard as default
   const dashboardName = permissions.dashboards[0]
+  console.log('🏠 Dashboard name:', dashboardName)
   
   // Map dashboard names to routes
   const dashboardRoutes = {
     'admin-dashboard': '/admin-dashboard',
     'user-dashboard': '/user-dashboard', 
     'dict-dashboard': '/dict-dashboard',
-    'hod-dashboard': '/hod-dashboard',
+    'hod-dashboard-request-list': '/hod-dashboard/request-list',
     'hod-it-dashboard': '/hod-it-dashboard',
     'divisional-dashboard': '/divisional-dashboard',
     'ict-dashboard': '/ict-dashboard'
   }
   
-  return dashboardRoutes[dashboardName] || null
+  const route = dashboardRoutes[dashboardName] || null
+  console.log('🗺 Final route for', userRole, ':', route)
+  
+  return route
 }
 
 /**
