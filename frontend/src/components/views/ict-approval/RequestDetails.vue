@@ -429,7 +429,7 @@ export default {
       this.isLoading = true
       try {
         const requestId = this.$route.params.id
-        // Replace with your actual API endpoint
+        // Fetch real data from API
         const response = await axios.get(`/api/device-requests/${requestId}`)
         this.request = response.data
         
@@ -439,54 +439,10 @@ export default {
         }
       } catch (error) {
         console.error('Error fetching request details:', error)
-        // Mock data for development
-        const requestId = parseInt(this.$route.params.id)
-        const mockRequests = [
-          {
-            id: 1,
-            borrowerName: 'John Doe',
-            department: 'ICT Department',
-            phoneNumber: '0712345678',
-            deviceType: 'projector',
-            customDevice: '',
-            bookingDate: '2024-01-15',
-            collectionDate: '2024-01-20',
-            returnTime: '14:00',
-            reason: 'Presentation for board meeting',
-            status: 'pending',
-            signature: null
-          },
-          {
-            id: 2,
-            borrowerName: 'Jane Smith',
-            department: 'Finance',
-            phoneNumber: '0723456789',
-            deviceType: 'laptop',
-            customDevice: '',
-            bookingDate: '2024-01-14',
-            collectionDate: '2024-01-18',
-            returnTime: '16:00',
-            reason: 'Financial analysis work',
-            status: 'returned',
-            signature: null
-          },
-          {
-            id: 3,
-            borrowerName: 'Mike Johnson',
-            department: 'Human Resources',
-            phoneNumber: '0734567890',
-            deviceType: 'others',
-            customDevice: 'Wireless Microphone',
-            bookingDate: '2024-01-13',
-            collectionDate: '2024-01-17',
-            returnTime: '12:00',
-            reason: 'Staff training session',
-            status: 'compromised',
-            signature: null
-          }
-        ]
-        
-        this.request = mockRequests.find(r => r.id === requestId) || {}
+        // Show user-friendly error message
+        alert('Unable to load request details. Please check your connection and try again.')
+        // No mock data - use real API data only
+        this.request = {}
         
         // Pre-fill assessment with current status
         this.assessment.status = this.request.status || ''

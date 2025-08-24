@@ -28,26 +28,31 @@
             {{ errorMessage }}
           </div>
           
+          <!-- Redirect explanation -->
+          <RedirectExplanation />
+          
           <form @submit.prevent="handleLogin">
             <div class="mb-4">
               <label class="block text-gray-700 font-bold text-left">Email</label>
               <input 
-                v-model="email" 
+                v-model="credentials.email" 
                 type="email" 
                 class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" 
                 required 
                 placeholder="Enter your email"
+                :disabled="loading"
               />
             </div>
             
             <div class="mb-4">
               <label class="block text-gray-700 font-bold text-left">Password</label>
               <input 
-                v-model="password" 
+                v-model="credentials.password" 
                 type="password" 
                 class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" 
                 required 
                 placeholder="Enter your password"
+                :disabled="loading"
               />
             </div>
             
@@ -55,7 +60,7 @@
             <div class="mb-4 flex items-center justify-between">
               <label class="flex items-center text-sm text-gray-600">
                 <input 
-                  v-model="rememberEmail" 
+                  v-model="rememberMe" 
                   type="checkbox" 
                   class="mr-2 rounded focus:ring-2 focus:ring-primary"
                 >
@@ -64,7 +69,7 @@
               
               <!-- Clear saved email button -->
               <button 
-                v-if="email"
+                v-if="credentials.email"
                 type="button"
                 @click="clearSavedEmail"
                 class="text-xs text-gray-500 hover:text-red-600 transition-colors"
@@ -77,10 +82,10 @@
             
             <button 
               type="submit" 
-              :disabled="isLoading"
+              :disabled="loading"
               class="w-full bg-primary text-white p-2 rounded hover:bg-opacity-90 transition ease-in-out duration-300 animate-fadeIn delay-2 animate-bounceIn disabled:opacity-50"
             >
-              <span v-if="isLoading">
+              <span v-if="loading">
                 <i class="fas fa-spinner fa-spin mr-2"></i>
                 Logging in...
               </span>
@@ -92,7 +97,7 @@
           </form>
           
           <!-- Email Memory Info -->
-          <div v-if="email && rememberEmail" class="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+          <div v-if="credentials.email && rememberMe" class="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
             <div class="flex items-center text-blue-700">
               <i class="fas fa-user-check mr-2"></i>
               <span class="text-sm font-medium">Email Remembered</span>
@@ -109,194 +114,190 @@
                 <i class="fas fa-check-circle mr-2"></i>
                 <span class="font-semibold">Backend API</span>
               </div>
-              <button 
-                @click="testConnection"
-                :disabled="testingConnection"
-                class="px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 disabled:opacity-50"
-              >
-                <i v-if="testingConnection" class="fas fa-spinner fa-spin mr-1"></i>
-                <i v-else class="fas fa-plug mr-1"></i>
-                {{ testingConnection ? 'Testing...' : 'Test' }}
-              </button>
+
             </div>
             <p class="text-xs text-green-600 mb-2">
               Using Laravel backend at <code class="bg-green-100 px-1 rounded">{{ apiUrl }}</code>
             </p>
-            <div v-if="connectionStatus" class="text-xs" :class="connectionStatus.success ? 'text-green-600' : 'text-red-600'">
-              <i :class="connectionStatus.success ? 'fas fa-check-circle' : 'fas fa-times-circle'" class="mr-1"></i>
-              {{ connectionStatus.message }}
-            </div>
+
             <p class="text-xs text-gray-600 mt-1">
               Please use your registered credentials to login.
             </p>
           </div>
+
+
         </div>
+      </div>
+    </div>
+
+    <!-- Success Snackbar -->
+    <div v-if="showSuccessSnackbar" class="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+      <div class="flex items-center">
+        <i class="fas fa-check-circle mr-2"></i>
+        Login successful! Redirecting...
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { ref, computed, onMounted, watch } from 'vue'
-import { useAuth } from '@/composables/useAuth'
-import { useRoute } from 'vue-router'
-import { loginMemory } from '../utils/loginMemory'
+import { mapActions, mapGetters } from 'vuex'
+import RedirectExplanation from './RedirectExplanation.vue'
 
 export default {
   name: 'LoginPage',
-  setup() {
-    const { login, isLoading, error, clearError } = useAuth()
-    const route = useRoute()
-    
-    // Connection testing
-    const testingConnection = ref(false)
-    const connectionStatus = ref(null)
-    
-    // Form data with localStorage persistence for email
-    const email = ref('')
-    const password = ref('')
-    const rememberEmail = ref(true)
-    
-    // API URL for display
-    const apiUrl = process.env.VUE_APP_API_URL || 'http://localhost:8000/api'
-    
-    // Load saved email on component mount
-    const loadSavedEmail = () => {
-      const savedEmail = loginMemory.getSavedEmail()
-      if (savedEmail) {
-        email.value = savedEmail
-        rememberEmail.value = true
-      }
+  components: {
+    RedirectExplanation
+  },
+  
+  data() {
+    return {
+      credentials: {
+        email: '',
+        password: ''
+      },
+      rememberMe: true,
+      loading: false,
+      showSuccessSnackbar: false,
+
     }
+  },
+  
+  computed: {
+    ...mapGetters('auth', ['error']),
     
-    // Save email to localStorage when remember is enabled
-    const saveEmail = () => {
-      if (rememberEmail.value && email.value) {
-        loginMemory.saveEmail(email.value)
-      } else {
-        loginMemory.clearSavedEmail()
-      }
-    }
+    apiUrl() {
+      return process.env.VUE_APP_API_URL || 'http://localhost:8000/api'
+    },
+
     
-    // Watch for changes in rememberEmail checkbox
-    watch(rememberEmail, (newValue) => {
-      if (!newValue) {
-        loginMemory.clearSavedEmail()
-      } else if (email.value) {
-        saveEmail()
-      }
-    })
-    
-    // Error handling
-    const errorMessage = computed(() => {
-      if (route.query.error === 'access_denied') {
+    errorMessage() {
+      if (this.$route.query.error === 'access_denied') {
         return 'Access denied. You do not have permission to access that page.'
       }
-      return error.value
-    })
+      return this.error
+    }
+  },
+  
+  methods: {
+    ...mapActions('auth', ['login', 'clearError']),
     
-    // Methods
-    const handleLogin = async () => {
-      clearError()
-      
-      if (!email.value || !password.value) {
+    async handleLogin() {
+      if (!this.credentials.email || !this.credentials.password) {
         return
       }
       
-      // Save email if remember is enabled
-      if (rememberEmail.value) {
-        saveEmail()
-      }
+      this.clearError()
+      this.loading = true
       
-      console.log('🚀 Attempting login with:', {
-        email: email.value,
-        rememberEmail: rememberEmail.value
-      })
-      
-      // Use the auth composable's login method which handles navigation
-      const result = await login({
-        email: email.value,
-        password: password.value
-      })
-      
-      if (result.success) {
-        console.log('✅ Login successful! Navigation should be handled by auth composable.')
-        // Clear password but keep email if remember is enabled
-        password.value = ''
-      } else {
-        console.error('❌ Login failed:', result.error)
-        // Clear password on failed login for security
-        password.value = ''
-      }
-    }
-    
-    const clearSavedEmail = () => {
-      loginMemory.clearSavedEmail()
-      email.value = ''
-      rememberEmail.value = false
-    }
-    
-    // Test API connection
-    const testConnection = async () => {
       try {
-        testingConnection.value = true
-        connectionStatus.value = null
-        
-        console.log('🔌 Testing API connection to:', apiUrl)
-        
-        // Try to make a simple request to test connectivity
-        const response = await fetch(apiUrl.replace('/api', '/api/user'), {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          }
+        console.log('🚀 Attempting login with:', {
+          email: this.credentials.email,
+          rememberMe: this.rememberMe
         })
         
-        if (response.ok || response.status === 401) {
-          // 401 is expected for unauthenticated requests, but means API is reachable
-          connectionStatus.value = {
-            success: true,
-            message: `API is reachable (Status: ${response.status})`
+        const result = await this.login({
+          email: this.credentials.email,
+          password: this.credentials.password
+        })
+        
+        if (result.success) {
+          this.showSuccessSnackbar = true
+          console.log('✅ Login successful! Navigation should be handled by auth system.')
+          
+          const userRole = result.user.role
+          console.log('🔍 Login successful, user role:', userRole)
+          
+          // Check if there's a redirect parameter in the URL
+          const redirectParam = this.$route.query.redirect
+          console.log('🔍 Redirect parameter:', redirectParam)
+          
+          let redirectPath = '/user-dashboard' // default fallback
+          
+          // First priority: Check if user needs onboarding
+          if (result.user.needs_onboarding && userRole !== 'admin') {
+            redirectPath = '/onboarding'
+            console.log('🔄 User needs onboarding, redirecting to:', redirectPath)
           }
-          console.log('✅ API connection successful')
+          // Second priority: Honor the redirect parameter if user has access
+          else if (redirectParam) {
+            // Validate that the user has access to the redirect path
+            const targetRoute = this.$router.resolve(redirectParam)
+            
+            if (targetRoute && targetRoute.meta && targetRoute.meta.roles) {
+              if (targetRoute.meta.roles.includes(userRole)) {
+                redirectPath = redirectParam
+                console.log('✅ User has access to redirect path:', redirectPath)
+              } else {
+                console.warn('⚠️ User does not have access to redirect path:', redirectParam)
+                // Fall through to role-based default
+                redirectPath = this.getDefaultDashboardForRole(userRole)
+              }
+            } else {
+              // No role restrictions, allow the redirect
+              redirectPath = redirectParam
+              console.log('🔄 No role restrictions on redirect path, allowing:', redirectPath)
+            }
+          }
+          // Third priority: Role-based default dashboard
+          else {
+            redirectPath = this.getDefaultDashboardForRole(userRole)
+          }
+          
+          console.log('🔄 Final redirect path:', redirectPath)
+          
+          // Clear password but keep email if remember is enabled
+          this.credentials.password = ''
+          
+          // Redirect after a short delay
+          setTimeout(() => {
+            this.$router.push(redirectPath)
+          }, 1500)
+          
         } else {
-          connectionStatus.value = {
-            success: false,
-            message: `API returned status: ${response.status}`
-          }
-          console.log('❌ API connection failed:', response.status)
+          console.error('❌ Login failed:', result.error)
+          // Clear password on failed login for security
+          this.credentials.password = ''
         }
-      } catch (err) {
-        connectionStatus.value = {
-          success: false,
-          message: `Connection failed: ${err.message}`
-        }
-        console.error('❌ API connection error:', err)
+      } catch (error) {
+        console.error('Login error:', error)
+        this.credentials.password = ''
       } finally {
-        testingConnection.value = false
+        this.loading = false
       }
-    }
+    },
+
     
-    // Initialize component
-    onMounted(() => {
-      clearError()
-      loadSavedEmail()
-    })
+    getDefaultDashboardForRole(userRole) {
+      switch (userRole) {
+        case 'admin':
+          return '/admin-dashboard'
+        case 'divisional_director':
+          return '/divisional-dashboard'
+        case 'head_of_department':
+          return '/hod-dashboard/request-list'
+        case 'hod_it':
+          return '/hod-it-dashboard'
+        case 'ict_director':
+          return '/dict-dashboard'
+        case 'ict_officer':
+          return '/ict-dashboard'
+        case 'staff':
+          return '/user-dashboard'
+        default:
+          console.warn('Unknown role, defaulting to user dashboard:', userRole)
+          return '/user-dashboard'
+      }
+    },
     
-    return {
-      email,
-      password,
-      rememberEmail,
-      errorMessage,
-      isLoading,
-      handleLogin,
-      clearSavedEmail,
-      apiUrl,
-      testConnection,
-      testingConnection,
-      connectionStatus
+    clearSavedEmail() {
+      this.credentials.email = ''
+      this.rememberMe = false
     }
+  },
+  
+  mounted() {
+    this.clearError()
   }
 }
 </script>

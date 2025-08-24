@@ -11,6 +11,10 @@ class UserSeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     * 
+     * This seeder creates the necessary roles for the hospital management system.
+     * For production use, create users through the admin interface or proper
+     * registration process instead of seeding demo accounts.
      */
     public function run(): void
     {
@@ -29,63 +33,20 @@ class UserSeeder extends Seeder
             Role::firstOrCreate($role);
         }
 
-        // Create test users
+        // Note: In production, users should be created through proper registration
+        // or admin interface rather than seeding demo accounts.
+        // This seeder only creates the necessary roles for the system.
+        
+        // Uncomment the following code only for development/testing purposes:
+        /*
         $users = [
             [
                 'name' => 'System Administrator',
-                'email' => 'admin@gmail.com',
-                'phone' => '255712000001',
-                'pf_number' => null, // Admin doesn't need PF number
-                'password' => Hash::make('12345678'),
+                'email' => 'admin@hospital.go.tz',
+                'phone' => '+255700000000',
+                'pf_number' => null,
+                'password' => Hash::make('secure_password_here'),
                 'role_name' => 'admin'
-            ],
-            [
-                'name' => 'Divisional Director',
-                'email' => 'divisional@gmail.com',
-                'phone' => '255712000002',
-                'pf_number' => 'DD001', // Unique PF number
-                'password' => Hash::make('12345678'),
-                'role_name' => 'divisional_director'
-            ],
-            [
-                'name' => 'Head of Department',
-                'email' => 'hod@gmail.com',
-                'phone' => '255712000003',
-                'pf_number' => 'HOD001', // Unique PF number
-                'password' => Hash::make('12345678'),
-                'role_name' => 'head_of_department'
-            ],
-            [
-                'name' => 'Head of IT Department',
-                'email' => 'hod.it@gmail.com',
-                'phone' => '255712000004',
-                'pf_number' => 'HODIT001', // Unique PF number
-                'password' => Hash::make('12345678'),
-                'role_name' => 'hod_it'
-            ],
-            [
-                'name' => 'ICT Director',
-                'email' => 'ict.director@gmail.com',
-                'phone' => '255712000005',
-                'pf_number' => 'ICTDIR001', // Unique PF number
-                'password' => Hash::make('12345678'),
-                'role_name' => 'ict_director'
-            ],
-            [
-                'name' => 'Hospital Staff',
-                'email' => 'staff@gmail.com',
-                'phone' => '255712000006',
-                'pf_number' => 'STAFF001', // Unique PF number
-                'password' => Hash::make('12345678'),
-                'role_name' => 'staff'
-            ],
-            [
-                'name' => 'ICT Officer',
-                'email' => 'ict.officer@gmail.com',
-                'phone' => '255712000007',
-                'pf_number' => 'ICTOFC001', // Unique PF number
-                'password' => Hash::make('12345678'),
-                'role_name' => 'ict_officer'
             ],
         ];
 
@@ -99,5 +60,6 @@ class UserSeeder extends Seeder
                 User::firstOrCreate(['email' => $userData['email']], $userData);
             }
         }
+        */
     }
 }
