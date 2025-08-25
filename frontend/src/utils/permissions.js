@@ -1,6 +1,6 @@
 /**
  * Centralized Role-Based Access Control (RBAC) Configuration
- * 
+ *
  * This file defines all roles and their allowed routes/permissions.
  * It provides a single source of truth for access control throughout the application.
  */
@@ -22,7 +22,7 @@ export const ROLE_PERMISSIONS = {
     routes: [
       '/admin-dashboard',
       '/jeeva-users',
-      '/wellsoft-users', 
+      '/wellsoft-users',
       '/internet-users'
     ],
     dashboards: ['admin-dashboard'],
@@ -34,7 +34,7 @@ export const ROLE_PERMISSIONS = {
     routes: [
       '/divisional-dashboard',
       '/jeeva-access',
-      '/wellsoft-access', 
+      '/wellsoft-access',
       '/internet-access',
       '/both-service-form',
       '/internal-access/list',
@@ -42,7 +42,12 @@ export const ROLE_PERMISSIONS = {
       '/onboarding'
     ],
     dashboards: ['divisional-dashboard'],
-    forms: ['jeeva-access', 'wellsoft-access', 'internet-access', 'both-service-form'],
+    forms: [
+      'jeeva-access',
+      'wellsoft-access',
+      'internet-access',
+      'both-service-form'
+    ],
     userManagement: [],
     requestsManagement: ['internal-access/list', 'internal-access/details']
   },
@@ -50,6 +55,7 @@ export const ROLE_PERMISSIONS = {
   [ROLES.HEAD_OF_DEPARTMENT]: {
     routes: [
       '/hod-dashboard',
+      '/hod-dashboard/request-list',
       '/jeeva-access',
       '/wellsoft-access',
       '/internet-access',
@@ -59,7 +65,12 @@ export const ROLE_PERMISSIONS = {
       '/onboarding'
     ],
     dashboards: ['hod-dashboard'],
-    forms: ['jeeva-access', 'wellsoft-access', 'internet-access', 'both-service-form'],
+    forms: [
+      'jeeva-access',
+      'wellsoft-access',
+      'internet-access',
+      'both-service-form'
+    ],
     userManagement: [],
     requestsManagement: ['internal-access/list', 'internal-access/details']
   },
@@ -76,7 +87,12 @@ export const ROLE_PERMISSIONS = {
       '/onboarding'
     ],
     dashboards: ['hod-it-dashboard'],
-    forms: ['jeeva-access', 'wellsoft-access', 'internet-access', 'both-service-form'],
+    forms: [
+      'jeeva-access',
+      'wellsoft-access',
+      'internet-access',
+      'both-service-form'
+    ],
     userManagement: [],
     requestsManagement: ['internal-access/list', 'internal-access/details']
   },
@@ -93,7 +109,12 @@ export const ROLE_PERMISSIONS = {
       '/onboarding'
     ],
     dashboards: ['dict-dashboard'],
-    forms: ['jeeva-access', 'wellsoft-access', 'internet-access', 'both-service-form'],
+    forms: [
+      'jeeva-access',
+      'wellsoft-access',
+      'internet-access',
+      'both-service-form'
+    ],
     userManagement: [],
     requestsManagement: ['internal-access/list', 'internal-access/details']
   },
@@ -109,7 +130,13 @@ export const ROLE_PERMISSIONS = {
       '/onboarding'
     ],
     dashboards: ['user-dashboard'],
-    forms: ['user-jeeva-form', 'user-wellsoft-form', 'user-internet-form', 'user-combined-form', 'booking-service'],
+    forms: [
+      'user-jeeva-form',
+      'user-wellsoft-form',
+      'user-internet-form',
+      'user-combined-form',
+      'booking-service'
+    ],
     userManagement: []
   },
 
@@ -127,7 +154,12 @@ export const ROLE_PERMISSIONS = {
       '/onboarding'
     ],
     dashboards: ['ict-dashboard'],
-    forms: ['jeeva-access', 'wellsoft-access', 'internet-access', 'both-service-form'],
+    forms: [
+      'jeeva-access',
+      'wellsoft-access',
+      'internet-access',
+      'both-service-form'
+    ],
     userManagement: [],
     deviceManagement: ['ict-approval/requests', 'ict-approval/request/:id'],
     requestsManagement: ['internal-access/list', 'internal-access/details']
@@ -143,14 +175,10 @@ export const PUBLIC_ROUTES = [
 ]
 
 // Onboarding routes (accessible to authenticated non-admin users)
-export const ONBOARDING_ROUTES = [
-  '/onboarding'
-]
+export const ONBOARDING_ROUTES = ['/onboarding']
 
 // Settings routes (accessible to all authenticated users)
-export const SETTINGS_ROUTES = [
-  '/settings'
-]
+export const SETTINGS_ROUTES = ['/settings']
 
 /**
  * Check if a user role has access to a specific route
@@ -196,12 +224,12 @@ export function getAllowedRoutes(userRole) {
   }
 
   let allowedRoutes = [...PUBLIC_ROUTES, ...permissions.routes]
-  
+
   // Add onboarding routes for non-admin users
   if (userRole !== ROLES.ADMIN) {
     allowedRoutes = [...allowedRoutes, ...ONBOARDING_ROUTES]
   }
-  
+
   // Add settings routes for all authenticated users
   if (userRole) {
     allowedRoutes = [...allowedRoutes, ...SETTINGS_ROUTES]
@@ -212,7 +240,7 @@ export function getAllowedRoutes(userRole) {
 
 /**
  * Get the default dashboard route for a user role
- * @param {string} userRole - The user's role  
+ * @param {string} userRole - The user's role
  * @returns {string|null} - Default dashboard route or null
  */
 export function getDefaultDashboard(userRole) {
@@ -223,18 +251,18 @@ export function getDefaultDashboard(userRole) {
 
   // Return the first dashboard as default
   const dashboardName = permissions.dashboards[0]
-  
+
   // Map dashboard names to routes
   const dashboardRoutes = {
     'admin-dashboard': '/admin-dashboard',
-    'user-dashboard': '/user-dashboard', 
+    'user-dashboard': '/user-dashboard',
     'dict-dashboard': '/dict-dashboard',
     'hod-dashboard': '/hod-dashboard',
     'hod-it-dashboard': '/hod-it-dashboard',
     'divisional-dashboard': '/divisional-dashboard',
     'ict-dashboard': '/ict-dashboard'
   }
-  
+
   return dashboardRoutes[dashboardName] || null
 }
 

@@ -54,7 +54,10 @@ class AuthController extends Controller
             'user_id' => $user->id,
             'user_name' => $user->name,
             'role_id' => $user->role_id,
-            'role_name' => $user->role ? $user->role->name : null
+            'old_role_name' => $user->role ? $user->role->name : null,
+            'primary_role_name' => $user->getPrimaryRoleName(),
+            'many_to_many_roles' => $user->roles()->pluck('name')->toArray(),
+            'permissions' => $user->getAllPermissions()
         ]);
         
         // Verify password
@@ -67,8 +70,8 @@ class AuthController extends Controller
         
         Log::info('Password verification successful for user: ' . $request->email);
         
-        // Load user relationships
-        $user->load(['role', 'onboarding']);
+        // Load user relationships (prioritize old role system)
+        $user->load(['role', 'roles', 'onboarding']);
         
         // Create a unique token name for this session
         $tokenName = $this->generateTokenName($user, $userAgent, $ipAddress);
@@ -96,7 +99,9 @@ class AuthController extends Controller
                 'phone' => $user->phone,
                 'pf_number' => $user->pf_number,
                 'role_id' => $user->role_id,
-                'role_name' => $user->role ? $user->role->name : null,
+                'role_name' => $user->getPrimaryRoleName(),
+                'roles' => $user->roles()->pluck('name')->toArray(),
+                'permissions' => $user->getAllPermissions(),
                 'needs_onboarding' => $user->needsOnboarding(),
                 'onboarding_step' => $onboarding->current_step,
             ],
@@ -112,7 +117,8 @@ class AuthController extends Controller
         Log::info('Login successful, returning response', [
             'user_id' => $user->id,
             'user_email' => $user->email,
-            'role_name' => $user->role ? $user->role->name : null,
+            'role_name' => $user->getPrimaryRoleName(),
+            'roles' => $user->roles()->pluck('name')->toArray(),
             'token_name' => $tokenName
         ]);
         
@@ -127,7 +133,7 @@ class AuthController extends Controller
     {
         $browser = $this->getBrowserName($userAgent);
         $timestamp = Carbon::now()->format('Y-m-d H:i:s');
-        $rolePrefix = $user->role ? strtoupper($user->role->name) : 'USER';
+        $rolePrefix = $user->getPrimaryRoleName() ? strtoupper($user->getPrimaryRoleName()) : 'USER';
         
         return "{$rolePrefix}_{$browser}_{$ipAddress}_{$timestamp}";
     }
@@ -157,42 +163,43 @@ class AuthController extends Controller
     {
         $baseAbilities = ['read-profile', 'update-profile'];
         
-        if (!$user->role) {
+        $userRoles = $user->roles()->pluck('name')->toArray();
+        
+        if (empty($userRoles)) {
             return $baseAbilities;
         }
         
-        switch ($user->role->name) {
-            case 'admin':
-                return array_merge($baseAbilities, [
-                    'admin-access',
-                    'manage-users',
-                    'manage-requests',
-                    'view-all-data',
-                    'system-settings'
-                ]);
-                
-            case 'divisional_director':
-            case 'head_of_department':
-            case 'hod_it':
-            case 'ict_director':
-            case 'ict_officer':
-                return array_merge($baseAbilities, [
-                    'approver-access',
-                    'review-requests',
-                    'approve-requests',
-                    'view-department-data'
-                ]);
-                
-            case 'staff':
-                return array_merge($baseAbilities, [
-                    'staff-access',
-                    'create-requests',
-                    'view-own-requests'
-                ]);
-                
-            default:
-                return $baseAbilities;
+        $abilities = $baseAbilities;
+        
+        // Add abilities based on roles
+        if (array_intersect($userRoles, ['admin', 'super_admin'])) {
+            $abilities = array_merge($abilities, [
+                'admin-access',
+                'manage-users',
+                'manage-requests',
+                'view-all-data',
+                'system-settings'
+            ]);
         }
+        
+        if (array_intersect($userRoles, ['divisional_director', 'head_of_department', 'hod_it', 'ict_director', 'ict_officer'])) {
+            $abilities = array_merge($abilities, [
+                'approver-access',
+                'review-requests',
+                'approve-requests',
+                'view-department-data'
+            ]);
+        }
+        
+        if (array_intersect($userRoles, ['staff'])) {
+            $abilities = array_merge($abilities, [
+                'staff-access',
+                'create-requests',
+                'view-own-requests'
+            ]);
+        }
+        
+        return array_unique($abilities);
     }
 
     /**

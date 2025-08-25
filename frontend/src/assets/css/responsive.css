@@ -244,19 +244,19 @@
   .no-print {
     display: none !important;
   }
-  
+
   .print-only {
     display: block !important;
   }
-  
+
   .print-break-before {
     page-break-before: always;
   }
-  
+
   .print-break-after {
     page-break-after: always;
   }
-  
+
   .print-break-inside-avoid {
     page-break-inside: avoid;
   }
@@ -310,7 +310,7 @@
     min-height: 44px;
     min-width: 44px;
   }
-  
+
   .touch-friendly-sm {
     min-height: 36px;
     min-width: 36px;
@@ -346,29 +346,29 @@
   .table-stack {
     display: block;
   }
-  
+
   .table-stack thead {
     display: none;
   }
-  
+
   .table-stack tbody,
   .table-stack tr,
   .table-stack td {
     display: block;
   }
-  
+
   .table-stack tr {
     border: 1px solid #e5e7eb;
     margin-bottom: 0.5rem;
     padding: 0.5rem;
     border-radius: 0.5rem;
   }
-  
+
   .table-stack td {
     border: none;
     padding: 0.25rem 0;
   }
-  
+
   .table-stack td:before {
     content: attr(data-label) ": ";
     font-weight: bold;

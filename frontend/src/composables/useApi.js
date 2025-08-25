@@ -8,7 +8,7 @@ const API_BASE_URL = process.env.VUE_APP_API_URL || 'http://localhost:8000/api'
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {
-    'Accept': 'application/json',
+    Accept: 'application/json',
     'Content-Type': 'application/json'
   }
 })
@@ -16,7 +16,9 @@ const apiClient = axios.create({
 // Request interceptor to add auth token
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')
+    const token =
+      localStorage.getItem('auth_token') ||
+      sessionStorage.getItem('auth_token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
@@ -46,7 +48,7 @@ export function useApi() {
   const error = ref('')
 
   // Generic API call function
-  const apiCall = async (method, url, data = null, config = {}) => {
+  const apiCall = async(method, url, data = null, config = {}) => {
     loading.value = true
     error.value = ''
 
@@ -61,16 +63,17 @@ export function useApi() {
       return response.data
     } catch (err) {
       console.error(`API Error [${method.toUpperCase()} ${url}]:`, err)
-      
+
       if (err.response) {
         // Server responded with error status
         const status = err.response.status
         const message = err.response.data?.message || 'An error occurred'
-        
+
         if (status === 401) {
           error.value = 'Authentication failed. Please log in again.'
         } else if (status === 403) {
-          error.value = 'Access denied. You do not have permission for this action.'
+          error.value =
+            'Access denied. You do not have permission for this action.'
         } else if (status >= 500) {
           error.value = 'Server error. Please try again later.'
         } else {
@@ -78,12 +81,13 @@ export function useApi() {
         }
       } else if (err.request) {
         // Network error
-        error.value = 'Network error. Please check your connection and try again.'
+        error.value =
+          'Network error. Please check your connection and try again.'
       } else {
         // Other error
         error.value = err.message || 'An unexpected error occurred'
       }
-      
+
       throw err
     } finally {
       loading.value = false
@@ -118,23 +122,27 @@ export function useDepartments() {
 
   const { get } = useApi()
 
-  const fetchDepartments = async () => {
+  const fetchDepartments = async() => {
     loading.value = true
     error.value = ''
 
     try {
       const response = await get('/v1/departments')
-      
+
       if (response.success) {
         departments.value = response.data || []
-        console.log('Departments loaded successfully:', departments.value.length, 'departments')
+        console.log(
+          'Departments loaded successfully:',
+          departments.value.length,
+          'departments'
+        )
       } else {
         throw new Error(response.message || 'Failed to fetch departments')
       }
     } catch (err) {
       console.error('Error fetching departments:', err)
       error.value = err.message || 'Failed to load departments'
-      
+
       // Fallback to hardcoded departments if API fails
       departments.value = [
         { id: 1, name: 'Administration', code: 'ADMIN' },
@@ -168,7 +176,7 @@ export function useDepartments() {
 export function useUserAccess() {
   const { post } = useApi()
 
-  const submitAccessRequest = async (formData) => {
+  const submitAccessRequest = async(formData) => {
     const response = await post('/v1/user-access', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
@@ -177,7 +185,7 @@ export function useUserAccess() {
     return response
   }
 
-  const checkSignature = async (pfNumber) => {
+  const checkSignature = async(pfNumber) => {
     const response = await post('/v1/check-signature', { pf_number: pfNumber })
     return response
   }

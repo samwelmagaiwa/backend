@@ -1,33 +1,51 @@
 <template>
   <aside
-    v-if="isAuthenticated && !isLoading"
+    v-if="isAuthenticated && !isLoading && userRole"
     class="h-screen bg-gradient-to-b from-slate-900 via-blue-900 to-teal-900 text-white flex flex-col transition-all duration-300 ease-in-out overflow-y-auto border-r border-slate-700/30 backdrop-blur-sm shadow-2xl"
     :class="containerWidthClass"
     aria-label="Sidebar navigation"
-    style="background: linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 58, 138, 0.95) 50%, rgba(13, 148, 136, 0.92) 100%); backdrop-filter: blur(25px);"
+    style="
+      background: linear-gradient(
+        180deg,
+        rgba(15, 23, 42, 0.98) 0%,
+        rgba(30, 58, 138, 0.95) 50%,
+        rgba(13, 148, 136, 0.92) 100%
+      );
+      backdrop-filter: blur(25px);
+    "
   >
     <!-- Header / Brand + Collapse Toggle -->
     <div class="relative p-4 border-b border-slate-600/20">
       <!-- Background Pattern -->
-      <div class="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-teal-600/10 to-cyan-600/10 backdrop-blur-sm"></div>
-      
+      <div
+        class="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-teal-600/10 to-cyan-600/10 backdrop-blur-sm"
+      ></div>
+
       <div class="relative flex items-center justify-between">
         <div class="flex items-center gap-3">
           <div class="relative">
-            <div class="w-10 h-10 bg-gradient-to-br from-blue-400 via-teal-400 to-cyan-400 rounded-xl flex items-center justify-center shadow-xl border border-white/20 backdrop-blur-sm">
+            <div
+              class="w-10 h-10 bg-gradient-to-br from-blue-400 via-teal-400 to-cyan-400 rounded-xl flex items-center justify-center shadow-xl border border-white/20 backdrop-blur-sm"
+            >
               <i class="fas fa-hospital text-white text-lg drop-shadow-lg"></i>
             </div>
-            <div class="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full border border-white animate-pulse"></div>
+            <div
+              class="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full border border-white animate-pulse"
+            ></div>
           </div>
           <div v-show="!isCollapsed" class="flex flex-col">
-            <span class="text-base font-bold tracking-wide text-white drop-shadow-lg bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
+            <span
+              class="text-base font-bold tracking-wide text-white drop-shadow-lg bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent"
+            >
               Muhimbili
             </span>
             <span class="text-xs text-slate-300 font-semibold tracking-wider">
               National Hospital
             </span>
             <div class="flex items-center gap-1 mt-0.5">
-              <div class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
+              <div
+                class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"
+              ></div>
               <span class="text-xs text-emerald-300 font-medium">Online</span>
             </div>
           </div>
@@ -37,12 +55,15 @@
           @click="toggleCollapse"
           :aria-label="isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
         >
-          <i :class="[isCollapsed ? 'fas fa-chevron-right' : 'fas fa-chevron-left', 'text-slate-300 text-sm group-hover:text-white transition-colors']"></i>
+          <i
+            :class="[
+              isCollapsed ? 'fas fa-chevron-right' : 'fas fa-chevron-left',
+              'text-slate-300 text-sm group-hover:text-white transition-colors',
+            ]"
+          ></i>
         </button>
       </div>
     </div>
-
-
 
     <!-- Navigation -->
     <nav class="flex-1 py-3">
@@ -51,31 +72,48 @@
         <template v-if="dashboardItems.length > 0">
           <li class="tree-node">
             <!-- Dashboard Root Node -->
-            <div 
+            <div
               class="relative flex items-center px-4 py-2 text-sm transition-all duration-300 cursor-pointer backdrop-blur-sm group"
               :class="[
                 isCollapsed ? 'justify-center' : '',
-                'text-slate-200 hover:bg-gradient-to-r hover:from-blue-600/20 hover:via-teal-600/20 hover:to-cyan-600/20 hover:text-white'
+                'text-slate-200 hover:bg-gradient-to-r hover:from-blue-600/20 hover:via-teal-600/20 hover:to-cyan-600/20 hover:text-white',
               ]"
               @click="!isCollapsed && (showDashboard = !showDashboard)"
             >
               <!-- Tree Lines -->
-              <div v-show="!isCollapsed" class="absolute left-2 top-0 bottom-0 w-px bg-slate-600/30"></div>
-              
+              <div
+                v-show="!isCollapsed"
+                class="absolute left-2 top-0 bottom-0 w-px bg-slate-600/30"
+              ></div>
+
               <!-- Expand/Collapse Icon -->
-              <div v-show="!isCollapsed" class="relative flex items-center justify-center w-4 h-4 mr-2">
+              <div
+                v-show="!isCollapsed"
+                class="relative flex items-center justify-center w-4 h-4 mr-2"
+              >
                 <div class="w-2 h-2 bg-slate-600/50 rounded-full"></div>
-                <i :class="['fas text-xs text-slate-400 absolute transition-transform duration-200', showDashboard ? 'fa-minus' : 'fa-plus']"></i>
+                <i
+                  :class="[
+                    'fas text-xs text-slate-400 absolute transition-transform duration-200',
+                    showDashboard ? 'fa-minus' : 'fa-plus',
+                  ]"
+                ></i>
               </div>
-              
+
               <!-- Node Icon -->
-              <div class="relative flex items-center justify-center w-6 h-6 rounded-lg bg-gradient-to-br from-blue-500/20 via-teal-500/20 to-cyan-500/20 group-hover:from-blue-500/40 group-hover:via-teal-500/40 group-hover:to-cyan-500/40 transition-all duration-300 shadow-lg border border-white/10 mr-3">
+              <div
+                class="relative flex items-center justify-center w-6 h-6 rounded-lg bg-gradient-to-br from-blue-500/20 via-teal-500/20 to-cyan-500/20 group-hover:from-blue-500/40 group-hover:via-teal-500/40 group-hover:to-cyan-500/40 transition-all duration-300 shadow-lg border border-white/10 mr-3"
+              >
                 <i class="fas fa-tachometer-alt text-xs drop-shadow-lg"></i>
               </div>
-              
-              <span v-show="!isCollapsed" class="font-semibold tracking-wide drop-shadow-lg">Dashboard</span>
+
+              <span
+                v-show="!isCollapsed"
+                class="font-semibold tracking-wide drop-shadow-lg"
+                >Dashboard</span
+              >
             </div>
-            
+
             <!-- Dashboard Children -->
             <transition
               enter-active-class="transition ease-out duration-300"
@@ -85,31 +123,52 @@
               leave-from-class="opacity-100 translate-y-0 scale-100"
               leave-to-class="opacity-0 -translate-y-2 scale-95"
             >
-              <ul v-if="showDashboard && !isCollapsed" class="tree-children ml-6 border-l border-slate-600/30 pl-4 space-y-1">
-                <li v-for="item in dashboardItems" :key="item.path" class="tree-leaf">
+              <ul
+                v-if="showDashboard && !isCollapsed"
+                class="tree-children ml-6 border-l border-slate-600/30 pl-4 space-y-1"
+              >
+                <li
+                  v-for="item in dashboardItems"
+                  :key="item.path"
+                  class="tree-leaf"
+                >
                   <router-link
                     :to="item.path"
                     class="relative flex items-center rounded-lg px-3 py-2 text-sm transition-all duration-300 backdrop-blur-sm group overflow-hidden"
                     :class="[
-                      $route.path === item.path 
-                        ? 'bg-gradient-to-r from-blue-500/40 via-teal-500/40 to-cyan-500/40 text-white shadow-xl border border-blue-400/50' 
-                        : 'text-slate-300 hover:bg-gradient-to-r hover:from-blue-600/30 hover:via-teal-600/30 hover:to-cyan-600/30 hover:text-white hover:shadow-lg'
+                      $route.path === item.path
+                        ? 'bg-gradient-to-r from-blue-500/40 via-teal-500/40 to-cyan-500/40 text-white shadow-xl border border-blue-400/50'
+                        : 'text-slate-300 hover:bg-gradient-to-r hover:from-blue-600/30 hover:via-teal-600/30 hover:to-cyan-600/30 hover:text-white hover:shadow-lg',
                     ]"
                   >
                     <!-- Tree Connector -->
-                    <div class="absolute -left-4 top-1/2 w-3 h-px bg-slate-600/30"></div>
-                    <div class="absolute -left-4 top-1/2 w-1 h-1 bg-slate-600/50 rounded-full transform -translate-y-0.5"></div>
-                    
+                    <div
+                      class="absolute -left-4 top-1/2 w-3 h-px bg-slate-600/30"
+                    ></div>
+                    <div
+                      class="absolute -left-4 top-1/2 w-1 h-1 bg-slate-600/50 rounded-full transform -translate-y-0.5"
+                    ></div>
+
                     <!-- Background Glow -->
-                    <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-teal-500/10 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    
-                    <div class="relative flex items-center justify-center w-5 h-5 rounded bg-gradient-to-br from-blue-500/30 via-teal-500/30 to-cyan-500/30 group-hover:from-blue-500/50 group-hover:via-teal-500/50 group-hover:to-cyan-500/50 transition-all duration-300 shadow border border-white/10 mr-3">
+                    <div
+                      class="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-teal-500/10 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    ></div>
+
+                    <div
+                      class="relative flex items-center justify-center w-5 h-5 rounded bg-gradient-to-br from-blue-500/30 via-teal-500/30 to-cyan-500/30 group-hover:from-blue-500/50 group-hover:via-teal-500/50 group-hover:to-cyan-500/50 transition-all duration-300 shadow border border-white/10 mr-3"
+                    >
                       <i :class="[item.icon, 'text-xs drop-shadow-lg']"></i>
                     </div>
-                    <span class="relative font-medium tracking-wide drop-shadow-lg">{{ item.displayName }}</span>
-                    
+                    <span
+                      class="relative font-medium tracking-wide drop-shadow-lg"
+                      >{{ item.displayName }}</span
+                    >
+
                     <!-- Active Indicator -->
-                    <div v-if="$route.path === item.path" class="absolute right-2 w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse shadow-lg"></div>
+                    <div
+                      v-if="$route.path === item.path"
+                      class="absolute right-2 w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse shadow-lg"
+                    ></div>
                   </router-link>
                 </li>
               </ul>
@@ -120,32 +179,49 @@
         <!-- User Management Section (Admin only) -->
         <li v-if="userManagementItems.length > 0" class="mt-6">
           <div v-show="!isCollapsed" class="px-3 py-2">
-            <h3 class="text-xs font-semibold text-blue-200 uppercase tracking-wider drop-shadow-sm">User Management</h3>
+            <h3
+              class="text-xs font-semibold text-blue-200 uppercase tracking-wider drop-shadow-sm"
+            >
+              User Management
+            </h3>
           </div>
-          
+
           <!-- Collapsible User Management -->
-          <div class="flex items-center" :class="!isCollapsed ? 'justify-between' : 'justify-center'">
+          <div
+            class="flex items-center"
+            :class="!isCollapsed ? 'justify-between' : 'justify-center'"
+          >
             <div class="flex items-center flex-1">
               <div
                 class="flex items-center rounded-md mx-2 px-3 py-2 text-sm transition-colors cursor-pointer flex-1 backdrop-blur-sm"
                 :class="[
                   isCollapsed ? 'justify-center' : '',
-                  'text-blue-100 hover:bg-blue-700/30 hover:text-white'
+                  'text-blue-100 hover:bg-blue-700/30 hover:text-white',
                 ]"
                 @click="!isCollapsed && (showUserMgmt = !showUserMgmt)"
               >
-                <i :class="['fas fa-users', isCollapsed ? 'text-lg' : 'text-base mr-3']"></i>
+                <i
+                  :class="[
+                    'fas fa-users',
+                    isCollapsed ? 'text-lg' : 'text-base mr-3',
+                  ]"
+                ></i>
                 <span v-show="!isCollapsed">User Management</span>
               </div>
             </div>
-            
+
             <button
               v-show="!isCollapsed"
               @click="showUserMgmt = !showUserMgmt"
               class="mr-2 p-2 rounded-md text-blue-200 hover:bg-blue-700/30 transition-colors backdrop-blur-sm"
               :aria-expanded="showUserMgmt.toString()"
             >
-              <i :class="['fas text-xs', showUserMgmt ? 'fa-chevron-up' : 'fa-chevron-down']"></i>
+              <i
+                :class="[
+                  'fas text-xs',
+                  showUserMgmt ? 'fa-chevron-up' : 'fa-chevron-down',
+                ]"
+              ></i>
             </button>
           </div>
 
@@ -159,7 +235,15 @@
             leave-to-class="opacity-0 -translate-y-4 scale-95"
           >
             <div v-if="showUserMgmt && !isCollapsed" class="ml-4 mr-2 mb-2">
-              <div class="bg-gradient-to-br from-blue-50 via-blue-50 to-cyan-50 rounded-xl border-2 border-blue-200/50 overflow-hidden shadow-xl" style="backdrop-filter: blur(10px); box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3), 0 0 0 1px rgba(59, 130, 246, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2);">
+              <div
+                class="bg-gradient-to-br from-blue-50 via-blue-50 to-cyan-50 rounded-xl border-2 border-blue-200/50 overflow-hidden shadow-xl"
+                style="
+                  backdrop-filter: blur(10px);
+                  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3),
+                    0 0 0 1px rgba(59, 130, 246, 0.1),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+                "
+              >
                 <div class="py-2">
                   <router-link
                     v-for="item in userManagementItems"
@@ -170,22 +254,39 @@
                     :class="[
                       $route.path === item.path
                         ? 'bg-blue-100 text-blue-700 shadow-md'
-                        : 'text-gray-700 hover:bg-blue-100 hover:text-blue-700 hover:shadow-md hover:transform hover:scale-105'
+                        : 'text-gray-700 hover:bg-blue-100 hover:text-blue-700 hover:shadow-md hover:transform hover:scale-105',
                     ]"
                   >
                     <!-- Hover gradient overlay -->
-                    <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    
-                    <div class="w-8 h-8 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center mr-3 group-hover:from-blue-200 group-hover:to-blue-300 transition-all duration-300 shadow-lg border border-blue-300/50">
-                      <i :class="[item.icon, 'text-blue-600 text-sm drop-shadow-sm']"></i>
+                    <div
+                      class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    ></div>
+
+                    <div
+                      class="w-8 h-8 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center mr-3 group-hover:from-blue-200 group-hover:to-blue-300 transition-all duration-300 shadow-lg border border-blue-300/50"
+                    >
+                      <i
+                        :class="[
+                          item.icon,
+                          'text-blue-600 text-sm drop-shadow-sm',
+                        ]"
+                      ></i>
                     </div>
                     <div class="flex-1 relative z-10">
-                      <p class="font-semibold drop-shadow-sm">{{ item.displayName }}</p>
-                      <p class="text-xs opacity-80 group-hover:opacity-100 transition-opacity duration-300">{{ item.description }}</p>
+                      <p class="font-semibold drop-shadow-sm">
+                        {{ item.displayName }}
+                      </p>
+                      <p
+                        class="text-xs opacity-80 group-hover:opacity-100 transition-opacity duration-300"
+                      >
+                        {{ item.description }}
+                      </p>
                     </div>
-                    
+
                     <!-- Chevron indicator -->
-                    <div class="opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
+                    <div
+                      class="opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0"
+                    >
                       <i class="fas fa-chevron-right text-xs text-blue-500"></i>
                     </div>
                   </router-link>
@@ -199,36 +300,59 @@
         <template v-if="requestsManagementItems.length > 0">
           <li class="tree-node mt-4">
             <!-- Requests Management Root Node -->
-            <div 
+            <div
               class="relative flex items-center px-4 py-2 text-sm transition-all duration-300 cursor-pointer backdrop-blur-sm group"
               :class="[
                 isCollapsed ? 'justify-center' : '',
-                $route.path.startsWith('/internal-access') 
-                  ? 'text-white' 
-                  : 'text-slate-200 hover:bg-gradient-to-r hover:from-orange-600/20 hover:via-amber-600/20 hover:to-yellow-600/20 hover:text-white'
+                $route.path.startsWith('/hod-dashboard/request-list') || $route.path.startsWith('/internal-access')
+                  ? 'text-white'
+                  : 'text-slate-200 hover:bg-gradient-to-r hover:from-orange-600/20 hover:via-amber-600/20 hover:to-yellow-600/20 hover:text-white',
               ]"
-              @click="!isCollapsed && (showRequestsManagement = !showRequestsManagement)"
+              @click="
+                !isCollapsed &&
+                  (showRequestsManagement = !showRequestsManagement)
+              "
             >
               <!-- Tree Lines -->
-              <div v-show="!isCollapsed" class="absolute left-2 top-0 bottom-0 w-px bg-slate-600/30"></div>
-              
+              <div
+                v-show="!isCollapsed"
+                class="absolute left-2 top-0 bottom-0 w-px bg-slate-600/30"
+              ></div>
+
               <!-- Expand/Collapse Icon -->
-              <div v-show="!isCollapsed" class="relative flex items-center justify-center w-4 h-4 mr-2">
+              <div
+                v-show="!isCollapsed"
+                class="relative flex items-center justify-center w-4 h-4 mr-2"
+              >
                 <div class="w-2 h-2 bg-slate-600/50 rounded-full"></div>
-                <i :class="['fas text-xs text-slate-400 absolute transition-transform duration-200', showRequestsManagement ? 'fa-minus' : 'fa-plus']"></i>
+                <i
+                  :class="[
+                    'fas text-xs text-slate-400 absolute transition-transform duration-200',
+                    showRequestsManagement ? 'fa-minus' : 'fa-plus',
+                  ]"
+                ></i>
               </div>
-              
+
               <!-- Node Icon -->
-              <div class="relative flex items-center justify-center w-6 h-6 rounded-lg bg-gradient-to-br from-orange-500/20 via-amber-500/20 to-yellow-500/20 group-hover:from-orange-500/40 group-hover:via-amber-500/40 group-hover:to-yellow-500/40 transition-all duration-300 shadow-lg border border-white/10 mr-3">
+              <div
+                class="relative flex items-center justify-center w-6 h-6 rounded-lg bg-gradient-to-br from-orange-500/20 via-amber-500/20 to-yellow-500/20 group-hover:from-orange-500/40 group-hover:via-amber-500/40 group-hover:to-yellow-500/40 transition-all duration-300 shadow-lg border border-white/10 mr-3"
+              >
                 <i class="fas fa-clipboard-check text-xs drop-shadow-lg"></i>
               </div>
-              
-              <span v-show="!isCollapsed" class="font-semibold tracking-wide drop-shadow-lg">Requests Management</span>
-              
+
+              <span
+                v-show="!isCollapsed"
+                class="font-semibold tracking-wide drop-shadow-lg"
+                >Requests Management</span
+              >
+
               <!-- Active Indicator -->
-              <div v-if="$route.path.startsWith('/internal-access')" class="absolute right-2 w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse shadow-lg"></div>
+              <div
+                v-if="$route.path.startsWith('/hod-dashboard/request-list') || $route.path.startsWith('/internal-access')"
+                class="absolute right-2 w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse shadow-lg"
+              ></div>
             </div>
-            
+
             <!-- Requests Management Children -->
             <transition
               enter-active-class="transition ease-out duration-300"
@@ -238,55 +362,98 @@
               leave-from-class="opacity-100 translate-y-0 scale-100"
               leave-to-class="opacity-0 -translate-y-2 scale-95"
             >
-              <ul v-if="showRequestsManagement && !isCollapsed" class="tree-children ml-6 border-l border-slate-600/30 pl-4 space-y-1">
+              <ul
+                v-if="showRequestsManagement && !isCollapsed"
+                class="tree-children ml-6 border-l border-slate-600/30 pl-4 space-y-1"
+              >
                 <!-- All Requests Node -->
                 <li class="tree-leaf">
                   <router-link
-                    to="/internal-access/list"
+                    to="/hod-dashboard/request-list"
                     class="relative flex items-center rounded-lg px-3 py-2 text-sm transition-all duration-300 backdrop-blur-sm group overflow-hidden"
                     :class="[
-                      $route.path === '/internal-access/list'
+                      $route.path === '/hod-dashboard/request-list'
                         ? 'bg-gradient-to-r from-orange-500/40 via-amber-500/40 to-yellow-500/40 text-white shadow-xl border border-orange-400/50'
-                        : 'text-slate-300 hover:bg-gradient-to-r hover:from-orange-600/30 hover:via-amber-600/30 hover:to-yellow-600/30 hover:text-white hover:shadow-lg'
+                        : 'text-slate-300 hover:bg-gradient-to-r hover:from-orange-600/30 hover:via-amber-600/30 hover:to-yellow-600/30 hover:text-white hover:shadow-lg',
                     ]"
                   >
                     <!-- Tree Connector -->
-                    <div class="absolute -left-4 top-1/2 w-3 h-px bg-slate-600/30"></div>
-                    <div class="absolute -left-4 top-1/2 w-1 h-1 bg-slate-600/50 rounded-full transform -translate-y-0.5"></div>
-                    
+                    <div
+                      class="absolute -left-4 top-1/2 w-3 h-px bg-slate-600/30"
+                    ></div>
+                    <div
+                      class="absolute -left-4 top-1/2 w-1 h-1 bg-slate-600/50 rounded-full transform -translate-y-0.5"
+                    ></div>
+
                     <!-- Background Glow -->
-                    <div class="absolute inset-0 bg-gradient-to-r from-orange-500/10 via-amber-500/10 to-yellow-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    
-                    <div class="relative flex items-center justify-center w-5 h-5 rounded bg-gradient-to-br from-orange-500/30 via-amber-500/30 to-yellow-500/30 group-hover:from-orange-500/50 group-hover:via-amber-500/50 group-hover:to-yellow-500/50 transition-all duration-300 shadow border border-white/10 mr-3">
+                    <div
+                      class="absolute inset-0 bg-gradient-to-r from-orange-500/10 via-amber-500/10 to-yellow-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    ></div>
+
+                    <div
+                      class="relative flex items-center justify-center w-5 h-5 rounded bg-gradient-to-br from-orange-500/30 via-amber-500/30 to-yellow-500/30 group-hover:from-orange-500/50 group-hover:via-amber-500/50 group-hover:to-yellow-500/50 transition-all duration-300 shadow border border-white/10 mr-3"
+                    >
                       <i class="fas fa-list text-xs drop-shadow-lg"></i>
                     </div>
                     <div class="relative flex-1">
-                      <span class="font-medium tracking-wide drop-shadow-lg block">Access Requests</span>
-                      <span class="text-xs opacity-70 group-hover:opacity-100 transition-opacity duration-300">Review pending requests</span>
+                      <span
+                        class="font-medium tracking-wide drop-shadow-lg block"
+                        >Access Requests</span
+                      >
+                      <span
+                        class="text-xs opacity-70 group-hover:opacity-100 transition-opacity duration-300"
+                        >Review pending requests</span
+                      >
                     </div>
-                    
+
                     <!-- Active Indicator -->
-                    <div v-if="$route.path === '/internal-access/list'" class="absolute right-2 w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse shadow-lg"></div>
+                    <div
+                      v-if="$route.path === '/hod-dashboard/request-list'"
+                      class="absolute right-2 w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse shadow-lg"
+                    ></div>
                   </router-link>
                 </li>
-                
+
                 <!-- Request Details Node (Dynamic) -->
-                <li v-if="$route.query.id && $route.path === '/internal-access/details'" class="tree-leaf">
-                  <div class="relative flex items-center rounded-lg px-3 py-2 text-sm transition-all duration-300 backdrop-blur-sm bg-gradient-to-r from-amber-500/40 via-yellow-500/40 to-orange-500/40 text-white shadow-xl border border-amber-400/50">
+                <li
+                  v-if="
+                    $route.query.id &&
+                    $route.path === '/internal-access/details'
+                  "
+                  class="tree-leaf"
+                >
+                  <div
+                    class="relative flex items-center rounded-lg px-3 py-2 text-sm transition-all duration-300 backdrop-blur-sm bg-gradient-to-r from-amber-500/40 via-yellow-500/40 to-orange-500/40 text-white shadow-xl border border-amber-400/50"
+                  >
                     <!-- Tree Connector -->
-                    <div class="absolute -left-4 top-1/2 w-3 h-px bg-slate-600/30"></div>
-                    <div class="absolute -left-4 top-1/2 w-1 h-1 bg-slate-600/50 rounded-full transform -translate-y-0.5"></div>
-                    
-                    <div class="relative flex items-center justify-center w-5 h-5 rounded bg-gradient-to-br from-amber-500/50 via-yellow-500/50 to-orange-500/50 transition-all duration-300 shadow border border-white/20 mr-3">
-                      <i class="fas fa-clipboard-check text-xs drop-shadow-lg"></i>
+                    <div
+                      class="absolute -left-4 top-1/2 w-3 h-px bg-slate-600/30"
+                    ></div>
+                    <div
+                      class="absolute -left-4 top-1/2 w-1 h-1 bg-slate-600/50 rounded-full transform -translate-y-0.5"
+                    ></div>
+
+                    <div
+                      class="relative flex items-center justify-center w-5 h-5 rounded bg-gradient-to-br from-amber-500/50 via-yellow-500/50 to-orange-500/50 transition-all duration-300 shadow border border-white/20 mr-3"
+                    >
+                      <i
+                        class="fas fa-clipboard-check text-xs drop-shadow-lg"
+                      ></i>
                     </div>
                     <div class="relative flex-1">
-                      <span class="font-medium tracking-wide drop-shadow-lg block">Request Details</span>
-                      <span class="text-xs opacity-80">ID: {{ $route.query.id }}</span>
+                      <span
+                        class="font-medium tracking-wide drop-shadow-lg block"
+                        >Request Details</span
+                      >
+                      <span class="text-xs opacity-80"
+                        >ID: {{ $route.query.id }}</span
+                      >
                     </div>
-                    
+
                     <!-- Active Indicator -->
-                    <div class="absolute right-2 w-1.5 h-1.5 bg-amber-300 rounded-full animate-pulse shadow-lg"></div>
+                    <div
+                      class="absolute right-2 w-1.5 h-1.5 bg-amber-300 rounded-full animate-pulse shadow-lg"
+                    ></div>
                   </div>
                 </li>
               </ul>
@@ -298,36 +465,58 @@
         <template v-if="deviceManagementItems.length > 0">
           <li class="tree-node mt-4">
             <!-- Device Management Root Node -->
-            <div 
+            <div
               class="relative flex items-center px-4 py-2 text-sm transition-all duration-300 cursor-pointer backdrop-blur-sm group"
               :class="[
                 isCollapsed ? 'justify-center' : '',
-                $route.path.startsWith('/ict-approval') 
-                  ? 'text-white' 
-                  : 'text-slate-200 hover:bg-gradient-to-r hover:from-teal-600/20 hover:via-cyan-600/20 hover:to-emerald-600/20 hover:text-white'
+                $route.path.startsWith('/ict-approval')
+                  ? 'text-white'
+                  : 'text-slate-200 hover:bg-gradient-to-r hover:from-teal-600/20 hover:via-cyan-600/20 hover:to-emerald-600/20 hover:text-white',
               ]"
-              @click="!isCollapsed && (showDeviceManagement = !showDeviceManagement)"
+              @click="
+                !isCollapsed && (showDeviceManagement = !showDeviceManagement)
+              "
             >
               <!-- Tree Lines -->
-              <div v-show="!isCollapsed" class="absolute left-2 top-0 bottom-0 w-px bg-slate-600/30"></div>
-              
+              <div
+                v-show="!isCollapsed"
+                class="absolute left-2 top-0 bottom-0 w-px bg-slate-600/30"
+              ></div>
+
               <!-- Expand/Collapse Icon -->
-              <div v-show="!isCollapsed" class="relative flex items-center justify-center w-4 h-4 mr-2">
+              <div
+                v-show="!isCollapsed"
+                class="relative flex items-center justify-center w-4 h-4 mr-2"
+              >
                 <div class="w-2 h-2 bg-slate-600/50 rounded-full"></div>
-                <i :class="['fas text-xs text-slate-400 absolute transition-transform duration-200', showDeviceManagement ? 'fa-minus' : 'fa-plus']"></i>
+                <i
+                  :class="[
+                    'fas text-xs text-slate-400 absolute transition-transform duration-200',
+                    showDeviceManagement ? 'fa-minus' : 'fa-plus',
+                  ]"
+                ></i>
               </div>
-              
+
               <!-- Node Icon -->
-              <div class="relative flex items-center justify-center w-6 h-6 rounded-lg bg-gradient-to-br from-teal-500/20 via-cyan-500/20 to-emerald-500/20 group-hover:from-teal-500/40 group-hover:via-cyan-500/40 group-hover:to-emerald-500/40 transition-all duration-300 shadow-lg border border-white/10 mr-3">
+              <div
+                class="relative flex items-center justify-center w-6 h-6 rounded-lg bg-gradient-to-br from-teal-500/20 via-cyan-500/20 to-emerald-500/20 group-hover:from-teal-500/40 group-hover:via-cyan-500/40 group-hover:to-emerald-500/40 transition-all duration-300 shadow-lg border border-white/10 mr-3"
+              >
                 <i class="fas fa-clipboard-list text-xs drop-shadow-lg"></i>
               </div>
-              
-              <span v-show="!isCollapsed" class="font-semibold tracking-wide drop-shadow-lg">Device Management</span>
-              
+
+              <span
+                v-show="!isCollapsed"
+                class="font-semibold tracking-wide drop-shadow-lg"
+                >Device Management</span
+              >
+
               <!-- Active Indicator -->
-              <div v-if="$route.path.startsWith('/ict-approval')" class="absolute right-2 w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse shadow-lg"></div>
+              <div
+                v-if="$route.path.startsWith('/ict-approval')"
+                class="absolute right-2 w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse shadow-lg"
+              ></div>
             </div>
-            
+
             <!-- Device Management Children -->
             <transition
               enter-active-class="transition ease-out duration-300"
@@ -337,7 +526,10 @@
               leave-from-class="opacity-100 translate-y-0 scale-100"
               leave-to-class="opacity-0 -translate-y-2 scale-95"
             >
-              <ul v-if="showDeviceManagement && !isCollapsed" class="tree-children ml-6 border-l border-slate-600/30 pl-4 space-y-1">
+              <ul
+                v-if="showDeviceManagement && !isCollapsed"
+                class="tree-children ml-6 border-l border-slate-600/30 pl-4 space-y-1"
+              >
                 <!-- All Requests Node -->
                 <li class="tree-leaf">
                   <router-link
@@ -346,46 +538,80 @@
                     :class="[
                       $route.path === '/ict-approval/requests'
                         ? 'bg-gradient-to-r from-teal-500/40 via-cyan-500/40 to-emerald-500/40 text-white shadow-xl border border-teal-400/50'
-                        : 'text-slate-300 hover:bg-gradient-to-r hover:from-teal-600/30 hover:via-cyan-600/30 hover:to-emerald-600/30 hover:text-white hover:shadow-lg'
+                        : 'text-slate-300 hover:bg-gradient-to-r hover:from-teal-600/30 hover:via-cyan-600/30 hover:to-emerald-600/30 hover:text-white hover:shadow-lg',
                     ]"
                   >
                     <!-- Tree Connector -->
-                    <div class="absolute -left-4 top-1/2 w-3 h-px bg-slate-600/30"></div>
-                    <div class="absolute -left-4 top-1/2 w-1 h-1 bg-slate-600/50 rounded-full transform -translate-y-0.5"></div>
-                    
+                    <div
+                      class="absolute -left-4 top-1/2 w-3 h-px bg-slate-600/30"
+                    ></div>
+                    <div
+                      class="absolute -left-4 top-1/2 w-1 h-1 bg-slate-600/50 rounded-full transform -translate-y-0.5"
+                    ></div>
+
                     <!-- Background Glow -->
-                    <div class="absolute inset-0 bg-gradient-to-r from-teal-500/10 via-cyan-500/10 to-emerald-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    
-                    <div class="relative flex items-center justify-center w-5 h-5 rounded bg-gradient-to-br from-teal-500/30 via-cyan-500/30 to-emerald-500/30 group-hover:from-teal-500/50 group-hover:via-cyan-500/50 group-hover:to-emerald-500/50 transition-all duration-300 shadow border border-white/10 mr-3">
+                    <div
+                      class="absolute inset-0 bg-gradient-to-r from-teal-500/10 via-cyan-500/10 to-emerald-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    ></div>
+
+                    <div
+                      class="relative flex items-center justify-center w-5 h-5 rounded bg-gradient-to-br from-teal-500/30 via-cyan-500/30 to-emerald-500/30 group-hover:from-teal-500/50 group-hover:via-cyan-500/50 group-hover:to-emerald-500/50 transition-all duration-300 shadow border border-white/10 mr-3"
+                    >
                       <i class="fas fa-list text-xs drop-shadow-lg"></i>
                     </div>
                     <div class="relative flex-1">
-                      <span class="font-medium tracking-wide drop-shadow-lg block">All Requests</span>
-                      <span class="text-xs opacity-70 group-hover:opacity-100 transition-opacity duration-300">View device requests</span>
+                      <span
+                        class="font-medium tracking-wide drop-shadow-lg block"
+                        >All Requests</span
+                      >
+                      <span
+                        class="text-xs opacity-70 group-hover:opacity-100 transition-opacity duration-300"
+                        >View device requests</span
+                      >
                     </div>
-                    
+
                     <!-- Active Indicator -->
-                    <div v-if="$route.path === '/ict-approval/requests'" class="absolute right-2 w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse shadow-lg"></div>
+                    <div
+                      v-if="$route.path === '/ict-approval/requests'"
+                      class="absolute right-2 w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse shadow-lg"
+                    ></div>
                   </router-link>
                 </li>
-                
+
                 <!-- Request Details Node (Dynamic) -->
                 <li v-if="$route.params.id" class="tree-leaf">
-                  <div class="relative flex items-center rounded-lg px-3 py-2 text-sm transition-all duration-300 backdrop-blur-sm bg-gradient-to-r from-cyan-500/40 via-emerald-500/40 to-teal-500/40 text-white shadow-xl border border-cyan-400/50">
+                  <div
+                    class="relative flex items-center rounded-lg px-3 py-2 text-sm transition-all duration-300 backdrop-blur-sm bg-gradient-to-r from-cyan-500/40 via-emerald-500/40 to-teal-500/40 text-white shadow-xl border border-cyan-400/50"
+                  >
                     <!-- Tree Connector -->
-                    <div class="absolute -left-4 top-1/2 w-3 h-px bg-slate-600/30"></div>
-                    <div class="absolute -left-4 top-1/2 w-1 h-1 bg-slate-600/50 rounded-full transform -translate-y-0.5"></div>
-                    
-                    <div class="relative flex items-center justify-center w-5 h-5 rounded bg-gradient-to-br from-cyan-500/50 via-emerald-500/50 to-teal-500/50 transition-all duration-300 shadow border border-white/20 mr-3">
-                      <i class="fas fa-clipboard-check text-xs drop-shadow-lg"></i>
+                    <div
+                      class="absolute -left-4 top-1/2 w-3 h-px bg-slate-600/30"
+                    ></div>
+                    <div
+                      class="absolute -left-4 top-1/2 w-1 h-1 bg-slate-600/50 rounded-full transform -translate-y-0.5"
+                    ></div>
+
+                    <div
+                      class="relative flex items-center justify-center w-5 h-5 rounded bg-gradient-to-br from-cyan-500/50 via-emerald-500/50 to-teal-500/50 transition-all duration-300 shadow border border-white/20 mr-3"
+                    >
+                      <i
+                        class="fas fa-clipboard-check text-xs drop-shadow-lg"
+                      ></i>
                     </div>
                     <div class="relative flex-1">
-                      <span class="font-medium tracking-wide drop-shadow-lg block">Request Details</span>
-                      <span class="text-xs opacity-80">ID: {{ $route.params.id }}</span>
+                      <span
+                        class="font-medium tracking-wide drop-shadow-lg block"
+                        >Request Details</span
+                      >
+                      <span class="text-xs opacity-80"
+                        >ID: {{ $route.params.id }}</span
+                      >
                     </div>
-                    
+
                     <!-- Active Indicator -->
-                    <div class="absolute right-2 w-1.5 h-1.5 bg-cyan-300 rounded-full animate-pulse shadow-lg"></div>
+                    <div
+                      class="absolute right-2 w-1.5 h-1.5 bg-cyan-300 rounded-full animate-pulse shadow-lg"
+                    ></div>
                   </div>
                 </li>
               </ul>
@@ -396,29 +622,46 @@
         <!-- Forms Section -->
         <li v-if="formItems.length > 0" class="tree-node mt-4">
           <!-- Forms Root Node -->
-          <div 
+          <div
             class="relative flex items-center px-4 py-2 text-sm transition-all duration-300 cursor-pointer backdrop-blur-sm group"
             :class="[
               isCollapsed ? 'justify-center' : '',
-              'text-slate-200 hover:bg-gradient-to-r hover:from-purple-600/20 hover:via-indigo-600/20 hover:to-violet-600/20 hover:text-white'
+              'text-slate-200 hover:bg-gradient-to-r hover:from-purple-600/20 hover:via-indigo-600/20 hover:to-violet-600/20 hover:text-white',
             ]"
             @click="!isCollapsed && (showForms = !showForms)"
           >
             <!-- Tree Lines -->
-            <div v-show="!isCollapsed" class="absolute left-2 top-0 bottom-0 w-px bg-slate-600/30"></div>
-            
+            <div
+              v-show="!isCollapsed"
+              class="absolute left-2 top-0 bottom-0 w-px bg-slate-600/30"
+            ></div>
+
             <!-- Expand/Collapse Icon -->
-            <div v-show="!isCollapsed" class="relative flex items-center justify-center w-4 h-4 mr-2">
+            <div
+              v-show="!isCollapsed"
+              class="relative flex items-center justify-center w-4 h-4 mr-2"
+            >
               <div class="w-2 h-2 bg-slate-600/50 rounded-full"></div>
-              <i :class="['fas text-xs text-slate-400 absolute transition-transform duration-200', showForms ? 'fa-minus' : 'fa-plus']"></i>
+              <i
+                :class="[
+                  'fas text-xs text-slate-400 absolute transition-transform duration-200',
+                  showForms ? 'fa-minus' : 'fa-plus',
+                ]"
+              ></i>
             </div>
-            
+
             <!-- Node Icon -->
-            <div class="relative flex items-center justify-center w-6 h-6 rounded-lg bg-gradient-to-br from-purple-500/20 via-indigo-500/20 to-violet-500/20 group-hover:from-purple-500/40 group-hover:via-indigo-500/40 group-hover:to-violet-500/40 transition-all duration-300 shadow-lg border border-white/10 mr-3">
+            <div
+              class="relative flex items-center justify-center w-6 h-6 rounded-lg bg-gradient-to-br from-purple-500/20 via-indigo-500/20 to-violet-500/20 group-hover:from-purple-500/40 group-hover:via-indigo-500/40 group-hover:to-violet-500/40 transition-all duration-300 shadow-lg border border-white/10 mr-3"
+            >
               <i :class="[getFormsIcon(), 'text-xs drop-shadow-lg']"></i>
             </div>
-            
-            <span v-show="!isCollapsed" class="font-semibold tracking-wide drop-shadow-lg">{{ getFormsSectionTitle() }}</span>
+
+            <span
+              v-show="!isCollapsed"
+              class="font-semibold tracking-wide drop-shadow-lg"
+              >{{ getFormsSectionTitle() }}</span
+            >
           </div>
 
           <!-- Forms Dropdown -->
@@ -431,7 +674,10 @@
             leave-to-class="opacity-0 -translate-y-4 scale-95"
           >
             <div v-if="showForms && !isCollapsed" class="ml-4 mr-2 mb-2">
-              <div :class="getFormsDropdownClass()" style="backdrop-filter: blur(10px);">
+              <div
+                :class="getFormsDropdownClass()"
+                style="backdrop-filter: blur(10px)"
+              >
                 <div class="py-2">
                   <router-link
                     v-for="item in formItems"
@@ -442,22 +688,38 @@
                     :class="[
                       $route.path === item.path
                         ? getActiveFormClass()
-                        : 'text-gray-700 hover:bg-blue-100 hover:text-blue-700 hover:shadow-md hover:transform hover:scale-105'
+                        : 'text-gray-700 hover:bg-blue-100 hover:text-blue-700 hover:shadow-md hover:transform hover:scale-105',
                     ]"
                   >
                     <!-- Hover gradient overlay -->
-                    <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    
+                    <div
+                      class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    ></div>
+
                     <div :class="getFormIconClass()">
-                      <i :class="[item.icon, getFormIconColor(), 'text-sm drop-shadow-sm']"></i>
+                      <i
+                        :class="[
+                          item.icon,
+                          getFormIconColor(),
+                          'text-sm drop-shadow-sm',
+                        ]"
+                      ></i>
                     </div>
                     <div class="flex-1 relative z-10">
-                      <p class="font-semibold drop-shadow-sm">{{ item.displayName }}</p>
-                      <p class="text-xs opacity-80 group-hover:opacity-100 transition-opacity duration-300">{{ item.description }}</p>
+                      <p class="font-semibold drop-shadow-sm">
+                        {{ item.displayName }}
+                      </p>
+                      <p
+                        class="text-xs opacity-80 group-hover:opacity-100 transition-opacity duration-300"
+                      >
+                        {{ item.description }}
+                      </p>
                     </div>
-                    
+
                     <!-- Chevron indicator -->
-                    <div class="opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
+                    <div
+                      class="opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0"
+                    >
                       <i class="fas fa-chevron-right text-xs text-blue-500"></i>
                     </div>
                   </router-link>
@@ -466,67 +728,19 @@
             </div>
           </transition>
         </li>
-
-
       </ul>
     </nav>
 
-    <!-- Settings Section (Admin only) -->
-    <div v-if="userRole === 'admin'" class="mt-auto border-t border-blue-600/30 p-3">
-      <button
-        @click="showSettings = !showSettings"
-        class="w-full flex items-center rounded-md px-3 py-2 text-sm text-blue-100 hover:bg-blue-700/30 hover:text-white transition-colors mb-2 backdrop-blur-sm"
-        :class="isCollapsed ? 'justify-center' : ''"
-        :title="isCollapsed ? 'Settings' : ''"
-      >
-        <i :class="['fas fa-cog', isCollapsed ? 'text-lg' : 'text-base mr-3']"></i>
-        <span v-show="!isCollapsed">Settings</span>
-        <i v-show="!isCollapsed" :class="['fas text-xs ml-auto', showSettings ? 'fa-chevron-up' : 'fa-chevron-down']"></i>
-      </button>
-      
-      <!-- Settings Dropdown -->
-      <transition
-        enter-active-class="transition ease-out duration-300"
-        enter-from-class="opacity-0 -translate-y-4 scale-95"
-        enter-to-class="opacity-100 translate-y-0 scale-100"
-        leave-active-class="transition ease-in duration-200"
-        leave-from-class="opacity-100 translate-y-0 scale-100"
-        leave-to-class="opacity-0 -translate-y-4 scale-95"
-      >
-        <div v-if="showSettings && !isCollapsed" class="mb-2">
-          <div class="bg-gradient-to-br from-blue-50 via-blue-50 to-cyan-50 rounded-xl border-2 border-blue-200/50 overflow-hidden shadow-xl" style="backdrop-filter: blur(10px); box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3), 0 0 0 1px rgba(59, 130, 246, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2);">
-            <div class="py-2">
-              <button
-                @click="openOnboardingReset"
-                class="w-full flex items-center px-4 py-3 text-xs transition-all duration-300 group text-left hover:bg-blue-100 hover:shadow-md hover:transform hover:scale-105 relative overflow-hidden"
-              >
-                <!-- Hover gradient overlay -->
-                <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                
-                <div class="w-8 h-8 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center mr-3 group-hover:from-blue-200 group-hover:to-blue-300 transition-all duration-300 shadow-lg border border-blue-300/50">
-                  <i class="fas fa-undo text-blue-600 text-sm drop-shadow-sm"></i>
-                </div>
-                <div class="flex-1 relative z-10">
-                  <p class="font-semibold text-gray-700 drop-shadow-sm">Reset Onboarding</p>
-                  <p class="text-xs text-gray-500 opacity-80 group-hover:opacity-100 transition-opacity duration-300">Reset Terms & ICT Policy per user</p>
-                </div>
-                
-                <!-- Chevron indicator -->
-                <div class="opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
-                  <i class="fas fa-chevron-right text-xs text-blue-500"></i>
-                </div>
-              </button>
-            </div>
-          </div>
-        </div>
-      </transition>
-    </div>
 
     <!-- Footer / Logout -->
-    <div class="relative border-t border-slate-600/20 p-4" :class="userRole !== 'admin' ? 'mt-auto' : ''">
+    <div
+      class="relative border-t border-slate-600/20 p-4 mt-auto"
+    >
       <!-- Background Pattern -->
-      <div class="absolute inset-0 bg-gradient-to-r from-red-500/5 via-orange-500/5 to-red-500/5 backdrop-blur-sm"></div>
-      
+      <div
+        class="absolute inset-0 bg-gradient-to-r from-red-500/5 via-orange-500/5 to-red-500/5 backdrop-blur-sm"
+      ></div>
+
       <button
         @click="handleLogout"
         class="relative w-full flex items-center rounded-xl px-4 py-3 text-sm text-red-300 hover:bg-gradient-to-r hover:from-red-500/30 hover:via-orange-500/30 hover:to-red-500/30 hover:text-white transition-all duration-300 backdrop-blur-sm group hover:shadow-xl transform hover:scale-105 overflow-hidden"
@@ -534,15 +748,26 @@
         :title="isCollapsed ? 'Logout' : ''"
       >
         <!-- Background Glow -->
-        <div class="absolute inset-0 bg-gradient-to-r from-red-500/10 via-orange-500/10 to-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-        
-        <div class="relative flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-red-500/20 via-orange-500/20 to-red-500/20 group-hover:from-red-500/40 group-hover:via-orange-500/40 group-hover:to-red-500/40 transition-all duration-300 shadow-lg border border-white/10">
+        <div
+          class="absolute inset-0 bg-gradient-to-r from-red-500/10 via-orange-500/10 to-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        ></div>
+
+        <div
+          class="relative flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-red-500/20 via-orange-500/20 to-red-500/20 group-hover:from-red-500/40 group-hover:via-orange-500/40 group-hover:to-red-500/40 transition-all duration-300 shadow-lg border border-white/10"
+        >
           <i class="fas fa-sign-out-alt text-sm drop-shadow-lg"></i>
         </div>
-        <span v-show="!isCollapsed" class="relative ml-3 font-semibold tracking-wide drop-shadow-lg">Logout</span>
+        <span
+          v-show="!isCollapsed"
+          class="relative ml-3 font-semibold tracking-wide drop-shadow-lg"
+          >Logout</span
+        >
       </button>
-      
-      <div v-show="!isCollapsed" class="mt-3 text-xs text-slate-400 text-center drop-shadow-sm font-medium">
+
+      <div
+        v-show="!isCollapsed"
+        class="mt-3 text-xs text-slate-400 text-center drop-shadow-sm font-medium"
+      >
         <div class="flex items-center justify-center gap-1 mb-0.5">
           <div class="w-1 h-1 bg-slate-500 rounded-full"></div>
           <span>© 2025 Muhimbili National Hospital</span>
@@ -558,88 +783,141 @@
 </template>
 
 <script>
-import { computed, ref } from 'vue'
+import { computed, ref, watch, onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { ROLE_PERMISSIONS, ROLES } from '../utils/permissions'
 import { useAuth } from '../composables/useAuth'
+import auth from '../utils/auth'
 
 export default {
   name: 'DynamicSidebar',
   props: {
-    collapsed: { 
-      type: Boolean, 
-      default: false 
+    collapsed: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['update:collapsed'],
   setup(props, { emit }) {
     const router = useRouter()
-    const { currentUser, userRole, logout, isAuthenticated, isLoading } = useAuth()
-    
+    const { currentUser, userRole, logout, isAuthenticated, isLoading } =
+      useAuth()
+
+    // Stable role tracking to prevent flickering
+    const stableUserRole = ref(null)
+
+    // Watch for authentication state changes with debouncing
+    watch([isAuthenticated, userRole], ([authenticated, role]) => {
+      if (authenticated && role) {
+        stableUserRole.value = role
+        console.log('🔄 Sidebar: Auth state updated - Role:', role)
+      }
+      // Don't immediately clear the role to prevent flickering during refresh
+    }, { immediate: true })
+
+    // Initialize auth state on mount
+    onMounted(async() => {
+      console.log('🔄 Sidebar mounted - checking auth state')
+      console.log('  - isAuthenticated:', isAuthenticated.value)
+      console.log('  - userRole:', userRole.value)
+      console.log('  - isLoading:', isLoading.value)
+
+      // Check if we have stored auth data
+      const token = localStorage.getItem('auth_token')
+      const userData = localStorage.getItem('user_data')
+
+      if (token && userData) {
+        try {
+          const user = JSON.parse(userData)
+          if (user.role) {
+            // Set stable role immediately from stored data
+            stableUserRole.value = user.role
+            console.log('✅ Sidebar: Set stable role from stored data:', user.role)
+          }
+        } catch (error) {
+          console.error('Failed to parse stored user data:', error)
+        }
+
+        // If not authenticated, reinitialize in background
+        if (!isAuthenticated.value && !isLoading.value) {
+          console.log('🔄 Sidebar: Reinitializing auth in background...')
+          await nextTick() // Wait for next tick to avoid blocking UI
+          auth.initializeAuth()
+        }
+      }
+
+      // If already authenticated, use current role
+      if (isAuthenticated.value && userRole.value) {
+        stableUserRole.value = userRole.value
+        console.log('✅ Sidebar: Using current auth role:', userRole.value)
+      }
+    })
+
     // Local state
     const showUserMgmt = ref(false)
     const showForms = ref(false)
-    const showSettings = ref(false)
     const showDeviceManagement = ref(false)
     const showRequestsManagement = ref(false)
     const showDashboard = ref(true) // Dashboard expanded by default
-    
+
     // Computed property for v-model implementation
     const isCollapsed = computed({
       get: () => props.collapsed,
       set: (value) => emit('update:collapsed', value)
     })
-    
-    // Computed properties are already provided by useAuth()
-    
-    const containerWidthClass = computed(() => 
+
+    const containerWidthClass = computed(() =>
       isCollapsed.value ? 'w-16' : 'w-64'
     )
-    
-    // Get menu items based on user role
+
+    // Get menu items based on stable user role
     const menuItems = computed(() => {
-      if (!userRole.value) return []
-      
-      const permissions = ROLE_PERMISSIONS[userRole.value]
+      const role = stableUserRole.value || userRole.value
+      if (!role) return []
+
+      const permissions = ROLE_PERMISSIONS[role]
       if (!permissions) return []
-      
-      return permissions.routes.map(route => {
-        const metadata = getRouteMetadata(route)
-        return {
-          path: route,
-          ...metadata
-        }
-      }).filter(item => item.name)
+
+      return permissions.routes
+        .map((route) => {
+          const metadata = getRouteMetadata(route)
+          return {
+            path: route,
+            ...metadata
+          }
+        })
+        .filter((item) => item.name)
     })
-    
+
     // Categorize menu items
-    const dashboardItems = computed(() => 
-      menuItems.value.filter(item => item.category === 'dashboard')
+    const dashboardItems = computed(() =>
+      menuItems.value.filter((item) => item.category === 'dashboard')
     )
-    
-    const userManagementItems = computed(() => 
-      menuItems.value.filter(item => item.category === 'user-management')
+
+    const userManagementItems = computed(() =>
+      menuItems.value.filter((item) => item.category === 'user-management')
     )
-    
-    const formItems = computed(() => 
-      menuItems.value.filter(item => 
-        item.category === 'access-form' || item.category === 'user-form'
+
+    const formItems = computed(() =>
+      menuItems.value.filter(
+        (item) =>
+          item.category === 'access-form' || item.category === 'user-form'
       )
     )
-    
-    const deviceManagementItems = computed(() => 
-      menuItems.value.filter(item => item.category === 'device-management')
+
+    const deviceManagementItems = computed(() =>
+      menuItems.value.filter((item) => item.category === 'device-management')
     )
-    
-    const requestsManagementItems = computed(() => 
-      menuItems.value.filter(item => item.category === 'requests-management')
+
+    const requestsManagementItems = computed(() =>
+      menuItems.value.filter((item) => item.category === 'requests-management')
     )
-    
+
     // Methods
     function toggleCollapse() {
       isCollapsed.value = !isCollapsed.value
     }
-    
+
     function getRoleDisplayName(role) {
       const roleNames = {
         [ROLES.ADMIN]: 'Administrator',
@@ -652,51 +930,58 @@ export default {
       }
       return roleNames[role] || role
     }
-    
+
     function getFormsSectionTitle() {
-      if (userRole.value === ROLES.STAFF) {
+      const role = stableUserRole.value || userRole.value
+      if (role === ROLES.STAFF) {
         return 'Request Forms'
       }
       return 'Approval Forms'
     }
-    
+
     function getFormsIcon() {
-      if (userRole.value === ROLES.STAFF) {
+      const role = stableUserRole.value || userRole.value
+      if (role === ROLES.STAFF) {
         return 'fas fa-file-plus'
       }
       return 'fas fa-file-signature'
     }
-    
+
     function getFormsDropdownClass() {
       const baseClass = 'rounded-xl border-2 overflow-hidden shadow-xl'
-      if (userRole.value === ROLES.STAFF) {
+      const role = stableUserRole.value || userRole.value
+      if (role === ROLES.STAFF) {
         return `${baseClass} bg-gradient-to-br from-green-50 via-green-50 to-emerald-50 border-green-200/50`
       }
       return `${baseClass} bg-gradient-to-br from-blue-50 via-blue-50 to-cyan-50 border-blue-200/50`
     }
-    
+
     function getActiveFormClass() {
-      if (userRole.value === ROLES.STAFF) {
+      const role = stableUserRole.value || userRole.value
+      if (role === ROLES.STAFF) {
         return 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 shadow-md border-l-4 border-green-500'
       }
       return 'bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-700 shadow-md border-l-4 border-blue-500'
     }
-    
+
     function getFormIconClass() {
-      const baseClass = 'w-8 h-8 rounded-xl flex items-center justify-center mr-3 transition-all duration-300 shadow-lg border'
-      if (userRole.value === ROLES.STAFF) {
+      const baseClass =
+        'w-8 h-8 rounded-xl flex items-center justify-center mr-3 transition-all duration-300 shadow-lg border'
+      const role = stableUserRole.value || userRole.value
+      if (role === ROLES.STAFF) {
         return `${baseClass} bg-gradient-to-br from-green-100 to-green-200 group-hover:from-green-200 group-hover:to-green-300 border-green-300/50`
       }
       return `${baseClass} bg-gradient-to-br from-blue-100 to-blue-200 group-hover:from-blue-200 group-hover:to-blue-300 border-blue-300/50`
     }
-    
+
     function getFormIconColor() {
-      if (userRole.value === ROLES.STAFF) {
+      const role = stableUserRole.value || userRole.value
+      if (role === ROLES.STAFF) {
         return 'text-green-600'
       }
       return 'text-blue-600'
     }
-    
+
     async function handleLogout() {
       try {
         await logout()
@@ -705,15 +990,10 @@ export default {
         console.error('Logout failed:', error)
       }
     }
-    
-    function openOnboardingReset() {
-      // Navigate to onboarding reset page
-      router.push('/admin/onboarding-reset')
-      showSettings.value = false
-    }
-    
+
+
     function getRouteMetadata(route) {
-      // Route metadata mapping
+      // Updated route metadata mapping based on current permissions
       const metadata = {
         // Dashboards
         '/admin-dashboard': {
@@ -724,7 +1004,7 @@ export default {
           description: 'Administrative control panel'
         },
         '/user-dashboard': {
-          name: 'UserDashboard', 
+          name: 'UserDashboard',
           displayName: 'User Dashboard',
           icon: 'fas fa-user',
           category: 'dashboard',
@@ -732,7 +1012,7 @@ export default {
         },
         '/dict-dashboard': {
           name: 'DictDashboard',
-          displayName: 'ICT Director Dashboard', 
+          displayName: 'ICT Director Dashboard',
           icon: 'fas fa-user-cog',
           category: 'dashboard',
           description: 'ICT Director control panel'
@@ -740,15 +1020,22 @@ export default {
         '/hod-dashboard': {
           name: 'HodDashboard',
           displayName: 'HOD Dashboard',
-          icon: 'fas fa-briefcase', 
+          icon: 'fas fa-user-tie',
           category: 'dashboard',
           description: 'Head of Department panel'
+        },
+        '/hod-it-dashboard': {
+          name: 'HodItDashboard',
+          displayName: 'HOD IT Dashboard',
+          icon: 'fas fa-laptop-code',
+          category: 'dashboard',
+          description: 'Head of IT Department panel'
         },
         '/divisional-dashboard': {
           name: 'DivisionalDashboard',
           displayName: 'Divisional Dashboard',
           icon: 'fas fa-building',
-          category: 'dashboard', 
+          category: 'dashboard',
           description: 'Divisional Director panel'
         },
         '/ict-dashboard': {
@@ -762,25 +1049,25 @@ export default {
         // User Management (Admin only)
         '/jeeva-users': {
           name: 'JeevaUsers',
-          displayName: 'View users details',
+          displayName: 'Jeeva Users',
           icon: 'fas fa-file-medical',
           category: 'user-management',
           description: 'Manage Jeeva system users'
         },
-        // '/wellsoft-users': {
-        //   name: 'WellsoftUsers', 
-        //   displayName: 'Wellsoft Users',
-        //   icon: 'fas fa-laptop-medical',
-        //   category: 'user-management',
-        //   description: 'Manage Wellsoft system users'
-        // },
-        // '/internet-users': {
-        //   name: 'InternetUsers',
-        //   displayName: 'Internet Users', 
-        //   icon: 'fas fa-wifi',
-        //   category: 'user-management',
-        //   description: 'Manage internet access users'
-        // },
+        '/wellsoft-users': {
+          name: 'WellsoftUsers',
+          displayName: 'Wellsoft Users',
+          icon: 'fas fa-laptop-medical',
+          category: 'user-management',
+          description: 'Manage Wellsoft system users'
+        },
+        '/internet-users': {
+          name: 'InternetUsers',
+          displayName: 'Internet Users',
+          icon: 'fas fa-wifi',
+          category: 'user-management',
+          description: 'Manage internet access users'
+        },
 
         // Access Forms (Approval workflows)
         '/jeeva-access': {
@@ -788,21 +1075,21 @@ export default {
           displayName: 'Jeeva Access',
           icon: 'fas fa-file-medical',
           category: 'access-form',
-          description: 'Jeeva system access requests'
+          description: 'Jeeva system access form'
         },
         '/wellsoft-access': {
           name: 'WellsoftAccessForm',
-          displayName: 'Wellsoft Access', 
+          displayName: 'Wellsoft Access',
           icon: 'fas fa-laptop-medical',
           category: 'access-form',
-          description: 'Wellsoft system access requests'
+          description: 'Wellsoft system access form'
         },
         '/internet-access': {
           name: 'InternetAccessForm',
           displayName: 'Internet Access',
           icon: 'fas fa-wifi',
-          category: 'access-form', 
-          description: 'Internet connectivity requests'
+          category: 'access-form',
+          description: 'Internet access form'
         },
         '/both-service-form': {
           name: 'BothServiceForm',
@@ -812,8 +1099,21 @@ export default {
           description: 'Multiple service access form'
         },
 
-        // User Forms (Staff submissions) - REMOVED
-        // All request forms and device booking service have been removed
+        // User Forms (Staff submissions)
+        '/user-combined-form': {
+          name: 'UserCombinedForm',
+          displayName: 'Access Request',
+          icon: 'fas fa-file-plus',
+          category: 'user-form',
+          description: 'Submit access request'
+        },
+        '/booking-service': {
+          name: 'BookingService',
+          displayName: 'Device Booking',
+          icon: 'fas fa-calendar-plus',
+          category: 'user-form',
+          description: 'Book devices and equipment'
+        },
 
         // Device Management (ICT Officer only)
         '/ict-approval/requests': {
@@ -832,6 +1132,13 @@ export default {
         },
 
         // Requests Management (for approvers)
+        '/hod-dashboard/request-list': {
+          name: 'HODDashboardRequestList',
+          displayName: 'Access Requests',
+          icon: 'fas fa-clipboard-check',
+          category: 'requests-management',
+          description: 'Review access requests'
+        },
         '/internal-access/list': {
           name: 'InternalAccessList',
           displayName: 'Access Requests',
@@ -847,20 +1154,20 @@ export default {
           description: 'Review and approve requests'
         }
       }
-      
+
       return metadata[route] || {}
     }
-    
+
     return {
       // State
       isCollapsed,
       showUserMgmt,
       showForms,
-      showSettings,
       showDeviceManagement,
       showRequestsManagement,
       showDashboard,
-      
+      stableUserRole,
+
       // Computed
       currentUser,
       userRole,
@@ -872,7 +1179,7 @@ export default {
       formItems,
       deviceManagementItems,
       requestsManagementItems,
-      
+
       // Methods
       toggleCollapse,
       getRoleDisplayName,
@@ -882,8 +1189,7 @@ export default {
       getActiveFormClass,
       getFormIconClass,
       getFormIconColor,
-      handleLogout,
-      openOnboardingReset
+      handleLogout
     }
   }
 }

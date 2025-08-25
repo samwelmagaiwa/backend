@@ -21,8 +21,8 @@ const apiClient = axios.create({
   timeout: API_CONFIG.TIMEOUT,
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json',
-    'X-Requested-With': 'XMLHttpRequest',
+    Accept: 'application/json',
+    'X-Requested-With': 'XMLHttpRequest'
   }
 })
 
@@ -33,15 +33,18 @@ apiClient.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
-    
+
     // Log request in debug mode
     if (typeof window !== 'undefined' && APP_CONFIG.DEBUG) {
-      console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`, {
-        headers: config.headers,
-        data: config.data
-      })
+      console.log(
+        `🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`,
+        {
+          headers: config.headers,
+          data: config.data
+        }
+      )
     }
-    
+
     return config
   },
   (error) => {
@@ -57,39 +60,54 @@ apiClient.interceptors.response.use(
   (response) => {
     // Log response in debug mode
     if (typeof window !== 'undefined' && APP_CONFIG.DEBUG) {
-      console.log(`✅ API Response: ${response.config.method?.toUpperCase()} ${response.config.url}`, {
-        status: response.status,
-        data: response.data
-      })
+      console.log(
+        `✅ API Response: ${response.config.method?.toUpperCase()} ${
+          response.config.url
+        }`,
+        {
+          status: response.status,
+          data: response.data
+        }
+      )
     }
-    
+
     return response
   },
   (error) => {
     // Log error in debug mode
     if (typeof window !== 'undefined' && APP_CONFIG.DEBUG) {
-      console.error(`❌ API Error: ${error.config?.method?.toUpperCase()} ${error.config?.url}`, {
-        status: error.response?.status,
-        message: error.response?.data?.message || error.message,
-        data: error.response?.data
-      })
+      console.error(
+        `❌ API Error: ${error.config?.method?.toUpperCase()} ${
+          error.config?.url
+        }`,
+        {
+          status: error.response?.status,
+          message: error.response?.data?.message || error.message,
+          data: error.response?.data
+        }
+      )
     }
-    
+
     // Handle 401 Unauthorized (token expired or invalid)
     if (error.response?.status === 401) {
-      console.warn('🔐 Authentication failed - clearing tokens and redirecting to login')
-      
+      console.warn(
+        '🔐 Authentication failed - clearing tokens and redirecting to login'
+      )
+
       // Clear invalid token
       localStorage.removeItem('auth_token')
       localStorage.removeItem('user_data')
       localStorage.removeItem('session_data')
-      
+
       // Redirect to login if not already there
-      if (window.location.pathname !== '/' && window.location.pathname !== '/login') {
+      if (
+        window.location.pathname !== '/' &&
+        window.location.pathname !== '/login'
+      ) {
         window.location.href = '/'
       }
     }
-    
+
     return Promise.reject(error)
   }
 )
@@ -116,7 +134,7 @@ export const authAPI = {
   async logout() {
     try {
       const response = await apiClient.post('/logout')
-      return { 
+      return {
         success: true,
         data: response.data
       }
@@ -244,7 +262,7 @@ export const authAPI = {
       // Handle both FormData (with files) and regular object data
       let requestData
       let headers = {}
-      
+
       if (declarationData instanceof FormData) {
         // For file uploads, send FormData directly
         requestData = declarationData
@@ -255,11 +273,15 @@ export const authAPI = {
           declaration_data: declarationData
         }
       }
-      
-      const response = await apiClient.post('/onboarding/submit-declaration', requestData, {
-        headers: headers
-      })
-      
+
+      const response = await apiClient.post(
+        '/onboarding/submit-declaration',
+        requestData,
+        {
+          headers: headers
+        }
+      )
+
       return {
         success: true,
         data: response.data.data
@@ -290,7 +312,9 @@ export const authAPI = {
 
   async updateOnboardingStep(step) {
     try {
-      const response = await apiClient.post('/onboarding/update-step', { step })
+      const response = await apiClient.post('/onboarding/update-step', {
+        step
+      })
       return {
         success: true,
         data: response.data.data
@@ -372,10 +396,13 @@ export const authAPI = {
 
   async bulkResetOnboarding(userIds, resetType = 'all') {
     try {
-      const response = await apiClient.post('/admin/users/bulk-reset-onboarding', {
-        user_ids: userIds,
-        reset_type: resetType
-      })
+      const response = await apiClient.post(
+        '/admin/users/bulk-reset-onboarding',
+        {
+          user_ids: userIds,
+          reset_type: resetType
+        }
+      )
       return {
         success: true,
         data: response.data.data

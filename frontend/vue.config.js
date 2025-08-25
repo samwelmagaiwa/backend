@@ -24,7 +24,7 @@ module.exports = defineConfig({
       directory: path.join(__dirname, 'public'),
       publicPath: '/'
     },
-    // Completely disable all WebSocket functionality
+    // Disable WebSocket functionality
     webSocketServer: false,
     hot: false,
     liveReload: false,
@@ -36,12 +36,11 @@ module.exports = defineConfig({
       'Access-Control-Allow-Origin': '*'
     },
     client: {
-      webSocketURL: false,  // Completely disable WebSocket URL
+      // Remove webSocketURL entirely when disabling WebSocket
       overlay: false,
       progress: false,
       reconnect: false,
-      logging: 'none',
-      webSocketTransport: 'sockjs'
+      logging: 'none'
     },
     // Additional WebSocket disabling
     devMiddleware: {
