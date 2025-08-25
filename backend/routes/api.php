@@ -1,8 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\v1\AuthController;
-use App\Http\Controllers\Api\v1\JeevaAccessRequestController;
-use App\Http\Controllers\Api\v1\ModuleAccessRequestController;
+
 use App\Http\Controllers\Api\v1\OnboardingController;
 use App\Http\Controllers\Api\v1\AdminController;
 use App\Http\Controllers\Api\V1\UserAccessController;
@@ -82,10 +81,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/onboarding/stats', [AdminController::class, 'getOnboardingStats'])->name('admin.onboarding.stats');
     });
 
-    Route::apiResource('jeeva-access-requests', JeevaAccessRequestController::class);
-    Route::apiResource('module-access-requests', ModuleAccessRequestController::class);
-    Route::get('/user-info', [ModuleAccessRequestController::class, 'userInfo'])->name('user-info');
-    Route::get('/jeeva-access-requests/pdf', [JeevaAccessRequestController::class, 'exportPdf'])->name('jeeva-access-requests.pdf');
+
 
     // User Access Request routes (v1)
     Route::prefix('v1')->group(function () {

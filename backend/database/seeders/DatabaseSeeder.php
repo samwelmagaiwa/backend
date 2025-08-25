@@ -23,7 +23,6 @@ class DatabaseSeeder extends Seeder
         RoleSeeder::class,
         UserSeeder::class,
         DepartmentSeeder::class,
-        UserAccessSeeder::class,
         RoleManagementSeeder::class,
     ]);
     }
