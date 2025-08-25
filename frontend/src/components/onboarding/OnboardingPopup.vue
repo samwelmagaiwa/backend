@@ -1,20 +1,29 @@
 <template>
-  <div class="fixed inset-0 bg-black bg-opacity-20 flex items-center justify-end z-50 p-4 backdrop-blur-sm">
+  <div
+    class="fixed inset-0 bg-black bg-opacity-20 flex items-center justify-end z-50 p-4 backdrop-blur-sm"
+  >
     <!-- Background Image -->
-    <div 
+    <div
       class="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-800"
       style="background-image: url('/assets/images/image1.jpg')"
     ></div>
-    <div class="ultra-glass rounded-3xl max-w-md w-full transform transition-all duration-500 scale-100 animate-slideInRight relative z-10 border border-white border-opacity-30 shadow-2xl mr-8">
-     
+    <div
+      class="ultra-glass rounded-3xl max-w-md w-full transform transition-all duration-500 scale-100 animate-slideInRight relative z-10 border border-white border-opacity-30 shadow-2xl mr-8"
+    >
       <!-- Body -->
       <div class="transparent-body p-8 text-center relative">
         <!-- Body Background Pattern -->
-        <div class="absolute inset-0 bg-gradient-to-t from-white from-opacity-2 to-transparent rounded-b-3xl"></div>
-        
+        <div
+          class="absolute inset-0 bg-gradient-to-t from-white from-opacity-2 to-transparent rounded-b-3xl"
+        ></div>
+
         <div class="relative z-10">
-          <p class="text-white text-2xl leading-relaxed mb-8 drop-shadow-glow font-semibold tracking-wide text-shadow-strong">{{ message }}</p>
-        
+          <p
+            class="text-white text-2xl leading-relaxed mb-8 drop-shadow-glow font-semibold tracking-wide text-shadow-strong"
+          >
+            {{ message }}
+          </p>
+
           <div class="space-y-4">
             <button
               @click="handleClick"
@@ -23,7 +32,7 @@
               <i class="fas fa-arrow-right mr-3"></i>
               {{ buttonText }}
             </button>
-            
+
             <button
               v-if="showReturnToLogin"
               @click="handleReturnToLogin"
@@ -84,7 +93,8 @@ export default {
   backdrop-filter: blur(25px);
   -webkit-backdrop-filter: blur(25px);
   border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 /* Transparent Sections */
@@ -122,7 +132,8 @@ export default {
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px);
   }
   50% {
@@ -131,7 +142,8 @@ export default {
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.4;
     transform: scale(1);
   }
@@ -142,11 +154,13 @@ export default {
 }
 
 @keyframes glow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
   }
   50% {
-    box-shadow: 0 0 30px rgba(59, 130, 246, 0.6), 0 0 40px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.6),
+      0 0 40px rgba(99, 102, 241, 0.4);
   }
 }
 
@@ -224,19 +238,19 @@ button:active {
 
 /* Enhanced Text Shadows */
 .drop-shadow-2xl {
-  filter: drop-shadow(0 25px 25px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 10px rgba(255, 255, 255, 0.1));
+  filter: drop-shadow(0 25px 25px rgba(0, 0, 0, 0.5))
+    drop-shadow(0 0 10px rgba(255, 255, 255, 0.1));
 }
 
 .drop-shadow-glow {
-  filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 40px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+  filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.8))
+    drop-shadow(0 0 40px rgba(0, 0, 0, 0.6))
+    drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
 }
 
 .text-shadow-strong {
-  text-shadow: 
-    0 0 10px rgba(0, 0, 0, 0.9),
-    0 0 20px rgba(0, 0, 0, 0.7),
-    0 0 30px rgba(0, 0, 0, 0.5),
-    2px 2px 4px rgba(0, 0, 0, 0.8),
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.9), 0 0 20px rgba(0, 0, 0, 0.7),
+    0 0 30px rgba(0, 0, 0, 0.5), 2px 2px 4px rgba(0, 0, 0, 0.8),
     0 0 5px rgba(255, 255, 255, 0.2);
 }
 
@@ -252,4 +266,5 @@ button:active {
 .border-opacity-10 {
   border-color: rgba(255, 255, 255, 0.1);
 }
-</style>"
+</style>
+"

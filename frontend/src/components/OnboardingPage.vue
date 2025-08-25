@@ -21,21 +21,22 @@ export default {
     OnboardingFlow
   },
   setup() {
-    const { currentUser, defaultDashboard, markOnboardingComplete, logout } = useAuth()
+    const { currentUser, defaultDashboard, markOnboardingComplete, logout } =
+      useAuth()
     const router = useRouter()
-    
-    const handleOnboardingComplete = async () => {
+
+    const handleOnboardingComplete = async() => {
       try {
         // Mark onboarding as complete
         if (currentUser.value) {
           const success = await markOnboardingComplete(currentUser.value.id)
-          
+
           if (success) {
             console.log('Onboarding completed successfully')
-            
+
             // Wait a moment for state to update
-            await new Promise(resolve => setTimeout(resolve, 100))
-            
+            await new Promise((resolve) => setTimeout(resolve, 100))
+
             // Redirect to dashboard
             const dashboard = defaultDashboard.value || '/user-dashboard'
             console.log('Redirecting to dashboard:', dashboard)
@@ -54,8 +55,8 @@ export default {
         await router.push(dashboard)
       }
     }
-    
-    const handleReturnToLogin = async () => {
+
+    const handleReturnToLogin = async() => {
       // Log out the user and navigate back to login page
       console.log('OnboardingPage: Logging out and navigating to login page')
       try {
@@ -67,7 +68,7 @@ export default {
         router.push('/')
       }
     }
-    
+
     return {
       currentUser,
       handleOnboardingComplete,
@@ -75,4 +76,5 @@ export default {
     }
   }
 }
-</script>"
+</script>
+"

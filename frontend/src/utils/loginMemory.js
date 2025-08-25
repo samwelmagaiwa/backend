@@ -1,6 +1,6 @@
 /**
  * Login Memory Utility
- * Manages remembering user email for faster login
+ * Handles saving and retrieving user email for faster login
  */
 
 const STORAGE_KEY = 'remembered_email'
@@ -8,15 +8,17 @@ const STORAGE_KEY = 'remembered_email'
 export const loginMemory = {
   /**
    * Save email to localStorage
-   * @param {string} email - Email to remember
+   * @param {string} email - Email to save
    */
   saveEmail(email) {
     if (email && email.trim()) {
-      localStorage.setItem(STORAGE_KEY, email.trim())
-      console.log('💾 Email saved for next login:', email)
-      return true
+      try {
+        localStorage.setItem(STORAGE_KEY, email.trim())
+        console.log('📧 Email saved for faster login')
+      } catch (error) {
+        console.error('Failed to save email:', error)
+      }
     }
-    return false
   },
 
   /**
@@ -24,10 +26,14 @@ export const loginMemory = {
    * @returns {string|null} - Saved email or null
    */
   getSavedEmail() {
-    const savedEmail = localStorage.getItem(STORAGE_KEY)
-    if (savedEmail) {
-      console.log('✅ Loaded saved email:', savedEmail)
-      return savedEmail
+    try {
+      const savedEmail = localStorage.getItem(STORAGE_KEY)
+      if (savedEmail && savedEmail.trim()) {
+        console.log('📧 Retrieved saved email for login')
+        return savedEmail.trim()
+      }
+    } catch (error) {
+      console.error('Failed to retrieve saved email:', error)
     }
     return null
   },
@@ -36,28 +42,20 @@ export const loginMemory = {
    * Clear saved email from localStorage
    */
   clearSavedEmail() {
-    localStorage.removeItem(STORAGE_KEY)
-    console.log('🗑️ Cleared saved email')
+    try {
+      localStorage.removeItem(STORAGE_KEY)
+      console.log('📧 Cleared saved email')
+    } catch (error) {
+      console.error('Failed to clear saved email:', error)
+    }
   },
 
   /**
-   * Check if email is currently saved
-   * @returns {boolean}
+   * Check if email is saved
+   * @returns {boolean} - True if email is saved
    */
   hasRememberedEmail() {
-    return localStorage.getItem(STORAGE_KEY) !== null
-  },
-
-  /**
-   * Update saved email if it exists
-   * @param {string} newEmail - New email to save
-   */
-  updateSavedEmail(newEmail) {
-    if (this.hasRememberedEmail() && newEmail && newEmail.trim()) {
-      this.saveEmail(newEmail)
-      return true
-    }
-    return false
+    return !!this.getSavedEmail()
   }
 }
 

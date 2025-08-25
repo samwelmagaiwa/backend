@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
 use App\Models\UserOnboarding;
+use App\Models\Declaration;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Arr;
 
 class OnboardingController extends Controller
@@ -120,6 +122,7 @@ class OnboardingController extends Controller
 
     /**
      * Submit declaration form
+     * Note: This method now redirects to the DeclarationController for better separation of concerns
      */
     public function submitDeclaration(Request $request)
     {
@@ -128,7 +131,7 @@ class OnboardingController extends Controller
             $formData = $request->has('declaration_data') ? $request->declaration_data : $request->all();
             
             // Log received data for debugging
-            Log::info('Declaration form data received', [
+            Log::info('Declaration form data received via onboarding', [
                 'user_id' => $request->user()->id,
                 'form_data' => $formData,
                 'agreement_type' => gettype($formData['agreement'] ?? null),
@@ -158,11 +161,33 @@ class OnboardingController extends Controller
             
             $validator = Validator::make($formData, [
                 'fullName' => 'required|string|max:255',
-                'pfNumber' => 'required|string|max:100',
+                'pfNumber' => [
+                    'required',
+                    'string',
+                    'max:100',
+                    // Check if PF number is unique across all declarations
+                    function ($attribute, $value, $fail) use ($request) {
+                        $existingDeclaration = Declaration::where('pf_number', $value)
+                            ->where('user_id', '!=', $request->user()->id)
+                            ->first();
+                        
+                        if ($existingDeclaration) {
+                            $fail('This PF number has already been used in another declaration.');
+                        }
+                    }
+                ],
                 'department' => 'required|string|max:255',
                 'jobTitle' => 'required|string|max:255',
                 'date' => 'required|date',
                 'agreement' => 'required|boolean|accepted',
+            ], [
+                'pfNumber.required' => 'PF Number is required.',
+                'pfNumber.max' => 'PF Number must not exceed 100 characters.',
+                'agreement.accepted' => 'You must confirm the declaration statement.',
+                'fullName.required' => 'Full Name is required.',
+                'department.required' => 'Department is required.',
+                'jobTitle.required' => 'Job Title is required.',
+                'date.required' => 'Signature Date is required.',
             ]);
 
             if ($validator->fails()) {
@@ -174,7 +199,6 @@ class OnboardingController extends Controller
             }
 
             $user = $request->user();
-            $onboarding = $user->getOrCreateOnboarding();
 
             // Handle signature file if present
             $signatureInfo = null;
@@ -182,39 +206,70 @@ class OnboardingController extends Controller
                 $signatureInfo = $this->handleSignatureUpload($request->file('signature'), $user->id);
             }
 
-            // Prepare declaration data for storage
-            $declarationData = [
-                'full_name' => $formData['fullName'],
-                'pf_number' => $formData['pfNumber'],
-                'department' => $formData['department'],
-                'job_title' => $formData['jobTitle'],
-                'signature_date' => $formData['date'],
-                'agreement_accepted' => $formData['agreement'],
-                'signature_info' => $signatureInfo,
-                'submitted_at' => now()->toISOString(),
-                'ip_address' => $request->ip(),
-                'user_agent' => $request->userAgent()
-            ];
+            // Use database transaction to ensure data consistency
+            DB::beginTransaction();
 
-            $onboarding->submitDeclaration($declarationData);
+            try {
+                // Create or update declaration record
+                $declaration = Declaration::updateOrCreate(
+                    ['user_id' => $user->id],
+                    [
+                        'full_name' => $formData['fullName'],
+                        'pf_number' => $formData['pfNumber'],
+                        'department' => $formData['department'],
+                        'job_title' => $formData['jobTitle'],
+                        'signature_date' => $formData['date'],
+                        'agreement_accepted' => $formData['agreement'],
+                        'signature_info' => $signatureInfo,
+                        'submitted_at' => now(),
+                        'ip_address' => $request->ip(),
+                        'user_agent' => $request->userAgent()
+                    ]
+                );
 
-            Log::info('User submitted declaration', [
-                'user_id' => $user->id,
-                'declaration_data' => Arr::except($declarationData, ['signature_info']) // Don't log file info
-            ]);
+                // Update onboarding status
+                $onboarding = $user->getOrCreateOnboarding();
+                $onboarding->submitDeclaration([
+                    'declaration_id' => $declaration->id,
+                    'full_name' => $formData['fullName'],
+                    'pf_number' => $formData['pfNumber'],
+                    'department' => $formData['department'],
+                    'job_title' => $formData['jobTitle'],
+                    'signature_date' => $formData['date'],
+                    'agreement_accepted' => $formData['agreement'],
+                    'signature_info' => $signatureInfo,
+                    'submitted_at' => now()->toISOString(),
+                    'ip_address' => $request->ip(),
+                    'user_agent' => $request->userAgent()
+                ]);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Declaration submitted successfully',
-                'data' => [
-                    'current_step' => $onboarding->current_step,
-                    'next_step' => $onboarding->getNextStep(),
-                    'declaration_submitted_at' => $onboarding->declaration_submitted_at,
-                    'ready_for_completion' => $this->isReadyForCompletion($onboarding)
-                ]
-            ]);
+                DB::commit();
+
+                Log::info('User submitted declaration via onboarding', [
+                    'user_id' => $user->id,
+                    'declaration_id' => $declaration->id,
+                    'pf_number' => $formData['pfNumber']
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Declaration submitted successfully',
+                    'data' => [
+                        'declaration_id' => $declaration->id,
+                        'current_step' => $onboarding->current_step,
+                        'next_step' => $onboarding->getNextStep(),
+                        'declaration_submitted_at' => $onboarding->declaration_submitted_at,
+                        'ready_for_completion' => $this->isReadyForCompletion($onboarding)
+                    ]
+                ]);
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
+            }
+
         } catch (\Exception $e) {
-            Log::error('Error submitting declaration', [
+            Log::error('Error submitting declaration via onboarding', [
                 'user_id' => $request->user()->id,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
@@ -246,15 +301,15 @@ class OnboardingController extends Controller
 
             // Generate unique filename
             $extension = $file->getClientOriginalExtension();
-            $filename = 'signature_' . $userId . '_' . time() . '.' . $extension;
+            $filename = 'declaration_signature_' . $userId . '_' . time() . '.' . $extension;
             
-            // Store file in storage/app/signatures
-            $path = $file->storeAs('signatures', $filename);
+            // Store file in storage/app/public/signatures/declarations
+            $path = $file->storeAs('public/signatures/declarations', $filename);
 
             return [
                 'original_name' => $file->getClientOriginalName(),
                 'filename' => $filename,
-                'path' => $path,
+                'path' => str_replace('public/', '', $path), // Remove 'public/' for URL generation
                 'size' => $file->getSize(),
                 'mime_type' => $file->getMimeType(),
                 'uploaded_at' => now()->toISOString()

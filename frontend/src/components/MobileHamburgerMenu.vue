@@ -1,15 +1,17 @@
 <template>
   <div class="mobile-menu-container">
     <!-- Hamburger Button -->
-    <button 
+    <button
       @click="toggleMenu"
       class="hamburger-button lg:hidden p-3 rounded-xl text-white hover:bg-blue-700/30 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-300 backdrop-blur-sm relative overflow-hidden group"
-      :class="{ 'active': isMenuOpen }"
+      :class="{ active: isMenuOpen }"
       aria-label="Toggle mobile menu"
     >
       <!-- Animated background -->
-      <div class="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-teal-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"></div>
-      
+      <div
+        class="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-teal-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"
+      ></div>
+
       <!-- Hamburger Icon -->
       <div class="hamburger-icon relative z-10">
         <span class="hamburger-line"></span>
@@ -27,11 +29,11 @@
       leave-from-class="opacity-100"
       leave-to-class="opacity-0"
     >
-      <div 
-        v-if="isMenuOpen" 
+      <div
+        v-if="isMenuOpen"
         class="fixed inset-0 bg-black/70 backdrop-blur-md z-40 lg:hidden"
         @click="closeMenu"
-        style="backdrop-filter: blur(12px);"
+        style="backdrop-filter: blur(12px)"
       ></div>
     </transition>
 
@@ -44,46 +46,67 @@
       leave-from-class="translate-x-0"
       leave-to-class="-translate-x-full"
     >
-      <div 
-        v-if="isMenuOpen" 
+      <div
+        v-if="isMenuOpen"
         class="fixed top-0 left-0 h-full w-80 bg-gradient-to-b from-blue-900 via-blue-800 to-teal-900 shadow-2xl z-50 lg:hidden overflow-y-auto border-r-2 border-blue-600/50"
-        style="backdrop-filter: blur(25px); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);"
+        style="
+          backdrop-filter: blur(25px);
+          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        "
       >
         <!-- Menu Header -->
-        <div class="flex items-center justify-between p-6 border-b-2 border-blue-600/30 bg-gradient-to-r from-blue-800/50 to-blue-700/50">
+        <div
+          class="flex items-center justify-between p-6 border-b-2 border-blue-600/30 bg-gradient-to-r from-blue-800/50 to-blue-700/50"
+        >
           <div class="flex items-center">
             <!-- Hospital Logo -->
-            <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-xl flex items-center justify-center mr-4 shadow-xl border-2 border-white/20">
+            <div
+              class="w-12 h-12 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-xl flex items-center justify-center mr-4 shadow-xl border-2 border-white/20"
+            >
               <i class="fas fa-hospital text-white text-xl drop-shadow-lg"></i>
             </div>
             <div>
-              <h2 class="text-xl font-bold text-white drop-shadow-lg">Muhimbili</h2>
-              <p class="text-sm text-blue-200 drop-shadow-sm">Hospital Staff Portal</p>
+              <h2 class="text-xl font-bold text-white drop-shadow-lg">
+                Muhimbili
+              </h2>
+              <!-- Portal text removed -->
             </div>
           </div>
-          
+
           <!-- Close Button -->
-          <button 
+          <button
             @click="closeMenu"
             class="p-3 rounded-xl text-blue-200 hover:text-white hover:bg-blue-700/30 transition-all duration-300 backdrop-blur-sm relative overflow-hidden group"
           >
-            <div class="absolute inset-0 bg-gradient-to-r from-red-500/20 to-red-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"></div>
+            <div
+              class="absolute inset-0 bg-gradient-to-r from-red-500/20 to-red-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"
+            ></div>
             <i class="fas fa-times text-xl relative z-10 drop-shadow-sm"></i>
           </button>
         </div>
 
         <!-- User Info Section -->
-        <div class="p-6 border-b border-blue-600/30 bg-gradient-to-r from-blue-800/30 to-blue-700/30">
+        <div
+          class="p-6 border-b border-blue-600/30 bg-gradient-to-r from-blue-800/30 to-blue-700/30"
+        >
           <div class="flex items-center">
-            <div class="w-14 h-14 bg-gradient-to-br from-blue-400 via-cyan-400 to-blue-500 rounded-full flex items-center justify-center mr-4 shadow-xl border-3 border-white/20 relative">
+            <div
+              class="w-14 h-14 bg-gradient-to-br from-blue-400 via-cyan-400 to-blue-500 rounded-full flex items-center justify-center mr-4 shadow-xl border-3 border-white/20 relative"
+            >
               <i class="fas fa-user-md text-white text-xl drop-shadow-lg"></i>
-              <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white shadow-lg"></div>
+              <div
+                class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white shadow-lg"
+              ></div>
             </div>
             <div class="flex-1">
-              <h3 class="text-lg font-bold text-white drop-shadow-lg">{{ currentUser?.name || 'Staff Member' }}</h3>
-              <p class="text-sm text-blue-200 drop-shadow-sm">{{ getRoleDisplayName(currentUser?.role) }}</p>
+              <h3 class="text-lg font-bold text-white drop-shadow-lg">
+                {{ currentUser?.name || "Staff Member" }}
+              </h3>
+              <!-- Role display removed -->
               <div class="flex items-center mt-1">
-                <div class="w-2 h-2 bg-green-400 rounded-full mr-2 shadow-sm"></div>
+                <div
+                  class="w-2 h-2 bg-green-400 rounded-full mr-2 shadow-sm"
+                ></div>
                 <span class="text-xs text-green-300 font-medium">Online</span>
               </div>
             </div>
@@ -95,145 +118,246 @@
           <!-- Dashboard Section -->
           <div class="mb-6">
             <div class="px-6 py-2">
-              <h3 class="text-xs font-semibold text-blue-200 uppercase tracking-wider drop-shadow-sm flex items-center">
+              <h3
+                class="text-xs font-semibold text-blue-200 uppercase tracking-wider drop-shadow-sm flex items-center"
+              >
                 <i class="fas fa-tachometer-alt mr-2 text-blue-300"></i>
                 Dashboard
               </h3>
             </div>
-            
+
             <!-- Dashboard Menu Item -->
-            <router-link 
+            <router-link
               :to="getDashboardRoute()"
               @click="closeMenu"
               class="flex items-center px-6 py-4 text-white hover:bg-blue-600/50 transition-all duration-300 group relative overflow-hidden border-l-4 border-transparent hover:border-blue-400"
               :class="{ 'bg-blue-600/50 border-blue-400': isDashboardActive }"
             >
-              <div class="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-cyan-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <div class="w-12 h-12 bg-gradient-to-br from-blue-600/40 to-blue-500/40 rounded-xl flex items-center justify-center mr-4 group-hover:bg-gradient-to-br group-hover:from-blue-500 group-hover:to-cyan-500 transition-all duration-300 shadow-lg border border-blue-400/30">
-                <i class="fas fa-chart-pie text-blue-200 group-hover:text-white text-lg transition-colors duration-300"></i>
+              <div
+                class="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-cyan-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              ></div>
+              <div
+                class="w-12 h-12 bg-gradient-to-br from-blue-600/40 to-blue-500/40 rounded-xl flex items-center justify-center mr-4 group-hover:bg-gradient-to-br group-hover:from-blue-500 group-hover:to-cyan-500 transition-all duration-300 shadow-lg border border-blue-400/30"
+              >
+                <i
+                  class="fas fa-chart-pie text-blue-200 group-hover:text-white text-lg transition-colors duration-300"
+                ></i>
               </div>
               <div class="flex-1 relative z-10">
-                <span class="font-semibold drop-shadow-sm text-lg">Dashboard</span>
-                <p class="text-sm text-blue-200 opacity-80 group-hover:opacity-100 transition-opacity duration-300">Main control panel</p>
+                <span class="font-semibold drop-shadow-sm text-lg"
+                  >Dashboard</span
+                >
+                <p
+                  class="text-sm text-blue-200 opacity-80 group-hover:opacity-100 transition-opacity duration-300"
+                >
+                  Main control panel
+                </p>
               </div>
-              <i class="fas fa-chevron-right text-blue-300 group-hover:text-white transition-all duration-300 group-hover:translate-x-1"></i>
+              <i
+                class="fas fa-chevron-right text-blue-300 group-hover:text-white transition-all duration-300 group-hover:translate-x-1"
+              ></i>
             </router-link>
 
             <!-- User Dashboard (if different from main dashboard) -->
-            <router-link 
+            <router-link
               v-if="showUserDashboard"
               to="/user-dashboard"
               @click="closeMenu"
               class="flex items-center px-6 py-4 text-white hover:bg-blue-600/50 transition-all duration-300 group relative overflow-hidden border-l-4 border-transparent hover:border-emerald-400"
-              :class="{ 'bg-blue-600/50 border-emerald-400': $route.path === '/user-dashboard' }"
+              :class="{
+                'bg-blue-600/50 border-emerald-400':
+                  $route.path === '/user-dashboard',
+              }"
             >
-              <div class="absolute inset-0 bg-gradient-to-r from-emerald-600/20 to-blue-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <div class="w-12 h-12 bg-gradient-to-br from-emerald-600/40 to-emerald-500/40 rounded-xl flex items-center justify-center mr-4 group-hover:bg-gradient-to-br group-hover:from-emerald-500 group-hover:to-blue-500 transition-all duration-300 shadow-lg border border-emerald-400/30">
-                <i class="fas fa-user text-emerald-200 group-hover:text-white text-lg transition-colors duration-300"></i>
+              <div
+                class="absolute inset-0 bg-gradient-to-r from-emerald-600/20 to-blue-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              ></div>
+              <div
+                class="w-12 h-12 bg-gradient-to-br from-emerald-600/40 to-emerald-500/40 rounded-xl flex items-center justify-center mr-4 group-hover:bg-gradient-to-br group-hover:from-emerald-500 group-hover:to-blue-500 transition-all duration-300 shadow-lg border border-emerald-400/30"
+              >
+                <i
+                  class="fas fa-user text-emerald-200 group-hover:text-white text-lg transition-colors duration-300"
+                ></i>
               </div>
               <div class="flex-1 relative z-10">
-                <span class="font-semibold drop-shadow-sm text-lg">User Dashboard</span>
-                <p class="text-sm text-blue-200 opacity-80 group-hover:opacity-100 transition-opacity duration-300">Personal workspace</p>
+                <span class="font-semibold drop-shadow-sm text-lg"
+                  >User Dashboard</span
+                >
+                <p
+                  class="text-sm text-blue-200 opacity-80 group-hover:opacity-100 transition-opacity duration-300"
+                >
+                  Personal workspace
+                </p>
               </div>
-              <i class="fas fa-chevron-right text-blue-300 group-hover:text-white transition-all duration-300 group-hover:translate-x-1"></i>
+              <i
+                class="fas fa-chevron-right text-blue-300 group-hover:text-white transition-all duration-300 group-hover:translate-x-1"
+              ></i>
             </router-link>
           </div>
 
           <!-- Request Forms Section -->
           <div class="mb-6">
             <div class="px-6 py-2">
-              <h3 class="text-xs font-semibold text-blue-200 uppercase tracking-wider drop-shadow-sm flex items-center">
+              <h3
+                class="text-xs font-semibold text-blue-200 uppercase tracking-wider drop-shadow-sm flex items-center"
+              >
                 <i class="fas fa-file-alt mr-2 text-blue-300"></i>
                 Request Forms
               </h3>
             </div>
-            
+
             <!-- Forms Submenu -->
             <div class="space-y-1">
               <!-- Jeeva Access Form -->
-              <router-link 
+              <router-link
                 :to="getFormRoute('jeeva')"
                 @click="closeMenu"
                 class="flex items-center px-6 py-4 text-white hover:bg-gradient-to-r hover:from-green-600/30 hover:to-emerald-600/30 transition-all duration-300 group relative overflow-hidden border-l-4 border-transparent hover:border-green-400"
-                :class="{ 'bg-gradient-to-r from-green-600/30 to-emerald-600/30 border-green-400': isFormActive('jeeva') }"
+                :class="{
+                  'bg-gradient-to-r from-green-600/30 to-emerald-600/30 border-green-400':
+                    isFormActive('jeeva'),
+                }"
               >
-                <div class="absolute inset-0 bg-gradient-to-r from-green-600/10 to-emerald-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div class="w-10 h-10 bg-gradient-to-br from-green-600/40 to-green-500/40 rounded-lg flex items-center justify-center mr-4 group-hover:bg-gradient-to-br group-hover:from-green-500 group-hover:to-emerald-500 transition-all duration-300 shadow-lg border border-green-400/30">
-                  <i class="fas fa-file-medical text-green-200 group-hover:text-white transition-colors duration-300"></i>
+                <div
+                  class="absolute inset-0 bg-gradient-to-r from-green-600/10 to-emerald-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                ></div>
+                <div
+                  class="w-10 h-10 bg-gradient-to-br from-green-600/40 to-green-500/40 rounded-lg flex items-center justify-center mr-4 group-hover:bg-gradient-to-br group-hover:from-green-500 group-hover:to-emerald-500 transition-all duration-300 shadow-lg border border-green-400/30"
+                >
+                  <i
+                    class="fas fa-file-medical text-green-200 group-hover:text-white transition-colors duration-300"
+                  ></i>
                 </div>
                 <div class="flex-1 relative z-10">
                   <span class="font-medium drop-shadow-sm">Jeeva Access</span>
-                  <p class="text-xs text-blue-200 opacity-80 group-hover:opacity-100 transition-opacity duration-300">Medical records system</p>
+                  <p
+                    class="text-xs text-blue-200 opacity-80 group-hover:opacity-100 transition-opacity duration-300"
+                  >
+                    Medical records system
+                  </p>
                 </div>
-                <i class="fas fa-chevron-right text-blue-300 group-hover:text-white text-sm transition-all duration-300 group-hover:translate-x-1"></i>
+                <i
+                  class="fas fa-chevron-right text-blue-300 group-hover:text-white text-sm transition-all duration-300 group-hover:translate-x-1"
+                ></i>
               </router-link>
 
               <!-- Wellsoft Access Form -->
-              <router-link 
+              <router-link
                 :to="getFormRoute('wellsoft')"
                 @click="closeMenu"
                 class="flex items-center px-6 py-4 text-white hover:bg-gradient-to-r hover:from-purple-600/30 hover:to-indigo-600/30 transition-all duration-300 group relative overflow-hidden border-l-4 border-transparent hover:border-purple-400"
-                :class="{ 'bg-gradient-to-r from-purple-600/30 to-indigo-600/30 border-purple-400': isFormActive('wellsoft') }"
+                :class="{
+                  'bg-gradient-to-r from-purple-600/30 to-indigo-600/30 border-purple-400':
+                    isFormActive('wellsoft'),
+                }"
               >
-                <div class="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-indigo-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div class="w-10 h-10 bg-gradient-to-br from-purple-600/40 to-purple-500/40 rounded-lg flex items-center justify-center mr-4 group-hover:bg-gradient-to-br group-hover:from-purple-500 group-hover:to-indigo-500 transition-all duration-300 shadow-lg border border-purple-400/30">
-                  <i class="fas fa-laptop-medical text-purple-200 group-hover:text-white transition-colors duration-300"></i>
+                <div
+                  class="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-indigo-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                ></div>
+                <div
+                  class="w-10 h-10 bg-gradient-to-br from-purple-600/40 to-purple-500/40 rounded-lg flex items-center justify-center mr-4 group-hover:bg-gradient-to-br group-hover:from-purple-500 group-hover:to-indigo-500 transition-all duration-300 shadow-lg border border-purple-400/30"
+                >
+                  <i
+                    class="fas fa-laptop-medical text-purple-200 group-hover:text-white transition-colors duration-300"
+                  ></i>
                 </div>
                 <div class="flex-1 relative z-10">
-                  <span class="font-medium drop-shadow-sm">Wellsoft Access</span>
-                  <p class="text-xs text-blue-200 opacity-80 group-hover:opacity-100 transition-opacity duration-300">Hospital management</p>
+                  <span class="font-medium drop-shadow-sm"
+                    >Wellsoft Access</span
+                  >
+                  <p
+                    class="text-xs text-blue-200 opacity-80 group-hover:opacity-100 transition-opacity duration-300"
+                  >
+                    Hospital management
+                  </p>
                 </div>
-                <i class="fas fa-chevron-right text-blue-300 group-hover:text-white text-sm transition-all duration-300 group-hover:translate-x-1"></i>
+                <i
+                  class="fas fa-chevron-right text-blue-300 group-hover:text-white text-sm transition-all duration-300 group-hover:translate-x-1"
+                ></i>
               </router-link>
 
               <!-- Internet Access Form -->
-              <router-link 
+              <router-link
                 :to="getFormRoute('internet')"
                 @click="closeMenu"
                 class="flex items-center px-6 py-4 text-white hover:bg-gradient-to-r hover:from-orange-600/30 hover:to-amber-600/30 transition-all duration-300 group relative overflow-hidden border-l-4 border-transparent hover:border-orange-400"
-                :class="{ 'bg-gradient-to-r from-orange-600/30 to-amber-600/30 border-orange-400': isFormActive('internet') }"
+                :class="{
+                  'bg-gradient-to-r from-orange-600/30 to-amber-600/30 border-orange-400':
+                    isFormActive('internet'),
+                }"
               >
-                <div class="absolute inset-0 bg-gradient-to-r from-orange-600/10 to-amber-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div class="w-10 h-10 bg-gradient-to-br from-orange-600/40 to-orange-500/40 rounded-lg flex items-center justify-center mr-4 group-hover:bg-gradient-to-br group-hover:from-orange-500 group-hover:to-amber-500 transition-all duration-300 shadow-lg border border-orange-400/30">
-                  <i class="fas fa-wifi text-orange-200 group-hover:text-white transition-colors duration-300"></i>
+                <div
+                  class="absolute inset-0 bg-gradient-to-r from-orange-600/10 to-amber-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                ></div>
+                <div
+                  class="w-10 h-10 bg-gradient-to-br from-orange-600/40 to-orange-500/40 rounded-lg flex items-center justify-center mr-4 group-hover:bg-gradient-to-br group-hover:from-orange-500 group-hover:to-amber-500 transition-all duration-300 shadow-lg border border-orange-400/30"
+                >
+                  <i
+                    class="fas fa-wifi text-orange-200 group-hover:text-white transition-colors duration-300"
+                  ></i>
                 </div>
                 <div class="flex-1 relative z-10">
-                  <span class="font-medium drop-shadow-sm">Internet Access</span>
-                  <p class="text-xs text-blue-200 opacity-80 group-hover:opacity-100 transition-opacity duration-300">Network connectivity</p>
+                  <span class="font-medium drop-shadow-sm"
+                    >Internet Access</span
+                  >
+                  <p
+                    class="text-xs text-blue-200 opacity-80 group-hover:opacity-100 transition-opacity duration-300"
+                  >
+                    Network connectivity
+                  </p>
                 </div>
-                <i class="fas fa-chevron-right text-blue-300 group-hover:text-white text-sm transition-all duration-300 group-hover:translate-x-1"></i>
+                <i
+                  class="fas fa-chevron-right text-blue-300 group-hover:text-white text-sm transition-all duration-300 group-hover:translate-x-1"
+                ></i>
               </router-link>
 
               <!-- Combined Access Form -->
-              <router-link 
+              <router-link
                 :to="getFormRoute('combined')"
                 @click="closeMenu"
                 class="flex items-center px-6 py-4 text-white hover:bg-gradient-to-r hover:from-cyan-600/30 hover:to-blue-600/30 transition-all duration-300 group relative overflow-hidden border-l-4 border-transparent hover:border-cyan-400"
-                :class="{ 'bg-gradient-to-r from-cyan-600/30 to-blue-600/30 border-cyan-400': isFormActive('combined') }"
+                :class="{
+                  'bg-gradient-to-r from-cyan-600/30 to-blue-600/30 border-cyan-400':
+                    isFormActive('combined'),
+                }"
               >
-                <div class="absolute inset-0 bg-gradient-to-r from-cyan-600/10 to-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div class="w-10 h-10 bg-gradient-to-br from-cyan-600/40 to-cyan-500/40 rounded-lg flex items-center justify-center mr-4 group-hover:bg-gradient-to-br group-hover:from-cyan-500 group-hover:to-blue-500 transition-all duration-300 shadow-lg border border-cyan-400/30">
-                  <i class="fas fa-layer-group text-cyan-200 group-hover:text-white transition-colors duration-300"></i>
+                <div
+                  class="absolute inset-0 bg-gradient-to-r from-cyan-600/10 to-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                ></div>
+                <div
+                  class="w-10 h-10 bg-gradient-to-br from-cyan-600/40 to-cyan-500/40 rounded-lg flex items-center justify-center mr-4 group-hover:bg-gradient-to-br group-hover:from-cyan-500 group-hover:to-blue-500 transition-all duration-300 shadow-lg border border-cyan-400/30"
+                >
+                  <i
+                    class="fas fa-layer-group text-cyan-200 group-hover:text-white transition-colors duration-300"
+                  ></i>
                 </div>
                 <div class="flex-1 relative z-10">
-                  <span class="font-medium drop-shadow-sm">Combined Access</span>
-                  <p class="text-xs text-blue-200 opacity-80 group-hover:opacity-100 transition-opacity duration-300">Multiple services</p>
+                  <span class="font-medium drop-shadow-sm"
+                    >Combined Access</span
+                  >
+                  <p
+                    class="text-xs text-blue-200 opacity-80 group-hover:opacity-100 transition-opacity duration-300"
+                  >
+                    Multiple services
+                  </p>
                 </div>
-                <i class="fas fa-chevron-right text-blue-300 group-hover:text-white text-sm transition-all duration-300 group-hover:translate-x-1"></i>
+                <i
+                  class="fas fa-chevron-right text-blue-300 group-hover:text-white text-sm transition-all duration-300 group-hover:translate-x-1"
+                ></i>
               </router-link>
             </div>
           </div>
         </nav>
 
         <!-- Footer -->
-        <div class="mt-auto border-t-2 border-blue-600/30 p-6 bg-gradient-to-r from-blue-800/30 to-blue-700/30">
+        <div
+          class="mt-auto border-t-2 border-blue-600/30 p-6 bg-gradient-to-r from-blue-800/30 to-blue-700/30"
+        >
           <div class="text-center">
             <div class="text-xs text-blue-300 drop-shadow-sm mb-2">
               © 2025 Muhimbili National Hospital
             </div>
-            <div class="text-xs text-blue-400 drop-shadow-sm">
-              ICT Department - Staff Portal
-            </div>
+            <!-- Footer text removed -->
           </div>
         </div>
       </div>
@@ -254,14 +378,16 @@ export default {
 
     const showUserDashboard = computed(() => {
       // Show User Dashboard option if user is not already on a user-specific dashboard
-      return userRole.value === ROLES.STAFF || userRole.value === ROLES.ICT_OFFICER
+      return (
+        userRole.value === ROLES.STAFF || userRole.value === ROLES.ICT_OFFICER
+      )
     })
 
     const isDashboardActive = computed(() => {
       const currentPath = window.location.pathname
       const dashboardPaths = [
         '/admin-dashboard',
-        '/user-dashboard', 
+        '/user-dashboard',
         '/dict-dashboard',
         '/hod-dashboard',
         '/divisional-dashboard',
@@ -308,14 +434,14 @@ export default {
     function getFormRoute(formType) {
       // Return appropriate form route based on user role and form type
       const isStaff = userRole.value === ROLES.STAFF
-      
+
       const formRoutes = {
         jeeva: isStaff ? '/user-jeeva-form' : '/jeeva-access',
         wellsoft: isStaff ? '/user-wellsoft-form' : '/wellsoft-access',
         internet: isStaff ? '/user-internet-form' : '/internet-access',
         combined: isStaff ? '/user-combined-form' : '/both-service-form'
       }
-      
+
       return formRoutes[formType] || '/user-dashboard'
     }
 
@@ -327,7 +453,7 @@ export default {
         internet: ['/user-internet-form', '/internet-access'],
         combined: ['/user-combined-form', '/both-service-form']
       }
-      
+
       return formPaths[formType]?.includes(currentPath) || false
     }
 
@@ -458,7 +584,9 @@ export default {
 
 /* Smooth transitions for all interactive elements */
 * {
-  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-property: color, background-color, border-color,
+    text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter,
+    backdrop-filter;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 200ms;
 }

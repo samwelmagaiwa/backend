@@ -3,6 +3,7 @@
 use App\Http\Middleware\BrowserBackArrowMiddleware;
 use App\Http\Middleware\CheckTokenAbilities;
 use App\Http\Middleware\RoleMiddleware;
+use App\Http\Middleware\BothServiceFormRoleMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Middleware\HandleCors;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
@@ -21,6 +22,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'browserbackarrow' => BrowserBackArrowMiddleware::class,
             'abilities' => CheckTokenAbilities::class,
             'role' => RoleMiddleware::class,
+            'both.service.role' => BothServiceFormRoleMiddleware::class,
+            'admin' => \App\Http\Middleware\AdminMiddleware::class,
         ]);
     })
     ->withExceptions(function ($exceptions) {

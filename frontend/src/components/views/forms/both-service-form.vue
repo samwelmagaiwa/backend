@@ -1,67 +1,118 @@
 <template>
   <div class="flex flex-col h-screen">
-    <AppHeader />
+    <Header />
     <div class="flex flex-1 overflow-hidden">
       <DynamicSidebar v-model:collapsed="sidebarCollapsed" />
-      <main class="flex-1 p-6 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative">
+      <main
+        class="flex-1 p-3 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative"
+      >
         <!-- Medical Background Pattern -->
         <div class="absolute inset-0 overflow-hidden">
           <!-- Medical Cross Pattern -->
           <div class="absolute inset-0 opacity-5">
             <div class="grid grid-cols-12 gap-8 h-full transform rotate-45">
-              <div v-for="i in 48" :key="i" class="bg-white rounded-full w-2 h-2 animate-pulse" :style="{animationDelay: (i * 0.1) + 's'}"></div>
+              <div
+                v-for="i in 48"
+                :key="i"
+                class="bg-white rounded-full w-2 h-2 animate-pulse"
+                :style="{ animationDelay: i * 0.1 + 's' }"
+              ></div>
             </div>
           </div>
           <!-- Floating medical icons -->
           <div class="absolute inset-0">
-            <div v-for="i in 15" :key="i" 
-                 class="absolute text-white opacity-10 animate-float"
-                 :style="{
-                   left: Math.random() * 100 + '%',
-                   top: Math.random() * 100 + '%',
-                   animationDelay: Math.random() * 3 + 's',
-                   animationDuration: (Math.random() * 3 + 2) + 's',
-                   fontSize: (Math.random() * 20 + 10) + 'px'
-                 }">
-              <i :class="['fas', ['fa-heartbeat', 'fa-user-md', 'fa-hospital', 'fa-stethoscope', 'fa-plus'][Math.floor(Math.random() * 5)]]"></i>
+            <div
+              v-for="i in 15"
+              :key="i"
+              class="absolute text-white opacity-10 animate-float"
+              :style="{
+                left: Math.random() * 100 + '%',
+                top: Math.random() * 100 + '%',
+                animationDelay: Math.random() * 3 + 's',
+                animationDuration: Math.random() * 3 + 2 + 's',
+                fontSize: Math.random() * 20 + 10 + 'px',
+              }"
+            >
+              <i
+                :class="[
+                  'fas',
+                  [
+                    'fa-heartbeat',
+                    'fa-user-md',
+                    'fa-hospital',
+                    'fa-stethoscope',
+                    'fa-plus',
+                  ][Math.floor(Math.random() * 5)],
+                ]"
+              ></i>
             </div>
           </div>
         </div>
-        
+
         <div class="max-w-12xl mx-auto relative z-10">
           <!-- Header Section -->
-          <div class="medical-glass-card rounded-t-3xl p-6 mb-0 border-b border-blue-300/30">
+          <div
+            class="medical-glass-card rounded-t-3xl p-4 mb-0 border-b border-blue-300/30"
+          >
             <div class="flex justify-between items-center">
               <!-- Left Logo -->
-              <div class="w-28 h-28 mr-6 transform hover:scale-110 transition-transform duration-300">
-                <div class="w-full h-full bg-gradient-to-br from-blue-500/20 to-teal-500/20 rounded-2xl backdrop-blur-sm border-2 border-blue-300/40 flex items-center justify-center shadow-2xl hover:shadow-blue-500/25">
-                  <img src="/assets/images/ngao2.png" alt="National Shield" class="max-w-18 max-h-18 object-contain" />
+              <div
+                class="w-20 h-20 mr-4 transform hover:scale-110 transition-transform duration-300"
+              >
+                <div
+                  class="w-full h-full bg-gradient-to-br from-blue-500/20 to-teal-500/20 rounded-2xl backdrop-blur-sm border-2 border-blue-300/40 flex items-center justify-center shadow-2xl hover:shadow-blue-500/25"
+                >
+                  <img
+                    src="/assets/images/ngao2.png"
+                    alt="National Shield"
+                    class="max-w-18 max-h-18 object-contain"
+                  />
                 </div>
               </div>
 
               <!-- Center Content -->
               <div class="text-center flex-1">
-                <h1 class="text-2xl font-bold text-white mb-4 tracking-wide drop-shadow-lg animate-fade-in">
+                <h1
+                  class="text-xl font-bold text-white mb-2 tracking-wide drop-shadow-lg animate-fade-in"
+                >
                   MUHIMBILI NATIONAL HOSPITAL
                 </h1>
                 <div class="relative inline-block mb-4">
-                  <div class="bg-gradient-to-r from-blue-600 to-purple-700 text-white px-8 py-3 rounded-full text-lg font-bold shadow-2xl transform hover:scale-105 transition-all duration-300 border-2 border-blue-400/60">
+                  <div
+                    class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2 rounded-full text-base font-bold shadow-xl transform hover:scale-105 transition-all duration-300 border-2 border-blue-400/60"
+                  >
                     <span class="relative z-10 flex items-center gap-2">
                       <i class="fas fa-layer-group"></i>
                       COMBINED ACCESS REQUEST
                     </span>
-                    <div class="absolute inset-0 bg-gradient-to-r from-purple-700 to-blue-800 rounded-full opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+                    <div
+                      class="absolute inset-0 bg-gradient-to-r from-blue-700 to-blue-800 rounded-full opacity-0 hover:opacity-100 transition-opacity duration-300"
+                    ></div>
                   </div>
                 </div>
-                <h2 class="text-lg font-bold text-blue-100 tracking-wide drop-shadow-md animate-fade-in-delay">
-                  {{ isReviewMode ? 'REQUEST REVIEW - ' + requestId : 'UNIFIED SERVICES FORM' }}
+                <h2
+                  class="text-base font-bold text-blue-100 tracking-wide drop-shadow-md animate-fade-in-delay"
+                >
+                  {{
+                    isReviewMode
+                      ? "REQUEST REVIEW - " + requestId
+                      : "UNIFIED SERVICES FORM"
+                  }}
                 </h2>
               </div>
-              
+
               <!-- Right Logo -->
-              <div class="w-28 h-28 ml-6 transform hover:scale-110 transition-transform duration-300">
-                <div class="w-full h-full bg-gradient-to-br from-teal-500/20 to-blue-500/20 rounded-2xl backdrop-blur-sm border-2 border-teal-300/40 flex items-center justify-center shadow-2xl hover:shadow-teal-500/25">
-                  <img src="/assets/images/logo2.png" alt="Muhimbili Logo" class="max-w-18 max-h-18 object-contain" />
+              <div
+                class="w-20 h-20 ml-4 transform hover:scale-110 transition-transform duration-300"
+              >
+                <div
+                  class="w-full h-full bg-gradient-to-br from-teal-500/20 to-blue-500/20 rounded-2xl backdrop-blur-sm border-2 border-teal-300/40 flex items-center justify-center shadow-2xl hover:shadow-teal-500/25"
+                >
+                  <img
+                    src="/assets/images/logo2.png"
+                    alt="Muhimbili Logo"
+                    class="max-w-18 max-h-18 object-contain"
+                  />
                 </div>
               </div>
             </div>
@@ -69,1086 +120,1663 @@
 
           <!-- Main Form -->
           <div class="medical-glass-card rounded-b-3xl overflow-hidden">
-            <form @submit.prevent="onSubmit" :class="['p-8 space-y-8', { 'review-mode': isReviewMode }]">
-
-          <div class="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-2 min-h-0">
-            <!-- Left: shared + selectors -->
-            <section aria-labelledby="applicant-details" class="xl:col-span-4 space-y-4">
-              <!-- Personal Information Section -->
-              <div class="medical-card bg-gradient-to-r from-teal-600/25 to-blue-600/25 border-2 border-teal-400/40 p-8 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-teal-500/20 transition-all duration-500 group">
-                <div class="flex items-center space-x-4 mb-6">
-                  <div class="w-14 h-14 bg-gradient-to-br from-teal-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-teal-300/50">
-                    <i class="fas fa-user-md text-white text-xl"></i>
-                  </div>
-                  <h3 class="text-xl font-bold text-white flex items-center">
-                    <i class="fas fa-id-card mr-2 text-teal-300"></i>
-                    Personal Information
-                  </h3>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div>
-                    <label class="block text-sm font-bold text-blue-100 mb-3">
-                      PF Number <span class="text-red-400">*</span>
-                    </label>
-                    <div class="relative">
-                      <input 
-                        v-model.trim="form.shared.pfNumber" 
-                        type="text" 
-                        class="medical-input w-full px-4 py-4 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-teal-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-teal-500/20" 
-                        placeholder="PF Number" 
-                        required
-                      />
-                      <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-teal-500/10 to-blue-500/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                    </div>
-                    <p v-if="errors.pfNumber" class="error text-red-400 text-sm mt-1">{{ errors.pfNumber }}</p>
-                  </div>
-            
-                  <div>
-                    <label class="block text-sm font-bold text-blue-100 mb-3">
-                      Staff Name <span class="text-red-400">*</span>
-                    </label>
-                    <div class="relative">
-                      <input 
-                        v-model.trim="form.shared.staffName" 
-                        type="text" 
-                        class="medical-input w-full px-4 py-4 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-teal-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-teal-500/20"
-                        placeholder="Full name"
-                        required
-                      />
-                      <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-teal-500/10 to-blue-500/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                    </div>
-                    <p v-if="errors.staffName" class="error text-red-400 text-sm mt-1">{{ errors.staffName }}</p>
-                  </div>
-            
-                  <div>
-                    <label class="block text-sm font-bold text-blue-100 mb-3">
-                      Department <span class="text-red-400">*</span>
-                    </label>
-                    <div class="relative">
-                      <input 
-                        v-model.trim="form.shared.department" 
-                        type="text" 
-                        class="medical-input w-full px-4 py-4 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-teal-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-teal-500/20"
-                        placeholder="Department"
-                        required
-                      />
-                      <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-teal-500/10 to-blue-500/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                    </div>
-                  </div>
-            
-                  <div>
-                    <label class="block text-sm font-bold text-blue-100 mb-3">
-                      Contact Number <span class="text-red-400">*</span>
-                    </label>
-                    <div class="relative">
-                      <input 
-                        v-model.trim="form.shared.phone" 
-                        type="tel" 
-                        class="medical-input w-full px-4 py-4 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-teal-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-teal-500/20"
-                        placeholder="e.g. 0712 000 000"
-                        required
-                      />
-                      <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-teal-500/10 to-blue-500/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                    </div>
-                  </div>
-                  <div class="md:col-span-3">
-                    <label class="block text-sm font-bold text-blue-100 mb-3 text-center">
-                      Digital Signature <span class="text-red-400">*</span>
-                    </label>
-                    <div class="relative max-w-md mx-auto">
-                      <div 
-                        v-if="!signaturePreview" 
-                        class="w-full px-4 py-4 border-2 border-dashed border-teal-300/40 rounded-xl focus-within:border-teal-400 bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-teal-500/20 min-h-[120px] flex items-center justify-center hover:bg-white/20"
+            <form
+              @submit.prevent="onSubmit"
+              :class="['p-4 space-y-4', { 'review-mode': isReviewMode }]"
+            >
+              <div
+                class="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-2 min-h-0"
+              >
+                <!-- Left: shared + selectors -->
+                <section
+                  aria-labelledby="applicant-details"
+                  class="xl:col-span-4 space-y-2"
+                >
+                  <!-- Personal Information Section -->
+                  <div
+                    class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-2 rounded-lg backdrop-blur-sm hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 group"
+                  >
+                    <div class="flex items-center space-x-2 mb-2">
+                      <div
+                        class="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
                       >
-                        <div class="text-center">
-                          <div class="mb-3">
-                            <i class="fas fa-signature text-teal-300 text-3xl mb-2"></i>
-                            <p class="text-blue-100 text-sm">No signature uploaded</p>
-                          </div>
-                          <button 
-                            type="button" 
-                            @click="triggerFileUpload"
-                            class="px-4 py-2 bg-gradient-to-r from-teal-500 to-blue-600 text-white text-sm font-semibold rounded-lg hover:from-teal-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-2 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-teal-400/50"
-                          >
-                            <i class="fas fa-upload"></i>
-                            Press to load your signature
-                          </button>
-                        </div>
+                        <i class="fas fa-user-md text-white text-xs"></i>
                       </div>
-                      
-                      <div 
-                        v-else 
-                        class="w-full px-4 py-4 border-2 border-teal-300/40 rounded-xl bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-teal-500/20 min-h-[120px] flex items-center justify-center relative"
+                      <h3
+                        class="text-sm font-bold text-white flex items-center"
                       >
-                        <div v-if="isImage(signaturePreview)" class="text-center">
-                          <img 
-                            :src="signaturePreview" 
-                            alt="Digital Signature" 
-                            class="max-h-[80px] max-w-full object-contain mx-auto mb-2"
-                          />
-                          <p class="text-sm text-blue-100">{{ signatureFileName }}</p>
-                        </div>
-                        <div v-else class="text-center">
-                          <div class="w-16 h-16 bg-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-2">
-                            <i class="fas fa-file-pdf text-red-400 text-2xl"></i>
-                          </div>
-                          <p class="text-sm text-blue-100">{{ signatureFileName }}</p>
-                        </div>
-                        
-                        <div class="absolute top-2 right-2 flex gap-2">
-                          <button 
-                            type="button" 
-                            @click="triggerFileUpload"
-                            class="w-8 h-8 bg-teal-500 text-white rounded-full flex items-center justify-center text-sm hover:bg-teal-600 transition-colors duration-200 shadow-lg"
-                            title="Change signature"
-                          >
-                            <i class="fas fa-edit"></i>
-                          </button>
-                          <button 
-                            type="button" 
-                            @click="clearSignature"
-                            class="w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center text-sm hover:bg-red-600 transition-colors duration-200 shadow-lg"
-                            title="Remove signature"
-                          >
-                            <i class="fas fa-times"></i>
-                          </button>
-                        </div>
-                      </div>
-                      
-                      <input 
-                        ref="signatureInput" 
-                        type="file" 
-                        accept="image/png,image/jpeg,application/pdf"
-                        @change="onSignatureChange"
-                        class="hidden"
-                      />
+                        <i
+                          class="fas fa-id-card mr-1 text-blue-300 text-xs"
+                        ></i>
+                        Personal Information
+                      </h3>
                     </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Module Request Section -->
-              <div class="medical-card bg-gradient-to-r from-blue-600/25 to-cyan-600/25 border-2 border-blue-400/40 p-8 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group">
-                <div class="flex items-center space-x-4 mb-6">
-                  <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50">
-                    <i class="fas fa-desktop text-white text-xl"></i>
-                  </div>
-                  <h3 class="text-xl font-bold text-white flex items-center">
-                    <i class="fas fa-th-large mr-2 text-blue-300"></i>
-                    Module Request
-                  </h3>
-                </div>
-
-                <!-- Wellsoft selector -->
-                <div class="mb-6">
-                  <label class="block text-sm font-bold text-blue-100 mb-3">
-                    Wellsoft Modules <span class="text-red-400">*</span>
-                  </label>
-                  <div class="flex items-center justify-between mb-3">
-                    <span class="text-sm text-blue-200">{{ selectedWellsoft.length }} modules selected</span>
-                    <div class="flex items-center gap-2 text-sm">
-                      <button type="button" class="px-3 py-1 bg-blue-500/20 text-blue-200 rounded-lg hover:bg-blue-500/30 transition-colors backdrop-blur-sm border border-blue-400/30" @click="selectAll('wellsoft')">Select all</button>
-                      <button type="button" class="px-3 py-1 bg-white/10 text-blue-200 rounded-lg hover:bg-white/20 transition-colors backdrop-blur-sm border border-blue-400/30" @click="clearAll('wellsoft')">Clear</button>
-                    </div>
-                  </div>
-                  <div class="relative mb-4">
-                    <input v-model.trim="wellsoftQuery" class="medical-input w-full px-4 py-3 pl-12 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm" placeholder="Search Wellsoft modules" />
-                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-blue-300"></i>
-                  </div>
-
-                  <!-- Selected chips -->
-                  <div v-if="selectedWellsoft.length" class="flex flex-wrap gap-2 mb-4">
-                    <span
-                      v-for="m in selectedWellsoft"
-                      :key="'selW-'+m"
-                      class="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-blue-500/20 text-blue-100 text-sm backdrop-blur-sm border border-blue-400/30"
-                    >
-                      <i class="fas fa-check text-blue-300"></i> {{ m }}
-                      <button type="button" @click="toggleWellsoft(m)" class="ml-1 hover:text-blue-200 transition-colors">
-                        <i class="fas fa-times"></i>
-                      </button>
-                    </span>
-                  </div>
-
-                  <!-- Options grid -->
-                  <div class="bg-white/10 rounded-xl p-4 max-h-60 border border-blue-300/30 overflow-y-auto backdrop-blur-sm">
-                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                      <label v-for="m in filteredWellsoft" :key="'optW-'+m" class="flex items-center p-2 hover:bg-blue-500/20 rounded-lg cursor-pointer transition-colors border border-blue-400/20">
-                        <input 
-                          type="checkbox" 
-                          :checked="isSelected('wellsoft', m)"
-                          @change="toggleWellsoft(m)"
-                          class="w-4 h-4 text-blue-600 border-blue-300 rounded focus:ring-blue-500 mr-3 module-request-editable"
-                        />
-                        <span class="text-sm font-medium text-blue-100">{{ m }}</span>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Jeeva selector -->
-                <div class="mb-6">
-                  <label class="block text-sm font-bold text-blue-100 mb-3">
-                    Jeeva Modules <span class="text-red-400">*</span>
-                  </label>
-                  <div class="flex items-center justify-between mb-3">
-                    <span class="text-sm text-blue-200">{{ selectedJeeva.length }} modules selected</span>
-                    <div class="flex items-center gap-2 text-sm">
-                      <button type="button" class="px-3 py-1 bg-cyan-500/20 text-cyan-200 rounded-lg hover:bg-cyan-500/30 transition-colors backdrop-blur-sm border border-cyan-400/30" @click="selectAll('jeeva')">Select all</button>
-                      <button type="button" class="px-3 py-1 bg-white/10 text-blue-200 rounded-lg hover:bg-white/20 transition-colors backdrop-blur-sm border border-blue-400/30" @click="clearAll('jeeva')">Clear</button>
-                    </div>
-                  </div>
-                  <div class="relative mb-4">
-                    <input v-model.trim="jeevaQuery" class="medical-input w-full px-4 py-3 pl-12 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-cyan-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm" placeholder="Search Jeeva modules" />
-                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-cyan-300"></i>
-                  </div>
-
-                  <div v-if="selectedJeeva.length" class="flex flex-wrap gap-2 mb-4">
-                    <span
-                      v-for="m in selectedJeeva"
-                      :key="'selJ-'+m"
-                      class="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-cyan-500/20 text-cyan-100 text-sm backdrop-blur-sm border border-cyan-400/30"
-                    >
-                      <i class="fas fa-check text-cyan-300"></i> {{ m }}
-                      <button type="button" @click="toggleJeeva(m)" class="ml-1 hover:text-cyan-200 transition-colors">
-                        <i class="fas fa-times"></i>
-                      </button>
-                    </span>
-                  </div>
-
-                  <div class="bg-white/10 rounded-xl p-4 max-h-60 border border-blue-300/30 overflow-y-auto backdrop-blur-sm">
-                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                      <label v-for="m in filteredJeeva" :key="'optJ-'+m" class="flex items-center p-2 hover:bg-cyan-500/20 rounded-lg cursor-pointer transition-colors border border-cyan-400/20">
-                        <input 
-                          type="checkbox" 
-                          :checked="isSelected('jeeva', m)"
-                          @change="toggleJeeva(m)"
-                          class="w-4 h-4 text-cyan-600 border-cyan-300 rounded focus:ring-cyan-500 mr-3 module-request-editable"
-                        />
-                        <span class="text-sm font-medium text-cyan-100">{{ m }}</span>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Internet selector -->
-                <div class="mb-6">
-                  <label class="block text-sm font-bold text-blue-100 mb-3">
-                    Internet Purpose <span class="text-red-400">*</span>
-                  </label>
-                  <div class="relative">
-                    <input v-model.trim="internetQuery" class="medical-input w-full px-4 py-3 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 module-request-editable" placeholder="Enter Internet purpose" />
-                    <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/10 to-cyan-500/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Access Rights Section -->
-              <div class="medical-card bg-gradient-to-r from-cyan-600/25 to-blue-600/25 border-2 border-cyan-400/40 p-8 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-cyan-500/20 transition-all duration-500 group">
-                <div class="flex items-center space-x-4 mb-6">
-                  <div class="w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-cyan-300/50">
-                    <i class="fas fa-lock text-white text-xl"></i>
-                  </div>
-                  <h3 class="text-xl font-bold text-white flex items-center">
-                    <i class="fas fa-key mr-2 text-cyan-300"></i>
-                    Access Rights
-                  </h3>
-                </div>
-          
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <!-- Permanent Option -->
-                  <div class="flex items-center p-4 border-2 border-blue-300/30 rounded-xl hover:border-cyan-400 hover:bg-white/10 transition-all backdrop-blur-sm">
-                    <input 
-                      v-model="form.accessRights.type" 
-                      type="radio" 
-                      value="permanent" 
-                      class="w-5 h-5 text-cyan-600 border-blue-300 focus:ring-cyan-500 mr-4 access-rights-editable"
-                    />
-                    <span class="font-medium text-white text-sm">Permanent (until retirement)</span>
-                  </div>
-
-                  <!-- Temporary Until Option -->
-                  <div class="flex items-center justify-between p-4 border-2 border-blue-300/30 rounded-xl hover:border-cyan-400 hover:bg-white/10 transition-all backdrop-blur-sm">
-                    <div class="flex items-center">
-                      <input 
-                        v-model="form.accessRights.type" 
-                        type="radio" 
-                        value="temporary" 
-                        class="w-5 h-5 text-cyan-600 border-blue-300 focus:ring-cyan-500 mr-4 access-rights-editable"
-                      />
-                      <span class="font-medium text-white text-sm">Temporary Until</span>
-                    </div>
-
-                    <div class="flex items-center gap-2" v-if="form.accessRights.type === 'temporary'">
-                      <input 
-                        v-model="form.accessRights.tempDate.month" 
-                        type="text" 
-                        placeholder="MM"
-                        maxlength="2"
-                        class="w-12 px-2 py-1 bg-white/15 border border-blue-300/30 rounded-lg text-center text-sm text-white focus:border-cyan-400 focus:outline-none backdrop-blur-sm access-rights-editable"
-                      />
-                      <span class="text-blue-200">/</span>
-                      <input 
-                        v-model="form.accessRights.tempDate.day" 
-                        type="text" 
-                        placeholder="DD"
-                        maxlength="2"
-                        class="w-12 px-2 py-1 bg-white/15 border border-blue-300/30 rounded-lg text-center text-sm text-white focus:border-cyan-400 focus:outline-none backdrop-blur-sm access-rights-editable"
-                      />
-                      <span class="text-blue-200">/</span>
-                      <input 
-                        v-model="form.accessRights.tempDate.year" 
-                        type="text" 
-                        placeholder="YYYY"
-                        maxlength="4"
-                        class="w-20 px-2 py-1 bg-white/15 border border-blue-300/30 rounded-lg text-center text-sm text-white focus:border-cyan-400 focus:outline-none backdrop-blur-sm access-rights-editable"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Approval Section -->
-              <div class="medical-card bg-gradient-to-r from-emerald-600/25 to-teal-600/25 border-2 border-emerald-400/40 p-8 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-500 group">
-                <div class="flex items-center space-x-4 mb-6">
-                  <div class="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-emerald-300/50">
-                    <i class="fas fa-check-circle text-white text-xl"></i>
-                  </div>
-                  <h3 class="text-xl font-bold text-white flex items-center">
-                    <i class="fas fa-clipboard-check mr-2 text-emerald-300"></i>
-                    Approval
-                  </h3>
-                </div>
-          
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <!-- HoD/BM -->
-                  <div class="bg-white/15 rounded-xl p-6 border border-emerald-300/30 backdrop-blur-sm">
-                    <h5 class="font-bold text-white mb-4 text-center text-sm flex items-center justify-center">
-                      <i class="fas fa-user-tie mr-2 text-emerald-300"></i>
-                      HoD/BM
-                    </h5>
-                    <div class="space-y-3">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                       <div>
-                        <label class="block text-sm font-medium text-blue-100 mb-2">Name<span class="text-red-400">*</span></label>
+                        <label
+                          class="block text-xs font-bold text-blue-100 mb-1"
+                        >
+                          PF Number <span class="text-red-400">*</span>
+                        </label>
                         <div class="relative">
-                          <input 
-                            v-model="form.approvals.hod.name" 
-                            type="text" 
-                            placeholder="Enter name"
-                            class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-emerald-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm hod-approval-editable"
+                          <input
+                            v-model.trim="form.shared.pfNumber"
+                            type="text"
+                            class="medical-input w-full px-2 py-1 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 text-sm"
+                            placeholder="PF Number"
+                            required
                           />
+                          <div
+                            class="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/10 to-blue-600/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                          ></div>
+                        </div>
+                        <p
+                          v-if="errors.pfNumber"
+                          class="error text-red-400 text-sm mt-1"
+                        >
+                          {{ errors.pfNumber }}
+                        </p>
+                      </div>
+
+                      <div>
+                        <label
+                          class="block text-xs font-bold text-blue-100 mb-1"
+                        >
+                          Staff Name <span class="text-red-400">*</span>
+                        </label>
+                        <div class="relative">
+                          <input
+                            v-model.trim="form.shared.staffName"
+                            type="text"
+                            class="medical-input w-full px-2 py-1 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 text-sm"
+                            placeholder="Full name"
+                            required
+                          />
+                          <div
+                            class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/10 to-blue-600/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                          ></div>
+                        </div>
+                        <p
+                          v-if="errors.staffName"
+                          class="error text-red-400 text-sm mt-1"
+                        >
+                          {{ errors.staffName }}
+                        </p>
+                      </div>
+
+                      <div>
+                        <label
+                          class="block text-xs font-bold text-blue-100 mb-1"
+                        >
+                          Department <span class="text-red-400">*</span>
+                        </label>
+                        <div class="relative">
+                          <input
+                            v-model.trim="form.shared.department"
+                            type="text"
+                            class="medical-input w-full px-2 py-1 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 text-sm"
+                            placeholder="Department"
+                            required
+                          />
+                          <div
+                            class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/10 to-blue-600/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                          ></div>
                         </div>
                       </div>
-                      <div>
-                        <label class="block text-sm font-medium text-blue-100 mb-2">Signature<span class="text-red-400">*</span></label>
-                        <div class="relative">
-                          <div 
-                            v-if="!hodSignaturePreview" 
-                            class="w-full px-3 py-3 border-2 border-dashed border-emerald-300/40 rounded-xl focus-within:border-emerald-400 bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-emerald-500/20 min-h-[70px] flex items-center justify-center hover:bg-white/20"
-                          >
-                            <div class="text-center">
-                              <div class="mb-2">
-                                <i class="fas fa-signature text-emerald-300 text-lg mb-1"></i>
-                                <p class="text-blue-100 text-xs">No signature uploaded</p>
-                              </div>
-                              <button 
-                                type="button" 
-                                @click="triggerHodSignatureUpload"
-                                class="px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-blue-600 text-white text-xs font-semibold rounded-lg hover:from-emerald-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-emerald-400/50"
-                              >
-                                <i class="fas fa-upload"></i>
-                                Upload Signature
-                              </button>
-                            </div>
-                          </div>
-                    
-                          <div 
-                            v-else 
-                            class="w-full px-3 py-3 border-2 border-emerald-300/40 rounded-xl bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-emerald-500/20 min-h-[70px] flex items-center justify-center relative"
-                          >
-                            <div v-if="isImage(hodSignaturePreview)" class="text-center">
-                              <img 
-                                :src="hodSignaturePreview" 
-                                alt="HOD Signature" 
-                                class="max-h-[50px] max-w-full object-contain mx-auto mb-1"
-                              />
-                              <p class="text-xs text-blue-100">{{ hodSignatureFileName }}</p>
-                            </div>
-                            <div v-else class="text-center">
-                              <div class="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-1">
-                                <i class="fas fa-file-pdf text-red-400 text-lg"></i>
-                              </div>
-                              <p class="text-xs text-blue-100">{{ hodSignatureFileName }}</p>
-                            </div>
-                            
-                            <div class="absolute top-2 right-2 flex gap-1">
-                              <button 
-                                type="button" 
-                                @click="triggerHodSignatureUpload"
-                                class="w-6 h-6 bg-emerald-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-emerald-600 transition-colors duration-200 shadow-lg"
-                                title="Change signature"
-                              >
-                                <i class="fas fa-edit"></i>
-                              </button>
-                              <button 
-                                type="button" 
-                                @click="clearHodSignature"
-                                class="w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors duration-200 shadow-lg"
-                                title="Remove signature"
-                              >
-                                <i class="fas fa-times"></i>
-                              </button>
-                            </div>
-                          </div>
-                    
-                          <input 
-                            ref="hodSignatureInput" 
-                            type="file" 
-                            accept="image/png,image/jpeg,application/pdf"
-                            @change="onHodSignatureChange"
-                            class="hidden"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <label class="block text-sm font-medium text-blue-100 mb-2">Date (mm/dd/yyyy)<span class="text-red-400">*</span></label>
-                        <div class="relative">
-                          <input 
-                            v-model="form.approvals.hod.date" 
-                            type="date" 
-                            class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-emerald-400 focus:outline-none text-white backdrop-blur-sm hod-approval-editable"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
 
-                  <!-- Divisional Director -->
-                  <div class="bg-white/15 rounded-xl p-6 border border-emerald-300/30 backdrop-blur-sm">
-                    <h5 class="font-bold text-white mb-4 text-center text-sm flex items-center justify-center">
-                      <i class="fas fa-user-circle mr-2 text-emerald-300"></i>
-                      Divisional Director
-                    </h5>
-                    <div class="space-y-3">
                       <div>
-                        <label class="block text-sm font-medium text-blue-100 mb-2">Name<span class="text-red-400">*</span></label>
+                        <label
+                          class="block text-xs font-bold text-blue-100 mb-1"
+                        >
+                          Contact Number <span class="text-red-400">*</span>
+                        </label>
                         <div class="relative">
-                          <input 
-                            v-model="form.approvals.divisionalDirector.name" 
-                            type="text" 
-                            placeholder="Enter name"
-                            class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-emerald-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm"
+                          <input
+                            v-model.trim="form.shared.phone"
+                            type="tel"
+                            class="medical-input w-full px-2 py-1 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 text-sm"
+                            placeholder="e.g. 0712 000 000"
+                            required
                           />
+                          <div
+                            class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/10 to-blue-600/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                          ></div>
                         </div>
                       </div>
-                      <div>
-                        <label class="block text-sm font-medium text-blue-100 mb-2">Signature<span class="text-red-400">*</span></label>
-                        <div class="relative">
-                          <div 
-                            v-if="!divDirectorSignaturePreview" 
-                            class="w-full px-3 py-3 border-2 border-dashed border-emerald-300/40 rounded-xl focus-within:border-emerald-400 bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-emerald-500/20 min-h-[70px] flex items-center justify-center hover:bg-white/20"
-                          >
-                            <div class="text-center">
-                              <div class="mb-2">
-                                <i class="fas fa-signature text-emerald-300 text-lg mb-1"></i>
-                                <p class="text-blue-100 text-xs">No signature uploaded</p>
-                              </div>
-                              <button 
-                                type="button" 
-                                @click="triggerDivDirectorSignatureUpload"
-                                class="px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-blue-600 text-white text-xs font-semibold rounded-lg hover:from-emerald-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-emerald-400/50"
-                              >
-                                <i class="fas fa-upload"></i>
-                                Upload Signature
-                              </button>
-                            </div>
-                          </div>
-                    
-                          <div 
-                            v-else 
-                            class="w-full px-3 py-3 border-2 border-emerald-300/40 rounded-xl bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-emerald-500/20 min-h-[70px] flex items-center justify-center relative"
-                          >
-                            <div v-if="isImage(divDirectorSignaturePreview)" class="text-center">
-                              <img 
-                                :src="divDirectorSignaturePreview" 
-                                alt="Divisional Director Signature" 
-                                class="max-h-[50px] max-w-full object-contain mx-auto mb-1"
-                              />
-                              <p class="text-xs text-blue-100">{{ divDirectorSignatureFileName }}</p>
-                            </div>
-                            <div v-else class="text-center">
-                              <div class="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-1">
-                                <i class="fas fa-file-pdf text-red-400 text-lg"></i>
-                              </div>
-                              <p class="text-xs text-blue-100">{{ divDirectorSignatureFileName }}</p>
-                            </div>
-                            
-                            <div class="absolute top-2 right-2 flex gap-1">
-                              <button 
-                                type="button" 
-                                @click="triggerDivDirectorSignatureUpload"
-                                class="w-6 h-6 bg-emerald-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-emerald-600 transition-colors duration-200 shadow-lg"
-                                title="Change signature"
-                              >
-                                <i class="fas fa-edit"></i>
-                              </button>
-                              <button 
-                                type="button" 
-                                @click="clearDivDirectorSignature"
-                                class="w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors duration-200 shadow-lg"
-                                title="Remove signature"
-                              >
-                                <i class="fas fa-times"></i>
-                              </button>
-                            </div>
-                          </div>
-                    
-                          <input 
-                            ref="divDirectorSignatureInput" 
-                            type="file" 
-                            accept="image/png,image/jpeg,application/pdf"
-                            @change="onDivDirectorSignatureChange"
-                            class="hidden"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <label class="block text-sm font-medium text-blue-100 mb-2">Date (mm/dd/yyyy)<span class="text-red-400">*</span></label>
-                        <div class="relative">
-                          <input 
-                            v-model="form.approvals.divisionalDirector.date" 
-                            type="date" 
-                            class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-emerald-400 focus:outline-none text-white backdrop-blur-sm"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Director of ICT -->
-                  <div class="bg-white/15 rounded-xl p-6 border border-emerald-300/30 backdrop-blur-sm">
-                    <h5 class="font-bold text-white mb-4 text-center text-sm flex items-center justify-center">
-                      <i class="fas fa-laptop-code mr-2 text-emerald-300"></i>
-                      Director of ICT
-                    </h5>
-                    <div class="space-y-3">
-                      <div>
-                        <label class="block text-sm font-medium text-blue-100 mb-2">Name<span class="text-red-400">*</span></label>
-                        <div class="relative">
-                          <input 
-                            v-model="form.approvals.directorICT.name" 
-                            type="text" 
-                            placeholder="Enter name"
-                            class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-emerald-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <label class="block text-sm font-medium text-blue-100 mb-2">Signature<span class="text-red-400">*</span></label>
-                        <div class="relative">
-                          <div 
-                            v-if="!directorICTSignaturePreview" 
-                            class="w-full px-3 py-3 border-2 border-dashed border-emerald-300/40 rounded-xl focus-within:border-emerald-400 bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-emerald-500/20 min-h-[70px] flex items-center justify-center hover:bg-white/20"
-                          >
-                            <div class="text-center">
-                              <div class="mb-2">
-                                <i class="fas fa-signature text-emerald-300 text-lg mb-1"></i>
-                                <p class="text-blue-100 text-xs">No signature uploaded</p>
-                              </div>
-                              <button 
-                                type="button" 
-                                @click="triggerDirectorICTSignatureUpload"
-                                class="px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-blue-600 text-white text-xs font-semibold rounded-lg hover:from-emerald-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-emerald-400/50"
-                              >
-                                <i class="fas fa-upload"></i>
-                                Upload Signature
-                              </button>
-                            </div>
-                          </div>
-                    
-                          <div 
-                            v-else 
-                            class="w-full px-3 py-3 border-2 border-emerald-300/40 rounded-xl bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-emerald-500/20 min-h-[70px] flex items-center justify-center relative"
-                          >
-                            <div v-if="isImage(directorICTSignaturePreview)" class="text-center">
-                              <img 
-                                :src="directorICTSignaturePreview" 
-                                alt="Director ICT Signature" 
-                                class="max-h-[50px] max-w-full object-contain mx-auto mb-1"
-                              />
-                              <p class="text-xs text-blue-100">{{ directorICTSignatureFileName }}</p>
-                            </div>
-                            <div v-else class="text-center">
-                              <div class="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-1">
-                                <i class="fas fa-file-pdf text-red-400 text-lg"></i>
-                              </div>
-                              <p class="text-xs text-blue-100">{{ directorICTSignatureFileName }}</p>
-                            </div>
-                            
-                            <div class="absolute top-2 right-2 flex gap-1">
-                              <button 
-                                type="button" 
-                                @click="triggerDirectorICTSignatureUpload"
-                                class="w-6 h-6 bg-emerald-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-emerald-600 transition-colors duration-200 shadow-lg"
-                                title="Change signature"
-                              >
-                                <i class="fas fa-edit"></i>
-                              </button>
-                              <button 
-                                type="button" 
-                                @click="clearDirectorICTSignature"
-                                class="w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors duration-200 shadow-lg"
-                                title="Remove signature"
-                              >
-                                <i class="fas fa-times"></i>
-                              </button>
-                            </div>
-                          </div>
-                    
-                          <input 
-                            ref="directorICTSignatureInput" 
-                            type="file" 
-                            accept="image/png,image/jpeg,application/pdf"
-                            @change="onDirectorICTSignatureChange"
-                            class="hidden"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <label class="block text-sm font-medium text-blue-100 mb-2">Date (mm/dd/yyyy)<span class="text-red-400">*</span></label>
-                        <div class="relative">
-                          <input 
-                            v-model="form.approvals.directorICT.date" 
-                            type="date" 
-                            class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-emerald-400 focus:outline-none text-white backdrop-blur-sm"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Comments Section -->
-              <div class="medical-card bg-gradient-to-r from-indigo-600/25 to-blue-600/25 border-2 border-indigo-400/40 p-8 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-indigo-500/20 transition-all duration-500 group">
-                <div class="flex items-center space-x-4 mb-6">
-                  <div class="w-14 h-14 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-indigo-300/50">
-                    <i class="fas fa-comments text-white text-xl"></i>
-                  </div>
-                  <h3 class="text-xl font-bold text-white flex items-center">
-                    <i class="fas fa-comment-alt mr-2 text-indigo-300"></i>
-                    Comments
-                  </h3>
-                </div>
-                <div class="relative">
-                  <textarea 
-                    v-model="form.comments" 
-                    rows="4" 
-                    class="medical-input w-full px-4 py-4 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-indigo-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-indigo-500/20 resize-y comments-editable"
-                    placeholder="HOD: specify access Category here..."
-                  ></textarea>
-                  <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-indigo-500/10 to-blue-500/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                </div>
-              </div>
-
-              <!-- For Implementation Section -->
-              <div class="medical-card bg-gradient-to-r from-purple-600/25 to-indigo-600/25 border-2 border-purple-400/40 p-8 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-500 group">
-                <div class="flex items-center space-x-4 mb-6">
-                  <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-purple-300/50">
-                    <i class="fas fa-cogs text-white text-xl"></i>
-                  </div>
-                  <h3 class="text-xl font-bold text-white flex items-center">
-                    <i class="fas fa-tools mr-2 text-purple-300"></i>
-                    For Implementation
-                  </h3>
-                </div>
-          
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <!-- Head of IT -->
-                  <div class="bg-white/15 rounded-xl p-4 border border-purple-300/30 backdrop-blur-sm">
-                    <h5 class="font-bold text-white mb-3 text-center text-sm flex items-center justify-center">
-                      <i class="fas fa-user-cog mr-2"></i>
-                      Head of IT
-                    </h5>
-                    <div class="space-y-3">
-                      <div>
-                        <label class="block text-sm font-medium text-blue-100 mb-2">Name<span class="text-red-400">*</span></label>
-                        <div class="relative">
-                          <input 
-                            v-model="form.implementation.headIT.name" 
-                            type="text" 
-                            placeholder="Enter name"
-                            class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-purple-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <label class="block text-sm font-medium text-blue-100 mb-2">Signature<span class="text-red-400">*</span></label>
-                        <div class="relative">
-                          <div 
-                            v-if="!headITSignaturePreview" 
-                            class="w-full px-2 py-2 border border-purple-300/30 rounded-lg focus-within:border-purple-400 bg-white/15 transition-all duration-300 shadow-sm hover:shadow-md min-h-[50px] flex items-center justify-center backdrop-blur-sm"
+                      <div class="md:col-span-3">
+                        <label
+                          class="block text-xs font-bold text-blue-100 mb-2 text-center"
+                        >
+                          Signature <span class="text-red-400">*</span>
+                        </label>
+                        <div class="relative max-w-sm mx-auto">
+                          <div
+                            v-if="!signaturePreview"
+                            class="w-full px-2 py-2 border-2 border-dashed border-blue-300/40 rounded-lg focus-within:border-blue-400 bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 min-h-[60px] flex items-center justify-center hover:bg-white/20"
                           >
                             <div class="text-center">
                               <div class="mb-1">
-                                <i class="fas fa-signature text-purple-300 text-sm mb-1"></i>
-                                <p class="text-blue-100 text-xs">No signature</p>
+                                <i
+                                  class="fas fa-signature text-blue-300 text-lg mb-1"
+                                ></i>
+                                <p class="text-blue-100 text-xs">
+                                  No signature uploaded
+                                </p>
                               </div>
-                              <button 
-                                type="button" 
-                                @click="triggerHeadITSignatureUpload"
-                                class="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors duration-200 flex items-center gap-1 mx-auto"
+                              <button
+                                type="button"
+                                @click="triggerFileUpload"
+                                class="px-3 py-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/50"
                               >
                                 <i class="fas fa-upload"></i>
                                 Press to load your signature
                               </button>
                             </div>
                           </div>
-                    
-                    <div 
-                      v-else 
-                      class="w-full px-2 py-2 border border-blue-300 rounded bg-gray-50 transition-all duration-300 shadow-sm hover:shadow-md min-h-[50px] flex items-center justify-center relative"
-                    >
-                      <div v-if="isImage(headITSignaturePreview)" class="text-center">
-                        <img 
-                          :src="headITSignaturePreview" 
-                          alt="Head IT Signature" 
-                          class="max-h-[35px] max-w-full object-contain mx-auto mb-1"
-                        />
-                        <p class="text-xs text-gray-600">{{ headITSignatureFileName }}</p>
-                      </div>
-                      <div v-else class="text-center">
-                        <div class="w-8 h-8 bg-red-100 rounded flex items-center justify-center mx-auto mb-1">
-                          <i class="fas fa-file-pdf text-red-600 text-sm"></i>
-                        </div>
-                        <p class="text-xs text-gray-600">{{ headITSignatureFileName }}</p>
-                      </div>
-                      
-                      <div class="absolute top-1 right-1 flex gap-1">
-                        <button 
-                          type="button" 
-                          @click="triggerHeadITSignatureUpload"
-                          class="w-5 h-5 bg-teal-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-teal-600 transition-colors duration-200"
-                          title="Change signature"
-                        >
-                          <i class="fas fa-edit"></i>
-                        </button>
-                        <button 
-                          type="button" 
-                          @click="clearHeadITSignature"
-                          class="w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors duration-200"
-                          title="Remove signature"
-                        >
-                          <i class="fas fa-times"></i>
-                        </button>
-                      </div>
-                    </div>
-                    
-                    <input 
-                      ref="headITSignatureInput" 
-                      type="file" 
-                      accept="image/png,image/jpeg,application/pdf"
-                      @change="onHeadITSignatureChange"
-                      class="hidden"
-                    />
-                  </div>
-                </div>
-                      <div>
-                        <label class="block text-sm font-medium text-blue-100 mb-2">Date (mm/dd/yyyy)<span class="text-red-400">*</span></label>
-                        <div class="relative">
-                          <input 
-                            v-model="form.implementation.headIT.date" 
-                            type="date" 
-                            class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-purple-400 focus:outline-none text-white backdrop-blur-sm"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
 
-                  <!-- ICT Officer granting access -->
-                  <div class="bg-white/15 rounded-xl p-4 border border-purple-300/30 backdrop-blur-sm">
-                    <h5 class="font-bold text-white mb-3 text-center text-sm flex items-center justify-center">
-                      <i class="fas fa-user-shield mr-2"></i>
-                      ICT Officer granting access
-                    </h5>
-                    <div class="space-y-3">
-                      <div>
-                        <label class="block text-sm font-medium text-blue-100 mb-2">Name<span class="text-red-400">*</span></label>
-                        <div class="relative">
-                          <input 
-                            v-model="form.implementation.ictOfficer.name" 
-                            type="text" 
-                            placeholder="Enter name"
-                            class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-purple-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <label class="block text-sm font-medium text-blue-100 mb-2">Signature<span class="text-red-400">*</span></label>
-                        <div class="relative">
-                          <div 
-                            v-if="!ictOfficerSignaturePreview" 
-                            class="w-full px-3 py-3 border-2 border-dashed border-purple-300/40 rounded-xl focus-within:border-purple-400 bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-purple-500/20 min-h-[70px] flex items-center justify-center hover:bg-white/20"
+                          <div
+                            v-else
+                            class="w-full px-2 py-2 border-2 border-blue-300/40 rounded-lg bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 min-h-[60px] flex items-center justify-center relative"
                           >
-                            <div class="text-center">
-                              <div class="mb-2">
-                                <i class="fas fa-signature text-purple-300 text-lg mb-1"></i>
-                                <p class="text-blue-100 text-xs">No signature uploaded</p>
-                              </div>
-                              <button 
-                                type="button" 
-                                @click="triggerIctOfficerSignatureUpload"
-                                class="px-3 py-1.5 bg-gradient-to-r from-purple-500 to-blue-600 text-white text-xs font-semibold rounded-lg hover:from-purple-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-purple-400/50"
-                              >
-                                <i class="fas fa-upload"></i>
-                                Upload Signature
-                              </button>
-                            </div>
-                          </div>
-                    
-                          <div 
-                            v-else 
-                            class="w-full px-3 py-3 border-2 border-purple-300/40 rounded-xl bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-purple-500/20 min-h-[70px] flex items-center justify-center relative"
-                          >
-                            <div v-if="isImage(ictOfficerSignaturePreview)" class="text-center">
-                              <img 
-                                :src="ictOfficerSignaturePreview" 
-                                alt="ICT Officer Signature" 
+                            <div
+                              v-if="isImage(signaturePreview)"
+                              class="text-center"
+                            >
+                              <img
+                                :src="signaturePreview"
+                                alt="Digital Signature"
                                 class="max-h-[50px] max-w-full object-contain mx-auto mb-1"
                               />
-                              <p class="text-xs text-blue-100">{{ ictOfficerSignatureFileName }}</p>
+                              <p class="text-xs text-blue-100">
+                                {{ signatureFileName }}
+                              </p>
                             </div>
                             <div v-else class="text-center">
-                              <div class="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-1">
-                                <i class="fas fa-file-pdf text-red-400 text-lg"></i>
+                              <div
+                                class="w-16 h-16 bg-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-2"
+                              >
+                                <i
+                                  class="fas fa-file-pdf text-red-400 text-2xl"
+                                ></i>
                               </div>
-                              <p class="text-xs text-blue-100">{{ ictOfficerSignatureFileName }}</p>
+                              <p class="text-sm text-blue-100">
+                                {{ signatureFileName }}
+                              </p>
                             </div>
-                            
-                            <div class="absolute top-2 right-2 flex gap-1">
-                              <button 
-                                type="button" 
-                                @click="triggerIctOfficerSignatureUpload"
-                                class="w-6 h-6 bg-purple-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-purple-600 transition-colors duration-200 shadow-lg"
+
+                            <div class="absolute top-2 right-2 flex gap-2">
+                              <button
+                                type="button"
+                                @click="triggerFileUpload"
+                                class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm hover:bg-blue-600 transition-colors duration-200 shadow-lg"
                                 title="Change signature"
                               >
                                 <i class="fas fa-edit"></i>
                               </button>
-                              <button 
-                                type="button" 
-                                @click="clearIctOfficerSignature"
-                                class="w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors duration-200 shadow-lg"
+                              <button
+                                type="button"
+                                @click="clearSignature"
+                                class="w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center text-sm hover:bg-red-600 transition-colors duration-200 shadow-lg"
                                 title="Remove signature"
                               >
                                 <i class="fas fa-times"></i>
                               </button>
                             </div>
                           </div>
-                          
-                          <input 
-                            ref="ictOfficerSignatureInput" 
-                            type="file" 
+
+                          <input
+                            ref="signatureInput"
+                            type="file"
                             accept="image/png,image/jpeg,application/pdf"
-                            @change="onIctOfficerSignatureChange"
+                            @change="onSignatureChange"
                             class="hidden"
                           />
                         </div>
                       </div>
-                      <div>
-                        <label class="block text-sm font-medium text-blue-100 mb-2">Date (mm/dd/yyyy)<span class="text-red-400">*</span></label>
-                        <div class="relative">
-                          <input 
-                            v-model="form.implementation.ictOfficer.date" 
-                            type="date" 
-                            class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-purple-400 focus:outline-none text-white backdrop-blur-sm"
+                    </div>
+                  </div>
+
+                  <!-- Module Request Section -->
+                  <div
+                    class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-2 rounded-lg backdrop-blur-sm hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 group"
+                  >
+                    <div class="flex items-center space-x-2 mb-2">
+                      <div
+                        class="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
+                      >
+                        <i class="fas fa-desktop text-white text-xs"></i>
+                      </div>
+                      <h3
+                        class="text-sm font-bold text-white flex items-center"
+                      >
+                        <i
+                          class="fas fa-th-large mr-1 text-blue-300 text-xs"
+                        ></i>
+                        Module Request
+                      </h3>
+                    </div>
+
+                    <!-- Module Requested for - Compact -->
+                    <div class="flex justify-center mb-3">
+                      <div
+                        class="bg-white/10 rounded-lg p-2 border border-blue-300/30 backdrop-blur-sm"
+                      >
+                        <label
+                          class="block text-sm font-bold text-blue-100 mb-2 text-center"
+                        >
+                          <i
+                            class="fas fa-toggle-on mr-1 text-blue-300 text-xs"
+                          ></i>
+                          Module Requested for
+                          <span class="text-red-400">*</span>
+                        </label>
+                        <div class="flex items-center gap-4 justify-center">
+                          <label
+                            class="flex items-center cursor-pointer hover:bg-blue-500/20 p-2 rounded transition-all"
+                          >
+                            <input
+                              v-model="wellsoftRequestType"
+                              type="radio"
+                              value="use"
+                              class="w-4 h-4 text-blue-600 border-blue-300 focus:ring-blue-500 mr-2"
+                            />
+                            <span
+                              class="text-sm font-medium text-blue-100 flex items-center"
+                            >
+                              <i
+                                class="fas fa-plus-circle mr-1 text-green-400 text-xs"
+                              ></i>
+                              Use
+                            </span>
+                          </label>
+                          <label
+                            class="flex items-center cursor-pointer hover:bg-red-500/20 p-2 rounded transition-all"
+                          >
+                            <input
+                              v-model="wellsoftRequestType"
+                              type="radio"
+                              value="revoke"
+                              class="w-4 h-4 text-blue-600 border-blue-300 focus:ring-blue-500 mr-2"
+                            />
+                            <span
+                              class="text-sm font-medium text-blue-100 flex items-center"
+                            >
+                              <i
+                                class="fas fa-minus-circle mr-1 text-red-400 text-xs"
+                              ></i>
+                              Revoke
+                            </span>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Wellsoft selector -->
+                    <div class="mb-6">
+                      <label class="block text-sm font-bold text-blue-100 mb-3">
+                        Wellsoft Modules <span class="text-red-400">*</span>
+                      </label>
+                      <div class="flex items-center justify-between mb-3">
+                        <span class="text-sm text-blue-200"
+                          >{{ selectedWellsoft.length }} modules selected</span
+                        >
+                        <div class="flex items-center gap-2 text-sm">
+                          <button
+                            type="button"
+                            class="px-3 py-1 bg-blue-500/20 text-blue-200 rounded-lg hover:bg-blue-500/30 transition-colors backdrop-blur-sm border border-blue-400/30"
+                            @click="selectAll('wellsoft')"
+                          >
+                            Select all
+                          </button>
+                          <button
+                            type="button"
+                            class="px-3 py-1 bg-white/10 text-blue-200 rounded-lg hover:bg-white/20 transition-colors backdrop-blur-sm border border-blue-400/30"
+                            @click="clearAll('wellsoft')"
+                          >
+                            Clear
+                          </button>
+                        </div>
+                      </div>
+                      <div class="relative mb-2">
+                        <input
+                          v-model.trim="wellsoftQuery"
+                          class="medical-input w-full px-3 py-2 pl-8 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm text-sm"
+                          placeholder="Search Wellsoft modules"
+                        />
+                        <i
+                          class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-blue-300 text-xs"
+                        ></i>
+                      </div>
+
+                      <!-- Selected chips -->
+                      <div
+                        v-if="selectedWellsoft.length"
+                        class="flex flex-wrap gap-2 mb-4"
+                      >
+                        <span
+                          v-for="m in selectedWellsoft"
+                          :key="'selW-' + m"
+                          class="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-blue-500/20 text-blue-100 text-sm backdrop-blur-sm border border-blue-400/30"
+                        >
+                          <i class="fas fa-check text-blue-300"></i> {{ m }}
+                          <button
+                            type="button"
+                            @click="toggleWellsoft(m)"
+                            class="ml-1 hover:text-blue-200 transition-colors"
+                          >
+                            <i class="fas fa-times"></i>
+                          </button>
+                        </span>
+                      </div>
+
+                      <!-- Options grid -->
+                      <div
+                        class="bg-white/10 rounded-lg p-3 max-h-40 border border-blue-300/30 overflow-y-auto backdrop-blur-sm"
+                      >
+                        <div
+                          class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2"
+                        >
+                          <label
+                            v-for="m in filteredWellsoft"
+                            :key="'optW-' + m"
+                            class="flex items-center p-2 hover:bg-blue-500/20 rounded-lg cursor-pointer transition-colors border border-blue-400/20"
+                          >
+                            <input
+                              type="checkbox"
+                              :checked="isSelected('wellsoft', m)"
+                              @change="toggleWellsoft(m)"
+                              class="w-4 h-4 text-blue-600 border-blue-300 rounded focus:ring-blue-500 mr-3 module-request-editable"
+                            />
+                            <span class="text-sm font-medium text-blue-100">{{
+                              m
+                            }}</span>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Jeeva selector -->
+                    <div class="mb-6">
+                      <label class="block text-sm font-bold text-blue-100 mb-3">
+                        Jeeva Modules <span class="text-red-400">*</span>
+                      </label>
+                      <div class="flex items-center justify-between mb-3">
+                        <span class="text-sm text-blue-200"
+                          >{{ selectedJeeva.length }} modules selected</span
+                        >
+                        <div class="flex items-center gap-2 text-sm">
+                          <button
+                            type="button"
+                            class="px-3 py-1 bg-cyan-500/20 text-cyan-200 rounded-lg hover:bg-cyan-500/30 transition-colors backdrop-blur-sm border border-cyan-400/30"
+                            @click="selectAll('jeeva')"
+                          >
+                            Select all
+                          </button>
+                          <button
+                            type="button"
+                            class="px-3 py-1 bg-white/10 text-blue-200 rounded-lg hover:bg-white/20 transition-colors backdrop-blur-sm border border-blue-400/30"
+                            @click="clearAll('jeeva')"
+                          >
+                            Clear
+                          </button>
+                        </div>
+                      </div>
+                      <div class="relative mb-2">
+                        <input
+                          v-model.trim="jeevaQuery"
+                          class="medical-input w-full px-3 py-2 pl-8 bg-white/15 border border-blue-300/30 rounded-lg focus:border-cyan-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm text-sm"
+                          placeholder="Search Jeeva modules"
+                        />
+                        <i
+                          class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-cyan-300 text-xs"
+                        ></i>
+                      </div>
+
+                      <div
+                        v-if="selectedJeeva.length"
+                        class="flex flex-wrap gap-2 mb-4"
+                      >
+                        <span
+                          v-for="m in selectedJeeva"
+                          :key="'selJ-' + m"
+                          class="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-cyan-500/20 text-cyan-100 text-sm backdrop-blur-sm border border-cyan-400/30"
+                        >
+                          <i class="fas fa-check text-cyan-300"></i> {{ m }}
+                          <button
+                            type="button"
+                            @click="toggleJeeva(m)"
+                            class="ml-1 hover:text-cyan-200 transition-colors"
+                          >
+                            <i class="fas fa-times"></i>
+                          </button>
+                        </span>
+                      </div>
+
+                      <div
+                        class="bg-white/10 rounded-lg p-3 max-h-40 border border-blue-300/30 overflow-y-auto backdrop-blur-sm"
+                      >
+                        <div
+                          class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2"
+                        >
+                          <label
+                            v-for="m in filteredJeeva"
+                            :key="'optJ-' + m"
+                            class="flex items-center p-2 hover:bg-cyan-500/20 rounded-lg cursor-pointer transition-colors border border-cyan-400/20"
+                          >
+                            <input
+                              type="checkbox"
+                              :checked="isSelected('jeeva', m)"
+                              @change="toggleJeeva(m)"
+                              class="w-4 h-4 text-cyan-600 border-cyan-300 rounded focus:ring-cyan-500 mr-3 module-request-editable"
+                            />
+                            <span class="text-sm font-medium text-cyan-100">{{
+                              m
+                            }}</span>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Internet selector -->
+                    <div class="mb-6">
+                      <label class="block text-sm font-bold text-blue-100 mb-3">
+                        Internet Purpose <span class="text-red-400">*</span>
+                      </label>
+                      <div class="space-y-2">
+                        <div
+                          v-for="(purpose, index) in internetPurposes"
+                          :key="index"
+                          class="flex items-center gap-2"
+                        >
+                          <span
+                            class="text-xs font-medium text-blue-300 w-5 h-5 bg-blue-500/20 rounded-full flex items-center justify-center border border-blue-400/30"
+                            >{{ index + 1 }}</span
+                          >
+                          <div class="flex-1 relative">
+                            <input
+                              v-model="internetPurposes[index]"
+                              type="text"
+                              class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 module-request-editable text-sm"
+                              :placeholder="`Purpose ${index + 1}`"
+                              :required="index === 0"
+                            />
+                            <div
+                              class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/10 to-cyan-500/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                            ></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Access Rights Section -->
+                  <div
+                    class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-3 rounded-lg backdrop-blur-sm hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 group"
+                  >
+                    <div class="flex items-center space-x-2 mb-3">
+                      <div
+                        class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
+                      >
+                        <i class="fas fa-lock text-white text-sm"></i>
+                      </div>
+                      <h3
+                        class="text-base font-bold text-white flex items-center"
+                      >
+                        <i class="fas fa-key mr-1 text-blue-300"></i>
+                        Access Rights
+                      </h3>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <!-- Permanent Option -->
+                      <div
+                        class="flex items-center p-4 border-2 border-blue-300/30 rounded-xl hover:border-blue-400 hover:bg-white/10 transition-all backdrop-blur-sm"
+                      >
+                        <input
+                          v-model="form.accessRights.type"
+                          type="radio"
+                          value="permanent"
+                          class="w-5 h-5 text-blue-600 border-blue-300 focus:ring-blue-500 mr-4 access-rights-editable"
+                        />
+                        <span class="font-medium text-white text-sm"
+                          >Permanent (until retirement)</span
+                        >
+                      </div>
+
+                      <!-- Temporary Until Option -->
+                      <div
+                        class="flex items-center justify-between p-4 border-2 border-blue-300/30 rounded-xl hover:border-blue-400 hover:bg-white/10 transition-all backdrop-blur-sm"
+                      >
+                        <div class="flex items-center">
+                          <input
+                            v-model="form.accessRights.type"
+                            type="radio"
+                            value="temporary"
+                            class="w-5 h-5 text-blue-600 border-blue-300 focus:ring-blue-500 mr-4 access-rights-editable"
+                          />
+                          <span class="font-medium text-white text-sm"
+                            >Temporary Until</span
+                          >
+                        </div>
+
+                        <div
+                          class="flex items-center gap-2"
+                          v-if="form.accessRights.type === 'temporary'"
+                        >
+                          <input
+                            v-model="form.accessRights.tempDate.month"
+                            type="text"
+                            placeholder="MM"
+                            maxlength="2"
+                            class="w-12 px-2 py-1 bg-white/15 border border-blue-300/30 rounded-lg text-center text-sm text-white focus:border-blue-400 focus:outline-none backdrop-blur-sm access-rights-editable"
+                          />
+                          <span class="text-blue-200">/</span>
+                          <input
+                            v-model="form.accessRights.tempDate.day"
+                            type="text"
+                            placeholder="DD"
+                            maxlength="2"
+                            class="w-12 px-2 py-1 bg-white/15 border border-blue-300/30 rounded-lg text-center text-sm text-white focus:border-blue-400 focus:outline-none backdrop-blur-sm access-rights-editable"
+                          />
+                          <span class="text-blue-200">/</span>
+                          <input
+                            v-model="form.accessRights.tempDate.year"
+                            type="text"
+                            placeholder="YYYY"
+                            maxlength="4"
+                            class="w-20 px-2 py-1 bg-white/15 border border-blue-300/30 rounded-lg text-center text-sm text-white focus:border-blue-400 focus:outline-none backdrop-blur-sm access-rights-editable"
                           />
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
 
-              <!-- Review Mode Actions -->
-              <div v-if="isReviewMode" class="medical-card bg-gradient-to-r from-emerald-600/25 to-green-600/25 border-2 border-emerald-400/40 p-8 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-500 group">
-                <div class="flex items-center space-x-4 mb-6">
-                  <div class="w-14 h-14 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-emerald-300/50">
-                    <i class="fas fa-gavel text-white text-xl"></i>
+                  <!-- Approval Section -->
+                  <div
+                    class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-3 rounded-lg backdrop-blur-sm hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 group"
+                  >
+                    <div class="flex items-center space-x-2 mb-3">
+                      <div
+                        class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
+                      >
+                        <i class="fas fa-check-circle text-white text-sm"></i>
+                      </div>
+                      <h3
+                        class="text-base font-bold text-white flex items-center"
+                      >
+                        <i
+                          class="fas fa-clipboard-check mr-1 text-blue-300"
+                        ></i>
+                        Approval
+                      </h3>
+                    </div>
+
+                    <div
+                      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+                    >
+                      <!-- HoD/BM -->
+                      <div
+                        class="bg-white/15 rounded-lg p-4 border border-blue-300/30 backdrop-blur-sm"
+                      >
+                        <h5
+                          class="font-bold text-white mb-4 text-center text-sm flex items-center justify-center"
+                        >
+                          <i class="fas fa-user-tie mr-2 text-blue-300"></i>
+                          HoD/BM
+                        </h5>
+                        <div class="space-y-3">
+                          <div>
+                            <label
+                              class="block text-sm font-medium text-blue-100 mb-2"
+                              >Name<span class="text-red-400">*</span></label
+                            >
+                            <div class="relative">
+                              <input
+                                v-model="form.approvals.hod.name"
+                                type="text"
+                                placeholder="Enter name"
+                                class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm hod-approval-editable"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label
+                              class="block text-sm font-medium text-blue-100 mb-2"
+                              >Signature<span class="text-red-400"
+                                >*</span
+                              ></label
+                            >
+                            <div class="relative">
+                              <div
+                                v-if="!hodSignaturePreview"
+                                class="w-full px-3 py-2 border-2 border-dashed border-blue-300/40 rounded-lg focus-within:border-blue-400 bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 min-h-[50px] flex items-center justify-center hover:bg-white/20"
+                              >
+                                <div class="text-center">
+                                  <div class="mb-2">
+                                    <i
+                                      class="fas fa-signature text-blue-300 text-lg mb-1"
+                                    ></i>
+                                    <p class="text-blue-100 text-xs">
+                                      No signature uploaded
+                                    </p>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    @click="triggerHodSignatureUpload"
+                                    class="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/50"
+                                  >
+                                    <i class="fas fa-upload"></i>
+                                    Upload Signature
+                                  </button>
+                                </div>
+                              </div>
+
+                              <div
+                                v-else
+                                class="w-full px-3 py-3 border-2 border-emerald-300/40 rounded-xl bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-emerald-500/20 min-h-[70px] flex items-center justify-center relative"
+                              >
+                                <div
+                                  v-if="isImage(hodSignaturePreview)"
+                                  class="text-center"
+                                >
+                                  <img
+                                    :src="hodSignaturePreview"
+                                    alt="HOD Signature"
+                                    class="max-h-[50px] max-w-full object-contain mx-auto mb-1"
+                                  />
+                                  <p class="text-xs text-blue-100">
+                                    {{ hodSignatureFileName }}
+                                  </p>
+                                </div>
+                                <div v-else class="text-center">
+                                  <div
+                                    class="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-1"
+                                  >
+                                    <i
+                                      class="fas fa-file-pdf text-red-400 text-lg"
+                                    ></i>
+                                  </div>
+                                  <p class="text-xs text-blue-100">
+                                    {{ hodSignatureFileName }}
+                                  </p>
+                                </div>
+
+                                <div class="absolute top-2 right-2 flex gap-1">
+                                  <button
+                                    type="button"
+                                    @click="triggerHodSignatureUpload"
+                                    class="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-blue-600 transition-colors duration-200 shadow-lg"
+                                    title="Change signature"
+                                  >
+                                    <i class="fas fa-edit"></i>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    @click="clearHodSignature"
+                                    class="w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors duration-200 shadow-lg"
+                                    title="Remove signature"
+                                  >
+                                    <i class="fas fa-times"></i>
+                                  </button>
+                                </div>
+                              </div>
+
+                              <input
+                                ref="hodSignatureInput"
+                                type="file"
+                                accept="image/png,image/jpeg,application/pdf"
+                                @change="onHodSignatureChange"
+                                class="hidden"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label
+                              class="block text-sm font-medium text-blue-100 mb-2"
+                              >Date (mm/dd/yyyy)<span class="text-red-400"
+                                >*</span
+                              ></label
+                            >
+                            <div class="relative">
+                              <input
+                                v-model="form.approvals.hod.date"
+                                type="date"
+                                class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm hod-approval-editable"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Divisional Director -->
+                      <div
+                        class="bg-white/15 rounded-lg p-4 border border-blue-300/30 backdrop-blur-sm"
+                      >
+                        <h5
+                          class="font-bold text-white mb-4 text-center text-sm flex items-center justify-center"
+                        >
+                          <i class="fas fa-user-circle mr-2 text-blue-300"></i>
+                          Divisional Director
+                        </h5>
+                        <div class="space-y-3">
+                          <div>
+                            <label
+                              class="block text-sm font-medium text-blue-100 mb-2"
+                              >Name<span class="text-red-400">*</span></label
+                            >
+                            <div class="relative">
+                              <input
+                                v-model="form.approvals.divisionalDirector.name"
+                                type="text"
+                                placeholder="Enter name"
+                                class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label
+                              class="block text-sm font-medium text-blue-100 mb-2"
+                              >Signature<span class="text-red-400"
+                                >*</span
+                              ></label
+                            >
+                            <div class="relative">
+                              <div
+                                v-if="!divDirectorSignaturePreview"
+                                class="w-full px-3 py-2 border-2 border-dashed border-blue-300/40 rounded-lg focus-within:border-blue-400 bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 min-h-[50px] flex items-center justify-center hover:bg-white/20"
+                              >
+                                <div class="text-center">
+                                  <div class="mb-2">
+                                    <i
+                                      class="fas fa-signature text-blue-300 text-lg mb-1"
+                                    ></i>
+                                    <p class="text-blue-100 text-xs">
+                                      No signature uploaded
+                                    </p>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    @click="triggerDivDirectorSignatureUpload"
+                                    class="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/50"
+                                  >
+                                    <i class="fas fa-upload"></i>
+                                    Upload Signature
+                                  </button>
+                                </div>
+                              </div>
+
+                              <div
+                                v-else
+                                class="w-full px-3 py-3 border-2 border-emerald-300/40 rounded-xl bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-emerald-500/20 min-h-[70px] flex items-center justify-center relative"
+                              >
+                                <div
+                                  v-if="isImage(divDirectorSignaturePreview)"
+                                  class="text-center"
+                                >
+                                  <img
+                                    :src="divDirectorSignaturePreview"
+                                    alt="Divisional Director Signature"
+                                    class="max-h-[50px] max-w-full object-contain mx-auto mb-1"
+                                  />
+                                  <p class="text-xs text-blue-100">
+                                    {{ divDirectorSignatureFileName }}
+                                  </p>
+                                </div>
+                                <div v-else class="text-center">
+                                  <div
+                                    class="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-1"
+                                  >
+                                    <i
+                                      class="fas fa-file-pdf text-red-400 text-lg"
+                                    ></i>
+                                  </div>
+                                  <p class="text-xs text-blue-100">
+                                    {{ divDirectorSignatureFileName }}
+                                  </p>
+                                </div>
+
+                                <div class="absolute top-2 right-2 flex gap-1">
+                                  <button
+                                    type="button"
+                                    @click="triggerDivDirectorSignatureUpload"
+                                    class="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-blue-600 transition-colors duration-200 shadow-lg"
+                                    title="Change signature"
+                                  >
+                                    <i class="fas fa-edit"></i>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    @click="clearDivDirectorSignature"
+                                    class="w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors duration-200 shadow-lg"
+                                    title="Remove signature"
+                                  >
+                                    <i class="fas fa-times"></i>
+                                  </button>
+                                </div>
+                              </div>
+
+                              <input
+                                ref="divDirectorSignatureInput"
+                                type="file"
+                                accept="image/png,image/jpeg,application/pdf"
+                                @change="onDivDirectorSignatureChange"
+                                class="hidden"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label
+                              class="block text-sm font-medium text-blue-100 mb-2"
+                              >Date (mm/dd/yyyy)<span class="text-red-400"
+                                >*</span
+                              ></label
+                            >
+                            <div class="relative">
+                              <input
+                                v-model="form.approvals.divisionalDirector.date"
+                                type="date"
+                                class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Director of ICT -->
+                      <div
+                        class="bg-white/15 rounded-lg p-4 border border-blue-300/30 backdrop-blur-sm"
+                      >
+                        <h5
+                          class="font-bold text-white mb-4 text-center text-sm flex items-center justify-center"
+                        >
+                          <i class="fas fa-laptop-code mr-2 text-blue-300"></i>
+                          Director of ICT
+                        </h5>
+                        <div class="space-y-3">
+                          <div>
+                            <label
+                              class="block text-sm font-medium text-blue-100 mb-2"
+                              >Name<span class="text-red-400">*</span></label
+                            >
+                            <div class="relative">
+                              <input
+                                v-model="form.approvals.directorICT.name"
+                                type="text"
+                                placeholder="Enter name"
+                                class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label
+                              class="block text-sm font-medium text-blue-100 mb-2"
+                              >Signature<span class="text-red-400"
+                                >*</span
+                              ></label
+                            >
+                            <div class="relative">
+                              <div
+                                v-if="!directorICTSignaturePreview"
+                                class="w-full px-3 py-2 border-2 border-dashed border-blue-300/40 rounded-lg focus-within:border-blue-400 bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 min-h-[50px] flex items-center justify-center hover:bg-white/20"
+                              >
+                                <div class="text-center">
+                                  <div class="mb-2">
+                                    <i
+                                      class="fas fa-signature text-blue-300 text-lg mb-1"
+                                    ></i>
+                                    <p class="text-blue-100 text-xs">
+                                      No signature uploaded
+                                    </p>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    @click="triggerDirectorICTSignatureUpload"
+                                    class="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/50"
+                                  >
+                                    <i class="fas fa-upload"></i>
+                                    Upload Signature
+                                  </button>
+                                </div>
+                              </div>
+
+                              <div
+                                v-else
+                                class="w-full px-3 py-3 border-2 border-emerald-300/40 rounded-xl bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-emerald-500/20 min-h-[70px] flex items-center justify-center relative"
+                              >
+                                <div
+                                  v-if="isImage(directorICTSignaturePreview)"
+                                  class="text-center"
+                                >
+                                  <img
+                                    :src="directorICTSignaturePreview"
+                                    alt="Director ICT Signature"
+                                    class="max-h-[50px] max-w-full object-contain mx-auto mb-1"
+                                  />
+                                  <p class="text-xs text-blue-100">
+                                    {{ directorICTSignatureFileName }}
+                                  </p>
+                                </div>
+                                <div v-else class="text-center">
+                                  <div
+                                    class="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-1"
+                                  >
+                                    <i
+                                      class="fas fa-file-pdf text-red-400 text-lg"
+                                    ></i>
+                                  </div>
+                                  <p class="text-xs text-blue-100">
+                                    {{ directorICTSignatureFileName }}
+                                  </p>
+                                </div>
+
+                                <div class="absolute top-2 right-2 flex gap-1">
+                                  <button
+                                    type="button"
+                                    @click="triggerDirectorICTSignatureUpload"
+                                    class="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-blue-600 transition-colors duration-200 shadow-lg"
+                                    title="Change signature"
+                                  >
+                                    <i class="fas fa-edit"></i>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    @click="clearDirectorICTSignature"
+                                    class="w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors duration-200 shadow-lg"
+                                    title="Remove signature"
+                                  >
+                                    <i class="fas fa-times"></i>
+                                  </button>
+                                </div>
+                              </div>
+
+                              <input
+                                ref="directorICTSignatureInput"
+                                type="file"
+                                accept="image/png,image/jpeg,application/pdf"
+                                @change="onDirectorICTSignatureChange"
+                                class="hidden"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label
+                              class="block text-sm font-medium text-blue-100 mb-2"
+                              >Date (mm/dd/yyyy)<span class="text-red-400"
+                                >*</span
+                              ></label
+                            >
+                            <div class="relative">
+                              <input
+                                v-model="form.approvals.directorICT.date"
+                                type="date"
+                                class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <h3 class="text-xl font-bold text-white flex items-center">
-                    <i class="fas fa-check-double mr-2 text-emerald-300"></i>
-                    Review Actions
-                  </h3>
-                </div>
-                
-                <!-- Request Status -->
-                <div class="mb-6 p-4 bg-white/10 rounded-xl border border-emerald-300/30">
-                  <h4 class="text-sm font-bold text-blue-100 mb-3">Request Status</h4>
-                  <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
-                    <div class="text-center">
-                      <div :class="getApprovalStatus('hod') === 'approved' ? 'bg-green-500' : getApprovalStatus('hod') === 'rejected' ? 'bg-red-500' : 'bg-yellow-500'" class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1">
-                        <i :class="getApprovalStatus('hod') === 'approved' ? 'fas fa-check' : getApprovalStatus('hod') === 'rejected' ? 'fas fa-times' : 'fas fa-clock'" class="text-white text-sm"></i>
+
+                  <!-- Comments Section -->
+                  <div
+                    class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-3 rounded-lg backdrop-blur-sm hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 group"
+                  >
+                    <div class="flex items-center space-x-2 mb-3">
+                      <div
+                        class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
+                      >
+                        <i class="fas fa-comments text-white text-sm"></i>
                       </div>
-                      <p class="text-xs text-white">HOD</p>
+                      <h3
+                        class="text-base font-bold text-white flex items-center"
+                      >
+                        <i class="fas fa-comment-alt mr-1 text-blue-300"></i>
+                        Comments
+                      </h3>
                     </div>
-                    <div class="text-center">
-                      <div :class="getApprovalStatus('divisional') === 'approved' ? 'bg-green-500' : getApprovalStatus('divisional') === 'rejected' ? 'bg-red-500' : 'bg-yellow-500'" class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1">
-                        <i :class="getApprovalStatus('divisional') === 'approved' ? 'fas fa-check' : getApprovalStatus('divisional') === 'rejected' ? 'fas fa-times' : 'fas fa-clock'" class="text-white text-sm"></i>
-                      </div>
-                      <p class="text-xs text-white">Divisional</p>
-                    </div>
-                    <div class="text-center">
-                      <div :class="getApprovalStatus('dict') === 'approved' ? 'bg-green-500' : getApprovalStatus('dict') === 'rejected' ? 'bg-red-500' : 'bg-yellow-500'" class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1">
-                        <i :class="getApprovalStatus('dict') === 'approved' ? 'fas fa-check' : getApprovalStatus('dict') === 'rejected' ? 'fas fa-times' : 'fas fa-clock'" class="text-white text-sm"></i>
-                      </div>
-                      <p class="text-xs text-white">DICT</p>
-                    </div>
-                    <div class="text-center">
-                      <div :class="getApprovalStatus('headOfIt') === 'approved' ? 'bg-green-500' : getApprovalStatus('headOfIt') === 'rejected' ? 'bg-red-500' : 'bg-yellow-500'" class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1">
-                        <i :class="getApprovalStatus('headOfIt') === 'approved' ? 'fas fa-check' : getApprovalStatus('headOfIt') === 'rejected' ? 'fas fa-times' : 'fas fa-clock'" class="text-white text-sm"></i>
-                      </div>
-                      <p class="text-xs text-white">Head IT</p>
-                    </div>
-                    <div class="text-center">
-                      <div :class="getApprovalStatus('ict') === 'approved' ? 'bg-green-500' : getApprovalStatus('ict') === 'rejected' ? 'bg-red-500' : 'bg-yellow-500'" class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1">
-                        <i :class="getApprovalStatus('ict') === 'approved' ? 'fas fa-check' : getApprovalStatus('ict') === 'rejected' ? 'fas fa-times' : 'fas fa-clock'" class="text-white text-sm"></i>
-                      </div>
-                      <p class="text-xs text-white">ICT Officer</p>
+                    <div class="relative">
+                      <textarea
+                        v-model="form.comments"
+                        rows="4"
+                        class="medical-input w-full px-3 py-3 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 resize-y comments-editable"
+                        placeholder="HOD: specify access Category here..."
+                      ></textarea>
+                      <div
+                        class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/10 to-blue-600/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                      ></div>
                     </div>
                   </div>
-                </div>
-                
-                <!-- Action Buttons -->
-                <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                  <button 
-                    type="button" 
-                    @click="goBackToRequests"
-                    class="px-6 py-3 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-lg hover:from-gray-700 hover:to-gray-800 transition-all duration-300 font-semibold flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105"
-                  >
-                    <i class="fas fa-arrow-left mr-2"></i>
-                    Back to Requests
-                  </button>
-                  
-                  <button 
-                    v-if="canApproveAtStage()"
-                    type="button" 
-                    @click="approveRequest"
-                    class="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-300 font-semibold flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105"
-                  >
-                    <i class="fas fa-check mr-2"></i>
-                    Approve Request
-                  </button>
-                  
-                  <button 
-                    v-if="canApproveAtStage()"
-                    type="button" 
-                    @click="rejectRequest"
-                    class="px-6 py-3 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-lg hover:from-red-700 hover:to-pink-700 transition-all duration-300 font-semibold flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105"
-                  >
-                    <i class="fas fa-times mr-2"></i>
-                    Reject Request
-                  </button>
-                </div>
-              </div>
 
-              <!-- Footer & Submit (Normal Mode) -->
-              <div v-if="!isReviewMode" class="border-t-3 border-gray-200 pt-1">
-                <div class="text-center mb-6">
-                  <div class="inline-block text-black px-4 py-2 rounded-lg">
-                    <p class="font-bold">Directorate of ICT</p>
-                    <p class="text-sm opacity-90">IT and Telephone Department</p>
-                  </div>
-                </div>
-
-                <div class="flex flex-col sm:flex-row justify-center gap-4">
-                  <button type="button" @click="onReset"
-                    class="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-all duration-300 font-semibold flex items-center justify-center shadow-lg hover:shadow-xl"
+                  <!-- For Implementation Section -->
+                  <div
+                    class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-3 rounded-lg backdrop-blur-sm hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 group"
                   >
-                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
-                    </svg>
-                    Reset Form
-                  </button>
-                  <button 
-                    type="submit" 
-                    class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-semibold flex items-center justify-center shadow-lg hover:shadow-xl"
-                  >
-                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                    </svg>
-                    Submit Request
-                  </button>
-                </div>
-              </div>
-            </section>
-
-            <!-- Right: tabs -->
-            <section aria-labelledby="module-tabs" class="lg:col-span-1 space-y-4">
-              <h2 id="module-tabs" class="sr-only">Module Details</h2>
-
-              <!-- Desktop tabs -->
-              <div class="hidden md:block">
-                <div class="flex items-center gap-2 overflow-x-auto pb-1">
-                  <button
-                    v-for="t in tabs"
-                    :key="t.key"
-                    class="tab"
-                    :class="t.key === activeTab ? 'tab-active' : ''"
-                    @click="activeTab = t.key"
-                    :aria-selected="t.key === activeTab"
-                    role="tab"
-                  >
-                    {{ t.label }}
-                    <i class="fas fa-times ml-2 text-xs opacity-70 hover:opacity-100" @click.stop="tryCloseTab(t.key)"></i>
-                  </button>
-                </div>
-                <div class="mt-2">
-                  <transition name="fade" mode="out-in">
-                    <div v-if="currentTab" :key="activeTab" class="card">
-                      <component :is="currentTab.component" v-model="moduleData[currentTab.key]" />
+                    <div class="flex items-center space-x-2 mb-3">
+                      <div
+                        class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
+                      >
+                        <i class="fas fa-cogs text-white text-sm"></i>
+                      </div>
+                      <h3
+                        class="text-base font-bold text-white flex items-center"
+                      >
+                        <i class="fas fa-tools mr-1 text-blue-300"></i>
+                        For Implementation
+                      </h3>
                     </div>
-                  </transition>
-                </div>
-              </div>
 
-              <!-- Mobile accordion -->
-              <div class="md:hidden space-y-2">
-                <div v-for="t in tabs" :key="t.key" class="card">
-                  <button class="w-full flex items-center justify-between text-left" @click="toggleAccordion(t.key)">
-                    <span class="font-semibold">{{ t.label }}</span>
-                    <i :class="['fas', openAccordions.has(t.key) ? 'fa-chevron-up' : 'fa-chevron-down']"></i>
-                  </button>
-                  <transition name="fade">
-                    <div v-show="openAccordions.has(t.key)" class="mt-3">
-                      <component :is="t.component" v-model="moduleData[t.key]" />
-                      <div class="mt-3 text-right">
-                        <button class="btn-secondary btn-sm" @click="tryCloseTab(t.key)">
-                          <i class="fas fa-times mr-1"></i> Remove
-                        </button>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <!-- Head of IT -->
+                      <div
+                        class="bg-white/15 rounded-lg p-4 border border-blue-300/30 backdrop-blur-sm"
+                      >
+                        <h5
+                          class="font-bold text-white mb-3 text-center text-sm flex items-center justify-center"
+                        >
+                          <i class="fas fa-user-cog mr-2"></i>
+                          Head of IT
+                        </h5>
+                        <div class="space-y-3">
+                          <div>
+                            <label
+                              class="block text-sm font-medium text-blue-100 mb-2"
+                              >Name<span class="text-red-400">*</span></label
+                            >
+                            <div class="relative">
+                              <input
+                                v-model="form.implementation.headIT.name"
+                                type="text"
+                                placeholder="Enter name"
+                                class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label
+                              class="block text-sm font-medium text-blue-100 mb-2"
+                              >Signature<span class="text-red-400"
+                                >*</span
+                              ></label
+                            >
+                            <div class="relative">
+                              <div
+                                v-if="!headITSignaturePreview"
+                                class="w-full px-2 py-2 border border-blue-300/30 rounded-lg focus-within:border-blue-400 bg-white/15 transition-all duration-300 shadow-sm hover:shadow-md min-h-[50px] flex items-center justify-center backdrop-blur-sm"
+                              >
+                                <div class="text-center">
+                                  <div class="mb-1">
+                                    <i
+                                      class="fas fa-signature text-blue-300 text-sm mb-1"
+                                    ></i>
+                                    <p class="text-blue-100 text-xs">
+                                      No signature
+                                    </p>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    @click="triggerHeadITSignatureUpload"
+                                    class="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors duration-200 flex items-center gap-1 mx-auto"
+                                  >
+                                    <i class="fas fa-upload"></i>
+                                    Press to load your signature
+                                  </button>
+                                </div>
+                              </div>
+
+                              <div
+                                v-else
+                                class="w-full px-2 py-2 border border-blue-300 rounded bg-gray-50 transition-all duration-300 shadow-sm hover:shadow-md min-h-[50px] flex items-center justify-center relative"
+                              >
+                                <div
+                                  v-if="isImage(headITSignaturePreview)"
+                                  class="text-center"
+                                >
+                                  <img
+                                    :src="headITSignaturePreview"
+                                    alt="Head IT Signature"
+                                    class="max-h-[35px] max-w-full object-contain mx-auto mb-1"
+                                  />
+                                  <p class="text-xs text-gray-600">
+                                    {{ headITSignatureFileName }}
+                                  </p>
+                                </div>
+                                <div v-else class="text-center">
+                                  <div
+                                    class="w-8 h-8 bg-red-100 rounded flex items-center justify-center mx-auto mb-1"
+                                  >
+                                    <i
+                                      class="fas fa-file-pdf text-red-600 text-sm"
+                                    ></i>
+                                  </div>
+                                  <p class="text-xs text-gray-600">
+                                    {{ headITSignatureFileName }}
+                                  </p>
+                                </div>
+
+                                <div class="absolute top-1 right-1 flex gap-1">
+                                  <button
+                                    type="button"
+                                    @click="triggerHeadITSignatureUpload"
+                                    class="w-5 h-5 bg-teal-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-teal-600 transition-colors duration-200"
+                                    title="Change signature"
+                                  >
+                                    <i class="fas fa-edit"></i>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    @click="clearHeadITSignature"
+                                    class="w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors duration-200"
+                                    title="Remove signature"
+                                  >
+                                    <i class="fas fa-times"></i>
+                                  </button>
+                                </div>
+                              </div>
+
+                              <input
+                                ref="headITSignatureInput"
+                                type="file"
+                                accept="image/png,image/jpeg,application/pdf"
+                                @change="onHeadITSignatureChange"
+                                class="hidden"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label
+                              class="block text-sm font-medium text-blue-100 mb-2"
+                              >Date (mm/dd/yyyy)<span class="text-red-400"
+                                >*</span
+                              ></label
+                            >
+                            <div class="relative">
+                              <input
+                                v-model="form.implementation.headIT.date"
+                                type="date"
+                                class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- ICT Officer granting access -->
+                      <div
+                        class="bg-white/15 rounded-lg p-4 border border-blue-300/30 backdrop-blur-sm"
+                      >
+                        <h5
+                          class="font-bold text-white mb-3 text-center text-sm flex items-center justify-center"
+                        >
+                          <i class="fas fa-user-shield mr-2"></i>
+                          ICT Officer granting access
+                        </h5>
+                        <div class="space-y-3">
+                          <div>
+                            <label
+                              class="block text-sm font-medium text-blue-100 mb-2"
+                              >Name<span class="text-red-400">*</span></label
+                            >
+                            <div class="relative">
+                              <input
+                                v-model="form.implementation.ictOfficer.name"
+                                type="text"
+                                placeholder="Enter name"
+                                class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label
+                              class="block text-sm font-medium text-blue-100 mb-2"
+                              >Signature<span class="text-red-400"
+                                >*</span
+                              ></label
+                            >
+                            <div class="relative">
+                              <div
+                                v-if="!ictOfficerSignaturePreview"
+                                class="w-full px-3 py-2 border-2 border-dashed border-blue-300/40 rounded-lg focus-within:border-blue-400 bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 min-h-[50px] flex items-center justify-center hover:bg-white/20"
+                              >
+                                <div class="text-center">
+                                  <div class="mb-2">
+                                    <i
+                                      class="fas fa-signature text-blue-300 text-lg mb-1"
+                                    ></i>
+                                    <p class="text-blue-100 text-xs">
+                                      No signature uploaded
+                                    </p>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    @click="triggerIctOfficerSignatureUpload"
+                                    class="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/50"
+                                  >
+                                    <i class="fas fa-upload"></i>
+                                    Upload Signature
+                                  </button>
+                                </div>
+                              </div>
+
+                              <div
+                                v-else
+                                class="w-full px-3 py-3 border-2 border-purple-300/40 rounded-xl bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-purple-500/20 min-h-[70px] flex items-center justify-center relative"
+                              >
+                                <div
+                                  v-if="isImage(ictOfficerSignaturePreview)"
+                                  class="text-center"
+                                >
+                                  <img
+                                    :src="ictOfficerSignaturePreview"
+                                    alt="ICT Officer Signature"
+                                    class="max-h-[50px] max-w-full object-contain mx-auto mb-1"
+                                  />
+                                  <p class="text-xs text-blue-100">
+                                    {{ ictOfficerSignatureFileName }}
+                                  </p>
+                                </div>
+                                <div v-else class="text-center">
+                                  <div
+                                    class="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-1"
+                                  >
+                                    <i
+                                      class="fas fa-file-pdf text-red-400 text-lg"
+                                    ></i>
+                                  </div>
+                                  <p class="text-xs text-blue-100">
+                                    {{ ictOfficerSignatureFileName }}
+                                  </p>
+                                </div>
+
+                                <div class="absolute top-2 right-2 flex gap-1">
+                                  <button
+                                    type="button"
+                                    @click="triggerIctOfficerSignatureUpload"
+                                    class="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-blue-600 transition-colors duration-200 shadow-lg"
+                                    title="Change signature"
+                                  >
+                                    <i class="fas fa-edit"></i>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    @click="clearIctOfficerSignature"
+                                    class="w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors duration-200 shadow-lg"
+                                    title="Remove signature"
+                                  >
+                                    <i class="fas fa-times"></i>
+                                  </button>
+                                </div>
+                              </div>
+
+                              <input
+                                ref="ictOfficerSignatureInput"
+                                type="file"
+                                accept="image/png,image/jpeg,application/pdf"
+                                @change="onIctOfficerSignatureChange"
+                                class="hidden"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label
+                              class="block text-sm font-medium text-blue-100 mb-2"
+                              >Date (mm/dd/yyyy)<span class="text-red-400"
+                                >*</span
+                              ></label
+                            >
+                            <div class="relative">
+                              <input
+                                v-model="form.implementation.ictOfficer.date"
+                                type="date"
+                                class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm"
+                              />
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </transition>
-                </div>
+                  </div>
+
+                  <!-- Review Mode Actions -->
+                  <div
+                    v-if="isReviewMode"
+                    class="medical-card bg-gradient-to-r from-emerald-600/25 to-green-600/25 border-2 border-emerald-400/40 p-8 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-500 group"
+                  >
+                    <div class="flex items-center space-x-4 mb-6">
+                      <div
+                        class="w-14 h-14 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-emerald-300/50"
+                      >
+                        <i class="fas fa-gavel text-white text-xl"></i>
+                      </div>
+                      <h3
+                        class="text-xl font-bold text-white flex items-center"
+                      >
+                        <i
+                          class="fas fa-check-double mr-2 text-emerald-300"
+                        ></i>
+                        Review Actions
+                      </h3>
+                    </div>
+
+                    <!-- Request Status -->
+                    <div
+                      class="mb-6 p-4 bg-white/10 rounded-xl border border-emerald-300/30"
+                    >
+                      <h4 class="text-sm font-bold text-blue-100 mb-3">
+                        Request Status
+                      </h4>
+                      <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
+                        <div class="text-center">
+                          <div
+                            :class="
+                              getApprovalStatus('hod') === 'approved'
+                                ? 'bg-green-500'
+                                : getApprovalStatus('hod') === 'rejected'
+                                ? 'bg-red-500'
+                                : 'bg-yellow-500'
+                            "
+                            class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1"
+                          >
+                            <i
+                              :class="
+                                getApprovalStatus('hod') === 'approved'
+                                  ? 'fas fa-check'
+                                  : getApprovalStatus('hod') === 'rejected'
+                                  ? 'fas fa-times'
+                                  : 'fas fa-clock'
+                              "
+                              class="text-white text-sm"
+                            ></i>
+                          </div>
+                          <p class="text-xs text-white">HOD</p>
+                        </div>
+                        <div class="text-center">
+                          <div
+                            :class="
+                              getApprovalStatus('divisional') === 'approved'
+                                ? 'bg-green-500'
+                                : getApprovalStatus('divisional') === 'rejected'
+                                ? 'bg-red-500'
+                                : 'bg-yellow-500'
+                            "
+                            class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1"
+                          >
+                            <i
+                              :class="
+                                getApprovalStatus('divisional') === 'approved'
+                                  ? 'fas fa-check'
+                                  : getApprovalStatus('divisional') ===
+                                    'rejected'
+                                  ? 'fas fa-times'
+                                  : 'fas fa-clock'
+                              "
+                              class="text-white text-sm"
+                            ></i>
+                          </div>
+                          <p class="text-xs text-white">Divisional</p>
+                        </div>
+                        <div class="text-center">
+                          <div
+                            :class="
+                              getApprovalStatus('dict') === 'approved'
+                                ? 'bg-green-500'
+                                : getApprovalStatus('dict') === 'rejected'
+                                ? 'bg-red-500'
+                                : 'bg-yellow-500'
+                            "
+                            class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1"
+                          >
+                            <i
+                              :class="
+                                getApprovalStatus('dict') === 'approved'
+                                  ? 'fas fa-check'
+                                  : getApprovalStatus('dict') === 'rejected'
+                                  ? 'fas fa-times'
+                                  : 'fas fa-clock'
+                              "
+                              class="text-white text-sm"
+                            ></i>
+                          </div>
+                          <p class="text-xs text-white">DICT</p>
+                        </div>
+                        <div class="text-center">
+                          <div
+                            :class="
+                              getApprovalStatus('headOfIt') === 'approved'
+                                ? 'bg-green-500'
+                                : getApprovalStatus('headOfIt') === 'rejected'
+                                ? 'bg-red-500'
+                                : 'bg-yellow-500'
+                            "
+                            class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1"
+                          >
+                            <i
+                              :class="
+                                getApprovalStatus('headOfIt') === 'approved'
+                                  ? 'fas fa-check'
+                                  : getApprovalStatus('headOfIt') === 'rejected'
+                                  ? 'fas fa-times'
+                                  : 'fas fa-clock'
+                              "
+                              class="text-white text-sm"
+                            ></i>
+                          </div>
+                          <p class="text-xs text-white">Head IT</p>
+                        </div>
+                        <div class="text-center">
+                          <div
+                            :class="
+                              getApprovalStatus('ict') === 'approved'
+                                ? 'bg-green-500'
+                                : getApprovalStatus('ict') === 'rejected'
+                                ? 'bg-red-500'
+                                : 'bg-yellow-500'
+                            "
+                            class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1"
+                          >
+                            <i
+                              :class="
+                                getApprovalStatus('ict') === 'approved'
+                                  ? 'fas fa-check'
+                                  : getApprovalStatus('ict') === 'rejected'
+                                  ? 'fas fa-times'
+                                  : 'fas fa-clock'
+                              "
+                              class="text-white text-sm"
+                            ></i>
+                          </div>
+                          <p class="text-xs text-white">ICT Officer</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                      <button
+                        type="button"
+                        @click="goBackToRequests"
+                        class="px-6 py-3 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-lg hover:from-gray-700 hover:to-gray-800 transition-all duration-300 font-semibold flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105"
+                      >
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Back to Requests
+                      </button>
+
+                      <button
+                        v-if="canApproveAtStage()"
+                        type="button"
+                        @click="approveRequest"
+                        class="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-300 font-semibold flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105"
+                      >
+                        <i class="fas fa-check mr-2"></i>
+                        Approve Request
+                      </button>
+
+                      <button
+                        v-if="canApproveAtStage()"
+                        type="button"
+                        @click="rejectRequest"
+                        class="px-6 py-3 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-lg hover:from-red-700 hover:to-pink-700 transition-all duration-300 font-semibold flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105"
+                      >
+                        <i class="fas fa-times mr-2"></i>
+                        Reject Request
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Footer & Submit (Normal Mode) -->
+                  <div
+                    v-if="!isReviewMode"
+                    class="border-t-2 border-gray-200 pt-3"
+                  >
+                    <div
+                      class="flex flex-col sm:flex-row justify-between gap-3"
+                    >
+                      <button
+                        type="button"
+                        @click="onReset"
+                        class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all duration-300 font-semibold flex items-center justify-center shadow-lg hover:shadow-xl"
+                      >
+                        <svg
+                          class="w-4 h-4 mr-2"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fill-rule="evenodd"
+                            d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
+                            clip-rule="evenodd"
+                          />
+                        </svg>
+                        Reset Form
+                      </button>
+                      <button
+                        type="submit"
+                        class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300 font-semibold flex items-center justify-center shadow-lg hover:shadow-xl"
+                      >
+                        <svg
+                          class="w-4 h-4 mr-2"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clip-rule="evenodd"
+                          />
+                        </svg>
+                        Submit Request
+                      </button>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- Right: tabs -->
+                <section
+                  aria-labelledby="module-tabs"
+                  class="lg:col-span-1 space-y-4"
+                >
+                  <h2 id="module-tabs" class="sr-only">Module Details</h2>
+
+                  <!-- Desktop tabs -->
+                  <div class="hidden md:block">
+                    <div class="flex items-center gap-2 overflow-x-auto pb-1">
+                      <button
+                        v-for="t in tabs"
+                        :key="t.key"
+                        class="tab"
+                        :class="t.key === activeTab ? 'tab-active' : ''"
+                        @click="activeTab = t.key"
+                        :aria-selected="t.key === activeTab"
+                        role="tab"
+                      >
+                        {{ t.label }}
+                        <i
+                          class="fas fa-times ml-2 text-xs opacity-70 hover:opacity-100"
+                          @click.stop="tryCloseTab(t.key)"
+                        ></i>
+                      </button>
+                    </div>
+                    <div class="mt-2">
+                      <transition name="fade" mode="out-in">
+                        <div v-if="currentTab" :key="activeTab" class="card">
+                          <component
+                            :is="currentTab.component"
+                            v-model="moduleData[currentTab.key]"
+                          />
+                        </div>
+                      </transition>
+                    </div>
+                  </div>
+
+                  <!-- Mobile accordion -->
+                  <div class="md:hidden space-y-2">
+                    <div v-for="t in tabs" :key="t.key" class="card">
+                      <button
+                        class="w-full flex items-center justify-between text-left"
+                        @click="toggleAccordion(t.key)"
+                      >
+                        <span class="font-semibold">{{ t.label }}</span>
+                        <i
+                          :class="[
+                            'fas',
+                            openAccordions.has(t.key)
+                              ? 'fa-chevron-up'
+                              : 'fa-chevron-down',
+                          ]"
+                        ></i>
+                      </button>
+                      <transition name="fade">
+                        <div v-show="openAccordions.has(t.key)" class="mt-3">
+                          <component
+                            :is="t.component"
+                            v-model="moduleData[t.key]"
+                          />
+                          <div class="mt-3 text-right">
+                            <button
+                              class="btn-secondary btn-sm"
+                              @click="tryCloseTab(t.key)"
+                            >
+                              <i class="fas fa-times mr-1"></i> Remove
+                            </button>
+                          </div>
+                        </div>
+                      </transition>
+                    </div>
+                  </div>
+                </section>
               </div>
-            </section>
+            </form>
           </div>
-        </form>
-      </div>
         </div>
       </main>
+      <!-- Footer -->
+      <AppFooter />
     </div>
-    <AppFooter />
 
     <!-- Close Tab Confirmation Modal -->
     <transition name="fade">
-      <div v-if="confirm.key" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div
+        v-if="confirm.key"
+        class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      >
         <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-4">
-          <h3 class="text-lg font-semibold text-gray-800">Remove {{ confirm.label }}?</h3>
-          <p class="text-sm text-gray-600 mt-1">You have unsaved data in this module. Are you sure you want to close it?</p>
+          <h3 class="text-lg font-semibold text-gray-800">
+            Remove {{ confirm.label }}?
+          </h3>
+          <p class="text-sm text-gray-600 mt-1">
+            You have unsaved data in this module. Are you sure you want to close
+            it?
+          </p>
           <div class="mt-4 flex justify-end gap-2">
-            <button class="btn-secondary" @click="confirm = { key: '', label: '' }">Cancel</button>
-            <button class="btn-danger" @click="closeTab(confirm.key)">Remove</button>
+            <button
+              class="btn-secondary"
+              @click="confirm = { key: '', label: '' }"
+            >
+              Cancel
+            </button>
+            <button class="btn-danger" @click="closeTab(confirm.key)">
+              Remove
+            </button>
           </div>
         </div>
       </div>
@@ -1156,7 +1784,10 @@
 
     <!-- Success Toast -->
     <transition name="fade">
-      <div v-if="toast.show" class="fixed bottom-4 right-4 bg-green-600 text-white rounded-lg shadow-lg px-4 py-3 text-sm">
+      <div
+        v-if="toast.show"
+        class="fixed bottom-4 right-4 bg-green-600 text-white rounded-lg shadow-lg px-4 py-3 text-sm"
+      >
         {{ toast.message }}
       </div>
     </transition>
@@ -1170,7 +1801,8 @@
   backdrop-filter: blur(25px);
   -webkit-backdrop-filter: blur(25px);
   border: 2px solid rgba(96, 165, 250, 0.3);
-  box-shadow: 0 8px 32px rgba(29, 78, 216, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(29, 78, 216, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .medical-card {
@@ -1182,13 +1814,18 @@
 }
 
 .medical-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.2), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(96, 165, 250, 0.2),
+    transparent
+  );
   transition: left 0.5s;
 }
 
@@ -1213,13 +1850,25 @@
 
 /* Animations */
 @keyframes fade-in {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes fade-in-delay {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fade-in {
@@ -1298,7 +1947,7 @@ const WellsoftPanel = {
 const JeevaPanel = {
   props: ['modelValue'],
   emits: ['update:modelValue'],
-  data(){
+  data() {
     return {
       open: false,
       focusIndex: 0,
@@ -1312,28 +1961,51 @@ const JeevaPanel = {
       ]
     }
   },
-  methods:{
-    isSelected(label){
+  methods: {
+    isSelected(label) {
       const sel = this.modelValue?.selections || []
       return sel.includes(label)
     },
-    toggle(label){
+    toggle(label) {
       // enforce mutual exclusivity between Use and Revoke
       let sel = [...(this.modelValue?.selections || [])]
-      if (label === 'Use') sel = sel.filter(v => v !== 'Revoke')
-      if (label === 'Revoke') sel = sel.filter(v => v !== 'Use')
-      if (sel.includes(label)) sel = sel.filter(v => v !== label); else sel.push(label)
-      this.$emit('update:modelValue', { ...(this.modelValue||{}), selections: sel })
+      if (label === 'Use') sel = sel.filter((v) => v !== 'Revoke')
+      if (label === 'Revoke') sel = sel.filter((v) => v !== 'Use')
+      if (sel.includes(label)) sel = sel.filter((v) => v !== label)
+      else sel.push(label)
+      this.$emit('update:modelValue', {
+        ...(this.modelValue || {}),
+        selections: sel
+      })
     },
-    close(){ this.open = false },
-    onKeydown(e){
-      if (!this.open && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); this.open = true; return }
+    close() {
+      this.open = false
+    },
+    onKeydown(e) {
+      if (!this.open && (e.key === 'Enter' || e.key === ' ')) {
+        e.preventDefault()
+        this.open = true
+        return
+      }
       if (!this.open) return
-      if (e.key === 'Escape'){ e.preventDefault(); this.open = false; return }
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        this.open = false
+        return
+      }
       const max = this.options.length - 1
-      if (e.key === 'ArrowDown'){ e.preventDefault(); this.focusIndex = Math.min(max, this.focusIndex+1) }
-      if (e.key === 'ArrowUp'){ e.preventDefault(); this.focusIndex = Math.max(0, this.focusIndex-1) }
-      if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); this.toggle(this.options[this.focusIndex]) }
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        this.focusIndex = Math.min(max, this.focusIndex + 1)
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        this.focusIndex = Math.max(0, this.focusIndex - 1)
+      }
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        this.toggle(this.options[this.focusIndex])
+      }
     }
   },
   template: `<div class="space-y-4">
@@ -1499,23 +2171,23 @@ const InternetPanel = {
 }
 
 import { ref } from 'vue'
-import AppHeader from '@/components/header.vue'
+import Header from '@/components/header.vue'
 import DynamicSidebar from '@/components/DynamicSidebar.vue'
 import AppFooter from '@/components/footer.vue'
 
 export default {
   name: 'BothServiveForm',
-  components: { 
-    WellsoftPanel, 
-    JeevaPanel, 
+  components: {
+    WellsoftPanel,
+    JeevaPanel,
     InternetPanel,
-    AppHeader,
+    Header,
     DynamicSidebar,
     AppFooter
   },
   setup() {
     const sidebarCollapsed = ref(false)
-    
+
     return {
       sidebarCollapsed
     }
@@ -1540,14 +2212,66 @@ export default {
       // Jeeva Requested for selector state
       jeevaItemOpen: false,
       jeevaItemFocusIndex: 0,
-      jeevaItemOptions: ['Use','Revoke','Access Rights','Approval','Comments','For Implementation'],
+      jeevaItemOptions: [
+        'Use',
+        'Revoke',
+        'Access Rights',
+        'Approval',
+        'Comments',
+        'For Implementation'
+      ],
       jeevaItemSelections: [],
       // From Wellsoft form
-      wellsoftModules: ['Registrar','Specialist','Cashier','Resident Nurse','Intern Doctor','Intern Nurse','Medical Recorder','Social Worker','Quality Officer','Administrator','Health Attendant'],
+      wellsoftModules: [
+        'Registrar',
+        'Specialist',
+        'Cashier',
+        'Resident Nurse',
+        'Intern Doctor',
+        'Intern Nurse',
+        'Medical Recorder',
+        'Social Worker',
+        'Quality Officer',
+        'Administrator',
+        'Health Attendant'
+      ],
       // From Jeeva form (names extracted)
-      jeevaModules: ['FINANCIAL ACCOUNTING','DOCTOR CONSULTATION','MEDICAL RECORDS','OUTPATIENT','NURSING STATION','INPATIENT','IP CASHIER','HIV','LINEN & LAUNDRY','FIXED ASSETS','PMTCT','PHARMACY','BILL NOTE','BLOOD BANK','ORDER MANAGEMENT','PRIVATE CREDIT','LABORATORY','GENERAL STORE','IP BILLING','RADIOLOGY','PURCHASE','SCROLLING','OPERATION THEATRE','CSSD','WEB INDENT','MORTUARY','GENERAL MAINTENANCE','PERSONNEL','MAINTENANCE','PAYROLL','CMS','MIS STATISTICS'],
+      jeevaModules: [
+        'FINANCIAL ACCOUNTING',
+        'DOCTOR CONSULTATION',
+        'MEDICAL RECORDS',
+        'OUTPATIENT',
+        'NURSING STATION',
+        'INPATIENT',
+        'IP CASHIER',
+        'HIV',
+        'LINEN & LAUNDRY',
+        'FIXED ASSETS',
+        'PMTCT',
+        'PHARMACY',
+        'BILL NOTE',
+        'BLOOD BANK',
+        'ORDER MANAGEMENT',
+        'PRIVATE CREDIT',
+        'LABORATORY',
+        'GENERAL STORE',
+        'IP BILLING',
+        'RADIOLOGY',
+        'PURCHASE',
+        'SCROLLING',
+        'OPERATION THEATRE',
+        'CSSD',
+        'WEB INDENT',
+        'MORTUARY',
+        'GENERAL MAINTENANCE',
+        'PERSONNEL',
+        'MAINTENANCE',
+        'PAYROLL',
+        'CMS',
+        'MIS STATISTICS'
+      ],
       // Suggested Internet purposes
-      internetPurposes: ['Research','Training','Remote Work','Telemedicine','Email/Communication'],
+      // internetPurposes: ['Research','Training','Remote Work','Telemedicine','Email/Communication'], // Removed duplicate - using the one in form data
 
       form: {
         shared: { pfNumber: '', staffName: '', department: '', phone: '' },
@@ -1593,10 +2317,11 @@ export default {
 
       selectedWellsoft: [],
       selectedJeeva: [],
+      wellsoftRequestType: 'use',
       // search queries
       wellsoftQuery: '',
       jeevaQuery: '',
-      internetQuery: '',
+      internetPurposes: ['', '', '', ''],
 
       tabs: [],
       activeTab: '',
@@ -1605,20 +2330,24 @@ export default {
 
       confirm: { key: '', label: '' },
       toast: { show: false, message: '' },
-      errors: { pfNumber: '', staffName: '' },
+      errors: { pfNumber: '', staffName: '' }
     }
   },
   computed: {
-    currentTab() 
-    { 
-      return this.tabs.find(t => t.key === this.activeTab) || null },
+    currentTab() {
+      return this.tabs.find((t) => t.key === this.activeTab) || null
+    },
     filteredWellsoft() {
       const q = (this.wellsoftQuery || '').toLowerCase()
-      return !q ? this.wellsoftModules : this.wellsoftModules.filter(m => m.toLowerCase().includes(q))
+      return !q
+        ? this.wellsoftModules
+        : this.wellsoftModules.filter((m) => m.toLowerCase().includes(q))
     },
     filteredJeeva() {
       const q = (this.jeevaQuery || '').toLowerCase()
-      return !q ? this.jeevaModules : this.jeevaModules.filter(m => m.toLowerCase().includes(q))
+      return !q
+        ? this.jeevaModules
+        : this.jeevaModules.filter((m) => m.toLowerCase().includes(q))
     },
 
     summaryErrors() {
@@ -1630,10 +2359,13 @@ export default {
 
       // Defensive guards for inline Jeeva block
       const ji = this.jeevaInline || {}
-      if (!ji.accessType) list.push('Jeeva Access Rights: Please select Permanent or Temporary.')
+      if (!ji.accessType)
+        list.push('Jeeva Access Rights: Please select Permanent or Temporary.')
       if (ji.accessType === 'temporary') {
         if (!ji.tempMonth || !ji.tempDay || !ji.tempYear) {
-          list.push('Jeeva Access Rights: Please provide complete Temporary Until date (MM/DD/YYYY).')
+          list.push(
+            'Jeeva Access Rights: Please provide complete Temporary Until date (MM/DD/YYYY).'
+          )
         }
       }
 
@@ -1643,11 +2375,12 @@ export default {
       tabs.forEach((t) => {
         if (!t || !t.key) return
         const d = data[t.key] || null
-        if ((t.type === 'wellsoft' || t.type === 'jeeva')) {
+        if (t.type === 'wellsoft' || t.type === 'jeeva') {
           const access = d && typeof d === 'object' ? d.accessType : undefined
-          if (!access) list.push(`${t.label || 'Module'}: Access Type is required.`)
+          if (!access)
+            list.push(`${t.label || 'Module'}: Access Type is required.`)
         }
-        if (t.type === 'internet' && !this.internetQuery.trim()) {
+        if (t.type === 'internet' && !this.internetPurposes[0].trim()) {
           list.push('Internet Purpose is required.')
         }
       })
@@ -1655,102 +2388,169 @@ export default {
     }
   },
   watch: {
-    selectedWellsoft: { handler(v){ this.syncTabs('wellsoft', v) }, deep: true },
-    selectedJeeva: { handler(v){ this.syncTabs('jeeva', v) }, deep: true },
+    selectedWellsoft: {
+      handler(v) {
+        this.syncTabs('wellsoft', v)
+      },
+      deep: true
+    },
+    selectedJeeva: {
+      handler(v) {
+        this.syncTabs('jeeva', v)
+      },
+      deep: true
+    }
   },
   methods: {
     // Jeeva Requested for selector handlers
-    isJeevaItemSelected(label){ return this.jeevaItemSelections.includes(label) },
-    toggleJeevaItem(label){
+    isJeevaItemSelected(label) {
+      return this.jeevaItemSelections.includes(label)
+    },
+    toggleJeevaItem(label) {
       let sel = [...this.jeevaItemSelections]
-      if (label === 'Use') sel = sel.filter(v => v !== 'Revoke')
-      if (label === 'Revoke') sel = sel.filter(v => v !== 'Use')
-      if (sel.includes(label)) sel = sel.filter(v => v !== label); else sel.push(label)
+      if (label === 'Use') sel = sel.filter((v) => v !== 'Revoke')
+      if (label === 'Revoke') sel = sel.filter((v) => v !== 'Use')
+      if (sel.includes(label)) sel = sel.filter((v) => v !== label)
+      else sel.push(label)
       this.jeevaItemSelections = sel
       // propagate into first Jeeva tab if exists
-      const firstJeeva = this.tabs.find(t => t.type==='jeeva')
+      const firstJeeva = this.tabs.find((t) => t.type === 'jeeva')
       if (firstJeeva) {
         const cur = this.moduleData[firstJeeva.key] || {}
         this.moduleData[firstJeeva.key] = { ...cur, selections: sel }
       }
     },
-    onJeevaItemsKeydown(e){
-      if (!this.jeevaItemOpen && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); this.jeevaItemOpen = true; return }
+    onJeevaItemsKeydown(e) {
+      if (!this.jeevaItemOpen && (e.key === 'Enter' || e.key === ' ')) {
+        e.preventDefault()
+        this.jeevaItemOpen = true
+        return
+      }
       if (!this.jeevaItemOpen) return
-      if (e.key === 'Escape'){ e.preventDefault(); this.jeevaItemOpen = false; return }
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        this.jeevaItemOpen = false
+        return
+      }
       const max = this.jeevaItemOptions.length - 1
-      if (e.key === 'ArrowDown'){ e.preventDefault(); this.jeevaItemFocusIndex = Math.min(max, this.jeevaItemFocusIndex+1) }
-      if (e.key === 'ArrowUp'){ e.preventDefault(); this.jeevaItemFocusIndex = Math.max(0, this.jeevaItemFocusIndex-1) }
-      if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); this.toggleJeevaItem(this.jeevaItemOptions[this.jeevaItemFocusIndex]) }
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        this.jeevaItemFocusIndex = Math.min(max, this.jeevaItemFocusIndex + 1)
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        this.jeevaItemFocusIndex = Math.max(0, this.jeevaItemFocusIndex - 1)
+      }
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        this.toggleJeevaItem(this.jeevaItemOptions[this.jeevaItemFocusIndex])
+      }
     },
 
-
     // Tabs
-    syncTabs(type, values){
+    syncTabs(type, values) {
       const prefix = { wellsoft: 'W', jeeva: 'J', internet: 'I' }[type]
       const newTabs = []
       const newData = { ...this.moduleData }
-      values.forEach(val => { const key = `${prefix}:${val}`; if (!newData[key]) newData[key] = {}; newTabs.push({ key, label: val, type, component: this.componentFor(type) }) })
+      values.forEach((val) => {
+        const key = `${prefix}:${val}`
+        if (!newData[key]) newData[key] = {}
+        newTabs.push({
+          key,
+          label: val,
+          type,
+          component: this.componentFor(type)
+        })
+      })
       this.tabs = newTabs
       this.moduleData = newData
       this.activeTab = this.tabs[0]?.key || ''
     },
 
     // Helpers
-    isSelected(type, value){
-      if (type==='wellsoft') return this.selectedWellsoft.includes(value)
-      if (type==='jeeva') return this.selectedJeeva.includes(value)
+    isSelected(type, value) {
+      if (type === 'wellsoft') return this.selectedWellsoft.includes(value)
+      if (type === 'jeeva') return this.selectedJeeva.includes(value)
       return false
     },
-    toggleWellsoft(m){
+    toggleWellsoft(m) {
       this.selectedWellsoft = this.isSelected('wellsoft', m)
-        ? this.selectedWellsoft.filter(x=>x!==m)
+        ? this.selectedWellsoft.filter((x) => x !== m)
         : [...this.selectedWellsoft, m]
     },
-    toggleJeeva(m){
+    toggleJeeva(m) {
       this.selectedJeeva = this.isSelected('jeeva', m)
-        ? this.selectedJeeva.filter(x=>x!==m)
+        ? this.selectedJeeva.filter((x) => x !== m)
         : [...this.selectedJeeva, m]
     },
-    selectAll(type){
-      if (type==='wellsoft') this.selectedWellsoft = [...this.wellsoftModules]
-      if (type==='jeeva') this.selectedJeeva = [...this.jeevaModules]
+    selectAll(type) {
+      if (type === 'wellsoft')
+        this.selectedWellsoft = [...this.wellsoftModules]
+      if (type === 'jeeva') this.selectedJeeva = [...this.jeevaModules]
     },
-    clearAll(type){
-      if (type==='wellsoft') this.selectedWellsoft = []
-      if (type==='jeeva') this.selectedJeeva = []
+    clearAll(type) {
+      if (type === 'wellsoft') this.selectedWellsoft = []
+      if (type === 'jeeva') this.selectedJeeva = []
     },
-    componentFor(type){ if (type==='wellsoft') return 'WellsoftPanel'; if (type==='jeeva') return 'JeevaPanel'; return 'InternetPanel' },
-    toggleAccordion(key){ this.openAccordions.has(key) ? this.openAccordions.delete(key) : this.openAccordions.add(key) },
-    tryCloseTab(key){ const t = this.tabs.find(x=>x.key===key); if (!t) return; this.confirm = { key, label: t.label } },
-    closeTab(key){
-      this.tabs = this.tabs.filter(t=>t.key!==key)
-      const data = { ...this.moduleData }; delete data[key]; this.moduleData = data
+    componentFor(type) {
+      if (type === 'wellsoft') return 'WellsoftPanel'
+      if (type === 'jeeva') return 'JeevaPanel'
+      return 'InternetPanel'
+    },
+    toggleAccordion(key) {
+      this.openAccordions.has(key)
+        ? this.openAccordions.delete(key)
+        : this.openAccordions.add(key)
+    },
+    tryCloseTab(key) {
+      const t = this.tabs.find((x) => x.key === key)
+      if (!t) return
+      this.confirm = { key, label: t.label }
+    },
+    closeTab(key) {
+      this.tabs = this.tabs.filter((t) => t.key !== key)
+      const data = { ...this.moduleData }
+      delete data[key]
+      this.moduleData = data
       const [p, v] = key.split(':')
-      if (p==='W') this.selectedWellsoft = this.selectedWellsoft.filter(x=>x!==v)
-      if (p==='J') this.selectedJeeva = this.selectedJeeva.filter(x=>x!==v)
+      if (p === 'W')
+        this.selectedWellsoft = this.selectedWellsoft.filter((x) => x !== v)
+      if (p === 'J')
+        this.selectedJeeva = this.selectedJeeva.filter((x) => x !== v)
       this.confirm = { key: '', label: '' }
       this.activeTab = this.tabs[0]?.key || ''
     },
 
     // Submit
-    onSubmit(){
+    onSubmit() {
       this.errors = { pfNumber: '', staffName: '' }
-      if (!this.form.shared.pfNumber) this.errors.pfNumber = 'PF Number is required.'
-      if (!this.form.shared.staffName) this.errors.staffName = 'Staff Name is required.'
+      if (!this.form.shared.pfNumber)
+        this.errors.pfNumber = 'PF Number is required.'
+      if (!this.form.shared.staffName)
+        this.errors.staffName = 'Staff Name is required.'
       if (this.summaryErrors.length) return
 
       const payload = {
         shared: { ...this.form.shared },
         jeevaInline: { ...this.jeevaInline },
-        modules: this.tabs.map(t => ({ type: t.type, name: t.label, details: this.moduleData[t.key] || {} })),
-        internetPurpose: this.internetQuery,
+        modules: this.tabs.map((t) => ({
+          type: t.type,
+          name: t.label,
+          details: this.moduleData[t.key] || {}
+        })),
+        internetPurposes: this.internetPurposes.filter((purpose) =>
+          purpose.trim()
+        ),
+        wellsoftRequestType: this.wellsoftRequestType
       }
       console.log('Submitting payload', payload)
-      this.toast = { show: true, message: 'Combined request submitted. You will receive updates.' }
-      setTimeout(()=> this.toast.show = false, 3000)
+      this.toast = {
+        show: true,
+        message: 'Combined request submitted. You will receive updates.'
+      }
+      setTimeout(() => (this.toast.show = false), 3000)
     },
-    onReset(){
+    onReset() {
       this.form = {
         shared: { pfNumber: '', staffName: '', department: '', phone: '' },
         accessRights: {
@@ -1792,9 +2592,16 @@ export default {
           }
         }
       }
-      this.selectedWellsoft = []; this.selectedJeeva = []
-      this.wellsoftQuery = ''; this.jeevaQuery = ''; this.internetQuery = ''
-      this.tabs = []; this.moduleData = {}; this.activeTab = ''; this.openAccordions.clear()
+      this.selectedWellsoft = []
+      this.selectedJeeva = []
+      this.wellsoftQuery = ''
+      this.jeevaQuery = ''
+      this.internetPurposes = ['', '', '', '']
+      this.wellsoftRequestType = 'use'
+      this.tabs = []
+      this.moduleData = {}
+      this.activeTab = ''
+      this.openAccordions.clear()
       this.errors = { pfNumber: '', staffName: '' }
       // Reset signatures
       this.signaturePreview = ''
@@ -1819,7 +2626,7 @@ export default {
     onSignatureChange(e) {
       const file = e.target.files[0]
       this.form.shared.signature = file || null
-      
+
       if (!file) {
         this.signaturePreview = ''
         this.signatureFileName = ''
@@ -1827,7 +2634,12 @@ export default {
       }
 
       // Validate file type
-      const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf']
+      const allowedTypes = [
+        'image/png',
+        'image/jpeg',
+        'image/jpg',
+        'application/pdf'
+      ]
       if (!allowedTypes.includes(file.type)) {
         this.showNotification('Please select a valid file (PNG, JPG, or PDF)')
         this.clearSignature()
@@ -1842,7 +2654,7 @@ export default {
       }
 
       this.signatureFileName = file.name
-      
+
       if (file.type.startsWith('image/')) {
         const reader = new FileReader()
         reader.onload = () => {
@@ -1880,14 +2692,19 @@ export default {
     onHodSignatureChange(e) {
       const file = e.target.files[0]
       this.form.approvals.hod.signature = file || null
-      
+
       if (!file) {
         this.hodSignaturePreview = ''
         this.hodSignatureFileName = ''
         return
       }
 
-      const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf']
+      const allowedTypes = [
+        'image/png',
+        'image/jpeg',
+        'image/jpg',
+        'application/pdf'
+      ]
       if (!allowedTypes.includes(file.type)) {
         this.showNotification('Please select a valid file (PNG, JPG, or PDF)')
         this.clearHodSignature()
@@ -1901,7 +2718,7 @@ export default {
       }
 
       this.hodSignatureFileName = file.name
-      
+
       if (file.type.startsWith('image/')) {
         const reader = new FileReader()
         reader.onload = () => {
@@ -1930,14 +2747,19 @@ export default {
     onDivDirectorSignatureChange(e) {
       const file = e.target.files[0]
       this.form.approvals.divisionalDirector.signature = file || null
-      
+
       if (!file) {
         this.divDirectorSignaturePreview = ''
         this.divDirectorSignatureFileName = ''
         return
       }
 
-      const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf']
+      const allowedTypes = [
+        'image/png',
+        'image/jpeg',
+        'image/jpg',
+        'application/pdf'
+      ]
       if (!allowedTypes.includes(file.type)) {
         this.showNotification('Please select a valid file (PNG, JPG, or PDF)')
         this.clearDivDirectorSignature()
@@ -1951,7 +2773,7 @@ export default {
       }
 
       this.divDirectorSignatureFileName = file.name
-      
+
       if (file.type.startsWith('image/')) {
         const reader = new FileReader()
         reader.onload = () => {
@@ -1980,14 +2802,19 @@ export default {
     onDirectorICTSignatureChange(e) {
       const file = e.target.files[0]
       this.form.approvals.directorICT.signature = file || null
-      
+
       if (!file) {
         this.directorICTSignaturePreview = ''
         this.directorICTSignatureFileName = ''
         return
       }
 
-      const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf']
+      const allowedTypes = [
+        'image/png',
+        'image/jpeg',
+        'image/jpg',
+        'application/pdf'
+      ]
       if (!allowedTypes.includes(file.type)) {
         this.showNotification('Please select a valid file (PNG, JPG, or PDF)')
         this.clearDirectorICTSignature()
@@ -2001,7 +2828,7 @@ export default {
       }
 
       this.directorICTSignatureFileName = file.name
-      
+
       if (file.type.startsWith('image/')) {
         const reader = new FileReader()
         reader.onload = () => {
@@ -2030,14 +2857,19 @@ export default {
     onHeadITSignatureChange(e) {
       const file = e.target.files[0]
       this.form.implementation.headIT.signature = file || null
-      
+
       if (!file) {
         this.headITSignaturePreview = ''
         this.headITSignatureFileName = ''
         return
       }
 
-      const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf']
+      const allowedTypes = [
+        'image/png',
+        'image/jpeg',
+        'image/jpg',
+        'application/pdf'
+      ]
       if (!allowedTypes.includes(file.type)) {
         this.showNotification('Please select a valid file (PNG, JPG, or PDF)')
         this.clearHeadITSignature()
@@ -2051,7 +2883,7 @@ export default {
       }
 
       this.headITSignatureFileName = file.name
-      
+
       if (file.type.startsWith('image/')) {
         const reader = new FileReader()
         reader.onload = () => {
@@ -2080,14 +2912,19 @@ export default {
     onIctOfficerSignatureChange(e) {
       const file = e.target.files[0]
       this.form.implementation.ictOfficer.signature = file || null
-      
+
       if (!file) {
         this.ictOfficerSignaturePreview = ''
         this.ictOfficerSignatureFileName = ''
         return
       }
 
-      const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf']
+      const allowedTypes = [
+        'image/png',
+        'image/jpeg',
+        'image/jpg',
+        'application/pdf'
+      ]
       if (!allowedTypes.includes(file.type)) {
         this.showNotification('Please select a valid file (PNG, JPG, or PDF)')
         this.clearIctOfficerSignature()
@@ -2101,7 +2938,7 @@ export default {
       }
 
       this.ictOfficerSignatureFileName = file.name
-      
+
       if (file.type.startsWith('image/')) {
         const reader = new FileReader()
         reader.onload = () => {
@@ -2128,8 +2965,13 @@ export default {
 <style scoped>
 /* Medical Background Animations */
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
 }
 
 .animate-float {
@@ -2178,50 +3020,87 @@ input[type="radio"]:focus {
 /* Enhanced form sections */
 .border-l-2 {
   position: relative;
-  background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1),
+    rgba(255, 255, 255, 0.05)
+  );
   border-radius: 12px;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
 }
 
 .border-l-2:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
 }
 
 /* Full width responsive container */
-.label { @apply block text-sm font-medium text-gray-700 mb-1; }
-.input { @apply w-full rounded-lg border border-gray-300 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary; }
-.btn-primary { @apply inline-flex items-center px-6 py-3 rounded-lg bg-primary text-white text-base font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition shadow-md hover:shadow-lg; }
-.btn-secondary { @apply inline-flex items-center px-6 py-3 rounded-lg bg-gray-100 text-gray-800 text-base font-semibold hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition shadow-md hover:shadow-lg; }
-.btn-danger { @apply inline-flex items-center px-4 py-2 rounded-md bg-red-600 text-white text-sm font-medium hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition; }
-.btn-sm { @apply px-2 py-1 text-xs; }
-.card { @apply bg-white rounded-lg shadow-md border border-gray-200 p-4 mb-3; }
-.error { @apply text-xs text-red-600 mt-1; }
-.tab { @apply inline-flex items-center px-3 py-2 rounded-md bg-white border border-gray-200 text-sm text-gray-700 hover:bg-gray-50 transition; }
-.tab-active { @apply bg-blue-50 border-blue-300 text-blue-800; }
-.fade-enter-active, .fade-leave-active { transition: opacity .2s, transform .2s; }
-.fade-enter-from, .fade-leave-to { opacity: 0; transform: translateY(4px); }
-.focus\:ring-primary { --tw-ring-color: #1E40AF; }
-.option-tile { @apply flex items-center gap-2 px-2 py-2 rounded-md border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 text-left text-sm; }
-.option-tile-active { @apply border-blue-300 bg-blue-50; }
+.label {
+  @apply block text-sm font-medium text-gray-700 mb-1;
+}
+.input {
+  @apply w-full rounded-lg border border-gray-300 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary;
+}
+.btn-primary {
+  @apply inline-flex items-center px-6 py-3 rounded-lg bg-primary text-white text-base font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition shadow-md hover:shadow-lg;
+}
+.btn-secondary {
+  @apply inline-flex items-center px-6 py-3 rounded-lg bg-gray-100 text-gray-800 text-base font-semibold hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition shadow-md hover:shadow-lg;
+}
+.btn-danger {
+  @apply inline-flex items-center px-4 py-2 rounded-md bg-red-600 text-white text-sm font-medium hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition;
+}
+.btn-sm {
+  @apply px-2 py-1 text-xs;
+}
+.card {
+  @apply bg-white rounded-lg shadow-md border border-gray-200 p-4 mb-3;
+}
+.error {
+  @apply text-xs text-red-600 mt-1;
+}
+.tab {
+  @apply inline-flex items-center px-3 py-2 rounded-md bg-white border border-gray-200 text-sm text-gray-700 hover:bg-gray-50 transition;
+}
+.tab-active {
+  @apply bg-blue-50 border-blue-300 text-blue-800;
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s, transform 0.2s;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(4px);
+}
+.focus\:ring-primary {
+  --tw-ring-color: #1e40af;
+}
+.option-tile {
+  @apply flex items-center gap-2 px-2 py-2 rounded-md border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 text-left text-sm;
+}
+.option-tile-active {
+  @apply border-blue-300 bg-blue-50;
+}
 
 /* Print styles */
 @media print {
   .min-h-screen {
     min-height: auto;
   }
-  
+
   button {
     display: none;
   }
-  
+
   .shadow-xl {
     box-shadow: none;
   }
-  
+
   .bg-gradient-to-br {
     background: white;
   }
@@ -2232,11 +3111,11 @@ input[type="radio"]:focus {
   .grid-cols-4 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  
+
   .grid-cols-3 {
     grid-template-columns: repeat(1, minmax(0, 1fr));
   }
-  
+
   .grid-cols-2 {
     grid-template-columns: repeat(1, minmax(0, 1fr));
   }
@@ -2246,7 +3125,7 @@ input[type="radio"]:focus {
   .lg\:grid-cols-4 {
     grid-template-columns: repeat(1, minmax(0, 1fr));
   }
-  
+
   .md\:grid-cols-3 {
     grid-template-columns: repeat(1, minmax(0, 1fr));
   }

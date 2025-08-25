@@ -33,30 +33,74 @@
 
 /* Custom utility classes for legacy widths/margins used in views */
 @layer utilities {
-  .max-w-500 { max-width: 500px; }
-  .max-h-500 { max-height: 500px; }
-  .w-30 { width: 7.5rem; }
-  .w-40 { width: 10rem; }
-  .w-65 { width: 16.25rem; }
-  .w-90 { width: 22.5rem; }
-  .w-200 { width: 50rem; }
-  .max-w-24 { max-width: 6rem; }
-  .max-h-16 { max-height: 4rem; }
-  .max-w-30 { max-width: 7.5rem; }
-  .max-h-30 { max-height: 7.5rem; }
-  .border-1 { border-width: 1px; }
-  .border-t-3 { border-top-width: 3px; }
-  .gap-100 { gap: 25rem; }
-  .pr-98 { padding-right: 24.5rem; }
-  .ml-90 { margin-left: 22.5rem; }
+  .max-w-500 {
+    max-width: 500px;
+  }
+  .max-h-500 {
+    max-height: 500px;
+  }
+  .w-30 {
+    width: 7.5rem;
+  }
+  .w-40 {
+    width: 10rem;
+  }
+  .w-65 {
+    width: 16.25rem;
+  }
+  .w-90 {
+    width: 22.5rem;
+  }
+  .w-200 {
+    width: 50rem;
+  }
+  .max-w-24 {
+    max-width: 6rem;
+  }
+  .max-h-16 {
+    max-height: 4rem;
+  }
+  .max-w-30 {
+    max-width: 7.5rem;
+  }
+  .max-h-30 {
+    max-height: 7.5rem;
+  }
+  .border-1 {
+    border-width: 1px;
+  }
+  .border-t-3 {
+    border-top-width: 3px;
+  }
+  .gap-100 {
+    gap: 25rem;
+  }
+  .pr-98 {
+    padding-right: 24.5rem;
+  }
+  .ml-90 {
+    margin-left: 22.5rem;
+  }
 }
 
 /* Make oversized spacing responsive to avoid overflow on small screens */
 @media (max-width: 768px) {
-  .ml-90 { margin-left: 0 !important; }
-  .pr-98 { padding-right: 0 !important; }
-  .gap-100 { gap: 1rem !important; }
-  .w-200 { width: 100% !important; }
-  .w-65 { width: 100% !important; }
-  .w-40 { width: 100% !important; }
+  .ml-90 {
+    margin-left: 0 !important;
+  }
+  .pr-98 {
+    padding-right: 0 !important;
+  }
+  .gap-100 {
+    gap: 1rem !important;
+  }
+  .w-200 {
+    width: 100% !important;
+  }
+  .w-65 {
+    width: 100% !important;
+  }
+  .w-40 {
+    width: 100% !important;
+  }
 }
