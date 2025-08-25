@@ -1378,11 +1378,12 @@
                 </div>
               </div>
             </form>
+
+            <!-- Footer -->
+            <AppFooter />
           </div>
         </div>
       </main>
-      <!-- Footer -->
-      <AppFooter />
     </div>
   </div>
 </template>

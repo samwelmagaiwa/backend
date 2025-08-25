@@ -97,11 +97,12 @@
                 </div>
               </div>
             </div>
+
+            <!-- Footer -->
+            <AppFooter />
           </div>
         </div>
       </main>
-      <!-- Footer -->
-      <AppFooter />
     </div>
   </div>
 </template>

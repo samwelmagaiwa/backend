@@ -487,12 +487,13 @@
                   </div>
                 </div>
               </div>
+
+              <!-- Footer -->
+              <AppFooter />
             </div>
           </div>
         </div>
       </main>
-      <!-- Footer -->
-      <AppFooter />
     </div>
 
 

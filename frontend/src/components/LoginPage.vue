@@ -369,7 +369,6 @@ export default {
   }
 }
 </script>
-</script>
 
 <style scoped>
 /* Define primary color */

@@ -51,10 +51,11 @@
 
         <div class="max-w-full mx-auto relative z-10">
           <UserManagementDropdown :defaultOpen="true" />
+
+          <!-- Footer -->
+          <AppFooter />
         </div>
       </main>
-      <!-- Footer -->
-      <AppFooter />
     </div>
   </div>
 </template>

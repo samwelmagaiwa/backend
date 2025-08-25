@@ -296,6 +296,14 @@ export default {
     // User management actions
     const userManagementActions = ref([
       {
+        title: 'Onboarding Reset',
+        description: 'Reset user onboarding status',
+        icon: 'fas fa-undo-alt',
+        gradient: 'from-orange-500 to-red-600',
+        border: 'border-orange-300/50',
+        route: '/admin/onboarding-reset'
+      },
+      {
         title: 'Jeeva Users',
         description: 'Manage Jeeva system users',
         icon: 'fas fa-heartbeat',
@@ -330,14 +338,6 @@ export default {
         gradient: 'from-gray-500 to-slate-600',
         border: 'border-gray-300/50',
         route: '/settings'
-      },
-      {
-        title: 'Performance Monitor',
-        description: 'Monitor system performance',
-        icon: 'fas fa-chart-line',
-        gradient: 'from-teal-500 to-cyan-600',
-        border: 'border-teal-300/50',
-        route: '/performance-test'
       },
       {
         title: 'Diagnostic Tools',
