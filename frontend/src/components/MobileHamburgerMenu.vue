@@ -208,110 +208,12 @@
 
             <!-- Forms Submenu -->
             <div class="space-y-1">
-              <!-- COMMENTED OUT: Individual forms - now using Combined Access Form only -->
-              <!-- 
-              <!-- Jeeva Access Form -->
-              <router-link
-                :to="getFormRoute('jeeva')"
-                @click="closeMenu"
-                class="flex items-center px-6 py-4 text-white hover:bg-gradient-to-r hover:from-green-600/30 hover:to-emerald-600/30 transition-all duration-300 group relative overflow-hidden border-l-4 border-transparent hover:border-green-400"
-                :class="{
-                  'bg-gradient-to-r from-green-600/30 to-emerald-600/30 border-green-400':
-                    isFormActive('jeeva'),
-                }"
-              >
-                <div
-                  class="absolute inset-0 bg-gradient-to-r from-green-600/10 to-emerald-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                ></div>
-                <div
-                  class="w-10 h-10 bg-gradient-to-br from-green-600/40 to-green-500/40 rounded-lg flex items-center justify-center mr-4 group-hover:bg-gradient-to-br group-hover:from-green-500 group-hover:to-emerald-500 transition-all duration-300 shadow-lg border border-green-400/30"
-                >
-                  <i
-                    class="fas fa-file-medical text-green-200 group-hover:text-white transition-colors duration-300"
-                  ></i>
-                </div>
-                <div class="flex-1 relative z-10">
-                  <span class="font-medium drop-shadow-sm">Jeeva Access</span>
-                  <p
-                    class="text-xs text-blue-200 opacity-80 group-hover:opacity-100 transition-opacity duration-300"
-                  >
-                    Medical records system
-                  </p>
-                </div>
-                <i
-                  class="fas fa-chevron-right text-blue-300 group-hover:text-white text-sm transition-all duration-300 group-hover:translate-x-1"
-                ></i>
-              </router-link>
+              <!-- COMMENTED OUT: Individual forms - now using Combined Access Form only
 
-              <!-- Wellsoft Access Form -->
-              <router-link
-                :to="getFormRoute('wellsoft')"
-                @click="closeMenu"
-                class="flex items-center px-6 py-4 text-white hover:bg-gradient-to-r hover:from-purple-600/30 hover:to-indigo-600/30 transition-all duration-300 group relative overflow-hidden border-l-4 border-transparent hover:border-purple-400"
-                :class="{
-                  'bg-gradient-to-r from-purple-600/30 to-indigo-600/30 border-purple-400':
-                    isFormActive('wellsoft'),
-                }"
-              >
-                <div
-                  class="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-indigo-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                ></div>
-                <div
-                  class="w-10 h-10 bg-gradient-to-br from-purple-600/40 to-purple-500/40 rounded-lg flex items-center justify-center mr-4 group-hover:bg-gradient-to-br group-hover:from-purple-500 group-hover:to-indigo-500 transition-all duration-300 shadow-lg border border-purple-400/30"
-                >
-                  <i
-                    class="fas fa-laptop-medical text-purple-200 group-hover:text-white transition-colors duration-300"
-                  ></i>
-                </div>
-                <div class="flex-1 relative z-10">
-                  <span class="font-medium drop-shadow-sm"
-                    >Wellsoft Access</span
-                  >
-                  <p
-                    class="text-xs text-blue-200 opacity-80 group-hover:opacity-100 transition-opacity duration-300"
-                  >
-                    Hospital management
-                  </p>
-                </div>
-                <i
-                  class="fas fa-chevron-right text-blue-300 group-hover:text-white text-sm transition-all duration-300 group-hover:translate-x-1"
-                ></i>
-              </router-link>
+              Jeeva Access Form, Wellsoft Access Form, and Internet Access Form
+              have been replaced with the Combined Access Form below.
 
-              <!-- Internet Access Form -->
-              <router-link
-                :to="getFormRoute('internet')"
-                @click="closeMenu"
-                class="flex items-center px-6 py-4 text-white hover:bg-gradient-to-r hover:from-orange-600/30 hover:to-amber-600/30 transition-all duration-300 group relative overflow-hidden border-l-4 border-transparent hover:border-orange-400"
-                :class="{
-                  'bg-gradient-to-r from-orange-600/30 to-amber-600/30 border-orange-400':
-                    isFormActive('internet'),
-                }"
-              >
-                <div
-                  class="absolute inset-0 bg-gradient-to-r from-orange-600/10 to-amber-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                ></div>
-                <div
-                  class="w-10 h-10 bg-gradient-to-br from-orange-600/40 to-orange-500/40 rounded-lg flex items-center justify-center mr-4 group-hover:bg-gradient-to-br group-hover:from-orange-500 group-hover:to-amber-500 transition-all duration-300 shadow-lg border border-orange-400/30"
-                >
-                  <i
-                    class="fas fa-wifi text-orange-200 group-hover:text-white transition-colors duration-300"
-                  ></i>
-                </div>
-                <div class="flex-1 relative z-10">
-                  <span class="font-medium drop-shadow-sm"
-                    >Internet Access</span
-                  >
-                  <p
-                    class="text-xs text-blue-200 opacity-80 group-hover:opacity-100 transition-opacity duration-300"
-                  >
-                    Network connectivity
-                  </p>
-                </div>
-                <i
-                  class="fas fa-chevron-right text-blue-300 group-hover:text-white text-sm transition-all duration-300 group-hover:translate-x-1"
-                ></i>
-              </router-link>
+              The individual forms are no longer used in the current implementation.
               -->
 
               <!-- Combined Access Form -->

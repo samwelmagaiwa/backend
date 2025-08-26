@@ -797,9 +797,8 @@
                   </div>
                   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                     <div
-                      v-for="(permissions, category) in availablePermissions"
+                      v-for="(permissions, category) in filteredOtherPermissions"
                       :key="category"
-                      v-if="!isKnownCategory(category)"
                     >
                       <div class="mb-4">
                         <h6 class="text-sm font-semibold text-gray-700 mb-2 capitalize">
@@ -1098,9 +1097,15 @@ export default {
       return Object.keys(this.availablePermissions).some(category => !knownCategories.includes(category))
     },
 
-    hasOtherPermissions() {
+    filteredOtherPermissions() {
       const knownCategories = ['user_management', 'role_management', 'department_management', 'request_management', 'system_administration']
-      return Object.keys(this.availablePermissions).some(category => !knownCategories.includes(category))
+      const filtered = {}
+      Object.keys(this.availablePermissions).forEach(category => {
+        if (!knownCategories.includes(category)) {
+          filtered[category] = this.availablePermissions[category]
+        }
+      })
+      return filtered
     }
   },
 
@@ -1343,31 +1348,31 @@ export default {
         'edit_users': 'fas fa-user-edit',
         'delete_users': 'fas fa-user-minus',
         'view_users': 'fas fa-eye',
-        
+
         // Role Management
         'create_roles': 'fas fa-plus-circle',
         'edit_roles': 'fas fa-edit',
         'delete_roles': 'fas fa-trash',
         'assign_roles': 'fas fa-user-tag',
-        
+
         // Department Management
         'create_departments': 'fas fa-building',
         'edit_departments': 'fas fa-edit',
         'delete_departments': 'fas fa-trash-alt',
         'assign_hod': 'fas fa-user-tie',
-        
+
         // Request Management
         'view_all_requests': 'fas fa-list',
         'approve_requests': 'fas fa-check-circle',
         'reject_requests': 'fas fa-times-circle',
         'export_requests': 'fas fa-download',
-        
+
         // System Administration
         'system_settings': 'fas fa-cog',
         'audit_logs': 'fas fa-clipboard-list',
         'backup_restore': 'fas fa-database'
       }
-      
+
       return iconMap[permission] || 'fas fa-key'
     },
 

@@ -5,7 +5,7 @@
 
 // API Configuration
 export const API_CONFIG = {
-  BASE_URL: process.env.VUE_APP_API_URL || 'http://localhost:8000/api',
+  BASE_URL: process.env.VUE_APP_API_URL || 'http://127.0.0.1:8000/api',
   TIMEOUT: parseInt(process.env.VUE_APP_API_TIMEOUT) || 10000
 }
 

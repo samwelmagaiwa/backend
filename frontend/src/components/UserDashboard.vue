@@ -1033,10 +1033,10 @@
                 <div class="absolute inset-0 bg-gradient-to-br from-blue-500/20 via-blue-600/10 to-blue-700/20 opacity-0 group-hover/button:opacity-100 transition-opacity duration-500"></div>
                 <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/30 to-transparent rounded-full blur-2xl group-hover/button:scale-150 transition-transform duration-700"></div>
                 <div class="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-blue-300/20 to-transparent rounded-full blur-xl group-hover/button:scale-125 transition-transform duration-600"></div>
-                
+
                 <!-- Animated Shine Effect -->
                 <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 -translate-x-full group-hover/button:translate-x-full transition-transform duration-1000"></div>
-                
+
                 <!-- Content Layer -->
                 <div class="relative z-10 flex items-start space-x-4">
                   <!-- Enhanced Icon Container -->
@@ -1055,7 +1055,7 @@
                     <!-- Outer Glow -->
                     <div class="absolute -inset-1 rounded-xl bg-gradient-to-br from-blue-400/30 to-blue-600/30 blur-md opacity-0 group-hover/button:opacity-100 transition-opacity duration-300"></div>
                   </div>
-                  
+
                   <!-- Text Content -->
                   <div class="flex-1 text-left">
                     <h3 class="text-xl font-bold text-white mb-2 flex items-center">
@@ -1073,7 +1073,7 @@
                       <span class="px-2 py-1 bg-blue-500/30 text-blue-200 text-xs rounded-full border border-blue-400/40">Recommended</span>
                     </div>
                   </div>
-                  
+
                   <!-- Arrow Indicator -->
                   <div class="flex-shrink-0 self-center">
                     <div class="w-10 h-10 bg-gradient-to-br from-blue-400/30 to-blue-600/30 rounded-full flex items-center justify-center group-hover/button:bg-gradient-to-br group-hover/button:from-blue-300/40 group-hover/button:to-blue-500/40 transition-all duration-300 border border-blue-300/40">
@@ -1081,11 +1081,11 @@
                     </div>
                   </div>
                 </div>
-                
+
                 <!-- Button Press Effect -->
                 <div class="absolute inset-0 bg-gradient-to-br from-blue-800/50 to-blue-900/50 opacity-0 group-active/button:opacity-100 transition-opacity duration-150 rounded-2xl"></div>
               </button>
-              
+
               <!-- Multi-Layer Card Shadow Effects -->
               <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/20 to-blue-600/20 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 pointer-events-none blur-sm -z-10"></div>
               <div class="absolute -inset-0.5 rounded-2xl bg-gradient-to-br from-blue-400/30 to-blue-500/30 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 pointer-events-none blur-md -z-10"></div>
@@ -1103,10 +1103,10 @@
                 <div class="absolute inset-0 bg-gradient-to-br from-red-500/20 via-red-600/10 to-red-700/20 opacity-0 group-hover/button:opacity-100 transition-opacity duration-500"></div>
                 <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-red-400/30 to-transparent rounded-full blur-2xl group-hover/button:scale-150 transition-transform duration-700"></div>
                 <div class="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-red-300/20 to-transparent rounded-full blur-xl group-hover/button:scale-125 transition-transform duration-600"></div>
-                
+
                 <!-- Animated Shine Effect -->
                 <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 -translate-x-full group-hover/button:translate-x-full transition-transform duration-1000"></div>
-                
+
                 <!-- Content Layer -->
                 <div class="relative z-10 flex items-start space-x-4">
                   <!-- Enhanced Icon Container -->
@@ -1125,7 +1125,7 @@
                     <!-- Outer Glow -->
                     <div class="absolute -inset-1 rounded-xl bg-gradient-to-br from-red-400/30 to-red-600/30 blur-md opacity-0 group-hover/button:opacity-100 transition-opacity duration-300"></div>
                   </div>
-                  
+
                   <!-- Text Content -->
                   <div class="flex-1 text-left">
                     <h3 class="text-xl font-bold text-white mb-2 flex items-center">
@@ -1143,7 +1143,7 @@
                       <span class="px-2 py-1 bg-red-500/30 text-red-200 text-xs rounded-full border border-red-400/40">Instant</span>
                     </div>
                   </div>
-                  
+
                   <!-- Arrow Indicator -->
                   <div class="flex-shrink-0 self-center">
                     <div class="w-10 h-10 bg-gradient-to-br from-red-400/30 to-red-600/30 rounded-full flex items-center justify-center group-hover/button:bg-gradient-to-br group-hover/button:from-red-300/40 group-hover/button:to-red-500/40 transition-all duration-300 border border-red-300/40">
@@ -1151,11 +1151,11 @@
                     </div>
                   </div>
                 </div>
-                
+
                 <!-- Button Press Effect -->
                 <div class="absolute inset-0 bg-gradient-to-br from-red-800/50 to-red-900/50 opacity-0 group-active/button:opacity-100 transition-opacity duration-150 rounded-2xl"></div>
               </button>
-              
+
               <!-- Multi-Layer Card Shadow Effects -->
               <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-red-500/20 to-red-600/20 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 pointer-events-none blur-sm -z-10"></div>
               <div class="absolute -inset-0.5 rounded-2xl bg-gradient-to-br from-red-400/30 to-red-500/30 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 pointer-events-none blur-md -z-10"></div>
@@ -1252,12 +1252,12 @@ export default {
       console.log('UserDashboard mounted - Route:', router.currentRoute.value.path)
       requireRole([ROLES.STAFF])
     })
-    
+
     // Add debugging for unmount
     onBeforeUnmount(() => {
       console.log('UserDashboard beforeUnmount - Route:', router.currentRoute.value.path)
     })
-    
+
     onUnmounted(() => {
       console.log('UserDashboard unmounted')
     })
@@ -1401,12 +1401,6 @@ export default {
       totalRequests,
       progressWidth,
       progressPercentage,
-<<<<<<< HEAD
-      // selectJeevaForm, // COMMENTED OUT
-      // selectWellsoftForm, // COMMENTED OUT  
-      // requestPasswordRenew, // COMMENTED OUT
-=======
->>>>>>> main
       selectBothServices,
       selectBookingService,
       cancelFormSelection,

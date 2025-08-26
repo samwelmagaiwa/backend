@@ -955,7 +955,7 @@
                       <i :class="showRolesList ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
                     </button>
                   </div>
-                  
+
                   <div v-if="showRolesList" class="bg-white/50 border-2 border-green-300/30 rounded-xl p-4 max-h-64 overflow-y-auto">
                     <div class="space-y-3">
                       <div
@@ -986,7 +986,7 @@
                     </div>
                   </div>
                 </div>
-                
+
                 <div v-if="getCreateUserFieldError('role_ids')" class="text-red-500 text-sm flex items-center space-x-1">
                   <i class="fas fa-exclamation-circle text-xs"></i>
                   <span>{{ getCreateUserFieldError('role_ids') }}</span>
@@ -1207,7 +1207,7 @@ export default {
 
     availableRolesForDropdown() {
       // Filter out roles that are already selected
-      return this.availableRoles.filter(role => 
+      return this.availableRoles.filter(role =>
         !this.createUserForm.role_ids.includes(role.id)
       )
     }
@@ -1410,10 +1410,10 @@ export default {
       try {
         // Add your API call here
         // const result = await userService.createUser(this.createUserForm)
-        
+
         // Mock success for now
         await new Promise(resolve => setTimeout(resolve, 1000))
-        
+
         this.showSuccessMessage('User created successfully!')
         this.closeCreateUserDialog()
         await this.refreshData()
@@ -1449,7 +1449,7 @@ export default {
         // Add your API call here
         // const result = await departmentService.getDepartments()
         // this.availableDepartments = result.data
-        
+
         // Mock data for now
         this.availableDepartments = [
           { id: 1, name: 'Information Technology' },

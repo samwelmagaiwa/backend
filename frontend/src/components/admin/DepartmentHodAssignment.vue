@@ -676,7 +676,7 @@
             <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/30 to-transparent rounded-full blur-2xl"></div>
             <div class="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-white/20 to-transparent rounded-full blur-xl"></div>
           </div>
-          
+
           <!-- Enhanced Icon Container -->
           <div class="relative z-10">
             <div class="w-20 h-20 bg-gradient-to-br from-white/20 to-white/10 rounded-2xl flex items-center justify-center mx-auto mb-6 backdrop-blur-sm border-2 border-white/30 shadow-2xl relative overflow-hidden group">
@@ -688,7 +688,7 @@
               <div class="absolute top-2 right-2 w-2 h-2 bg-white/60 rounded-full animate-ping"></div>
               <div class="absolute bottom-3 left-3 w-1.5 h-1.5 bg-blue-300/80 rounded-full animate-pulse"></div>
             </div>
-            
+
             <!-- Enhanced Title -->
             <h3 class="text-2xl font-bold text-white mb-3 drop-shadow-lg">
               <span class="bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">Create New Department</span>
@@ -711,7 +711,7 @@
                   <span class="bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">Department Information</span>
                 </h4>
               </div>
-              
+
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Department Name -->
                 <div class="group/field">
@@ -919,7 +919,7 @@
             >
               <!-- Button Shine Effect -->
               <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 -translate-x-full group-hover/create:translate-x-full transition-transform duration-700"></div>
-              
+
               <div class="relative z-10 flex items-center space-x-3">
                 <div class="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center">
                   <i v-if="createDepartmentSubmitting" class="fas fa-spinner fa-spin text-sm"></i>
