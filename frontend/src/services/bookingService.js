@@ -1,330 +1,290 @@
-import axios from 'axios'
+import apiClient from '../utils/apiClient'
 
-// Base API URL - adjust this to match your Laravel backend URL
-const API_BASE_URL = process.env.VUE_APP_API_URL || 'http://localhost:8000/api'
-
-// Create axios instance with default config
-const apiClient = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Accept': 'application/json',
-  },
-  timeout: 30000, // 30 seconds timeout for file uploads
-})
-
-// Add request interceptor to include auth token
-apiClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('auth_token')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
-    }
-    return config
-  },
-  (error) => {
-    return Promise.reject(error)
-  }
-)
-
-// Add response interceptor for error handling
-apiClient.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Token expired or invalid
-      localStorage.removeItem('auth_token')
-      window.location.href = '/login'
-    }
-    return Promise.reject(error)
-  }
-)
-
-const bookingService = {
+/**
+ * Service for handling device booking requests
+ * Manages ICT equipment reservations and bookings
+ */
+export const bookingService = {
   /**
    * Submit a new booking request
+   * @param {FormData} formData - Form data including signature file
+   * @returns {Promise<Object>} - API response
    */
-  async submitBooking(bookingData) {
+  async submitBooking(formData) {
     try {
-      console.log('Submitting booking request:', bookingData)
-      
-      // Create FormData for file upload
-      const formData = new FormData()
-      
-      // Append all form fields
-      Object.keys(bookingData).forEach(key => {
-        if (bookingData[key] !== null && bookingData[key] !== undefined) {
-          if (key === 'signature' && bookingData[key] instanceof File) {
-            formData.append(key, bookingData[key])
-            console.log(`Added file ${key}:`, bookingData[key].name, bookingData[key].size, 'bytes')
-          } else {
-            formData.append(key, bookingData[key])
-            console.log(`Added field ${key}:`, bookingData[key])
+      const response = await apiClient.post(
+        '/booking-service/bookings',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
           }
         }
-      })
-      
-      // Debug: Log FormData contents
-      console.log('FormData contents:')
-      for (let [key, value] of formData.entries()) {
-        console.log(key, value)
-      }
-
-
-      
-      // If basic validation passes, try the full endpoint
-      const response = await apiClient.post('/booking-service/bookings', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
-
-      console.log('Booking submission response:', response.data)
+      )
       return {
         success: true,
-        data: response.data.data,
-        message: response.data.message
+        data: response.data
       }
     } catch (error) {
-      console.error('Error submitting booking:', error)
-      
-      if (error.response?.data?.errors) {
-        // Validation errors
-        return {
-          success: false,
-          type: 'validation',
-          errors: error.response.data.errors,
-          message: 'Please check the form for errors'
-        }
-      }
-      
+      console.error('Booking submission failed:', error)
       return {
         success: false,
-        message: error.response?.data?.message || 'Failed to submit booking request'
+        message:
+          error.response?.data?.message || 'Failed to submit booking request',
+        errors: error.response?.data?.errors || {},
+        status: error.response?.status
       }
     }
   },
 
   /**
-   * Get user's bookings
+   * Get user's booking requests
+   * @param {Object} params - Query parameters (status, device_type, etc.)
+   * @returns {Promise<Object>} - API response with paginated bookings
    */
   async getUserBookings(params = {}) {
     try {
-      const response = await apiClient.get('/booking-service/bookings', { params })
-      
+      const response = await apiClient.get('/booking-service/bookings', {
+        params
+      })
       return {
         success: true,
-        data: response.data.data,
-        message: response.data.message
+        data: response.data
       }
     } catch (error) {
-      console.error('Error fetching user bookings:', error)
+      console.error('Failed to fetch user bookings:', error)
       return {
         success: false,
-        message: error.response?.data?.message || 'Failed to fetch bookings'
+        message: error.response?.data?.message || 'Failed to fetch bookings',
+        status: error.response?.status
       }
     }
   },
 
   /**
-   * Get a specific booking
+   * Get a specific booking by ID
+   * @param {number} bookingId - Booking ID
+   * @returns {Promise<Object>} - API response with booking details
    */
-  async getBooking(bookingId) {
+  async getBookingById(bookingId) {
     try {
-      const response = await apiClient.get(`/booking-service/bookings/${bookingId}`)
-      
+      const response = await apiClient.get(
+        `/booking-service/bookings/${bookingId}`
+      )
       return {
         success: true,
-        data: response.data.data,
-        message: response.data.message
+        data: response.data
       }
     } catch (error) {
-      console.error('Error fetching booking:', error)
+      console.error('Failed to fetch booking details:', error)
       return {
         success: false,
-        message: error.response?.data?.message || 'Failed to fetch booking'
+        message:
+          error.response?.data?.message || 'Failed to fetch booking details',
+        status: error.response?.status
       }
     }
   },
 
   /**
-   * Update a booking
+   * Update an existing booking
+   * @param {number} bookingId - Booking ID
+   * @param {FormData} formData - Updated form data
+   * @returns {Promise<Object>} - API response
    */
-  async updateBooking(bookingId, bookingData) {
+  async updateBooking(bookingId, formData) {
     try {
-      // Create FormData for file upload
-      const formData = new FormData()
-      
-      // Append all form fields
-      Object.keys(bookingData).forEach(key => {
-        if (bookingData[key] !== null && bookingData[key] !== undefined) {
-          if (key === 'signature' && bookingData[key] instanceof File) {
-            formData.append(key, bookingData[key])
-          } else {
-            formData.append(key, bookingData[key])
+      const response = await apiClient.post(
+        `/booking-service/bookings/${bookingId}`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
           }
         }
-      })
-
-      // Add method override for PUT request with FormData
-      formData.append('_method', 'PUT')
-
-      const response = await apiClient.post(`/booking-service/bookings/${bookingId}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
-
+      )
       return {
         success: true,
-        data: response.data.data,
-        message: response.data.message
+        data: response.data
       }
     } catch (error) {
-      console.error('Error updating booking:', error)
-      
-      if (error.response?.data?.errors) {
-        return {
-          success: false,
-          type: 'validation',
-          errors: error.response.data.errors,
-          message: 'Please check the form for errors'
-        }
-      }
-      
+      console.error('Failed to update booking:', error)
       return {
         success: false,
-        message: error.response?.data?.message || 'Failed to update booking'
+        message: error.response?.data?.message || 'Failed to update booking',
+        errors: error.response?.data?.errors || {},
+        status: error.response?.status
       }
     }
   },
 
   /**
    * Delete a booking
+   * @param {number} bookingId - Booking ID
+   * @returns {Promise<Object>} - API response
    */
   async deleteBooking(bookingId) {
     try {
-      const response = await apiClient.delete(`/booking-service/bookings/${bookingId}`)
-      
+      const response = await apiClient.delete(
+        `/booking-service/bookings/${bookingId}`
+      )
       return {
         success: true,
-        message: response.data.message
+        data: response.data
       }
     } catch (error) {
-      console.error('Error deleting booking:', error)
+      console.error('Failed to delete booking:', error)
       return {
         success: false,
-        message: error.response?.data?.message || 'Failed to delete booking'
+        message: error.response?.data?.message || 'Failed to delete booking',
+        status: error.response?.status
       }
     }
   },
 
   /**
    * Get available device types
+   * @returns {Promise<Object>} - API response with device types
    */
   async getDeviceTypes() {
     try {
       const response = await apiClient.get('/booking-service/device-types')
-      
       return {
         success: true,
-        data: response.data.data,
-        message: response.data.message
+        data: response.data
       }
     } catch (error) {
-      console.error('Error fetching device types:', error)
+      console.error('Failed to fetch device types:', error)
       return {
         success: false,
-        message: error.response?.data?.message || 'Failed to fetch device types',
-        data: []
+        message:
+          error.response?.data?.message || 'Failed to fetch device types',
+        status: error.response?.status
       }
     }
   },
 
   /**
    * Get available departments
+   * @returns {Promise<Object>} - API response with departments
    */
   async getDepartments() {
     try {
       const response = await apiClient.get('/booking-service/departments')
-      
       return {
         success: true,
-        data: response.data.data,
-        message: response.data.message
+        data: response.data
       }
     } catch (error) {
-      console.error('Error fetching departments:', error)
+      console.error('Failed to fetch departments:', error)
       return {
         success: false,
         message: error.response?.data?.message || 'Failed to fetch departments',
-        data: []
+        status: error.response?.status
       }
     }
   },
 
   /**
    * Get booking statistics
+   * @returns {Promise<Object>} - API response with statistics
    */
   async getStatistics() {
     try {
       const response = await apiClient.get('/booking-service/statistics')
-      
       return {
         success: true,
-        data: response.data.data,
-        message: response.data.message
+        data: response.data
       }
     } catch (error) {
-      console.error('Error fetching statistics:', error)
+      console.error('Failed to fetch booking statistics:', error)
       return {
         success: false,
-        message: error.response?.data?.message || 'Failed to fetch statistics'
+        message: error.response?.data?.message || 'Failed to fetch statistics',
+        status: error.response?.status
       }
     }
   },
 
   /**
    * Admin: Approve a booking
+   * @param {number} bookingId - Booking ID
+   * @param {string} adminNotes - Optional admin notes
+   * @returns {Promise<Object>} - API response
    */
   async approveBooking(bookingId, adminNotes = '') {
     try {
-      const response = await apiClient.post(`/booking-service/bookings/${bookingId}/approve`, {
-        admin_notes: adminNotes
-      })
-      
+      const response = await apiClient.post(
+        `/booking-service/bookings/${bookingId}/approve`,
+        {
+          admin_notes: adminNotes
+        }
+      )
       return {
         success: true,
-        data: response.data.data,
-        message: response.data.message
+        data: response.data
       }
     } catch (error) {
-      console.error('Error approving booking:', error)
+      console.error('Failed to approve booking:', error)
       return {
         success: false,
-        message: error.response?.data?.message || 'Failed to approve booking'
+        message: error.response?.data?.message || 'Failed to approve booking',
+        status: error.response?.status
       }
     }
   },
 
   /**
    * Admin: Reject a booking
+   * @param {number} bookingId - Booking ID
+   * @param {string} adminNotes - Required rejection reason
+   * @returns {Promise<Object>} - API response
    */
   async rejectBooking(bookingId, adminNotes) {
     try {
-      const response = await apiClient.post(`/booking-service/bookings/${bookingId}/reject`, {
-        admin_notes: adminNotes
-      })
-      
+      const response = await apiClient.post(
+        `/booking-service/bookings/${bookingId}/reject`,
+        {
+          admin_notes: adminNotes
+        }
+      )
       return {
         success: true,
-        data: response.data.data,
-        message: response.data.message
+        data: response.data
       }
     } catch (error) {
-      console.error('Error rejecting booking:', error)
+      console.error('Failed to reject booking:', error)
       return {
         success: false,
-        message: error.response?.data?.message || 'Failed to reject booking'
+        message: error.response?.data?.message || 'Failed to reject booking',
+        errors: error.response?.data?.errors || {},
+        status: error.response?.status
+      }
+    }
+  },
+
+  /**
+   * Test validation endpoint (for debugging)
+   * @param {Object} testData - Test data to validate
+   * @returns {Promise<Object>} - API response
+   */
+  async testValidation(testData) {
+    try {
+      const response = await apiClient.post(
+        '/booking-service/test-validation',
+        testData
+      )
+      return {
+        success: true,
+        data: response.data
+      }
+    } catch (error) {
+      console.error('Validation test failed:', error)
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Validation test failed',
+        errors: error.response?.data?.errors || {},
+        status: error.response?.status
       }
     }
   }

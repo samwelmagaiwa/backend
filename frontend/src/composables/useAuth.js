@@ -1,11 +1,12 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth as useAuthState } from '../utils/auth'
-import { 
-  hasRouteAccess, 
+import {
+  hasRouteAccess,
   getAllowedRoutes,
   hasUserManagementAccess
 } from '../utils/permissions'
+import { preloadRoleBasedImages } from '../utils/imagePreloader'
 
 /**
  * Authentication and authorization composable
@@ -51,13 +52,13 @@ export function useAuth() {
   })
 
   // Authentication actions
-  const login = async (credentials) => {
+  const login = async(credentials) => {
     try {
       const result = await authLogin(credentials)
       if (result.success) {
         // Wait a bit for the auth state to update
-        await new Promise(resolve => setTimeout(resolve, 100))
-        
+        await new Promise((resolve) => setTimeout(resolve, 100))
+
         try {
           // Check if user needs onboarding (non-admin users who haven't completed it)
           if (needsOnboarding.value) {
@@ -66,8 +67,56 @@ export function useAuth() {
           } else {
             // Redirect to intended route or default dashboard
             const redirect = router.currentRoute.value.query.redirect
-            const targetRoute = redirect || defaultDashboard.value || '/user-dashboard'
-            
+            const dashboard = defaultDashboard.value
+
+            console.log('🏠 Login redirect logic:')
+            console.log('  - Redirect query:', redirect)
+            console.log('  - Default dashboard:', dashboard)
+            console.log('  - User role:', userRole.value)
+
+            let targetRoute
+            if (redirect) {
+              targetRoute = redirect
+              console.log('🔄 Using redirect parameter:', targetRoute)
+            } else if (dashboard) {
+              targetRoute = dashboard
+              console.log('🏠 Using default dashboard:', targetRoute)
+            } else {
+              // Fallback based on role - use getDefaultDashboard for consistency
+              const { getDefaultDashboard } = await import('../utils/permissions')
+              const fallbackDashboard = getDefaultDashboard(userRole.value)
+
+              if (fallbackDashboard) {
+                targetRoute = fallbackDashboard
+              } else {
+                // Last resort fallbacks if getDefaultDashboard fails
+                if (userRole.value === 'head_of_department') {
+                  targetRoute = '/hod-dashboard'
+                } else if (userRole.value === 'admin') {
+                  targetRoute = '/admin-dashboard'
+                } else if (userRole.value === 'staff') {
+                  targetRoute = '/user-dashboard'
+                } else {
+                  targetRoute = '/user-dashboard' // Final fallback
+                }
+              }
+              console.log(
+                '⚠️ No default dashboard found, using fallback:',
+                targetRoute
+              )
+            }
+
+            console.log('🚀 Navigating to:', targetRoute)
+
+            // Preload images for the user's role after successful login
+            if (userRole.value) {
+              console.log(
+                '🎯 Preloading images for role after login:',
+                userRole.value
+              )
+              preloadRoleBasedImages(userRole.value)
+            }
+
             // Use Vue Router for proper SPA navigation
             await router.push(targetRoute)
           }
@@ -90,7 +139,7 @@ export function useAuth() {
     }
   }
 
-  const logout = async () => {
+  const logout = async() => {
     try {
       await authLogout()
       await router.push('/')
@@ -116,7 +165,9 @@ export function useAuth() {
   const requireRole = (requiredRoles) => {
     if (!requireAuth()) return false
 
-    const roles = Array.isArray(requiredRoles) ? requiredRoles : [requiredRoles]
+    const roles = Array.isArray(requiredRoles)
+      ? requiredRoles
+      : [requiredRoles]
     if (!roles.includes(userRole.value)) {
       // Redirect to default dashboard with error
       const dashboard = defaultDashboard.value

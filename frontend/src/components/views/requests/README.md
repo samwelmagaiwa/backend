@@ -1,14 +1,17 @@
 # Requests Dashboard System
 
 ## Overview
+
 A comprehensive requests management system for ICT Officers, HODs, Divisional Directors, DICT, and Head of IT to review and approve access requests with role-based filtering and approval workflows.
 
 ## Components
 
 ### 1. InternalAccessList.vue
+
 **Purpose**: Main dashboard showing paginated, searchable, sortable data table of requests
 
 **Features**:
+
 - **Role-based filtering**: Each role sees only relevant requests
 - **Search functionality**: Search by PF Number, Staff Name, Department
 - **Sorting**: Sortable by Request ID, Type, Submission Date
@@ -17,16 +20,22 @@ A comprehensive requests management system for ICT Officers, HODs, Divisional Di
 - **Quick actions**: View and Approve buttons
 
 **Table Headers**:
+
 - Request ID
-- Request Type (Jeeva, Wellsoft, Internet, Combined)
+- Request Type (jeeva_access,wellsoft,internet_access_request)
 - Personal Information (PF Number, Staff Name, Department, Digital Signature)
-- Module Request (Module Requested for)
+- Module Requested for (use/revoke)
+- Module Request (select service as per jeeva_access,wellsoft,internet_access_request) from the Request Type if multiple select both
 - Access Rights (Permanent/Temporary)
+- Approval (ROLE BASED WHERE HOD,Divisional Director,DICT,HOD_IT,ICT Officer )can only be filled and signed by the user with the matching role. Other sections should be visible but disabled (readonly/muted). Ensure backend validation enforces these role-based restrictions
+  -COMMENTS be required to HOD
+  -For Implementation (apply logic as of approval means role based Head of IT,ICT Officer granting access) some part be muted as per role
 - Submission Date
 - Current Status
-- Actions (View/Approve)
+- Actions (View/Approve/reject)
 
 **Role-based Request Filtering**:
+
 - **HOD**: `hod_approval_status = "pending"`
 - **Divisional Director**: `hod_approval_status = "approved" AND divisional_status = "pending"`
 - **DICT**: `divisional_status = "approved" AND dict_status = "pending"`
@@ -34,9 +43,11 @@ A comprehensive requests management system for ICT Officers, HODs, Divisional Di
 - **ICT Officer**: `head_of_it_status = "approved" AND ict_status = "pending"`
 
 ### 2. InternalAccessDetails.vue
+
 **Purpose**: Detailed view for reviewing and approving individual requests
 
 **Features**:
+
 - **Request details**: Complete staff information and request specifics
 - **Approval trail**: Visual workflow showing all approval stages
 - **Role-based actions**: Approve/Reject buttons based on user role
@@ -44,6 +55,7 @@ A comprehensive requests management system for ICT Officers, HODs, Divisional Di
 - **Status tracking**: Real-time status updates
 
 **Approval Trail Stages**:
+
 1. Head of Department
 2. Divisional Director
 3. DICT (ICT Director)
@@ -53,6 +65,7 @@ A comprehensive requests management system for ICT Officers, HODs, Divisional Di
 ## Navigation & Routing
 
 ### Routes Added:
+
 ```javascript
 // Internal Access Requests Dashboard
 {
@@ -76,6 +89,7 @@ A comprehensive requests management system for ICT Officers, HODs, Divisional Di
 ```
 
 ### Sidebar Navigation:
+
 - Added "Requests Management" section in DynamicSidebar
 - Accessible to all approver roles
 - Shows active state when on requests pages
@@ -84,13 +98,16 @@ A comprehensive requests management system for ICT Officers, HODs, Divisional Di
 ## Permissions & Access Control
 
 ### Updated Role Permissions:
+
 All approver roles now have access to:
+
 - `/internal-access/list`
 - `/internal-access/details`
 
 ### Role-specific Dashboard Access:
+
 - **HEAD_OF_DEPARTMENT**: `/hod-dashboard` + requests management
-- **HOD_IT**: `/hod-it-dashboard` + requests management  
+- **HOD_IT**: `/hod-it-dashboard` + requests management
 - **DIVISIONAL_DIRECTOR**: `/divisional-dashboard` + requests management
 - **ICT_DIRECTOR**: `/dict-dashboard` + requests management
 - **ICT_OFFICER**: `/ict-dashboard` + requests management
@@ -98,27 +115,28 @@ All approver roles now have access to:
 ## Request Flow Navigation
 
 ### From List to Details:
+
 When clicking on a request row or "View" button:
+
 ```javascript
 // Navigate to appropriate form based on request type
 const routes = {
-  jeeva: '/internal-access/details',
-  wellsoft: '/internal-access/details', 
-  internet: '/internal-access/details',
-  combined: '/internal-access/details'
-}
+  combined: "/internal-access/details",
+};
 
 router.push({
   path: route,
-  query: { 
+  query: {
     id: request.id,
-    type: request.type
-  }
-})
+    type: request.type,
+  },
+});
 ```
 
 ### Form Pre-filling:
+
 The details page loads the appropriate form template based on request type:
+
 - **Jeeva Access**: Shows Jeeva-specific modules and fields
 - **Wellsoft Access**: Shows Wellsoft modules and configuration
 - **Internet Access**: Shows internet access parameters
@@ -127,6 +145,7 @@ The details page loads the appropriate form template based on request type:
 ## Data Structure
 
 ### Mock Request Object:
+
 ```javascript
 {
   id: 'REQ-001',
@@ -141,21 +160,21 @@ The details page loads the appropriate form template based on request type:
   temporaryUntil: null, // Date if temporary
   submissionDate: '2024-01-15',
   currentStatus: 'pending', // pending, approved, rejected
-  
+
   // Approval statuses for each stage
   hodApprovalStatus: 'pending',
-  divisionalStatus: 'pending', 
+  divisionalStatus: 'pending',
   dictStatus: 'pending',
   headOfItStatus: 'pending',
   ictStatus: 'pending',
-  
+
   // Approval dates
   hodApprovalDate: null,
   divisionalApprovalDate: null,
   dictApprovalDate: null,
   headOfItApprovalDate: null,
   ictApprovalDate: null,
-  
+
   comments: 'Need access for patient consultation...'
 }
 ```
@@ -163,14 +182,16 @@ The details page loads the appropriate form template based on request type:
 ## Styling & Design
 
 ### Color Scheme:
+
 - **Primary**: Blue gradient theme matching other dashboards
 - **Requests Management**: Orange/Amber accent colors
-- **Status indicators**: 
+- **Status indicators**:
   - Pending: Yellow
-  - Approved: Green  
+  - Approved: Green
   - Rejected: Red
 
 ### Glass Morphism Effects:
+
 - Consistent with existing dashboard design
 - Backdrop blur and transparency
 - Gradient borders and shadows
@@ -179,11 +200,12 @@ The details page loads the appropriate form template based on request type:
 ## API Integration Points
 
 ### Required API Endpoints:
+
 ```javascript
 // Get requests filtered by user role
 GET /api/requests?role={userRole}&status={status}&type={type}
 
-// Get specific request details  
+// Get specific request details
 GET /api/requests/{requestId}
 
 // Approve request
@@ -194,7 +216,7 @@ POST /api/requests/{requestId}/approve
 }
 
 // Reject request
-POST /api/requests/{requestId}/reject  
+POST /api/requests/{requestId}/reject
 {
   approverRole: 'head_of_department',
   comments: 'Insufficient justification provided'
@@ -204,6 +226,7 @@ POST /api/requests/{requestId}/reject
 ## Usage Instructions
 
 ### For Approvers:
+
 1. **Access Dashboard**: Navigate to "Requests Management" → "Access Requests"
 2. **Filter Requests**: Use search, status, and type filters
 3. **Review Request**: Click "View" to see full details
@@ -211,6 +234,7 @@ POST /api/requests/{requestId}/reject
 5. **Track Progress**: Monitor approval trail for request status
 
 ### For System Integration:
+
 1. **Replace Mock Data**: Connect to actual API endpoints
 2. **Update Permissions**: Ensure role-based access is properly configured
 3. **Customize Fields**: Modify request fields based on actual requirements
