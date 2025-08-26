@@ -187,7 +187,6 @@ const routes = [
   },
 
 
-
   // Access approval forms
   {
     path: '/jeeva-access',
@@ -447,7 +446,7 @@ router.beforeEach(async(to, from, next) => {
     const userData = localStorage.getItem('user_data')
     let storedUser = null
     let storedRole = null
-    
+
     if (token && userData) {
       try {
         storedUser = JSON.parse(userData)
@@ -459,12 +458,12 @@ router.beforeEach(async(to, from, next) => {
         localStorage.removeItem('user_data')
       }
     }
-    
+
     // Use the new auth utility
     console.log('📦 Router: Importing auth utility...')
     const authModule = await import('../utils/auth')
     const auth = authModule.default
-    
+
     // Force auth initialization if we have stored data but auth isn't initialized
     if ((token && userData && storedUser) && !auth.isAuthenticated) {
       console.log('🔄 Router: Auth not initialized but have stored data, force initializing...')
@@ -477,7 +476,7 @@ router.beforeEach(async(to, from, next) => {
     const user = auth.currentUser || storedUser
     const requiresAuth = to.meta.requiresAuth !== false
     const isPublicRoute = to.meta.isPublic === true
-    
+
     console.log('🔍 Router: Auth state check:')
     console.log('  - hasStoredToken:', !!token)
     console.log('  - hasStoredUser:', !!userData)
@@ -604,20 +603,20 @@ router.beforeEach(async(to, from, next) => {
         console.log('  - Required roles:', to.meta.roles)
         console.log('  - User role:', userRole)
         console.log('  - Stored role:', storedRole)
-        
+
         // Check if user has required role (use both current and stored role)
         const hasRequiredRole = to.meta.roles.includes(userRole) || to.meta.roles.includes(storedRole)
-        
+
         if (!hasRequiredRole) {
           console.log('⚠️ Router: User does not have required role for', to.path)
           console.log('  - Checked userRole:', userRole, 'in', to.meta.roles, '=', to.meta.roles.includes(userRole))
           console.log('  - Checked storedRole:', storedRole, 'in', to.meta.roles, '=', to.meta.roles.includes(storedRole))
-          
+
           // Only redirect if we're sure the user doesn't have access
           // Don't redirect if we're already on the user's default dashboard
           const defaultDashboard = getDefaultDashboard(userRole || storedRole)
           console.log('🏠 Router: Default dashboard for role', userRole || storedRole, ':', defaultDashboard)
-          
+
           if (defaultDashboard && defaultDashboard !== to.path) {
             console.log('🔄 Router: Redirecting to default dashboard with access denied error')
             return next({

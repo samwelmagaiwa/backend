@@ -477,7 +477,7 @@
                 </div>
 
                 <!-- No Departments Found -->
-                <div v-else class="text-center py-8">
+                <div v-if="!departmentsWithHodsLoading && allDepartmentsWithHods.length === 0" class="text-center py-8">
                   <div class="text-teal-100">
                     <i class="fas fa-building text-4xl mb-4 opacity-50"></i>
                     <p class="text-lg">No departments found</p>
@@ -495,7 +495,6 @@
         </div>
       </main>
     </div>
-
 
 
     <!-- Assign/Change HOD Dialog -->
@@ -855,8 +854,6 @@
 </template>
 
 <script>
-import { ref } from 'vue'
-import { mapGetters, mapActions } from 'vuex'
 import { debounce } from 'lodash'
 import AppHeader from '@/components/AppHeader.vue'
 import DynamicSidebar from '@/components/DynamicSidebar.vue'
@@ -864,7 +861,7 @@ import AppFooter from '@/components/footer.vue'
 
 export default {
   name: 'DepartmentHodAssignment',
-  
+
   components: {
     AppHeader,
     DynamicSidebar,
@@ -934,10 +931,10 @@ export default {
       // Remove HOD confirmation
       departmentToRemoveHod: null,
       removeHodLoading: false,
-      
+
       // Selected department
       selectedDepartment: null,
-      
+
       // Create department data
       newDepartment: {
         name: '',
@@ -966,25 +963,24 @@ export default {
         with_pending_requests: 0
       }
     },
-    
+
     departmentsPagination() {
       return {
         total: 0
       }
     },
-    
+
     allDepartmentsWithHods() {
       return []
     },
-    
+
     departmentsWithHodsLoading() {
       return false
     },
-    
+
     departmentsLoading() {
       return false
     },
-
 
 
     availableHods() {
@@ -1024,7 +1020,7 @@ export default {
 
   async created() {
     await this.initializeData()
-    
+
     // Check if we should auto-open the create department dialog
     const urlParams = new URLSearchParams(window.location.search)
     if (urlParams.get('action') === 'create') {
@@ -1041,44 +1037,44 @@ export default {
     async fetchDepartmentsWithHods(params) {
       console.log('fetchDepartmentsWithHods called with:', params)
     },
-    
+
     async fetchEligibleHods() {
       console.log('fetchEligibleHods called')
     },
-    
+
     async fetchDepartmentHodStatistics() {
       console.log('fetchDepartmentHodStatistics called')
     },
-    
+
     async assignHodToDepartment(data) {
       console.log('assignHodToDepartment called with:', data)
       return { success: true }
     },
-    
+
     async removeHodFromDepartment(id) {
       console.log('removeHodFromDepartment called with:', id)
       return { success: true }
     },
-    
+
     setSelectedDepartment(department) {
       this.selectedDepartment = department
     },
-    
+
     clearMessages() {
       console.log('clearMessages called')
     },
-    
+
     async createDepartmentAPI(data) {
       console.log('createDepartmentAPI called with:', data)
       // Simulate API call
       return new Promise((resolve) => {
         setTimeout(() => {
-          resolve({ 
-            success: true, 
-            data: { 
-              id: Date.now(), 
-              ...data 
-            } 
+          resolve({
+            success: true,
+            data: {
+              id: Date.now(),
+              ...data
+            }
           })
         }, 1000)
       })
@@ -1253,7 +1249,7 @@ export default {
 
         if (result.success) {
           this.showSuccessMessage(`Department "${this.newDepartment.name}" created successfully!`)
-          
+
           // If auto-assign HOD is checked, open the assign HOD dialog
           if (this.autoAssignHod) {
             this.closeCreateDepartmentDialog()
@@ -1271,7 +1267,7 @@ export default {
           } else {
             this.closeCreateDepartmentDialog()
           }
-          
+
           // Refresh the departments list
           await this.refreshData()
         } else {
@@ -1479,15 +1475,15 @@ button:hover {
   .grid-cols-4 {
     grid-template-columns: repeat(1, minmax(0, 1fr));
   }
-  
+
   .grid-cols-3 {
     grid-template-columns: repeat(1, minmax(0, 1fr));
   }
-  
+
   .text-4xl {
     font-size: 2rem;
   }
-  
+
   .text-2xl {
     font-size: 1.5rem;
   }

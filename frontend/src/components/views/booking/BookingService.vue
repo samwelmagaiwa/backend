@@ -677,7 +677,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import DynamicSidebar from '@/components/DynamicSidebar.vue'
 import AppFooter from '@/components/footer.vue'
 import AppHeader from '@/components/AppHeader.vue'

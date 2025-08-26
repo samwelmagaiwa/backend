@@ -256,7 +256,7 @@
 
 <script>
 import { ref, onMounted } from 'vue'
-import AppHeader from '@/components/AppHeader.vue'
+import Header from '@/components/header.vue'
 import DynamicSidebar from './DynamicSidebar.vue'
 import AppFooter from '@/components/footer.vue'
 import { useAuth } from '@/composables/useAuth'
@@ -264,7 +264,7 @@ import { useAuth } from '@/composables/useAuth'
 export default {
   name: 'HodDashboard',
   components: {
-    AppHeader,
+    Header,
     DynamicSidebar,
     AppFooter
   },

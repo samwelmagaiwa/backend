@@ -696,14 +696,14 @@ export default {
     onMounted(() => {
       // Guard this route - only admins can access
       requireRole([ROLES.ADMIN])
-      
+
       // Check for search parameter in URL
       const urlParams = new URLSearchParams(window.location.search)
       const searchParam = urlParams.get('search')
       if (searchParam) {
         searchQuery.value = searchParam
       }
-      
+
       loadUsers()
     })
 

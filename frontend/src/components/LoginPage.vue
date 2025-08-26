@@ -296,7 +296,7 @@ export default {
         // Clear password on failed login for security
         password.value = ''
       }
-      
+
       loading.value = false
     }
 

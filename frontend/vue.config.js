@@ -47,7 +47,7 @@ module.exports = defineConfig({
       writeToDisk: false
     },
     // Force disable WebSocket at webpack level
-    onBeforeSetupMiddleware: function(devServer) {
+    setupMiddlewares: (middlewares, devServer) => {
       // Disable WebSocket upgrade
       devServer.app.use((req, res, next) => {
         if (req.headers.upgrade === 'websocket') {
@@ -56,6 +56,7 @@ module.exports = defineConfig({
         }
         next()
       })
+      return middlewares
     }
   }
 })

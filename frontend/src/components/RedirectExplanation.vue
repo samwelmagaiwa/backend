@@ -10,7 +10,7 @@
           Redirect Notice
         </div>
         <div class="text-sm text-blue-600 mb-1">
-          You were redirected here because you tried to access 
+          You were redirected here because you tried to access
           <code class="bg-blue-100 px-1 rounded">{{ redirectParam }}</code>
           without being logged in.
         </div>
@@ -32,17 +32,17 @@
 <script>
 export default {
   name: 'RedirectExplanation',
-  
+
   computed: {
     redirectParam() {
       return this.$route.query.redirect
     }
   },
-  
+
   methods: {
     clearRedirect() {
       // Remove the redirect parameter from the URL
-      this.$router.replace({ 
+      this.$router.replace({
         path: this.$route.path,
         query: { ...this.$route.query, redirect: undefined }
       })

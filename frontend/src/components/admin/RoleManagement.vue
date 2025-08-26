@@ -235,7 +235,6 @@
                 </div>
 
 
-
                 <!-- Filters and Search -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                   <div>
@@ -453,8 +452,6 @@
       <!-- Footer -->
       <AppFooter />
     </div>
-
-
 
 
     <!-- Create/Edit Role Dialog -->
@@ -747,7 +744,6 @@
 </template>
 
 <script>
-import { ref } from 'vue'
 import { mapGetters, mapActions } from 'vuex'
 import { debounce } from 'lodash'
 import AppHeader from '@/components/AppHeader.vue'
@@ -756,7 +752,7 @@ import AppFooter from '@/components/footer.vue'
 
 export default {
   name: 'RoleManagement',
-  
+
   components: {
     AppHeader,
     DynamicSidebar,
@@ -1245,15 +1241,15 @@ button:hover {
   .grid-cols-4 {
     grid-template-columns: repeat(1, minmax(0, 1fr));
   }
-  
+
   .grid-cols-3 {
     grid-template-columns: repeat(1, minmax(0, 1fr));
   }
-  
+
   .text-4xl {
     font-size: 2rem;
   }
-  
+
   .text-2xl {
     font-size: 1.5rem;
   }

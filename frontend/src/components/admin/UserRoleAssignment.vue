@@ -235,7 +235,6 @@
                 </div>
 
 
-
                 <!-- Filters and Search -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                   <div>
@@ -451,8 +450,6 @@
     </div>
 
 
-
-
     <!-- Assign Roles Dialog -->
     <div
       v-if="assignRolesDialog"
@@ -602,8 +599,7 @@
 
         <!-- Body -->
         <div class="p-6">
-          <div v-if="roleHistory.length > 0">
-          <div v-else class="space-y-4">
+          <div v-if="roleHistory.length > 0" class="space-y-4">
             <div
               v-for="(change, index) in roleHistory"
               :key="index"
@@ -648,7 +644,6 @@
                 </div>
               </div>
             </div>
-          </div>
           </div>
           <div v-if="roleHistory.length === 0" class="text-center py-8">
             <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -707,7 +702,6 @@
 </template>
 
 <script>
-import { ref } from 'vue'
 import { mapGetters, mapActions } from 'vuex'
 import { debounce } from 'lodash'
 import AppHeader from '@/components/AppHeader.vue'
@@ -716,7 +710,7 @@ import AppFooter from '@/components/footer.vue'
 
 export default {
   name: 'UserRoleAssignment',
-  
+
   components: {
     AppHeader,
     DynamicSidebar,
@@ -1191,15 +1185,15 @@ button:hover {
   .grid-cols-4 {
     grid-template-columns: repeat(1, minmax(0, 1fr));
   }
-  
+
   .grid-cols-3 {
     grid-template-columns: repeat(1, minmax(0, 1fr));
   }
-  
+
   .text-4xl {
     font-size: 2rem;
   }
-  
+
   .text-2xl {
     font-size: 1.5rem;
   }

@@ -350,7 +350,6 @@ export default {
     ])
 
 
-
     // Guard this route - only Admins can access
     onMounted(() => {
       requireRole([ROLES.ADMIN])
@@ -367,9 +366,6 @@ export default {
         console.error('Failed to load stats:', error)
       }
     }
-
-
-
 
 
     return {

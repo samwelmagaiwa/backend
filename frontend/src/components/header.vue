@@ -368,7 +368,7 @@ import { useAuth } from '@/composables/useAuth'
 import { useRouter } from 'vue-router'
 
 export default {
-  name: 'Header',
+  name: 'AppHeader',
   setup() {
     const { currentUser, logout: authLogout } = useAuth()
     const router = useRouter()
@@ -596,3 +596,4 @@ button:hover {
   position: absolute !important;
 }
 </style>
+
