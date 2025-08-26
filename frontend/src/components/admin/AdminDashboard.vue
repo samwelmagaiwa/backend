@@ -94,7 +94,7 @@
                 >
                   <div class="flex items-center mb-4">
                     <div
-                      class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-green-300/50 mr-4"
+                      class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50 mr-4"
                     >
                       <i class="fas fa-file-alt text-white text-xl"></i>
                     </div>
@@ -112,7 +112,7 @@
                 >
                   <div class="flex items-center mb-4">
                     <div
-                      class="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-yellow-300/50 mr-4"
+                      class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50 mr-4"
                     >
                       <i class="fas fa-clock text-white text-xl"></i>
                     </div>
@@ -130,7 +130,7 @@
                 >
                   <div class="flex items-center mb-4">
                     <div
-                      class="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-purple-300/50 mr-4"
+                      class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50 mr-4"
                     >
                       <i class="fas fa-shield-alt text-white text-xl"></i>
                     </div>
@@ -271,7 +271,7 @@ export default {
         title: 'Role Management',
         description: 'Manage user roles and permissions',
         icon: 'fas fa-user-shield',
-        gradient: 'from-blue-500 to-cyan-600',
+        gradient: 'from-blue-500 to-blue-600',
         border: 'border-blue-300/50',
         route: '/admin/roles'
       },
@@ -279,16 +279,16 @@ export default {
         title: 'User Roles',
         description: 'Assign roles to users',
         icon: 'fas fa-users',
-        gradient: 'from-purple-500 to-indigo-600',
-        border: 'border-purple-300/50',
+        gradient: 'from-blue-500 to-blue-600',
+        border: 'border-blue-300/50',
         route: '/admin/user-roles'
       },
       {
         title: 'Department HODs',
         description: 'Manage department heads',
         icon: 'fas fa-building',
-        gradient: 'from-yellow-500 to-orange-600',
-        border: 'border-yellow-300/50',
+        gradient: 'from-blue-500 to-blue-600',
+        border: 'border-blue-300/50',
         route: '/admin/department-hods'
       }
     ])
@@ -299,23 +299,23 @@ export default {
         title: 'Onboarding Reset',
         description: 'Reset user onboarding status',
         icon: 'fas fa-undo-alt',
-        gradient: 'from-orange-500 to-red-600',
-        border: 'border-orange-300/50',
+        gradient: 'from-blue-500 to-blue-600',
+        border: 'border-blue-300/50',
         route: '/admin/onboarding-reset'
       },
       {
         title: 'Jeeva Users',
         description: 'Manage Jeeva system users',
         icon: 'fas fa-heartbeat',
-        gradient: 'from-red-500 to-pink-600',
-        border: 'border-red-300/50',
+        gradient: 'from-blue-500 to-blue-600',
+        border: 'border-blue-300/50',
         route: '/jeeva-users'
       },
       {
         title: 'Wellsoft Users',
         description: 'Manage Wellsoft system users',
         icon: 'fas fa-laptop-medical',
-        gradient: 'from-blue-500 to-cyan-600',
+        gradient: 'from-blue-500 to-blue-600',
         border: 'border-blue-300/50',
         route: '/wellsoft-users'
       },
@@ -323,8 +323,8 @@ export default {
         title: 'Internet Users',
         description: 'Manage internet access users',
         icon: 'fas fa-wifi',
-        gradient: 'from-green-500 to-emerald-600',
-        border: 'border-green-300/50',
+        gradient: 'from-blue-500 to-blue-600',
+        border: 'border-blue-300/50',
         route: '/internet-users'
       }
     ])
@@ -335,16 +335,16 @@ export default {
         title: 'System Settings',
         description: 'Configure system parameters',
         icon: 'fas fa-cog',
-        gradient: 'from-gray-500 to-slate-600',
-        border: 'border-gray-300/50',
+        gradient: 'from-blue-500 to-blue-600',
+        border: 'border-blue-300/50',
         route: '/settings'
       },
       {
         title: 'Diagnostic Tools',
         description: 'System diagnostic utilities',
         icon: 'fas fa-stethoscope',
-        gradient: 'from-orange-500 to-red-600',
-        border: 'border-orange-300/50',
+        gradient: 'from-blue-500 to-blue-600',
+        border: 'border-blue-300/50',
         route: '/diagnostic'
       }
     ])

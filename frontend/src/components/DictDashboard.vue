@@ -84,11 +84,11 @@
                 </div>
 
                 <div
-                  class="medical-card bg-gradient-to-r from-green-600/25 to-emerald-600/25 border-2 border-green-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-green-500/20 transition-all duration-500 group"
+                  class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-600/25 border-2 border-blue-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
                 >
                   <div class="flex items-center mb-4">
                     <div
-                      class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-green-300/50 mr-4"
+                      class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50 mr-4"
                     >
                       <i class="fas fa-check-circle text-white text-xl"></i>
                     </div>
@@ -96,17 +96,17 @@
                       FORMS APPROVED
                     </h3>
                   </div>
-                  <p class="text-3xl font-bold text-green-100 drop-shadow-lg">
+                  <p class="text-3xl font-bold text-blue-100 drop-shadow-lg">
                     56
                   </p>
                 </div>
 
                 <div
-                  class="medical-card bg-gradient-to-r from-pink-600/25 to-rose-600/25 border-2 border-pink-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-pink-500/20 transition-all duration-500 group"
+                  class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-600/25 border-2 border-blue-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
                 >
                   <div class="flex items-center mb-4">
                     <div
-                      class="w-12 h-12 bg-gradient-to-br from-pink-500 to-rose-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-pink-300/50 mr-4"
+                      class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50 mr-4"
                     >
                       <i class="fas fa-clock text-white text-xl"></i>
                     </div>
@@ -114,17 +114,17 @@
                       PENDING REQUESTS
                     </h3>
                   </div>
-                  <p class="text-3xl font-bold text-pink-100 drop-shadow-lg">
+                  <p class="text-3xl font-bold text-blue-100 drop-shadow-lg">
                     89
                   </p>
                 </div>
 
                 <div
-                  class="medical-card bg-gradient-to-r from-purple-600/25 to-indigo-600/25 border-2 border-purple-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-500 group"
+                  class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-600/25 border-2 border-blue-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
                 >
                   <div class="flex items-center mb-4">
                     <div
-                      class="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-purple-300/50 mr-4"
+                      class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50 mr-4"
                     >
                       <i class="fas fa-database text-white text-xl"></i>
                     </div>
@@ -132,17 +132,17 @@
                       JEEVA REQUESTS
                     </h3>
                   </div>
-                  <p class="text-3xl font-bold text-purple-100 drop-shadow-lg">
+                  <p class="text-3xl font-bold text-blue-100 drop-shadow-lg">
                     70
                   </p>
                 </div>
 
                 <div
-                  class="medical-card bg-gradient-to-r from-yellow-600/25 to-orange-600/25 border-2 border-yellow-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-yellow-500/20 transition-all duration-500 group"
+                  class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-600/25 border-2 border-blue-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
                 >
                   <div class="flex items-center mb-4">
                     <div
-                      class="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-yellow-300/50 mr-4"
+                      class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50 mr-4"
                     >
                       <i class="fas fa-laptop-medical text-white text-xl"></i>
                     </div>
@@ -150,17 +150,17 @@
                       WELLSOFT REQUESTS
                     </h3>
                   </div>
-                  <p class="text-3xl font-bold text-yellow-100 drop-shadow-lg">
+                  <p class="text-3xl font-bold text-blue-100 drop-shadow-lg">
                     89
                   </p>
                 </div>
 
                 <div
-                  class="medical-card bg-gradient-to-r from-teal-600/25 to-cyan-600/25 border-2 border-teal-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-teal-500/20 transition-all duration-500 group"
+                  class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-600/25 border-2 border-blue-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
                 >
                   <div class="flex items-center mb-4">
                     <div
-                      class="w-12 h-12 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-teal-300/50 mr-4"
+                      class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50 mr-4"
                     >
                       <i class="fas fa-wifi text-white text-xl"></i>
                     </div>
@@ -168,7 +168,7 @@
                       INTERNET ACCESS
                     </h3>
                   </div>
-                  <p class="text-3xl font-bold text-teal-100 drop-shadow-lg">
+                  <p class="text-3xl font-bold text-blue-100 drop-shadow-lg">
                     900
                   </p>
                 </div>

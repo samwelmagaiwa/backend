@@ -295,7 +295,7 @@
                       <button
                         @click="resetUserOnboarding(user, 'terms')"
                         :disabled="!user.onboarding_status?.terms_accepted"
-                        class="flex-1 bg-gradient-to-r from-orange-500 to-red-500 text-white py-2 px-3 rounded-lg text-xs font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 shadow-lg"
+                        class="flex-1 bg-red-500 text-white py-2 px-3 rounded-lg text-xs font-semibold hover:bg-red-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 shadow-lg"
                         :class="
                           !user.onboarding_status?.terms_accepted
                             ? 'opacity-50 cursor-not-allowed'
@@ -309,7 +309,7 @@
                       <button
                         @click="resetUserOnboarding(user, 'ict')"
                         :disabled="!user.onboarding_status?.ict_policy_accepted"
-                        class="flex-1 bg-gradient-to-r from-purple-500 to-indigo-500 text-white py-2 px-3 rounded-lg text-xs font-semibold hover:from-purple-600 hover:to-indigo-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 shadow-lg"
+                        class="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 rounded-lg text-xs font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 shadow-lg"
                         :class="
                           !user.onboarding_status?.ict_policy_accepted
                             ? 'opacity-50 cursor-not-allowed'
@@ -327,7 +327,7 @@
                         !user.onboarding_status?.terms_accepted &&
                         !user.onboarding_status?.ict_policy_accepted
                       "
-                      class="w-full mt-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-2 px-3 rounded-lg text-xs font-semibold hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 shadow-lg"
+                      class="w-full mt-2 bg-blue-500 text-white py-2 px-3 rounded-lg text-xs font-semibold hover:bg-blue-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 shadow-lg"
                       :class="
                         !user.onboarding_status?.terms_accepted &&
                         !user.onboarding_status?.ict_policy_accepted

@@ -499,12 +499,13 @@
                   </button>
                 </div>
               </div>
+
+              <!-- Footer -->
+              <AppFooter />
             </div>
           </div>
         </div>
       </main>
-      <!-- Footer -->
-      <AppFooter />
     </div>
 
     <!-- Password Change Modal -->

@@ -153,11 +153,11 @@
                   </div>
 
                   <div
-                    class="bg-white/15 p-4 rounded-xl backdrop-blur-sm border border-green-300/30 hover:bg-white/20 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/20 group"
+                    class="bg-white/15 p-4 rounded-xl backdrop-blur-sm border border-blue-300/30 hover:bg-white/20 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20 group"
                   >
                     <div class="flex items-center space-x-3">
                       <div
-                        class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300"
+                        class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300"
                       >
                         <i class="fas fa-user-check text-white text-lg"></i>
                       </div>
@@ -165,17 +165,17 @@
                         <div class="text-2xl font-bold text-white">
                           {{ userRoleStatistics.users_with_roles || 0 }}
                         </div>
-                        <div class="text-sm text-green-100">Users with Roles</div>
+                        <div class="text-sm text-blue-100">Users with Roles</div>
                       </div>
                     </div>
                   </div>
 
                   <div
-                    class="bg-white/15 p-4 rounded-xl backdrop-blur-sm border border-orange-300/30 hover:bg-white/20 transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/20 group"
+                    class="bg-white/15 p-4 rounded-xl backdrop-blur-sm border border-blue-300/30 hover:bg-white/20 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20 group"
                   >
                     <div class="flex items-center space-x-3">
                       <div
-                        class="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300"
+                        class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300"
                       >
                         <i class="fas fa-user-times text-white text-lg"></i>
                       </div>
@@ -183,17 +183,17 @@
                         <div class="text-2xl font-bold text-white">
                           {{ userRoleStatistics.users_without_roles || 0 }}
                         </div>
-                        <div class="text-sm text-orange-100">Users without Roles</div>
+                        <div class="text-sm text-blue-100">Users without Roles</div>
                       </div>
                     </div>
                   </div>
 
                   <div
-                    class="bg-white/15 p-4 rounded-xl backdrop-blur-sm border border-yellow-300/30 hover:bg-white/20 transition-all duration-300 hover:shadow-lg hover:shadow-yellow-500/20 group"
+                    class="bg-white/15 p-4 rounded-xl backdrop-blur-sm border border-blue-300/30 hover:bg-white/20 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20 group"
                   >
                     <div class="flex items-center space-x-3">
                       <div
-                        class="w-12 h-12 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300"
+                        class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300"
                       >
                         <i class="fas fa-crown text-white text-lg"></i>
                       </div>
@@ -201,7 +201,7 @@
                         <div class="text-2xl font-bold text-white">
                           {{ userRoleStatistics.hod_users || 0 }}
                         </div>
-                        <div class="text-sm text-yellow-100">HOD Users</div>
+                        <div class="text-sm text-blue-100">HOD Users</div>
                       </div>
                     </div>
                   </div>
@@ -215,23 +215,32 @@
                 <div class="flex items-center justify-between mb-6">
                   <div class="flex items-center space-x-4">
                     <div
-                      class="w-14 h-14 bg-gradient-to-br from-teal-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-teal-300/50"
+                      class="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
                     >
                       <i class="fas fa-users-cog text-white text-xl"></i>
                     </div>
                     <h3 class="text-xl font-bold text-white flex items-center">
-                      <i class="fas fa-list mr-2 text-teal-300"></i>
+                      <i class="fas fa-list mr-2 text-blue-300"></i>
                       Users and Their Roles ({{ usersWithRolesPagination.total || 0 }} total users)
                     </h3>
                   </div>
-                  <button
-                    @click="refreshData"
-                    :disabled="usersWithRolesLoading"
-                    class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 shadow-lg flex items-center space-x-2"
-                  >
-                    <i :class="usersWithRolesLoading ? 'fas fa-spinner fa-spin' : 'fas fa-refresh'"></i>
-                    <span>{{ usersWithRolesLoading ? 'Loading...' : 'Refresh' }}</span>
-                  </button>
+                  <div class="flex space-x-3">
+                    <button
+                      @click="openCreateUserDialog"
+                      class="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center space-x-2"
+                    >
+                      <i class="fas fa-user-plus"></i>
+                      <span>Create User</span>
+                    </button>
+                    <button
+                      @click="refreshData"
+                      :disabled="usersWithRolesLoading"
+                      class="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 shadow-lg flex items-center space-x-2"
+                    >
+                      <i :class="usersWithRolesLoading ? 'fas fa-spinner fa-spin' : 'fas fa-refresh'"></i>
+                      <span>{{ usersWithRolesLoading ? 'Loading...' : 'Refresh' }}</span>
+                    </button>
+                  </div>
                 </div>
 
 
@@ -421,7 +430,7 @@
 
                       <button
                         @click="viewRoleHistory(user)"
-                        class="flex-1 bg-gradient-to-r from-purple-500 to-purple-600 text-white py-2 px-3 rounded-lg text-xs font-semibold hover:from-purple-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center space-x-1"
+                        class="flex-1 bg-gradient-to-r from-red-500 to-red-600 text-white py-2 px-3 rounded-lg text-xs font-semibold hover:from-red-600 hover:to-red-700 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center space-x-1"
                       >
                         <i class="fas fa-history"></i>
                         <span>History</span>
@@ -441,12 +450,13 @@
                   </div>
                 </div>
               </div>
+
+              <!-- Footer -->
+              <AppFooter />
             </div>
           </div>
         </div>
       </main>
-      <!-- Footer -->
-      <AppFooter />
     </div>
 
 
@@ -585,7 +595,7 @@
         class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-100 animate-slideUp"
       >
         <!-- Header -->
-        <div class="bg-gradient-to-r from-purple-500 to-purple-600 p-6 text-center">
+        <div class="bg-gradient-to-r from-red-500 to-red-600 p-6 text-center">
           <div
             class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm border border-white/30"
           >
@@ -663,6 +673,373 @@
             class="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 transition-all duration-200 shadow-md hover:shadow-lg"
           >
             Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create User Dialog -->
+    <div
+      v-if="createUserDialog"
+      class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 backdrop-blur-sm"
+    >
+      <div
+        class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-100 animate-slideUp"
+      >
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-6 text-center">
+          <div
+            class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm border border-white/30"
+          >
+            <i class="fas fa-user-plus text-white text-2xl"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-2">
+            Create New User
+          </h3>
+          <div class="w-12 h-1 bg-white/50 mx-auto rounded-full"></div>
+        </div>
+
+        <!-- Body -->
+        <div class="p-6">
+          <form ref="createUserForm" @submit.prevent="createUser">
+            <!-- User Basic Information Section -->
+            <div class="medical-card bg-gradient-to-r from-blue-600/15 to-cyan-600/15 border-2 border-blue-400/30 p-6 rounded-2xl backdrop-blur-sm hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 mb-6">
+              <div class="flex items-center space-x-3 mb-6">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <i class="fas fa-user text-white text-lg"></i>
+                </div>
+                <h4 class="text-xl font-bold text-gray-800">User Information</h4>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Full Name -->
+                <div class="space-y-2">
+                  <div class="flex items-center space-x-2 mb-3">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md">
+                      <i class="fas fa-user text-white text-sm"></i>
+                    </div>
+                    <label class="text-sm font-bold text-gray-700">
+                      Full Name *
+                    </label>
+                  </div>
+                  <div class="relative">
+                    <input
+                      v-model="createUserForm.name"
+                      type="text"
+                      required
+                      class="w-full px-4 py-3 bg-white/70 border-2 border-blue-300/30 rounded-xl focus:border-blue-500 focus:outline-none text-gray-800 placeholder-gray-500 backdrop-blur-sm transition-all duration-300 hover:bg-white/80 focus:bg-white/90 focus:shadow-lg focus:shadow-blue-500/20"
+                      placeholder="Enter full name"
+                    />
+                    <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/5 to-cyan-500/5 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                  </div>
+                  <div v-if="getCreateUserFieldError('name')" class="text-red-500 text-sm mt-1 flex items-center space-x-1">
+                    <i class="fas fa-exclamation-circle text-xs"></i>
+                    <span>{{ getCreateUserFieldError('name') }}</span>
+                  </div>
+                </div>
+
+                <!-- Email Address -->
+                <div class="space-y-2">
+                  <div class="flex items-center space-x-2 mb-3">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md">
+                      <i class="fas fa-envelope text-white text-sm"></i>
+                    </div>
+                    <label class="text-sm font-bold text-gray-700">
+                      Email Address *
+                    </label>
+                  </div>
+                  <div class="relative">
+                    <input
+                      v-model="createUserForm.email"
+                      type="email"
+                      required
+                      class="w-full px-4 py-3 bg-white/70 border-2 border-blue-300/30 rounded-xl focus:border-blue-500 focus:outline-none text-gray-800 placeholder-gray-500 backdrop-blur-sm transition-all duration-300 hover:bg-white/80 focus:bg-white/90 focus:shadow-lg focus:shadow-blue-500/20"
+                      placeholder="Enter email address"
+                    />
+                    <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/5 to-cyan-500/5 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                  </div>
+                  <div v-if="getCreateUserFieldError('email')" class="text-red-500 text-sm mt-1 flex items-center space-x-1">
+                    <i class="fas fa-exclamation-circle text-xs"></i>
+                    <span>{{ getCreateUserFieldError('email') }}</span>
+                  </div>
+                </div>
+
+                <!-- PF Number -->
+                <div class="space-y-2">
+                  <div class="flex items-center space-x-2 mb-3">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md">
+                      <i class="fas fa-id-badge text-white text-sm"></i>
+                    </div>
+                    <label class="text-sm font-bold text-gray-700">
+                      PF Number
+                    </label>
+                  </div>
+                  <div class="relative">
+                    <input
+                      v-model="createUserForm.pf_number"
+                      type="text"
+                      class="w-full px-4 py-3 bg-white/70 border-2 border-blue-300/30 rounded-xl focus:border-blue-500 focus:outline-none text-gray-800 placeholder-gray-500 backdrop-blur-sm transition-all duration-300 hover:bg-white/80 focus:bg-white/90 focus:shadow-lg focus:shadow-blue-500/20"
+                      placeholder="Enter PF number"
+                    />
+                    <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/5 to-cyan-500/5 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                  </div>
+                  <div v-if="getCreateUserFieldError('pf_number')" class="text-red-500 text-sm mt-1 flex items-center space-x-1">
+                    <i class="fas fa-exclamation-circle text-xs"></i>
+                    <span>{{ getCreateUserFieldError('pf_number') }}</span>
+                  </div>
+                </div>
+
+                <!-- Phone Number -->
+                <div class="space-y-2">
+                  <div class="flex items-center space-x-2 mb-3">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md">
+                      <i class="fas fa-phone text-white text-sm"></i>
+                    </div>
+                    <label class="text-sm font-bold text-gray-700">
+                      Phone Number
+                    </label>
+                  </div>
+                  <div class="relative">
+                    <input
+                      v-model="createUserForm.phone"
+                      type="tel"
+                      class="w-full px-4 py-3 bg-white/70 border-2 border-blue-300/30 rounded-xl focus:border-blue-500 focus:outline-none text-gray-800 placeholder-gray-500 backdrop-blur-sm transition-all duration-300 hover:bg-white/80 focus:bg-white/90 focus:shadow-lg focus:shadow-blue-500/20"
+                      placeholder="Enter phone number"
+                    />
+                    <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/5 to-cyan-500/5 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                  </div>
+                  <div v-if="getCreateUserFieldError('phone')" class="text-red-500 text-sm mt-1 flex items-center space-x-1">
+                    <i class="fas fa-exclamation-circle text-xs"></i>
+                    <span>{{ getCreateUserFieldError('phone') }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Department and Security Section -->
+            <div class="medical-card bg-gradient-to-r from-purple-600/15 to-indigo-600/15 border-2 border-purple-400/30 p-6 rounded-2xl backdrop-blur-sm hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 mb-6">
+              <div class="flex items-center space-x-3 mb-6">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <i class="fas fa-building text-white text-lg"></i>
+                </div>
+                <h4 class="text-xl font-bold text-gray-800">Department & Security</h4>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Department -->
+                <div class="space-y-2">
+                  <div class="flex items-center space-x-2 mb-3">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md">
+                      <i class="fas fa-building text-white text-sm"></i>
+                    </div>
+                    <label class="text-sm font-bold text-gray-700">
+                      Department
+                    </label>
+                  </div>
+                  <div class="relative">
+                    <select
+                      v-model="createUserForm.department_id"
+                      class="w-full px-4 py-3 bg-white/70 border-2 border-purple-300/30 rounded-xl focus:border-purple-500 focus:outline-none text-gray-800 backdrop-blur-sm transition-all duration-300 hover:bg-white/80 focus:bg-white/90 focus:shadow-lg focus:shadow-purple-500/20 appearance-none cursor-pointer"
+                    >
+                      <option value="" class="bg-gray-800 text-white">Select Department</option>
+                      <option
+                        v-for="department in availableDepartments"
+                        :key="department.id"
+                        :value="department.id"
+                        class="bg-gray-800 text-white"
+                      >
+                        {{ department.name }}
+                      </option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                      <i class="fas fa-chevron-down text-purple-500"></i>
+                    </div>
+                  </div>
+                  <div v-if="getCreateUserFieldError('department_id')" class="text-red-500 text-sm mt-1 flex items-center space-x-1">
+                    <i class="fas fa-exclamation-circle text-xs"></i>
+                    <span>{{ getCreateUserFieldError('department_id') }}</span>
+                  </div>
+                </div>
+
+                <!-- Password -->
+                <div class="space-y-2">
+                  <div class="flex items-center space-x-2 mb-3">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md">
+                      <i class="fas fa-lock text-white text-sm"></i>
+                    </div>
+                    <label class="text-sm font-bold text-gray-700">
+                      Password *
+                    </label>
+                  </div>
+                  <div class="relative">
+                    <input
+                      v-model="createUserForm.password"
+                      type="password"
+                      required
+                      class="w-full px-4 py-3 bg-white/70 border-2 border-purple-300/30 rounded-xl focus:border-purple-500 focus:outline-none text-gray-800 placeholder-gray-500 backdrop-blur-sm transition-all duration-300 hover:bg-white/80 focus:bg-white/90 focus:shadow-lg focus:shadow-purple-500/20"
+                      placeholder="Enter password"
+                    />
+                    <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-purple-500/5 to-indigo-500/5 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                  </div>
+                  <div v-if="getCreateUserFieldError('password')" class="text-red-500 text-sm mt-1 flex items-center space-x-1">
+                    <i class="fas fa-exclamation-circle text-xs"></i>
+                    <span>{{ getCreateUserFieldError('password') }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Roles Assignment Section -->
+            <div class="medical-card bg-gradient-to-r from-green-600/15 to-emerald-600/15 border-2 border-green-400/30 p-6 rounded-2xl backdrop-blur-sm hover:shadow-lg hover:shadow-green-500/20 transition-all duration-300 mb-6">
+              <div class="flex items-center space-x-3 mb-6">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <i class="fas fa-user-tag text-white text-lg"></i>
+                </div>
+                <h4 class="text-xl font-bold text-gray-800">Assign Roles</h4>
+              </div>
+
+              <div class="space-y-6">
+                <!-- Role Selection Dropdown -->
+                <div class="space-y-2">
+                  <div class="flex items-center space-x-2 mb-3">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md">
+                      <i class="fas fa-list text-white text-sm"></i>
+                    </div>
+                    <label class="text-sm font-bold text-gray-700">
+                      Select Roles
+                    </label>
+                  </div>
+                  <div class="relative">
+                    <select
+                      v-model="selectedRoleForAdd"
+                      @change="addRoleToUser"
+                      class="w-full px-4 py-3 bg-white/70 border-2 border-green-300/30 rounded-xl focus:border-green-500 focus:outline-none text-gray-800 backdrop-blur-sm transition-all duration-300 hover:bg-white/80 focus:bg-white/90 focus:shadow-lg focus:shadow-green-500/20 appearance-none cursor-pointer"
+                    >
+                      <option value="" class="bg-gray-800 text-white">Choose a role to add...</option>
+                      <option
+                        v-for="role in availableRolesForDropdown"
+                        :key="role.id"
+                        :value="role.id"
+                        class="bg-gray-800 text-white"
+                      >
+                        {{ role.name }} {{ role.description ? '- ' + role.description : '' }}
+                      </option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                      <i class="fas fa-chevron-down text-green-500"></i>
+                    </div>
+                  </div>
+                  <div class="text-xs text-gray-600 mt-1 flex items-center space-x-1">
+                    <i class="fas fa-info-circle text-green-500"></i>
+                    <span>Select roles from the dropdown to assign to the user</span>
+                  </div>
+                </div>
+
+                <!-- Alternative: Checkbox List (Optional) -->
+                <div class="space-y-2">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                      <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md">
+                        <i class="fas fa-check-square text-white text-sm"></i>
+                      </div>
+                      <label class="text-sm font-bold text-gray-700">
+                        Or select from list
+                      </label>
+                    </div>
+                    <button
+                      @click="toggleRolesList"
+                      type="button"
+                      class="text-sm text-green-600 hover:text-green-700 font-medium flex items-center space-x-1"
+                    >
+                      <span>{{ showRolesList ? 'Hide' : 'Show' }} roles list</span>
+                      <i :class="showRolesList ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
+                    </button>
+                  </div>
+                  
+                  <div v-if="showRolesList" class="bg-white/50 border-2 border-green-300/30 rounded-xl p-4 max-h-64 overflow-y-auto">
+                    <div class="space-y-3">
+                      <div
+                        v-for="role in availableRoles"
+                        :key="role.id"
+                        class="flex items-center space-x-3 p-3 bg-white/50 rounded-lg hover:bg-white/70 transition-all duration-200"
+                      >
+                        <input
+                          v-model="createUserForm.role_ids"
+                          :value="role.id"
+                          type="checkbox"
+                          class="w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
+                        />
+                        <div class="flex items-center space-x-2 flex-1">
+                          <div class="w-5 h-5 bg-gradient-to-br from-blue-500 to-blue-600 rounded flex items-center justify-center">
+                            <i class="fas fa-shield-alt text-white text-xs"></i>
+                          </div>
+                          <div class="flex-1">
+                            <span class="text-sm font-medium text-gray-700">
+                              {{ role.name }}
+                            </span>
+                            <p v-if="role.description" class="text-xs text-gray-600 mt-1">
+                              {{ role.description }}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div v-if="getCreateUserFieldError('role_ids')" class="text-red-500 text-sm flex items-center space-x-1">
+                  <i class="fas fa-exclamation-circle text-xs"></i>
+                  <span>{{ getCreateUserFieldError('role_ids') }}</span>
+                </div>
+              </div>
+
+              <!-- Selected Roles Preview -->
+              <div v-if="createUserForm.role_ids.length > 0" class="mt-6">
+                <div class="flex items-center space-x-2 mb-3">
+                  <div class="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-sm">
+                    <i class="fas fa-check text-white text-xs"></i>
+                  </div>
+                  <label class="text-sm font-bold text-gray-700">
+                    Selected Roles ({{ createUserForm.role_ids.length }}):
+                  </label>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  <span
+                    v-for="roleId in createUserForm.role_ids"
+                    :key="roleId"
+                    class="px-3 py-2 bg-blue-500/20 text-blue-800 rounded-lg text-sm border border-blue-400/50 flex items-center space-x-2 shadow-sm"
+                  >
+                    <span>{{ availableRoles.find(r => r.id === roleId)?.name }}</span>
+                    <button
+                      @click="removeRoleFromCreateForm(roleId)"
+                      class="text-blue-600 hover:text-red-500 transition-colors duration-200"
+                    >
+                      <i class="fas fa-times text-xs"></i>
+                    </button>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-end space-x-3 p-6 border-t border-gray-200">
+          <button
+            @click="closeCreateUserDialog"
+            :disabled="createUserSubmitting"
+            class="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Cancel
+          </button>
+          <button
+            @click="createUser"
+            :disabled="createUserSubmitting || !createUserForm.name || !createUserForm.email || !createUserForm.password"
+            class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-medium hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+          >
+            <i v-if="createUserSubmitting" class="fas fa-spinner fa-spin"></i>
+            <i v-else class="fas fa-user-plus"></i>
+            <span>{{ createUserSubmitting ? 'Creating...' : 'Create User' }}</span>
           </button>
         </div>
       </div>
@@ -751,6 +1128,7 @@ export default {
       // Dialog states
       assignRolesDialog: false,
       roleHistoryDialog: false,
+      createUserDialog: false,
 
       // Form data
       selectedRoleIds: [],
@@ -765,6 +1143,24 @@ export default {
 
       // Role history
       roleHistory: [],
+
+      // Create User Form
+      createUserForm: {
+        name: '',
+        email: '',
+        pf_number: '',
+        phone: '',
+        department_id: '',
+        password: '',
+        role_ids: []
+      },
+      createUserSubmitting: false,
+      createUserFormErrors: {},
+      availableDepartments: [],
+
+      // Role selection for dropdown
+      selectedRoleForAdd: '',
+      showRolesList: false,
 
       // Snackbar
       showSnackbar: false,
@@ -807,6 +1203,13 @@ export default {
 
     debouncedSearch() {
       return debounce(this.applyFilters, 500)
+    },
+
+    availableRolesForDropdown() {
+      // Filter out roles that are already selected
+      return this.availableRoles.filter(role => 
+        !this.createUserForm.role_ids.includes(role.id)
+      )
     }
   },
 
@@ -973,6 +1376,94 @@ export default {
       }
     },
 
+    // Create User methods
+    openCreateUserDialog() {
+      this.resetCreateUserForm()
+      this.createUserDialog = true
+      this.fetchDepartments()
+    },
+
+    closeCreateUserDialog() {
+      this.createUserDialog = false
+      this.resetCreateUserForm()
+    },
+
+    resetCreateUserForm() {
+      this.createUserForm = {
+        name: '',
+        email: '',
+        pf_number: '',
+        phone: '',
+        department_id: '',
+        password: '',
+        role_ids: []
+      }
+      this.createUserFormErrors = {}
+      this.selectedRoleForAdd = ''
+      this.showRolesList = false
+    },
+
+    async createUser() {
+      this.createUserSubmitting = true
+      this.createUserFormErrors = {}
+
+      try {
+        // Add your API call here
+        // const result = await userService.createUser(this.createUserForm)
+        
+        // Mock success for now
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        
+        this.showSuccessMessage('User created successfully!')
+        this.closeCreateUserDialog()
+        await this.refreshData()
+      } catch (error) {
+        console.error('Error creating user:', error)
+        this.showErrorMessage('Failed to create user')
+        // Handle validation errors
+        if (error.response && error.response.data && error.response.data.errors) {
+          this.createUserFormErrors = error.response.data.errors
+        }
+      } finally {
+        this.createUserSubmitting = false
+      }
+    },
+
+    removeRoleFromCreateForm(roleId) {
+      this.createUserForm.role_ids = this.createUserForm.role_ids.filter(id => id !== roleId)
+    },
+
+    addRoleToUser() {
+      if (this.selectedRoleForAdd && !this.createUserForm.role_ids.includes(this.selectedRoleForAdd)) {
+        this.createUserForm.role_ids.push(this.selectedRoleForAdd)
+        this.selectedRoleForAdd = '' // Reset dropdown
+      }
+    },
+
+    toggleRolesList() {
+      this.showRolesList = !this.showRolesList
+    },
+
+    async fetchDepartments() {
+      try {
+        // Add your API call here
+        // const result = await departmentService.getDepartments()
+        // this.availableDepartments = result.data
+        
+        // Mock data for now
+        this.availableDepartments = [
+          { id: 1, name: 'Information Technology' },
+          { id: 2, name: 'Human Resources' },
+          { id: 3, name: 'Finance' },
+          { id: 4, name: 'Medical Services' },
+          { id: 5, name: 'Administration' }
+        ]
+      } catch (error) {
+        console.error('Error fetching departments:', error)
+        this.availableDepartments = []
+      }
+    },
+
     // Utility methods
     getInitials(name) {
       return name
@@ -1025,6 +1516,12 @@ export default {
     getFieldError(fieldName) {
       return this.assignRolesFormErrors[fieldName]
         ? this.assignRolesFormErrors[fieldName][0]
+        : ''
+    },
+
+    getCreateUserFieldError(fieldName) {
+      return this.createUserFormErrors[fieldName]
+        ? this.createUserFormErrors[fieldName][0]
         : ''
     },
 

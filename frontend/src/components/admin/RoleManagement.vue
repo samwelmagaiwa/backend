@@ -153,11 +153,11 @@
                   </div>
 
                   <div
-                    class="bg-white/15 p-4 rounded-xl backdrop-blur-sm border border-green-300/30 hover:bg-white/20 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/20 group"
+                    class="bg-white/15 p-4 rounded-xl backdrop-blur-sm border border-blue-300/30 hover:bg-white/20 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20 group"
                   >
                     <div class="flex items-center space-x-3">
                       <div
-                        class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300"
+                        class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300"
                       >
                         <i class="fas fa-cog text-white text-lg"></i>
                       </div>
@@ -165,17 +165,17 @@
                         <div class="text-2xl font-bold text-white">
                           {{ roleStatistics.system_roles || 0 }}
                         </div>
-                        <div class="text-sm text-green-100">System Roles</div>
+                        <div class="text-sm text-blue-100">System Roles</div>
                       </div>
                     </div>
                   </div>
 
                   <div
-                    class="bg-white/15 p-4 rounded-xl backdrop-blur-sm border border-purple-300/30 hover:bg-white/20 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20 group"
+                    class="bg-white/15 p-4 rounded-xl backdrop-blur-sm border border-blue-300/30 hover:bg-white/20 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20 group"
                   >
                     <div class="flex items-center space-x-3">
                       <div
-                        class="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300"
+                        class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300"
                       >
                         <i class="fas fa-user-edit text-white text-lg"></i>
                       </div>
@@ -183,17 +183,17 @@
                         <div class="text-2xl font-bold text-white">
                           {{ roleStatistics.custom_roles || 0 }}
                         </div>
-                        <div class="text-sm text-purple-100">Custom Roles</div>
+                        <div class="text-sm text-blue-100">Custom Roles</div>
                       </div>
                     </div>
                   </div>
 
                   <div
-                    class="bg-white/15 p-4 rounded-xl backdrop-blur-sm border border-orange-300/30 hover:bg-white/20 transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/20 group"
+                    class="bg-white/15 p-4 rounded-xl backdrop-blur-sm border border-blue-300/30 hover:bg-white/20 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20 group"
                   >
                     <div class="flex items-center space-x-3">
                       <div
-                        class="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300"
+                        class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300"
                       >
                         <i class="fas fa-users text-white text-lg"></i>
                       </div>
@@ -201,7 +201,7 @@
                         <div class="text-2xl font-bold text-white">
                           {{ roleStatistics.roles_with_users || 0 }}
                         </div>
-                        <div class="text-sm text-orange-100">Roles in Use</div>
+                        <div class="text-sm text-blue-100">Roles in Use</div>
                       </div>
                     </div>
                   </div>
@@ -226,8 +226,7 @@
                   </div>
                   <button
                     @click="openCreateRoleDialog"
-                    :disabled="!canManageRoles"
-                    class="bg-gradient-to-r from-green-500 to-emerald-500 text-white py-3 px-6 rounded-xl font-semibold hover:from-green-600 hover:to-emerald-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 shadow-lg flex items-center space-x-2"
+                    class="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center space-x-2"
                   >
                     <i class="fas fa-plus"></i>
                     <span>Create New Role</span>
@@ -317,7 +316,7 @@
                     <button
                       @click="refreshRoles"
                       :disabled="rolesLoading"
-                      class="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-3 px-4 rounded-xl font-semibold hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 shadow-lg flex items-center justify-center space-x-2"
+                      class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 px-4 rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 shadow-lg flex items-center justify-center space-x-2"
                     >
                       <i :class="rolesLoading ? 'fas fa-spinner fa-spin' : 'fas fa-refresh'"></i>
                       <span>{{ rolesLoading ? 'Loading...' : 'Refresh' }}</span>
@@ -445,12 +444,13 @@
                   </div>
                 </div>
               </div>
+
+              <!-- Footer -->
+              <AppFooter />
             </div>
           </div>
         </div>
       </main>
-      <!-- Footer -->
-      <AppFooter />
     </div>
 
 
@@ -460,12 +460,12 @@
       class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 backdrop-blur-sm"
     >
       <div
-        class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-100 animate-slideUp"
+        class="bg-white rounded-2xl shadow-2xl max-w-8xl w-full mx-4 max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-100 animate-slideUp"
       >
         <!-- Header -->
         <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-6 text-center">
           <div
-            class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm border border-white/30"
+            class="w-16 h-8 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm border border-white/30"
           >
             <i
               :class="[
@@ -483,119 +483,347 @@
         <!-- Body -->
         <div class="p-6">
           <form ref="roleForm" @submit.prevent="saveRole">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                  Role Name *
-                </label>
-                <input
-                  v-model="roleForm.name"
-                  type="text"
-                  required
-                  class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-blue-500 focus:outline-none transition-all duration-300"
-                  placeholder="Enter role name"
-                />
-                <div v-if="getFieldError('name')" class="text-red-500 text-sm mt-1">
-                  {{ getFieldError('name') }}
+            <!-- Role Basic Information Section -->
+            <div class="medical-card bg-gradient-to-r from-blue-600/15 to-cyan-600/15 border-2 border-blue-400/30 p-6 rounded-2xl backdrop-blur-sm hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 mb-6">
+              <div class="flex items-center space-x-3 mb-6">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <i class="fas fa-info-circle text-white text-lg"></i>
+                </div>
+                <h4 class="text-xl font-bold text-gray-800">Role Information</h4>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                  <div class="flex items-center space-x-2 mb-3">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md">
+                      <i class="fas fa-tag text-white text-sm"></i>
+                    </div>
+                    <label class="text-sm font-bold text-gray-700">
+                      Role Name *
+                    </label>
+                  </div>
+                  <div class="relative">
+                    <input
+                      v-model="roleForm.name"
+                      type="text"
+                      required
+                      class="w-full px-4 py-3 bg-white/70 border-2 border-blue-300/30 rounded-xl focus:border-blue-500 focus:outline-none text-gray-800 placeholder-gray-500 backdrop-blur-sm transition-all duration-300 hover:bg-white/80 focus:bg-white/90 focus:shadow-lg focus:shadow-blue-500/20"
+                      placeholder="Enter role name"
+                    />
+                    <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/5 to-cyan-500/5 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                  </div>
+                  <div v-if="getFieldError('name')" class="text-red-500 text-sm mt-1 flex items-center space-x-1">
+                    <i class="fas fa-exclamation-circle text-xs"></i>
+                    <span>{{ getFieldError('name') }}</span>
+                  </div>
+                </div>
+
+                <div class="space-y-2">
+                  <div class="flex items-center space-x-2 mb-3">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md">
+                      <i class="fas fa-sort-numeric-up text-white text-sm"></i>
+                    </div>
+                    <label class="text-sm font-bold text-gray-700">
+                      Sort Order
+                    </label>
+                  </div>
+                  <div class="relative">
+                    <input
+                      v-model="roleForm.sort_order"
+                      type="number"
+                      class="w-full px-4 py-3 bg-white/70 border-2 border-blue-300/30 rounded-xl focus:border-blue-500 focus:outline-none text-gray-800 placeholder-gray-500 backdrop-blur-sm transition-all duration-300 hover:bg-white/80 focus:bg-white/90 focus:shadow-lg focus:shadow-blue-500/20"
+                      placeholder="Lower numbers appear first"
+                    />
+                    <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/5 to-cyan-500/5 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                  </div>
+                  <div class="text-xs text-gray-600 mt-1 flex items-center space-x-1">
+                    <i class="fas fa-info-circle text-blue-500"></i>
+                    <span>Lower numbers appear first in lists</span>
+                  </div>
                 </div>
               </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                  Sort Order
-                </label>
-                <input
-                  v-model="roleForm.sort_order"
-                  type="number"
-                  class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-blue-500 focus:outline-none transition-all duration-300"
-                  placeholder="Lower numbers appear first"
-                />
+
+              <div class="mt-6">
+                <div class="flex items-center space-x-2 mb-3">
+                  <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md">
+                    <i class="fas fa-align-left text-white text-sm"></i>
+                  </div>
+                  <label class="text-sm font-bold text-gray-700">
+                    Description
+                  </label>
+                </div>
+                <div class="relative">
+                  <textarea
+                    v-model="roleForm.description"
+                    rows="4"
+                    maxlength="1000"
+                    class="w-full px-4 py-3 bg-white/70 border-2 border-blue-300/30 rounded-xl focus:border-blue-500 focus:outline-none text-gray-800 placeholder-gray-500 backdrop-blur-sm transition-all duration-300 hover:bg-white/80 focus:bg-white/90 focus:shadow-lg focus:shadow-blue-500/20 resize-none"
+                    placeholder="Enter role description"
+                  ></textarea>
+                  <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/5 to-cyan-500/5 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                </div>
+                <div class="flex justify-between items-center mt-2">
+                  <div v-if="getFieldError('description')" class="text-red-500 text-sm flex items-center space-x-1">
+                    <i class="fas fa-exclamation-circle text-xs"></i>
+                    <span>{{ getFieldError('description') }}</span>
+                  </div>
+                  <div class="text-xs text-gray-600 flex items-center space-x-1 ml-auto">
+                    <i class="fas fa-keyboard text-blue-500"></i>
+                    <span>{{ (roleForm.description || '').length }}/1000 characters</span>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                Description
-              </label>
-              <textarea
-                v-model="roleForm.description"
-                rows="3"
-                maxlength="1000"
-                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-blue-500 focus:outline-none transition-all duration-300 resize-none"
-                placeholder="Enter role description"
-              ></textarea>
-              <div v-if="getFieldError('description')" class="text-red-500 text-sm mt-1">
-                {{ getFieldError('description') }}
-              </div>
-              <div class="text-gray-500 text-sm mt-1">
-                {{ (roleForm.description || '').length }}/1000 characters
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              <div class="flex items-center space-x-3">
-                <input
-                  v-model="roleForm.is_system_role"
-                  type="checkbox"
-                  :disabled="isEditMode && selectedRole?.is_system_role"
-                  class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                />
-                <div>
-                  <label class="text-sm font-medium text-gray-700">
-                    System Role
-                  </label>
-                  <p class="text-xs text-gray-500">
-                    System roles cannot be deleted
-                  </p>
+            <!-- Role Settings Section -->
+            <div class="medical-card bg-gradient-to-r from-purple-600/15 to-indigo-600/15 border-2 border-purple-400/30 p-6 rounded-2xl backdrop-blur-sm hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 mb-6">
+              <div class="flex items-center space-x-3 mb-6">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <i class="fas fa-cogs text-white text-lg"></i>
                 </div>
+                <h4 class="text-xl font-bold text-gray-800">Role Settings</h4>
               </div>
-              <div class="flex items-center space-x-3">
-                <input
-                  v-model="roleForm.is_deletable"
-                  type="checkbox"
-                  :disabled="roleForm.is_system_role"
-                  class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                />
-                <div>
-                  <label class="text-sm font-medium text-gray-700">
-                    Deletable
-                  </label>
-                  <p class="text-xs text-gray-500">
-                    Allow this role to be deleted
-                  </p>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white/50 p-4 rounded-xl border border-purple-300/30 hover:bg-white/70 transition-all duration-300">
+                  <div class="flex items-start space-x-4">
+                    <div class="flex items-center space-x-3">
+                      <input
+                        v-model="roleForm.is_system_role"
+                        type="checkbox"
+                        :disabled="isEditMode && selectedRole?.is_system_role"
+                        class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                      />
+                    </div>
+                    <div class="flex-1">
+                      <div class="flex items-center space-x-2 mb-2">
+                        <div class="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-sm">
+                          <i class="fas fa-shield-alt text-white text-xs"></i>
+                        </div>
+                        <label class="text-sm font-bold text-gray-700">
+                          System Role
+                        </label>
+                      </div>
+                      <p class="text-xs text-gray-600 leading-relaxed">
+                        System roles cannot be deleted and are protected from modification
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="bg-white/50 p-4 rounded-xl border border-purple-300/30 hover:bg-white/70 transition-all duration-300">
+                  <div class="flex items-start space-x-4">
+                    <div class="flex items-center space-x-3">
+                      <input
+                        v-model="roleForm.is_deletable"
+                        type="checkbox"
+                        :disabled="roleForm.is_system_role"
+                        class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                      />
+                    </div>
+                    <div class="flex-1">
+                      <div class="flex items-center space-x-2 mb-2">
+                        <div class="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-sm">
+                          <i class="fas fa-trash-alt text-white text-xs"></i>
+                        </div>
+                        <label class="text-sm font-bold text-gray-700">
+                          Deletable
+                        </label>
+                      </div>
+                      <p class="text-xs text-gray-600 leading-relaxed">
+                        Allow this role to be deleted when no longer needed
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
             <!-- Permissions Section -->
             <div class="border-t border-gray-200 pt-6">
-              <div class="flex items-center space-x-2 mb-4">
-                <i class="fas fa-key text-blue-600"></i>
-                <h4 class="text-lg font-semibold text-gray-800">Permissions</h4>
+              <div class="flex items-center space-x-3 mb-6">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <i class="fas fa-key text-white text-lg"></i>
+                </div>
+                <h4 class="text-xl font-bold text-gray-800">Permissions</h4>
               </div>
 
-              <div
-                v-for="(permissions, category) in availablePermissions"
-                :key="category"
-                class="mb-6"
-              >
-                <h5 class="text-md font-medium text-gray-700 mb-3 capitalize">
-                  {{ category.replace('_', ' ') }}
-                </h5>
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                  <div
-                    v-for="permission in permissions"
-                    :key="permission"
-                    class="flex items-center space-x-2"
-                  >
-                    <input
-                      v-model="roleForm.permissions"
-                      :value="permission"
-                      type="checkbox"
-                      class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                    />
-                    <label class="text-sm text-gray-700">
-                      {{ formatPermissionName(permission) }}
-                    </label>
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- User Management -->
+                <div class="medical-card bg-gradient-to-r from-blue-600/15 to-cyan-600/15 border-2 border-blue-400/30 p-6 rounded-2xl backdrop-blur-sm hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300">
+                  <div class="flex items-center space-x-3 mb-4">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg">
+                      <i class="fas fa-users text-white"></i>
+                    </div>
+                    <h5 class="text-lg font-bold text-gray-800">User Management</h5>
+                  </div>
+                  <div class="space-y-3">
+                    <div v-for="permission in ['create_users', 'edit_users', 'delete_users', 'view_users']" :key="permission" class="flex items-center space-x-3 p-3 bg-white/50 rounded-lg hover:bg-white/70 transition-all duration-200">
+                      <input
+                        v-model="roleForm.permissions"
+                        :value="permission"
+                        type="checkbox"
+                        class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                      />
+                      <div class="flex items-center space-x-2">
+                        <i :class="getPermissionIcon(permission)" class="text-blue-600"></i>
+                        <label class="text-sm font-medium text-gray-700 cursor-pointer">
+                          {{ formatPermissionName(permission) }}
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Role Management -->
+                <div class="medical-card bg-gradient-to-r from-purple-600/15 to-indigo-600/15 border-2 border-purple-400/30 p-6 rounded-2xl backdrop-blur-sm hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300">
+                  <div class="flex items-center space-x-3 mb-4">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg">
+                      <i class="fas fa-shield-alt text-white"></i>
+                    </div>
+                    <h5 class="text-lg font-bold text-gray-800">Role Management</h5>
+                  </div>
+                  <div class="space-y-3">
+                    <div v-for="permission in ['create_roles', 'edit_roles', 'delete_roles', 'assign_roles']" :key="permission" class="flex items-center space-x-3 p-3 bg-white/50 rounded-lg hover:bg-white/70 transition-all duration-200">
+                      <input
+                        v-model="roleForm.permissions"
+                        :value="permission"
+                        type="checkbox"
+                        class="w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500 focus:ring-2"
+                      />
+                      <div class="flex items-center space-x-2">
+                        <i :class="getPermissionIcon(permission)" class="text-blue-600"></i>
+                        <label class="text-sm font-medium text-gray-700 cursor-pointer">
+                          {{ formatPermissionName(permission) }}
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Department Management -->
+                <div class="medical-card bg-gradient-to-r from-green-600/15 to-emerald-600/15 border-2 border-green-400/30 p-6 rounded-2xl backdrop-blur-sm hover:shadow-lg hover:shadow-green-500/20 transition-all duration-300">
+                  <div class="flex items-center space-x-3 mb-4">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg">
+                      <i class="fas fa-building text-white"></i>
+                    </div>
+                    <h5 class="text-lg font-bold text-gray-800">Department Management</h5>
+                  </div>
+                  <div class="space-y-3">
+                    <div v-for="permission in ['create_departments', 'edit_departments', 'delete_departments', 'assign_hod']" :key="permission" class="flex items-center space-x-3 p-3 bg-white/50 rounded-lg hover:bg-white/70 transition-all duration-200">
+                      <input
+                        v-model="roleForm.permissions"
+                        :value="permission"
+                        type="checkbox"
+                        class="w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
+                      />
+                      <div class="flex items-center space-x-2">
+                        <div class="w-5 h-5 bg-gradient-to-br from-blue-500 to-blue-600 rounded flex items-center justify-center">
+                          <i :class="getPermissionIcon(permission)" class="text-white text-xs"></i>
+                        </div>
+                        <label class="text-sm font-medium text-gray-700 cursor-pointer">
+                          {{ formatPermissionName(permission) }}
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Request Management -->
+                <div class="medical-card bg-gradient-to-r from-orange-600/15 to-red-600/15 border-2 border-orange-400/30 p-6 rounded-2xl backdrop-blur-sm hover:shadow-lg hover:shadow-orange-500/20 transition-all duration-300">
+                  <div class="flex items-center space-x-3 mb-4">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg">
+                      <i class="fas fa-file-alt text-white"></i>
+                    </div>
+                    <h5 class="text-lg font-bold text-gray-800">Request Management</h5>
+                  </div>
+                  <div class="space-y-3">
+                    <div v-for="permission in ['view_all_requests', 'approve_requests', 'reject_requests', 'export_requests']" :key="permission" class="flex items-center space-x-3 p-3 bg-white/50 rounded-lg hover:bg-white/70 transition-all duration-200">
+                      <input
+                        v-model="roleForm.permissions"
+                        :value="permission"
+                        type="checkbox"
+                        class="w-5 h-5 text-orange-600 border-gray-300 rounded focus:ring-orange-500 focus:ring-2"
+                      />
+                      <div class="flex items-center space-x-2">
+                        <div class="w-5 h-5 bg-gradient-to-br from-blue-500 to-blue-600 rounded flex items-center justify-center">
+                          <i :class="getPermissionIcon(permission)" class="text-white text-xs"></i>
+                        </div>
+                        <label class="text-sm font-medium text-gray-700 cursor-pointer">
+                          {{ formatPermissionName(permission) }}
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- System Administration -->
+                <div class="medical-card bg-gradient-to-r from-gray-600/15 to-slate-600/15 border-2 border-gray-400/30 p-6 rounded-2xl backdrop-blur-sm hover:shadow-lg hover:shadow-gray-500/20 transition-all duration-300 lg:col-span-2">
+                  <div class="flex items-center space-x-3 mb-4">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg">
+                      <i class="fas fa-cogs text-white"></i>
+                    </div>
+                    <h5 class="text-lg font-bold text-gray-800">System Administration</h5>
+                  </div>
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div v-for="permission in ['system_settings', 'audit_logs', 'backup_restore']" :key="permission" class="flex items-center space-x-3 p-3 bg-white/50 rounded-lg hover:bg-white/70 transition-all duration-200">
+                      <input
+                        v-model="roleForm.permissions"
+                        :value="permission"
+                        type="checkbox"
+                        class="w-5 h-5 text-gray-600 border-gray-300 rounded focus:ring-gray-500 focus:ring-2"
+                      />
+                      <div class="flex items-center space-x-2">
+                        <div class="w-5 h-5 bg-gradient-to-br from-blue-500 to-blue-600 rounded flex items-center justify-center">
+                          <i :class="getPermissionIcon(permission)" class="text-white text-xs"></i>
+                        </div>
+                        <label class="text-sm font-medium text-gray-700 cursor-pointer">
+                          {{ formatPermissionName(permission) }}
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Other Permissions (if any) -->
+              <div v-if="hasOtherPermissions" class="mt-6">
+                <div class="medical-card bg-gradient-to-r from-teal-600/15 to-cyan-600/15 border-2 border-teal-400/30 p-6 rounded-2xl backdrop-blur-sm hover:shadow-lg hover:shadow-teal-500/20 transition-all duration-300">
+                  <div class="flex items-center space-x-3 mb-4">
+                    <div class="w-10 h-10 bg-gradient-to-br from-teal-500 to-teal-600 rounded-lg flex items-center justify-center shadow-lg">
+                      <i class="fas fa-ellipsis-h text-white"></i>
+                    </div>
+                    <h5 class="text-lg font-bold text-gray-800">Other Permissions</h5>
+                  </div>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    <div
+                      v-for="(permissions, category) in availablePermissions"
+                      :key="category"
+                      v-if="!isKnownCategory(category)"
+                    >
+                      <div class="mb-4">
+                        <h6 class="text-sm font-semibold text-gray-700 mb-2 capitalize">
+                          {{ category.replace('_', ' ') }}
+                        </h6>
+                        <div class="space-y-2">
+                          <div
+                            v-for="permission in permissions"
+                            :key="permission"
+                            class="flex items-center space-x-3 p-2 bg-white/50 rounded-lg hover:bg-white/70 transition-all duration-200"
+                          >
+                            <input
+                              v-model="roleForm.permissions"
+                              :value="permission"
+                              type="checkbox"
+                              class="w-4 h-4 text-teal-600 border-gray-300 rounded focus:ring-teal-500"
+                            />
+                            <label class="text-sm text-gray-700 cursor-pointer">
+                              {{ formatPermissionName(permission) }}
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -863,6 +1091,16 @@ export default {
 
     debouncedSearch() {
       return debounce(this.applyFilters, 500)
+    },
+
+    hasOtherPermissions() {
+      const knownCategories = ['user_management', 'role_management', 'department_management', 'request_management', 'system_administration']
+      return Object.keys(this.availablePermissions).some(category => !knownCategories.includes(category))
+    },
+
+    hasOtherPermissions() {
+      const knownCategories = ['user_management', 'role_management', 'department_management', 'request_management', 'system_administration']
+      return Object.keys(this.availablePermissions).some(category => !knownCategories.includes(category))
     }
   },
 
@@ -1096,6 +1334,46 @@ export default {
       this.snackbarColor = 'error'
       this.showSnackbar = true
       this.clearMessages()
+    },
+
+    getPermissionIcon(permission) {
+      const iconMap = {
+        // User Management
+        'create_users': 'fas fa-user-plus',
+        'edit_users': 'fas fa-user-edit',
+        'delete_users': 'fas fa-user-minus',
+        'view_users': 'fas fa-eye',
+        
+        // Role Management
+        'create_roles': 'fas fa-plus-circle',
+        'edit_roles': 'fas fa-edit',
+        'delete_roles': 'fas fa-trash',
+        'assign_roles': 'fas fa-user-tag',
+        
+        // Department Management
+        'create_departments': 'fas fa-building',
+        'edit_departments': 'fas fa-edit',
+        'delete_departments': 'fas fa-trash-alt',
+        'assign_hod': 'fas fa-user-tie',
+        
+        // Request Management
+        'view_all_requests': 'fas fa-list',
+        'approve_requests': 'fas fa-check-circle',
+        'reject_requests': 'fas fa-times-circle',
+        'export_requests': 'fas fa-download',
+        
+        // System Administration
+        'system_settings': 'fas fa-cog',
+        'audit_logs': 'fas fa-clipboard-list',
+        'backup_restore': 'fas fa-database'
+      }
+      
+      return iconMap[permission] || 'fas fa-key'
+    },
+
+    isKnownCategory(category) {
+      const knownCategories = ['user_management', 'role_management', 'department_management', 'request_management', 'system_administration']
+      return knownCategories.includes(category)
     }
   }
 }

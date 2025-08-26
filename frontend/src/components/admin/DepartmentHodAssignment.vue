@@ -153,11 +153,11 @@
                   </div>
 
                   <div
-                    class="bg-white/15 p-4 rounded-xl backdrop-blur-sm border border-green-300/30 hover:bg-white/20 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/20 group"
+                    class="bg-white/15 p-4 rounded-xl backdrop-blur-sm border border-blue-300/30 hover:bg-white/20 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20 group"
                   >
                     <div class="flex items-center space-x-3">
                       <div
-                        class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300"
+                        class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300"
                       >
                         <i class="fas fa-user-check text-white text-lg"></i>
                       </div>
@@ -165,17 +165,17 @@
                         <div class="text-2xl font-bold text-white">
                           {{ departmentStatistics.with_hod || 0 }}
                         </div>
-                        <div class="text-sm text-green-100">With HOD</div>
+                        <div class="text-sm text-blue-100">With HOD</div>
                       </div>
                     </div>
                   </div>
 
                   <div
-                    class="bg-white/15 p-4 rounded-xl backdrop-blur-sm border border-orange-300/30 hover:bg-white/20 transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/20 group"
+                    class="bg-white/15 p-4 rounded-xl backdrop-blur-sm border border-blue-300/30 hover:bg-white/20 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20 group"
                   >
                     <div class="flex items-center space-x-3">
                       <div
-                        class="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300"
+                        class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300"
                       >
                         <i class="fas fa-user-times text-white text-lg"></i>
                       </div>
@@ -183,17 +183,17 @@
                         <div class="text-2xl font-bold text-white">
                           {{ departmentStatistics.without_hod || 0 }}
                         </div>
-                        <div class="text-sm text-orange-100">Without HOD</div>
+                        <div class="text-sm text-blue-100">Without HOD</div>
                       </div>
                     </div>
                   </div>
 
                   <div
-                    class="bg-white/15 p-4 rounded-xl backdrop-blur-sm border border-purple-300/30 hover:bg-white/20 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20 group"
+                    class="bg-white/15 p-4 rounded-xl backdrop-blur-sm border border-blue-300/30 hover:bg-white/20 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20 group"
                   >
                     <div class="flex items-center space-x-3">
                       <div
-                        class="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300"
+                        class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300"
                       >
                         <i class="fas fa-file-alt text-white text-lg"></i>
                       </div>
@@ -201,7 +201,7 @@
                         <div class="text-2xl font-bold text-white">
                           {{ departmentStatistics.with_pending_requests || 0 }}
                         </div>
-                        <div class="text-sm text-purple-100">With Pending Requests</div>
+                        <div class="text-sm text-blue-100">With Pending Requests</div>
                       </div>
                     </div>
                   </div>
@@ -215,12 +215,12 @@
                 <div class="flex items-center justify-between mb-6">
                   <div class="flex items-center space-x-4">
                     <div
-                      class="w-14 h-14 bg-gradient-to-br from-teal-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-teal-300/50"
+                      class="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
                     >
                       <i class="fas fa-sitemap text-white text-xl"></i>
                     </div>
                     <h3 class="text-xl font-bold text-white flex items-center">
-                      <i class="fas fa-list mr-2 text-teal-300"></i>
+                      <i class="fas fa-list mr-2 text-blue-300"></i>
                       Departments and HOD Assignments ({{ departmentsPagination.total || 0 }} total departments)
                     </h3>
                   </div>
@@ -235,7 +235,7 @@
                     <button
                       @click="refreshData"
                       :disabled="departmentsLoading"
-                      class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 shadow-lg flex items-center space-x-2"
+                      class="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 shadow-lg flex items-center space-x-2"
                     >
                       <i :class="departmentsLoading ? 'fas fa-spinner fa-spin' : 'fas fa-refresh'"></i>
                       <span>{{ departmentsLoading ? 'Loading...' : 'Refresh' }}</span>
@@ -342,27 +342,7 @@
                 </div>
 
                 <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <!-- Create New Department Card -->
-                  <div
-                    @click="openCreateDepartmentDialog"
-                    class="bg-gradient-to-br from-green-500/20 to-emerald-500/20 p-6 rounded-xl backdrop-blur-sm border-2 border-dashed border-green-400/50 hover:border-green-400/80 hover:bg-green-500/25 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/20 group cursor-pointer transform hover:scale-105"
-                  >
-                    <div class="flex flex-col items-center justify-center h-full min-h-[200px] text-center">
-                      <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 mb-4">
-                        <i class="fas fa-plus text-white text-2xl"></i>
-                      </div>
-                      <h4 class="font-bold text-green-100 text-lg mb-2">Create New Department</h4>
-                      <p class="text-green-200 text-sm opacity-80">
-                        Add a new department to the system
-                      </p>
-                      <div class="mt-4 px-4 py-2 bg-green-500/30 rounded-lg border border-green-400/50">
-                        <span class="text-green-100 text-xs font-medium">
-                          <i class="fas fa-mouse-pointer mr-1"></i>
-                          Click to create
-                        </span>
-                      </div>
-                    </div>
-                  </div>
+
 
                   <!-- Existing Department Cards -->
                   <div
@@ -687,135 +667,269 @@
       class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 backdrop-blur-sm"
     >
       <div
-        class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-100 animate-slideUp"
+        class="bg-gradient-to-br from-blue-50 via-white to-blue-50 rounded-3xl shadow-2xl max-w-3xl w-full mx-4 max-h-[95vh] overflow-y-auto transform transition-all duration-300 scale-100 animate-slideUp border-2 border-blue-200/50"
       >
-        <!-- Header -->
-        <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-6 text-center">
-          <div
-            class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm border border-white/30"
-          >
-            <i class="fas fa-building text-white text-2xl"></i>
+        <!-- Enhanced Header with Multi-Layer Design -->
+        <div class="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 p-8 text-center relative overflow-hidden rounded-t-3xl">
+          <!-- Background Pattern -->
+          <div class="absolute inset-0 opacity-10">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/30 to-transparent rounded-full blur-2xl"></div>
+            <div class="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-white/20 to-transparent rounded-full blur-xl"></div>
           </div>
-          <h3 class="text-xl font-bold text-white mb-2">
-            Create New Department
-          </h3>
-          <div class="w-12 h-1 bg-white/50 mx-auto rounded-full"></div>
+          
+          <!-- Enhanced Icon Container -->
+          <div class="relative z-10">
+            <div class="w-20 h-20 bg-gradient-to-br from-white/20 to-white/10 rounded-2xl flex items-center justify-center mx-auto mb-6 backdrop-blur-sm border-2 border-white/30 shadow-2xl relative overflow-hidden group">
+              <!-- Icon Background Glow -->
+              <div class="absolute inset-0 bg-gradient-to-br from-blue-400/30 to-blue-600/30 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <!-- Multi-Layer Icon -->
+              <i class="fas fa-building text-white text-3xl relative z-10 drop-shadow-lg group-hover:scale-110 transition-transform duration-300"></i>
+              <!-- Animated Particles -->
+              <div class="absolute top-2 right-2 w-2 h-2 bg-white/60 rounded-full animate-ping"></div>
+              <div class="absolute bottom-3 left-3 w-1.5 h-1.5 bg-blue-300/80 rounded-full animate-pulse"></div>
+            </div>
+            
+            <!-- Enhanced Title -->
+            <h3 class="text-2xl font-bold text-white mb-3 drop-shadow-lg">
+              <span class="bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">Create New Department</span>
+            </h3>
+            <p class="text-blue-100/90 text-sm mb-4 drop-shadow-sm">Set up a new department with advanced configuration options</p>
+            <div class="w-16 h-1 bg-gradient-to-r from-white/60 to-white/30 mx-auto rounded-full shadow-sm"></div>
+          </div>
         </div>
 
-        <!-- Body -->
-        <div class="p-6">
+        <!-- Enhanced Body with Card Design -->
+        <div class="p-8 space-y-6">
           <form ref="createDepartmentForm" @submit.prevent="createDepartment">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <!-- Department Name -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                  Department Name *
-                </label>
-                <input
-                  v-model="newDepartment.name"
-                  type="text"
-                  class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-all duration-200"
-                  placeholder="Enter department name"
-                  required
-                />
-                <div v-if="getFieldError('name')" class="text-red-500 text-sm mt-1">
-                  {{ getFieldError('name') }}
+            <!-- Department Information Card -->
+            <div class="bg-gradient-to-r from-blue-50/50 to-blue-100/30 rounded-2xl p-6 border-2 border-blue-200/40 backdrop-blur-sm hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300 group">
+              <div class="flex items-center space-x-3 mb-6">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50">
+                  <i class="fas fa-info-circle text-white text-lg"></i>
+                </div>
+                <h4 class="text-lg font-bold text-gray-800 flex items-center">
+                  <span class="bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">Department Information</span>
+                </h4>
+              </div>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Department Name -->
+                <div class="group/field">
+                  <label class="block text-sm font-bold text-gray-700 mb-3 flex items-center">
+                    <i class="fas fa-building mr-2 text-blue-500"></i>
+                    Department Name
+                    <span class="text-red-500 ml-1">*</span>
+                  </label>
+                  <div class="relative">
+                    <input
+                      v-model="newDepartment.name"
+                      type="text"
+                      class="w-full px-4 py-4 bg-white/80 border-2 border-blue-200/50 rounded-xl focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200/50 transition-all duration-300 hover:bg-white hover:border-blue-300/70 focus:bg-white focus:shadow-lg focus:shadow-blue-500/20 group-hover/field:border-blue-300/70 text-gray-800 placeholder-gray-400"
+                      placeholder="Enter department name"
+                      required
+                    />
+                    <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/5 to-blue-500/5 opacity-0 group-hover/field:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                    <div class="absolute right-4 top-1/2 transform -translate-y-1/2 text-blue-400/50">
+                      <i class="fas fa-edit"></i>
+                    </div>
+                  </div>
+                  <div v-if="getFieldError('name')" class="text-red-500 text-sm mt-2 flex items-center">
+                    <i class="fas fa-exclamation-circle mr-1"></i>
+                    {{ getFieldError('name') }}
+                  </div>
+                </div>
+
+                <!-- Department Code -->
+                <div class="group/field">
+                  <label class="block text-sm font-bold text-gray-700 mb-3 flex items-center">
+                    <i class="fas fa-code mr-2 text-blue-500"></i>
+                    Department Code
+                    <span class="text-red-500 ml-1">*</span>
+                  </label>
+                  <div class="relative">
+                    <input
+                      v-model="newDepartment.code"
+                      type="text"
+                      class="w-full px-4 py-4 bg-white/80 border-2 border-blue-200/50 rounded-xl focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200/50 transition-all duration-300 hover:bg-white hover:border-blue-300/70 focus:bg-white focus:shadow-lg focus:shadow-blue-500/20 group-hover/field:border-blue-300/70 text-gray-800 placeholder-gray-400"
+                      placeholder="Enter department code"
+                      required
+                    />
+                    <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/5 to-blue-500/5 opacity-0 group-hover/field:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                    <div class="absolute right-4 top-1/2 transform -translate-y-1/2 text-blue-400/50">
+                      <i class="fas fa-hashtag"></i>
+                    </div>
+                  </div>
+                  <div v-if="getFieldError('code')" class="text-red-500 text-sm mt-2 flex items-center">
+                    <i class="fas fa-exclamation-circle mr-1"></i>
+                    {{ getFieldError('code') }}
+                  </div>
                 </div>
               </div>
 
-              <!-- Department Code -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                  Department Code *
+              <!-- Description -->
+              <div class="mt-6 group/field">
+                <label class="block text-sm font-bold text-gray-700 mb-3 flex items-center">
+                  <i class="fas fa-align-left mr-2 text-blue-500"></i>
+                  Description
+                  <span class="text-gray-400 text-xs ml-2">(Optional)</span>
                 </label>
-                <input
-                  v-model="newDepartment.code"
-                  type="text"
-                  class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-all duration-200"
-                  placeholder="Enter department code"
-                  required
-                />
-                <div v-if="getFieldError('code')" class="text-red-500 text-sm mt-1">
-                  {{ getFieldError('code') }}
+                <div class="relative">
+                  <textarea
+                    v-model="newDepartment.description"
+                    rows="4"
+                    class="w-full px-4 py-4 bg-white/80 border-2 border-blue-200/50 rounded-xl focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200/50 transition-all duration-300 hover:bg-white hover:border-blue-300/70 focus:bg-white focus:shadow-lg focus:shadow-blue-500/20 group-hover/field:border-blue-300/70 text-gray-800 placeholder-gray-400 resize-none"
+                    placeholder="Enter department description (optional)"
+                  ></textarea>
+                  <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/5 to-blue-500/5 opacity-0 group-hover/field:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                  <div class="absolute right-4 top-4 text-blue-400/50">
+                    <i class="fas fa-comment-alt"></i>
+                  </div>
+                </div>
+                <div v-if="getFieldError('description')" class="text-red-500 text-sm mt-2 flex items-center">
+                  <i class="fas fa-exclamation-circle mr-1"></i>
+                  {{ getFieldError('description') }}
                 </div>
               </div>
             </div>
 
-            <!-- Description -->
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                Description
-              </label>
-              <textarea
-                v-model="newDepartment.description"
-                rows="3"
-                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-all duration-200 resize-none"
-                placeholder="Enter department description (optional)"
-              ></textarea>
-              <div v-if="getFieldError('description')" class="text-red-500 text-sm mt-1">
-                {{ getFieldError('description') }}
+            <!-- Department Settings Card -->
+            <div class="bg-gradient-to-r from-green-50/50 to-emerald-100/30 rounded-2xl p-6 border-2 border-green-200/40 backdrop-blur-sm hover:shadow-lg hover:shadow-green-500/10 transition-all duration-300 group">
+              <div class="flex items-center space-x-3 mb-6">
+                <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-green-300/50">
+                  <i class="fas fa-cogs text-white text-lg"></i>
+                </div>
+                <h4 class="text-lg font-bold text-gray-800 flex items-center">
+                  <span class="bg-gradient-to-r from-green-600 to-emerald-700 bg-clip-text text-transparent">Department Settings</span>
+                </h4>
               </div>
-            </div>
 
-            <!-- Status -->
-            <div class="mb-6">
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                Status
-              </label>
-              <div class="flex items-center space-x-4">
-                <label class="flex items-center space-x-2 cursor-pointer">
-                  <input
-                    v-model="newDepartment.is_active"
-                    type="checkbox"
-                    class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                  />
-                  <span class="text-sm text-gray-700">Active Department</span>
+              <!-- Status Toggle -->
+              <div class="mb-6">
+                <label class="block text-sm font-bold text-gray-700 mb-4 flex items-center">
+                  <i class="fas fa-toggle-on mr-2 text-green-500"></i>
+                  Department Status
                 </label>
-              </div>
-              <p class="text-xs text-gray-500 mt-1">
-                Active departments can be assigned HODs and manage requests
-              </p>
-            </div>
-
-            <!-- Auto-assign HOD Option -->
-            <div class="mb-6">
-              <div class="bg-blue-50 rounded-xl p-4 border border-blue-100">
-                <div class="flex items-center space-x-3 mb-3">
-                  <input
-                    v-model="autoAssignHod"
-                    type="checkbox"
-                    class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                  />
-                  <label class="text-sm font-medium text-gray-700">
-                    Assign HOD immediately after creation
+                <div class="bg-white/60 rounded-xl p-4 border border-green-200/50 hover:bg-white/80 transition-all duration-300">
+                  <label class="flex items-center space-x-4 cursor-pointer group/toggle">
+                    <div class="relative">
+                      <input
+                        v-model="newDepartment.is_active"
+                        type="checkbox"
+                        class="sr-only"
+                      />
+                      <div :class="[
+                        'w-12 h-6 rounded-full transition-all duration-300 shadow-inner',
+                        newDepartment.is_active ? 'bg-gradient-to-r from-green-500 to-emerald-500' : 'bg-gray-300'
+                      ]">
+                        <div :class="[
+                          'w-5 h-5 bg-white rounded-full shadow-lg transform transition-transform duration-300 mt-0.5',
+                          newDepartment.is_active ? 'translate-x-6' : 'translate-x-0.5'
+                        ]"></div>
+                      </div>
+                    </div>
+                    <div class="flex-1">
+                      <span class="text-lg font-semibold text-gray-800 group-hover/toggle:text-green-600 transition-colors duration-300">
+                        {{ newDepartment.is_active ? 'Active Department' : 'Inactive Department' }}
+                      </span>
+                      <p class="text-sm text-gray-600 mt-1">
+                        {{ newDepartment.is_active ? 'Department is active and can be assigned HODs and manage requests' : 'Department is inactive and cannot manage requests' }}
+                      </p>
+                    </div>
+                    <div class="text-2xl">
+                      <i :class="[
+                        'fas transition-all duration-300',
+                        newDepartment.is_active ? 'fa-check-circle text-green-500' : 'fa-times-circle text-gray-400'
+                      ]"></i>
+                    </div>
                   </label>
                 </div>
-                <p class="text-xs text-gray-600">
-                  If checked, you'll be prompted to assign a HOD after the department is created
-                </p>
+              </div>
+            </div>
+
+            <!-- HOD Assignment Card -->
+            <div class="bg-gradient-to-r from-purple-50/50 to-indigo-100/30 rounded-2xl p-6 border-2 border-purple-200/40 backdrop-blur-sm hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300 group">
+              <div class="flex items-center space-x-3 mb-6">
+                <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-purple-300/50">
+                  <i class="fas fa-user-tie text-white text-lg"></i>
+                </div>
+                <h4 class="text-lg font-bold text-gray-800 flex items-center">
+                  <span class="bg-gradient-to-r from-purple-600 to-indigo-700 bg-clip-text text-transparent">HOD Assignment Options</span>
+                </h4>
+              </div>
+
+              <!-- Auto-assign HOD Option -->
+              <div class="bg-white/60 rounded-xl p-5 border border-purple-200/50 hover:bg-white/80 transition-all duration-300">
+                <label class="flex items-start space-x-4 cursor-pointer group/hod">
+                  <div class="relative mt-1">
+                    <input
+                      v-model="autoAssignHod"
+                      type="checkbox"
+                      class="sr-only"
+                    />
+                    <div :class="[
+                      'w-6 h-6 rounded-lg border-2 transition-all duration-300 flex items-center justify-center',
+                      autoAssignHod ? 'bg-gradient-to-br from-purple-500 to-indigo-500 border-purple-500' : 'bg-white border-gray-300 group-hover/hod:border-purple-300'
+                    ]">
+                      <i v-if="autoAssignHod" class="fas fa-check text-white text-sm"></i>
+                    </div>
+                  </div>
+                  <div class="flex-1">
+                    <span class="text-lg font-semibold text-gray-800 group-hover/hod:text-purple-600 transition-colors duration-300">
+                      Assign HOD immediately after creation
+                    </span>
+                    <p class="text-sm text-gray-600 mt-2 leading-relaxed">
+                      If checked, you'll be prompted to assign a Head of Department immediately after the department is created. This ensures the department is ready to manage requests right away.
+                    </p>
+                    <div class="flex items-center space-x-2 mt-3">
+                      <div class="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
+                      <span class="text-xs text-purple-600 font-medium">Recommended for immediate deployment</span>
+                    </div>
+                  </div>
+                  <div class="text-2xl mt-1">
+                    <i :class="[
+                      'fas transition-all duration-300',
+                      autoAssignHod ? 'fa-user-check text-purple-500' : 'fa-user-clock text-gray-400'
+                    ]"></i>
+                  </div>
+                </label>
               </div>
             </div>
           </form>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="flex justify-end space-x-3 p-6 border-t border-gray-200">
-          <button
-            @click="closeCreateDepartmentDialog"
-            :disabled="createDepartmentSubmitting"
-            class="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Cancel
-          </button>
-          <button
-            @click="createDepartment"
-            :disabled="createDepartmentSubmitting || !newDepartment.name || !newDepartment.code"
-            class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-medium hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
-          >
-            <i v-if="createDepartmentSubmitting" class="fas fa-spinner fa-spin"></i>
-            <i v-else class="fas fa-building"></i>
-            <span>{{ createDepartmentSubmitting ? 'Creating...' : 'Create Department' }}</span>
-          </button>
+        <!-- Enhanced Action Buttons -->
+        <div class="flex justify-between items-center p-8 border-t-2 border-blue-100/50 bg-gradient-to-r from-gray-50/50 to-blue-50/30 rounded-b-3xl">
+          <div class="text-sm text-gray-600">
+            <i class="fas fa-info-circle mr-2 text-blue-500"></i>
+            All required fields must be completed
+          </div>
+          <div class="flex space-x-4">
+            <button
+              @click="closeCreateDepartmentDialog"
+              :disabled="createDepartmentSubmitting"
+              class="px-8 py-4 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 rounded-xl font-semibold hover:from-gray-200 hover:to-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 shadow-lg hover:shadow-xl border border-gray-300/50 flex items-center space-x-2"
+            >
+              <i class="fas fa-times"></i>
+              <span>Cancel</span>
+            </button>
+            <button
+              @click="createDepartment"
+              :disabled="createDepartmentSubmitting || !newDepartment.name || !newDepartment.code"
+              class="px-8 py-4 bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white rounded-xl font-semibold hover:from-blue-700 hover:via-blue-800 hover:to-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-3 border border-blue-500/50 relative overflow-hidden group/create"
+            >
+              <!-- Button Shine Effect -->
+              <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 -translate-x-full group-hover/create:translate-x-full transition-transform duration-700"></div>
+              
+              <div class="relative z-10 flex items-center space-x-3">
+                <div class="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center">
+                  <i v-if="createDepartmentSubmitting" class="fas fa-spinner fa-spin text-sm"></i>
+                  <i v-else class="fas fa-building text-sm"></i>
+                </div>
+                <span class="font-bold">{{ createDepartmentSubmitting ? 'Creating Department...' : 'Create Department' }}</span>
+                <i class="fas fa-arrow-right group-hover/create:translate-x-1 transition-transform duration-300"></i>
+              </div>
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -1020,27 +1020,147 @@
             </p>
           </div>
 
-          <!-- Form Options -->
-          <div class="space-y-4">
-            <button
-              @click="selectBothServices"
-              :disabled="formLoading"
-              class="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 text-white py-4 px-6 rounded-xl font-medium hover:from-indigo-700 hover:to-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <i class="fas fa-layer-group mr-3 drop-shadow-sm text-lg"></i>
-              <span class="drop-shadow-sm text-lg font-semibold">Combined Access Form</span>
-              <div class="text-sm text-indigo-200 mt-1">Request access to Jeeva, Wellsoft, and Internet services</div>
-            </button>
+          <!-- Enhanced Form Options with Multi-Layer Design -->
+          <div class="space-y-6">
+            <!-- Combined Access Form Card -->
+            <div class="relative group/card">
+              <button
+                @click="selectBothServices"
+                :disabled="formLoading"
+                class="w-full relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white p-6 rounded-2xl font-medium transition-all duration-500 transform hover:scale-[1.02] hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed group/button"
+              >
+                <!-- Multi-Layer Background Effects -->
+                <div class="absolute inset-0 bg-gradient-to-br from-blue-500/20 via-blue-600/10 to-blue-700/20 opacity-0 group-hover/button:opacity-100 transition-opacity duration-500"></div>
+                <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/30 to-transparent rounded-full blur-2xl group-hover/button:scale-150 transition-transform duration-700"></div>
+                <div class="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-blue-300/20 to-transparent rounded-full blur-xl group-hover/button:scale-125 transition-transform duration-600"></div>
+                
+                <!-- Animated Shine Effect -->
+                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 -translate-x-full group-hover/button:translate-x-full transition-transform duration-1000"></div>
+                
+                <!-- Content Layer -->
+                <div class="relative z-10 flex items-start space-x-4">
+                  <!-- Enhanced Icon Container -->
+                  <div class="relative flex-shrink-0">
+                    <div class="w-16 h-16 bg-gradient-to-br from-blue-400/40 to-blue-600/40 rounded-xl flex items-center justify-center group-hover/button:scale-110 transition-transform duration-300 relative overflow-hidden border border-blue-300/30">
+                      <!-- Icon Background Glow -->
+                      <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
+                      <!-- Multi-Layer Icon -->
+                      <i class="fas fa-layer-group text-white text-2xl relative z-10 drop-shadow-lg"></i>
+                      <!-- Animated Particles -->
+                      <div class="absolute top-1 right-1 w-1.5 h-1.5 bg-white/60 rounded-full animate-ping"></div>
+                      <div class="absolute bottom-2 left-2 w-1 h-1 bg-blue-300/80 rounded-full animate-pulse"></div>
+                    </div>
+                    <!-- Orbital Ring -->
+                    <div class="absolute inset-0 rounded-xl border border-blue-400/30 animate-spin-slow opacity-50"></div>
+                    <!-- Outer Glow -->
+                    <div class="absolute -inset-1 rounded-xl bg-gradient-to-br from-blue-400/30 to-blue-600/30 blur-md opacity-0 group-hover/button:opacity-100 transition-opacity duration-300"></div>
+                  </div>
+                  
+                  <!-- Text Content -->
+                  <div class="flex-1 text-left">
+                    <h3 class="text-xl font-bold text-white mb-2 flex items-center">
+                      <span class="bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent drop-shadow-lg">Combined Access Form</span>
+                      <!-- New Badge -->
+                      <span class="ml-3 px-2 py-1 bg-blue-400/30 text-blue-100 text-xs rounded-full border border-blue-300/50 animate-pulse">Popular</span>
+                    </h3>
+                    <p class="text-blue-100/90 text-sm leading-relaxed mb-3">
+                      Request access to Jeeva, Wellsoft, and Internet services
+                    </p>
+                    <!-- Feature Tags -->
+                    <div class="flex flex-wrap gap-2">
+                      <span class="px-2 py-1 bg-blue-500/30 text-blue-200 text-xs rounded-full border border-blue-400/40">All-in-One</span>
+                      <span class="px-2 py-1 bg-blue-500/30 text-blue-200 text-xs rounded-full border border-blue-400/40">Fast Process</span>
+                      <span class="px-2 py-1 bg-blue-500/30 text-blue-200 text-xs rounded-full border border-blue-400/40">Recommended</span>
+                    </div>
+                  </div>
+                  
+                  <!-- Arrow Indicator -->
+                  <div class="flex-shrink-0 self-center">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-400/30 to-blue-600/30 rounded-full flex items-center justify-center group-hover/button:bg-gradient-to-br group-hover/button:from-blue-300/40 group-hover/button:to-blue-500/40 transition-all duration-300 border border-blue-300/40">
+                      <i class="fas fa-chevron-right text-white group-hover/button:translate-x-0.5 transition-transform duration-300 drop-shadow-sm"></i>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Button Press Effect -->
+                <div class="absolute inset-0 bg-gradient-to-br from-blue-800/50 to-blue-900/50 opacity-0 group-active/button:opacity-100 transition-opacity duration-150 rounded-2xl"></div>
+              </button>
+              
+              <!-- Multi-Layer Card Shadow Effects -->
+              <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/20 to-blue-600/20 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 pointer-events-none blur-sm -z-10"></div>
+              <div class="absolute -inset-0.5 rounded-2xl bg-gradient-to-br from-blue-400/30 to-blue-500/30 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 pointer-events-none blur-md -z-10"></div>
+              <div class="absolute -inset-1 rounded-2xl bg-gradient-to-br from-blue-300/20 to-blue-400/20 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 pointer-events-none blur-lg -z-10"></div>
+            </div>
 
-            <button
-              @click="selectBookingService"
-              :disabled="formLoading"
-              class="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-4 px-6 rounded-xl font-medium hover:from-purple-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <i class="fas fa-calendar-check mr-3 drop-shadow-sm text-lg"></i>
-              <span class="drop-shadow-sm text-lg font-semibold">Booking Service</span>
-              <div class="text-sm text-purple-200 mt-1">Book hospital equipment and devices</div>
-            </button>
+            <!-- Booking Service Card -->
+            <div class="relative group/card">
+              <button
+                @click="selectBookingService"
+                :disabled="formLoading"
+                class="w-full relative overflow-hidden bg-gradient-to-br from-red-600 via-red-700 to-red-800 text-white p-6 rounded-2xl font-medium transition-all duration-500 transform hover:scale-[1.02] hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed group/button"
+              >
+                <!-- Multi-Layer Background Effects -->
+                <div class="absolute inset-0 bg-gradient-to-br from-red-500/20 via-red-600/10 to-red-700/20 opacity-0 group-hover/button:opacity-100 transition-opacity duration-500"></div>
+                <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-red-400/30 to-transparent rounded-full blur-2xl group-hover/button:scale-150 transition-transform duration-700"></div>
+                <div class="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-red-300/20 to-transparent rounded-full blur-xl group-hover/button:scale-125 transition-transform duration-600"></div>
+                
+                <!-- Animated Shine Effect -->
+                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 -translate-x-full group-hover/button:translate-x-full transition-transform duration-1000"></div>
+                
+                <!-- Content Layer -->
+                <div class="relative z-10 flex items-start space-x-4">
+                  <!-- Enhanced Icon Container -->
+                  <div class="relative flex-shrink-0">
+                    <div class="w-16 h-16 bg-gradient-to-br from-red-400/40 to-red-600/40 rounded-xl flex items-center justify-center group-hover/button:scale-110 transition-transform duration-300 relative overflow-hidden border border-red-300/30">
+                      <!-- Icon Background Glow -->
+                      <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
+                      <!-- Multi-Layer Icon -->
+                      <i class="fas fa-calendar-check text-white text-2xl relative z-10 drop-shadow-lg"></i>
+                      <!-- Animated Particles -->
+                      <div class="absolute top-1 right-1 w-1.5 h-1.5 bg-white/60 rounded-full animate-ping"></div>
+                      <div class="absolute bottom-2 left-2 w-1 h-1 bg-red-300/80 rounded-full animate-pulse"></div>
+                    </div>
+                    <!-- Orbital Ring -->
+                    <div class="absolute inset-0 rounded-xl border border-red-400/30 animate-spin-slow opacity-50"></div>
+                    <!-- Outer Glow -->
+                    <div class="absolute -inset-1 rounded-xl bg-gradient-to-br from-red-400/30 to-red-600/30 blur-md opacity-0 group-hover/button:opacity-100 transition-opacity duration-300"></div>
+                  </div>
+                  
+                  <!-- Text Content -->
+                  <div class="flex-1 text-left">
+                    <h3 class="text-xl font-bold text-white mb-2 flex items-center">
+                      <span class="bg-gradient-to-r from-white to-red-100 bg-clip-text text-transparent drop-shadow-lg">Booking Service</span>
+                      <!-- New Badge -->
+                      <span class="ml-3 px-2 py-1 bg-red-400/30 text-red-100 text-xs rounded-full border border-red-300/50 animate-pulse">Available</span>
+                    </h3>
+                    <p class="text-red-100/90 text-sm leading-relaxed mb-3">
+                      Book hospital equipment and devices
+                    </p>
+                    <!-- Feature Tags -->
+                    <div class="flex flex-wrap gap-2">
+                      <span class="px-2 py-1 bg-red-500/30 text-red-200 text-xs rounded-full border border-red-400/40">Equipment</span>
+                      <span class="px-2 py-1 bg-red-500/30 text-red-200 text-xs rounded-full border border-red-400/40">Real-time</span>
+                      <span class="px-2 py-1 bg-red-500/30 text-red-200 text-xs rounded-full border border-red-400/40">Instant</span>
+                    </div>
+                  </div>
+                  
+                  <!-- Arrow Indicator -->
+                  <div class="flex-shrink-0 self-center">
+                    <div class="w-10 h-10 bg-gradient-to-br from-red-400/30 to-red-600/30 rounded-full flex items-center justify-center group-hover/button:bg-gradient-to-br group-hover/button:from-red-300/40 group-hover/button:to-red-500/40 transition-all duration-300 border border-red-300/40">
+                      <i class="fas fa-chevron-right text-white group-hover/button:translate-x-0.5 transition-transform duration-300 drop-shadow-sm"></i>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Button Press Effect -->
+                <div class="absolute inset-0 bg-gradient-to-br from-red-800/50 to-red-900/50 opacity-0 group-active/button:opacity-100 transition-opacity duration-150 rounded-2xl"></div>
+              </button>
+              
+              <!-- Multi-Layer Card Shadow Effects -->
+              <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-red-500/20 to-red-600/20 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 pointer-events-none blur-sm -z-10"></div>
+              <div class="absolute -inset-0.5 rounded-2xl bg-gradient-to-br from-red-400/30 to-red-500/30 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 pointer-events-none blur-md -z-10"></div>
+              <div class="absolute -inset-1 rounded-2xl bg-gradient-to-br from-red-300/20 to-red-400/20 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 pointer-events-none blur-lg -z-10"></div>
+            </div>
           </div>
 
           <!-- Action Buttons -->
