@@ -2,7 +2,7 @@
   <div class="flex flex-col h-screen">
     <AppHeader />
     <div class="flex flex-1 overflow-hidden">
-      <DynamicSidebar v-model:collapsed="sidebarCollapsed" />
+      <ModernSidebar v-model:collapsed="sidebarCollapsed" />
       <main
         class="flex-1 p-3 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative"
       >
@@ -953,7 +953,7 @@
 
 <script>
 import { ref } from 'vue'
-import DynamicSidebar from '@/components/DynamicSidebar.vue'
+import ModernSidebar from '@/components/ModernSidebar.vue'
 import AppFooter from '@/components/footer.vue'
 import AppHeader from '@/components/AppHeader.vue'
 import userCombinedAccessService from '@/services/userCombinedAccessService'
@@ -961,7 +961,7 @@ import userCombinedAccessService from '@/services/userCombinedAccessService'
 export default {
   name: 'UserCombinedAccessForm',
   components: {
-    DynamicSidebar,
+    ModernSidebar,
     AppFooter,
     AppHeader
   },
@@ -1269,7 +1269,15 @@ export default {
 
     closeSuccessModal() {
       this.showSuccessModal = false
-      this.$router.push('/user-dashboard')
+      // Redirect to Request Status page with success parameters
+      this.$router.push({
+        path: '/request-status',
+        query: {
+          success: 'true',
+          type: 'Combined Access Request',
+          id: 'REQ-' + Date.now()
+        }
+      })
     },
 
     showNotification(message, type = 'info') {

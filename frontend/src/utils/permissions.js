@@ -10,7 +10,6 @@ export const ROLES = {
   ADMIN: 'admin',
   DIVISIONAL_DIRECTOR: 'divisional_director',
   HEAD_OF_DEPARTMENT: 'head_of_department',
-  HOD_IT: 'hod_it',
   ICT_DIRECTOR: 'ict_director',
   STAFF: 'staff',
   ICT_OFFICER: 'ict_officer'
@@ -75,27 +74,6 @@ export const ROLE_PERMISSIONS = {
     requestsManagement: ['internal-access/list', 'internal-access/details']
   },
 
-  [ROLES.HOD_IT]: {
-    routes: [
-      '/hod-it-dashboard',
-      '/jeeva-access',
-      '/wellsoft-access',
-      '/internet-access',
-      '/both-service-form',
-      '/internal-access/list',
-      '/internal-access/details',
-      '/onboarding'
-    ],
-    dashboards: ['hod-it-dashboard'],
-    forms: [
-      'jeeva-access',
-      'wellsoft-access',
-      'internet-access',
-      'both-service-form'
-    ],
-    userManagement: [],
-    requestsManagement: ['internal-access/list', 'internal-access/details']
-  },
 
   [ROLES.ICT_DIRECTOR]: {
     routes: [
@@ -258,7 +236,7 @@ export function getDefaultDashboard(userRole) {
     'user-dashboard': '/user-dashboard',
     'dict-dashboard': '/dict-dashboard',
     'hod-dashboard': '/hod-dashboard',
-    'hod-it-dashboard': '/hod-it-dashboard',
+
     'divisional-dashboard': '/divisional-dashboard',
     'ict-dashboard': '/ict-dashboard'
   }

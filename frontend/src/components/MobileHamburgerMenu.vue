@@ -314,7 +314,7 @@ export default {
         [ROLES.ADMIN]: 'Administrator',
         [ROLES.DIVISIONAL_DIRECTOR]: 'Divisional Director',
         [ROLES.HEAD_OF_DEPARTMENT]: 'Head of Department',
-        [ROLES.HOD_IT]: 'Head of IT Department',
+
         [ROLES.ICT_DIRECTOR]: 'ICT Director',
         [ROLES.STAFF]: 'Staff Member',
         [ROLES.ICT_OFFICER]: 'ICT Officer'
@@ -328,7 +328,7 @@ export default {
         [ROLES.ADMIN]: '/admin-dashboard',
         [ROLES.DIVISIONAL_DIRECTOR]: '/divisional-dashboard',
         [ROLES.HEAD_OF_DEPARTMENT]: '/hod-dashboard',
-        [ROLES.HOD_IT]: '/hod-it-dashboard',
+
         [ROLES.ICT_DIRECTOR]: '/dict-dashboard',
         [ROLES.ICT_OFFICER]: '/ict-dashboard',
         [ROLES.STAFF]: '/user-dashboard'

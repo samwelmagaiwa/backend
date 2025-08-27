@@ -27,7 +27,7 @@ const roleMapping = {
   'Head of Department': ROLES.HEAD_OF_DEPARTMENT, // Handle title case
   HOD: ROLES.HEAD_OF_DEPARTMENT, // Handle abbreviation
   hod: ROLES.HEAD_OF_DEPARTMENT, // Handle lowercase
-  hod_it: ROLES.HOD_IT,
+
   ict_director: ROLES.ICT_DIRECTOR,
   staff: ROLES.STAFF,
   ict_officer: ROLES.ICT_OFFICER
@@ -599,7 +599,7 @@ export const useAuth = () => {
       return [
         ROLES.DIVISIONAL_DIRECTOR,
         ROLES.HEAD_OF_DEPARTMENT,
-        ROLES.HOD_IT,
+
         ROLES.ICT_DIRECTOR,
         ROLES.ICT_OFFICER
       ].includes(role)

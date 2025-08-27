@@ -68,7 +68,7 @@ class BothServiceFormController extends Controller
             $userRole = $currentUser->getPrimaryRole()?->name; // For backward compatibility
 
             // Check if user has permission to access this data
-            $allowedRoles = ['head_of_department', 'divisional_director', 'ict_director', 'hod_it', 'ict_officer', 'admin', 'super_admin'];
+            $allowedRoles = ['head_of_department', 'divisional_director', 'ict_director', 'ict_officer', 'admin', 'super_admin'];
             if (!array_intersect($userRoles, $allowedRoles)) {
                 return response()->json([
                     'success' => false,
@@ -384,7 +384,7 @@ class BothServiceFormController extends Controller
                 $query->whereHas('department', function ($q) use ($user) {
                     $q->where('hod_user_id', $user->id);
                 });
-            } elseif (in_array($userRole, ['divisional_director', 'ict_director', 'hod_it', 'ict_officer'])) {
+            } elseif (in_array($userRole, ['divisional_director', 'ict_director', 'ict_officer'])) {
                 // Other approvers can see forms in their approval stage
                 $query->forRole($userRole);
             } else {
@@ -495,7 +495,9 @@ class BothServiceFormController extends Controller
      */
     public function approveAsHODIT(Request $request, int $id): JsonResponse
     {
-        return $this->processApproval($request, $id, 'hod_it', [
+        // HOD_IT role has been removed
+        return response()->json(['error' => 'HOD_IT role has been removed'], 404);
+        // return $this->processApproval($request, $id, 'hod_it', [
             'action' => 'required|in:approve,reject',
             'comments' => 'nullable|string|max:1000',
             'signature' => 'required|file|mimes:png,jpg,jpeg|max:2048',
@@ -615,7 +617,7 @@ class BothServiceFormController extends Controller
         }
 
         // Other approvers can view forms in their approval stage or completed forms
-        if (in_array($userRole, ['divisional_director', 'ict_director', 'hod_it', 'ict_officer'])) {
+        if (in_array($userRole, ['divisional_director', 'ict_director', 'ict_officer'])) {
             return true; // They can view all forms for approval purposes
         }
 
@@ -653,7 +655,7 @@ class BothServiceFormController extends Controller
         $userRole = $user->role?->name;
         $currentStage = $form->current_approval_stage;
         
-        $allSections = ['hod', 'divisional_director', 'dict', 'hod_it', 'ict_officer'];
+        $allSections = ['hod', 'divisional_director', 'dict', 'ict_officer'];
         $readonlySections = [];
 
         foreach ($allSections as $section) {
@@ -697,7 +699,7 @@ class BothServiceFormController extends Controller
                 $query->whereHas('department', function ($q) use ($user) {
                     $q->where('hod_user_id', $user->id);
                 });
-            } elseif (in_array($userRole, ['divisional_director', 'ict_director', 'hod_it', 'ict_officer'])) {
+            } elseif (in_array($userRole, ['divisional_director', 'ict_director', 'ict_officer'])) {
                 // Other approvers can see forms in their approval stage
                 $query->forRole($userRole);
             } else {
@@ -826,11 +828,7 @@ class BothServiceFormController extends Controller
                     'can_edit' => false,
                     'is_readonly' => true
                 ],
-                'hod_it_section' => [
-                    'approval_status' => $form->hod_it_approval_status,
-                    'comments' => $form->hod_it_comments,
-                    'approved_at' => $form->hod_it_approved_at,
-                    'approved_by' => $form->hodItUser?->name,
+
                     'can_edit' => false,
                     'is_readonly' => true
                 ],
@@ -1034,11 +1032,7 @@ class BothServiceFormController extends Controller
                 'approved_by' => $form->dictUser?->name,
                 'approved_at' => $form->dict_approved_at?->format('Y-m-d H:i:s')
             ],
-            'hod_it' => [
-                'status' => $form->hod_it_approval_status,
-                'approved_by' => $form->hodItUser?->name,
-                'approved_at' => $form->hod_it_approved_at?->format('Y-m-d H:i:s')
-            ],
+
             'ict_officer' => [
                 'status' => $form->ict_officer_approval_status,
                 'approved_by' => $form->ictOfficerUser?->name,
@@ -1066,9 +1060,7 @@ class BothServiceFormController extends Controller
         if ($form->dict_comments) {
             $comments['dict'] = $form->dict_comments;
         }
-        if ($form->hod_it_comments) {
-            $comments['hod_it'] = $form->hod_it_comments;
-        }
+
         if ($form->ict_officer_comments) {
             $comments['ict_officer'] = $form->ict_officer_comments;
         }

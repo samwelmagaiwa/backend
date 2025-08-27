@@ -39,7 +39,7 @@ class BothServiceFormRoleMiddleware
             'head_of_department',
             'divisional_director',
             'ict_director',
-            'hod_it',
+
             'ict_officer',
             'admin',
             'super_admin',
@@ -60,7 +60,7 @@ class BothServiceFormRoleMiddleware
                 'hod' => ['head_of_department'],
                 'divisional_director' => ['divisional_director'],
                 'dict' => ['ict_director'],
-                'hod_it' => ['hod_it'],
+
                 'ict_officer' => ['ict_officer'],
                 'admin' => ['admin', 'super_admin'],
             ];

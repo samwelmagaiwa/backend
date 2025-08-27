@@ -2,7 +2,7 @@
   <div class="flex flex-col h-screen">
     <Header />
     <div class="flex flex-1 overflow-hidden">
-      <DynamicSidebar v-model:collapsed="sidebarCollapsed" />
+      <ModernSidebar v-model:collapsed="sidebarCollapsed" />
       <main
         class="flex-1 p-6 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative"
       >
@@ -617,7 +617,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Header from '@/components/header.vue'
-import DynamicSidebar from '@/components/DynamicSidebar.vue'
+import ModernSidebar from '@/components/ModernSidebar.vue'
 import AppFooter from '@/components/footer.vue'
 import { useAuth } from '@/composables/useAuth'
 
@@ -625,7 +625,7 @@ export default {
   name: 'InternalAccessDetails',
   components: {
     Header,
-    DynamicSidebar,
+    ModernSidebar,
     AppFooter
   },
   setup() {
@@ -718,11 +718,7 @@ export default {
             requestData.value.divisionalStatus === 'approved' &&
             requestData.value.dictStatus === 'pending'
           )
-        case ROLES.HOD_IT:
-          return (
-            requestData.value.dictStatus === 'approved' &&
-            requestData.value.headOfItStatus === 'pending'
-          )
+
         case ROLES.ICT_OFFICER:
           return (
             requestData.value.headOfItStatus === 'approved' &&
@@ -930,10 +926,7 @@ export default {
             requestData.value.dictStatus = 'approved'
             requestData.value.dictApprovalDate = currentDate
             break
-          case ROLES.HOD_IT:
-            requestData.value.headOfItStatus = 'approved'
-            requestData.value.headOfItApprovalDate = currentDate
-            break
+
           case ROLES.ICT_OFFICER:
             requestData.value.ictStatus = 'approved'
             requestData.value.ictApprovalDate = currentDate
@@ -978,10 +971,7 @@ export default {
             requestData.value.dictStatus = 'rejected'
             requestData.value.dictApprovalDate = currentDate
             break
-          case ROLES.HOD_IT:
-            requestData.value.headOfItStatus = 'rejected'
-            requestData.value.headOfItApprovalDate = currentDate
-            break
+
           case ROLES.ICT_OFFICER:
             requestData.value.ictStatus = 'rejected'
             requestData.value.ictApprovalDate = currentDate

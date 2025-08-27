@@ -2,7 +2,7 @@
   <div class="flex flex-col h-screen">
     <AppHeader />
     <div class="flex flex-1 overflow-hidden">
-      <DynamicSidebar v-model:collapsed="sidebarCollapsed" />
+      <ModernSidebar v-model:collapsed="sidebarCollapsed" />
       <main
         class="flex-1 p-6 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative"
       >
@@ -970,7 +970,7 @@
 <script>
 import { debounce } from 'lodash'
 import AppHeader from '@/components/AppHeader.vue'
-import DynamicSidebar from '@/components/DynamicSidebar.vue'
+import ModernSidebar from '@/components/ModernSidebar.vue'
 import AppFooter from '@/components/footer.vue'
 
 export default {
@@ -978,7 +978,7 @@ export default {
 
   components: {
     AppHeader,
-    DynamicSidebar,
+    ModernSidebar,
     AppFooter
   },
 
@@ -1411,7 +1411,7 @@ export default {
         admin: 'red',
         super_admin: 'purple',
         head_of_department: 'blue',
-        hod_it: 'indigo',
+
         ict_director: 'teal',
         ict_officer: 'green',
         divisional_director: 'orange',

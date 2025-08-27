@@ -619,115 +619,7 @@
           </li>
         </template>
 
-        <!-- Forms Section -->
-        <li v-if="formItems.length > 0" class="tree-node mt-4">
-          <!-- Forms Root Node -->
-          <div
-            class="relative flex items-center px-4 py-2 text-sm transition-all duration-300 cursor-pointer backdrop-blur-sm group"
-            :class="[
-              isCollapsed ? 'justify-center' : '',
-              'text-slate-200 hover:bg-gradient-to-r hover:from-purple-600/20 hover:via-indigo-600/20 hover:to-violet-600/20 hover:text-white',
-            ]"
-            @click="!isCollapsed && (showForms = !showForms)"
-          >
-            <!-- Tree Lines -->
-            <div
-              v-show="!isCollapsed"
-              class="absolute left-2 top-0 bottom-0 w-px bg-slate-600/30"
-            ></div>
-
-            <!-- Expand/Collapse Icon -->
-            <div
-              v-show="!isCollapsed"
-              class="relative flex items-center justify-center w-4 h-4 mr-2"
-            >
-              <div class="w-2 h-2 bg-slate-600/50 rounded-full"></div>
-              <i
-                :class="[
-                  'fas text-xs text-slate-400 absolute transition-transform duration-200',
-                  showForms ? 'fa-minus' : 'fa-plus',
-                ]"
-              ></i>
-            </div>
-
-            <!-- Node Icon -->
-            <div
-              class="relative flex items-center justify-center w-6 h-6 rounded-lg bg-gradient-to-br from-purple-500/20 via-indigo-500/20 to-violet-500/20 group-hover:from-purple-500/40 group-hover:via-indigo-500/40 group-hover:to-violet-500/40 transition-all duration-300 shadow-lg border border-white/10 mr-3"
-            >
-              <i :class="[getFormsIcon(), 'text-xs drop-shadow-lg']"></i>
-            </div>
-
-            <span
-              v-show="!isCollapsed"
-              class="font-semibold tracking-wide drop-shadow-lg"
-              >{{ getFormsSectionTitle() }}</span
-            >
-          </div>
-
-          <!-- Forms Dropdown -->
-          <transition
-            enter-active-class="transition ease-out duration-300"
-            enter-from-class="opacity-0 -translate-y-4 scale-95"
-            enter-to-class="opacity-100 translate-y-0 scale-100"
-            leave-active-class="transition ease-in duration-200"
-            leave-from-class="opacity-100 translate-y-0 scale-100"
-            leave-to-class="opacity-0 -translate-y-4 scale-95"
-          >
-            <div v-if="showForms && !isCollapsed" class="ml-4 mr-2 mb-2">
-              <div
-                :class="getFormsDropdownClass()"
-                style="backdrop-filter: blur(10px)"
-              >
-                <div class="py-2">
-                  <router-link
-                    v-for="item in formItems"
-                    :key="item.path"
-                    :to="item.path"
-                    @click="showForms = false"
-                    class="flex items-center px-4 py-3 text-xs transition-all duration-300 group relative overflow-hidden"
-                    :class="[
-                      $route.path === item.path
-                        ? getActiveFormClass()
-                        : 'text-gray-700 hover:bg-blue-100 hover:text-blue-700 hover:shadow-md hover:transform hover:scale-105',
-                    ]"
-                  >
-                    <!-- Hover gradient overlay -->
-                    <div
-                      class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                    ></div>
-
-                    <div :class="getFormIconClass()">
-                      <i
-                        :class="[
-                          item.icon,
-                          getFormIconColor(),
-                          'text-sm drop-shadow-sm',
-                        ]"
-                      ></i>
-                    </div>
-                    <div class="flex-1 relative z-10">
-                      <p class="font-semibold drop-shadow-sm">
-                        {{ item.displayName }}
-                      </p>
-                      <p
-                        class="text-xs opacity-80 group-hover:opacity-100 transition-opacity duration-300"
-                      >
-                        {{ item.description }}
-                      </p>
-                    </div>
-
-                    <!-- Chevron indicator -->
-                    <div
-                      class="opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0"
-                    >
-                      <i class="fas fa-chevron-right text-xs text-blue-500"></i>
-                    </div>
-                  </router-link>
-                </div>
-              </div>
-            </div>
-          </transition>
-        </li>
+        <!-- Forms Section - REMOVED: Forms are now only accessible through Submit New Request button in dashboard -->
       </ul>
     </nav>
 
@@ -788,6 +680,7 @@ import { useRouter } from 'vue-router'
 import { ROLE_PERMISSIONS, ROLES } from '../utils/permissions'
 import { useAuth } from '../composables/useAuth'
 import auth from '../utils/auth'
+import { logoutGuard } from '@/utils/logoutGuard'
 
 export default {
   name: 'DynamicSidebar',
@@ -855,7 +748,6 @@ export default {
 
     // Local state
     const showUserMgmt = ref(false)
-    const showForms = ref(false)
     const showDeviceManagement = ref(false)
     const showRequestsManagement = ref(false)
     const showDashboard = ref(true) // Dashboard expanded by default
@@ -898,12 +790,7 @@ export default {
       menuItems.value.filter((item) => item.category === 'user-management')
     )
 
-    const formItems = computed(() =>
-      menuItems.value.filter(
-        (item) =>
-          item.category === 'access-form' || item.category === 'user-form'
-      )
-    )
+    // formItems removed - forms are now only accessible through Submit New Request button
 
     const deviceManagementItems = computed(() =>
       menuItems.value.filter((item) => item.category === 'device-management')
@@ -923,7 +810,7 @@ export default {
         [ROLES.ADMIN]: 'Administrator',
         [ROLES.DIVISIONAL_DIRECTOR]: 'Divisional Director',
         [ROLES.HEAD_OF_DEPARTMENT]: 'Head of Department',
-        [ROLES.HOD_IT]: 'Head of IT Department',
+
         [ROLES.ICT_DIRECTOR]: 'ICT Director',
         [ROLES.STAFF]: 'Staff Member',
         [ROLES.ICT_OFFICER]: 'ICT Officer'
@@ -931,63 +818,18 @@ export default {
       return roleNames[role] || role
     }
 
-    function getFormsSectionTitle() {
-      const role = stableUserRole.value || userRole.value
-      if (role === ROLES.STAFF) {
-        return 'Request Forms'
-      }
-      return 'Approval Forms'
-    }
-
-    function getFormsIcon() {
-      const role = stableUserRole.value || userRole.value
-      if (role === ROLES.STAFF) {
-        return 'fas fa-file-plus'
-      }
-      return 'fas fa-file-signature'
-    }
-
-    function getFormsDropdownClass() {
-      const baseClass = 'rounded-xl border-2 overflow-hidden shadow-xl'
-      const role = stableUserRole.value || userRole.value
-      if (role === ROLES.STAFF) {
-        return `${baseClass} bg-gradient-to-br from-green-50 via-green-50 to-emerald-50 border-green-200/50`
-      }
-      return `${baseClass} bg-gradient-to-br from-blue-50 via-blue-50 to-cyan-50 border-blue-200/50`
-    }
-
-    function getActiveFormClass() {
-      const role = stableUserRole.value || userRole.value
-      if (role === ROLES.STAFF) {
-        return 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 shadow-md border-l-4 border-green-500'
-      }
-      return 'bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-700 shadow-md border-l-4 border-blue-500'
-    }
-
-    function getFormIconClass() {
-      const baseClass =
-        'w-8 h-8 rounded-xl flex items-center justify-center mr-3 transition-all duration-300 shadow-lg border'
-      const role = stableUserRole.value || userRole.value
-      if (role === ROLES.STAFF) {
-        return `${baseClass} bg-gradient-to-br from-green-100 to-green-200 group-hover:from-green-200 group-hover:to-green-300 border-green-300/50`
-      }
-      return `${baseClass} bg-gradient-to-br from-blue-100 to-blue-200 group-hover:from-blue-200 group-hover:to-blue-300 border-blue-300/50`
-    }
-
-    function getFormIconColor() {
-      const role = stableUserRole.value || userRole.value
-      if (role === ROLES.STAFF) {
-        return 'text-green-600'
-      }
-      return 'text-blue-600'
-    }
+    // Form-related methods removed - forms are now only accessible through Submit New Request button
 
     async function handleLogout() {
       try {
-        await logout()
+        await logoutGuard.executeLogout(async() => {
+          await logout()
+        })
         router.push('/')
       } catch (error) {
         console.error('Logout failed:', error)
+        // Force redirect even if logout fails
+        router.push('/')
       }
     }
 
@@ -1162,7 +1004,6 @@ export default {
       // State
       isCollapsed,
       showUserMgmt,
-      showForms,
       showDeviceManagement,
       showRequestsManagement,
       showDashboard,
@@ -1176,19 +1017,12 @@ export default {
       containerWidthClass,
       dashboardItems,
       userManagementItems,
-      formItems,
       deviceManagementItems,
       requestsManagementItems,
 
       // Methods
       toggleCollapse,
       getRoleDisplayName,
-      getFormsSectionTitle,
-      getFormsIcon,
-      getFormsDropdownClass,
-      getActiveFormClass,
-      getFormIconClass,
-      getFormIconColor,
       handleLogout
     }
   }

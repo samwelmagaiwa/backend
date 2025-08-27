@@ -1,10 +1,5 @@
 <template>
   <div id="app">
-    <!-- AppHeader removed -->
-
-    <!-- Auth Debugger (temporary) -->
-    <AuthDebugger v-if="showDebugger" />
-
     <!-- Main content -->
     <main>
       <router-view />
@@ -13,20 +8,13 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
-import AuthDebugger from './components/AuthDebugger.vue'
+import { onMounted } from 'vue'
 import auth from './utils/auth'
 
 export default {
   name: 'App',
 
-  components: {
-    AuthDebugger
-  },
-
   setup() {
-    const showDebugger = ref(false) // Set to false to hide debugger
-
     onMounted(async() => {
       console.log('🔄 App: Mounted, initializing auth...')
 
@@ -39,9 +27,7 @@ export default {
       console.log('  - currentUser:', auth.currentUser?.name)
     })
 
-    return {
-      showDebugger
-    }
+    return {}
   }
 }
 </script>
@@ -53,7 +39,6 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
   min-height: 100vh;
-  background-color: #f5f5f5;
 }
 
 main {

@@ -2,7 +2,7 @@
   <div class="flex flex-col h-screen">
     <!-- AppHeader removed -->
     <div class="flex flex-1 overflow-hidden">
-      <DynamicSidebar v-model:collapsed="sidebarCollapsed" />
+      <ModernSidebar v-model:collapsed="sidebarCollapsed" />
       <main class="flex-1 p-6 bg-gray-100 overflow-y-auto">
         <div class="container-responsive">
           <div class="bg-white rounded-xl shadow-md p-6">
@@ -109,13 +109,13 @@
 
 <script>
 import { ref } from 'vue'
-import DynamicSidebar from './DynamicSidebar.vue'
+import ModernSidebar from './ModernSidebar.vue'
 import AppFooter from './footer.vue'
 
 export default {
   name: 'SettingsPage',
   components: {
-    DynamicSidebar,
+    ModernSidebar,
     AppFooter
   },
   setup() {

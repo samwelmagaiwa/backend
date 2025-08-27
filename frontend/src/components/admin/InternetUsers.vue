@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col h-screen">
     <div class="flex flex-1 overflow-hidden">
-      <DynamicSidebar v-model:collapsed="sidebarCollapsed" />
+      <ModernSidebar v-model:collapsed="sidebarCollapsed" />
       <main
         class="flex-1 p-6 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative"
       >
@@ -58,13 +58,13 @@
 
 <script>
 import { ref } from 'vue'
-import DynamicSidebar from '@/components/DynamicSidebar.vue'
+import ModernSidebar from '@/components/ModernSidebar.vue'
 import UserManagementDropdown from '@/components/UserManagementDropdown.vue'
 
 export default {
   name: 'InternetUsersPage',
   components: {
-    DynamicSidebar,
+    ModernSidebar,
     UserManagementDropdown
   },
   setup() {

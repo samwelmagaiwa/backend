@@ -53,16 +53,7 @@ class RoleManagementSeeder extends Seeder
                     'is_deletable' => false,
                     'sort_order' => 3
                 ],
-                'hod_it' => [
-                    'description' => 'Head of IT department',
-                    'permissions' => [
-                        'view_users', 'view_all_requests', 'approve_requests', 'reject_requests',
-                        'system_settings'
-                    ],
-                    'is_system_role' => true,
-                    'is_deletable' => false,
-                    'sort_order' => 4
-                ],
+
                 'ict_director' => [
                     'description' => 'ICT director with technical oversight',
                     'permissions' => [

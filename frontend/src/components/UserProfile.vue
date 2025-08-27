@@ -2,7 +2,7 @@
   <div class="flex flex-col h-screen">
     <!-- AppHeader removed -->
     <div class="flex flex-1 overflow-hidden">
-      <DynamicSidebar v-model:collapsed="sidebarCollapsed" />
+      <ModernSidebar v-model:collapsed="sidebarCollapsed" />
       <main
         class="flex-1 p-6 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative"
       >
@@ -610,13 +610,13 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
-import DynamicSidebar from './DynamicSidebar.vue'
+import ModernSidebar from './ModernSidebar.vue'
 import AppFooter from './footer.vue'
 
 export default {
   name: 'UserProfile',
   components: {
-    DynamicSidebar,
+    ModernSidebar,
     AppFooter
   },
   setup() {

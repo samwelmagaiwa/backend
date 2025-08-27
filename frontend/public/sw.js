@@ -1,5 +1,4 @@
 // Service Worker for Muhimbili Hospital Frontend
-const CACHE_NAME = 'muhimbili-hospital-v1'
 const STATIC_CACHE_NAME = 'muhimbili-static-v1'
 const DYNAMIC_CACHE_NAME = 'muhimbili-dynamic-v1'
 

@@ -190,7 +190,7 @@ export function useAuth() {
       [ROLES.ADMIN]: 'Administrator',
       [ROLES.DIVISIONAL_DIRECTOR]: 'Divisional Director',
       [ROLES.HEAD_OF_DEPARTMENT]: 'Head of Department',
-      [ROLES.HOD_IT]: 'Head of IT Department',
+
       [ROLES.ICT_DIRECTOR]: 'ICT Director',
       [ROLES.STAFF]: 'Staff Member',
       [ROLES.ICT_OFFICER]: 'ICT Officer'

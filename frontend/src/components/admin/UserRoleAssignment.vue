@@ -2,7 +2,7 @@
   <div class="flex flex-col h-screen">
     <AppHeader />
     <div class="flex flex-1 overflow-hidden">
-      <DynamicSidebar v-model:collapsed="sidebarCollapsed" />
+      <ModernSidebar v-model:collapsed="sidebarCollapsed" />
       <main
         class="flex-1 p-6 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative"
       >
@@ -1082,7 +1082,7 @@
 import { mapGetters, mapActions } from 'vuex'
 import { debounce } from 'lodash'
 import AppHeader from '@/components/AppHeader.vue'
-import DynamicSidebar from '@/components/DynamicSidebar.vue'
+import ModernSidebar from '@/components/ModernSidebar.vue'
 import AppFooter from '@/components/footer.vue'
 
 export default {
@@ -1090,7 +1090,7 @@ export default {
 
   components: {
     AppHeader,
-    DynamicSidebar,
+    ModernSidebar,
     AppFooter
   },
 
@@ -1479,7 +1479,7 @@ export default {
         admin: 'red',
         super_admin: 'purple',
         head_of_department: 'blue',
-        hod_it: 'indigo',
+
         ict_director: 'teal',
         ict_officer: 'green',
         divisional_director: 'orange',
@@ -1493,7 +1493,7 @@ export default {
         admin: 'bg-red-500/30 text-red-100 border-red-400/50',
         super_admin: 'bg-purple-500/30 text-purple-100 border-purple-400/50',
         head_of_department: 'bg-blue-500/30 text-blue-100 border-blue-400/50',
-        hod_it: 'bg-indigo-500/30 text-indigo-100 border-indigo-400/50',
+
         ict_director: 'bg-teal-500/30 text-teal-100 border-teal-400/50',
         ict_officer: 'bg-green-500/30 text-green-100 border-green-400/50',
         divisional_director: 'bg-orange-500/30 text-orange-100 border-orange-400/50',

@@ -40,8 +40,10 @@ class AuthController extends Controller
             'user_agent' => $userAgent
         ]);
         
-        // Find user by email
-        $user = User::where('email', $request->email)->first();
+        // Find user by email with eager loading to reduce queries
+        $user = User::with(['role', 'roles', 'onboarding'])
+                   ->where('email', $request->email)
+                   ->first();
         
         if (!$user) {
             Log::warning('User not found in database: ' . $request->email);
@@ -70,8 +72,7 @@ class AuthController extends Controller
         
         Log::info('Password verification successful for user: ' . $request->email);
         
-        // Load user relationships (prioritize old role system)
-        $user->load(['role', 'roles', 'onboarding']);
+        // Relationships already loaded with eager loading above
         
         // Create a unique token name for this session
         $tokenName = $this->generateTokenName($user, $userAgent, $ipAddress);
@@ -182,7 +183,7 @@ class AuthController extends Controller
             ]);
         }
         
-        if (array_intersect($userRoles, ['divisional_director', 'head_of_department', 'hod_it', 'ict_director', 'ict_officer'])) {
+        if (array_intersect($userRoles, ['divisional_director', 'head_of_department', 'ict_director', 'ict_officer'])) {
             $abilities = array_merge($abilities, [
                 'approver-access',
                 'review-requests',

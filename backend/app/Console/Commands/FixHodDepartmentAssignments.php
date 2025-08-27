@@ -48,7 +48,7 @@ class FixHodDepartmentAssignments extends Command
         // Check HOD users
         $this->info('👥 Checking HOD Users:');
         $hodUsers = User::whereHas('role', function($query) {
-            $query->whereIn('name', ['head_of_department', 'hod_it', 'ict_director']);
+            $query->whereIn('name', ['head_of_department', 'ict_director']);
         })->with('role')->get();
 
         if ($hodUsers->isEmpty()) {
@@ -108,7 +108,7 @@ class FixHodDepartmentAssignments extends Command
         })->first();
         
         $hodItUser = User::whereHas('role', function($query) {
-            $query->where('name', 'hod_it');
+            $query->where('name', 'ict_director');
         })->first();
 
         $fixed = 0;

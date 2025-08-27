@@ -166,7 +166,7 @@ const getters = {
     const approverRoles = [
       'divisional_director',
       'head_of_department',
-      'hod_it',
+
       'ict_director',
       'ict_officer'
     ]

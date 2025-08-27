@@ -274,37 +274,7 @@
         </div>
 
         <!-- Head of IT Approval -->
-        <div class="approval-section {{ $form->hod_it_approval_status }}">
-            <div class="section-title">
-                4. Head of IT Approval
-                <span class="status-badge status-{{ $form->hod_it_approval_status }}">{{ ucfirst($form->hod_it_approval_status) }}</span>
-            </div>
-            @if($form->hod_it_approval_status !== 'pending')
-                <div class="form-row">
-                    <span class="form-label">Approved By:</span>
-                    <span class="form-value">{{ $form->hodItUser->name ?? 'N/A' }}</span>
-                </div>
-                <div class="form-row">
-                    <span class="form-label">Date:</span>
-                    <span class="form-value">{{ $form->hod_it_approved_at?->format('d/m/Y H:i') ?? 'N/A' }}</span>
-                </div>
-                @if($form->hod_it_comments)
-                    <div class="form-row">
-                        <span class="form-label">Comments:</span>
-                        <span class="form-value">{{ $form->hod_it_comments }}</span>
-                    </div>
-                @endif
-                <div class="signature-box">
-                    @if($form->hod_it_signature_path)
-                        <img src="{{ storage_path('app/public/' . $form->hod_it_signature_path) }}" alt="Head of IT Signature" style="max-height: 50px;">
-                    @else
-                        Digital Signature
-                    @endif
-                </div>
-            @else
-                <p><em>Pending Head of IT approval</em></p>
-            @endif
-        </div>
+        <!-- HOD_IT section has been removed -->
 
         <!-- ICT Officer Approval -->
         <div class="approval-section {{ $form->ict_officer_approval_status }}">

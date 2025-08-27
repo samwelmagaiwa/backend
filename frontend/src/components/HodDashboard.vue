@@ -2,7 +2,7 @@
   <div class="flex flex-col h-screen">
     <Header />
     <div class="flex flex-1 overflow-hidden">
-      <DynamicSidebar v-model:collapsed="sidebarCollapsed" />
+      <ModernSidebar v-model:collapsed="sidebarCollapsed" />
       <main
         class="flex-1 p-6 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative"
       >
@@ -257,7 +257,7 @@
 <script>
 import { ref, onMounted } from 'vue'
 import Header from '@/components/header.vue'
-import DynamicSidebar from './DynamicSidebar.vue'
+import ModernSidebar from './ModernSidebar.vue'
 import AppFooter from '@/components/footer.vue'
 import { useAuth } from '@/composables/useAuth'
 
@@ -265,7 +265,7 @@ export default {
   name: 'HodDashboard',
   components: {
     Header,
-    DynamicSidebar,
+    ModernSidebar,
     AppFooter
   },
   setup() {

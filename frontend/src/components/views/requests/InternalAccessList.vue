@@ -2,7 +2,7 @@
   <div class="flex flex-col h-screen">
     <Header />
     <div class="flex flex-1 overflow-hidden">
-      <DynamicSidebar v-model:collapsed="sidebarCollapsed" />
+      <ModernSidebar v-model:collapsed="sidebarCollapsed" />
       <main
         class="flex-1 p-6 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative"
       >
@@ -626,7 +626,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Header from '@/components/header.vue'
-import DynamicSidebar from '@/components/DynamicSidebar.vue'
+import ModernSidebar from '@/components/ModernSidebar.vue'
 import AppFooter from '@/components/footer.vue'
 import { useAuth } from '@/composables/useAuth'
 import personalInfoService from '@/services/personalInfoService'
@@ -637,7 +637,7 @@ export default {
   name: 'HODDashboardRequestList',
   components: {
     Header,
-    DynamicSidebar,
+    ModernSidebar,
     AppFooter
   },
   setup() {
@@ -680,11 +680,7 @@ export default {
               request.divisionalStatus === 'approved' &&
               request.dictStatus === 'pending'
             )
-          case ROLES.HOD_IT:
-            return (
-              request.dictStatus === 'approved' &&
-              request.headOfItStatus === 'pending'
-            )
+
           case ROLES.ICT_OFFICER:
             return (
               request.headOfItStatus === 'approved' &&
@@ -766,11 +762,7 @@ export default {
               request.divisionalStatus === 'approved' &&
               request.dictStatus === 'pending'
             )
-          case ROLES.HOD_IT:
-            return (
-              request.dictStatus === 'approved' &&
-              request.headOfItStatus === 'pending'
-            )
+
           case ROLES.ICT_OFFICER:
             return (
               request.headOfItStatus === 'approved' &&
@@ -804,8 +796,7 @@ export default {
           return 'Divisional Director Approval Stage'
         case ROLES.ICT_DIRECTOR:
           return 'DICT Approval Stage'
-        case ROLES.HOD_IT:
-          return 'Head of IT Approval Stage'
+
         case ROLES.ICT_OFFICER:
           return 'ICT Officer Final Approval Stage'
         default:
@@ -872,7 +863,7 @@ export default {
           userRole.value === ROLES.DIVISIONAL_DIRECTOR) ||
         (roleType === 'ict_director' &&
           userRole.value === ROLES.ICT_DIRECTOR) ||
-        (roleType === 'hod_it' && userRole.value === ROLES.HOD_IT) ||
+
         (roleType === 'ict_officer' && userRole.value === ROLES.ICT_OFFICER)
 
       let baseClass = 'text-xs font-medium'
@@ -971,9 +962,7 @@ export default {
               case ROLES.ICT_DIRECTOR:
                 requests.value[index].dictStatus = 'rejected'
                 break
-              case ROLES.HOD_IT:
-                requests.value[index].headOfItStatus = 'rejected'
-                break
+
               case ROLES.ICT_OFFICER:
                 requests.value[index].ictStatus = 'rejected'
                 break
@@ -1106,9 +1095,7 @@ export default {
               case ROLES.ICT_DIRECTOR:
                 requests.value[index].dictStatus = 'approved'
                 break
-              case ROLES.HOD_IT:
-                requests.value[index].headOfItStatus = 'approved'
-                break
+
               case ROLES.ICT_OFFICER:
                 requests.value[index].ictStatus = 'approved'
                 requests.value[index].currentStatus = 'approved'

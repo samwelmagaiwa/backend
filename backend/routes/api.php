@@ -13,6 +13,41 @@ use Illuminate\Support\Facades\Route;
 
 
 // Public routes
+    // Health check endpoint
+    Route::get('/health', function () {
+        return response()->json([
+            'status' => 'ok',
+            'timestamp' => now()->toISOString(),
+            'database' => 'checking...'
+        ]);
+    });
+    
+    // Detailed health check with database test
+    Route::get('/health/detailed', function () {
+        $dbStatus = 'ok';
+        $dbError = null;
+        
+        try {
+            \DB::connection()->getPdo();
+            \DB::table('users')->count(); // Test a simple query
+        } catch (\Exception $e) {
+            $dbStatus = 'error';
+            $dbError = $e->getMessage();
+        }
+        
+        return response()->json([
+            'status' => $dbStatus === 'ok' ? 'ok' : 'error',
+            'timestamp' => now()->toISOString(),
+            'database' => [
+                'status' => $dbStatus,
+                'error' => $dbError
+            ],
+            'environment' => app()->environment(),
+            'php_version' => PHP_VERSION,
+            'laravel_version' => app()->version()
+        ]);
+    });
+    
     // Authentication routes
     Route::post('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -157,7 +192,7 @@ Route::middleware('auth:sanctum')->group(function () {
             ->middleware('both.service.role:dict')
             ->name('both-service-form.approve.dict');
         Route::post('/{id}/approve/hod-it', [BothServiceFormController::class, 'approveAsHODIT'])
-            ->middleware('both.service.role:hod_it')
+
             ->name('both-service-form.approve.hod-it');
         Route::post('/{id}/approve/ict-officer', [BothServiceFormController::class, 'approveAsICTOfficer'])
             ->middleware('both.service.role:ict_officer')

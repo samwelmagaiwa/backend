@@ -416,6 +416,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { useRouter } from 'vue-router'
+import { logoutGuard } from '@/utils/logoutGuard'
 
 export default {
   name: 'AppHeader',
@@ -444,7 +445,7 @@ export default {
         admin: 'Administrator',
         ict_officer: 'ICT Officer',
         head_of_department: 'Head of Department',
-        hod_it: 'Head of IT Department',
+
         divisional_director: 'Divisional Director',
         ict_director: 'ICT Director',
         staff: 'Staff Member'
@@ -467,9 +468,6 @@ export default {
             break
           case 'head_of_department':
             router.push('/hod-dashboard')
-            break
-          case 'hod_it':
-            router.push('/hod-it-dashboard')
             break
           case 'divisional_director':
             router.push('/divisional-dashboard')
@@ -507,7 +505,9 @@ export default {
       closeProfileDropdown()
 
       try {
-        await authLogout()
+        await logoutGuard.executeLogout(async() => {
+          await authLogout()
+        })
         router.push('/login')
       } catch (error) {
         console.error('Logout error:', error)

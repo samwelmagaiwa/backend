@@ -103,11 +103,7 @@ export function preloadRoleBasedImages(userRole) {
       images: commonImages,
       reason: 'ICT Director accesses forms and approval pages'
     },
-    hod_it: {
-      priority: 'high',
-      images: commonImages,
-      reason: 'HOD IT accesses forms and approval pages'
-    },
+
     ict_officer: {
       priority: 'high',
       images: commonImages,

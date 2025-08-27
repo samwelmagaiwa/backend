@@ -20,7 +20,7 @@ class DepartmentSeeder extends Seeder
         })->first();
         
         $hodItUser = User::whereHas('role', function($query) {
-            $query->where('name', 'hod_it');
+            $query->where('name', 'ict_director');
         })->first();
         
         $ictDirectorUser = User::whereHas('role', function($query) {

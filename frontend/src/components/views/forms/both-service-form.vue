@@ -2,7 +2,7 @@
   <div class="flex flex-col h-screen">
     <Header />
     <div class="flex flex-1 overflow-hidden">
-      <DynamicSidebar v-model:collapsed="sidebarCollapsed" />
+      <ModernSidebar v-model:collapsed="sidebarCollapsed" />
       <main
         class="flex-1 p-3 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative"
       >
@@ -2172,7 +2172,7 @@ const InternetPanel = {
 
 import { ref } from 'vue'
 import Header from '@/components/header.vue'
-import DynamicSidebar from '@/components/DynamicSidebar.vue'
+import ModernSidebar from '@/components/ModernSidebar.vue'
 import AppFooter from '@/components/footer.vue'
 
 export default {
@@ -2182,7 +2182,7 @@ export default {
     JeevaPanel,
     InternetPanel,
     Header,
-    DynamicSidebar,
+    ModernSidebar,
     AppFooter
   },
   setup() {

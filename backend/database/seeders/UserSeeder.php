@@ -23,7 +23,7 @@ class UserSeeder extends Seeder
             ['name' => 'admin'],
             ['name' => 'divisional_director'],
             ['name' => 'head_of_department'],
-            ['name' => 'hod_it'],
+
             ['name' => 'ict_director'],
             ['name' => 'staff'],
             ['name' => 'ict_officer'],

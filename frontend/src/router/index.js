@@ -7,6 +7,8 @@ const LoginPageWrapper = () =>
   import(/* webpackChunkName: "auth" */ '../components/LoginPageWrapper.vue')
 
 const routes = [
+
+
   // Public routes
   {
     path: '/',
@@ -77,10 +79,10 @@ const routes = [
   {
     path: '/user-dashboard',
     name: 'UserDashboard',
-    component: () => import('../components/UserDashboard.vue'),
+    component: () => import('../components/UserDashboardWorking.vue'),
     meta: {
-      requiresAuth: true,
-      roles: [ROLES.STAFF]
+      requiresAuth: false,
+      isPublic: true
     }
   },
   {
@@ -101,15 +103,7 @@ const routes = [
       roles: [ROLES.HEAD_OF_DEPARTMENT]
     }
   },
-  {
-    path: '/hod-it-dashboard',
-    name: 'HodItDashboard',
-    component: () => import('../components/HodItDashboard.vue'),
-    meta: {
-      requiresAuth: true,
-      roles: [ROLES.HOD_IT]
-    }
-  },
+
   {
     path: '/divisional-dashboard',
     name: 'DivisionalDashboard',
@@ -140,29 +134,6 @@ const routes = [
     }
   },
 
-  // Multi-session demo page (for testing)
-
-  // Onboarding demo page (for testing)
-  // {
-  //   path: '/onboarding-demo',
-  //   name: 'OnboardingDemo',
-  //   component: () => import('../components/OnboardingDemo.vue'),
-  //   meta: {
-  //     requiresAuth: true,
-  //     roles: Object.values(ROLES)
-  //   }
-  // },
-
-  // Auth test page (for debugging) - DISABLED: Component not found
-  // {
-  //   path: '/auth-test',
-  //   name: 'AuthTest',
-  //   component: () => import('../components/AuthTest.vue'),
-  //   meta: {
-  //     requiresAuth: true,
-  //     roles: Object.values(ROLES)
-  //   }
-  // },
 
   // Settings (accessible to all authenticated users)
   {
@@ -197,7 +168,6 @@ const routes = [
       roles: [
         ROLES.DIVISIONAL_DIRECTOR,
         ROLES.HEAD_OF_DEPARTMENT,
-        ROLES.HOD_IT,
         ROLES.ICT_DIRECTOR,
         ROLES.ICT_OFFICER
       ]
@@ -212,7 +182,6 @@ const routes = [
       roles: [
         ROLES.DIVISIONAL_DIRECTOR,
         ROLES.HEAD_OF_DEPARTMENT,
-        ROLES.HOD_IT,
         ROLES.ICT_DIRECTOR,
         ROLES.ICT_OFFICER
       ]
@@ -227,7 +196,6 @@ const routes = [
       roles: [
         ROLES.DIVISIONAL_DIRECTOR,
         ROLES.HEAD_OF_DEPARTMENT,
-        ROLES.HOD_IT,
         ROLES.ICT_DIRECTOR,
         ROLES.ICT_OFFICER
       ]
@@ -242,7 +210,6 @@ const routes = [
       roles: [
         ROLES.DIVISIONAL_DIRECTOR,
         ROLES.HEAD_OF_DEPARTMENT,
-        ROLES.HOD_IT,
         ROLES.ICT_DIRECTOR,
         ROLES.ICT_OFFICER
       ]
@@ -300,6 +267,15 @@ const routes = [
       roles: [ROLES.STAFF]
     }
   },
+  {
+    path: '/request-status',
+    name: 'RequestStatusPage',
+    component: () => import('../components/views/requests/RequestStatusPage.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: [ROLES.STAFF]
+    }
+  },
 
   // ICT Approval routes (ICT Officer only)
   {
@@ -335,7 +311,6 @@ const routes = [
         ROLES.HEAD_OF_DEPARTMENT,
         ROLES.DIVISIONAL_DIRECTOR,
         ROLES.ICT_DIRECTOR,
-        ROLES.HOD_IT,
         ROLES.ICT_OFFICER
       ]
     }
@@ -357,7 +332,6 @@ const routes = [
       roles: [
         ROLES.DIVISIONAL_DIRECTOR,
         ROLES.HEAD_OF_DEPARTMENT,
-        ROLES.HOD_IT,
         ROLES.ICT_DIRECTOR,
         ROLES.ICT_OFFICER
       ]
@@ -549,8 +523,7 @@ router.beforeEach(async(to, from, next) => {
             return next('/admin-dashboard')
           } else if (userRole === 'head_of_department') {
             return next('/hod-dashboard')
-          } else if (userRole === 'hod_it') {
-            return next('/hod-it-dashboard')
+
           } else if (userRole === 'divisional_director') {
             return next('/divisional-dashboard')
           } else if (userRole === 'ict_director') {

@@ -138,7 +138,7 @@ class DepartmentHodController extends Controller
             $currentUser = $request->user();
 
             // Check if user has appropriate role
-            if (!$hodUser->hasAnyRole(['head_of_department', 'hod_it', 'ict_director', 'admin'])) {
+            if (!$hodUser->hasAnyRole(['head_of_department', 'ict_director', 'admin'])) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Selected user does not have appropriate role to be HOD.'
@@ -239,7 +239,7 @@ class DepartmentHodController extends Controller
     {
         try {
             $eligibleUsers = User::whereHas('roles', function ($query) {
-                $query->whereIn('name', ['head_of_department', 'hod_it', 'ict_director', 'admin']);
+                $query->whereIn('name', ['head_of_department', 'ict_director', 'admin']);
             })
             ->with('roles', 'departmentsAsHOD')
             ->orderBy('name')
