@@ -31,6 +31,14 @@ class Department extends Model
     ];
 
     /**
+     * Get the users that belong to this department.
+     */
+    public function users(): HasMany
+    {
+        return $this->hasMany(User::class);
+    }
+
+    /**
      * Get the user access requests for the department.
      */
     public function userAccessRequests(): HasMany

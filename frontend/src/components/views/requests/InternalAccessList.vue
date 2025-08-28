@@ -2,7 +2,7 @@
   <div class="flex flex-col h-screen">
     <Header />
     <div class="flex flex-1 overflow-hidden">
-      <ModernSidebar v-model:collapsed="sidebarCollapsed" />
+      <ModernSidebar />
       <main
         class="flex-1 p-6 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative"
       >
@@ -645,6 +645,7 @@ export default {
     const { userRole, ROLES, getRoleDisplayName } = useAuth()
 
     // Reactive data
+    // Sidebar state now managed by Pinia - no local state needed
     const sidebarCollapsed = ref(false)
     const requests = ref([])
     const isLoading = ref(true)

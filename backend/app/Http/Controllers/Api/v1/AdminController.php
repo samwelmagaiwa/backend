@@ -20,7 +20,7 @@ class AdminController extends Controller
         try {
             // Check if current user is admin
             $currentUser = $request->user();
-            if (!$currentUser->role || $currentUser->role->name !== 'admin') {
+            if (!$currentUser->hasAdminPrivileges()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Unauthorized. Admin access required.'
@@ -43,7 +43,7 @@ class AdminController extends Controller
             }
 
             // Build query
-            $query = User::with(['role', 'onboarding'])
+            $query = User::with(['roles', 'onboarding'])
                 ->where('id', '!=', $currentUser->id); // Exclude current admin
 
             // Apply search filter
@@ -58,14 +58,14 @@ class AdminController extends Controller
 
             // Apply role filter
             if ($request->has('role') && $request->role) {
-                $query->whereHas('role', function ($q) use ($request) {
+                $query->whereHas('roles', function ($q) use ($request) {
                     $q->where('name', $request->role);
                 });
             }
 
-            // Exclude admin users from the list
-            $query->whereHas('role', function ($q) {
-                $q->where('name', '!=', 'admin');
+            // Exclude super admin users from the list
+            $query->whereDoesntHave('roles', function ($q) {
+                $q->where('name', 'super_admin');
             });
 
             // Pagination
@@ -82,8 +82,15 @@ class AdminController extends Controller
                     'email' => $user->email,
                     'pf_number' => $user->pf_number,
                     'phone' => $user->phone,
-                    'role' => $user->role ? $user->role->name : null,
-                    'role_display' => $user->role ? ucwords(str_replace('_', ' ', $user->role->name)) : null,
+                    'roles' => $user->roles->map(function ($role) {
+                        return [
+                            'id' => $role->id,
+                            'name' => $role->name,
+                            'display_name' => ucwords(str_replace('_', ' ', $role->name))
+                        ];
+                    }),
+                    'primary_role' => $user->getPrimaryRoleName(),
+                    'display_roles' => $user->getDisplayRoleNames(),
                     'created_at' => $user->created_at,
                     'onboarding_status' => [
                         'needs_onboarding' => $user->needsOnboarding(),
@@ -144,14 +151,14 @@ class AdminController extends Controller
         try {
             // Check if current user is admin
             $currentUser = $request->user();
-            if (!$currentUser->role || $currentUser->role->name !== 'admin') {
+            if (!$currentUser->hasAdminPrivileges()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Unauthorized. Admin access required.'
                 ], 403);
             }
 
-            $user = User::with(['role', 'onboarding'])->find($userId);
+            $user = User::with(['roles', 'onboarding'])->find($userId);
 
             if (!$user) {
                 return response()->json([
@@ -160,11 +167,11 @@ class AdminController extends Controller
                 ], 404);
             }
 
-            // Don't allow viewing other admin users
-            if ($user->role && $user->role->name === 'admin' && $user->id !== $currentUser->id) {
+            // Don't allow viewing other super admin users
+            if ($user->hasRole('super_admin') && $user->id !== $currentUser->id) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Cannot view other admin users'
+                    'message' => 'Cannot view other super admin users'
                 ], 403);
             }
 
@@ -176,8 +183,15 @@ class AdminController extends Controller
                 'email' => $user->email,
                 'pf_number' => $user->pf_number,
                 'phone' => $user->phone,
-                'role' => $user->role ? $user->role->name : null,
-                'role_display' => $user->role ? ucwords(str_replace('_', ' ', $user->role->name)) : null,
+                'roles' => $user->roles->map(function ($role) {
+                    return [
+                        'id' => $role->id,
+                        'name' => $role->name,
+                        'display_name' => ucwords(str_replace('_', ' ', $role->name))
+                    ];
+                }),
+                'primary_role' => $user->getPrimaryRoleName(),
+                'display_roles' => $user->getDisplayRoleNames(),
                 'created_at' => $user->created_at,
                 'updated_at' => $user->updated_at,
                 'onboarding_status' => [
@@ -227,7 +241,7 @@ class AdminController extends Controller
         try {
             // Check if current user is admin
             $currentUser = $request->user();
-            if (!$currentUser->role || $currentUser->role->name !== 'admin') {
+            if (!$currentUser->hasAdminPrivileges()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Unauthorized. Admin access required.'
@@ -251,7 +265,7 @@ class AdminController extends Controller
             $resetType = $request->reset_type;
 
             // Get target user
-            $targetUser = User::with('role')->find($targetUserId);
+            $targetUser = User::with('roles')->find($targetUserId);
             
             if (!$targetUser) {
                 return response()->json([
@@ -261,7 +275,7 @@ class AdminController extends Controller
             }
 
             // Don't allow resetting other admin users
-            if ($targetUser->role && $targetUser->role->name === 'admin') {
+            if ($targetUser->hasAdminPrivileges()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Cannot reset admin user onboarding'
@@ -373,50 +387,50 @@ class AdminController extends Controller
         try {
             // Check if current user is admin
             $currentUser = $request->user();
-            if (!$currentUser->role || $currentUser->role->name !== 'admin') {
+            if (!$currentUser->hasAdminPrivileges()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Unauthorized. Admin access required.'
                 ], 403);
             }
 
-            // Get total users (excluding admins)
-            $totalUsers = User::whereHas('role', function ($q) {
-                $q->where('name', '!=', 'admin');
+            // Get total users (excluding super admins)
+            $totalUsers = User::whereDoesntHave('roles', function ($q) {
+                $q->where('name', 'super_admin');
             })->count();
 
             // Get users with onboarding records
             $usersWithOnboarding = User::whereHas('onboarding')
-                ->whereHas('role', function ($q) {
-                    $q->where('name', '!=', 'admin');
+                ->whereDoesntHave('roles', function ($q) {
+                    $q->where('name', 'super_admin');
                 })->count();
 
             // Get completed onboarding count
             $completedOnboarding = User::whereHas('onboarding', function ($q) {
                 $q->where('completed', true);
-            })->whereHas('role', function ($q) {
-                $q->where('name', '!=', 'admin');
+            })->whereDoesntHave('roles', function ($q) {
+                $q->where('name', 'super_admin');
             })->count();
 
             // Get users who accepted terms
             $termsAccepted = User::whereHas('onboarding', function ($q) {
                 $q->where('terms_accepted', true);
-            })->whereHas('role', function ($q) {
-                $q->where('name', '!=', 'admin');
+            })->whereDoesntHave('roles', function ($q) {
+                $q->where('name', 'super_admin');
             })->count();
 
             // Get users who accepted ICT policy
             $ictPolicyAccepted = User::whereHas('onboarding', function ($q) {
                 $q->where('ict_policy_accepted', true);
-            })->whereHas('role', function ($q) {
-                $q->where('name', '!=', 'admin');
+            })->whereDoesntHave('roles', function ($q) {
+                $q->where('name', 'super_admin');
             })->count();
 
             // Get users who submitted declaration
             $declarationSubmitted = User::whereHas('onboarding', function ($q) {
                 $q->where('declaration_submitted', true);
-            })->whereHas('role', function ($q) {
-                $q->where('name', '!=', 'admin');
+            })->whereDoesntHave('roles', function ($q) {
+                $q->where('name', 'super_admin');
             })->count();
 
             // Calculate percentages
@@ -471,7 +485,7 @@ class AdminController extends Controller
         try {
             // Check if current user is admin
             $currentUser = $request->user();
-            if (!$currentUser->role || $currentUser->role->name !== 'admin') {
+            if (!$currentUser->hasAdminPrivileges()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Unauthorized. Admin access required.'
@@ -495,11 +509,11 @@ class AdminController extends Controller
             $userIds = $request->user_ids;
             $resetType = $request->reset_type;
 
-            // Get target users (exclude admins)
-            $targetUsers = User::with('role')
+            // Get target users (exclude super admins)
+            $targetUsers = User::with('roles')
                 ->whereIn('id', $userIds)
-                ->whereHas('role', function ($q) {
-                    $q->where('name', '!=', 'admin');
+                ->whereDoesntHave('roles', function ($q) {
+                    $q->where('name', 'super_admin');
                 })
                 ->get();
 

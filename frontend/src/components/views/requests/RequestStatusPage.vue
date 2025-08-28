@@ -2,7 +2,7 @@
   <div class="flex flex-col h-screen">
     <AppHeader />
     <div class="flex flex-1 overflow-hidden">
-      <ModernSidebar v-model:collapsed="sidebarCollapsed" />
+      <ModernSidebar />
       <main class="flex-1 p-3 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative">
         <!-- Medical Background Pattern -->
         <div class="absolute inset-0 overflow-hidden">
@@ -421,7 +421,7 @@ export default {
     const { requireRole, ROLES } = useAuth()
 
     // Local state
-    const sidebarCollapsed = ref(false)
+    // Sidebar state now managed by Pinia - no local state needed
     const loading = ref(false)
     const selectedRequest = ref(null)
     const showSuccessMessage = ref(false)
@@ -618,7 +618,6 @@ export default {
     }
 
     return {
-      sidebarCollapsed,
       loading,
       requests,
       selectedRequest,

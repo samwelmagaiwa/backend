@@ -2,7 +2,7 @@
   <div class="flex flex-col h-screen">
     <AppHeader />
     <div class="flex flex-1 overflow-hidden">
-      <ModernSidebar v-model:collapsed="sidebarCollapsed" />
+      <ModernSidebar />
       <main
         class="flex-1 p-6 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative"
       >
@@ -988,7 +988,6 @@ export default {
 
   data() {
     return {
-      sidebarCollapsed: false,
       // Table configuration
       headers: [
         { text: 'Role Name', value: 'name', sortable: true },
@@ -1292,7 +1291,7 @@ export default {
     canEditRole(role) {
       return (
         this.userPermissions.includes('edit_roles') &&
-        (!role.is_system_role || this.user.roles.includes('super_admin'))
+        (!role.is_system_role || this.user.roles.includes('admin'))
       )
     },
 
@@ -1301,7 +1300,7 @@ export default {
         this.userPermissions.includes('delete_roles') &&
         role.is_deletable &&
         role.users_count === 0 &&
-        (!role.is_system_role || this.user.roles.includes('super_admin'))
+        (!role.is_system_role || this.user.roles.includes('admin'))
       )
     },
 

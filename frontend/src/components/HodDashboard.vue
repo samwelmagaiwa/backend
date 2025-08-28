@@ -2,7 +2,7 @@
   <div class="flex flex-col h-screen">
     <Header />
     <div class="flex flex-1 overflow-hidden">
-      <ModernSidebar v-model:collapsed="sidebarCollapsed" />
+      <ModernSidebar />
       <main
         class="flex-1 p-6 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative"
       >
@@ -272,7 +272,30 @@ export default {
     const { userName, ROLES, requireRole } = useAuth()
 
     // Local state
-    const sidebarCollapsed = ref(false)
+    // Sidebar state now managed by Pinia - no local state needed
+
+    // Add missing definitions
+    const stats = ref({
+      totalRequests: 1234,
+      pendingApproval: 89,
+      approvedToday: 56,
+      jeevaRequests: 70,
+      wellsoftRequests: 89,
+      internetAccess: 900
+    })
+
+    const recentRequests = ref([])
+    const quickActions = ref([
+      { name: 'View Requests', icon: 'fas fa-list', route: '/hod-dashboard/request-list' },
+      { name: 'Jeeva Access', icon: 'fas fa-database', route: '/jeeva-access' },
+      { name: 'Wellsoft Access', icon: 'fas fa-laptop-medical', route: '/wellsoft-access' },
+      { name: 'Internet Access', icon: 'fas fa-wifi', route: '/internet-access' }
+    ])
+
+    const performAction = (action) => {
+      console.log('Performing action:', action)
+      // Add your action implementation here
+    }
 
     // Guard this route - only Head of Department can access
     onMounted(() => {
@@ -281,7 +304,10 @@ export default {
 
     return {
       userName,
-      sidebarCollapsed
+      stats,
+      recentRequests,
+      quickActions,
+      performAction
     }
   }
 }

@@ -23,7 +23,6 @@ class UserSeeder extends Seeder
             ['name' => 'admin'],
             ['name' => 'divisional_director'],
             ['name' => 'head_of_department'],
-
             ['name' => 'ict_director'],
             ['name' => 'staff'],
             ['name' => 'ict_officer'],
@@ -38,14 +37,14 @@ class UserSeeder extends Seeder
         // This seeder only creates the necessary roles for the system.
         
         // Uncomment the following code only for development/testing purposes:
-        /*
+
         $users = [
             [
                 'name' => 'System Administrator',
-                'email' => 'admin@hospital.go.tz',
+                'email' => 'admin@gmail.com',
                 'phone' => '+255700000000',
                 'pf_number' => null,
-                'password' => Hash::make('secure_password_here'),
+                'password' => Hash::make('12345678'),
                 'role_name' => 'admin'
             ],
         ];
@@ -60,6 +59,5 @@ class UserSeeder extends Seeder
                 User::firstOrCreate(['email' => $userData['email']], $userData);
             }
         }
-        */
     }
 }

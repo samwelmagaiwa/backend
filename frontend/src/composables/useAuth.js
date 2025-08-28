@@ -1,304 +1,230 @@
 import { computed } from 'vue'
+import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
-import { useAuth as useAuthState } from '../utils/auth'
-import {
-  hasRouteAccess,
-  getAllowedRoutes,
-  hasUserManagementAccess
-} from '../utils/permissions'
-import { preloadRoleBasedImages } from '../utils/imagePreloader'
+import { ROLES } from '../utils/permissions'
 
 /**
- * Authentication and authorization composable
- * Provides reactive access to user state and permission checking
+ * Auth composable that provides authentication functionality
+ * using Vuex store and Vue Router
  */
 export function useAuth() {
+  const store = useStore()
   const router = useRouter()
-  const authState = useAuthState()
 
-  // Reactive user state from auth utility
-  const {
-    isAuthenticated,
-    currentUser,
-    userRole,
-    userName,
-    userEmail,
-    isLoading,
-    error,
-    isAdmin,
-    isStaff,
-    isApprover,
-    defaultDashboard,
-    needsOnboarding,
-    hasCompletedOnboarding,
-    markOnboardingComplete,
-    login: authLogin,
-    logout: authLogout,
-    clearError,
-    ROLES
-  } = authState
+  // Computed properties from store
+  const user = computed(() => store.getters['auth/user'])
+  const token = computed(() => store.getters['auth/token'])
+  const isAuthenticated = computed(() => store.getters['auth/isAuthenticated'])
+  const userPermissions = computed(() => store.getters['auth/userPermissions'])
+  const userRole = computed(() => store.getters['auth/userRole'])
+  const userRoles = computed(() => store.getters['auth/userRoles'])
+  const isLoading = computed(() => store.getters['auth/loading'])
+  const error = computed(() => store.getters['auth/error'])
+  const isAdmin = computed(() => store.getters['auth/isAdmin'])
+  const isStaff = computed(() => store.getters['auth/isStaff'])
+  const isApprover = computed(() => store.getters['auth/isApprover'])
+  const userName = computed(() => user.value?.name || 'User')
 
-  // Permission checks
-  const canAccessRoute = (routePath) => {
-    return hasRouteAccess(userRole.value, routePath)
-  }
-
-  const canManageUsers = computed(() => {
-    return hasUserManagementAccess(userRole.value)
-  })
-
-  const allowedRoutes = computed(() => {
-    return getAllowedRoutes(userRole.value)
-  })
-
-  // Authentication actions
+  /**
+   * Login user with credentials
+   * @param {Object} credentials - { email, password }
+   * @returns {Promise<Object>} - Login result
+   */
   const login = async(credentials) => {
     try {
-      const result = await authLogin(credentials)
+      const result = await store.dispatch('auth/login', credentials)
+
       if (result.success) {
-        // Wait a bit for the auth state to update
-        await new Promise((resolve) => setTimeout(resolve, 100))
+        console.log('✅ Login successful, navigating to dashboard...')
 
-        try {
-          // Check if user needs onboarding (non-admin users who haven't completed it)
-          if (needsOnboarding.value) {
-            // Redirect to onboarding flow
-            await router.push('/onboarding')
-          } else {
-            // Redirect to intended route or default dashboard
-            const redirect = router.currentRoute.value.query.redirect
-            const dashboard = defaultDashboard.value
+        // Navigate to appropriate dashboard based on user role
+        const userRole = result.user?.role
+        const userRoles = result.user?.roles || []
 
-            console.log('🏠 Login redirect logic:')
-            console.log('  - Redirect query:', redirect)
-            console.log('  - Default dashboard:', dashboard)
-            console.log('  - User role:', userRole.value)
+        // Determine redirect path based on role
+        let redirectPath = '/dashboard'
 
-            let targetRoute
-            if (redirect) {
-              targetRoute = redirect
-              console.log('🔄 Using redirect parameter:', targetRoute)
-            } else if (dashboard) {
-              targetRoute = dashboard
-              console.log('🏠 Using default dashboard:', targetRoute)
-            } else {
-              // Fallback based on role - use getDefaultDashboard for consistency
-              const { getDefaultDashboard } = await import('../utils/permissions')
-              const fallbackDashboard = getDefaultDashboard(userRole.value)
-
-              if (fallbackDashboard) {
-                targetRoute = fallbackDashboard
-              } else {
-                // Last resort fallbacks if getDefaultDashboard fails
-                if (userRole.value === 'head_of_department') {
-                  targetRoute = '/hod-dashboard'
-                } else if (userRole.value === 'admin') {
-                  targetRoute = '/admin-dashboard'
-                } else if (userRole.value === 'staff') {
-                  targetRoute = '/user-dashboard'
-                } else {
-                  targetRoute = '/user-dashboard' // Final fallback
-                }
-              }
-              console.log(
-                '⚠️ No default dashboard found, using fallback:',
-                targetRoute
-              )
-            }
-
-            console.log('🚀 Navigating to:', targetRoute)
-
-            // Preload images for the user's role after successful login
-            if (userRole.value) {
-              console.log(
-                '🎯 Preloading images for role after login:',
-                userRole.value
-              )
-              preloadRoleBasedImages(userRole.value)
-            }
-
-            // Use Vue Router for proper SPA navigation
-            await router.push(targetRoute)
-          }
-        } catch (navError) {
-          console.warn('Router navigation failed:', navError)
-          // Fallback to router push with default route
-          try {
-            await router.push('/user-dashboard')
-          } catch (fallbackError) {
-            console.error('Fallback navigation also failed:', fallbackError)
-            // Last resort: use window.location but only if router completely fails
-            window.location.href = '/user-dashboard'
-          }
+        if (userRole === 'admin' || userRoles.includes('admin')) {
+          redirectPath = '/admin/dashboard'
+        } else if (userRole === 'ict_officer' || userRoles.includes('ict_officer')) {
+          redirectPath = '/ict-approval'
+        } else if (userRole === 'head_of_department' || userRoles.includes('head_of_department')) {
+          redirectPath = '/hod-approval'
+        } else if (userRole === 'divisional_director' || userRoles.includes('divisional_director')) {
+          redirectPath = '/director-approval'
+        } else {
+          redirectPath = '/dashboard'
         }
+
+        // Check if there's a redirect query parameter
+        const redirectTo = router.currentRoute.value.query.redirect
+        if (redirectTo && typeof redirectTo === 'string') {
+          redirectPath = redirectTo
+        }
+
+        // Navigate to the determined path
+        await router.push(redirectPath)
+
+        return result
       }
+
       return result
     } catch (error) {
-      console.error('Login error:', error)
-      return { success: false, error: error.message }
+      console.error('❌ Login error in composable:', error)
+      return {
+        success: false,
+        message: error.message || 'Login failed'
+      }
     }
   }
 
+  /**
+   * Logout current user
+   * @returns {Promise<Object>} - Logout result
+   */
   const logout = async() => {
     try {
-      await authLogout()
-      await router.push('/')
-      return { success: true }
-    } catch (error) {
-      console.error('Logout error:', error)
-      return { success: false, error: error.message }
-    }
-  }
+      const result = await store.dispatch('auth/logout')
 
-  // Route protection
-  const requireAuth = () => {
-    if (!isAuthenticated.value) {
-      router.push({
-        name: 'LoginPage',
-        query: { redirect: router.currentRoute.value.fullPath }
-      })
-      return false
-    }
-    return true
-  }
-
-  const requireRole = (requiredRoles) => {
-    if (!requireAuth()) return false
-
-    const roles = Array.isArray(requiredRoles)
-      ? requiredRoles
-      : [requiredRoles]
-    if (!roles.includes(userRole.value)) {
-      // Redirect to default dashboard with error
-      const dashboard = defaultDashboard.value
-      if (dashboard) {
-        router.push({
-          path: dashboard,
-          query: { error: 'access_denied' }
-        })
-      } else {
-        router.push('/')
+      if (result.success) {
+        console.log('✅ Logout successful, redirecting to login...')
+        await router.push('/login')
       }
-      return false
+
+      return result
+    } catch (error) {
+      console.error('❌ Logout error in composable:', error)
+      // Even if logout fails, clear local state and redirect
+      await store.dispatch('auth/logout')
+      await router.push('/login')
+      return {
+        success: true,
+        message: 'Logged out locally'
+      }
     }
-    return true
   }
 
-  // Utility functions
-  const getRoleDisplayName = (role = userRole.value) => {
-    const roleNames = {
-      [ROLES.ADMIN]: 'Administrator',
-      [ROLES.DIVISIONAL_DIRECTOR]: 'Divisional Director',
-      [ROLES.HEAD_OF_DEPARTMENT]: 'Head of Department',
+  /**
+   * Logout from all sessions
+   * @returns {Promise<Object>} - Logout all result
+   */
+  const logoutAll = async() => {
+    try {
+      const result = await store.dispatch('auth/logoutAll')
 
-      [ROLES.ICT_DIRECTOR]: 'ICT Director',
-      [ROLES.STAFF]: 'Staff Member',
-      [ROLES.ICT_OFFICER]: 'ICT Officer'
+      if (result.success) {
+        console.log('✅ Logout all successful, redirecting to login...')
+        await router.push('/login')
+      }
+
+      return result
+    } catch (error) {
+      console.error('❌ Logout all error in composable:', error)
+      // Even if logout fails, clear local state and redirect
+      await store.dispatch('auth/logout')
+      await router.push('/login')
+      return {
+        success: true,
+        message: 'Logged out locally'
+      }
     }
-    return roleNames[role] || role
   }
 
+  /**
+   * Update user data
+   * @param {Object} userData - Updated user data
+   */
+  const updateUser = (userData) => {
+    store.dispatch('auth/updateUser', userData)
+  }
+
+  /**
+   * Clear authentication error
+   */
+  const clearError = () => {
+    store.dispatch('auth/clearError')
+  }
+
+  /**
+   * Check if user has specific permission
+   * @param {string} permission - Permission to check
+   * @returns {boolean} - Whether user has permission
+   */
   const hasPermission = (permission) => {
-    // Custom permission checking logic can be added here
-    // For now, we'll use role-based checks
-    switch (permission) {
-      case 'manage_users':
-        return canManageUsers.value
-      case 'approve_requests':
-        return isApprover.value
-      case 'submit_requests':
-        return isStaff.value
-      case 'admin_access':
-        return isAdmin.value
-      default:
-        return false
-    }
+    return userPermissions.value.includes(permission)
   }
 
-  // Error handling is handled by the auth utility
+  /**
+   * Check if user has any of the specified roles
+   * @param {string|Array} roles - Role(s) to check
+   * @returns {boolean} - Whether user has any of the roles
+   */
+  const hasRole = (roles) => {
+    const rolesToCheck = Array.isArray(roles) ? roles : [roles]
+    const currentRole = userRole.value
+    const currentRoles = userRoles.value
+
+    return rolesToCheck.some(role =>
+      currentRole === role || currentRoles.includes(role)
+    )
+  }
+
+  /**
+   * Check if user can access a specific route
+   * @param {Object} route - Route object with meta.roles
+   * @returns {boolean} - Whether user can access route
+   */
+  const canAccessRoute = (route) => {
+    if (!route.meta?.roles) {
+      return true // No role restriction
+    }
+
+    return hasRole(route.meta.roles)
+  }
+
+  /**
+   * Require specific role(s) - throws error if user doesn't have required role
+   * @param {string|Array} requiredRoles - Required role(s)
+   * @throws {Error} - If user doesn't have required role
+   */
+  const requireRole = (requiredRoles) => {
+    if (!hasRole(requiredRoles)) {
+      const roleList = Array.isArray(requiredRoles) ? requiredRoles.join(', ') : requiredRoles
+      throw new Error(`Access denied. Required role(s): ${roleList}`)
+    }
+  }
 
   return {
     // State
-    isAuthenticated,
-    currentUser,
-    userRole,
+    user,
     userName,
-    userEmail,
+    token,
+    isAuthenticated,
+    userPermissions,
+    userRole,
+    userRoles,
     isLoading,
     error,
-
-    // Computed permissions
-    canManageUsers,
     isAdmin,
     isStaff,
     isApprover,
-    allowedRoutes,
-    defaultDashboard,
-    needsOnboarding,
-    hasCompletedOnboarding,
-    markOnboardingComplete,
 
-    // Methods
+    // Actions
     login,
     logout,
-    canAccessRoute,
-    requireAuth,
-    requireRole,
-    getRoleDisplayName,
-    hasPermission,
+    logoutAll,
+    updateUser,
     clearError,
+
+    // Utilities
+    hasPermission,
+    hasRole,
+    canAccessRoute,
+    requireRole,
 
     // Constants
     ROLES
   }
 }
 
-/**
- * Route guard composable for components
- * Use this in components that need to check permissions
- */
-export function useRouteGuard() {
-  const { requireAuth, requireRole, canAccessRoute } = useAuth()
-
-  const guardRoute = (requiredRoles = null) => {
-    if (!requireAuth()) return false
-    if (requiredRoles && !requireRole(requiredRoles)) return false
-    return true
-  }
-
-  return {
-    guardRoute,
-    requireAuth,
-    requireRole,
-    canAccessRoute
-  }
-}
-
-/**
- * Permission directive for conditional rendering
- * Use this to show/hide elements based on permissions
- */
-export function usePermissions() {
-  const { hasPermission, userRole, canAccessRoute } = useAuth()
-
-  const canShow = (permission) => {
-    if (typeof permission === 'string') {
-      return hasPermission(permission)
-    }
-    if (typeof permission === 'object') {
-      if (permission.roles) {
-        return permission.roles.includes(userRole.value)
-      }
-      if (permission.route) {
-        return canAccessRoute(permission.route)
-      }
-    }
-    return false
-  }
-
-  return {
-    canShow,
-    hasPermission,
-    canAccessRoute
-  }
-}
+export default useAuth

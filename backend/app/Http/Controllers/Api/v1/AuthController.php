@@ -173,7 +173,7 @@ class AuthController extends Controller
         $abilities = $baseAbilities;
         
         // Add abilities based on roles
-        if (array_intersect($userRoles, ['admin', 'super_admin'])) {
+        if (array_intersect($userRoles, ['admin'])) {
             $abilities = array_merge($abilities, [
                 'admin-access',
                 'manage-users',
@@ -414,6 +414,137 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to revoke session'
+            ], 500);
+        }
+    }
+
+    /**
+     * Get current authenticated user with fresh data.
+     * Used for token verification and session restoration.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getCurrentUser(Request $request)
+    {
+        try {
+            $user = $request->user();
+            
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No authenticated user found'
+                ], 401);
+            }
+            
+            // Refresh user data with relationships
+            $user->load(['role', 'roles', 'onboarding']);
+            
+            // Get onboarding status
+            $onboarding = $user->getOrCreateOnboarding();
+            
+            $userData = [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'pf_number' => $user->pf_number,
+                'role_id' => $user->role_id,
+                'role_name' => $user->getPrimaryRoleName(),
+                'roles' => $user->roles()->pluck('name')->toArray(),
+                'permissions' => $user->getAllPermissions(),
+                'needs_onboarding' => $user->needsOnboarding(),
+                'onboarding_step' => $onboarding->current_step,
+            ];
+            
+            Log::info('getCurrentUser called', [
+                'user_id' => $user->id,
+                'user_email' => $user->email,
+                'role_name' => $user->getPrimaryRoleName(),
+                'roles' => $user->roles()->pluck('name')->toArray()
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'data' => $userData
+            ], 200);
+            
+        } catch (\Exception $e) {
+            Log::error('getCurrentUser error', [
+                'user_id' => $request->user() ? $request->user()->id : null,
+                'error' => $e->getMessage()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve user data'
+            ], 500);
+        }
+    }
+
+    /**
+     * Get role-based redirect URL for authenticated user.
+     * Used by frontend to determine where to redirect after login.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getRoleBasedRedirect(Request $request)
+    {
+        try {
+            $user = $request->user();
+            
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No authenticated user found'
+                ], 401);
+            }
+            
+            $primaryRole = $user->getPrimaryRoleName();
+            
+            // Define role-based redirects
+            $redirectMap = [
+                'admin' => '/admin-dashboard',
+                'head_of_department' => '/hod-dashboard',
+                'divisional_director' => '/divisional-dashboard',
+                'ict_director' => '/dict-dashboard',
+                'ict_officer' => '/ict-dashboard',
+                'staff' => '/user-dashboard'
+            ];
+            
+            $redirectUrl = $redirectMap[$primaryRole] ?? '/user-dashboard';
+            
+            // Check if user needs onboarding (except admin)
+            if ($primaryRole !== 'admin' && $user->needsOnboarding()) {
+                $redirectUrl = '/onboarding';
+            }
+            
+            Log::info('getRoleBasedRedirect called', [
+                'user_id' => $user->id,
+                'role' => $primaryRole,
+                'redirect_url' => $redirectUrl,
+                'needs_onboarding' => $user->needsOnboarding()
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'redirect_url' => $redirectUrl,
+                    'role' => $primaryRole,
+                    'needs_onboarding' => $user->needsOnboarding()
+                ]
+            ], 200);
+            
+        } catch (\Exception $e) {
+            Log::error('getRoleBasedRedirect error', [
+                'user_id' => $request->user() ? $request->user()->id : null,
+                'error' => $e->getMessage()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to determine redirect URL'
             ], 500);
         }
     }

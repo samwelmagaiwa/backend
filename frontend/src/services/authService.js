@@ -108,7 +108,7 @@ export const authService = {
    */
   async getCurrentUser() {
     try {
-      const response = await apiClient.get('/user')
+      const response = await apiClient.get('/current-user')
       return {
         success: true,
         data: response.data
@@ -117,6 +117,26 @@ export const authService = {
       return {
         success: false,
         message: error.response?.data?.message || 'Failed to get user data',
+        status: error.response?.status
+      }
+    }
+  },
+
+  /**
+   * Get role-based redirect URL
+   * @returns {Promise<Object>} - Redirect URL response
+   */
+  async getRoleBasedRedirect() {
+    try {
+      const response = await apiClient.get('/role-redirect')
+      return {
+        success: true,
+        data: response.data
+      }
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to get redirect URL',
         status: error.response?.status
       }
     }

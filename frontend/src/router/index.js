@@ -7,8 +7,6 @@ const LoginPageWrapper = () =>
   import(/* webpackChunkName: "auth" */ '../components/LoginPageWrapper.vue')
 
 const routes = [
-
-
   // Public routes
   {
     path: '/',
@@ -62,27 +60,39 @@ const routes = [
     path: '/admin/roles',
     name: 'RoleManagement',
     component: () => import('../components/admin/RoleManagement.vue'),
-    meta: { requiresAuth: true, roles: ['admin', 'super_admin'] }
+    meta: { requiresAuth: true, roles: ['admin'] }
   },
   {
     path: '/admin/user-roles',
     name: 'UserRoleAssignment',
     component: () => import('../components/admin/UserRoleAssignment.vue'),
-    meta: { requiresAuth: true, roles: ['admin', 'super_admin'] }
+    meta: { requiresAuth: true, roles: ['admin'] }
+  },
+  {
+    path: '/admin/clean-role-assignment',
+    name: 'CleanRoleAssignment',
+    component: () => import('../components/admin/CleanRoleAssignment.vue'),
+    meta: { requiresAuth: true, roles: ['admin'] }
+  },
+  {
+    path: '/admin/role-assignment-demo',
+    name: 'RoleAssignmentDemo',
+    component: () => import('../components/admin/RoleAssignmentDemo.vue'),
+    meta: { requiresAuth: true, roles: ['admin'] }
   },
   {
     path: '/admin/department-hods',
     name: 'DepartmentHodAssignment',
     component: () => import('../components/admin/DepartmentHodAssignment.vue'),
-    meta: { requiresAuth: true, roles: ['admin', 'super_admin'] }
+    meta: { requiresAuth: true, roles: ['admin'] }
   },
   {
     path: '/user-dashboard',
     name: 'UserDashboard',
-    component: () => import('../components/UserDashboardWorking.vue'),
+    component: () => import('../components/UserDashboard.vue'),
     meta: {
-      requiresAuth: false,
-      isPublic: true
+      requiresAuth: true,
+      roles: [ROLES.STAFF]
     }
   },
   {
@@ -103,7 +113,6 @@ const routes = [
       roles: [ROLES.HEAD_OF_DEPARTMENT]
     }
   },
-
   {
     path: '/divisional-dashboard',
     name: 'DivisionalDashboard',
@@ -134,7 +143,6 @@ const routes = [
     }
   },
 
-
   // Settings (accessible to all authenticated users)
   {
     path: '/settings',
@@ -156,7 +164,6 @@ const routes = [
       roles: Object.values(ROLES)
     }
   },
-
 
   // Access approval forms
   {
@@ -218,36 +225,6 @@ const routes = [
   },
 
   // User submission forms
-  // COMMENTED OUT: Individual forms - now using Combined Access Form only
-  /*
-  {
-    path: '/user-jeeva-form',
-    name: 'UserJeevaForm',
-    component: () => import('../components/views/forms/userjeevaform.vue'),
-    meta: {
-      requiresAuth: true,
-      roles: [ROLES.STAFF]
-    }
-  },
-  {
-    path: '/user-wellsoft-form',
-    name: 'UserWellSoftForm',
-    component: () => import('../components/views/forms/userWellSoftForm.vue'),
-    meta: {
-      requiresAuth: true,
-      roles: [ROLES.STAFF]
-    }
-  },
-  {
-    path: '/user-internet-form',
-    name: 'UserInternetForm',
-    component: () => import('../components/views/forms/UserInternetAccessForm.vue'),
-    meta: {
-      requiresAuth: true,
-      roles: [ROLES.STAFF]
-    }
-  },
-  */
   {
     path: '/user-combined-form',
     name: 'UserCombinedForm',
@@ -340,8 +317,8 @@ const routes = [
 
   // Admin User Management routes
   {
-    path: '/jeeva-users',
-    name: 'JeevaUsers',
+    path: '/service-users',
+    name: 'ServiceUsers',
     component: () => import('../components/admin/JeevaUsers.vue'),
     meta: {
       requiresAuth: true,
@@ -379,7 +356,11 @@ const routes = [
   // Legacy admin routes (for backward compatibility)
   {
     path: '/admin/users/jeeva',
-    redirect: '/jeeva-users'
+    redirect: '/service-users'
+  },
+  {
+    path: '/jeeva-users',
+    redirect: '/service-users'
   },
   {
     path: '/admin/users/wellsoft',
@@ -388,6 +369,50 @@ const routes = [
   {
     path: '/admin/users/internet',
     redirect: '/internet-users'
+  },
+
+  // Test route for role-based redirect system (development only)
+  {
+    path: '/test-role-redirect',
+    name: 'RoleBasedRedirectTest',
+    component: () => import('../components/RoleBasedRedirectTest.vue'),
+    meta: {
+      requiresAuth: false, // Allow access for testing
+      isPublic: true
+    }
+  },
+
+  // Test route for sidebar persistence with Pinia (development only)
+  {
+    path: '/test-sidebar-persistence',
+    name: 'SidebarPersistenceDemo',
+    component: () => import('../components/SidebarPersistenceDemo.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: Object.values(ROLES) // Allow all authenticated users
+    }
+  },
+
+  // Diagnostic route for admin access issues (development only)
+  {
+    path: '/admin-access-diagnostic',
+    name: 'AdminAccessDiagnostic',
+    component: () => import('../components/AdminAccessDiagnostic.vue'),
+    meta: {
+      requiresAuth: false, // Allow access for debugging
+      isPublic: true
+    }
+  },
+
+  // Admin Dashboard Diagnostic (development only)
+  {
+    path: '/admin-dashboard-diagnostic',
+    name: 'AdminDashboardDiagnostic',
+    component: () => import('../components/AdminDashboardDiagnostic.vue'),
+    meta: {
+      requiresAuth: false, // Allow access for debugging
+      isPublic: true
+    }
   },
 
   // Catch-all route for 404 errors
@@ -410,58 +435,35 @@ const router = createRouter({
   routes
 })
 
-// Navigation guards
+// Enhanced Navigation guards with Vuex store integration
 router.beforeEach(async(to, from, next) => {
   console.log('🔄 Router: Navigating from', from.path, 'to', to.path)
 
   try {
-    // Check localStorage first for immediate auth state
-    const token = localStorage.getItem('auth_token')
-    const userData = localStorage.getItem('user_data')
-    let storedUser = null
-    let storedRole = null
+    // Import store to access auth state
+    const store = (await import('../store')).default
 
-    if (token && userData) {
-      try {
-        storedUser = JSON.parse(userData)
-        storedRole = storedUser.role
-        console.log('💾 Router: Found stored auth data - Role:', storedRole, 'User:', storedUser.name)
-      } catch (error) {
-        console.error('💾 Router: Failed to parse stored user data:', error)
-        localStorage.removeItem('auth_token')
-        localStorage.removeItem('user_data')
-      }
+    // Wait for session restoration if not completed yet
+    if (!store.getters['auth/sessionRestored']) {
+      console.log('⏳ Router: Waiting for session restoration...')
+      await store.dispatch('auth/restoreSession')
     }
 
-    // Use the new auth utility
-    console.log('📦 Router: Importing auth utility...')
-    const authModule = await import('../utils/auth')
-    const auth = authModule.default
-
-    // Force auth initialization if we have stored data but auth isn't initialized
-    if ((token && userData && storedUser) && !auth.isAuthenticated) {
-      console.log('🔄 Router: Auth not initialized but have stored data, force initializing...')
-      await auth.initializeAuth(true) // Force initialization
-    }
-
-    // Use stored data as fallback if auth utility isn't ready
-    const isAuthenticated = auth.isAuthenticated || (token && userData && storedUser)
-    const userRole = auth.userRole || storedRole
-    const user = auth.currentUser || storedUser
+    // Get auth state from store
+    const isAuthenticated = store.getters['auth/isAuthenticated']
+    const user = store.getters['auth/user']
+    const userRole = store.getters['auth/userRole']
     const requiresAuth = to.meta.requiresAuth !== false
     const isPublicRoute = to.meta.isPublic === true
 
     console.log('🔍 Router: Auth state check:')
-    console.log('  - hasStoredToken:', !!token)
-    console.log('  - hasStoredUser:', !!userData)
-    console.log('  - storedRole:', storedRole)
-    console.log('  - auth.isAuthenticated:', auth.isAuthenticated)
-    console.log('  - auth.userRole:', auth.userRole)
-    console.log('  - finalIsAuthenticated:', isAuthenticated)
-    console.log('  - finalUserRole:', userRole)
-    console.log('  - finalUser:', user?.name)
+    console.log('  - isAuthenticated:', isAuthenticated)
+    console.log('  - userRole:', userRole)
+    console.log('  - userName:', user?.name)
     console.log('  - requiresAuth:', requiresAuth)
     console.log('  - isPublicRoute:', isPublicRoute)
+    console.log('  - sessionRestored:', store.getters['auth/sessionRestored'])
+
     // Handle public routes
     if (isPublicRoute) {
       // If user is authenticated and trying to access login page, redirect appropriately
@@ -523,7 +525,6 @@ router.beforeEach(async(to, from, next) => {
             return next('/admin-dashboard')
           } else if (userRole === 'head_of_department') {
             return next('/hod-dashboard')
-
           } else if (userRole === 'divisional_director') {
             return next('/divisional-dashboard')
           } else if (userRole === 'ict_director') {
@@ -542,6 +543,7 @@ router.beforeEach(async(to, from, next) => {
     if (requiresAuth) {
       // Check if user is authenticated
       if (!isAuthenticated) {
+        console.log('🚫 Router: User not authenticated, redirecting to login')
         return next({
           name: 'LoginPage',
           query: { redirect: to.fullPath }
@@ -555,6 +557,7 @@ router.beforeEach(async(to, from, next) => {
         user &&
         user.needs_onboarding
       ) {
+        console.log('🔄 Router: User needs onboarding, redirecting...')
         return next('/onboarding')
       }
 
@@ -575,20 +578,17 @@ router.beforeEach(async(to, from, next) => {
         console.log('🔍 Router: Checking role access for route:', to.path)
         console.log('  - Required roles:', to.meta.roles)
         console.log('  - User role:', userRole)
-        console.log('  - Stored role:', storedRole)
 
-        // Check if user has required role (use both current and stored role)
-        const hasRequiredRole = to.meta.roles.includes(userRole) || to.meta.roles.includes(storedRole)
+        // Check if user has required role
+        const hasRequiredRole = to.meta.roles.includes(userRole)
 
         if (!hasRequiredRole) {
           console.log('⚠️ Router: User does not have required role for', to.path)
-          console.log('  - Checked userRole:', userRole, 'in', to.meta.roles, '=', to.meta.roles.includes(userRole))
-          console.log('  - Checked storedRole:', storedRole, 'in', to.meta.roles, '=', to.meta.roles.includes(storedRole))
+          console.log('  - Checked userRole:', userRole, 'in', to.meta.roles, '=', hasRequiredRole)
 
-          // Only redirect if we're sure the user doesn't have access
-          // Don't redirect if we're already on the user's default dashboard
-          const defaultDashboard = getDefaultDashboard(userRole || storedRole)
-          console.log('🏠 Router: Default dashboard for role', userRole || storedRole, ':', defaultDashboard)
+          // Get default dashboard for user's role
+          const defaultDashboard = getDefaultDashboard(userRole)
+          console.log('🏠 Router: Default dashboard for role', userRole, ':', defaultDashboard)
 
           if (defaultDashboard && defaultDashboard !== to.path) {
             console.log('🔄 Router: Redirecting to default dashboard with access denied error')
@@ -598,7 +598,7 @@ router.beforeEach(async(to, from, next) => {
             })
           } else if (to.path === defaultDashboard) {
             console.log('✅ Router: User is accessing their default dashboard, allowing...')
-            // Allow access to default dashboard even if role check fails temporarily
+            // Allow access to default dashboard
           } else {
             console.log('🔄 Router: No default dashboard found, redirecting to login')
             // Fallback to login if no default dashboard

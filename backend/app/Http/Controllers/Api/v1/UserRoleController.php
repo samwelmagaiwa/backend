@@ -7,10 +7,13 @@ use App\Http\Requests\AssignRoleRequest;
 use App\Models\User;
 use App\Models\Role;
 use App\Models\RoleChangeLog;
+use App\Models\Department;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class UserRoleController extends Controller
 {
@@ -348,6 +351,158 @@ class UserRoleController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to retrieve statistics.',
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
+            ], 500);
+        }
+    }
+
+    /**
+     * Get all departments for dropdown selection.
+     */
+    public function getDepartments(): JsonResponse
+    {
+        try {
+            $departments = Department::active()
+                ->orderBy('name')
+                ->get(['id', 'name', 'code', 'description']);
+
+            return response()->json([
+                'success' => true,
+                'data' => $departments,
+                'message' => 'Departments retrieved successfully.'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error retrieving departments: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve departments.',
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
+            ], 500);
+        }
+    }
+
+    /**
+     * Create a new user with roles and department assignment.
+     */
+    public function createUser(Request $request): JsonResponse
+    {
+        // Validate the request
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8',
+            'pf_number' => 'nullable|string|max:50|unique:users,pf_number',
+            'phone' => 'nullable|string|max:20',
+            'department_id' => 'nullable|exists:departments,id',
+            'role_ids' => 'nullable|array',
+            'role_ids.*' => 'exists:roles,id',
+        ]);
+
+        DB::beginTransaction();
+        
+        try {
+            $currentUser = $request->user();
+
+            // Create the user
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+                'pf_number' => $validated['pf_number'] ?? null,
+                'phone' => $validated['phone'] ?? null,
+                'is_active' => true,
+            ]);
+
+            // Assign roles if provided
+            if (!empty($validated['role_ids'])) {
+                $roleData = [];
+                foreach ($validated['role_ids'] as $roleId) {
+                    $roleData[$roleId] = [
+                        'assigned_at' => now(),
+                        'assigned_by' => $currentUser->id,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+                }
+                
+                $user->roles()->attach($roleData);
+                
+                // Log role assignments
+                foreach ($validated['role_ids'] as $roleId) {
+                    RoleChangeLog::create([
+                        'user_id' => $user->id,
+                        'role_id' => $roleId,
+                        'action' => 'assigned',
+                        'changed_by' => $currentUser->id,
+                        'changed_at' => now(),
+                        'metadata' => [
+                            'user_email' => $user->email,
+                            'changed_by_email' => $currentUser->email,
+                            'context' => 'user_creation'
+                        ]
+                    ]);
+                }
+            }
+
+            // Log user creation
+            Log::info('New user created', [
+                'user_id' => $user->id,
+                'user_email' => $user->email,
+                'user_name' => $user->name,
+                'department_id' => $validated['department_id'] ?? null,
+                'roles_assigned' => $validated['role_ids'] ?? [],
+                'created_by' => $currentUser->id
+            ]);
+
+            DB::commit();
+
+            // Load relationships for response
+            $user->load(['roles', 'departmentsAsHOD']);
+
+            // Get department info if assigned
+            $department = null;
+            if ($validated['department_id']) {
+                $department = Department::find($validated['department_id']);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'pf_number' => $user->pf_number,
+                        'phone' => $user->phone,
+                        'is_active' => $user->is_active,
+                        'created_at' => $user->created_at,
+                        'roles' => $user->roles->map(function ($role) {
+                            return [
+                                'id' => $role->id,
+                                'name' => $role->name,
+                                'description' => $role->description,
+                            ];
+                        }),
+                        'department' => $department ? [
+                            'id' => $department->id,
+                            'name' => $department->name,
+                            'code' => $department->code,
+                        ] : null,
+                        'primary_role' => $user->getPrimaryRole()?->name,
+                    ]
+                ],
+                'message' => 'User created successfully.'
+            ], 201);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error creating user: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create user.',
                 'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
             ], 500);
         }

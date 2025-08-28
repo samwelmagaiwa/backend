@@ -2,7 +2,7 @@
   <div class="flex flex-col h-screen">
     <AppHeader />
     <div class="flex flex-1 overflow-hidden">
-      <ModernSidebar v-model:collapsed="sidebarCollapsed" />
+      <ModernSidebar />
       <main class="flex-1 p-3 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative">
         <!-- Your existing template content -->
         <div class="max-w-12xl mx-auto relative z-10">
@@ -309,7 +309,7 @@
 </template>
 
 <script>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import ModernSidebar from '@/components/ModernSidebar.vue'
 import AppHeader from '@/components/AppHeader.vue'
 import { useDepartments } from '@/composables/useApiWithGuards'
@@ -322,7 +322,7 @@ export default {
     AppHeader
   },
   setup() {
-    const sidebarCollapsed = ref(false)
+    // Sidebar state now managed by Pinia - no local state needed
 
     // Use the improved departments composable with deduplication
     const {
@@ -345,7 +345,6 @@ export default {
     })
 
     return {
-      sidebarCollapsed,
       departments,
       departmentsLoading,
       departmentsError,

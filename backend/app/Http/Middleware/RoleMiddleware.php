@@ -27,8 +27,8 @@ class RoleMiddleware
 
         $user = Auth::user();
 
-        // Check if user has a role
-        if (!$user->role) {
+        // Check if user has any roles assigned
+        if (!$user->roles()->exists()) {
             return response()->json([
                 'success' => false,
                 'message' => 'User role not assigned.',
@@ -36,16 +36,16 @@ class RoleMiddleware
             ], 403);
         }
 
-        $userRole = $user->role->name;
-
-        // Check if user's role is in the allowed roles
-        if (!in_array($userRole, $roles)) {
+        // Check if user has any of the required roles using new many-to-many system
+        if (!$user->hasAnyRole($roles)) {
+            $userRoles = $user->roles()->pluck('name')->toArray();
+            
             return response()->json([
                 'success' => false,
                 'message' => 'Insufficient permissions.',
                 'error' => 'Access denied',
                 'required_roles' => $roles,
-                'user_role' => $userRole
+                'user_roles' => $userRoles
             ], 403);
         }
 

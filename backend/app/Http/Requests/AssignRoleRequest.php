@@ -56,9 +56,9 @@ class AssignRoleRequest extends FormRequest
             $user = $this->route('user');
             $roleIds = $this->input('role_ids', []);
 
-            // Prevent privilege escalation
-            if (!$this->user()->isSuperAdmin()) {
-                $adminRoles = Role::whereIn('name', ['admin', 'super_admin'])->pluck('id')->toArray();
+            // Prevent privilege escalation - only admins can assign admin roles
+            if (!$this->user()->isAdmin()) {
+                $adminRoles = Role::whereIn('name', ['admin'])->pluck('id')->toArray();
                 $hasAdminRole = !empty(array_intersect($roleIds, $adminRoles));
                 
                 if ($hasAdminRole) {
@@ -80,8 +80,8 @@ class AssignRoleRequest extends FormRequest
                 }
 
                 // Check for system roles that shouldn't be assigned
-                $systemRoles = $validRoles->where('is_system_role', true);
-                if ($systemRoles->isNotEmpty() && !$this->user()->isSuperAdmin()) {
+                $systemRoles = $validRoles->where('is_system_role', true)->where('name', 'admin');
+                if ($systemRoles->isNotEmpty() && !$this->user()->isAdmin()) {
                     $validator->errors()->add('role_ids', 'You cannot assign system roles.');
                 }
             }

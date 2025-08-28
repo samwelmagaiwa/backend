@@ -39,10 +39,8 @@ class BothServiceFormRoleMiddleware
             'head_of_department',
             'divisional_director',
             'ict_director',
-
             'ict_officer',
             'admin',
-            'super_admin',
             'staff' // Regular staff can create forms
         ];
 
@@ -60,9 +58,8 @@ class BothServiceFormRoleMiddleware
                 'hod' => ['head_of_department'],
                 'divisional_director' => ['divisional_director'],
                 'dict' => ['ict_director'],
-
                 'ict_officer' => ['ict_officer'],
-                'admin' => ['admin', 'super_admin'],
+                'admin' => ['admin'],
             ];
 
             $allowedForRoute = $roleMapping[$requiredRole] ?? [];

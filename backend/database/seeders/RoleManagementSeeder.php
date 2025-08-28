@@ -6,6 +6,7 @@ use Illuminate\Database\Seeder;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class RoleManagementSeeder extends Seeder
 {
@@ -17,10 +18,31 @@ class RoleManagementSeeder extends Seeder
      */
     public function run(): void
     {
+        // Check if the roles table has the required columns
+        if (!Schema::hasTable('roles')) {
+            $this->command->warn('Roles table does not exist. Skipping role seeding.');
+            return;
+        }
+
+        // Check for required columns
+        $requiredColumns = ['description', 'permissions', 'is_system_role', 'is_deletable', 'sort_order'];
+        $missingColumns = [];
+        
+        foreach ($requiredColumns as $column) {
+            if (!Schema::hasColumn('roles', $column)) {
+                $missingColumns[] = $column;
+            }
+        }
+        
+        if (!empty($missingColumns)) {
+            $this->command->warn('Missing columns in roles table: ' . implode(', ', $missingColumns) . '. Skipping role seeding.');
+            return;
+        }
+
         DB::beginTransaction();
         
         try {
-            // Update existing roles with new fields
+            // Create or update roles with new fields
             $roleUpdates = [
                 'admin' => [
                     'description' => 'System administrator with full access to all features',
@@ -33,7 +55,7 @@ class RoleManagementSeeder extends Seeder
                     ],
                     'is_system_role' => true,
                     'is_deletable' => false,
-                    'sort_order' => 1
+                    'sort_order' => 0
                 ],
                 'divisional_director' => [
                     'description' => 'Divisional director with approval authority',
@@ -42,7 +64,7 @@ class RoleManagementSeeder extends Seeder
                     ],
                     'is_system_role' => true,
                     'is_deletable' => false,
-                    'sort_order' => 2
+                    'sort_order' => 1
                 ],
                 'head_of_department' => [
                     'description' => 'Head of department with departmental oversight',
@@ -51,9 +73,8 @@ class RoleManagementSeeder extends Seeder
                     ],
                     'is_system_role' => true,
                     'is_deletable' => false,
-                    'sort_order' => 3
+                    'sort_order' => 2
                 ],
-
                 'ict_director' => [
                     'description' => 'ICT director with technical oversight',
                     'permissions' => [
@@ -62,7 +83,17 @@ class RoleManagementSeeder extends Seeder
                     ],
                     'is_system_role' => true,
                     'is_deletable' => false,
-                    'sort_order' => 5
+                    'sort_order' => 3
+                ],
+                'dict' => [
+                    'description' => 'Director of ICT with full technical authority',
+                    'permissions' => [
+                        'view_users', 'view_all_requests', 'approve_requests', 'reject_requests',
+                        'system_settings', 'audit_logs'
+                    ],
+                    'is_system_role' => true,
+                    'is_deletable' => false,
+                    'sort_order' => 4
                 ],
                 'ict_officer' => [
                     'description' => 'ICT officer with technical support responsibilities',
@@ -71,7 +102,7 @@ class RoleManagementSeeder extends Seeder
                     ],
                     'is_system_role' => true,
                     'is_deletable' => false,
-                    'sort_order' => 6
+                    'sort_order' => 5
                 ],
                 'staff' => [
                     'description' => 'Regular hospital staff member',
@@ -80,59 +111,19 @@ class RoleManagementSeeder extends Seeder
                     ],
                     'is_system_role' => true,
                     'is_deletable' => false,
-                    'sort_order' => 7
+                    'sort_order' => 6
                 ]
             ];
 
             foreach ($roleUpdates as $roleName => $updates) {
-                Role::where('name', $roleName)->update($updates);
+                Role::updateOrCreate(
+                    ['name' => $roleName],
+                    $updates
+                );
             }
 
-            // Create super admin role if it doesn't exist
-            Role::firstOrCreate(
-                ['name' => 'super_admin'],
-                [
-                    'description' => 'Super administrator with unrestricted access',
-                    'permissions' => [
-                        'create_users', 'edit_users', 'delete_users', 'view_users',
-                        'create_roles', 'edit_roles', 'delete_roles', 'assign_roles',
-                        'create_departments', 'edit_departments', 'delete_departments', 'assign_hod',
-                        'view_all_requests', 'approve_requests', 'reject_requests', 'export_requests',
-                        'system_settings', 'audit_logs', 'backup_restore', 'maintenance_mode'
-                    ],
-                    'is_system_role' => true,
-                    'is_deletable' => false,
-                    'sort_order' => 0
-                ]
-            );
-
-            // Note: Role assignments should be done through the admin interface
-            // or proper user management system in production.
-            // Uncomment the following code only for development/testing:
-            /*
-            $userRoleAssignments = [
-                'admin@hospital.go.tz' => ['admin'],
-            ];
-
-            foreach ($userRoleAssignments as $email => $roleNames) {
-                $user = User::where('email', $email)->first();
-                if ($user) {
-                    $roles = Role::whereIn('name', $roleNames)->get();
-                    
-                    $roleData = [];
-                    foreach ($roles as $role) {
-                        $roleData[$role->id] = [
-                            'assigned_at' => now(),
-                            'assigned_by' => 1,
-                            'created_at' => now(),
-                            'updated_at' => now(),
-                        ];
-                    }
-                    
-                    $user->roles()->sync($roleData);
-                }
-            }
-            */
+            // Ensure all users have roles in the new system
+            $this->migrateUserRoles();
 
             DB::commit();
             
@@ -142,6 +133,46 @@ class RoleManagementSeeder extends Seeder
             DB::rollBack();
             $this->command->error('Error seeding role management: ' . $e->getMessage());
             throw $e;
+        }
+    }
+
+    /**
+     * Migrate users from old single role system to new many-to-many system
+     */
+    private function migrateUserRoles(): void
+    {
+        $users = User::with('role')->get();
+        
+        foreach ($users as $user) {
+            // Check if user already has roles in the new system
+            $existingRoles = $user->roles()->count();
+            
+            if ($existingRoles === 0) {
+                // If user has old role_id, migrate it
+                if ($user->role_id && $user->role) {
+                    $user->roles()->attach($user->role_id, [
+                        'assigned_at' => $user->created_at ?? now(),
+                        'assigned_by' => 1, // System migration
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                    
+                    $this->command->info("Migrated user {$user->email} from role {$user->role->name}");
+                } else {
+                    // Assign default 'staff' role if no role exists
+                    $staffRole = Role::where('name', 'staff')->first();
+                    if ($staffRole) {
+                        $user->roles()->attach($staffRole->id, [
+                            'assigned_at' => $user->created_at ?? now(),
+                            'assigned_by' => 1, // System migration
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                        
+                        $this->command->info("Assigned default staff role to user {$user->email}");
+                    }
+                }
+            }
         }
     }
 }

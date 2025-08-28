@@ -1,0 +1,43 @@
+/* Z-Index Fix for Success Messages and Notifications */
+
+/* Success/Error Toast Notifications - Higher than header */
+.toast-notification {
+  z-index: 9999 !important;
+}
+
+/* Success messages that appear after user creation */
+.success-message,
+.error-message,
+.notification-toast {
+  z-index: 9999 !important;
+}
+
+/* Ensure all fixed positioned notifications are above header */
+.fixed.top-4.right-4 {
+  z-index: 9999 !important;
+}
+
+/* Specific override for admin success messages */
+.admin-success-message {
+  z-index: 9999 !important;
+}
+
+/* General notification override */
+[class*="fixed"][class*="top-4"][class*="right-4"] {
+  z-index: 9999 !important;
+}
+
+/* Ensure modals stay above everything else */
+.modal-overlay {
+  z-index: 10000 !important;
+}
+
+/* Header should be below notifications */
+header {
+  z-index: 50 !important;
+}
+
+/* Dropdown should be below notifications but above header */
+.profile-dropdown {
+  z-index: 9998 !important;
+}

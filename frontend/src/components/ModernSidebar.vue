@@ -1,184 +1,389 @@
 <template>
   <aside
     v-if="isAuthenticated && !isLoading && userRole"
-    class="h-screen flex flex-col transition-all duration-300 ease-in-out overflow-hidden relative bg-blue-600"
+    class="h-screen flex flex-col transition-all duration-300 ease-in-out overflow-hidden relative shadow-2xl"
     :class="[
       isCollapsed ? 'w-16' : 'w-72'
     ]"
     aria-label="Sidebar navigation"
-    style="background: linear-gradient(135deg, #3B82F6 0%, #2563EB 50%, #1D4ED8 100%);"
+    style="background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 25%, #1d4ed8 50%, #1e40af 75%, #1e3a8a 100%); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1); border-right: 1px solid rgba(59, 130, 246, 0.4);"
   >
-    <!-- Decorative Border -->
-    <div class="absolute inset-0 border-2 border-dashed border-white/20 rounded-2xl m-2"></div>
+    <!-- Enhanced Background Layers -->
+    <div class="absolute inset-0">
+      <!-- Primary shadow layer -->
+      <div class="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-transparent to-blue-800/30 rounded-2xl m-1"></div>
+      <!-- Decorative Border -->
+      <div class="absolute inset-0 border-2 border-dashed border-blue-300/20 rounded-2xl m-2"></div>
+      <!-- Inner glow -->
+      <div class="absolute inset-0 bg-gradient-to-t from-transparent via-blue-400/5 to-blue-300/10 rounded-2xl m-3"></div>
+    </div>
 
     <!-- Main Content Container -->
     <div class="relative z-10 flex flex-col h-full p-4">
-      <!-- User Profile Section -->
+      <!-- Header with Menu Icon and Profile -->
       <div class="mb-6">
-        <div v-if="!isCollapsed" class="flex items-center space-x-3">
-          <!-- User Avatar -->
-          <div class="relative">
-            <div class="w-12 h-12 rounded-full bg-orange-500 flex items-center justify-center shadow-lg border-2 border-white">
-              <span class="text-white font-bold text-lg">{{ userInitials }}</span>
+        <!-- Menu Icon and Brand -->
+        <div class="flex items-center justify-between mb-4">
+          <!-- Menu Toggle Button -->
+          <button
+            @click="toggleCollapse"
+            class="menu-toggle-btn p-2 rounded-lg transition-all duration-300 hover:bg-blue-600/60 text-white group relative overflow-hidden"
+            :aria-label="isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+          >
+            <!-- Animated Menu Icon -->
+            <div class="relative w-6 h-6">
+              <!-- Top line -->
+              <span
+                class="absolute left-0 top-1 w-6 h-0.5 bg-white rounded-full transition-all duration-300 transform origin-center"
+                :class="{
+                  'rotate-45 translate-y-2': isCollapsed,
+                  'rotate-0 translate-y-0': !isCollapsed
+                }"
+              ></span>
+              <!-- Middle line -->
+              <span
+                class="absolute left-0 top-3 w-6 h-0.5 bg-white rounded-full transition-all duration-300"
+                :class="{
+                  'opacity-0 scale-0': isCollapsed,
+                  'opacity-100 scale-100': !isCollapsed
+                }"
+              ></span>
+              <!-- Bottom line -->
+              <span
+                class="absolute left-0 top-5 w-6 h-0.5 bg-white rounded-full transition-all duration-300 transform origin-center"
+                :class="{
+                  '-rotate-45 -translate-y-2': isCollapsed,
+                  'rotate-0 translate-y-0': !isCollapsed
+                }"
+              ></span>
+            </div>
+            <!-- Hover effect -->
+            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+          </button>
+
+          <!-- Brand/Logo (when expanded) -->
+          <div
+            class="transition-all duration-300 ease-in-out overflow-hidden"
+            :class="{
+              'w-0 opacity-0': isCollapsed,
+              'w-auto opacity-100': !isCollapsed
+            }"
+          >
+            <div class="flex items-center space-x-2">
+              <div class="w-8 h-8 bg-gradient-to-br from-blue-500/30 to-blue-600/30 rounded-lg backdrop-blur-sm border border-blue-400/50 flex items-center justify-center shadow-lg">
+                <i class="fas fa-hospital text-white text-sm"></i>
+              </div>
+              <span class="text-white font-bold text-lg tracking-wide">MNH</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- User Profile Section -->
+        <div class="transition-all duration-500 ease-in-out">
+          <!-- Expanded Profile -->
+          <div
+            v-if="!isCollapsed"
+            class="profile-expanded opacity-100 transform translate-y-0 transition-all duration-500 ease-out"
+          >
+            <div class="flex items-center space-x-3 p-3 rounded-xl bg-blue-600/60 border border-blue-500/40 backdrop-blur-sm hover:bg-blue-600/80 transition-all duration-300 group cursor-pointer">
+              <!-- User Avatar -->
+              <div class="relative">
+                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg border-2 border-white/20 group-hover:scale-110 transition-transform duration-300 relative overflow-hidden">
+                  <!-- Avatar background layers -->
+                  <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
+                  <span class="text-white font-bold text-lg relative z-10 drop-shadow-lg">{{ userInitials }}</span>
+                  <!-- Online indicator -->
+                  <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-white shadow-sm animate-pulse"></div>
+                </div>
+                <!-- Avatar glow -->
+                <div class="absolute inset-0 bg-orange-500/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+              </div>
+
+              <!-- User Info -->
+              <div class="flex-1 min-w-0">
+                <h3 class="text-white font-bold text-sm truncate group-hover:text-orange-100 transition-colors duration-300">
+                  {{ userName || 'JOHN DOE' }}
+                </h3>
+                <p class="text-blue-100 text-xs truncate opacity-80 group-hover:opacity-100 transition-opacity duration-300">
+                  {{ getRoleDisplayName(userRole) }}
+                </p>
+              </div>
+
+              <!-- Profile chevron -->
+              <div class="w-5 h-5 text-blue-200 group-hover:text-white transition-colors duration-300">
+                <svg class="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
             </div>
           </div>
 
-          <!-- User Info -->
-          <div class="flex-1 min-w-0">
-            <h3 class="text-white font-bold text-sm truncate">
-              {{ userName || 'JOHN DOE' }}
-            </h3>
-            <p class="text-blue-100 text-xs truncate">
-              {{ getRoleDisplayName(userRole) }}
-            </p>
-          </div>
-        </div>
-
-        <!-- Collapsed User Avatar -->
-        <div v-else class="flex justify-center">
-          <div class="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center shadow-lg border-2 border-white">
-            <span class="text-white font-bold text-sm">{{ userInitials }}</span>
+          <!-- Collapsed Profile -->
+          <div
+            v-else
+            class="profile-collapsed opacity-100 transform translate-y-0 transition-all duration-500 ease-out flex justify-center"
+          >
+            <div class="relative group cursor-pointer">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg border-2 border-white/20 group-hover:scale-110 transition-transform duration-300 relative overflow-hidden">
+                <!-- Avatar background layers -->
+                <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
+                <span class="text-white font-bold text-sm relative z-10 drop-shadow-lg">{{ userInitials }}</span>
+                <!-- Online indicator -->
+                <div class="absolute bottom-0 right-0 w-2 h-2 bg-green-400 rounded-full border border-white shadow-sm animate-pulse"></div>
+              </div>
+              <!-- Avatar glow -->
+              <div class="absolute inset-0 bg-orange-500/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Search Section -->
-      <div v-if="!isCollapsed" class="mb-6">
-        <div class="relative">
-          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg class="h-4 w-4 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-          <input
-            v-model="searchQuery"
-            type="text"
-            placeholder="SEARCH..."
-            class="w-full pl-10 pr-3 py-3 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder-blue-200 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 focus:bg-white/20 backdrop-blur-sm"
-          />
-        </div>
-      </div>
-
-      <!-- Collapsed Search Icon -->
-      <div v-else class="mb-6 flex justify-center">
-        <div class="w-10 h-10 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center">
-          <svg class="h-5 w-5 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </div>
-      </div>
 
       <!-- Navigation Menu -->
-      <nav class="flex-1 space-y-2 overflow-y-auto custom-scrollbar">
-        <!-- Dashboard Items -->
-        <div v-if="filteredDashboardItems.length > 0">
-          <router-link
-            v-for="item in filteredDashboardItems"
-            :key="item.path"
-            :to="item.path"
-            class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 relative"
-            :class="[
-              $route.path === item.path
-                ? 'bg-white text-blue-600 shadow-lg'
-                : 'text-white hover:bg-white/10 hover:text-white',
-              isCollapsed ? 'justify-center' : ''
-            ]"
-            v-tooltip="isCollapsed ? item.displayName : ''"
+      <nav class="flex-1 space-y-1 overflow-y-auto custom-scrollbar">
+        <!-- Dashboard Section -->
+        <div v-if="filteredDashboardItems.length > 0" class="mb-2">
+          <div
+            v-if="!isCollapsed"
+            class="flex items-center justify-between px-4 py-2 text-xs font-bold text-blue-200 uppercase tracking-wider cursor-pointer hover:text-white transition-colors duration-200 section-header"
+            @click="toggleSectionLocal('dashboard')"
           >
-            <div
-              class="flex items-center justify-center w-5 h-5 transition-colors duration-200"
-              :class="isCollapsed ? '' : 'mr-3'"
+            <span>Dashboard</span>
+            <svg
+              class="w-4 h-4 transition-transform duration-200"
+              :class="{ 'rotate-180': !expandedSections.dashboard }"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              <i :class="[item.icon, 'text-current']"></i>
-            </div>
-            <span v-if="!isCollapsed" class="truncate uppercase tracking-wide">{{ item.displayName.toUpperCase() }}</span>
-          </router-link>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+
+          <div
+            class="space-y-1 transition-all duration-300 ease-in-out overflow-hidden"
+            :class="{
+              'max-h-0 opacity-0': !isCollapsed && !expandedSections.dashboard,
+              'max-h-96 opacity-100': isCollapsed || expandedSections.dashboard
+            }"
+            :style="{
+              maxHeight: (isCollapsed || expandedSections.dashboard) ? '24rem' : '0',
+              opacity: (isCollapsed || expandedSections.dashboard) ? '1' : '0'
+            }"
+          >
+            <router-link
+              v-for="item in filteredDashboardItems"
+              :key="item.path"
+              :to="item.path"
+              class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 relative ml-2 shadow-sm nav-item"
+              :class="[
+                route.path === item.path
+                  ? 'bg-white text-blue-600 shadow-lg transform scale-105'
+                  : 'text-white hover:bg-blue-600/60 hover:text-white hover:shadow-md hover:transform hover:scale-102',
+                isCollapsed ? 'justify-center ml-0' : ''
+              ]"
+              v-tooltip="isCollapsed ? item.displayName : ''"
+            >
+              <div
+                class="flex items-center justify-center w-5 h-5 transition-colors duration-200"
+                :class="isCollapsed ? '' : 'mr-3'"
+              >
+                <i :class="[item.icon, 'text-current']"></i>
+              </div>
+              <span v-if="!isCollapsed" class="truncate uppercase tracking-wide">{{ item.displayName.toUpperCase() }}</span>
+              <!-- Active indicator -->
+              <div
+                v-if="route.path === item.path && !isCollapsed"
+                class="absolute right-2 w-2 h-2 bg-blue-600 rounded-full shadow-sm active-indicator"
+              ></div>
+            </router-link>
+          </div>
         </div>
 
-        <!-- User Management Items (Admin only) -->
-        <div v-if="filteredUserManagementItems.length > 0">
-          <router-link
-            v-for="item in filteredUserManagementItems"
-            :key="item.path"
-            :to="item.path"
-            class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 relative"
-            :class="[
-              $route.path === item.path
-                ? 'bg-white text-blue-600 shadow-lg'
-                : 'text-white hover:bg-white/10 hover:text-white',
-              isCollapsed ? 'justify-center' : ''
-            ]"
-            v-tooltip="isCollapsed ? item.displayName : ''"
+        <!-- User Management Section (Admin only) -->
+        <div v-if="filteredUserManagementItems.length > 0" class="mb-2">
+          <div
+            v-if="!isCollapsed"
+            class="flex items-center justify-between px-4 py-2 text-xs font-bold text-blue-200 uppercase tracking-wider cursor-pointer hover:text-white transition-colors duration-200 section-header"
+            @click="toggleSectionLocal('userManagement')"
           >
-            <div
-              class="flex items-center justify-center w-5 h-5 transition-colors duration-200"
-              :class="isCollapsed ? '' : 'mr-3'"
+            <span>User Management</span>
+            <svg
+              class="w-4 h-4 transition-transform duration-200"
+              :class="{ 'rotate-180': !expandedSections.userManagement }"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              <i :class="[item.icon, 'text-current']"></i>
-            </div>
-            <span v-if="!isCollapsed" class="truncate uppercase tracking-wide">{{ item.displayName.toUpperCase() }}</span>
-          </router-link>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+
+          <div
+            class="space-y-1 transition-all duration-300 ease-in-out overflow-hidden"
+            :class="{
+              'max-h-0 opacity-0': !isCollapsed && !expandedSections.userManagement,
+              'max-h-96 opacity-100': isCollapsed || expandedSections.userManagement
+            }"
+            :style="{
+              maxHeight: (isCollapsed || expandedSections.userManagement) ? '24rem' : '0',
+              opacity: (isCollapsed || expandedSections.userManagement) ? '1' : '0'
+            }"
+          >
+            <router-link
+              v-for="item in filteredUserManagementItems"
+              :key="item.path"
+              :to="item.path"
+              class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 relative ml-2 shadow-sm nav-item"
+              :class="[
+                route.path === item.path
+                  ? 'bg-white text-blue-600 shadow-lg transform scale-105'
+                  : 'text-white hover:bg-blue-600/60 hover:text-white hover:shadow-md hover:transform hover:scale-102',
+                isCollapsed ? 'justify-center ml-0' : ''
+              ]"
+              v-tooltip="isCollapsed ? item.displayName : ''"
+            >
+              <div
+                class="flex items-center justify-center w-5 h-5 transition-colors duration-200"
+                :class="isCollapsed ? '' : 'mr-3'"
+              >
+                <i :class="[item.icon, 'text-current']"></i>
+              </div>
+              <span v-if="!isCollapsed" class="truncate uppercase tracking-wide">{{ item.displayName.toUpperCase() }}</span>
+              <!-- Active indicator -->
+              <div
+                v-if="route.path === item.path && !isCollapsed"
+                class="absolute right-2 w-2 h-2 bg-blue-600 rounded-full shadow-sm active-indicator"
+              ></div>
+            </router-link>
+          </div>
         </div>
 
-        <!-- Requests Management Items -->
-        <div v-if="filteredRequestsManagementItems.length > 0">
-          <router-link
-            v-for="item in filteredRequestsManagementItems"
-            :key="item.path"
-            :to="item.path"
-            class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 relative"
-            :class="[
-              $route.path === item.path
-                ? 'bg-white text-blue-600 shadow-lg'
-                : 'text-white hover:bg-white/10 hover:text-white',
-              isCollapsed ? 'justify-center' : ''
-            ]"
-            v-tooltip="isCollapsed ? item.displayName : ''"
+        <!-- Requests Management Section -->
+        <div v-if="filteredRequestsManagementItems.length > 0" class="mb-2">
+          <div
+            v-if="!isCollapsed"
+            class="flex items-center justify-between px-4 py-2 text-xs font-bold text-blue-200 uppercase tracking-wider cursor-pointer hover:text-white transition-colors duration-200 section-header"
+            @click="toggleSectionLocal('requestsManagement')"
           >
-            <div
-              class="flex items-center justify-center w-5 h-5 transition-colors duration-200"
-              :class="isCollapsed ? '' : 'mr-3'"
+            <span>Requests</span>
+            <svg
+              class="w-4 h-4 transition-transform duration-200"
+              :class="{ 'rotate-180': !expandedSections.requestsManagement }"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              <i :class="[item.icon, 'text-current']"></i>
-            </div>
-            <span v-if="!isCollapsed" class="truncate uppercase tracking-wide">{{ item.displayName.toUpperCase() }}</span>
-          </router-link>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+
+          <div
+            class="space-y-1 transition-all duration-300 ease-in-out overflow-hidden"
+            :class="{
+              'max-h-0 opacity-0': !isCollapsed && !expandedSections.requestsManagement,
+              'max-h-96 opacity-100': isCollapsed || expandedSections.requestsManagement
+            }"
+            :style="{
+              maxHeight: (isCollapsed || expandedSections.requestsManagement) ? '24rem' : '0',
+              opacity: (isCollapsed || expandedSections.requestsManagement) ? '1' : '0'
+            }"
+          >
+            <router-link
+              v-for="item in filteredRequestsManagementItems"
+              :key="item.path"
+              :to="item.path"
+              class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 relative ml-2 shadow-sm nav-item"
+              :class="[
+                route.path === item.path
+                  ? 'bg-white text-blue-600 shadow-lg transform scale-105'
+                  : 'text-white hover:bg-blue-600/60 hover:text-white hover:shadow-md hover:transform hover:scale-102',
+                isCollapsed ? 'justify-center ml-0' : ''
+              ]"
+              v-tooltip="isCollapsed ? item.displayName : ''"
+            >
+              <div
+                class="flex items-center justify-center w-5 h-5 transition-colors duration-200"
+                :class="isCollapsed ? '' : 'mr-3'"
+              >
+                <i :class="[item.icon, 'text-current']"></i>
+              </div>
+              <span v-if="!isCollapsed" class="truncate uppercase tracking-wide">{{ item.displayName.toUpperCase() }}</span>
+              <!-- Active indicator -->
+              <div
+                v-if="route.path === item.path && !isCollapsed"
+                class="absolute right-2 w-2 h-2 bg-blue-600 rounded-full shadow-sm active-indicator"
+              ></div>
+            </router-link>
+          </div>
         </div>
 
-        <!-- Device Management Items (ICT Officer only) -->
-        <div v-if="filteredDeviceManagementItems.length > 0">
-          <router-link
-            v-for="item in filteredDeviceManagementItems"
-            :key="item.path"
-            :to="item.path"
-            class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 relative"
-            :class="[
-              $route.path === item.path
-                ? 'bg-white text-blue-600 shadow-lg'
-                : 'text-white hover:bg-white/10 hover:text-white',
-              isCollapsed ? 'justify-center' : ''
-            ]"
-            v-tooltip="isCollapsed ? item.displayName : ''"
+        <!-- Device Management Section (ICT Officer only) -->
+        <div v-if="filteredDeviceManagementItems.length > 0" class="mb-2">
+          <div
+            v-if="!isCollapsed"
+            class="flex items-center justify-between px-4 py-2 text-xs font-bold text-blue-200 uppercase tracking-wider cursor-pointer hover:text-white transition-colors duration-200 section-header"
+            @click="toggleSectionLocal('deviceManagement')"
           >
-            <div
-              class="flex items-center justify-center w-5 h-5 transition-colors duration-200"
-              :class="isCollapsed ? '' : 'mr-3'"
+            <span>Device Management</span>
+            <svg
+              class="w-4 h-4 transition-transform duration-200"
+              :class="{ 'rotate-180': !expandedSections.deviceManagement }"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              <i :class="[item.icon, 'text-current']"></i>
-            </div>
-            <span v-if="!isCollapsed" class="truncate uppercase tracking-wide">{{ item.displayName.toUpperCase() }}</span>
-          </router-link>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+
+          <div
+            class="space-y-1 transition-all duration-300 ease-in-out overflow-hidden"
+            :class="{
+              'max-h-0 opacity-0': !isCollapsed && !expandedSections.deviceManagement,
+              'max-h-96 opacity-100': isCollapsed || expandedSections.deviceManagement
+            }"
+            :style="{
+              maxHeight: (isCollapsed || expandedSections.deviceManagement) ? '24rem' : '0',
+              opacity: (isCollapsed || expandedSections.deviceManagement) ? '1' : '0'
+            }"
+          >
+            <router-link
+              v-for="item in filteredDeviceManagementItems"
+              :key="item.path"
+              :to="item.path"
+              class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 relative ml-2 shadow-sm nav-item"
+              :class="[
+                route.path === item.path
+                  ? 'bg-white text-blue-600 shadow-lg transform scale-105'
+                  : 'text-white hover:bg-blue-600/60 hover:text-white hover:shadow-md hover:transform hover:scale-102',
+                isCollapsed ? 'justify-center ml-0' : ''
+              ]"
+              v-tooltip="isCollapsed ? item.displayName : ''"
+            >
+              <div
+                class="flex items-center justify-center w-5 h-5 transition-colors duration-200"
+                :class="isCollapsed ? '' : 'mr-3'"
+              >
+                <i :class="[item.icon, 'text-current']"></i>
+              </div>
+              <span v-if="!isCollapsed" class="truncate uppercase tracking-wide">{{ item.displayName.toUpperCase() }}</span>
+              <!-- Active indicator -->
+              <div
+                v-if="route.path === item.path && !isCollapsed"
+                class="absolute right-2 w-2 h-2 bg-blue-600 rounded-full shadow-sm active-indicator"
+              ></div>
+            </router-link>
+          </div>
         </div>
-
-
       </nav>
 
       <!-- Bottom Section -->
-      <div class="space-y-2 mt-6">
+      <div class="bottom-section space-y-2 mt-6">
         <!-- Help Center -->
         <button
           @click="showHelp"
-          class="w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 text-white hover:bg-white/10"
+          class="w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 text-white hover:bg-blue-600/60"
           :class="isCollapsed ? 'justify-center' : ''"
           v-tooltip="isCollapsed ? 'Help Center' : ''"
         >
@@ -196,7 +401,7 @@
         <!-- Logout -->
         <button
           @click="handleLogout"
-          class="w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 text-white hover:bg-white/10"
+          class="w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 text-white hover:bg-blue-600/60"
           :class="isCollapsed ? 'justify-center' : ''"
           v-tooltip="isCollapsed ? 'Log Out' : ''"
         >
@@ -214,18 +419,7 @@
 
       </div>
 
-      <!-- Collapse Toggle Button -->
-      <div class="mt-4 flex justify-center">
-        <button
-          @click="toggleCollapse"
-          class="p-2 rounded-lg transition-all duration-200 hover:bg-white/10 text-white"
-          :aria-label="isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
-        >
-          <svg class="w-5 h-5 transition-transform duration-300" :class="{ 'rotate-180': isCollapsed }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-      </div>
+
     </div>
 
     <!-- Help Modal -->
@@ -304,30 +498,42 @@
 </template>
 
 <script>
-import { computed, ref, watch, onMounted, nextTick } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, ref, watch, onMounted, onUnmounted, nextTick } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { ROLE_PERMISSIONS, ROLES } from '../utils/permissions'
 import { useAuth } from '../composables/useAuth'
+import { useSidebar } from '../composables/useSidebar'
 import auth from '../utils/auth'
 import { logoutGuard } from '@/utils/logoutGuard'
 
 export default {
   name: 'ModernSidebar',
-  props: {
-    collapsed: {
-      type: Boolean,
-      default: false
-    }
-  },
-  emits: ['update:collapsed'],
-  setup(props, { emit }) {
+  // Remove props and emits since we're using Vuex now
+  // props: {
+  //   collapsed: {
+  //     type: Boolean,
+  //     default: false
+  //   }
+  // },
+  // emits: ['update:collapsed'],
+  setup() {
     const router = useRouter()
+    const route = useRoute()
     const { currentUser, userRole, logout, isAuthenticated, isLoading } = useAuth()
+    const {
+      isCollapsed,
+      expandedSections,
+      toggleSidebar,
+      toggleSection,
+      setSectionExpanded: _setSectionExpanded,
+      setCollapsed
+    } = useSidebar()
 
     // Local state
     const stableUserRole = ref(null)
     const searchQuery = ref('')
     const showHelpModal = ref(false)
+    // expandedSections now comes from useSidebar composable
 
     // Responsive behavior
     const isSmallScreen = ref(window.innerWidth < 768)
@@ -336,14 +542,9 @@ export default {
     const handleResize = () => {
       isSmallScreen.value = window.innerWidth < 768
       if (isSmallScreen.value && !isCollapsed.value) {
-        emit('update:collapsed', true)
+        setCollapsed(true)
       }
     }
-
-    onMounted(() => {
-      window.addEventListener('resize', handleResize)
-      handleResize() // Initial check
-    })
 
     // Watch for authentication state changes
     watch([isAuthenticated, userRole], ([authenticated, role]) => {
@@ -352,8 +553,13 @@ export default {
       }
     }, { immediate: true })
 
-    // Initialize auth state on mount
+    // Initialize auth state and setup event listeners on mount
     onMounted(async() => {
+      // Setup resize listener
+      window.addEventListener('resize', handleResize)
+      handleResize() // Initial check
+
+      // Initialize auth state
       const token = localStorage.getItem('auth_token')
       const userData = localStorage.getItem('user_data')
 
@@ -378,120 +584,24 @@ export default {
       }
     })
 
-    // Computed properties
-    const isCollapsed = computed({
-      get: () => props.collapsed,
-      set: (value) => emit('update:collapsed', value)
+    // Cleanup event listeners on unmount
+    onUnmounted(() => {
+      window.removeEventListener('resize', handleResize)
     })
+
+    // Computed properties
+    // isCollapsed now comes from useSidebar composable
 
     const userName = computed(() => {
       return currentUser.value?.name || 'JOHN DOE'
     })
 
     const userInitials = computed(() => {
-      const name = userName.value
-      return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+      const name = userName.value || 'JOHN DOE'
+      return name.split(' ').map(n => n?.[0] || '').join('').toUpperCase().slice(0, 2) || 'JD'
     })
 
-    // Get menu items based on stable user role
-    const menuItems = computed(() => {
-      const role = stableUserRole.value || userRole.value
-      if (!role) return []
-
-      const permissions = ROLE_PERMISSIONS[role]
-      if (!permissions) return []
-
-      return permissions.routes
-        .map((route) => {
-          const metadata = getRouteMetadata(route)
-          return {
-            path: route,
-            ...metadata
-          }
-        })
-        .filter((item) => item.name)
-    })
-
-    // Categorize menu items
-    const dashboardItems = computed(() =>
-      menuItems.value.filter((item) => item.category === 'dashboard')
-    )
-
-    const userManagementItems = computed(() =>
-      menuItems.value.filter((item) => item.category === 'user-management')
-    )
-
-    const deviceManagementItems = computed(() =>
-      menuItems.value.filter((item) => item.category === 'device-management')
-    )
-
-    const requestsManagementItems = computed(() =>
-      menuItems.value.filter((item) => item.category === 'requests-management')
-    )
-
-    // Filtered items based on search
-    const filteredDashboardItems = computed(() => {
-      if (!searchQuery.value) return dashboardItems.value
-      return dashboardItems.value.filter(item =>
-        item.displayName.toLowerCase().includes(searchQuery.value.toLowerCase())
-      )
-    })
-
-    const filteredUserManagementItems = computed(() => {
-      if (!searchQuery.value) return userManagementItems.value
-      return userManagementItems.value.filter(item =>
-        item.displayName.toLowerCase().includes(searchQuery.value.toLowerCase())
-      )
-    })
-
-    const filteredDeviceManagementItems = computed(() => {
-      if (!searchQuery.value) return deviceManagementItems.value
-      return deviceManagementItems.value.filter(item =>
-        item.displayName.toLowerCase().includes(searchQuery.value.toLowerCase())
-      )
-    })
-
-    const filteredRequestsManagementItems = computed(() => {
-      if (!searchQuery.value) return requestsManagementItems.value
-      return requestsManagementItems.value.filter(item =>
-        item.displayName.toLowerCase().includes(searchQuery.value.toLowerCase())
-      )
-    })
-
-    // Methods
-    function toggleCollapse() {
-      isCollapsed.value = !isCollapsed.value
-    }
-
-
-    function showHelp() {
-      showHelpModal.value = true
-    }
-
-    function getRoleDisplayName(role) {
-      const roleNames = {
-        [ROLES.ADMIN]: 'Administrator',
-        [ROLES.DIVISIONAL_DIRECTOR]: 'Divisional Director',
-        [ROLES.HEAD_OF_DEPARTMENT]: 'Head of Department',
-        [ROLES.ICT_DIRECTOR]: 'ICT Director',
-        [ROLES.STAFF]: 'D. IN MEDICINE',
-        [ROLES.ICT_OFFICER]: 'ICT Officer'
-      }
-      return roleNames[role] || role
-    }
-
-    async function handleLogout() {
-      try {
-        await logoutGuard.executeLogout(async() => {
-          await logout()
-        })
-        router.push('/')
-      } catch (error) {
-        console.error('Logout failed:', error)
-        router.push('/')
-      }
-    }
-
+    // Route metadata function (moved before computed properties)
     function getRouteMetadata(route) {
       const metadata = {
         // Dashboards
@@ -539,26 +649,12 @@ export default {
         },
 
         // User Management (Admin only)
-        '/jeeva-users': {
-          name: 'JeevaUsers',
-          displayName: 'Jeeva Users',
-          icon: 'fas fa-file-medical',
+        '/service-users': {
+          name: 'ServiceUsers',
+          displayName: 'Service Granted',
+          icon: 'fas fa-check-circle',
           category: 'user-management',
-          description: 'Manage Jeeva system users'
-        },
-        '/wellsoft-users': {
-          name: 'WellsoftUsers',
-          displayName: 'Wellsoft Users',
-          icon: 'fas fa-laptop-medical',
-          category: 'user-management',
-          description: 'Manage Wellsoft system users'
-        },
-        '/internet-users': {
-          name: 'InternetUsers',
-          displayName: 'Internet Users',
-          icon: 'fas fa-wifi',
-          category: 'user-management',
-          description: 'Manage internet access users'
+          description: 'Manage granted services'
         },
 
         // Device Management (ICT Officer only)
@@ -604,6 +700,141 @@ export default {
       return metadata[route] || {}
     }
 
+    // Get menu items based on stable user role
+    const menuItems = computed(() => {
+      try {
+        const role = stableUserRole.value || userRole.value
+        if (!role) return []
+
+        const permissions = ROLE_PERMISSIONS[role]
+        if (!permissions || !permissions.routes) return []
+
+        return permissions.routes
+          .map((route) => {
+            try {
+              const metadata = getRouteMetadata(route)
+              return {
+                path: route,
+                ...metadata
+              }
+            } catch (error) {
+              console.warn('Error getting metadata for route:', route, error)
+              return null
+            }
+          })
+          .filter((item) => item && item.name)
+      } catch (error) {
+        console.error('Error computing menu items:', error)
+        return []
+      }
+    })
+
+    // Categorize menu items
+    const dashboardItems = computed(() =>
+      menuItems.value.filter((item) => item.category === 'dashboard')
+    )
+
+    const userManagementItems = computed(() =>
+      menuItems.value.filter((item) => item.category === 'user-management')
+    )
+
+    const deviceManagementItems = computed(() =>
+      menuItems.value.filter((item) => item.category === 'device-management')
+    )
+
+    const requestsManagementItems = computed(() =>
+      menuItems.value.filter((item) => item.category === 'requests-management')
+    )
+
+    // Filtered items based on search
+    const filteredDashboardItems = computed(() => {
+      try {
+        if (!searchQuery.value) return dashboardItems.value
+        return dashboardItems.value.filter(item =>
+          item?.displayName?.toLowerCase().includes(searchQuery.value.toLowerCase())
+        )
+      } catch (error) {
+        console.error('Error filtering dashboard items:', error)
+        return dashboardItems.value
+      }
+    })
+
+    const filteredUserManagementItems = computed(() => {
+      try {
+        if (!searchQuery.value) return userManagementItems.value
+        return userManagementItems.value.filter(item =>
+          item?.displayName?.toLowerCase().includes(searchQuery.value.toLowerCase())
+        )
+      } catch (error) {
+        console.error('Error filtering user management items:', error)
+        return userManagementItems.value
+      }
+    })
+
+    const filteredDeviceManagementItems = computed(() => {
+      try {
+        if (!searchQuery.value) return deviceManagementItems.value
+        return deviceManagementItems.value.filter(item =>
+          item?.displayName?.toLowerCase().includes(searchQuery.value.toLowerCase())
+        )
+      } catch (error) {
+        console.error('Error filtering device management items:', error)
+        return deviceManagementItems.value
+      }
+    })
+
+    const filteredRequestsManagementItems = computed(() => {
+      try {
+        if (!searchQuery.value) return requestsManagementItems.value
+        return requestsManagementItems.value.filter(item =>
+          item?.displayName?.toLowerCase().includes(searchQuery.value.toLowerCase())
+        )
+      } catch (error) {
+        console.error('Error filtering requests management items:', error)
+        return requestsManagementItems.value
+      }
+    })
+
+    // Methods
+    function toggleCollapse() {
+      toggleSidebar()
+      console.log('🔄 Sidebar toggled via Pinia')
+    }
+
+    function toggleSectionLocal(section) {
+      toggleSection(section)
+    }
+
+    function showHelp() {
+      showHelpModal.value = true
+    }
+
+    function getRoleDisplayName(role) {
+      if (!role) return 'User'
+
+      const roleNames = {
+        [ROLES.ADMIN]: 'Administrator',
+        [ROLES.DIVISIONAL_DIRECTOR]: 'Divisional Director',
+        [ROLES.HEAD_OF_DEPARTMENT]: 'Head of Department',
+        [ROLES.ICT_DIRECTOR]: 'ICT Director',
+        [ROLES.STAFF]: 'D. IN MEDICINE',
+        [ROLES.ICT_OFFICER]: 'ICT Officer'
+      }
+      return roleNames[role] || role
+    }
+
+    async function handleLogout() {
+      try {
+        await logoutGuard.executeLogout(async() => {
+          await logout()
+        })
+        router.push('/')
+      } catch (error) {
+        console.error('Logout failed:', error)
+        router.push('/')
+      }
+    }
+
     // Theme is automatically initialized by useTheme composable
 
     return {
@@ -612,6 +843,10 @@ export default {
       searchQuery,
       showHelpModal,
       stableUserRole,
+      expandedSections,
+
+      // Router
+      route,
 
       // Computed
       currentUser,
@@ -631,6 +866,7 @@ export default {
 
       // Methods
       toggleCollapse,
+      toggleSectionLocal,
       showHelp,
       getRoleDisplayName,
       handleLogout
@@ -639,16 +875,19 @@ export default {
   directives: {
     tooltip: {
       mounted(el, binding) {
-        if (binding.value) {
+        if (binding.value && typeof binding.value === 'string') {
           el.title = binding.value
         }
       },
       updated(el, binding) {
-        if (binding.value) {
+        if (binding.value && typeof binding.value === 'string') {
           el.title = binding.value
         } else {
           el.removeAttribute('title')
         }
+      },
+      unmounted(el) {
+        el.removeAttribute('title')
       }
     }
   }
@@ -664,16 +903,114 @@ export default {
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background-color: rgba(255, 255, 255, 0.3);
   border-radius: 2px;
+  box-shadow: inset 0 0 2px rgba(255, 255, 255, 0.2);
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
   background-color: transparent;
 }
 
+/* Enhanced shadow effects */
+.shadow-sm {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05), 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.shadow-md {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.shadow-2xl {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Multi-layer background effects */
+.bg-gradient-to-br {
+  --tw-gradient-from: transparent;
+  --tw-gradient-to: transparent;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+  background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
+}
+
+.bg-gradient-to-t {
+  --tw-gradient-from: transparent;
+  --tw-gradient-to: transparent;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+  background-image: linear-gradient(to top, var(--tw-gradient-stops));
+}
+
+/* Gradient color utilities */
+.from-black\/10 {
+  --tw-gradient-from: rgba(0, 0, 0, 0.1);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(0, 0, 0, 0));
+}
+
+.via-transparent {
+  --tw-gradient-stops: var(--tw-gradient-from), transparent, var(--tw-gradient-to, transparent);
+}
+
+.to-black\/20 {
+  --tw-gradient-to: rgba(0, 0, 0, 0.2);
+}
+
+.from-transparent {
+  --tw-gradient-from: transparent;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, transparent);
+}
+
+.via-white\/5 {
+  --tw-gradient-stops: var(--tw-gradient-from), rgba(255, 255, 255, 0.05), var(--tw-gradient-to, rgba(255, 255, 255, 0));
+}
+
+.to-white\/10 {
+  --tw-gradient-to: rgba(255, 255, 255, 0.1);
+}
+
+/* Enhanced hover effects */
+.hover\:scale-102:hover {
+  transform: scale(1.02);
+}
+
+.scale-105 {
+  transform: scale(1.05);
+}
+
+/* Fallback for transform utilities */
+.transform {
+  --tw-translate-x: 0;
+  --tw-translate-y: 0;
+  --tw-rotate: 0;
+  --tw-skew-x: 0;
+  --tw-skew-y: 0;
+  --tw-scale-x: 1;
+  --tw-scale-y: 1;
+  --tw-transform: translateX(var(--tw-translate-x)) translateY(var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+  transform: var(--tw-transform);
+}
+
+.hover\:transform:hover {
+  transform: var(--tw-transform);
+}
+
 /* Smooth transitions */
 .transition-all {
   transition-property: all;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.transition-transform {
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+.transition-colors {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
 }
 
 /* Backdrop blur support */
@@ -687,5 +1024,218 @@ export default {
   outline: 2px solid transparent;
   outline-offset: 2px;
   box-shadow: 0 0 0 2px var(--tw-ring-color);
+}
+
+/* Section header styles */
+.section-header {
+  position: relative;
+  overflow: hidden;
+}
+
+.section-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.section-header:hover::before {
+  transform: translateX(100%);
+}
+
+/* Navigation item enhanced styles */
+.nav-item {
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.nav-item:hover::before {
+  left: 100%;
+}
+
+/* Active indicator pulse animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.active-indicator {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Layered shadow for depth */
+.layered-shadow {
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.12),
+    0 1px 2px rgba(0, 0, 0, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Glassmorphism effect */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Enhanced Menu Toggle Button */
+.menu-toggle-btn {
+  position: relative;
+  z-index: 10;
+}
+
+.menu-toggle-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+}
+
+.menu-toggle-btn:active {
+  transform: scale(0.95);
+}
+
+/* Profile Section Animations */
+.profile-expanded {
+  animation: slideInFromLeft 0.5s ease-out;
+}
+
+.profile-collapsed {
+  animation: slideInFromLeft 0.5s ease-out;
+}
+
+.search-expanded {
+  animation: slideInFromLeft 0.6s ease-out;
+  animation-delay: 0.1s;
+  animation-fill-mode: both;
+}
+
+.search-collapsed {
+  animation: slideInFromLeft 0.6s ease-out;
+  animation-delay: 0.1s;
+  animation-fill-mode: both;
+}
+
+@keyframes slideInFromLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Enhanced Sidebar Transitions */
+.h-screen {
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Profile hover effects */
+.profile-expanded .group:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.profile-collapsed .group:hover {
+  transform: translateY(-1px) scale(1.05);
+}
+
+/* Search input enhancements */
+.search-expanded input:focus {
+  transform: scale(1.02);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+/* Brand logo animation */
+.brand-logo {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Navigation items enhanced transitions */
+.nav-item {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-item:hover {
+  transform: translateX(4px) scale(1.02);
+}
+
+/* Section headers enhanced */
+.section-header {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.section-header:hover {
+  transform: translateX(2px);
+  background: rgba(37, 99, 235, 0.3);
+  border-radius: 8px;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+/* Bottom section buttons */
+.bottom-section button {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bottom-section button:hover {
+  transform: translateX(4px) scale(1.02);
+  background: rgba(37, 99, 235, 0.6);
+}
+
+/* Staggered animation for navigation items */
+.nav-item:nth-child(1) { animation-delay: 0.1s; }
+.nav-item:nth-child(2) { animation-delay: 0.2s; }
+.nav-item:nth-child(3) { animation-delay: 0.3s; }
+.nav-item:nth-child(4) { animation-delay: 0.4s; }
+.nav-item:nth-child(5) { animation-delay: 0.5s; }
+
+/* Responsive design helpers */
+@media (max-width: 768px) {
+  .sidebar-mobile {
+    position: fixed;
+    z-index: 50;
+    left: 0;
+    top: 0;
+  }
+
+  /* Faster transitions on mobile */
+  .h-screen {
+    transition: width 0.3s ease-in-out;
+  }
+
+  .menu-toggle-btn {
+    padding: 12px;
+  }
+
+  /* Reduce animations on mobile for performance */
+  .profile-expanded,
+  .profile-collapsed,
+  .search-expanded,
+  .search-collapsed {
+    animation: none;
+  }
 }
 </style>

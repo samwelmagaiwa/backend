@@ -30,6 +30,8 @@ class User extends Authenticatable
         'role_id',
         'pf_number',
         'staff_name',
+        'department_id',
+        'is_active',
     ];
 
     /**
@@ -52,8 +54,13 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
         ];
     }
+
+    /**
+     * Legacy single role relationship (kept for backward compatibility)
+     */
     public function role()
     {
         return $this->belongsTo(Role::class);
@@ -70,6 +77,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the department this user belongs to.
+     */
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
+
+    /**
      * Get the departments where this user is the head of department.
      */
     public function departmentsAsHOD()
@@ -78,7 +93,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Roles assigned to this user (many-to-many relationship)
+     * Roles assigned to this user (many-to-many relationship) - PRIMARY SYSTEM
      */
     public function roles()
     {
@@ -143,114 +158,107 @@ class User extends Authenticatable
      */
     public function getAllPermissions(): array
     {
-        return $this->roles()->get()
+        $permissions = $this->roles()->get()
             ->pluck('permissions')
             ->flatten()
             ->unique()
             ->values()
             ->toArray();
+            
+        // If no permissions from many-to-many roles, return basic permissions
+        if (empty($permissions)) {
+            return ['view_users']; // Basic staff permissions
+        }
+        
+        return $permissions;
     }
 
     /**
-     * Check if user is admin (use old system)
+     * Check if user is admin (use new many-to-many system)
      */
     public function isAdmin(): bool
     {
-        // Prioritize old single role system
-        if ($this->role_id && $this->role) {
-            return $this->role->name === 'admin';
-        }
-        
-        // Fallback to new system
         return $this->hasRole('admin');
     }
 
     /**
-     * Check if user is super admin (use old system)
-     */
-    public function isSuperAdmin(): bool
-    {
-        // Prioritize old single role system
-        if ($this->role_id && $this->role) {
-            return $this->role->name === 'super_admin';
-        }
-        
-        // Fallback to new system
-        return $this->hasRole('super_admin');
-    }
-
-    /**
-     * Check if user is HOD (use old system)
+     * Check if user is HOD (use new many-to-many system)
      */
     public function isHOD(): bool
     {
-        // Prioritize old single role system
-        if ($this->role_id && $this->role) {
-            return $this->role->name === 'head_of_department';
-        }
-        
-        // Fallback to new system
         return $this->hasRole('head_of_department');
     }
 
     /**
-     * Get user's primary role (prioritize old single role system)
+     * Get user's primary role (use new many-to-many system)
      */
     public function getPrimaryRole()
     {
-        // Prioritize old single role system (as it was yesterday)
-        if ($this->role_id && $this->role) {
-            return $this->role;
-        }
-        
-        // Fallback to new many-to-many system if old system not available
-        return $this->roles()->orderBy('sort_order')->first();
+        // Get the first role - removed sort_order dependency
+        return $this->roles()->first();
     }
 
     /**
-     * Get role names as array (prioritize old system)
+     * Get role names as array (use new many-to-many system)
      */
     public function getRoleNamesAttribute(): array
     {
-        // Prioritize old single role system
-        if ($this->role_id && $this->role) {
-            return [$this->role->name];
-        }
-        
-        // Fallback to new many-to-many system
         return $this->roles()->pluck('name')->toArray();
     }
 
     /**
-     * Get primary role name for backward compatibility (use old system)
+     * Get primary role name (use new many-to-many system)
      */
     public function getPrimaryRoleName(): ?string
     {
-        // Prioritize old single role system (as it was yesterday)
+        $primaryRole = $this->getPrimaryRole();
+        
+        if ($primaryRole) {
+            return $primaryRole->name;
+        }
+        
+        // Fallback: check old role_id system
         if ($this->role_id && $this->role) {
             return $this->role->name;
         }
         
-        // Fallback to new many-to-many system
-        return $this->getPrimaryRole()?->name;
+        // Last resort: return 'staff' as default
+        return 'staff';
     }
 
     /**
-     * Check if user has role using either old or new system (prioritize old)
+     * Get display role names for UI
      */
-    public function hasRoleCompat(string $roleName): bool
+    public function getDisplayRoleNames(): string
     {
-        // Check old single role system first (as it was yesterday)
-        if ($this->role_id && $this->role && $this->role->name === $roleName) {
-            return true;
-        }
-        
-        // Fallback to new many-to-many system
-        if ($this->hasRole($roleName)) {
-            return true;
-        }
-        
-        return false;
+        $roleNames = $this->roles()->pluck('name')->toArray();
+        return implode(', ', array_map(function($name) {
+            return ucwords(str_replace('_', ' ', $name));
+        }, $roleNames));
+    }
+
+    /**
+     * Check if user has admin privileges
+     */
+    public function hasAdminPrivileges(): bool
+    {
+        return $this->hasRole('admin');
+    }
+
+    /**
+     * Check if user can manage other users
+     */
+    public function canManageUsers(): bool
+    {
+        return $this->hasPermission('manage_users') || $this->hasAdminPrivileges();
+    }
+
+    /**
+     * Check if user can assign roles
+     */
+    public function canAssignRoles(): bool
+    {
+        return $this->hasPermission('assign_roles') || $this->hasAdminPrivileges();
     }
 
     /**
@@ -259,7 +267,7 @@ class User extends Authenticatable
     public function needsOnboarding(): bool
     {
         // Admin users don't need onboarding
-        if ($this->isAdmin() || $this->isSuperAdmin()) {
+        if ($this->isAdmin()) {
             return false;
         }
 
@@ -278,6 +286,64 @@ class User extends Authenticatable
             ['current_step' => 'terms-popup']
         );
     }
-}
 
-    
+    /**
+     * Scope for active users
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    /**
+     * Scope for inactive users
+     */
+    public function scopeInactive($query)
+    {
+        return $query->where('is_active', false);
+    }
+
+    /**
+     * Scope for users with specific role
+     */
+    public function scopeWithRole($query, string $roleName)
+    {
+        return $query->whereHas('roles', function ($q) use ($roleName) {
+            $q->where('name', $roleName);
+        });
+    }
+
+    /**
+     * Scope for users with any of the given roles
+     */
+    public function scopeWithAnyRole($query, array $roleNames)
+    {
+        return $query->whereHas('roles', function ($q) use ($roleNames) {
+            $q->whereIn('name', $roleNames);
+        });
+    }
+
+    /**
+     * Scope for users in specific department
+     */
+    public function scopeInDepartment($query, $departmentId)
+    {
+        return $query->where('department_id', $departmentId);
+    }
+
+    /**
+     * Get department name attribute
+     */
+    public function getDepartmentNameAttribute(): ?string
+    {
+        return $this->department?->name;
+    }
+
+    /**
+     * Get full department display name
+     */
+    public function getFullDepartmentNameAttribute(): ?string
+    {
+        return $this->department?->getFullNameAttribute();
+    }
+}

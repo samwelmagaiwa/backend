@@ -2,7 +2,7 @@
   <div class="flex flex-col h-screen">
     <AppHeader />
     <div class="flex flex-1 overflow-hidden">
-      <ModernSidebar v-model:collapsed="sidebarCollapsed" />
+      <ModernSidebar />
       <main
         class="flex-1 p-3 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative"
       >
@@ -678,7 +678,6 @@
 </template>
 
 <script>
-import { ref } from 'vue'
 import ModernSidebar from '@/components/ModernSidebar.vue'
 import AppFooter from '@/components/footer.vue'
 import AppHeader from '@/components/AppHeader.vue'
@@ -692,10 +691,10 @@ export default {
     AppHeader
   },
   setup() {
-    const sidebarCollapsed = ref(false)
+    // Sidebar state now managed by Pinia - no local state needed
 
     return {
-      sidebarCollapsed
+      // No local state needed for sidebar
     }
   },
   data() {

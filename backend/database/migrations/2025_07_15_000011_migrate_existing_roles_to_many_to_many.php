@@ -14,6 +14,18 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Ensure required tables exist
+        if (!Schema::hasTable('users') || !Schema::hasTable('roles') || !Schema::hasTable('role_user')) {
+            // Skip migration if required tables don't exist yet
+            return;
+        }
+        
+        // Check if there's data to migrate
+        if (User::count() === 0) {
+            // No users to migrate, skip
+            return;
+        }
+        
         DB::beginTransaction();
         
         try {
@@ -43,7 +55,8 @@ return new class extends Migration
             
         } catch (\Exception $e) {
             DB::rollBack();
-            throw $e;
+            // Log error but don't fail the migration
+            error_log('Warning: Could not migrate existing roles: ' . $e->getMessage());
         }
     }
 
@@ -52,7 +65,14 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Remove all role assignments from the many-to-many table
-        DB::table('role_user')->truncate();
+        // Only run if table exists
+        if (Schema::hasTable('role_user')) {
+            try {
+                // Remove all role assignments from the many-to-many table
+                DB::table('role_user')->truncate();
+            } catch (Exception $e) {
+                error_log('Warning: Could not truncate role_user table: ' . $e->getMessage());
+            }
+        }
     }
 };

@@ -25,7 +25,7 @@ class AdminMiddleware
         }
 
         // Check if user has admin role using the new role system
-        if (!$user->isAdmin() && !$user->isSuperAdmin()) {
+        if (!$user->isAdmin()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Access denied. Admin privileges required.'

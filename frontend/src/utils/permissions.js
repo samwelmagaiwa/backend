@@ -20,13 +20,11 @@ export const ROLE_PERMISSIONS = {
   [ROLES.ADMIN]: {
     routes: [
       '/admin-dashboard',
-      '/jeeva-users',
-      '/wellsoft-users',
-      '/internet-users'
+      '/service-users'
     ],
     dashboards: ['admin-dashboard'],
     forms: [],
-    userManagement: ['jeeva-users', 'wellsoft-users', 'internet-users']
+    userManagement: ['service-users']
   },
 
   [ROLES.DIVISIONAL_DIRECTOR]: {

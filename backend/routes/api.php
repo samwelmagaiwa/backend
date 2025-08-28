@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\UserAccessController;
 use App\Http\Controllers\Api\v1\BookingServiceController;
 use App\Http\Controllers\Api\v1\DeclarationController;
 use App\Http\Controllers\Api\v1\BothServiceFormController;
+use App\Http\Controllers\Api\v1\AdminUserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -54,6 +55,7 @@ use Illuminate\Support\Facades\Route;
     Route::post('/logout-all', [AuthController::class, 'logoutAll'])->name('logout-all');
     Route::get('/active-sessions', [AuthController::class, 'getActiveSessions'])->name('active-sessions');
     Route::post('/revoke-session', [AuthController::class, 'revokeSession'])->name('revoke-session');
+    Route::get('/role-redirect', [AuthController::class, 'getRoleBasedRedirect'])->name('role-redirect');
 Route::post('/register', [AuthController::class, 'register'])->name('register');
 
 // Protected routes
@@ -61,10 +63,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         $user = $request->user();
         
-        // Load the role relationship
-        $user->load('role');
+        // Load the roles relationship (new system)
+        $user->load('roles', 'department');
         
-        // Return user with role information
+        // Return user with role information using new system
         return [
             'id' => $user->id,
             'name' => $user->name,
@@ -72,9 +74,24 @@ Route::middleware('auth:sanctum')->group(function () {
             'phone' => $user->phone,
             'pf_number' => $user->pf_number,
             'staff_name' => $user->staff_name,
-            'role_id' => $user->role_id,
-            'role' => $user->role ? $user->role->name : null,
-            'role_name' => $user->role ? $user->role->name : null,
+            'department_id' => $user->department_id,
+            'department' => $user->department ? [
+                'id' => $user->department->id,
+                'name' => $user->department->name,
+                'code' => $user->department->code,
+                'display_name' => $user->department->getFullNameAttribute()
+            ] : null,
+            'is_active' => $user->is_active ?? true,
+            'roles' => $user->roles->map(function ($role) {
+                return [
+                    'id' => $role->id,
+                    'name' => $role->name,
+                    'display_name' => ucwords(str_replace('_', ' ', $role->name))
+                ];
+            }),
+            'primary_role' => $user->getPrimaryRoleName(),
+            'display_roles' => $user->getDisplayRoleNames(),
+            'permissions' => $user->getAllPermissions(),
             'needs_onboarding' => $user->needsOnboarding(),
             'created_at' => $user->created_at,
             'updated_at' => $user->updated_at,
@@ -86,6 +103,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout-all', [AuthController::class, 'logoutAll'])->name('logout-all');
     Route::get('/sessions', [AuthController::class, 'getActiveSessions'])->name('sessions');
     Route::post('/sessions/revoke', [AuthController::class, 'revokeSession'])->name('sessions.revoke');
+    Route::get('/current-user', [AuthController::class, 'getCurrentUser'])->name('current-user');
+    Route::get('/role-redirect', [AuthController::class, 'getRoleBasedRedirect'])->name('role-redirect');
 
     // Onboarding routes
     Route::prefix('onboarding')->group(function () {
@@ -109,11 +128,39 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Admin routes (Admin only)
     Route::prefix('admin')->group(function () {
+        // Legacy admin routes
         Route::get('/users', [AdminController::class, 'getUsers'])->name('admin.users.index');
         Route::get('/users/{userId}', [AdminController::class, 'getUserDetails'])->name('admin.users.show');
         Route::post('/users/reset-onboarding', [AdminController::class, 'resetUserOnboarding'])->name('admin.users.reset-onboarding');
         Route::post('/users/bulk-reset-onboarding', [AdminController::class, 'bulkResetOnboarding'])->name('admin.users.bulk-reset-onboarding');
         Route::get('/onboarding/stats', [AdminController::class, 'getOnboardingStats'])->name('admin.onboarding.stats');
+        
+        // New comprehensive user management routes
+        Route::prefix('users')->group(function () {
+            Route::get('/', [AdminUserController::class, 'index'])->name('admin.users.index');
+            Route::post('/', [AdminUserController::class, 'store'])->name('admin.users.store');
+            Route::get('/roles', [AdminUserController::class, 'getRoles'])->name('admin.users.roles');
+            Route::get('/departments', [AdminUserController::class, 'getDepartments'])->name('admin.users.departments');
+            Route::get('/create-form-data', [AdminUserController::class, 'getCreateFormData'])->name('admin.users.create-form-data');
+            Route::post('/validate', [AdminUserController::class, 'validateUserData'])->name('admin.users.validate');
+            Route::get('/statistics', [AdminUserController::class, 'getStatistics'])->name('admin.users.statistics');
+            Route::get('/{user}', [AdminUserController::class, 'show'])->name('admin.users.show');
+            Route::put('/{user}', [AdminUserController::class, 'update'])->name('admin.users.update');
+            Route::delete('/{user}', [AdminUserController::class, 'destroy'])->name('admin.users.destroy');
+            Route::patch('/{user}/toggle-status', [AdminUserController::class, 'toggleStatus'])->name('admin.users.toggle-status');
+        });
+        
+        // Legacy user management routes (keep for backward compatibility)
+        Route::prefix('user-management')->group(function () {
+            Route::get('/', [AdminUserController::class, 'index'])->name('admin.user-management.index');
+            Route::post('/', [AdminUserController::class, 'store'])->name('admin.user-management.store');
+            Route::get('/roles', [AdminUserController::class, 'getRoles'])->name('admin.user-management.roles');
+            Route::get('/statistics', [AdminUserController::class, 'getStatistics'])->name('admin.user-management.statistics');
+            Route::get('/{user}', [AdminUserController::class, 'show'])->name('admin.user-management.show');
+            Route::put('/{user}', [AdminUserController::class, 'update'])->name('admin.user-management.update');
+            Route::delete('/{user}', [AdminUserController::class, 'destroy'])->name('admin.user-management.destroy');
+            Route::post('/{user}/toggle-status', [AdminUserController::class, 'toggleStatus'])->name('admin.user-management.toggle-status');
+        });
     });
 
 
