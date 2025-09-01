@@ -50,12 +50,12 @@
             </div>
 
             <!-- User Info -->
-            <div v-if="currentUser" class="text-left">
+            <div v-if="safeCurrentUser" class="text-left">
               <p class="text-sm font-medium text-white leading-tight">
-                {{ currentUser.name }}
+                {{ safeCurrentUser.name }}
               </p>
               <p class="text-xs text-blue-200 capitalize leading-tight">
-                {{ formatRole(currentUser.role) }}
+                {{ formatRole(safeCurrentUser.role || safeCurrentUser.role_name) }}
               </p>
             </div>
 
@@ -133,10 +133,10 @@
                   <!-- User Details -->
                   <div class="flex-1">
                     <h3 class="text-white font-semibold text-sm">
-                      {{ currentUser?.name || 'User' }}
+                      {{ safeCurrentUser.name }}
                     </h3>
                     <p class="text-blue-100 text-xs">
-                      {{ currentUser?.email || 'user@example.com' }}
+                      {{ safeCurrentUser.email }}
                     </p>
                     <div class="flex items-center mt-1">
                       <span
@@ -151,7 +151,7 @@
                         <div class="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-blue-600/20"></div>
                         <div class="relative z-10">
                           <i class="fas fa-id-badge mr-1"></i>
-                          {{ formatRole(currentUser?.role) }}
+                          {{ formatRole(safeCurrentUser.role || safeCurrentUser.role_name) }}
                         </div>
                       </span>
                     </div>
@@ -209,7 +209,7 @@
 
                 <!-- Reset Onboarding (Admin only) -->
                 <button
-                  v-if="currentUser?.role === 'admin'"
+                  v-if="isAdmin"
                   @click="openOnboardingReset"
                   class="w-full flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 transition-all duration-300 text-left relative overflow-hidden group"
                 >
@@ -233,8 +233,9 @@
 
                 <!-- Debug Info (Temporary - Remove after testing) -->
                 <div v-if="isDevelopment" class="px-4 py-2 text-xs text-gray-500 border-t border-gray-200">
-                  Debug: Role = "{{ currentUser?.role || 'undefined' }}" |
-                  Is Admin = {{ currentUser?.role === 'admin' ? 'YES' : 'NO' }}
+                  Debug: Role = "{{ safeCurrentUser.role || safeCurrentUser.role_name || 'undefined' }}" |
+                  Roles = {{ safeCurrentUser.roles || '[]' }} |
+                  Is Admin = {{ isAdmin ? 'YES' : 'NO' }}
                 </div>
 
                 <!-- Divider -->
@@ -377,7 +378,7 @@ import { logoutGuard } from '@/utils/logoutGuard'
 export default {
   name: 'HeaderComponent',
   setup() {
-    const { currentUser, logout: authLogout } = useAuth()
+    const { user: currentUser, logout: authLogout } = useAuth()
     const router = useRouter()
 
     // Reactive state
@@ -385,9 +386,59 @@ export default {
     const showHelpModal = ref(false)
     const profileDropdown = ref(null)
 
-    // Environment check using Vue CLI's process.env
+    // Environment check using Vue CLI's process.env - safely handle undefined
     const isDevelopment = computed(() => {
-      return process.env.NODE_ENV === 'development'
+      try {
+        return process.env.NODE_ENV === 'development'
+      } catch (error) {
+        console.warn('Error accessing NODE_ENV:', error)
+        return false
+      }
+    })
+
+    // Enhanced admin check to handle multiple role sources - safely handle undefined
+    const isAdmin = computed(() => {
+      try {
+        // Safely access currentUser with null checks
+        const user = currentUser?.value
+        if (!user || typeof user !== 'object') return false
+
+        // Check multiple possible role sources with safe access
+        const role = user.role || user.role_name || user.primary_role || null
+        const roles = Array.isArray(user.roles) ? user.roles : []
+
+        // Check if user is admin via role field or roles array
+        return role === 'admin' || roles.includes('admin')
+      } catch (error) {
+        console.warn('Error in isAdmin computed:', error)
+        return false
+      }
+    })
+
+    // Safe current user computed property with fallbacks
+    const safeCurrentUser = computed(() => {
+      try {
+        const user = currentUser?.value
+        if (!user || typeof user !== 'object') {
+          return {
+            name: 'User',
+            email: 'user@example.com',
+            role: null,
+            role_name: null,
+            roles: []
+          }
+        }
+        return user
+      } catch (error) {
+        console.warn('Error accessing currentUser:', error)
+        return {
+          name: 'User',
+          email: 'user@example.com',
+          role: null,
+          role_name: null,
+          roles: []
+        }
+      }
     })
 
     // Methods
@@ -418,31 +469,39 @@ export default {
     const goToDashboard = () => {
       closeProfileDropdown()
 
-      // Navigate to appropriate dashboard based on user role
-      if (currentUser.value?.role) {
-        switch (currentUser.value.role) {
-          case 'admin':
-            router.push('/admin-dashboard')
-            break
-          case 'ict_officer':
-            router.push('/ict-dashboard')
-            break
-          case 'head_of_department':
-            router.push('/hod-dashboard')
-            break
-          case 'divisional_director':
-            router.push('/divisional-dashboard')
-            break
-          case 'ict_director':
-            router.push('/dict-dashboard')
-            break
-          case 'staff':
-            router.push('/user-dashboard')
-            break
-          default:
-            router.push('/user-dashboard')
+      try {
+        // Navigate to appropriate dashboard based on user role - safely access user data
+        const user = safeCurrentUser.value
+        const userRole = user?.role || user?.role_name || user?.primary_role
+
+        if (userRole) {
+          switch (userRole) {
+            case 'admin':
+              router.push('/admin-dashboard')
+              break
+            case 'ict_officer':
+              router.push('/ict-dashboard')
+              break
+            case 'head_of_department':
+              router.push('/hod-dashboard')
+              break
+            case 'divisional_director':
+              router.push('/divisional-dashboard')
+              break
+            case 'ict_director':
+              router.push('/dict-dashboard')
+              break
+            case 'staff':
+              router.push('/user-dashboard')
+              break
+            default:
+              router.push('/user-dashboard')
+          }
+        } else {
+          router.push('/user-dashboard')
         }
-      } else {
+      } catch (error) {
+        console.warn('Error in goToDashboard:', error)
         router.push('/user-dashboard')
       }
     }
@@ -495,10 +554,12 @@ export default {
 
     return {
       currentUser,
+      safeCurrentUser,
       showProfileDropdown,
       showHelpModal,
       profileDropdown,
       isDevelopment,
+      isAdmin,
       toggleProfileDropdown,
       closeProfileDropdown,
       formatRole,

@@ -62,7 +62,7 @@ class UserSeeder extends Seeder
                 'email' => 'ict@gmail.com',
                 'phone' => '+255700000001',
                 'pf_number' => 'PF1289',
-                'department_id' => $ictDepartment?->id,
+                'department_id' => null,
                 'password' => Hash::make('12345678'),
                 'role_name' => 'ict_officer'
             ],
@@ -71,7 +71,7 @@ class UserSeeder extends Seeder
                 'email' => 'staff@gmail.com',
                 'phone' => '+255700000002',
                 'pf_number' => 'PF3746',
-                'department_id' => $nursingDepartment?->id,
+                'department_id' => null,
                 'password' => Hash::make('12345678'),
                 'role_name' => 'staff'
             ],
@@ -80,7 +80,7 @@ class UserSeeder extends Seeder
                 'email' => 'divisional_director@gmail.com',
                 'phone' => '+255700000003',
                 'pf_number' => 'PF6372',
-                'department_id' => $adminDepartment?->id,
+                'department_id' => null,
                 'password' => Hash::make('12345678'),
                 'role_name' => 'divisional_director'
             ],
@@ -89,7 +89,7 @@ class UserSeeder extends Seeder
                 'email' => 'ict_director@gmail.com',
                 'phone' => '+255700000004',
                 'pf_number' => 'PF8901',
-                'department_id' => $ictDepartment?->id,
+                'department_id' => null,
                 'password' => Hash::make('12345678'),
                 'role_name' => 'ict_director'
             ],
@@ -98,7 +98,7 @@ class UserSeeder extends Seeder
                 'email' => 'hod_hr@gmail.com',
                 'phone' => '+255700000005',
                 'pf_number' => 'PF5432',
-                'department_id' => $hrDepartment?->id,
+                'department_id' => null,
                 'password' => Hash::make('12345678'),
                 'role_name' => 'head_of_department'
             ],
@@ -107,7 +107,7 @@ class UserSeeder extends Seeder
                 'email' => 'hod_nursing@gmail.com',
                 'phone' => '+255700000006',
                 'pf_number' => 'PF7890',
-                'department_id' => $nursingDepartment?->id,
+                'department_id' => null,
                 'password' => Hash::make('12345678'),
                 'role_name' => 'head_of_department'
             ],
@@ -116,7 +116,7 @@ class UserSeeder extends Seeder
                 'email' => 'lab_tech@gmail.com',
                 'phone' => '+255700000007',
                 'pf_number' => 'PF4567',
-                'department_id' => $labDepartment?->id,
+                'department_id' => null,
                 'password' => Hash::make('12345678'),
                 'role_name' => 'staff'
             ],
@@ -125,11 +125,101 @@ class UserSeeder extends Seeder
                 'email' => 'pharmacist@gmail.com',
                 'phone' => '+255700000008',
                 'pf_number' => 'PF9876',
-                'department_id' => $pharmacyDepartment?->id,
+                'department_id' => null,
                 'password' => Hash::make('12345678'),
                 'role_name' => 'staff'
             ],
-        ];
+             [
+        'name' => 'John Mwanga',
+        'email' => 'john.mwanga@gmail.com',
+        'phone' => '+255700000009',
+        'pf_number' => 'PF1122',
+        'department_id' => null,
+        'password' => Hash::make('12345678'),
+        'role_name' => 'staff'
+    ],
+    [
+        'name' => 'Asha Juma',
+        'email' => 'asha.juma@gmail.com',
+        'phone' => '+255700000010',
+        'pf_number' => 'PF3344',
+        'department_id' => null,
+        'password' => Hash::make('12345678'),
+        'role_name' => 'staff'
+    ],
+    [
+        'name' => 'David Selemani',
+        'email' => 'david.selemani@gmail.com',
+        'phone' => '+255700000011',
+        'pf_number' => 'PF5566',
+        'department_id' => null,
+        'password' => Hash::make('12345678'),
+        'role_name' => 'staff'
+    ],
+    [
+        'name' => 'Fatuma Bakari',
+        'email' => 'fatuma.bakari@gmail.com',
+        'phone' => '+255700000012',
+        'pf_number' => 'PF7788',
+        'department_id' => null,
+        'password' => Hash::make('12345678'),
+        'role_name' => 'staff'
+    ],
+    [
+        'name' => 'Samuel Nyerere',
+        'email' => 'samuel.nyerere@gmail.com',
+        'phone' => '+255700000013',
+        'pf_number' => 'PF9900',
+        'department_id' => null,
+        'password' => Hash::make('12345678'),
+        'role_name' => 'staff'
+    ],
+    [
+        'name' => 'Rashid Ali',
+        'email' => 'rashid.ali@gmail.com',
+        'phone' => '+255700000014',
+        'pf_number' => 'PF2233',
+        'department_id' => null,
+        'password' => Hash::make('12345678'),
+        'role_name' => 'staff'
+    ],
+    [
+        'name' => 'Neema Msuya',
+        'email' => 'neema.msuya@gmail.com',
+        'phone' => '+255700000015',
+        'pf_number' => 'PF4455',
+        'department_id' => null,
+        'password' => Hash::make('12345678'),
+        'role_name' => 'staff'
+    ],
+    [
+        'name' => 'Mohamed Suleiman',
+        'email' => 'mohamed.suleiman@gmail.com',
+        'phone' => '+255700000016',
+        'pf_number' => 'PF6677',
+        'department_id' => null,
+        'password' => Hash::make('12345678'),
+        'role_name' => 'staff'
+    ],
+    [
+        'name' => 'Amina Hassan',
+        'email' => 'amina.hassan@gmail.com',
+        'phone' => '+255700000017',
+        'pf_number' => 'PF8899',
+        'department_id' => null,
+        'password' => Hash::make('12345678'),
+        'role_name' => 'staff'
+    ],
+    [
+        'name' => 'Peter Komba',
+        'email' => 'peter.komba@gmail.com',
+        'phone' => '+255700000018',
+        'pf_number' => 'PF1010',
+        'department_id' => null,
+        'password' => Hash::make('12345678'),
+        'role_name' => 'staff'
+    ],
+];
 
         foreach ($users as $userData) {
             $roleName = $userData['role_name'];
@@ -143,7 +233,7 @@ class UserSeeder extends Seeder
         }
 
         // After creating users, update departments with HOD assignments
-        $this->assignHeadsOfDepartments();
+        //$this->assignHeadsOfDepartments();
     }
 
     /**

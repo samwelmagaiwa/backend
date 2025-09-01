@@ -106,6 +106,30 @@ class AdminDepartmentController extends Controller
 
             $department = Department::create($departmentData);
 
+            // Assign department_id to HOD if specified
+            if ($department->hod_user_id) {
+                $hod = \App\Models\User::find($department->hod_user_id);
+                if ($hod) {
+                    $hod->update(['department_id' => $department->id]);
+                    Log::info('Assigned department to HOD during creation', [
+                        'user_id' => $department->hod_user_id,
+                        'department_id' => $department->id
+                    ]);
+                }
+            }
+
+            // Assign department_id to Divisional Director if specified
+            if ($department->divisional_director_id) {
+                $director = \App\Models\User::find($department->divisional_director_id);
+                if ($director) {
+                    $director->update(['department_id' => $department->id]);
+                    Log::info('Assigned department to Divisional Director during creation', [
+                        'user_id' => $department->divisional_director_id,
+                        'department_id' => $department->id
+                    ]);
+                }
+            }
+
             // Log the creation
             Log::info('Department created', [
                 'department_id' => $department->id,
@@ -113,7 +137,8 @@ class AdminDepartmentController extends Controller
                 'department_code' => $department->code,
                 'hod_assigned' => $department->hod_user_id ? true : false,
                 'hod_user_id' => $department->hod_user_id,
-                'assign_hod_immediately' => $request->boolean('assign_hod_immediately'),
+                'director_assigned' => $department->divisional_director_id ? true : false,
+                'director_user_id' => $department->divisional_director_id,
                 'created_by' => $request->user()->id
             ]);
 
@@ -249,6 +274,10 @@ class AdminDepartmentController extends Controller
             $originalData = $department->toArray();
             $validatedData = $request->validated();
 
+            // Store original HOD and Divisional Director IDs for comparison
+            $originalHodId = $department->hod_user_id;
+            $originalDirectorId = $department->divisional_director_id;
+
             $updateData = [
                 'name' => $validatedData['name'],
                 'code' => $validatedData['code'], // Already uppercase from DepartmentRequest
@@ -261,11 +290,69 @@ class AdminDepartmentController extends Controller
 
             $department->update($updateData);
 
+            // Handle HOD assignment changes
+            $newHodId = $validatedData['hod_user_id'] ?? null;
+            if ($originalHodId !== $newHodId) {
+                // Remove department_id from previous HOD if they exist
+                if ($originalHodId) {
+                    $previousHod = \App\Models\User::find($originalHodId);
+                    if ($previousHod && $previousHod->department_id == $department->id) {
+                        $previousHod->update(['department_id' => null]);
+                        Log::info('Removed department assignment from previous HOD', [
+                            'user_id' => $originalHodId,
+                            'department_id' => $department->id
+                        ]);
+                    }
+                }
+
+                // Assign department_id to new HOD if they exist
+                if ($newHodId) {
+                    $newHod = \App\Models\User::find($newHodId);
+                    if ($newHod) {
+                        $newHod->update(['department_id' => $department->id]);
+                        Log::info('Assigned department to new HOD', [
+                            'user_id' => $newHodId,
+                            'department_id' => $department->id
+                        ]);
+                    }
+                }
+            }
+
+            // Handle Divisional Director assignment changes
+            $newDirectorId = $validatedData['divisional_director_id'] ?? null;
+            if ($originalDirectorId !== $newDirectorId) {
+                // Remove department_id from previous Divisional Director if they exist
+                if ($originalDirectorId) {
+                    $previousDirector = \App\Models\User::find($originalDirectorId);
+                    if ($previousDirector && $previousDirector->department_id == $department->id) {
+                        $previousDirector->update(['department_id' => null]);
+                        Log::info('Removed department assignment from previous Divisional Director', [
+                            'user_id' => $originalDirectorId,
+                            'department_id' => $department->id
+                        ]);
+                    }
+                }
+
+                // Assign department_id to new Divisional Director if they exist
+                if ($newDirectorId) {
+                    $newDirector = \App\Models\User::find($newDirectorId);
+                    if ($newDirector) {
+                        $newDirector->update(['department_id' => $department->id]);
+                        Log::info('Assigned department to new Divisional Director', [
+                            'user_id' => $newDirectorId,
+                            'department_id' => $department->id
+                        ]);
+                    }
+                }
+            }
+
             // Log the update
             Log::info('Department updated', [
                 'department_id' => $department->id,
                 'department_name' => $department->name,
                 'changes' => array_diff_assoc($department->toArray(), $originalData),
+                'hod_changed' => $originalHodId !== $newHodId,
+                'director_changed' => $originalDirectorId !== $newDirectorId,
                 'updated_by' => $request->user()->id
             ]);
 
@@ -429,15 +516,8 @@ class AdminDepartmentController extends Controller
             
             $allUsers = $allUsersQuery->orderBy('name')->get();
 
-            // Filter HOD eligible users
+            // Filter HOD eligible users - ANY user is eligible except those already assigned
             $users = $allUsers->filter(function ($user) use ($departmentId) {
-                // Check if user has appropriate roles
-                $hasHodRole = $user->roles->whereIn('name', ['head_of_department', 'ict_director', 'admin'])->isNotEmpty();
-                
-                if (!$hasHodRole) {
-                    return false;
-                }
-                
                 // Check if user is already assigned as HOD to another department
                 $isCurrentlyHod = $user->departmentsAsHOD->where('id', '!=', $departmentId)->isNotEmpty();
                 
@@ -516,15 +596,8 @@ class AdminDepartmentController extends Controller
             
             $allUsers = $allUsersQuery->orderBy('name')->get();
 
-            // Filter Divisional Director eligible users
+            // Filter Divisional Director eligible users - ANY user is eligible except those already assigned
             $users = $allUsers->filter(function ($user) use ($departmentId) {
-                // Check if user has appropriate roles
-                $hasDirectorRole = $user->roles->whereIn('name', ['divisional_director', 'admin'])->isNotEmpty();
-                
-                if (!$hasDirectorRole) {
-                    return false;
-                }
-                
                 // Check if user is already assigned as Divisional Director to another department
                 $isCurrentlyDirector = $user->departmentsAsDivisionalDirector->where('id', '!=', $departmentId)->isNotEmpty();
                 
@@ -603,15 +676,8 @@ class AdminDepartmentController extends Controller
             
             $allUsers = $allUsersQuery->orderBy('name')->get();
 
-            // Filter HOD eligible users
+            // Filter HOD eligible users - ANY user is eligible except those already assigned
             $hodUsers = $allUsers->filter(function ($user) use ($departmentId) {
-                // Check if user has appropriate roles
-                $hasHodRole = $user->roles->whereIn('name', ['head_of_department', 'ict_director', 'admin'])->isNotEmpty();
-                
-                if (!$hasHodRole) {
-                    return false;
-                }
-                
                 // Check if user is already assigned as HOD to another department
                 $isCurrentlyHod = $user->departmentsAsHOD->where('id', '!=', $departmentId)->isNotEmpty();
                 
@@ -654,15 +720,8 @@ class AdminDepartmentController extends Controller
                 ];
             })->values();
 
-            // Filter Divisional Director eligible users
+            // Filter Divisional Director eligible users - ANY user is eligible except those already assigned
             $divisionalDirectorUsers = $allUsers->filter(function ($user) use ($departmentId) {
-                // Check if user has appropriate roles
-                $hasDirectorRole = $user->roles->whereIn('name', ['divisional_director', 'admin'])->isNotEmpty();
-                
-                if (!$hasDirectorRole) {
-                    return false;
-                }
-                
                 // Check if user is already assigned as Divisional Director to another department
                 $isCurrentlyDirector = $user->departmentsAsDivisionalDirector->where('id', '!=', $departmentId)->isNotEmpty();
                 

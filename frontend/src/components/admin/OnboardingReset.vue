@@ -240,6 +240,24 @@
                   </div>
                 </div>
 
+                <!-- Error State -->
+                <div v-else-if="error" class="text-center py-8">
+                  <div class="bg-red-500/20 border border-red-400/40 rounded-xl p-6 backdrop-blur-sm">
+                    <div class="text-red-100">
+                      <i class="fas fa-exclamation-triangle text-4xl mb-4 opacity-75"></i>
+                      <p class="text-lg font-semibold mb-2">Error Loading Users</p>
+                      <p class="text-sm opacity-75">{{ error }}</p>
+                      <button
+                        @click="loadUsers(1)"
+                        class="mt-4 bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition-all duration-300"
+                      >
+                        <i class="fas fa-retry mr-2"></i>
+                        Retry
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
                 <!-- Users Grid -->
                 <div
                   v-else-if="filteredUsers.length > 0"
@@ -508,7 +526,7 @@ export default {
     AppFooter
   },
   setup() {
-    const { ROLES, requireRole } = useAuth()
+    const { ROLES, requireRole, isAuthenticated, userRole } = useAuth()
 
     // Local state
     // Sidebar state now managed by Pinia - no local state needed
@@ -520,6 +538,7 @@ export default {
     const showConfirmModal = ref(false)
     const confirmData = ref({})
     const pendingReset = ref(null)
+    const error = ref(null)
 
     // Pagination state
     const currentPage = ref(1)
@@ -528,7 +547,25 @@ export default {
 
     const loadUsers = async(page = 1) => {
       loading.value = true
+      error.value = null
+
       try {
+        console.log('🔍 Loading users for onboarding reset...', {
+          page,
+          isAuthenticated: isAuthenticated.value,
+          userRole: userRole.value
+        })
+
+        // Check authentication first
+        if (!isAuthenticated.value) {
+          throw new Error('User not authenticated')
+        }
+
+        // Check admin role
+        if (userRole.value !== 'admin') {
+          throw new Error('Admin access required')
+        }
+
         const params = {
           page: page,
           per_page: 20
@@ -544,7 +581,9 @@ export default {
           params.role = selectedRole.value
         }
 
+        console.log('📡 Making API call to get users...', params)
         const result = await authAPI.getUsers(params)
+        console.log('📡 API response:', result)
 
         if (result.success) {
           users.value = result.data.users
@@ -552,15 +591,21 @@ export default {
           currentPage.value = result.data.pagination.current_page
           totalPages.value = result.data.pagination.last_page
           totalUsers.value = result.data.pagination.total
+          console.log('✅ Users loaded successfully:', {
+            count: users.value.length,
+            total: totalUsers.value
+          })
         } else {
-          console.error('Failed to load users:', result.error)
+          console.error('❌ Failed to load users:', result.error)
+          error.value = result.error || 'Error loading users'
           showNotification(result.error || 'Error loading users', 'error')
           users.value = []
           filteredUsers.value = []
         }
       } catch (error) {
-        console.error('Error loading users:', error)
-        showNotification('Error loading users', 'error')
+        console.error('❌ Error loading users:', error)
+        error.value = error.message || 'Error loading users'
+        showNotification(error.message || 'Error loading users', 'error')
         users.value = []
         filteredUsers.value = []
       } finally {
@@ -688,18 +733,31 @@ export default {
       }, 4000)
     }
 
-    onMounted(() => {
-      // Guard this route - only admins can access
-      requireRole([ROLES.ADMIN])
+    onMounted(async() => {
+      try {
+        console.log('🚀 OnboardingReset component mounted')
 
-      // Check for search parameter in URL
-      const urlParams = new URLSearchParams(window.location.search)
-      const searchParam = urlParams.get('search')
-      if (searchParam) {
-        searchQuery.value = searchParam
+        // Guard this route - only admins can access
+        console.log('🔐 Checking admin role...')
+        requireRole([ROLES.ADMIN])
+        console.log('✅ Admin role verified')
+
+        // Check for search parameter in URL
+        const urlParams = new URLSearchParams(window.location.search)
+        const searchParam = urlParams.get('search')
+        if (searchParam) {
+          searchQuery.value = searchParam
+          console.log('🔍 Search parameter found:', searchParam)
+        }
+
+        console.log('📡 Loading users...')
+        await loadUsers()
+
+      } catch (error) {
+        console.error('❌ Error in onMounted:', error)
+        error.value = error.message || 'Failed to initialize component'
+        showNotification(error.message || 'Failed to initialize component', 'error')
       }
-
-      loadUsers()
     })
 
     // Add debounce timer property
@@ -711,6 +769,7 @@ export default {
       users,
       filteredUsers,
       loading,
+      error,
       showConfirmModal,
       confirmData,
       currentPage,

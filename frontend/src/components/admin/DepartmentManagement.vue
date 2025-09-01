@@ -36,14 +36,14 @@
 
               <!-- Statistics Cards -->
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="medical-card bg-gradient-to-r from-green-600/25 to-emerald-600/25 border-2 border-green-400/40 p-6 rounded-2xl backdrop-blur-sm">
+                <div class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-600/25 border-2 border-blue-400/40 p-6 rounded-2xl backdrop-blur-sm">
                   <div class="flex items-center space-x-3 mb-4">
-                    <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
                       <i class="fas fa-building text-white text-lg"></i>
                     </div>
                     <div>
                       <div class="text-2xl font-bold text-white">{{ statistics.total_departments || 0 }}</div>
-                      <div class="text-sm text-green-100">Total Departments</div>
+                      <div class="text-sm text-blue-100">Total Departments</div>
                     </div>
                   </div>
                 </div>
@@ -60,33 +60,33 @@
                   </div>
                 </div>
 
-                <div class="medical-card bg-gradient-to-r from-purple-600/25 to-indigo-600/25 border-2 border-purple-400/40 p-6 rounded-2xl backdrop-blur-sm">
+                <div class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-600/25 border-2 border-blue-400/40 p-6 rounded-2xl backdrop-blur-sm">
                   <div class="flex items-center space-x-3 mb-4">
-                    <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
                       <i class="fas fa-crown text-white text-lg"></i>
                     </div>
                     <div>
                       <div class="text-2xl font-bold text-white">{{ statistics.departments_with_divisional_director || 0 }}</div>
-                      <div class="text-sm text-purple-100">With Div. Director</div>
+                      <div class="text-sm text-blue-100">With Div. Director</div>
                     </div>
                   </div>
                 </div>
 
-                <div class="medical-card bg-gradient-to-r from-orange-600/25 to-red-600/25 border-2 border-orange-400/40 p-6 rounded-2xl backdrop-blur-sm">
+                <div class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-600/25 border-2 border-blue-400/40 p-6 rounded-2xl backdrop-blur-sm">
                   <div class="flex items-center space-x-3 mb-4">
-                    <div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
                       <i class="fas fa-toggle-on text-white text-lg"></i>
                     </div>
                     <div>
                       <div class="text-2xl font-bold text-white">{{ statistics.active_departments || 0 }}</div>
-                      <div class="text-sm text-orange-100">Active Departments</div>
+                      <div class="text-sm text-blue-100">Active Departments</div>
                     </div>
                   </div>
                 </div>
               </div>
 
               <!-- Department Management Section -->
-              <div class="medical-card bg-gradient-to-r from-teal-600/25 to-blue-600/25 border-2 border-teal-400/40 p-6 rounded-2xl backdrop-blur-sm">
+              <div class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-600/25 border-2 border-blue-400/40 p-6 rounded-2xl backdrop-blur-sm">
                 <div class="flex items-center justify-between mb-6">
                   <div class="flex items-center space-x-4">
                     <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
@@ -100,7 +100,7 @@
                   <div class="flex space-x-3">
                     <button
                       @click="openCreateDialog"
-                      class="bg-gradient-to-r from-green-500 to-green-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-green-600 hover:to-green-700 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center space-x-2"
+                      class="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center space-x-2"
                     >
                       <i class="fas fa-plus"></i>
                       <span>Create Department</span>
@@ -119,27 +119,27 @@
                 <!-- Filters and Search -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                   <div>
-                    <label class="block text-sm font-bold text-teal-100 mb-2">Search Departments</label>
+                    <label class="block text-sm font-bold text-blue-100 mb-2">Search Departments</label>
                     <div class="relative">
                       <input
                         v-model="searchQuery"
                         type="text"
-                        class="medical-input w-full px-4 py-3 bg-white/15 border-2 border-teal-300/30 rounded-xl focus:border-cyan-400 focus:outline-none text-white placeholder-teal-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-cyan-500/20"
+                        class="medical-input w-full px-4 py-3 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20"
                         placeholder="Search by name or code..."
                         @input="debouncedSearch"
                       />
                       <div class="absolute inset-y-0 left-0 flex items-center pl-3">
-                        <i class="fas fa-search text-teal-300"></i>
+                        <i class="fas fa-search text-blue-300"></i>
                       </div>
                     </div>
                   </div>
 
                   <div>
-                    <label class="block text-sm font-bold text-teal-100 mb-2">Filter by Status</label>
+                    <label class="block text-sm font-bold text-blue-100 mb-2">Filter by Status</label>
                     <div class="relative">
                       <select
                         v-model="filterStatus"
-                        class="medical-input w-full px-4 py-3 bg-white/15 border-2 border-teal-300/30 rounded-xl focus:border-cyan-400 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-cyan-500/20 appearance-none cursor-pointer"
+                        class="medical-input w-full px-4 py-3 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 appearance-none cursor-pointer"
                         @change="applyFilters"
                       >
                         <option value="" class="bg-gray-800 text-white">All Status</option>
@@ -147,17 +147,17 @@
                         <option value="inactive" class="bg-gray-800 text-white">Inactive</option>
                       </select>
                       <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                        <i class="fas fa-chevron-down text-teal-300"></i>
+                        <i class="fas fa-chevron-down text-blue-300"></i>
                       </div>
                     </div>
                   </div>
 
                   <div>
-                    <label class="block text-sm font-bold text-teal-100 mb-2">Filter by HOD</label>
+                    <label class="block text-sm font-bold text-blue-100 mb-2">Filter by HOD</label>
                     <div class="relative">
                       <select
                         v-model="filterHod"
-                        class="medical-input w-full px-4 py-3 bg-white/15 border-2 border-teal-300/30 rounded-xl focus:border-cyan-400 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-cyan-500/20 appearance-none cursor-pointer"
+                        class="medical-input w-full px-4 py-3 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 appearance-none cursor-pointer"
                         @change="applyFilters"
                       >
                         <option value="" class="bg-gray-800 text-white">All HOD Status</option>
@@ -165,17 +165,17 @@
                         <option value="without_hod" class="bg-gray-800 text-white">Without HOD</option>
                       </select>
                       <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                        <i class="fas fa-chevron-down text-teal-300"></i>
+                        <i class="fas fa-chevron-down text-blue-300"></i>
                       </div>
                     </div>
                   </div>
 
                   <div>
-                    <label class="block text-sm font-bold text-teal-100 mb-2">Sort By</label>
+                    <label class="block text-sm font-bold text-blue-100 mb-2">Sort By</label>
                     <div class="relative">
                       <select
                         v-model="sortBy"
-                        class="medical-input w-full px-4 py-3 bg-white/15 border-2 border-teal-300/30 rounded-xl focus:border-cyan-400 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-cyan-500/20 appearance-none cursor-pointer"
+                        class="medical-input w-full px-4 py-3 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 appearance-none cursor-pointer"
                         @change="applyFilters"
                       >
                         <option value="name" class="bg-gray-800 text-white">Name</option>
@@ -183,7 +183,7 @@
                         <option value="created_at" class="bg-gray-800 text-white">Created Date</option>
                       </select>
                       <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                        <i class="fas fa-chevron-down text-teal-300"></i>
+                        <i class="fas fa-chevron-down text-blue-300"></i>
                       </div>
                     </div>
                   </div>
@@ -191,7 +191,7 @@
 
                 <!-- Departments List -->
                 <div v-if="loading" class="text-center py-8">
-                  <div class="inline-flex items-center space-x-2 text-teal-100">
+                  <div class="inline-flex items-center space-x-2 text-blue-100">
                     <i class="fas fa-spinner fa-spin text-xl"></i>
                     <span>Loading departments...</span>
                   </div>
@@ -201,19 +201,19 @@
                   <div
                     v-for="department in filteredDepartments"
                     :key="department.id"
-                    class="bg-white/15 p-6 rounded-xl backdrop-blur-sm border border-teal-300/30 hover:bg-white/20 transition-all duration-300 hover:shadow-lg hover:shadow-teal-500/20 group"
+                    class="bg-white/15 p-6 rounded-xl backdrop-blur-sm border border-blue-300/30 hover:bg-white/20 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20 group"
                   >
                     <div class="flex items-start justify-between mb-4">
                       <div class="flex items-center space-x-3 flex-1">
-                        <div class="w-12 h-12 bg-gradient-to-br from-teal-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
                           <span class="text-white font-bold text-sm">
                             {{ getInitials(department.name) }}
                           </span>
                         </div>
                         <div class="flex-1">
                           <h4 class="font-bold text-white text-lg">{{ department.name }}</h4>
-                          <p class="text-teal-100 text-sm">{{ department.code }}</p>
-                          <p v-if="department.description" class="text-teal-200 text-xs mt-1">
+                          <p class="text-blue-100 text-sm">{{ department.code }}</p>
+                          <p v-if="department.description" class="text-blue-200 text-xs mt-1">
                             {{ department.description }}
                           </p>
                         </div>
@@ -234,7 +234,7 @@
 
                     <!-- HOD Information -->
                     <div class="mb-4">
-                      <div class="text-xs text-teal-100 mb-2">Head of Department:</div>
+                      <div class="text-xs text-blue-100 mb-2">Head of Department:</div>
                       <div v-if="department.hod" class="flex items-center space-x-2">
                         <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
                           <i class="fas fa-user-tie text-white text-xs"></i>
@@ -254,15 +254,15 @@
 
                     <!-- Divisional Director Information -->
                     <div class="mb-4" v-if="department.has_divisional_director">
-                      <div class="text-xs text-teal-100 mb-2">Divisional Director:</div>
+                      <div class="text-xs text-blue-100 mb-2">Divisional Director:</div>
                       <div v-if="department.divisional_director" class="flex items-center space-x-2">
-                        <div class="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
+                        <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
                           <i class="fas fa-crown text-white text-xs"></i>
                         </div>
                         <div>
                           <div class="text-sm text-white font-medium">{{ department.divisional_director.name }}</div>
-                          <div class="text-xs text-purple-100">{{ department.divisional_director.email }}</div>
-                          <div v-if="department.divisional_director.pf_number" class="text-xs text-purple-200">
+                          <div class="text-xs text-blue-100">{{ department.divisional_director.email }}</div>
+                          <div v-if="department.divisional_director.pf_number" class="text-xs text-blue-200">
                             PF: {{ department.divisional_director.pf_number }}
                           </div>
                         </div>
@@ -303,7 +303,7 @@
 
                 <!-- No Departments Found -->
                 <div v-else class="text-center py-8">
-                  <div class="text-teal-100">
+                  <div class="text-blue-100">
                     <i class="fas fa-building text-4xl mb-4 opacity-50"></i>
                     <p class="text-lg">No departments found</p>
                     <p class="text-sm opacity-75">
@@ -447,9 +447,9 @@
             </div>
 
             <!-- HOD Assignment Section -->
-            <div class="medical-card bg-gradient-to-r from-green-600/15 to-emerald-600/15 border-2 border-green-400/30 p-6 rounded-2xl backdrop-blur-sm hover:shadow-lg hover:shadow-green-500/20 transition-all duration-300 mb-6">
+            <div class="medical-card bg-gradient-to-r from-blue-600/15 to-blue-600/15 border-2 border-blue-400/30 p-6 rounded-2xl backdrop-blur-sm hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 mb-6">
               <div class="flex items-center space-x-3 mb-6">
-                <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
                   <i class="fas fa-user-tie text-white text-lg"></i>
                 </div>
                 <h4 class="text-xl font-bold text-gray-800">Head of Department (HOD)</h4>
@@ -458,7 +458,7 @@
               <div class="space-y-4">
                 <div class="space-y-2">
                   <div class="flex items-center space-x-2 mb-3">
-                    <div class="w-8 h-8 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center shadow-md">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md">
                       <i class="fas fa-user-tie text-white text-sm"></i>
                     </div>
                     <label class="text-sm font-bold text-gray-700">
@@ -468,7 +468,7 @@
                   <div class="relative">
                     <select
                       v-model="form.hod_user_id"
-                      class="w-full px-4 py-3 bg-white/70 border-2 border-green-300/30 rounded-xl focus:border-green-500 focus:outline-none text-gray-800 backdrop-blur-sm transition-all duration-300 hover:bg-white/80 focus:bg-white/90 focus:shadow-lg focus:shadow-green-500/20 appearance-none cursor-pointer"
+                      class="w-full px-4 py-3 bg-white/70 border-2 border-blue-300/30 rounded-xl focus:border-blue-500 focus:outline-none text-gray-800 backdrop-blur-sm transition-all duration-300 hover:bg-white/80 focus:bg-white/90 focus:shadow-lg focus:shadow-blue-500/20 appearance-none cursor-pointer"
                     >
                       <option value="" class="bg-gray-800 text-white">No HOD assigned</option>
                       <option
@@ -481,7 +481,7 @@
                       </option>
                     </select>
                     <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                      <i class="fas fa-chevron-down text-green-500"></i>
+                      <i class="fas fa-chevron-down text-blue-500"></i>
                     </div>
                   </div>
                   <div v-if="formErrors.hod_user_id" class="text-red-500 text-sm mt-1 flex items-center space-x-1">
@@ -493,9 +493,9 @@
             </div>
 
             <!-- Divisional Director Section -->
-            <div class="medical-card bg-gradient-to-r from-purple-600/15 to-indigo-600/15 border-2 border-purple-400/30 p-6 rounded-2xl backdrop-blur-sm hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 mb-6">
+            <div class="medical-card bg-gradient-to-r from-blue-600/15 to-blue-600/15 border-2 border-blue-400/30 p-6 rounded-2xl backdrop-blur-sm hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 mb-6">
               <div class="flex items-center space-x-3 mb-6">
-                <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
                   <i class="fas fa-crown text-white text-lg"></i>
                 </div>
                 <h4 class="text-xl font-bold text-gray-800">Divisional Director</h4>
@@ -507,7 +507,7 @@
                   <input
                     v-model="form.has_divisional_director"
                     type="checkbox"
-                    class="w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500 focus:ring-2"
+                    class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                   />
                   <label class="text-sm font-bold text-gray-700">
                     This department has a divisional director
@@ -517,7 +517,7 @@
                 <!-- Divisional Director Selection -->
                 <div v-if="form.has_divisional_director" class="space-y-2">
                   <div class="flex items-center space-x-2 mb-3">
-                    <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center shadow-md">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md">
                       <i class="fas fa-crown text-white text-sm"></i>
                     </div>
                     <label class="text-sm font-bold text-gray-700">
@@ -528,7 +528,7 @@
                     <select
                       v-model="form.divisional_director_id"
                       :required="form.has_divisional_director"
-                      class="w-full px-4 py-3 bg-white/70 border-2 border-purple-300/30 rounded-xl focus:border-purple-500 focus:outline-none text-gray-800 backdrop-blur-sm transition-all duration-300 hover:bg-white/80 focus:bg-white/90 focus:shadow-lg focus:shadow-purple-500/20 appearance-none cursor-pointer"
+                      class="w-full px-4 py-3 bg-white/70 border-2 border-blue-300/30 rounded-xl focus:border-blue-500 focus:outline-none text-gray-800 backdrop-blur-sm transition-all duration-300 hover:bg-white/80 focus:bg-white/90 focus:shadow-lg focus:shadow-blue-500/20 appearance-none cursor-pointer"
                     >
                       <option value="" class="bg-gray-800 text-white">Select divisional director</option>
                       <option
@@ -541,7 +541,7 @@
                       </option>
                     </select>
                     <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                      <i class="fas fa-chevron-down text-purple-500"></i>
+                      <i class="fas fa-chevron-down text-blue-500"></i>
                     </div>
                   </div>
                   <div v-if="formErrors.divisional_director_id" class="text-red-500 text-sm mt-1 flex items-center space-x-1">
@@ -1083,8 +1083,8 @@ export default {
 }
 
 .medical-input:focus {
-  border-color: rgba(45, 212, 191, 0.8);
-  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.2);
+  border-color: rgba(59, 130, 246, 0.8);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
 /* Select dropdown styling */
