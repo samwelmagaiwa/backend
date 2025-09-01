@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col h-screen">
-    <AppHeader />
+    <Header />
     <div class="flex flex-1 overflow-hidden">
       <ModernSidebar />
       <main class="flex-1 p-6 overflow-y-auto relative user-dashboard-main">
@@ -399,14 +399,14 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import ModernSidebar from './ModernSidebar.vue'
-import AppHeader from './AppHeader.vue'
+import Header from './header.vue'
 import { useAuth } from '@/composables/useAuth'
 
 export default {
   name: 'UserDashboard',
   components: {
     ModernSidebar,
-    AppHeader
+    Header
   },
   setup() {
     const router = useRouter()

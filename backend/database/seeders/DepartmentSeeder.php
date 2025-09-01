@@ -14,32 +14,22 @@ class DepartmentSeeder extends Seeder
      */
     public function run(): void
     {
-        // Get users for HOD assignments
-        $hodUser = User::whereHas('role', function($query) {
-            $query->where('name', 'head_of_department');
-        })->first();
-        
-        $hodItUser = User::whereHas('role', function($query) {
-            $query->where('name', 'ict_director');
-        })->first();
-        
-        $ictDirectorUser = User::whereHas('role', function($query) {
-            $query->where('name', 'ict_director');
-        })->first();
+        // Note: HOD assignments will be done after users are created
+        // This seeder only creates the department structure
 
         $departments = [
             [
                 'name' => 'Information and Communication Technology',
                 'code' => 'ICT',
                 'description' => 'Manages hospital IT infrastructure and systems',
-                'hod_user_id' => $ictDirectorUser?->id, // Assign ICT Director as HOD of ICT
+                'hod_user_id' => null, // Will be assigned after users are created
                 'is_active' => true,
             ],
             [
                 'name' => 'Human Resources',
                 'code' => 'HR',
                 'description' => 'Manages staff recruitment, training, and welfare',
-                'hod_user_id' => $hodUser?->id, // Assign general HOD to HR
+                'hod_user_id' => null, // Will be assigned after users are created
                 'is_active' => true,
             ],
             [

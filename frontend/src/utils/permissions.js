@@ -20,11 +20,18 @@ export const ROLE_PERMISSIONS = {
   [ROLES.ADMIN]: {
     routes: [
       '/admin-dashboard',
-      '/service-users'
+      '/admin/dashboard',
+      '/service-users',
+      '/admin/user-roles',
+      '/admin/departments',
+      '/admin/onboarding-reset',
+      '/wellsoft-users',
+      '/internet-users'
     ],
     dashboards: ['admin-dashboard'],
     forms: [],
-    userManagement: ['service-users']
+    userManagement: ['service-users', 'wellsoft-users', 'internet-users'],
+    adminFeatures: ['admin/user-roles', 'admin/departments', 'admin/onboarding-reset']
   },
 
   [ROLES.DIVISIONAL_DIRECTOR]: {
@@ -230,11 +237,10 @@ export function getDefaultDashboard(userRole) {
 
   // Map dashboard names to routes
   const dashboardRoutes = {
-    'admin-dashboard': '/admin-dashboard',
+    'admin-dashboard': '/admin-dashboard', // Back to original route
     'user-dashboard': '/user-dashboard',
     'dict-dashboard': '/dict-dashboard',
     'hod-dashboard': '/hod-dashboard',
-
     'divisional-dashboard': '/divisional-dashboard',
     'ict-dashboard': '/ict-dashboard'
   }

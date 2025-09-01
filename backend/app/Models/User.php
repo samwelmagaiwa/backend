@@ -93,6 +93,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the departments where this user is the divisional director.
+     */
+    public function departmentsAsDivisionalDirector()
+    {
+        return $this->hasMany(Department::class, 'divisional_director_id');
+    }
+
+    /**
      * Roles assigned to this user (many-to-many relationship) - PRIMARY SYSTEM
      */
     public function roles()

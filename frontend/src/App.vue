@@ -2,23 +2,21 @@
   <div id="app">
     <!-- Debug info -->
     <div v-if="showDebug" class="fixed top-0 left-0 bg-black text-white p-4 z-50 text-xs">
-      <div>Auth Loading: {{ isLoading }}</div>
+      <div>Auth Ready: {{ isAuthReady }}</div>
+      <div>Restoring Session: {{ restoringSession }}</div>
+      <div>Session Restored: {{ sessionRestored }}</div>
       <div>Is Authenticated: {{ isAuthenticated }}</div>
       <div>User Role: {{ userRole }}</div>
       <div>Current User: {{ currentUser?.name }}</div>
       <div>Auth Error: {{ authError }}</div>
     </div>
 
-    <!-- Loading overlay during auth initialization -->
-    <div
-      v-if="isLoading"
-      class="fixed inset-0 bg-blue-900 flex items-center justify-center z-[10000]"
-    >
-      <div class="text-center text-white">
-        <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-white mx-auto mb-4"></div>
-        <p class="text-lg font-medium">Initializing Authentication...</p>
-      </div>
-    </div>
+    <!-- Loading screen during auth initialization -->
+    <AuthLoadingScreen
+      v-if="!isAuthReady"
+      :message="loadingMessage"
+      :progress="loadingProgress"
+    />
 
     <!-- Main content -->
     <main v-else>
@@ -44,60 +42,75 @@
       </div>
     </div>
 
-    <!-- Debug toggle -->
-    <button
-      @click="showDebug = !showDebug"
-      class="fixed bottom-4 left-4 bg-gray-800 text-white px-2 py-1 rounded text-xs z-50"
-    >
-      Debug
-    </button>
+    <!-- Auth Debugger Component -->
+    <AuthDebugger />
   </div>
 </template>
 
 <script>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import { useStore } from 'vuex'
+import AuthLoadingScreen from './components/AuthLoadingScreen.vue'
+import AuthDebugger from './components/AuthDebugger.vue'
 
 export default {
   name: 'App',
+  components: {
+    AuthLoadingScreen,
+    AuthDebugger
+  },
 
   setup() {
+    const store = useStore()
     const showDebug = ref(false)
-    const isLoading = ref(false)
-    const isAuthenticated = ref(false)
-    const currentUser = ref(null)
-    const userRole = ref(null)
     const authError = ref(null)
+
+    // Computed properties from Vuex store
+    const isAuthReady = computed(() => store.getters['auth/isAuthReady'])
+    const restoringSession = computed(() => store.getters['auth/restoringSession'])
+    const sessionRestored = computed(() => store.getters['auth/sessionRestored'])
+    const isAuthenticated = computed(() => store.getters['auth/isAuthenticated'])
+    const currentUser = computed(() => store.getters['auth/user'])
+    const userRole = computed(() => store.getters['auth/userRole'])
+
+    // Loading message based on current state
+    const loadingMessage = computed(() => {
+      if (restoringSession.value) {
+        return 'Restoring your session...'
+      }
+      if (!sessionRestored.value) {
+        return 'Initializing authentication...'
+      }
+      return 'Preparing application...'
+    })
+
+    // Loading progress based on current state
+    const loadingProgress = computed(() => {
+      if (!sessionRestored.value) {
+        return 30
+      }
+      if (restoringSession.value) {
+        return 60
+      }
+      if (isAuthReady.value) {
+        return 100
+      }
+      return 80
+    })
 
     // Initialize authentication on app mount
     onMounted(async() => {
-      console.log('🔄 App: Mounted, initializing auth...')
+      console.log('🔄 App: Mounted, auth should already be initialized in main.js')
 
-      try {
-        // Import auth utility
-        const authModule = await import('@/utils/auth')
-        const { useAuth } = authModule
-
-        if (useAuth) {
-          const auth = useAuth()
-
-          // Set reactive references
-          isLoading.value = auth.isLoading.value
-          isAuthenticated.value = auth.isAuthenticated.value
-          currentUser.value = auth.currentUser.value
-          userRole.value = auth.userRole.value
-          authError.value = auth.error.value
-
-          console.log('✅ App: Auth system ready')
-          console.log('  - isAuthenticated:', auth.isAuthenticated.value)
-          console.log('  - userRole:', auth.userRole.value)
-          console.log('  - currentUser:', auth.currentUser.value?.name)
-        } else {
-          console.error('❌ App: useAuth not available')
-        }
-      } catch (error) {
-        console.error('❌ App: Auth system error:', error)
-        authError.value = error.message
-      }
+      // Log current auth state
+      console.log('🔍 App: Current auth state:', {
+        isAuthReady: isAuthReady.value,
+        restoringSession: restoringSession.value,
+        sessionRestored: sessionRestored.value,
+        isAuthenticated: isAuthenticated.value,
+        userRole: userRole.value,
+        userName: currentUser.value?.name
+      })
     })
 
     // Clear auth error
@@ -110,11 +123,15 @@ export default {
       showDebug,
 
       // Auth state
+      isAuthReady,
+      restoringSession,
+      sessionRestored,
       isAuthenticated,
       currentUser,
       userRole,
-      isLoading,
       authError,
+      loadingMessage,
+      loadingProgress,
 
       // Methods
       clearAuthError

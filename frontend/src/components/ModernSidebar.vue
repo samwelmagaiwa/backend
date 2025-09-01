@@ -1,6 +1,6 @@
 <template>
   <aside
-    v-if="isAuthenticated && !isLoading && userRole"
+    v-if="shouldShowSidebar"
     class="h-screen flex flex-col transition-all duration-300 ease-in-out overflow-hidden relative shadow-2xl"
     :class="[
       isCollapsed ? 'w-16' : 'w-72'
@@ -503,6 +503,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { ROLE_PERMISSIONS, ROLES } from '../utils/permissions'
 import { useAuth } from '../composables/useAuth'
 import { useSidebar } from '../composables/useSidebar'
+import { useAuthStore } from '../stores/auth'
 import auth from '../utils/auth'
 import { logoutGuard } from '@/utils/logoutGuard'
 
@@ -529,6 +530,14 @@ export default {
       setCollapsed
     } = useSidebar()
 
+    // Use Pinia auth store for additional reliability
+    const piniaAuthStore = useAuthStore()
+
+    // Ensure Pinia auth is initialized
+    if (!piniaAuthStore.isInitialized) {
+      piniaAuthStore.initializeAuth()
+    }
+
     // Local state
     const stableUserRole = ref(null)
     const searchQuery = ref('')
@@ -548,8 +557,14 @@ export default {
 
     // Watch for authentication state changes
     watch([isAuthenticated, userRole], ([authenticated, role]) => {
-      if (authenticated && role) {
-        stableUserRole.value = role
+      try {
+        console.log('🔄 Sidebar: Auth state changed:', { authenticated, role })
+        if (authenticated && role) {
+          stableUserRole.value = role
+          console.log('✅ Sidebar: Stable user role set to:', role)
+        }
+      } catch (error) {
+        console.warn('Error in auth state watcher:', error)
       }
     }, { immediate: true })
 
@@ -573,13 +588,13 @@ export default {
           console.error('Failed to parse stored user data:', error)
         }
 
-        if (!isAuthenticated.value && !isLoading.value) {
+        if (!isAuthenticated?.value && !isLoading?.value) {
           await nextTick()
           auth.initializeAuth()
         }
       }
 
-      if (isAuthenticated.value && userRole.value) {
+      if (isAuthenticated?.value && userRole?.value) {
         stableUserRole.value = userRole.value
       }
     })
@@ -593,12 +608,54 @@ export default {
     // isCollapsed now comes from useSidebar composable
 
     const userName = computed(() => {
-      return currentUser.value?.name || 'JOHN DOE'
+      try {
+        return currentUser?.value?.name || piniaAuthStore?.user?.name || 'JOHN DOE'
+      } catch (error) {
+        console.warn('Error getting userName:', error)
+        return 'JOHN DOE'
+      }
     })
 
     const userInitials = computed(() => {
-      const name = userName.value || 'JOHN DOE'
-      return name.split(' ').map(n => n?.[0] || '').join('').toUpperCase().slice(0, 2) || 'JD'
+      try {
+        const name = userName.value || 'JOHN DOE'
+        return name.split(' ').map(n => n?.[0] || '').join('').toUpperCase().slice(0, 2) || 'JD'
+      } catch (error) {
+        console.warn('Error getting userInitials:', error)
+        return 'JD'
+      }
+    })
+
+    // Enhanced sidebar visibility logic with dual auth store support
+    const shouldShowSidebar = computed(() => {
+      try {
+        // Check both Vuex and Pinia auth states for maximum reliability
+        const vuexAuth = isAuthenticated?.value || false
+        const vuexRole = userRole?.value || null
+        const vuexLoading = isLoading?.value || false
+
+        const piniaAuth = piniaAuthStore?.isAuthenticated || false
+        const piniaRole = piniaAuthStore?.userRole || null
+        const piniaLoading = piniaAuthStore?.isLoading || false
+
+        // Use the most reliable source (prefer Pinia if both are available)
+        const hasAuth = piniaAuth || vuexAuth
+        const hasRole = piniaRole || vuexRole || stableUserRole?.value
+        const notLoading = !piniaLoading && !vuexLoading
+
+        console.log('🔍 Sidebar visibility check (dual auth):', {
+          vuex: { auth: vuexAuth, role: vuexRole, loading: vuexLoading },
+          pinia: { auth: piniaAuth, role: piniaRole, loading: piniaLoading },
+          stable: { role: stableUserRole?.value },
+          final: { hasAuth, hasRole, notLoading },
+          shouldShow: hasAuth && hasRole && notLoading
+        })
+
+        return hasAuth && hasRole && notLoading
+      } catch (error) {
+        console.warn('Error in shouldShowSidebar computed:', error)
+        return false
+      }
     })
 
     // Route metadata function (moved before computed properties)
@@ -700,16 +757,24 @@ export default {
       return metadata[route] || {}
     }
 
-    // Get menu items based on stable user role
+    // Get menu items based on enhanced role detection
     const menuItems = computed(() => {
       try {
-        const role = stableUserRole.value || userRole.value
-        if (!role) return []
+        // Use the most reliable role source
+        const role = piniaAuthStore?.userRole || userRole?.value || stableUserRole?.value
+        if (!role) {
+          console.log('🔍 Menu items: No role found')
+          return []
+        }
 
+        console.log('🔍 Menu items: Using role:', role)
         const permissions = ROLE_PERMISSIONS[role]
-        if (!permissions || !permissions.routes) return []
+        if (!permissions || !permissions.routes) {
+          console.log('🔍 Menu items: No permissions found for role:', role)
+          return []
+        }
 
-        return permissions.routes
+        const items = permissions.routes
           .map((route) => {
             try {
               const metadata = getRouteMetadata(route)
@@ -723,6 +788,9 @@ export default {
             }
           })
           .filter((item) => item && item.name)
+
+        console.log('🔍 Menu items computed:', items.length, 'items for role:', role)
+        return items
       } catch (error) {
         console.error('Error computing menu items:', error)
         return []
@@ -730,68 +798,88 @@ export default {
     })
 
     // Categorize menu items
-    const dashboardItems = computed(() =>
-      menuItems.value.filter((item) => item.category === 'dashboard')
-    )
+    const dashboardItems = computed(() => {
+      try {
+        return menuItems?.value?.filter((item) => item?.category === 'dashboard') || []
+      } catch (error) {
+        console.warn('Error filtering dashboard items:', error)
+        return []
+      }
+    })
 
-    const userManagementItems = computed(() =>
-      menuItems.value.filter((item) => item.category === 'user-management')
-    )
+    const userManagementItems = computed(() => {
+      try {
+        return menuItems?.value?.filter((item) => item?.category === 'user-management') || []
+      } catch (error) {
+        console.warn('Error filtering user management items:', error)
+        return []
+      }
+    })
 
-    const deviceManagementItems = computed(() =>
-      menuItems.value.filter((item) => item.category === 'device-management')
-    )
+    const deviceManagementItems = computed(() => {
+      try {
+        return menuItems?.value?.filter((item) => item?.category === 'device-management') || []
+      } catch (error) {
+        console.warn('Error filtering device management items:', error)
+        return []
+      }
+    })
 
-    const requestsManagementItems = computed(() =>
-      menuItems.value.filter((item) => item.category === 'requests-management')
-    )
+    const requestsManagementItems = computed(() => {
+      try {
+        return menuItems?.value?.filter((item) => item?.category === 'requests-management') || []
+      } catch (error) {
+        console.warn('Error filtering requests management items:', error)
+        return []
+      }
+    })
 
     // Filtered items based on search
     const filteredDashboardItems = computed(() => {
       try {
-        if (!searchQuery.value) return dashboardItems.value
-        return dashboardItems.value.filter(item =>
+        if (!searchQuery?.value) return dashboardItems?.value || []
+        return dashboardItems?.value?.filter(item =>
           item?.displayName?.toLowerCase().includes(searchQuery.value.toLowerCase())
-        )
+        ) || []
       } catch (error) {
         console.error('Error filtering dashboard items:', error)
-        return dashboardItems.value
+        return dashboardItems?.value || []
       }
     })
 
     const filteredUserManagementItems = computed(() => {
       try {
-        if (!searchQuery.value) return userManagementItems.value
-        return userManagementItems.value.filter(item =>
+        if (!searchQuery?.value) return userManagementItems?.value || []
+        return userManagementItems?.value?.filter(item =>
           item?.displayName?.toLowerCase().includes(searchQuery.value.toLowerCase())
-        )
+        ) || []
       } catch (error) {
         console.error('Error filtering user management items:', error)
-        return userManagementItems.value
+        return userManagementItems?.value || []
       }
     })
 
     const filteredDeviceManagementItems = computed(() => {
       try {
-        if (!searchQuery.value) return deviceManagementItems.value
-        return deviceManagementItems.value.filter(item =>
+        if (!searchQuery?.value) return deviceManagementItems?.value || []
+        return deviceManagementItems?.value?.filter(item =>
           item?.displayName?.toLowerCase().includes(searchQuery.value.toLowerCase())
-        )
+        ) || []
       } catch (error) {
         console.error('Error filtering device management items:', error)
-        return deviceManagementItems.value
+        return deviceManagementItems?.value || []
       }
     })
 
     const filteredRequestsManagementItems = computed(() => {
       try {
-        if (!searchQuery.value) return requestsManagementItems.value
-        return requestsManagementItems.value.filter(item =>
+        if (!searchQuery?.value) return requestsManagementItems?.value || []
+        return requestsManagementItems?.value?.filter(item =>
           item?.displayName?.toLowerCase().includes(searchQuery.value.toLowerCase())
-        )
+        ) || []
       } catch (error) {
         console.error('Error filtering requests management items:', error)
-        return requestsManagementItems.value
+        return requestsManagementItems?.value || []
       }
     })
 
@@ -855,6 +943,7 @@ export default {
       isLoading,
       userName,
       userInitials,
+      shouldShowSidebar,
       dashboardItems,
       userManagementItems,
       deviceManagementItems,

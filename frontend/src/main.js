@@ -18,8 +18,7 @@ console.log('🚀 Starting Vue application...')
 try {
   const app = createApp(App)
 
-  // Use plugins
-  app.use(router)
+  // Use plugins (but don't mount yet)
   app.use(store)
   app.use(pinia) // Add Pinia
 
@@ -30,22 +29,35 @@ try {
     console.error('❌ Info:', info)
   }
 
+  // Initialize Pinia auth store first
+  console.log('🔄 Initializing Pinia auth store...')
+  const { useAuthStore } = await import('./stores/auth')
+  const authStore = useAuthStore()
+  authStore.initializeAuth()
+  console.log('✅ Pinia auth store initialized')
+
+  // Restore Vuex authentication session BEFORE router setup
+  console.log('🔄 Restoring Vuex authentication session before router setup...')
+  const sessionResult = await store.dispatch('auth/restoreSession')
+  console.log('✅ Vuex authentication session restoration completed:', sessionResult)
+
+  // Sync Pinia with Vuex
+  console.log('🔄 Syncing Pinia auth with Vuex...')
+  await authStore.syncWithVuex()
+  console.log('✅ Pinia-Vuex auth sync completed')
+
+  // Add a small delay to ensure all state is stabilized
+  await new Promise(resolve => setTimeout(resolve, 100))
+
+  // Now add router after auth is fully restored
+  app.use(router)
+  console.log('✅ Router added after auth restoration')
+
   // Mount the app
   app.mount('#app')
   console.log('✅ Vue application mounted successfully')
 
-  // Restore authentication session after app mount
-  setTimeout(async() => {
-    try {
-      console.log('🔄 Restoring authentication session...')
-      await store.dispatch('auth/restoreSession')
-      console.log('✅ Authentication session restoration completed')
-    } catch (sessionError) {
-      console.warn('⚠️ Session restoration failed:', sessionError)
-    }
-  }, 50) // Small delay to ensure store is ready
-
-  // Initialize sidebar state with Pinia
+  // Initialize sidebar state with Pinia immediately after mount
   setTimeout(async() => {
     try {
       console.log('🔄 Initializing sidebar state with Pinia...')
@@ -56,7 +68,7 @@ try {
     } catch (sidebarError) {
       console.warn('⚠️ Pinia sidebar initialization failed:', sidebarError)
     }
-  }, 100) // Small delay after auth restoration
+  }, 50) // Reduced delay since auth is already restored
 
   // Initialize performance optimizations after app mount
   setTimeout(async() => {

@@ -267,16 +267,21 @@ export default {
     },
 
     async completeOnboarding() {
+      console.log('🔄 OnboardingFlow: completeOnboarding() called')
+      
       // Mark user as having completed onboarding
       const success = await this.markOnboardingComplete()
+      console.log('📊 markOnboardingComplete result:', success)
 
       if (success) {
+        console.log('✅ Onboarding marked as complete, cleaning up and emitting event')
         // Clean up the step tracking since onboarding is complete
         this.clearOnboardingStep()
+        console.log('🚀 Emitting onboarding-complete event')
         this.$emit('onboarding-complete')
       } else {
         // Handle error - maybe show a notification
-        console.error('Failed to complete onboarding process')
+        console.error('❌ Failed to complete onboarding process')
       }
     },
 

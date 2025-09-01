@@ -21,8 +21,8 @@ class DatabaseSeeder extends Seeder
         // ]);
         $this->call([
         RoleSeeder::class,
-        UserSeeder::class,
-        DepartmentSeeder::class,
+        DepartmentSeeder::class,  // Create departments first
+        UserSeeder::class,        // Then create users with department_id
         RoleManagementSeeder::class,
     ]);
     }

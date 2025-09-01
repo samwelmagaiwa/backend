@@ -1,7 +1,7 @@
 import { computed } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
-import { ROLES } from '../utils/permissions'
+import { ROLES, getDefaultDashboard } from '../utils/permissions'
 
 /**
  * Auth composable that provides authentication functionality
@@ -41,26 +41,31 @@ export function useAuth() {
         const userRole = result.user?.role
         const userRoles = result.user?.roles || []
 
-        // Determine redirect path based on role
-        let redirectPath = '/dashboard'
+        console.log('🔍 Login redirect logic:', {
+          userRole,
+          userRoles,
+          user: result.user
+        })
 
-        if (userRole === 'admin' || userRoles.includes('admin')) {
-          redirectPath = '/admin/dashboard'
-        } else if (userRole === 'ict_officer' || userRoles.includes('ict_officer')) {
-          redirectPath = '/ict-approval'
-        } else if (userRole === 'head_of_department' || userRoles.includes('head_of_department')) {
-          redirectPath = '/hod-approval'
-        } else if (userRole === 'divisional_director' || userRoles.includes('divisional_director')) {
-          redirectPath = '/director-approval'
-        } else {
-          redirectPath = '/dashboard'
+        // Use centralized function to get default dashboard for user role
+        let redirectPath = getDefaultDashboard(userRole) || '/user-dashboard'
+
+        console.log('🎯 Determined redirect path from role:', userRole, '->', redirectPath)
+
+        // Check if user needs onboarding (except admin)
+        if (result.user?.needs_onboarding && userRole !== 'admin') {
+          console.log('🔄 User needs onboarding, redirecting to onboarding...')
+          redirectPath = '/onboarding'
         }
 
         // Check if there's a redirect query parameter
         const redirectTo = router.currentRoute.value.query.redirect
         if (redirectTo && typeof redirectTo === 'string') {
+          console.log('🔄 Using redirect query parameter:', redirectTo)
           redirectPath = redirectTo
         }
+
+        console.log('✅ Final redirect path:', redirectPath)
 
         // Navigate to the determined path
         await router.push(redirectPath)

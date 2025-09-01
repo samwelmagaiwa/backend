@@ -1,3 +1,50 @@
+/**
+ * Normalize user data to ensure consistent role information
+ * @param {Object} user - Raw user data from API
+ * @returns {Object} - Normalized user data
+ */
+function normalizeUserData(user) {
+  if (!user) return null
+
+  // Determine the primary role from multiple possible sources
+  const primaryRole = user.role || user.primary_role || user.role_name ||
+                     (user.roles && user.roles.length > 0 ? user.roles[0] : 'staff')
+
+  // Ensure roles is always an array of strings
+  let rolesArray = []
+  if (Array.isArray(user.roles)) {
+    // If roles is already an array of strings, use it
+    if (user.roles.length > 0 && typeof user.roles[0] === 'string') {
+      rolesArray = user.roles
+    }
+    // If roles is an array of objects, extract the name property
+    else if (user.roles.length > 0 && typeof user.roles[0] === 'object') {
+      rolesArray = user.roles.map(role => role.name || role)
+    }
+  }
+  // If no roles array but we have a primary role, create array with that role
+  else if (primaryRole) {
+    rolesArray = [primaryRole]
+  }
+
+  console.log('🔄 Auth Store: Normalizing user data:', {
+    originalRoles: user.roles,
+    normalizedRoles: rolesArray,
+    primaryRole,
+    originalRole: user.role,
+    originalRoleName: user.role_name
+  })
+
+  return {
+    ...user,
+    role: primaryRole, // Normalized role field
+    role_name: primaryRole, // For backward compatibility
+    primary_role: primaryRole, // Explicit primary role
+    roles: rolesArray, // Always an array of role name strings
+    permissions: user.permissions || []
+  }
+}
+
 const state = {
   user: null,
   token: localStorage.getItem('auth_token'),
@@ -5,7 +52,9 @@ const state = {
   userPermissions: [],
   loading: false,
   error: null,
-  sessionRestored: false // Track if session has been restored from localStorage
+  sessionRestored: false, // Track if session has been restored from localStorage
+  authInitialized: false, // Track if auth system is fully initialized
+  restoringSession: false // Track if session restoration is in progress
 }
 
 const mutations = {
@@ -51,6 +100,14 @@ const mutations = {
     state.sessionRestored = restored
   },
 
+  SET_AUTH_INITIALIZED(state, initialized) {
+    state.authInitialized = initialized
+  },
+
+  SET_RESTORING_SESSION(state, restoring) {
+    state.restoringSession = restoring
+  },
+
   LOGOUT(state) {
     state.user = null
     state.token = null
@@ -59,6 +116,8 @@ const mutations = {
     state.loading = false
     state.error = null
     state.sessionRestored = false
+    state.authInitialized = false
+    state.restoringSession = false
     localStorage.removeItem('auth_token')
     localStorage.removeItem('user_data')
     localStorage.removeItem('session_data')
@@ -77,19 +136,22 @@ const actions = {
       if (result.success) {
         const { user, token } = result.data
 
-        // Store user data with role information
-        const userData = {
-          ...user,
-          role: user.role_name || user.role, // Ensure role is available
-          roles: user.roles || [],
-          permissions: user.permissions || []
-        }
+        // Normalize user data with consistent role information
+        const normalizedUserData = normalizeUserData(user)
 
-        commit('SET_USER', userData)
+        console.log('🔄 Auth Store: Normalized user data on login:', {
+          originalRole: user.role,
+          originalRoleName: user.role_name,
+          originalPrimaryRole: user.primary_role,
+          normalizedRole: normalizedUserData.role,
+          roles: normalizedUserData.roles
+        })
+
+        commit('SET_USER', normalizedUserData)
         commit('SET_TOKEN', token)
-        commit('SET_USER_PERMISSIONS', userData.permissions)
+        commit('SET_USER_PERMISSIONS', normalizedUserData.permissions)
 
-        return { success: true, user: userData }
+        return { success: true, user: normalizedUserData }
       } else {
         commit('SET_ERROR', result.message)
         return {
@@ -144,8 +206,9 @@ const actions = {
   },
 
   updateUser({ commit }, user) {
-    commit('SET_USER', user)
-    commit('SET_USER_PERMISSIONS', user.permissions || [])
+    const normalizedUserData = normalizeUserData(user)
+    commit('SET_USER', normalizedUserData)
+    commit('SET_USER_PERMISSIONS', normalizedUserData.permissions || [])
   },
 
   clearError({ commit }) {
@@ -153,7 +216,14 @@ const actions = {
   },
 
   // Restore session from localStorage on app initialization
-  async restoreSession({ commit, dispatch }) {
+  async restoreSession({ commit, dispatch, state }) {
+    // Prevent multiple simultaneous restoration attempts
+    if (state.restoringSession || state.sessionRestored) {
+      console.log('⏳ Auth Store: Session restoration already in progress or completed')
+      return { success: state.sessionRestored, user: state.user }
+    }
+
+    commit('SET_RESTORING_SESSION', true)
     console.log('🔄 Auth Store: Restoring session from localStorage...')
 
     const token = localStorage.getItem('auth_token')
@@ -162,26 +232,46 @@ const actions = {
     if (token && userData) {
       try {
         const user = JSON.parse(userData)
-        console.log('📊 Auth Store: Found stored session data:', {
+        console.log('📆 Auth Store: Found stored session data:', {
           hasToken: !!token,
           userName: user.name,
           userRole: user.role || user.role_name,
-          userId: user.id
+          userId: user.id,
+          rawUserData: user
+        })
+
+        // Normalize restored user data to ensure consistent role information
+        const restoredUserData = normalizeUserData(user)
+
+        console.log('🔄 Auth Store: Normalized restored user data:', {
+          originalRole: user.role,
+          originalRoleName: user.role_name,
+          originalPrimaryRole: user.primary_role,
+          normalizedRole: restoredUserData.role,
+          roles: restoredUserData.roles
         })
 
         // Restore user and token immediately
         commit('SET_TOKEN', token)
-        commit('SET_USER', user)
+        commit('SET_USER', restoredUserData)
+        commit('SET_USER_PERMISSIONS', restoredUserData.permissions)
         commit('SET_SESSION_RESTORED', true)
+        commit('SET_AUTH_INITIALIZED', true)
+        commit('SET_RESTORING_SESSION', false)
 
-        console.log('✅ Auth Store: Session restored successfully')
+        console.log('✅ Auth Store: Session restored successfully:', {
+          role: restoredUserData.role,
+          role_name: restoredUserData.role_name,
+          userName: restoredUserData.name,
+          isAuthenticated: true
+        })
 
         // Verify token in background (don't await to avoid blocking)
         setTimeout(() => {
           dispatch('verifyToken')
         }, 100)
 
-        return { success: true, user }
+        return { success: true, user: restoredUserData }
       } catch (error) {
         console.error('❌ Auth Store: Failed to parse stored user data:', error)
         // Clear corrupted data
@@ -189,11 +279,15 @@ const actions = {
         localStorage.removeItem('user_data')
         localStorage.removeItem('session_data')
         commit('SET_SESSION_RESTORED', true)
+        commit('SET_AUTH_INITIALIZED', true)
+        commit('SET_RESTORING_SESSION', false)
         return { success: false, error: 'Corrupted session data' }
       }
     } else {
       console.log('🚨 Auth Store: No stored session data found')
       commit('SET_SESSION_RESTORED', true)
+      commit('SET_AUTH_INITIALIZED', true)
+      commit('SET_RESTORING_SESSION', false)
       return { success: false, error: 'No stored session' }
     }
   },
@@ -209,13 +303,14 @@ const actions = {
       const result = await authService.default.getCurrentUser()
 
       if (result.success) {
-        // Update user data with fresh backend data
-        const userData = {
-          ...result.data.data,
-          role: result.data.data.role_name || result.data.data.role,
-          roles: result.data.data.roles || [],
-          permissions: result.data.data.permissions || []
-        }
+        // Normalize user data from backend verification
+        const userData = normalizeUserData(result.data.data)
+
+        console.log('🔄 Auth Store: Normalized user data from token verification:', {
+          originalData: result.data.data,
+          normalizedRole: userData.role,
+          roles: userData.roles
+        })
 
         commit('SET_USER', userData)
         commit('SET_USER_PERMISSIONS', userData.permissions)
@@ -244,11 +339,19 @@ const getters = {
   token: (state) => state.token,
   isAuthenticated: (state) => state.isAuthenticated,
   userPermissions: (state) => state.userPermissions,
-  userRole: (state) => state.user?.role || state.user?.role_name,
+  userRole: (state) => {
+    if (!state.user) return null
+    // Use the normalized role field first, then fallback to other sources
+    return state.user.role || state.user.primary_role || state.user.role_name ||
+           (state.user.roles && state.user.roles.length > 0 ? state.user.roles[0] : null)
+  },
   userRoles: (state) => state.user?.roles || [],
   loading: (state) => state.loading,
   error: (state) => state.error,
   sessionRestored: (state) => state.sessionRestored,
+  authInitialized: (state) => state.authInitialized,
+  restoringSession: (state) => state.restoringSession,
+  isAuthReady: (state) => state.authInitialized && !state.restoringSession,
   isAdmin: (state) =>
     state.user?.role === 'admin' || (state.user?.roles || []).includes('admin'),
   isStaff: (state) =>

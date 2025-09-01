@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\v1\BookingServiceController;
 use App\Http\Controllers\Api\v1\DeclarationController;
 use App\Http\Controllers\Api\v1\BothServiceFormController;
 use App\Http\Controllers\Api\v1\AdminUserController;
+use App\Http\Controllers\Api\v1\AdminDepartmentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -66,6 +67,10 @@ Route::middleware('auth:sanctum')->group(function () {
         // Load the roles relationship (new system)
         $user->load('roles', 'department');
         
+        // Get primary role for consistent role handling
+        $primaryRole = $user->getPrimaryRoleName();
+        $userRoles = $user->roles->pluck('name')->toArray();
+        
         // Return user with role information using new system
         return [
             'id' => $user->id,
@@ -82,14 +87,17 @@ Route::middleware('auth:sanctum')->group(function () {
                 'display_name' => $user->department->getFullNameAttribute()
             ] : null,
             'is_active' => $user->is_active ?? true,
-            'roles' => $user->roles->map(function ($role) {
+            'role' => $primaryRole, // Normalized role field
+            'role_name' => $primaryRole, // For backward compatibility
+            'primary_role' => $primaryRole, // Explicit primary role
+            'roles' => $userRoles, // Array of role names
+            'role_objects' => $user->roles->map(function ($role) {
                 return [
                     'id' => $role->id,
                     'name' => $role->name,
                     'display_name' => ucwords(str_replace('_', ' ', $role->name))
                 ];
             }),
-            'primary_role' => $user->getPrimaryRoleName(),
             'display_roles' => $user->getDisplayRoleNames(),
             'permissions' => $user->getAllPermissions(),
             'needs_onboarding' => $user->needsOnboarding(),
@@ -148,6 +156,19 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::put('/{user}', [AdminUserController::class, 'update'])->name('admin.users.update');
             Route::delete('/{user}', [AdminUserController::class, 'destroy'])->name('admin.users.destroy');
             Route::patch('/{user}/toggle-status', [AdminUserController::class, 'toggleStatus'])->name('admin.users.toggle-status');
+        });
+        
+        // Department management routes
+        Route::prefix('departments')->group(function () {
+            Route::get('/', [AdminDepartmentController::class, 'index'])->name('admin.departments.index');
+            Route::post('/', [AdminDepartmentController::class, 'store'])->name('admin.departments.store');
+            Route::get('/create-form-data', [AdminDepartmentController::class, 'getCreateFormData'])->name('admin.departments.create-form-data');
+            Route::get('/eligible-hods', [AdminDepartmentController::class, 'getEligibleHods'])->name('admin.departments.eligible-hods');
+            Route::get('/eligible-divisional-directors', [AdminDepartmentController::class, 'getEligibleDivisionalDirectors'])->name('admin.departments.eligible-divisional-directors');
+            Route::get('/{department}', [AdminDepartmentController::class, 'show'])->name('admin.departments.show');
+            Route::put('/{department}', [AdminDepartmentController::class, 'update'])->name('admin.departments.update');
+            Route::delete('/{department}', [AdminDepartmentController::class, 'destroy'])->name('admin.departments.destroy');
+            Route::patch('/{department}/toggle-status', [AdminDepartmentController::class, 'toggleStatus'])->name('admin.departments.toggle-status');
         });
         
         // Legacy user management routes (keep for backward compatibility)
@@ -246,16 +267,7 @@ Route::middleware('auth:sanctum')->group(function () {
             ->name('both-service-form.approve.ict-officer');
     });
 
-    // Role Management routes (Admin only)
-    Route::prefix('roles')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Api\v1\RoleController::class, 'index'])->name('roles.index');
-        Route::post('/', [\App\Http\Controllers\Api\v1\RoleController::class, 'store'])->name('roles.store');
-        Route::get('/statistics', [\App\Http\Controllers\Api\v1\RoleController::class, 'statistics'])->name('roles.statistics');
-        Route::get('/permissions', [\App\Http\Controllers\Api\v1\RoleController::class, 'permissions'])->name('roles.permissions');
-        Route::get('/{role}', [\App\Http\Controllers\Api\v1\RoleController::class, 'show'])->name('roles.show');
-        Route::put('/{role}', [\App\Http\Controllers\Api\v1\RoleController::class, 'update'])->name('roles.update');
-        Route::delete('/{role}', [\App\Http\Controllers\Api\v1\RoleController::class, 'destroy'])->name('roles.destroy');
-    });
+
 
     // User Role Management routes (Admin only)
     Route::prefix('user-roles')->group(function () {
@@ -272,7 +284,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/eligible-hods', [\App\Http\Controllers\Api\v1\DepartmentHodController::class, 'eligibleHods'])->name('department-hod.eligible');
         Route::get('/statistics', [\App\Http\Controllers\Api\v1\DepartmentHodController::class, 'statistics'])->name('department-hod.statistics');
         Route::post('/{department}/assign', [\App\Http\Controllers\Api\v1\DepartmentHodController::class, 'assignHod'])->name('department-hod.assign');
+        Route::put('/{department}/update', [\App\Http\Controllers\Api\v1\DepartmentHodController::class, 'updateHod'])->name('department-hod.update');
+        Route::get('/{department}/details', [\App\Http\Controllers\Api\v1\DepartmentHodController::class, 'getHodDetails'])->name('department-hod.details');
         Route::delete('/{department}/remove', [\App\Http\Controllers\Api\v1\DepartmentHodController::class, 'removeHod'])->name('department-hod.remove');
+        Route::delete('/{department}/delete', [\App\Http\Controllers\Api\v1\DepartmentHodController::class, 'deleteHod'])->name('department-hod.delete');
     });
 
     // COMMENTED OUT: Individual form routes - now using Combined Access Form only

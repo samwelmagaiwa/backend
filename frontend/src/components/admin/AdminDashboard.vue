@@ -155,7 +155,8 @@
                     v-for="action in quickActions"
                     :key="action.title"
                     :to="action.route"
-                    class="medical-card bg-gradient-to-r from-blue-600/25 to-cyan-600/25 border-2 border-blue-400/40 p-4 rounded-xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-300 group text-center"
+                    @click="handleQuickActionClick(action)"
+                    class="medical-card bg-gradient-to-r from-blue-600/25 to-cyan-600/25 border-2 border-blue-400/40 p-4 rounded-xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-300 group text-center cursor-pointer"
                   >
                     <div class="flex flex-col items-center">
                       <div
@@ -268,14 +269,6 @@ export default {
     // Quick actions
     const quickActions = ref([
       {
-        title: 'Role Management',
-        description: 'Manage user roles and permissions',
-        icon: 'fas fa-user-shield',
-        gradient: 'from-blue-500 to-blue-600',
-        border: 'border-blue-300/50',
-        route: '/admin/roles'
-      },
-      {
         title: 'User Roles',
         description: 'Assign roles to users',
         icon: 'fas fa-users',
@@ -284,12 +277,12 @@ export default {
         route: '/admin/user-roles'
       },
       {
-        title: 'Department HODs',
-        description: 'Manage department heads',
+        title: 'Departments',
+        description: 'Manage departments & assignments',
         icon: 'fas fa-building',
         gradient: 'from-blue-500 to-blue-600',
         border: 'border-blue-300/50',
-        route: '/admin/department-hods'
+        route: '/admin/departments'
       }
     ])
 
@@ -367,13 +360,19 @@ export default {
       }
     }
 
+    const handleQuickActionClick = (action) => {
+      console.log('Quick action clicked:', action)
+      console.log('Navigating to:', action.route)
+    }
+
 
     return {
       userName,
       stats,
       quickActions,
       userManagementActions,
-      systemManagementActions
+      systemManagementActions,
+      handleQuickActionClick
     }
   }
 }

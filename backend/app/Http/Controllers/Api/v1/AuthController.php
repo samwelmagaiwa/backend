@@ -92,6 +92,10 @@ class AuthController extends Controller
         // Get onboarding status
         $onboarding = $user->getOrCreateOnboarding();
         
+        // Get primary role for consistent role handling
+        $primaryRole = $user->getPrimaryRoleName();
+        $userRoles = $user->roles()->pluck('name')->toArray();
+        
         $responseData = [
             'user'  => [
                 'id' => $user->id,
@@ -100,8 +104,10 @@ class AuthController extends Controller
                 'phone' => $user->phone,
                 'pf_number' => $user->pf_number,
                 'role_id' => $user->role_id,
-                'role_name' => $user->getPrimaryRoleName(),
-                'roles' => $user->roles()->pluck('name')->toArray(),
+                'role' => $primaryRole, // Normalized role field
+                'role_name' => $primaryRole, // For backward compatibility
+                'primary_role' => $primaryRole, // Explicit primary role
+                'roles' => $userRoles,
                 'permissions' => $user->getAllPermissions(),
                 'needs_onboarding' => $user->needsOnboarding(),
                 'onboarding_step' => $onboarding->current_step,
@@ -443,6 +449,10 @@ class AuthController extends Controller
             // Get onboarding status
             $onboarding = $user->getOrCreateOnboarding();
             
+            // Get primary role for consistent role handling
+            $primaryRole = $user->getPrimaryRoleName();
+            $userRoles = $user->roles->pluck('name')->toArray(); // Use loaded relationship
+
             $userData = [
                 'id' => $user->id,
                 'name' => $user->name,
@@ -450,8 +460,10 @@ class AuthController extends Controller
                 'phone' => $user->phone,
                 'pf_number' => $user->pf_number,
                 'role_id' => $user->role_id,
-                'role_name' => $user->getPrimaryRoleName(),
-                'roles' => $user->roles()->pluck('name')->toArray(),
+                'role' => $primaryRole, // Normalized role field
+                'role_name' => $primaryRole, // For backward compatibility
+                'primary_role' => $primaryRole, // Explicit primary role
+                'roles' => $userRoles, // Array of role names
                 'permissions' => $user->getAllPermissions(),
                 'needs_onboarding' => $user->needsOnboarding(),
                 'onboarding_step' => $onboarding->current_step,

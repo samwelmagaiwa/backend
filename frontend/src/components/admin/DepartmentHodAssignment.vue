@@ -444,14 +444,43 @@
                         <span>Change HOD</span>
                       </button>
 
-                      <button
-                        v-if="department.hod"
-                        @click="confirmRemoveHod(department)"
-                        class="bg-gradient-to-r from-red-500 to-red-600 text-white py-2 px-3 rounded-lg text-xs font-semibold hover:from-red-600 hover:to-red-700 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center space-x-1"
-                      >
-                        <i class="fas fa-user-minus"></i>
-                        <span>Remove</span>
-                      </button>
+                      <!-- Three-dot Actions Menu -->
+                      <div v-if="department.hod" class="relative">
+                        <button
+                          @click="toggleActionsMenu(department.id)"
+                          class="actions-button bg-gradient-to-r from-gray-500 to-gray-600 text-white py-2 px-3 rounded-lg text-xs font-semibold hover:from-gray-600 hover:to-gray-700 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center"
+                        >
+                          <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        
+                        <!-- Actions Dropdown -->
+                        <div
+                          v-if="activeActionsMenu === department.id"
+                          class="actions-dropdown absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-50 overflow-hidden"
+                        >
+                          <button
+                            @click="editHod(department)"
+                            class="w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 flex items-center space-x-2"
+                          >
+                            <i class="fas fa-edit text-blue-500"></i>
+                            <span>Edit HOD</span>
+                          </button>
+                          <button
+                            @click="updateHod(department)"
+                            class="w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-green-50 hover:text-green-600 transition-colors duration-200 flex items-center space-x-2"
+                          >
+                            <i class="fas fa-sync-alt text-green-500"></i>
+                            <span>Update HOD</span>
+                          </button>
+                          <button
+                            @click="confirmRemoveHod(department)"
+                            class="w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200 flex items-center space-x-2"
+                          >
+                            <i class="fas fa-trash text-red-500"></i>
+                            <span>Delete HOD</span>
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -537,7 +566,7 @@
                     :key="hod.id"
                     :value="hod.id"
                   >
-                    {{ hod.name }} - {{ hod.email }}
+                    {{ hod.display_name || `${hod.name} (${hod.pf_number}) - ${hod.email}` }}
                   </option>
                 </select>
                 <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
@@ -546,6 +575,19 @@
               </div>
               <div v-if="getFieldError('hod_user_id')" class="text-red-500 text-sm mt-1">
                 {{ getFieldError('hod_user_id') }}
+              </div>
+              
+              <!-- User Details Preview -->
+              <div v-if="selectedHodId && selectedHodDetails" class="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <h4 class="text-sm font-semibold text-gray-800 mb-2">Selected User Details:</h4>
+                <div class="grid grid-cols-2 gap-2 text-sm">
+                  <div><strong>Name:</strong> {{ selectedHodDetails.name }}</div>
+                  <div><strong>PF Number:</strong> {{ selectedHodDetails.pf_number }}</div>
+                  <div><strong>Email:</strong> {{ selectedHodDetails.email }}</div>
+                  <div><strong>Phone:</strong> {{ selectedHodDetails.phone || 'N/A' }}</div>
+                  <div><strong>Department:</strong> {{ selectedHodDetails.department?.name || 'N/A' }}</div>
+                  <div><strong>Roles:</strong> {{ selectedHodDetails.role_display_names?.join(', ') || 'N/A' }}</div>
+                </div>
               </div>
             </div>
 
@@ -972,6 +1014,7 @@ import { debounce } from 'lodash'
 import AppHeader from '@/components/AppHeader.vue'
 import ModernSidebar from '@/components/ModernSidebar.vue'
 import AppFooter from '@/components/footer.vue'
+import departmentHodService from '@/services/departmentHodService'
 
 export default {
   name: 'DepartmentHodAssignment',
@@ -1063,46 +1106,63 @@ export default {
       // Snackbar
       showSnackbar: false,
       snackbarMessage: '',
-      snackbarColor: 'success'
+      snackbarColor: 'success',
+
+      // Real data from API
+      departmentsData: [],
+      departmentStatisticsData: {},
+      availableHodsData: [],
+      departmentsLoading: false,
+      departmentsWithHodsLoading: false,
+      statisticsLoading: false,
+      hodsLoading: false,
+      paginationData: {
+        current_page: 1,
+        last_page: 1,
+        per_page: 15,
+        total: 0
+      },
+
+      // Actions menu state
+      activeActionsMenu: null
     }
   },
 
   computed: {
-    // Mock data for now since the store might not be properly configured
+    // Real computed properties using API data
     departmentStatistics() {
       return {
-        total_departments: 0,
-        with_hod: 0,
-        without_hod: 0,
-        with_pending_requests: 0
+        total_departments: this.departmentStatisticsData.total_departments || 0,
+        with_hod: this.departmentStatisticsData.departments_with_hod || 0,
+        without_hod: this.departmentStatisticsData.departments_without_hod || 0,
+        with_pending_requests: this.departmentStatisticsData.departments_with_pending_requests || 0
       }
     },
 
     departmentsPagination() {
       return {
-        total: 0
+        total: this.paginationData.total || 0,
+        current_page: this.paginationData.current_page || 1,
+        last_page: this.paginationData.last_page || 1,
+        per_page: this.paginationData.per_page || 15
       }
     },
 
     allDepartmentsWithHods() {
-      return []
+      return this.departmentsData || []
     },
-
-    departmentsWithHodsLoading() {
-      return false
-    },
-
-    departmentsLoading() {
-      return false
-    },
-
 
     availableHods() {
-      return []
+      return this.availableHodsData || []
     },
 
     debouncedSearch() {
       return debounce(this.applyFilters, 500)
+    },
+
+    selectedHodDetails() {
+      if (!this.selectedHodId) return null
+      return this.availableHods.find(hod => hod.id === this.selectedHodId)
     }
   },
 
@@ -1146,28 +1206,121 @@ export default {
     }
   },
 
+  mounted() {
+    // Add click outside listener to close actions menu
+    document.addEventListener('click', this.handleClickOutside)
+  },
+
+  beforeUnmount() {
+    // Remove click outside listener
+    document.removeEventListener('click', this.handleClickOutside)
+  },
+
   methods: {
-    // Mock methods for now since the store might not be properly configured
-    async fetchDepartmentsWithHods(params) {
-      console.log('fetchDepartmentsWithHods called with:', params)
+    // Real API methods
+    async fetchDepartmentsWithHods(params = {}) {
+      this.departmentsWithHodsLoading = true
+      try {
+        const result = await departmentHodService.getDepartmentsWithHods(params)
+
+        if (result.success) {
+          this.departmentsData = result.data.data || []
+          this.paginationData = {
+            current_page: result.data.current_page || 1,
+            last_page: result.data.last_page || 1,
+            per_page: result.data.per_page || 15,
+            total: result.data.total || 0
+          }
+        } else {
+          this.showErrorMessage(result.error || 'Failed to fetch departments')
+          this.departmentsData = []
+        }
+      } catch (error) {
+        console.error('Error fetching departments:', error)
+        this.showErrorMessage('Failed to fetch departments')
+        this.departmentsData = []
+      } finally {
+        this.departmentsWithHodsLoading = false
+      }
     },
 
     async fetchEligibleHods() {
-      console.log('fetchEligibleHods called')
+      this.hodsLoading = true
+      try {
+        const result = await departmentHodService.getEligibleHods()
+
+        if (result.success) {
+          this.availableHodsData = result.data || []
+        } else {
+          this.showErrorMessage(result.error || 'Failed to fetch eligible HODs')
+          this.availableHodsData = []
+        }
+      } catch (error) {
+        console.error('Error fetching eligible HODs:', error)
+        this.showErrorMessage('Failed to fetch eligible HODs')
+        this.availableHodsData = []
+      } finally {
+        this.hodsLoading = false
+      }
     },
 
     async fetchDepartmentHodStatistics() {
-      console.log('fetchDepartmentHodStatistics called')
+      this.statisticsLoading = true
+      try {
+        const result = await departmentHodService.getStatistics()
+
+        if (result.success) {
+          this.departmentStatisticsData = result.data || {}
+        } else {
+          this.showErrorMessage(result.error || 'Failed to fetch statistics')
+          this.departmentStatisticsData = {}
+        }
+      } catch (error) {
+        console.error('Error fetching statistics:', error)
+        this.showErrorMessage('Failed to fetch statistics')
+        this.departmentStatisticsData = {}
+      } finally {
+        this.statisticsLoading = false
+      }
     },
 
     async assignHodToDepartment(data) {
-      console.log('assignHodToDepartment called with:', data)
-      return { success: true }
+      try {
+        const result = await departmentHodService.assignHod(data.departmentId, data.hodUserId)
+
+        if (result.success) {
+          this.showSuccessMessage(result.message || 'HOD assigned successfully')
+          return { success: true }
+        } else {
+          this.showErrorMessage(result.error || 'Failed to assign HOD')
+          return {
+            success: false,
+            errors: result.errors || {}
+          }
+        }
+      } catch (error) {
+        console.error('Error assigning HOD:', error)
+        this.showErrorMessage('Failed to assign HOD')
+        return { success: false }
+      }
     },
 
-    async removeHodFromDepartment(id) {
-      console.log('removeHodFromDepartment called with:', id)
-      return { success: true }
+    async removeHodFromDepartment(departmentId) {
+      try {
+        const result = await departmentHodService.removeHod(departmentId)
+
+        if (result.success) {
+          this.showSuccessMessage(result.message || 'HOD removed successfully')
+          return { success: true }
+        } else {
+          this.showErrorMessage(result.error || 'Failed to remove HOD')
+          return { success: false }
+        }
+      } catch (error) {
+        console.error('Error removing HOD:', error)
+        this.showErrorMessage('Failed to remove HOD')
+        return { success: false }
+      }
     },
 
     setSelectedDepartment(department) {
@@ -1175,23 +1328,33 @@ export default {
     },
 
     clearMessages() {
-      console.log('clearMessages called')
+      // Clear any existing messages
+      this.showSnackbar = false
     },
 
     async createDepartmentAPI(data) {
-      console.log('createDepartmentAPI called with:', data)
-      // Simulate API call
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
+      try {
+        const result = await departmentHodService.createDepartment(data)
+
+        if (result.success) {
+          return {
             success: true,
-            data: {
-              id: Date.now(),
-              ...data
-            }
-          })
-        }, 1000)
-      })
+            data: result.data
+          }
+        } else {
+          return {
+            success: false,
+            errors: result.errors || {},
+            message: result.error
+          }
+        }
+      } catch (error) {
+        console.error('Error creating department:', error)
+        return {
+          success: false,
+          message: 'Failed to create department'
+        }
+      }
     },
 
     async initializeData() {
@@ -1442,6 +1605,91 @@ export default {
       this.snackbarColor = 'error'
       this.showSnackbar = true
       this.clearMessages()
+    },
+
+    // Actions menu methods
+    toggleActionsMenu(departmentId) {
+      if (this.activeActionsMenu === departmentId) {
+        this.activeActionsMenu = null
+      } else {
+        this.activeActionsMenu = departmentId
+      }
+    },
+
+    closeActionsMenu() {
+      this.activeActionsMenu = null
+    },
+
+    // HOD management actions
+    async editHod(department) {
+      this.closeActionsMenu()
+      try {
+        const result = await departmentHodService.getHodDetails(department.id)
+        if (result.success) {
+          // Open edit dialog with HOD details
+          this.selectedDepartment = department
+          this.selectedHodId = department.hod.id
+          this.isChangeMode = true
+          this.assignHodDialog = true
+          this.showSuccessMessage('HOD details loaded for editing')
+        } else {
+          this.showErrorMessage(result.error || 'Failed to load HOD details')
+        }
+      } catch (error) {
+        console.error('Error loading HOD details:', error)
+        this.showErrorMessage('Failed to load HOD details')
+      }
+    },
+
+    async updateHod(department) {
+      this.closeActionsMenu()
+      // Open the change HOD dialog
+      this.openChangeHodDialog(department)
+    },
+
+    async deleteHod(department) {
+      this.closeActionsMenu()
+      try {
+        const result = await departmentHodService.deleteHod(department.id)
+        if (result.success) {
+          this.showSuccessMessage(result.message || 'HOD deleted successfully')
+          await this.refreshData()
+        } else {
+          this.showErrorMessage(result.error || 'Failed to delete HOD')
+        }
+      } catch (error) {
+        console.error('Error deleting HOD:', error)
+        this.showErrorMessage('Failed to delete HOD')
+      }
+    },
+
+    // Click outside handler
+    handleClickOutside(event) {
+      // Check if the click is outside the actions menu
+      const actionsMenus = document.querySelectorAll('.actions-dropdown')
+      const actionsButtons = document.querySelectorAll('.actions-button')
+      
+      let clickedInsideMenu = false
+      let clickedOnButton = false
+      
+      // Check if clicked inside any actions menu
+      actionsMenus.forEach(menu => {
+        if (menu.contains(event.target)) {
+          clickedInsideMenu = true
+        }
+      })
+      
+      // Check if clicked on any actions button
+      actionsButtons.forEach(button => {
+        if (button.contains(event.target)) {
+          clickedOnButton = true
+        }
+      })
+      
+      // Close menu if clicked outside and not on button
+      if (!clickedInsideMenu && !clickedOnButton) {
+        this.closeActionsMenu()
+      }
     }
   }
 }

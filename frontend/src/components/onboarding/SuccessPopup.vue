@@ -144,6 +144,8 @@ export default {
   emits: ['continue'],
   methods: {
     handleContinue() {
+      console.log('🎯 SuccessPopup: Continue button clicked')
+      console.log('🚀 SuccessPopup: Emitting continue event')
       this.$emit('continue')
     }
   }

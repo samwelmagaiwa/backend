@@ -21,38 +21,75 @@ export default {
     OnboardingFlow
   },
   setup() {
-    const { currentUser, defaultDashboard, markOnboardingComplete, logout } =
-      useAuth()
+    const { user: currentUser, logout } = useAuth()
     const router = useRouter()
 
     const handleOnboardingComplete = async() => {
       try {
-        // Mark onboarding as complete
-        if (currentUser.value) {
-          const success = await markOnboardingComplete(currentUser.value.id)
+        console.log('🎉 Onboarding completed successfully')
+        console.log('👤 Current user:', currentUser.value)
+        console.log('🔑 User role:', currentUser.value?.role)
 
-          if (success) {
-            console.log('Onboarding completed successfully')
+        // Wait a moment for state to update
+        await new Promise((resolve) => setTimeout(resolve, 100))
 
-            // Wait a moment for state to update
-            await new Promise((resolve) => setTimeout(resolve, 100))
+        // Redirect to appropriate dashboard based on user role
+        let dashboard = '/user-dashboard' // default
 
-            // Redirect to dashboard
-            const dashboard = defaultDashboard.value || '/user-dashboard'
-            console.log('Redirecting to dashboard:', dashboard)
-            await router.push(dashboard)
-          } else {
-            console.error('Failed to complete onboarding')
-            // Still redirect but show error
-            const dashboard = defaultDashboard.value || '/user-dashboard'
-            await router.push(dashboard)
+        if (currentUser.value?.role) {
+          console.log('🔄 Determining dashboard for role:', currentUser.value.role)
+          switch (currentUser.value.role) {
+            case 'admin':
+              dashboard = '/admin-dashboard'
+              break
+            case 'ict_officer':
+              dashboard = '/ict-dashboard'
+              break
+            case 'head_of_department':
+              dashboard = '/hod-dashboard'
+              break
+            case 'divisional_director':
+              dashboard = '/divisional-dashboard'
+              break
+            case 'ict_director':
+              dashboard = '/dict-dashboard'
+              break
+            case 'staff':
+            default:
+              dashboard = '/user-dashboard'
+              break
           }
+        } else {
+          console.warn('⚠️ No user role found, using default dashboard')
         }
+
+        console.log('🚀 Redirecting to dashboard:', dashboard)
+        
+        // Add a small delay to ensure the console logs are visible
+        await new Promise((resolve) => setTimeout(resolve, 500))
+        
+        const navigationResult = await router.push(dashboard)
+        console.log('✅ Navigation result:', navigationResult)
+        
       } catch (error) {
-        console.error('Error completing onboarding:', error)
-        // Fallback redirect
-        const dashboard = defaultDashboard.value || '/user-dashboard'
-        await router.push(dashboard)
+        console.error('❌ Error completing onboarding:', error)
+        console.error('📍 Error details:', {
+          message: error.message,
+          stack: error.stack,
+          currentUser: currentUser.value
+        })
+        
+        // Fallback redirect with more logging
+        try {
+          console.log('🔄 Attempting fallback redirect to /user-dashboard')
+          await router.push('/user-dashboard')
+          console.log('✅ Fallback redirect successful')
+        } catch (fallbackError) {
+          console.error('❌ Fallback redirect also failed:', fallbackError)
+          // Force page reload as last resort
+          console.log('🔄 Forcing page reload to /user-dashboard')
+          window.location.href = '/user-dashboard'
+        }
       }
     }
 

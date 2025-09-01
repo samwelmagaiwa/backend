@@ -22,3 +22,4 @@ export default pinia
 
 // Export individual stores for convenience
 export { useSidebarStore } from './sidebar'
+export { useAuthStore } from './auth'

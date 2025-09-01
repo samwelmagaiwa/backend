@@ -18,6 +18,8 @@ class Department extends Model
         'code',
         'description',
         'hod_user_id',
+        'divisional_director_id',
+        'has_divisional_director',
         'is_active',
     ];
 
@@ -26,6 +28,7 @@ class Department extends Model
      */
     protected $casts = [
         'is_active' => 'boolean',
+        'has_divisional_director' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
@@ -52,6 +55,14 @@ class Department extends Model
     public function headOfDepartment()
     {
         return $this->belongsTo(User::class, 'hod_user_id');
+    }
+
+    /**
+     * Get the divisional director user.
+     */
+    public function divisionalDirector()
+    {
+        return $this->belongsTo(User::class, 'divisional_director_id');
     }
 
     /**

@@ -102,13 +102,6 @@
                   </div>
                   <div class="flex space-x-3">
                     <button
-                      @click="openCreateUserDialog"
-                      class="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center space-x-2"
-                    >
-                      <i class="fas fa-user-plus"></i>
-                      <span>Create User</span>
-                    </button>
-                    <button
                       @click="refreshData"
                       :disabled="loading"
                       class="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 shadow-lg flex items-center space-x-2"
@@ -318,356 +311,6 @@
       </main>
     </div>
 
-    <!-- Create User Dialog -->
-    <div
-      v-if="createUserDialog"
-      class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 backdrop-blur-sm"
-    >
-      <div
-        class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-100 animate-slideUp"
-      >
-        <!-- Header -->
-        <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-6 text-center">
-          <div
-            class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm border border-white/30"
-          >
-            <i class="fas fa-user-plus text-white text-2xl"></i>
-          </div>
-          <h3 class="text-xl font-bold text-white mb-2">
-            Create New User
-          </h3>
-          <div class="w-12 h-1 bg-white/50 mx-auto rounded-full"></div>
-        </div>
-
-        <!-- Body -->
-        <div class="p-6">
-          <form @submit.prevent="createUser">
-            <!-- User Information Section -->
-            <div class="medical-card bg-gradient-to-r from-blue-600/15 to-cyan-600/15 border-2 border-blue-400/30 p-6 rounded-2xl backdrop-blur-sm hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 mb-6">
-              <div class="flex items-center space-x-3 mb-6">
-                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <i class="fas fa-user text-white text-lg"></i>
-                </div>
-                <h4 class="text-xl font-bold text-gray-800">User Information</h4>
-              </div>
-
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Full Name -->
-                <div class="space-y-2">
-                  <div class="flex items-center space-x-2 mb-3">
-                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md">
-                      <i class="fas fa-user text-white text-sm"></i>
-                    </div>
-                    <label class="text-sm font-bold text-gray-700">
-                      Full Name *
-                    </label>
-                  </div>
-                  <input
-                    v-model="createUserForm.name"
-                    type="text"
-                    required
-                    class="w-full px-4 py-3 bg-white/70 border-2 border-blue-300/30 rounded-xl focus:border-blue-500 focus:outline-none text-gray-800 placeholder-gray-500 backdrop-blur-sm transition-all duration-300 hover:bg-white/80 focus:bg-white/90 focus:shadow-lg focus:shadow-blue-500/20"
-                    placeholder="Enter full name"
-                  />
-                  <div v-if="getCreateUserFieldError('name')" class="text-red-500 text-sm mt-1 flex items-center space-x-1">
-                    <i class="fas fa-exclamation-circle text-xs"></i>
-                    <span>{{ getCreateUserFieldError('name') }}</span>
-                  </div>
-                </div>
-
-                <!-- Email Address -->
-                <div class="space-y-2">
-                  <div class="flex items-center space-x-2 mb-3">
-                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md">
-                      <i class="fas fa-envelope text-white text-sm"></i>
-                    </div>
-                    <label class="text-sm font-bold text-gray-700">
-                      Email Address *
-                    </label>
-                  </div>
-                  <input
-                    v-model="createUserForm.email"
-                    type="email"
-                    required
-                    class="w-full px-4 py-3 bg-white/70 border-2 border-blue-300/30 rounded-xl focus:border-blue-500 focus:outline-none text-gray-800 placeholder-gray-500 backdrop-blur-sm transition-all duration-300 hover:bg-white/80 focus:bg-white/90 focus:shadow-lg focus:shadow-blue-500/20"
-                    placeholder="Enter email address"
-                  />
-                  <div v-if="getCreateUserFieldError('email')" class="text-red-500 text-sm mt-1 flex items-center space-x-1">
-                    <i class="fas fa-exclamation-circle text-xs"></i>
-                    <span>{{ getCreateUserFieldError('email') }}</span>
-                  </div>
-                </div>
-
-                <!-- PF Number -->
-                <div class="space-y-2">
-                  <div class="flex items-center space-x-2 mb-3">
-                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md">
-                      <i class="fas fa-id-badge text-white text-sm"></i>
-                    </div>
-                    <label class="text-sm font-bold text-gray-700">
-                      PF Number
-                    </label>
-                  </div>
-                  <input
-                    v-model="createUserForm.pf_number"
-                    type="text"
-                    class="w-full px-4 py-3 bg-white/70 border-2 border-blue-300/30 rounded-xl focus:border-blue-500 focus:outline-none text-gray-800 placeholder-gray-500 backdrop-blur-sm transition-all duration-300 hover:bg-white/80 focus:bg-white/90 focus:shadow-lg focus:shadow-blue-500/20"
-                    placeholder="Enter PF number"
-                  />
-                  <div v-if="getCreateUserFieldError('pf_number')" class="text-red-500 text-sm mt-1 flex items-center space-x-1">
-                    <i class="fas fa-exclamation-circle text-xs"></i>
-                    <span>{{ getCreateUserFieldError('pf_number') }}</span>
-                  </div>
-                </div>
-
-                <!-- Phone Number -->
-                <div class="space-y-2">
-                  <div class="flex items-center space-x-2 mb-3">
-                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md">
-                      <i class="fas fa-phone text-white text-sm"></i>
-                    </div>
-                    <label class="text-sm font-bold text-gray-700">
-                      Phone Number
-                    </label>
-                  </div>
-                  <input
-                    v-model="createUserForm.phone"
-                    type="tel"
-                    class="w-full px-4 py-3 bg-white/70 border-2 border-blue-300/30 rounded-xl focus:border-blue-500 focus:outline-none text-gray-800 placeholder-gray-500 backdrop-blur-sm transition-all duration-300 hover:bg-white/80 focus:bg-white/90 focus:shadow-lg focus:shadow-blue-500/20"
-                    placeholder="Enter phone number"
-                  />
-                  <div v-if="getCreateUserFieldError('phone')" class="text-red-500 text-sm mt-1 flex items-center space-x-1">
-                    <i class="fas fa-exclamation-circle text-xs"></i>
-                    <span>{{ getCreateUserFieldError('phone') }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Department & Security Section -->
-            <div class="medical-card bg-gradient-to-r from-purple-600/15 to-indigo-600/15 border-2 border-purple-400/30 p-6 rounded-2xl backdrop-blur-sm hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 mb-6">
-              <div class="flex items-center space-x-3 mb-6">
-                <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <i class="fas fa-building text-white text-lg"></i>
-                </div>
-                <h4 class="text-xl font-bold text-gray-800">Department & Security</h4>
-              </div>
-
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Department -->
-                <div class="space-y-2">
-                  <div class="flex items-center space-x-2 mb-3">
-                    <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center shadow-md">
-                      <i class="fas fa-building text-white text-sm"></i>
-                    </div>
-                    <label class="text-sm font-bold text-gray-700">
-                      Department
-                    </label>
-                  </div>
-                  <div class="relative">
-                    <select
-                      v-model="createUserForm.department_id"
-                      class="w-full px-4 py-3 bg-white/70 border-2 border-purple-300/30 rounded-xl focus:border-purple-500 focus:outline-none text-gray-800 backdrop-blur-sm transition-all duration-300 hover:bg-white/80 focus:bg-white/90 focus:shadow-lg focus:shadow-purple-500/20 appearance-none cursor-pointer"
-                    >
-                      <option value="" class="bg-gray-800 text-white">Administration</option>
-                      <option
-                        v-for="department in availableDepartments"
-                        :key="department.id"
-                        :value="department.id"
-                        class="bg-gray-800 text-white"
-                      >
-                        {{ department.display_name }}
-                      </option>
-                    </select>
-                    <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                      <i class="fas fa-chevron-down text-purple-500"></i>
-                    </div>
-                  </div>
-                  <div v-if="getCreateUserFieldError('department_id')" class="text-red-500 text-sm mt-1 flex items-center space-x-1">
-                    <i class="fas fa-exclamation-circle text-xs"></i>
-                    <span>{{ getCreateUserFieldError('department_id') }}</span>
-                  </div>
-                </div>
-
-                <!-- Password -->
-                <div class="space-y-2">
-                  <div class="flex items-center space-x-2 mb-3">
-                    <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center shadow-md">
-                      <i class="fas fa-lock text-white text-sm"></i>
-                    </div>
-                    <label class="text-sm font-bold text-gray-700">
-                      Password *
-                    </label>
-                  </div>
-                  <input
-                    v-model="createUserForm.password"
-                    type="password"
-                    required
-                    class="w-full px-4 py-3 bg-white/70 border-2 border-purple-300/30 rounded-xl focus:border-purple-500 focus:outline-none text-gray-800 placeholder-gray-500 backdrop-blur-sm transition-all duration-300 hover:bg-white/80 focus:bg-white/90 focus:shadow-lg focus:shadow-purple-500/20"
-                    placeholder="Enter password"
-                  />
-                  <div v-if="getCreateUserFieldError('password')" class="text-red-500 text-sm mt-1 flex items-center space-x-1">
-                    <i class="fas fa-exclamation-circle text-xs"></i>
-                    <span>{{ getCreateUserFieldError('password') }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Assign Roles Section -->
-            <div class="medical-card bg-gradient-to-r from-green-600/15 to-emerald-600/15 border-2 border-green-400/30 p-6 rounded-2xl backdrop-blur-sm hover:shadow-lg hover:shadow-green-500/20 transition-all duration-300 mb-6">
-              <div class="flex items-center space-x-3 mb-6">
-                <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <i class="fas fa-user-tag text-white text-lg"></i>
-                </div>
-                <h4 class="text-xl font-bold text-gray-800">Assign Roles</h4>
-              </div>
-
-              <div class="space-y-6">
-                <!-- Role Selection Dropdown -->
-                <div class="space-y-2">
-                  <div class="flex items-center space-x-2 mb-3">
-                    <div class="w-8 h-8 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center shadow-md">
-                      <i class="fas fa-list text-white text-sm"></i>
-                    </div>
-                    <label class="text-sm font-bold text-gray-700">
-                      Select Roles
-                    </label>
-                  </div>
-                  <div class="relative">
-                    <select
-                      v-model="selectedRoleForAdd"
-                      @change="addRoleToUser"
-                      class="w-full px-4 py-3 bg-white/70 border-2 border-green-300/30 rounded-xl focus:border-green-500 focus:outline-none text-gray-800 backdrop-blur-sm transition-all duration-300 hover:bg-white/80 focus:bg-white/90 focus:shadow-lg focus:shadow-green-500/20 appearance-none cursor-pointer"
-                    >
-                      <option value="" class="bg-gray-800 text-white">Choose a role to add...</option>
-                      <option
-                        v-for="role in availableRolesForDropdown"
-                        :key="role.id"
-                        :value="role.id"
-                        class="bg-gray-800 text-white"
-                      >
-                        {{ role.display_name }} {{ role.description ? '- ' + role.description : '' }}
-                      </option>
-                    </select>
-                    <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                      <i class="fas fa-chevron-down text-green-500"></i>
-                    </div>
-                  </div>
-                  <div class="text-xs text-gray-600 mt-1 flex items-center space-x-1">
-                    <i class="fas fa-info-circle text-green-500"></i>
-                    <span>Select roles from the dropdown to assign to the user</span>
-                  </div>
-                </div>
-
-                <!-- Alternative: Checkbox List -->
-                <div class="space-y-2">
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-2">
-                      <div class="w-8 h-8 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center shadow-md">
-                        <i class="fas fa-check-square text-white text-sm"></i>
-                      </div>
-                      <label class="text-sm font-bold text-gray-700">
-                        Or select from list
-                      </label>
-                    </div>
-                    <button
-                      @click="toggleRolesList"
-                      type="button"
-                      class="text-sm text-green-600 hover:text-green-700 font-medium flex items-center space-x-1"
-                    >
-                      <span>{{ showRolesList ? 'Hide' : 'Show' }} roles list</span>
-                      <i :class="showRolesList ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
-                    </button>
-                  </div>
-
-                  <div v-if="showRolesList" class="bg-white/50 border-2 border-green-300/30 rounded-xl p-4 max-h-64 overflow-y-auto">
-                    <div class="space-y-3">
-                      <div
-                        v-for="role in availableRoles"
-                        :key="role.id"
-                        class="flex items-center space-x-3 p-3 bg-white/50 rounded-lg hover:bg-white/70 transition-all duration-200"
-                      >
-                        <input
-                          v-model="createUserForm.role_ids"
-                          :value="role.id"
-                          type="checkbox"
-                          class="w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
-                        />
-                        <div class="flex items-center space-x-2 flex-1">
-                          <div class="w-5 h-5 bg-gradient-to-br from-green-500 to-green-600 rounded flex items-center justify-center">
-                            <i class="fas fa-shield-alt text-white text-xs"></i>
-                          </div>
-                          <div class="flex-1">
-                            <span class="text-sm font-medium text-gray-700">
-                              {{ role.display_name }}
-                            </span>
-                            <p v-if="role.description" class="text-xs text-gray-600 mt-1">
-                              {{ role.description }}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div v-if="getCreateUserFieldError('role_ids')" class="text-red-500 text-sm flex items-center space-x-1">
-                  <i class="fas fa-exclamation-circle text-xs"></i>
-                  <span>{{ getCreateUserFieldError('role_ids') }}</span>
-                </div>
-              </div>
-
-              <!-- Selected Roles Preview -->
-              <div v-if="createUserForm.role_ids.length > 0" class="mt-6">
-                <div class="flex items-center space-x-2 mb-3">
-                  <div class="w-6 h-6 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center shadow-sm">
-                    <i class="fas fa-check text-white text-xs"></i>
-                  </div>
-                  <label class="text-sm font-bold text-gray-700">
-                    Selected Roles ({{ createUserForm.role_ids.length }}):</label>
-                </div>
-                <div class="flex flex-wrap gap-2">
-                  <span
-                    v-for="roleId in createUserForm.role_ids"
-                    :key="roleId"
-                    class="px-3 py-2 bg-green-500/20 text-green-800 rounded-lg text-sm border border-green-400/50 flex items-center space-x-2 shadow-sm"
-                  >
-                    <span>{{ availableRoles.find(r => r.id === roleId)?.display_name }}</span>
-                    <button
-                      @click="removeRoleFromCreateForm(roleId)"
-                      class="text-green-600 hover:text-red-500 transition-colors duration-200"
-                    >
-                      <i class="fas fa-times text-xs"></i>
-                    </button>
-                  </span>
-                </div>
-              </div>
-            </div>
-          </form>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="flex justify-end space-x-3 p-6 border-t border-gray-200">
-          <button
-            @click="closeCreateUserDialog"
-            :disabled="createUserSubmitting"
-            class="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Cancel
-          </button>
-          <button
-            @click="createUser"
-            :disabled="createUserSubmitting || !createUserForm.name || !createUserForm.email || !createUserForm.password || createUserForm.role_ids.length === 0"
-            class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-medium hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
-          >
-            <i v-if="createUserSubmitting" class="fas fa-spinner fa-spin"></i>
-            <i v-else class="fas fa-user-plus"></i>
-            <span>{{ createUserSubmitting ? 'Creating...' : 'Create User' }}</span>
-          </button>
-        </div>
-      </div>
-    </div>
 
     <!-- Success/Error Toast Notifications -->
     <div
@@ -707,7 +350,6 @@ import { ref, computed, onMounted } from 'vue'
 import { debounce } from 'lodash'
 import AppHeader from '@/components/AppHeader.vue'
 import ModernSidebar from '@/components/ModernSidebar.vue'
-import adminUserService from '@/services/adminUserService'
 import _roleAssignmentService from '@/services/roleAssignmentService'
 
 export default {
@@ -723,7 +365,12 @@ export default {
     const users = ref([])
     const availableRoles = ref([])
     const availableDepartments = ref([])
-    const userStatistics = ref({})
+    const userStatistics = ref({
+      total_users: 0,
+      users_with_roles: 0,
+      department_distribution: [],
+      hod_users: 0
+    })
 
     // Filters
     const searchQuery = ref('')
@@ -731,26 +378,7 @@ export default {
     const filterDepartment = ref('')
     const sortBy = ref('name')
 
-    // Dialog states
-    const createUserDialog = ref(false)
-
-    // Create user form
-    const createUserForm = ref({
-      name: '',
-      email: '',
-      pf_number: '',
-      phone: '',
-      department_id: '',
-      password: '',
-      password_confirmation: '',
-      role_ids: []
-    })
-    const createUserSubmitting = ref(false)
-    const createUserFormErrors = ref({})
-
-    // Role selection
-    const selectedRoleForAdd = ref('')
-    const showRolesList = ref(false)
+    // Dialog states - removed create user dialog
 
     // Snackbar
     const showSnackbar = ref(false)
@@ -795,19 +423,12 @@ export default {
       return filtered
     })
 
-    const availableRolesForDropdown = computed(() => {
-      return availableRoles.value.filter(role =>
-        !createUserForm.value.role_ids.includes(role.id)
-      )
-    })
-
     // Methods
     const initializeData = async() => {
       loading.value = true
       try {
         await Promise.all([
           fetchUsers(),
-          fetchFormData(),
           fetchUserStatistics()
         ])
       } catch (error) {
@@ -820,35 +441,30 @@ export default {
 
     const fetchUsers = async() => {
       try {
-        const response = await adminUserService.getAllUsers()
-        if (response.success) {
-          users.value = response.data.users || []
-        }
+        // TODO: Replace with appropriate service call for fetching users
+        // const response = await userRoleService.getAllUsers()
+        // For now, set empty array to avoid errors
+        users.value = []
+        console.log('Users fetching not implemented yet')
       } catch (error) {
         console.error('Error fetching users:', error)
         throw error
       }
     }
 
-    const fetchFormData = async() => {
-      try {
-        const response = await adminUserService.getCreateFormData()
-        if (response.success) {
-          availableRoles.value = response.data.roles || []
-          availableDepartments.value = response.data.departments || []
-        }
-      } catch (error) {
-        console.error('Error fetching form data:', error)
-        throw error
-      }
-    }
 
     const fetchUserStatistics = async() => {
       try {
-        const response = await adminUserService.getUserStatistics()
-        if (response.success) {
-          userStatistics.value = response.data
+        // TODO: Replace with appropriate service call for fetching statistics
+        // const response = await userRoleService.getUserStatistics()
+        // For now, set empty object to avoid errors
+        userStatistics.value = {
+          total_users: 0,
+          users_with_roles: 0,
+          department_distribution: [],
+          hod_users: 0
         }
+        console.log('User statistics fetching not implemented yet')
       } catch (error) {
         console.error('Error fetching user statistics:', error)
         throw error
@@ -867,74 +483,7 @@ export default {
       // Filters are handled by computed property
     }
 
-    // Create user methods
-    const openCreateUserDialog = () => {
-      resetCreateUserForm()
-      createUserDialog.value = true
-    }
-
-    const closeCreateUserDialog = () => {
-      createUserDialog.value = false
-      resetCreateUserForm()
-    }
-
-    const resetCreateUserForm = () => {
-      createUserForm.value = {
-        name: '',
-        email: '',
-        pf_number: '',
-        phone: '',
-        department_id: '',
-        password: '',
-        password_confirmation: '',
-        role_ids: []
-      }
-      createUserFormErrors.value = {}
-      selectedRoleForAdd.value = ''
-      showRolesList.value = false
-    }
-
-    const createUser = async() => {
-      createUserSubmitting.value = true
-      createUserFormErrors.value = {}
-
-      try {
-        // Add password confirmation
-        createUserForm.value.password_confirmation = createUserForm.value.password
-
-        const response = await adminUserService.createUser(createUserForm.value)
-
-        if (response.success) {
-          showSuccessMessage('User created successfully!')
-          closeCreateUserDialog()
-          await refreshData()
-        }
-      } catch (error) {
-        console.error('Error creating user:', error)
-        if (error.response && error.response.data && error.response.data.errors) {
-          createUserFormErrors.value = error.response.data.errors
-        } else {
-          showErrorMessage('Failed to create user')
-        }
-      } finally {
-        createUserSubmitting.value = false
-      }
-    }
-
-    const addRoleToUser = () => {
-      if (selectedRoleForAdd.value && !createUserForm.value.role_ids.includes(selectedRoleForAdd.value)) {
-        createUserForm.value.role_ids.push(selectedRoleForAdd.value)
-        selectedRoleForAdd.value = ''
-      }
-    }
-
-    const removeRoleFromCreateForm = (roleId) => {
-      createUserForm.value.role_ids = createUserForm.value.role_ids.filter(id => id !== roleId)
-    }
-
-    const toggleRolesList = () => {
-      showRolesList.value = !showRolesList.value
-    }
+    // Create user methods removed
 
     // Utility methods
     const getInitials = (name) => {
@@ -958,13 +507,8 @@ export default {
       return colorClasses[roleName] || 'bg-blue-500/30 text-blue-100 border-blue-400/50'
     }
 
-    const getCreateUserFieldError = (fieldName) => {
-      return createUserFormErrors.value[fieldName]
-        ? createUserFormErrors.value[fieldName][0]
-        : ''
-    }
 
-    const showSuccessMessage = (message) => {
+    const _showSuccessMessage = (message) => {
       snackbarMessage.value = message
       snackbarColor.value = 'success'
       showSnackbar.value = true
@@ -1009,33 +553,19 @@ export default {
       filterRole,
       filterDepartment,
       sortBy,
-      createUserDialog,
-      createUserForm,
-      createUserSubmitting,
-      createUserFormErrors,
-      selectedRoleForAdd,
-      showRolesList,
       showSnackbar,
       snackbarMessage,
       snackbarColor,
 
       // Computed
       filteredUsers,
-      availableRolesForDropdown,
 
       // Methods
       refreshData,
       debouncedSearch,
       applyFilters,
-      openCreateUserDialog,
-      closeCreateUserDialog,
-      createUser,
-      addRoleToUser,
-      removeRoleFromCreateForm,
-      toggleRolesList,
       getInitials,
       getRoleColorClasses,
-      getCreateUserFieldError,
       openAssignRolesDialog,
       viewRoleHistory
     }

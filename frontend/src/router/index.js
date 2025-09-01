@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { getDefaultDashboard, ROLES } from '../utils/permissions'
+import { ROLES } from '../utils/permissions'
 import { preloadRouteBasedImages } from '../utils/imagePreloader'
+import { enhancedNavigationGuard, syncAuthStores } from '../utils/routeGuards'
 
 // Lazy load LoginPageWrapper as well for better initial bundle size
 const LoginPageWrapper = () =>
@@ -54,37 +55,38 @@ const routes = [
     path: '/admin-dashboard',
     name: 'AdminDashboard',
     component: () => import('../components/admin/AdminDashboard.vue'),
-    meta: { requiresAuth: true, roles: ['admin'] }
+    meta: { requiresAuth: true, roles: [ROLES.ADMIN] }
   },
   {
-    path: '/admin/roles',
-    name: 'RoleManagement',
-    component: () => import('../components/admin/RoleManagement.vue'),
-    meta: { requiresAuth: true, roles: ['admin'] }
+    path: '/admin/dashboard',
+    name: 'AdminDashboardAlt',
+    component: () => import('../components/admin/AdminDashboard.vue'),
+    meta: { requiresAuth: true, roles: [ROLES.ADMIN] }
   },
+
   {
     path: '/admin/user-roles',
     name: 'UserRoleAssignment',
     component: () => import('../components/admin/UserRoleAssignment.vue'),
-    meta: { requiresAuth: true, roles: ['admin'] }
+    meta: { requiresAuth: true, roles: [ROLES.ADMIN] }
   },
   {
     path: '/admin/clean-role-assignment',
     name: 'CleanRoleAssignment',
     component: () => import('../components/admin/CleanRoleAssignment.vue'),
-    meta: { requiresAuth: true, roles: ['admin'] }
+    meta: { requiresAuth: true, roles: [ROLES.ADMIN] }
   },
   {
     path: '/admin/role-assignment-demo',
     name: 'RoleAssignmentDemo',
     component: () => import('../components/admin/RoleAssignmentDemo.vue'),
-    meta: { requiresAuth: true, roles: ['admin'] }
+    meta: { requiresAuth: true, roles: [ROLES.ADMIN] }
   },
   {
-    path: '/admin/department-hods',
-    name: 'DepartmentHodAssignment',
-    component: () => import('../components/admin/DepartmentHodAssignment.vue'),
-    meta: { requiresAuth: true, roles: ['admin'] }
+    path: '/admin/departments',
+    name: 'DepartmentManagement',
+    component: () => import('../components/admin/DepartmentManagement.vue'),
+    meta: { requiresAuth: true, roles: [ROLES.ADMIN] }
   },
   {
     path: '/user-dashboard',
@@ -370,6 +372,15 @@ const routes = [
     path: '/admin/users/internet',
     redirect: '/internet-users'
   },
+  {
+    path: '/admin/department-hods',
+    redirect: '/admin/departments'
+  },
+  // Admin dashboard redirect for consistency
+  {
+    path: '/admin',
+    redirect: '/admin-dashboard'
+  },
 
   // Test route for role-based redirect system (development only)
   {
@@ -415,6 +426,28 @@ const routes = [
     }
   },
 
+  // Role-Based Auth Diagnostic (development only)
+  {
+    path: '/role-auth-diagnostic',
+    name: 'RoleBasedAuthDiagnostic',
+    component: () => import('../components/RoleBasedAuthDiagnostic.vue'),
+    meta: {
+      requiresAuth: false, // Allow access for debugging
+      isPublic: true
+    }
+  },
+
+  // Department HOD Diagnostic (development only)
+  {
+    path: '/department-hod-diagnostic',
+    name: 'DepartmentHodDiagnostic',
+    component: () => import('../components/admin/DepartmentHodDiagnostic.vue'),
+    meta: {
+      requiresAuth: false, // Allow access for debugging
+      isPublic: true
+    }
+  },
+
   // Catch-all route for 404 errors
   {
     path: '/:pathMatch(.*)*',
@@ -435,202 +468,28 @@ const router = createRouter({
   routes
 })
 
-// Enhanced Navigation guards with Vuex store integration
+// Enhanced Navigation guards with dual auth store integration
 router.beforeEach(async(to, from, next) => {
-  console.log('🔄 Router: Navigating from', from.path, 'to', to.path)
-
   try {
     // Import store to access auth state
     const store = (await import('../store')).default
 
-    // Wait for session restoration if not completed yet
-    if (!store.getters['auth/sessionRestored']) {
-      console.log('⏳ Router: Waiting for session restoration...')
-      await store.dispatch('auth/restoreSession')
-    }
+    // Sync auth stores before navigation
+    await syncAuthStores(store)
 
-    // Get auth state from store
-    const isAuthenticated = store.getters['auth/isAuthenticated']
-    const user = store.getters['auth/user']
-    const userRole = store.getters['auth/userRole']
-    const requiresAuth = to.meta.requiresAuth !== false
-    const isPublicRoute = to.meta.isPublic === true
+    // Use enhanced navigation guard
+    return enhancedNavigationGuard(to, from, next, store)
 
-    console.log('🔍 Router: Auth state check:')
-    console.log('  - isAuthenticated:', isAuthenticated)
-    console.log('  - userRole:', userRole)
-    console.log('  - userName:', user?.name)
-    console.log('  - requiresAuth:', requiresAuth)
-    console.log('  - isPublicRoute:', isPublicRoute)
-    console.log('  - sessionRestored:', store.getters['auth/sessionRestored'])
-
-    // Handle public routes
-    if (isPublicRoute) {
-      // If user is authenticated and trying to access login page, redirect appropriately
-      if (isAuthenticated && (to.name === 'LoginPage' || to.name === 'Login')) {
-        console.log('🔍 User is authenticated with role:', userRole)
-
-        // Check if user needs onboarding (skip for admin)
-        if (user && user.needs_onboarding && userRole !== 'admin') {
-          console.log('🔄 User needs onboarding, redirecting...')
-          return next('/onboarding')
-        }
-
-        // Check if there's a redirect query parameter
-        if (to.query.redirect) {
-          console.log('🔄 Redirect parameter found:', to.query.redirect)
-          const redirectPath = to.query.redirect
-
-          // Find the route that matches the redirect path
-          const targetRoute = router.resolve(redirectPath)
-
-          // Check if the user has access to the redirect route
-          if (targetRoute && targetRoute.meta && targetRoute.meta.roles) {
-            if (targetRoute.meta.roles.includes(userRole)) {
-              console.log('✅ User has access to redirect path:', redirectPath)
-              return next(redirectPath)
-            } else {
-              console.warn(
-                '⚠️ User does not have access to redirect path:',
-                redirectPath
-              )
-              console.log('🔄 Redirecting to default dashboard instead')
-              // Fall through to default dashboard logic
-            }
-          } else {
-            // If no role restrictions, allow the redirect
-            console.log(
-              '🔄 No role restrictions on redirect path, allowing:',
-              redirectPath
-            )
-            return next(redirectPath)
-          }
-        }
-
-        const defaultDashboard = getDefaultDashboard(userRole)
-        console.log(
-          '🏠 Default dashboard for',
-          userRole,
-          ':',
-          defaultDashboard
-        )
-
-        if (defaultDashboard) {
-          console.log('🔄 Redirecting to default dashboard:', defaultDashboard)
-          return next(defaultDashboard)
-        } else {
-          console.error('❌ No default dashboard found for role:', userRole)
-          // Fallback based on role - ensure consistency
-          if (userRole === 'admin') {
-            return next('/admin-dashboard')
-          } else if (userRole === 'head_of_department') {
-            return next('/hod-dashboard')
-          } else if (userRole === 'divisional_director') {
-            return next('/divisional-dashboard')
-          } else if (userRole === 'ict_director') {
-            return next('/dict-dashboard')
-          } else if (userRole === 'ict_officer') {
-            return next('/ict-dashboard')
-          } else {
-            return next('/user-dashboard')
-          }
-        }
-      }
-      return next()
-    }
-
-    // Handle protected routes
-    if (requiresAuth) {
-      // Check if user is authenticated
-      if (!isAuthenticated) {
-        console.log('🚫 Router: User not authenticated, redirecting to login')
-        return next({
-          name: 'LoginPage',
-          query: { redirect: to.fullPath }
-        })
-      }
-
-      // Check if user needs onboarding (except for onboarding route itself)
-      if (
-        to.name !== 'Onboarding' &&
-        userRole !== ROLES.ADMIN &&
-        user &&
-        user.needs_onboarding
-      ) {
-        console.log('🔄 Router: User needs onboarding, redirecting...')
-        return next('/onboarding')
-      }
-
-      // Prevent access to onboarding if already completed or admin
-      if (to.name === 'Onboarding') {
-        if (userRole === ROLES.ADMIN) {
-          const defaultDashboard = getDefaultDashboard(userRole)
-          return next(defaultDashboard || '/admin-dashboard')
-        }
-        if (!user || !user.needs_onboarding) {
-          const defaultDashboard = getDefaultDashboard(userRole)
-          return next(defaultDashboard || '/')
-        }
-      }
-
-      // Check role-based access
-      if (to.meta.roles && to.meta.roles.length > 0) {
-        console.log('🔍 Router: Checking role access for route:', to.path)
-        console.log('  - Required roles:', to.meta.roles)
-        console.log('  - User role:', userRole)
-
-        // Check if user has required role
-        const hasRequiredRole = to.meta.roles.includes(userRole)
-
-        if (!hasRequiredRole) {
-          console.log('⚠️ Router: User does not have required role for', to.path)
-          console.log('  - Checked userRole:', userRole, 'in', to.meta.roles, '=', hasRequiredRole)
-
-          // Get default dashboard for user's role
-          const defaultDashboard = getDefaultDashboard(userRole)
-          console.log('🏠 Router: Default dashboard for role', userRole, ':', defaultDashboard)
-
-          if (defaultDashboard && defaultDashboard !== to.path) {
-            console.log('🔄 Router: Redirecting to default dashboard with access denied error')
-            return next({
-              path: defaultDashboard,
-              query: { error: 'access_denied' }
-            })
-          } else if (to.path === defaultDashboard) {
-            console.log('✅ Router: User is accessing their default dashboard, allowing...')
-            // Allow access to default dashboard
-          } else {
-            console.log('🔄 Router: No default dashboard found, redirecting to login')
-            // Fallback to login if no default dashboard
-            return next({
-              name: 'LoginPage',
-              query: { error: 'access_denied' }
-            })
-          }
-        } else {
-          console.log('✅ Router: User has required role for', to.path)
-        }
-      } else {
-        console.log('🔍 Router: No role restrictions for route:', to.path)
-      }
-    }
-
-    // Preload images for the target route
-    preloadRouteBasedImages(to.path)
-
-    console.log('✅ Router: Navigation completed successfully to', to.path)
-    next()
   } catch (error) {
-    console.error('❌ Router navigation error:', error)
-    console.error('Error details:', {
-      message: error.message,
-      stack: error.stack,
-      to: to.path,
-      from: from.path
-    })
-    // Fallback to login page on any router error
-    next('/')
+    console.error('❌ Router: Navigation error:', error)
+    next('/login')
   }
+})
+
+// Image preloading after navigation
+router.afterEach((to) => {
+  // Preload images for the target route
+  preloadRouteBasedImages(to.path)
 })
 
 // After navigation guard for error handling
