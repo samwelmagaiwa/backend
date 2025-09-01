@@ -222,8 +222,8 @@
                         <span
                           :class="[
                             'px-2 py-1 rounded text-xs font-medium',
-                            department.is_active 
-                              ? 'bg-green-500/30 text-green-100 border border-green-400/50' 
+                            department.is_active
+                              ? 'bg-green-500/30 text-green-100 border border-green-400/50'
                               : 'bg-red-500/30 text-red-100 border border-red-400/50'
                           ]"
                         >
@@ -847,7 +847,7 @@ export default {
         divisional_director_id: department.divisional_director?.id || ''
       }
       form.value.id = department.id
-      
+
       // Refresh form data with current department ID to get available users
       try {
         await fetchFormData(department.id)
@@ -855,7 +855,7 @@ export default {
         console.error('Error refreshing form data for edit:', error)
         showErrorMessage('Failed to load available users for editing')
       }
-      
+
       showDialog.value = true
     }
 
@@ -883,7 +883,7 @@ export default {
 
       try {
         const formData = { ...form.value }
-        
+
         // Clear divisional_director_id if has_divisional_director is false
         if (!formData.has_divisional_director) {
           formData.divisional_director_id = ''

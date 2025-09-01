@@ -33,7 +33,7 @@ export async function checkRouteAccess(route, vuexStore) {
     // Use the most reliable source - prioritize data that has roles array
     const isAuthenticated = piniaAuth || vuexAuth
     const user = piniaUser || vuexUser
-    
+
     // Prioritize role from source that has roles array populated
     let userRole = null
     if (piniaUser && piniaUser.roles && piniaUser.roles.length > 0) {
@@ -43,12 +43,12 @@ export async function checkRouteAccess(route, vuexStore) {
     } else {
       userRole = piniaRole || vuexRole
     }
-    
+
     // Get roles array from the most reliable source
-    const userRoles = (piniaUser && piniaUser.roles && piniaUser.roles.length > 0) 
-      ? piniaUser.roles 
-      : (vuexUser && vuexUser.roles && vuexUser.roles.length > 0) 
-        ? vuexUser.roles 
+    const userRoles = (piniaUser && piniaUser.roles && piniaUser.roles.length > 0)
+      ? piniaUser.roles
+      : (vuexUser && vuexUser.roles && vuexUser.roles.length > 0)
+        ? vuexUser.roles
         : []
 
     console.log('🔍 Route Guard: Checking access for', route.path, {
@@ -103,7 +103,7 @@ export async function checkRouteAccess(route, vuexStore) {
       }
 
       // Check if user has required role (check both primary role and roles array)
-      const hasRequiredRole = route.meta.roles.includes(userRole) || 
+      const hasRequiredRole = route.meta.roles.includes(userRole) ||
                              userRoles.some(role => route.meta.roles.includes(role))
 
       if (!hasRequiredRole) {

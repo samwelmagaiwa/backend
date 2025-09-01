@@ -76,12 +76,7 @@ const routes = [
     component: () => import('../components/admin/CleanRoleAssignment.vue'),
     meta: { requiresAuth: true, roles: [ROLES.ADMIN] }
   },
-  {
-    path: '/admin/role-assignment-demo',
-    name: 'RoleAssignmentDemo',
-    component: () => import('../components/admin/RoleAssignmentDemo.vue'),
-    meta: { requiresAuth: true, roles: [ROLES.ADMIN] }
-  },
+
   {
     path: '/admin/departments',
     name: 'DepartmentManagement',
@@ -382,71 +377,6 @@ const routes = [
     redirect: '/admin-dashboard'
   },
 
-  // Test route for role-based redirect system (development only)
-  {
-    path: '/test-role-redirect',
-    name: 'RoleBasedRedirectTest',
-    component: () => import('../components/RoleBasedRedirectTest.vue'),
-    meta: {
-      requiresAuth: false, // Allow access for testing
-      isPublic: true
-    }
-  },
-
-  // Test route for sidebar persistence with Pinia (development only)
-  {
-    path: '/test-sidebar-persistence',
-    name: 'SidebarPersistenceDemo',
-    component: () => import('../components/SidebarPersistenceDemo.vue'),
-    meta: {
-      requiresAuth: true,
-      roles: Object.values(ROLES) // Allow all authenticated users
-    }
-  },
-
-  // Diagnostic route for admin access issues (development only)
-  {
-    path: '/admin-access-diagnostic',
-    name: 'AdminAccessDiagnostic',
-    component: () => import('../components/AdminAccessDiagnostic.vue'),
-    meta: {
-      requiresAuth: false, // Allow access for debugging
-      isPublic: true
-    }
-  },
-
-  // Admin Dashboard Diagnostic (development only)
-  {
-    path: '/admin-dashboard-diagnostic',
-    name: 'AdminDashboardDiagnostic',
-    component: () => import('../components/AdminDashboardDiagnostic.vue'),
-    meta: {
-      requiresAuth: false, // Allow access for debugging
-      isPublic: true
-    }
-  },
-
-  // Role-Based Auth Diagnostic (development only)
-  {
-    path: '/role-auth-diagnostic',
-    name: 'RoleBasedAuthDiagnostic',
-    component: () => import('../components/RoleBasedAuthDiagnostic.vue'),
-    meta: {
-      requiresAuth: false, // Allow access for debugging
-      isPublic: true
-    }
-  },
-
-  // Department HOD Diagnostic (development only)
-  {
-    path: '/department-hod-diagnostic',
-    name: 'DepartmentHodDiagnostic',
-    component: () => import('../components/admin/DepartmentHodDiagnostic.vue'),
-    meta: {
-      requiresAuth: false, // Allow access for debugging
-      isPublic: true
-    }
-  },
 
   // Catch-all route for 404 errors
   {

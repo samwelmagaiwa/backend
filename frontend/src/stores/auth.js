@@ -159,7 +159,7 @@ export const useAuthStore = defineStore('auth', () => {
     token.value = authData.token
     user.value = authData.user
     userRole.value = authData.user?.role || authData.user?.role_name
-    
+
     // Ensure roles is always an array of strings
     let rolesArray = []
     if (Array.isArray(authData.user?.roles)) {
@@ -176,7 +176,7 @@ export const useAuthStore = defineStore('auth', () => {
     else if (userRole.value) {
       rolesArray = [userRole.value]
     }
-    
+
     userRoles.value = rolesArray
     userPermissions.value = authData.user?.permissions || []
     isAuthenticated.value = true
@@ -192,7 +192,7 @@ export const useAuthStore = defineStore('auth', () => {
     console.log('🔄 Pinia Auth: Updating user data')
     user.value = { ...user.value, ...userData }
     userRole.value = userData.role || userData.role_name || userRole.value
-    
+
     // Ensure roles is always an array of strings when updating
     if (userData.roles) {
       let rolesArray = []
@@ -208,7 +208,7 @@ export const useAuthStore = defineStore('auth', () => {
       }
       userRoles.value = rolesArray
     }
-    
+
     userPermissions.value = userData.permissions || userPermissions.value
   }
 

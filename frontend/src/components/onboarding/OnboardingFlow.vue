@@ -268,7 +268,7 @@ export default {
 
     async completeOnboarding() {
       console.log('🔄 OnboardingFlow: completeOnboarding() called')
-      
+
       // Mark user as having completed onboarding
       const success = await this.markOnboardingComplete()
       console.log('📊 markOnboardingComplete result:', success)

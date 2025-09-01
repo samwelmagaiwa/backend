@@ -452,7 +452,7 @@
                         >
                           <i class="fas fa-ellipsis-v"></i>
                         </button>
-                        
+
                         <!-- Actions Dropdown -->
                         <div
                           v-if="activeActionsMenu === department.id"
@@ -576,7 +576,7 @@
               <div v-if="getFieldError('hod_user_id')" class="text-red-500 text-sm mt-1">
                 {{ getFieldError('hod_user_id') }}
               </div>
-              
+
               <!-- User Details Preview -->
               <div v-if="selectedHodId && selectedHodDetails" class="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
                 <h4 class="text-sm font-semibold text-gray-800 mb-2">Selected User Details:</h4>
@@ -1668,24 +1668,24 @@ export default {
       // Check if the click is outside the actions menu
       const actionsMenus = document.querySelectorAll('.actions-dropdown')
       const actionsButtons = document.querySelectorAll('.actions-button')
-      
+
       let clickedInsideMenu = false
       let clickedOnButton = false
-      
+
       // Check if clicked inside any actions menu
       actionsMenus.forEach(menu => {
         if (menu.contains(event.target)) {
           clickedInsideMenu = true
         }
       })
-      
+
       // Check if clicked on any actions button
       actionsButtons.forEach(button => {
         if (button.contains(event.target)) {
           clickedOnButton = true
         }
       })
-      
+
       // Close menu if clicked outside and not on button
       if (!clickedInsideMenu && !clickedOnButton) {
         this.closeActionsMenu()

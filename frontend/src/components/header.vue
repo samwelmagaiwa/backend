@@ -232,8 +232,8 @@
                 </button>
 
                 <!-- Debug Info (Temporary - Remove after testing) -->
-                <div v-if="process.env.NODE_ENV === 'development'" class="px-4 py-2 text-xs text-gray-500 border-t border-gray-200">
-                  Debug: Role = "{{ currentUser?.role || 'undefined' }}" | 
+                <div v-if="isDevelopment" class="px-4 py-2 text-xs text-gray-500 border-t border-gray-200">
+                  Debug: Role = "{{ currentUser?.role || 'undefined' }}" |
                   Is Admin = {{ currentUser?.role === 'admin' ? 'YES' : 'NO' }}
                 </div>
 
@@ -369,7 +369,7 @@
 </template>
 
 <script>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { useRouter } from 'vue-router'
 import { logoutGuard } from '@/utils/logoutGuard'
@@ -384,6 +384,11 @@ export default {
     const showProfileDropdown = ref(false)
     const showHelpModal = ref(false)
     const profileDropdown = ref(null)
+
+    // Environment check using Vue CLI's process.env
+    const isDevelopment = computed(() => {
+      return process.env.NODE_ENV === 'development'
+    })
 
     // Methods
     const toggleProfileDropdown = () => {
@@ -493,6 +498,7 @@ export default {
       showProfileDropdown,
       showHelpModal,
       profileDropdown,
+      isDevelopment,
       toggleProfileDropdown,
       closeProfileDropdown,
       formatRole,

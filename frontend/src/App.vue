@@ -42,8 +42,7 @@
       </div>
     </div>
 
-    <!-- Auth Debugger Component -->
-    <AuthDebugger />
+    <!-- Auth Debugger Component removed - using inline debug info above -->
   </div>
 </template>
 
@@ -51,13 +50,11 @@
 import { computed, onMounted, ref } from 'vue'
 import { useStore } from 'vuex'
 import AuthLoadingScreen from './components/AuthLoadingScreen.vue'
-import AuthDebugger from './components/AuthDebugger.vue'
 
 export default {
   name: 'App',
   components: {
-    AuthLoadingScreen,
-    AuthDebugger
+    AuthLoadingScreen
   },
 
   setup() {

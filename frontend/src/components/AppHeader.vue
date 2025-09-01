@@ -263,7 +263,7 @@
 
                 <!-- Debug Info (Temporary - Remove after testing) -->
                 <div v-if="process.env.NODE_ENV === 'development'" class="px-4 py-2 text-xs text-gray-500 border-t border-gray-200">
-                  Debug: Role = "{{ currentUser?.role || 'undefined' }}" | 
+                  Debug: Role = "{{ currentUser?.role || 'undefined' }}" |
                   Is Admin = {{ currentUser?.role === 'admin' ? 'YES' : 'NO' }}
                 </div>
 

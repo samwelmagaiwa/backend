@@ -64,13 +64,13 @@ export default {
         }
 
         console.log('🚀 Redirecting to dashboard:', dashboard)
-        
+
         // Add a small delay to ensure the console logs are visible
         await new Promise((resolve) => setTimeout(resolve, 500))
-        
+
         const navigationResult = await router.push(dashboard)
         console.log('✅ Navigation result:', navigationResult)
-        
+
       } catch (error) {
         console.error('❌ Error completing onboarding:', error)
         console.error('📍 Error details:', {
@@ -78,7 +78,7 @@ export default {
           stack: error.stack,
           currentUser: currentUser.value
         })
-        
+
         // Fallback redirect with more logging
         try {
           console.log('🔄 Attempting fallback redirect to /user-dashboard')
