@@ -199,6 +199,25 @@ export function useAuth() {
     }
   }
 
+  /**
+   * Get display name for a role
+   * @param {string} role - Role to get display name for
+   * @returns {string} - Display name for the role
+   */
+  const getRoleDisplayName = (role) => {
+    if (!role) return 'User'
+
+    const roleNames = {
+      [ROLES.ADMIN]: 'Administrator',
+      [ROLES.DIVISIONAL_DIRECTOR]: 'Divisional Director',
+      [ROLES.HEAD_OF_DEPARTMENT]: 'Head of Department',
+      [ROLES.ICT_DIRECTOR]: 'ICT Director',
+      [ROLES.STAFF]: 'D. IN MEDICINE',
+      [ROLES.ICT_OFFICER]: 'ICT Officer'
+    }
+    return roleNames[role] || role
+  }
+
   return {
     // State
     user,
@@ -226,6 +245,7 @@ export function useAuth() {
     hasRole,
     canAccessRoute,
     requireRole,
+    getRoleDisplayName,
 
     // Constants
     ROLES

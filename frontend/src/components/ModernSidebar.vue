@@ -738,13 +738,6 @@ export default {
           category: 'requests-management',
           description: 'Review access requests'
         },
-        '/internal-access/list': {
-          name: 'InternalAccessList',
-          displayName: 'Access Requests',
-          icon: 'fas fa-clipboard-check',
-          category: 'requests-management',
-          description: 'Review access requests'
-        },
         '/internal-access/details': {
           name: 'InternalAccessDetails',
           displayName: 'Request Details',

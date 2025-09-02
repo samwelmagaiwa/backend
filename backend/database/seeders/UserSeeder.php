@@ -13,253 +13,351 @@ class UserSeeder extends Seeder
     /**
      * Run the database seeds.
      * 
-     * This seeder creates the necessary roles for the hospital management system.
-     * For production use, create users through the admin interface or proper
-     * registration process instead of seeding demo accounts.
+     * This seeder creates users with proper role assignments using both:
+     * 1. Many-to-many system (role_user pivot table) - Primary system
+     * 2. Legacy role_id field - For backward compatibility
+     * 
+     * Each user gets their primary role assigned to role_id field and all roles
+     * assigned through the many-to-many relationship.
      */
     public function run(): void
     {
-        // Create roles first
-        $roles = [
-            ['name' => 'admin'],
-            ['name' => 'divisional_director'],
-            ['name' => 'head_of_department'],
-            ['name' => 'ict_director'],
-            ['name' => 'staff'],
-            ['name' => 'ict_officer'],
+        // Get departments for assignment
+        $departments = [
+            'ICT' => Department::where('code', 'ICT')->first(),
+            'HR' => Department::where('code', 'HR')->first(),
+            'ADMIN' => Department::where('code', 'ADMIN')->first(),
+            'NURS' => Department::where('code', 'NURS')->first(),
+            'LAB' => Department::where('code', 'LAB')->first(),
+            'PHARM' => Department::where('code', 'PHARM')->first(),
+            'MR' => Department::where('code', 'MR')->first(),
+            'RAD' => Department::where('code', 'RAD')->first(),
+            'ED' => Department::where('code', 'ED')->first(),
+            'SURG' => Department::where('code', 'SURG')->first(),
+            'OPD' => Department::where('code', 'OPD')->first(),
+            'FIN' => Department::where('code', 'FIN')->first(),
         ];
 
-        foreach ($roles as $role) {
-            Role::firstOrCreate($role);
-        }
+        // Get roles for assignment
+        $roles = [
+            'admin' => Role::where('name', 'admin')->first(),
+            'divisional_director' => Role::where('name', 'divisional_director')->first(),
+            'head_of_department' => Role::where('name', 'head_of_department')->first(),
+            'ict_director' => Role::where('name', 'ict_director')->first(),
+            'ict_officer' => Role::where('name', 'ict_officer')->first(),
+            'staff' => Role::where('name', 'staff')->first(),
+        ];
 
-        // Get departments for assignment
-        $ictDepartment = Department::where('code', 'ICT')->first();
-        $hrDepartment = Department::where('code', 'HR')->first();
-        $adminDepartment = Department::where('code', 'ADMIN')->first();
-        $nursingDepartment = Department::where('code', 'NURS')->first();
-        $labDepartment = Department::where('code', 'LAB')->first();
-        $pharmacyDepartment = Department::where('code', 'PHARM')->first();
-
-        // Note: In production, users should be created through proper registration
-        // or admin interface rather than seeding demo accounts.
-        // This seeder only creates the necessary roles for the system.
-        
-        // Uncomment the following code only for development/testing purposes:
-
+        // Create users with role assignments
         $users = [
+            // Administrative Users
             [
                 'name' => 'System Administrator',
-                'email' => 'admin@gmail.com',
+                'email' => 'admin@mnh.go.tz',
                 'phone' => '+255700000000',
                 'pf_number' => 'PF2367',
-                'department_id' => $adminDepartment?->id,
+                'department_id' => $departments['ADMIN']?->id,
                 'password' => Hash::make('12345678'),
-                'role_name' => 'admin'
+                'is_active' => true,
+                'roles' => ['admin']
             ],
-            [
-                'name' => 'ICT Officer',
-                'email' => 'ict@gmail.com',
-                'phone' => '+255700000001',
-                'pf_number' => 'PF1289',
-                'department_id' => null,
-                'password' => Hash::make('12345678'),
-                'role_name' => 'ict_officer'
-            ],
-            [
-                'name' => 'Staff Normal',
-                'email' => 'staff@gmail.com',
-                'phone' => '+255700000002',
-                'pf_number' => 'PF3746',
-                'department_id' => null,
-                'password' => Hash::make('12345678'),
-                'role_name' => 'staff'
-            ],
-            [
-                'name' => 'Divisional Director',
-                'email' => 'divisional_director@gmail.com',
-                'phone' => '+255700000003',
-                'pf_number' => 'PF6372',
-                'department_id' => null,
-                'password' => Hash::make('12345678'),
-                'role_name' => 'divisional_director'
-            ],
+            
+            // ICT Department Users
             [
                 'name' => 'ICT Director',
-                'email' => 'ict_director@gmail.com',
-                'phone' => '+255700000004',
+                'email' => 'ict.director@mnh.go.tz',
+                'phone' => '+255700000001',
                 'pf_number' => 'PF8901',
-                'department_id' => null,
+                'department_id' => $departments['ICT']?->id,
                 'password' => Hash::make('12345678'),
-                'role_name' => 'ict_director'
+                'is_active' => true,
+                'roles' => ['ict_director']
             ],
             [
-                'name' => 'Head of Department - HR',
-                'email' => 'hod_hr@gmail.com',
+                'name' => 'Senior ICT Officer',
+                'email' => 'ict.officer@mnh.go.tz',
+                'phone' => '+255700000002',
+                'pf_number' => 'PF1289',
+                'department_id' => $departments['ICT']?->id,
+                'password' => Hash::make('12345678'),
+                'is_active' => true,
+                'roles' => ['ict_officer']
+            ],
+            [
+                'name' => 'ICT Support Specialist',
+                'email' => 'ict.support@mnh.go.tz',
+                'phone' => '+255700000003',
+                'pf_number' => 'PF3456',
+                'department_id' => $departments['ICT']?->id,
+                'password' => Hash::make('12345678'),
+                'is_active' => true,
+                'roles' => ['staff']
+            ],
+            
+            // HR Department Users
+            [
+                'name' => 'HR Director',
+                'email' => 'hr.director@mnh.go.tz',
+                'phone' => '+255700000004',
+                'pf_number' => 'PF6372',
+                'department_id' => $departments['HR']?->id,
+                'password' => Hash::make('12345678'),
+                'is_active' => true,
+                'roles' => ['divisional_director']
+            ],
+            [
+                'name' => 'Head of HR Department',
+                'email' => 'hod.hr@mnh.go.tz',
                 'phone' => '+255700000005',
                 'pf_number' => 'PF5432',
-                'department_id' => null,
+                'department_id' => $departments['HR']?->id,
                 'password' => Hash::make('12345678'),
-                'role_name' => 'head_of_department'
+                'is_active' => true,
+                'roles' => ['head_of_department']
             ],
             [
-                'name' => 'Head of Department - Nursing',
-                'email' => 'hod_nursing@gmail.com',
+                'name' => 'HR Officer',
+                'email' => 'hr.officer@mnh.go.tz',
                 'phone' => '+255700000006',
-                'pf_number' => 'PF7890',
-                'department_id' => null,
+                'pf_number' => 'PF7654',
+                'department_id' => $departments['HR']?->id,
                 'password' => Hash::make('12345678'),
-                'role_name' => 'head_of_department'
+                'is_active' => true,
+                'roles' => ['staff']
             ],
+            
+            // Nursing Department Users
             [
-                'name' => 'Lab Technician',
-                'email' => 'lab_tech@gmail.com',
+                'name' => 'Chief Nursing Officer',
+                'email' => 'cno@mnh.go.tz',
                 'phone' => '+255700000007',
-                'pf_number' => 'PF4567',
-                'department_id' => null,
+                'pf_number' => 'PF7890',
+                'department_id' => $departments['NURS']?->id,
                 'password' => Hash::make('12345678'),
-                'role_name' => 'staff'
+                'is_active' => true,
+                'roles' => ['head_of_department']
             ],
             [
-                'name' => 'Pharmacist',
-                'email' => 'pharmacist@gmail.com',
+                'name' => 'Senior Nurse',
+                'email' => 'senior.nurse@mnh.go.tz',
                 'phone' => '+255700000008',
-                'pf_number' => 'PF9876',
-                'department_id' => null,
+                'pf_number' => 'PF1122',
+                'department_id' => $departments['NURS']?->id,
                 'password' => Hash::make('12345678'),
-                'role_name' => 'staff'
+                'is_active' => true,
+                'roles' => ['staff']
             ],
-             [
-        'name' => 'John Mwanga',
-        'email' => 'john.mwanga@gmail.com',
-        'phone' => '+255700000009',
-        'pf_number' => 'PF1122',
-        'department_id' => null,
-        'password' => Hash::make('12345678'),
-        'role_name' => 'staff'
-    ],
-    [
-        'name' => 'Asha Juma',
-        'email' => 'asha.juma@gmail.com',
-        'phone' => '+255700000010',
-        'pf_number' => 'PF3344',
-        'department_id' => null,
-        'password' => Hash::make('12345678'),
-        'role_name' => 'staff'
-    ],
-    [
-        'name' => 'David Selemani',
-        'email' => 'david.selemani@gmail.com',
-        'phone' => '+255700000011',
-        'pf_number' => 'PF5566',
-        'department_id' => null,
-        'password' => Hash::make('12345678'),
-        'role_name' => 'staff'
-    ],
-    [
-        'name' => 'Fatuma Bakari',
-        'email' => 'fatuma.bakari@gmail.com',
-        'phone' => '+255700000012',
-        'pf_number' => 'PF7788',
-        'department_id' => null,
-        'password' => Hash::make('12345678'),
-        'role_name' => 'staff'
-    ],
-    [
-        'name' => 'Samuel Nyerere',
-        'email' => 'samuel.nyerere@gmail.com',
-        'phone' => '+255700000013',
-        'pf_number' => 'PF9900',
-        'department_id' => null,
-        'password' => Hash::make('12345678'),
-        'role_name' => 'staff'
-    ],
-    [
-        'name' => 'Rashid Ali',
-        'email' => 'rashid.ali@gmail.com',
-        'phone' => '+255700000014',
-        'pf_number' => 'PF2233',
-        'department_id' => null,
-        'password' => Hash::make('12345678'),
-        'role_name' => 'staff'
-    ],
-    [
-        'name' => 'Neema Msuya',
-        'email' => 'neema.msuya@gmail.com',
-        'phone' => '+255700000015',
-        'pf_number' => 'PF4455',
-        'department_id' => null,
-        'password' => Hash::make('12345678'),
-        'role_name' => 'staff'
-    ],
-    [
-        'name' => 'Mohamed Suleiman',
-        'email' => 'mohamed.suleiman@gmail.com',
-        'phone' => '+255700000016',
-        'pf_number' => 'PF6677',
-        'department_id' => null,
-        'password' => Hash::make('12345678'),
-        'role_name' => 'staff'
-    ],
-    [
-        'name' => 'Amina Hassan',
-        'email' => 'amina.hassan@gmail.com',
-        'phone' => '+255700000017',
-        'pf_number' => 'PF8899',
-        'department_id' => null,
-        'password' => Hash::make('12345678'),
-        'role_name' => 'staff'
-    ],
-    [
-        'name' => 'Peter Komba',
-        'email' => 'peter.komba@gmail.com',
-        'phone' => '+255700000018',
-        'pf_number' => 'PF1010',
-        'department_id' => null,
-        'password' => Hash::make('12345678'),
-        'role_name' => 'staff'
-    ],
-];
+            [
+                'name' => 'Registered Nurse',
+                'email' => 'nurse1@mnh.go.tz',
+                'phone' => '+255700000009',
+                'pf_number' => 'PF3344',
+                'department_id' => $departments['NURS']?->id,
+                'password' => Hash::make('12345678'),
+                'is_active' => true,
+                'roles' => ['staff']
+            ],
+            [
+                'name' => 'Staff Nurse',
+                'email' => 'nurse2@mnh.go.tz',
+                'phone' => '+255700000010',
+                'pf_number' => 'PF5566',
+                'department_id' => $departments['NURS']?->id,
+                'password' => Hash::make('12345678'),
+                'is_active' => true,
+                'roles' => ['staff']
+            ],
+            
+            // Laboratory Department Users
+            [
+                'name' => 'Chief Laboratory Technologist',
+                'email' => 'chief.lab@mnh.go.tz',
+                'phone' => '+255700000011',
+                'pf_number' => 'PF4567',
+                'department_id' => $departments['LAB']?->id,
+                'password' => Hash::make('12345678'),
+                'is_active' => true,
+                'roles' => ['head_of_department']
+            ],
+            [
+                'name' => 'Senior Lab Technician',
+                'email' => 'lab.tech1@mnh.go.tz',
+                'phone' => '+255700000012',
+                'pf_number' => 'PF7788',
+                'department_id' => $departments['LAB']?->id,
+                'password' => Hash::make('12345678'),
+                'is_active' => true,
+                'roles' => ['staff']
+            ],
+            [
+                'name' => 'Laboratory Assistant',
+                'email' => 'lab.assistant@mnh.go.tz',
+                'phone' => '+255700000013',
+                'pf_number' => 'PF9900',
+                'department_id' => $departments['LAB']?->id,
+                'password' => Hash::make('12345678'),
+                'is_active' => true,
+                'roles' => ['staff']
+            ],
+            
+            // Pharmacy Department Users
+            [
+                'name' => 'Chief Pharmacist',
+                'email' => 'chief.pharmacist@mnh.go.tz',
+                'phone' => '+255700000014',
+                'pf_number' => 'PF9876',
+                'department_id' => $departments['PHARM']?->id,
+                'password' => Hash::make('12345678'),
+                'is_active' => true,
+                'roles' => ['head_of_department']
+            ],
+            [
+                'name' => 'Senior Pharmacist',
+                'email' => 'pharmacist1@mnh.go.tz',
+                'phone' => '+255700000015',
+                'pf_number' => 'PF2233',
+                'department_id' => $departments['PHARM']?->id,
+                'password' => Hash::make('12345678'),
+                'is_active' => true,
+                'roles' => ['staff']
+            ],
+            [
+                'name' => 'Pharmacy Technician',
+                'email' => 'pharm.tech@mnh.go.tz',
+                'phone' => '+255700000016',
+                'pf_number' => 'PF4455',
+                'department_id' => $departments['PHARM']?->id,
+                'password' => Hash::make('12345678'),
+                'is_active' => true,
+                'roles' => ['staff']
+            ],
+            
+            // Additional Staff Members
+            [
+                'name' => 'John Mwanga',
+                'email' => 'john.mwanga@mnh.go.tz',
+                'phone' => '+255700000017',
+                'pf_number' => 'PF6677',
+                'department_id' => $departments['NURS']?->id,
+                'password' => Hash::make('12345678'),
+                'is_active' => true,
+                'roles' => ['staff']
+            ],
+            [
+                'name' => 'Asha Juma',
+                'email' => 'asha.juma@mnh.go.tz',
+                'phone' => '+255700000018',
+                'pf_number' => 'PF8899',
+                'department_id' => $departments['NURS']?->id,
+                'password' => Hash::make('12345678'),
+                'is_active' => true,
+                'roles' => ['staff']
+            ],
+            [
+                'name' => 'David Selemani',
+                'email' => 'david.selemani@mnh.go.tz',
+                'phone' => '+255700000019',
+                'pf_number' => 'PF1010',
+                'department_id' => $departments['LAB']?->id,
+                'password' => Hash::make('12345678'),
+                'is_active' => true,
+                'roles' => ['staff']
+            ],
+            [
+                'name' => 'Fatuma Bakari',
+                'email' => 'fatuma.bakari@mnh.go.tz',
+                'phone' => '+255700000020',
+                'pf_number' => 'PF1212',
+                'department_id' => $departments['PHARM']?->id,
+                'password' => Hash::make('12345678'),
+                'is_active' => true,
+                'roles' => ['staff']
+            ],
+        ];
+
+        $this->command->info('Creating users with role assignments...');
 
         foreach ($users as $userData) {
-            $roleName = $userData['role_name'];
-            unset($userData['role_name']);
+            // Extract roles from user data
+            $userRoles = $userData['roles'] ?? ['staff'];
+            unset($userData['roles']);
             
-            $role = Role::where('name', $roleName)->first();
-            if ($role) {
-                $userData['role_id'] = $role->id;
-                User::firstOrCreate(['email' => $userData['email']], $userData);
+            // Get the primary role for role_id assignment
+            $primaryRoleName = $userRoles[0] ?? 'staff';
+            $primaryRole = $roles[$primaryRoleName] ?? $roles['staff'];
+            
+            // Add role_id to user data for backward compatibility
+            if ($primaryRole) {
+                $userData['role_id'] = $primaryRole->id;
             }
+            
+            // Create or update user
+            $user = User::firstOrCreate(
+                ['email' => $userData['email']], 
+                $userData
+            );
+            
+            // Assign roles via many-to-many relationship
+            foreach ($userRoles as $roleName) {
+                $role = $roles[$roleName] ?? $roles['staff'];
+                if ($role && !$user->roles()->where('role_id', $role->id)->exists()) {
+                    $user->roles()->attach($role->id, [
+                        'assigned_at' => now(),
+                        'assigned_by' => 1, // System assignment
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
+            }
+            
+            $departmentName = $user->department ? $user->department->name : 'No Department';
+            $assignedRoles = implode(', ', $userRoles);
+            $primaryRoleInfo = $primaryRole ? " (role_id: {$primaryRole->id})" : '';
+            $this->command->info("Created user: {$user->name} ({$departmentName}) - Roles: {$assignedRoles}{$primaryRoleInfo}");
         }
 
-        // After creating users, update departments with HOD assignments
-        //$this->assignHeadsOfDepartments();
+        // Update department relationships
+        $this->updateDepartmentRelationships();
+
+        $this->command->info('Users created successfully with role assignments!');
     }
 
     /**
-     * Assign heads of departments after users are created
+     * Update department relationships based on role assignments
      */
-    private function assignHeadsOfDepartments(): void
+    private function updateDepartmentRelationships(): void
     {
-        // Assign ICT Director as HOD of ICT Department
-        $ictDirector = User::where('email', 'ict_director@gmail.com')->first();
-        $ictDepartment = Department::where('code', 'ICT')->first();
-        if ($ictDirector && $ictDepartment) {
-            $ictDepartment->update(['hod_user_id' => $ictDirector->id]);
+        $this->command->info('Updating department relationships...');
+
+        // Update HOD assignments
+        $hodRole = Role::where('name', 'head_of_department')->first();
+        if ($hodRole) {
+            foreach ($hodRole->users as $user) {
+                if ($user->department_id) {
+                    $department = Department::find($user->department_id);
+                    if ($department && !$department->hod_user_id) {
+                        $department->update(['hod_user_id' => $user->id]);
+                        $this->command->info("  → Set {$user->name} as HOD of {$department->name}");
+                    }
+                }
+            }
         }
 
-        // Assign HR HOD
-        $hrHod = User::where('email', 'hod_hr@gmail.com')->first();
-        $hrDepartment = Department::where('code', 'HR')->first();
-        if ($hrHod && $hrDepartment) {
-            $hrDepartment->update(['hod_user_id' => $hrHod->id]);
-        }
-
-        // Assign Nursing HOD
-        $nursingHod = User::where('email', 'hod_nursing@gmail.com')->first();
-        $nursingDepartment = Department::where('code', 'NURS')->first();
-        if ($nursingHod && $nursingDepartment) {
-            $nursingDepartment->update(['hod_user_id' => $nursingHod->id]);
+        // Update Divisional Director assignments
+        $divDirectorRole = Role::where('name', 'divisional_director')->first();
+        if ($divDirectorRole) {
+            foreach ($divDirectorRole->users as $user) {
+                if ($user->department_id) {
+                    $department = Department::find($user->department_id);
+                    if ($department && !$department->divisional_director_id) {
+                        $department->update([
+                            'divisional_director_id' => $user->id,
+                            'has_divisional_director' => true
+                        ]);
+                        $this->command->info("  → Set {$user->name} as Divisional Director of {$department->name}");
+                    }
+                }
+            }
         }
     }
 }

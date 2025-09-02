@@ -583,12 +583,13 @@
                   </div>
                 </div>
               </div>
+
+              <!-- Footer -->
+              <AppFooter />
             </div>
           </div>
         </div>
       </main>
-      <!-- Footer -->
-      <AppFooter />
     </div>
 
     <!-- Loading Modal -->
@@ -1059,13 +1060,13 @@ export default {
         // Add small delay to show loading state
         await new Promise((resolve) => setTimeout(resolve, 200))
 
-        // Navigate to both-service-form with request ID for HOD review
+        // Navigate to internal-access/details with proper query parameters
         await router.push({
-          path: '/both-service-form',
+          path: '/internal-access/details',
           query: {
-            mode: 'hod-review',
-            requestId: request.id,
-            userAccessId: request.userAccessId // Pass the real user access ID
+            id: request.id,
+            type: request.type,
+            userAccessId: request.userAccessId // Pass the real user access ID for API calls
           }
         })
       } catch (error) {

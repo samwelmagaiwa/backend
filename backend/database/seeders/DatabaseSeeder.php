@@ -20,10 +20,9 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'demo@example.com',
         // ]);
         $this->call([
-        RoleSeeder::class,
-        DepartmentSeeder::class,  // Create departments first
-        UserSeeder::class,        // Then create users with department_id
-        RoleManagementSeeder::class,
-    ]);
+            DepartmentSeeder::class,              // Create departments first
+            RoleManagementSeeder::class,          // Create roles with permissions and structure
+            UserSeeder::class,                    // Create users with role assignments
+        ]);
     }
 }

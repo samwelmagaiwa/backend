@@ -72,13 +72,27 @@ export async function checkRouteAccess(route, vuexStore) {
         console.log('🔄 Route Guard: User needs onboarding, redirecting...', {
           userRole,
           needs_onboarding: user.needs_onboarding,
-          targetRoute: route.path
+          targetRoute: route.path,
+          routeName: route.name,
+          userId: user.id,
+          userName: user.name
         })
         return {
           hasAccess: false,
           redirectTo: '/onboarding',
           reason: 'Onboarding required'
         }
+      }
+
+      // Debug log when onboarding check passes
+      if (route.name !== 'Onboarding') {
+        console.log('✅ Route Guard: Onboarding check passed', {
+          userRole,
+          needs_onboarding: user?.needs_onboarding,
+          targetRoute: route.path,
+          routeName: route.name,
+          isAdmin: userRole === 'admin' || userRole === 'ADMIN'
+        })
       }
 
       // Additional check: if admin user is trying to access onboarding, redirect to dashboard

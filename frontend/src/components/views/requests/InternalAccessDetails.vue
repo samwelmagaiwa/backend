@@ -620,6 +620,8 @@ import Header from '@/components/header.vue'
 import ModernSidebar from '@/components/ModernSidebar.vue'
 import AppFooter from '@/components/footer.vue'
 import { useAuth } from '@/composables/useAuth'
+// Import personalInfoService for API calls
+// Note: We'll import it dynamically in the loadRequestData method to avoid import issues
 
 export default {
   name: 'InternalAccessDetails',
@@ -883,20 +885,80 @@ export default {
       isLoading.value = true
       try {
         const requestId = route.query.id
-        const _requestType = route.query.type // Prefixed with _ to indicate intentionally unused
+        const requestType = route.query.type
+        const userAccessId = route.query.userAccessId
 
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1000))
+        console.log('Loading request data:', { requestId, requestType, userAccessId })
 
-        // In real implementation, fetch from API
-        requestData.value = mockRequestData[requestId] || null
-
-        if (!requestData.value) {
-          throw new Error('Request not found')
+        // If we have a userAccessId, fetch real data from API
+        if (userAccessId) {
+          try {
+            // Import the service dynamically to avoid import issues
+            const { default: personalInfoService } = await import('@/services/personalInfoService')
+            
+            const result = await personalInfoService.getPersonalInfoFromUserAccess(userAccessId)
+            
+            if (result.success) {
+              // Transform API data to match component structure
+              const apiData = result.data
+              
+              requestData.value = {
+                id: requestId,
+                type: requestType,
+                staffName: apiData.personal_information?.staff_name || apiData.pf_number || 'Unknown',
+                pfNumber: apiData.personal_information?.pf_number || apiData.pf_number || 'Unknown',
+                department: apiData.personal_information?.department || apiData.department || 'Unknown',
+                digitalSignature: apiData.personal_information?.signature?.exists || apiData.signature?.exists || false,
+                moduleRequestedFor: 'Use', // Default value
+                selectedModules: Array.isArray(apiData.request_details?.request_type) 
+                  ? apiData.request_details.request_type 
+                  : [apiData.request_details?.request_type || requestType],
+                accessType: 'Permanent (until retirement)', // Default value
+                temporaryUntil: null,
+                submissionDate: apiData.request_details?.submission_date || apiData.request_details?.created_at || new Date().toISOString().split('T')[0],
+                currentStatus: apiData.request_details?.status || 'pending',
+                hodApprovalStatus: 'pending', // Since this is for HOD approval
+                divisionalStatus: 'pending',
+                dictStatus: 'pending',
+                headOfItStatus: 'pending',
+                ictStatus: 'pending',
+                comments: apiData.request_details?.purpose ? 
+                  (Array.isArray(apiData.request_details.purpose) ? 
+                    apiData.request_details.purpose.join(', ') : 
+                    apiData.request_details.purpose) : 
+                  'No comments provided',
+                hodApprovalDate: null,
+                divisionalApprovalDate: null,
+                dictApprovalDate: null,
+                headOfItApprovalDate: null,
+                ictApprovalDate: null
+              }
+              
+              console.log('✅ Real request data loaded:', requestData.value)
+            } else {
+              throw new Error(result.error || 'Failed to load request data')
+            }
+          } catch (apiError) {
+            console.error('❌ API Error:', apiError)
+            // Fallback to mock data if API fails
+            requestData.value = mockRequestData[requestId] || null
+            
+            if (!requestData.value) {
+              throw new Error('Request not found in both API and mock data')
+            }
+          }
+        } else {
+          // Fallback to mock data if no userAccessId
+          console.log('No userAccessId provided, using mock data')
+          requestData.value = mockRequestData[requestId] || null
+          
+          if (!requestData.value) {
+            throw new Error('Request not found')
+          }
         }
       } catch (error) {
         console.error('Error loading request:', error)
-        alert('Error loading request details')
+        alert('Error loading request details: ' + error.message)
         router.push('/hod-dashboard/request-list')
       } finally {
         isLoading.value = false
@@ -908,7 +970,10 @@ export default {
 
       isProcessing.value = true
       try {
-        // Simulate API call
+        console.log('Approving request:', requestData.value.id, 'as', userRole.value)
+        
+        // TODO: Implement real API call for approval
+        // For now, simulate the API call
         await new Promise((resolve) => setTimeout(resolve, 1500))
 
         // Update the appropriate approval status
@@ -927,7 +992,6 @@ export default {
             requestData.value.dictStatus = 'approved'
             requestData.value.dictApprovalDate = currentDate
             break
-
           case ROLES.ICT_OFFICER:
             requestData.value.ictStatus = 'approved'
             requestData.value.ictApprovalDate = currentDate
@@ -940,8 +1004,10 @@ export default {
           text: `Request ${requestData.value.id} has been successfully approved.`
         }
         showSuccessModal.value = true
+        
+        console.log('✅ Request approved successfully')
       } catch (error) {
-        console.error('Error approving request:', error)
+        console.error('❌ Error approving request:', error)
         alert('Error approving request. Please try again.')
       } finally {
         isProcessing.value = false
@@ -953,7 +1019,10 @@ export default {
 
       isProcessing.value = true
       try {
-        // Simulate API call
+        console.log('Rejecting request:', requestData.value.id, 'as', userRole.value)
+        
+        // TODO: Implement real API call for rejection
+        // For now, simulate the API call
         await new Promise((resolve) => setTimeout(resolve, 1500))
 
         // Update the appropriate approval status
@@ -972,7 +1041,6 @@ export default {
             requestData.value.dictStatus = 'rejected'
             requestData.value.dictApprovalDate = currentDate
             break
-
           case ROLES.ICT_OFFICER:
             requestData.value.ictStatus = 'rejected'
             requestData.value.ictApprovalDate = currentDate
@@ -986,8 +1054,10 @@ export default {
           text: `Request ${requestData.value.id} has been rejected.`
         }
         showSuccessModal.value = true
+        
+        console.log('✅ Request rejected successfully')
       } catch (error) {
-        console.error('Error rejecting request:', error)
+        console.error('❌ Error rejecting request:', error)
         alert('Error rejecting request. Please try again.')
       } finally {
         isProcessing.value = false

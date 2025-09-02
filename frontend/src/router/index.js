@@ -312,6 +312,23 @@ const routes = [
     }
   },
 
+  // Debug route for HOD Dashboard
+  {
+    path: '/hod-dashboard/debug',
+    name: 'HODDashboardDebug',
+    component: () =>
+      import('../components/debug/HODDashboardDebug.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: [
+        ROLES.HEAD_OF_DEPARTMENT,
+        ROLES.DIVISIONAL_DIRECTOR,
+        ROLES.ICT_DIRECTOR,
+        ROLES.ICT_OFFICER
+      ]
+    }
+  },
+
   // Admin User Management routes
   {
     path: '/service-users',

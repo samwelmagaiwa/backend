@@ -246,7 +246,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/user-access/{userAccessId}/personal-info', [BothServiceFormController::class, 'getPersonalInfoFromUserAccess'])
             ->name('both-service-form.personal-info');
         Route::get('/hod/user-access-requests', [BothServiceFormController::class, 'getUserAccessRequestsForHOD'])
-            ->middleware('both.service.role:hod')
+            ->middleware('both.service.role:hod,divisional_director')
             ->name('both-service-form.hod.user-access-requests');
         
         // Role-based approval routes with specific role requirements

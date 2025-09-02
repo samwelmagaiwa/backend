@@ -54,6 +54,9 @@ class BothServiceFormRoleMiddleware
 
         // If a specific role is required for this route, check it
         if ($requiredRole) {
+            // Support comma-separated roles
+            $requiredRoles = explode(',', $requiredRole);
+            
             $roleMapping = [
                 'hod' => ['head_of_department'],
                 'divisional_director' => ['divisional_director'],
@@ -62,12 +65,18 @@ class BothServiceFormRoleMiddleware
                 'admin' => ['admin'],
             ];
 
-            $allowedForRoute = $roleMapping[$requiredRole] ?? [];
+            $allowedForRoute = [];
+            foreach ($requiredRoles as $role) {
+                $role = trim($role); // Remove any whitespace
+                if (isset($roleMapping[$role])) {
+                    $allowedForRoute = array_merge($allowedForRoute, $roleMapping[$role]);
+                }
+            }
             
             if (!array_intersect($userRoles, $allowedForRoute)) {
                 return response()->json([
                     'success' => false,
-                    'message' => "Access denied. Required role: {$requiredRole}"
+                    'message' => "Access denied. Required roles: {$requiredRole}"
                 ], 403);
             }
         }
