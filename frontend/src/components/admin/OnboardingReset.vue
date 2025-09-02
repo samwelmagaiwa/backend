@@ -275,7 +275,7 @@
                         </h4>
                         <p class="text-teal-100 text-xs">{{ user.email }}</p>
                         <p class="text-teal-200 text-xs capitalize">
-                          {{ user.role.replace("_", " ") }}
+                          {{ user.role ? user.role.replace("_", " ") : 'No Role' }}
                         </p>
                       </div>
                       <div class="flex flex-col space-y-1">
@@ -586,11 +586,17 @@ export default {
         console.log('📡 API response:', result)
 
         if (result.success) {
-          users.value = result.data.users
-          filteredUsers.value = result.data.users
-          currentPage.value = result.data.pagination.current_page
-          totalPages.value = result.data.pagination.last_page
-          totalUsers.value = result.data.pagination.total
+          // Transform users to ensure role property exists
+          const transformedUsers = (result.data.users || []).map(user => ({
+            ...user,
+            role: user.role || user.primary_role || 'staff' // Fallback to primary_role or 'staff'
+          }))
+          
+          users.value = transformedUsers
+          filteredUsers.value = transformedUsers
+          currentPage.value = result.data.pagination?.current_page || 1
+          totalPages.value = result.data.pagination?.last_page || 1
+          totalUsers.value = result.data.pagination?.total || 0
           console.log('✅ Users loaded successfully:', {
             count: users.value.length,
             total: totalUsers.value
