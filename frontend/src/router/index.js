@@ -325,30 +325,13 @@ const routes = [
   {
     path: '/admin/onboarding-reset',
     name: 'OnboardingReset',
-    component: () => import('../components/admin/OnboardingResetDebug.vue'),
-    meta: {
-      requiresAuth: true,
-      roles: [ROLES.ADMIN]
-    }
-  },
-  {
-    path: '/admin/onboarding-reset-original',
-    name: 'OnboardingResetOriginal',
     component: () => import('../components/admin/OnboardingReset.vue'),
     meta: {
       requiresAuth: true,
       roles: [ROLES.ADMIN]
     }
   },
-  {
-    path: '/admin/onboarding-reset-noauth',
-    name: 'OnboardingResetNoAuth',
-    component: () => import('../components/admin/OnboardingReset.vue'),
-    meta: {
-      requiresAuth: false,
-      isPublic: true
-    }
-  },
+
 
 
   {
