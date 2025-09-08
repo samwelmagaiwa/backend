@@ -30,19 +30,15 @@
                 top: Math.random() * 100 + '%',
                 animationDelay: Math.random() * 3 + 's',
                 animationDuration: Math.random() * 3 + 2 + 's',
-                fontSize: Math.random() * 20 + 10 + 'px',
+                fontSize: Math.random() * 20 + 10 + 'px'
               }"
             >
               <i
                 :class="[
                   'fas',
-                  [
-                    'fa-heartbeat',
-                    'fa-user-md',
-                    'fa-hospital',
-                    'fa-stethoscope',
-                    'fa-plus',
-                  ][Math.floor(Math.random() * 5)],
+                  ['fa-heartbeat', 'fa-user-md', 'fa-hospital', 'fa-stethoscope', 'fa-plus'][
+                    Math.floor(Math.random() * 5)
+                  ]
                 ]"
               ></i>
             </div>
@@ -51,9 +47,7 @@
 
         <div class="max-w-12xl mx-auto relative z-10">
           <!-- Header Section -->
-          <div
-            class="medical-glass-card rounded-t-3xl p-4 mb-0 border-b border-blue-300/30"
-          >
+          <div class="medical-glass-card rounded-t-3xl p-4 mb-0 border-b border-blue-300/30">
             <div class="flex justify-between items-center">
               <!-- Left Logo -->
               <div
@@ -93,11 +87,7 @@
                 <h2
                   class="text-base font-bold text-blue-100 tracking-wide drop-shadow-md animate-fade-in-delay"
                 >
-                  {{
-                    isReviewMode
-                      ? "REQUEST REVIEW - " + requestId
-                      : "UNIFIED SERVICES FORM"
-                  }}
+                  {{ isReviewMode ? 'REQUEST REVIEW - ' + requestId : 'UNIFIED SERVICES FORM' }}
                 </h2>
               </div>
 
@@ -124,14 +114,9 @@
               @submit.prevent="onSubmit"
               :class="['p-4 space-y-4', { 'review-mode': isReviewMode }]"
             >
-              <div
-                class="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-2 min-h-0"
-              >
+              <div class="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-2 min-h-0">
                 <!-- Left: shared + selectors -->
-                <section
-                  aria-labelledby="applicant-details"
-                  class="xl:col-span-4 space-y-2"
-                >
+                <section aria-labelledby="applicant-details" class="xl:col-span-4 space-y-2">
                   <!-- Personal Information Section -->
                   <div
                     class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-2 rounded-lg backdrop-blur-sm hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 group"
@@ -142,20 +127,14 @@
                       >
                         <i class="fas fa-user-md text-white text-xs"></i>
                       </div>
-                      <h3
-                        class="text-sm font-bold text-white flex items-center"
-                      >
-                        <i
-                          class="fas fa-id-card mr-1 text-blue-300 text-xs"
-                        ></i>
+                      <h3 class="text-sm font-bold text-white flex items-center">
+                        <i class="fas fa-id-card mr-1 text-blue-300 text-xs"></i>
                         Personal Information
                       </h3>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                       <div>
-                        <label
-                          class="block text-xs font-bold text-blue-100 mb-1"
-                        >
+                        <label class="block text-xs font-bold text-blue-100 mb-1">
                           PF Number <span class="text-red-400">*</span>
                         </label>
                         <div class="relative">
@@ -170,18 +149,13 @@
                             class="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/10 to-blue-600/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
                           ></div>
                         </div>
-                        <p
-                          v-if="errors.pfNumber"
-                          class="error text-red-400 text-sm mt-1"
-                        >
+                        <p v-if="errors.pfNumber" class="error text-red-400 text-sm mt-1">
                           {{ errors.pfNumber }}
                         </p>
                       </div>
 
                       <div>
-                        <label
-                          class="block text-xs font-bold text-blue-100 mb-1"
-                        >
+                        <label class="block text-xs font-bold text-blue-100 mb-1">
                           Staff Name <span class="text-red-400">*</span>
                         </label>
                         <div class="relative">
@@ -196,18 +170,13 @@
                             class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/10 to-blue-600/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
                           ></div>
                         </div>
-                        <p
-                          v-if="errors.staffName"
-                          class="error text-red-400 text-sm mt-1"
-                        >
+                        <p v-if="errors.staffName" class="error text-red-400 text-sm mt-1">
                           {{ errors.staffName }}
                         </p>
                       </div>
 
                       <div>
-                        <label
-                          class="block text-xs font-bold text-blue-100 mb-1"
-                        >
+                        <label class="block text-xs font-bold text-blue-100 mb-1">
                           Department <span class="text-red-400">*</span>
                         </label>
                         <div class="relative">
@@ -225,9 +194,7 @@
                       </div>
 
                       <div>
-                        <label
-                          class="block text-xs font-bold text-blue-100 mb-1"
-                        >
+                        <label class="block text-xs font-bold text-blue-100 mb-1">
                           Contact Number <span class="text-red-400">*</span>
                         </label>
                         <div class="relative">
@@ -244,9 +211,7 @@
                         </div>
                       </div>
                       <div class="md:col-span-3">
-                        <label
-                          class="block text-xs font-bold text-blue-100 mb-2 text-center"
-                        >
+                        <label class="block text-xs font-bold text-blue-100 mb-2 text-center">
                           Signature <span class="text-red-400">*</span>
                         </label>
                         <div class="relative max-w-sm mx-auto">
@@ -256,12 +221,8 @@
                           >
                             <div class="text-center">
                               <div class="mb-1">
-                                <i
-                                  class="fas fa-signature text-blue-300 text-lg mb-1"
-                                ></i>
-                                <p class="text-blue-100 text-xs">
-                                  No signature uploaded
-                                </p>
+                                <i class="fas fa-signature text-blue-300 text-lg mb-1"></i>
+                                <p class="text-blue-100 text-xs">No signature uploaded</p>
                               </div>
                               <button
                                 type="button"
@@ -278,10 +239,7 @@
                             v-else
                             class="w-full px-2 py-2 border-2 border-blue-300/40 rounded-lg bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 min-h-[60px] flex items-center justify-center relative"
                           >
-                            <div
-                              v-if="isImage(signaturePreview)"
-                              class="text-center"
-                            >
+                            <div v-if="isImage(signaturePreview)" class="text-center">
                               <img
                                 :src="signaturePreview"
                                 alt="Digital Signature"
@@ -295,9 +253,7 @@
                               <div
                                 class="w-16 h-16 bg-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-2"
                               >
-                                <i
-                                  class="fas fa-file-pdf text-red-400 text-2xl"
-                                ></i>
+                                <i class="fas fa-file-pdf text-red-400 text-2xl"></i>
                               </div>
                               <p class="text-sm text-blue-100">
                                 {{ signatureFileName }}
@@ -346,12 +302,8 @@
                       >
                         <i class="fas fa-desktop text-white text-xs"></i>
                       </div>
-                      <h3
-                        class="text-sm font-bold text-white flex items-center"
-                      >
-                        <i
-                          class="fas fa-th-large mr-1 text-blue-300 text-xs"
-                        ></i>
+                      <h3 class="text-sm font-bold text-white flex items-center">
+                        <i class="fas fa-th-large mr-1 text-blue-300 text-xs"></i>
                         Module Request
                       </h3>
                     </div>
@@ -361,12 +313,8 @@
                       <div
                         class="bg-white/10 rounded-lg p-2 border border-blue-300/30 backdrop-blur-sm"
                       >
-                        <label
-                          class="block text-sm font-bold text-blue-100 mb-2 text-center"
-                        >
-                          <i
-                            class="fas fa-toggle-on mr-1 text-blue-300 text-xs"
-                          ></i>
+                        <label class="block text-sm font-bold text-blue-100 mb-2 text-center">
+                          <i class="fas fa-toggle-on mr-1 text-blue-300 text-xs"></i>
                           Module Requested for
                           <span class="text-red-400">*</span>
                         </label>
@@ -380,12 +328,8 @@
                               value="use"
                               class="w-4 h-4 text-blue-600 border-blue-300 focus:ring-blue-500 mr-2"
                             />
-                            <span
-                              class="text-sm font-medium text-blue-100 flex items-center"
-                            >
-                              <i
-                                class="fas fa-plus-circle mr-1 text-green-400 text-xs"
-                              ></i>
+                            <span class="text-sm font-medium text-blue-100 flex items-center">
+                              <i class="fas fa-plus-circle mr-1 text-green-400 text-xs"></i>
                               Use
                             </span>
                           </label>
@@ -398,12 +342,8 @@
                               value="revoke"
                               class="w-4 h-4 text-blue-600 border-blue-300 focus:ring-blue-500 mr-2"
                             />
-                            <span
-                              class="text-sm font-medium text-blue-100 flex items-center"
-                            >
-                              <i
-                                class="fas fa-minus-circle mr-1 text-red-400 text-xs"
-                              ></i>
+                            <span class="text-sm font-medium text-blue-100 flex items-center">
+                              <i class="fas fa-minus-circle mr-1 text-red-400 text-xs"></i>
                               Revoke
                             </span>
                           </label>
@@ -449,10 +389,7 @@
                       </div>
 
                       <!-- Selected chips -->
-                      <div
-                        v-if="selectedWellsoft.length"
-                        class="flex flex-wrap gap-2 mb-4"
-                      >
+                      <div v-if="selectedWellsoft.length" class="flex flex-wrap gap-2 mb-4">
                         <span
                           v-for="m in selectedWellsoft"
                           :key="'selW-' + m"
@@ -473,9 +410,7 @@
                       <div
                         class="bg-white/10 rounded-lg p-3 max-h-40 border border-blue-300/30 overflow-y-auto backdrop-blur-sm"
                       >
-                        <div
-                          class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2"
-                        >
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                           <label
                             v-for="m in filteredWellsoft"
                             :key="'optW-' + m"
@@ -487,9 +422,7 @@
                               @change="toggleWellsoft(m)"
                               class="w-4 h-4 text-blue-600 border-blue-300 rounded focus:ring-blue-500 mr-3 module-request-editable"
                             />
-                            <span class="text-sm font-medium text-blue-100">{{
-                              m
-                            }}</span>
+                            <span class="text-sm font-medium text-blue-100">{{ m }}</span>
                           </label>
                         </div>
                       </div>
@@ -532,10 +465,7 @@
                         ></i>
                       </div>
 
-                      <div
-                        v-if="selectedJeeva.length"
-                        class="flex flex-wrap gap-2 mb-4"
-                      >
+                      <div v-if="selectedJeeva.length" class="flex flex-wrap gap-2 mb-4">
                         <span
                           v-for="m in selectedJeeva"
                           :key="'selJ-' + m"
@@ -555,9 +485,7 @@
                       <div
                         class="bg-white/10 rounded-lg p-3 max-h-40 border border-blue-300/30 overflow-y-auto backdrop-blur-sm"
                       >
-                        <div
-                          class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2"
-                        >
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                           <label
                             v-for="m in filteredJeeva"
                             :key="'optJ-' + m"
@@ -569,9 +497,7 @@
                               @change="toggleJeeva(m)"
                               class="w-4 h-4 text-cyan-600 border-cyan-300 rounded focus:ring-cyan-500 mr-3 module-request-editable"
                             />
-                            <span class="text-sm font-medium text-cyan-100">{{
-                              m
-                            }}</span>
+                            <span class="text-sm font-medium text-cyan-100">{{ m }}</span>
                           </label>
                         </div>
                       </div>
@@ -619,9 +545,7 @@
                       >
                         <i class="fas fa-lock text-white text-sm"></i>
                       </div>
-                      <h3
-                        class="text-base font-bold text-white flex items-center"
-                      >
+                      <h3 class="text-base font-bold text-white flex items-center">
                         <i class="fas fa-key mr-1 text-blue-300"></i>
                         Access Rights
                       </h3>
@@ -654,9 +578,7 @@
                             value="temporary"
                             class="w-5 h-5 text-blue-600 border-blue-300 focus:ring-blue-500 mr-4 access-rights-editable"
                           />
-                          <span class="font-medium text-white text-sm"
-                            >Temporary Until</span
-                          >
+                          <span class="font-medium text-white text-sm">Temporary Until</span>
                         </div>
 
                         <div
@@ -701,19 +623,13 @@
                       >
                         <i class="fas fa-check-circle text-white text-sm"></i>
                       </div>
-                      <h3
-                        class="text-base font-bold text-white flex items-center"
-                      >
-                        <i
-                          class="fas fa-clipboard-check mr-1 text-blue-300"
-                        ></i>
+                      <h3 class="text-base font-bold text-white flex items-center">
+                        <i class="fas fa-clipboard-check mr-1 text-blue-300"></i>
                         Approval
                       </h3>
                     </div>
 
-                    <div
-                      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-                    >
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       <!-- HoD/BM -->
                       <div
                         class="bg-white/15 rounded-lg p-4 border border-blue-300/30 backdrop-blur-sm"
@@ -726,8 +642,7 @@
                         </h5>
                         <div class="space-y-3">
                           <div>
-                            <label
-                              class="block text-sm font-medium text-blue-100 mb-2"
+                            <label class="block text-sm font-medium text-blue-100 mb-2"
                               >Name<span class="text-red-400">*</span></label
                             >
                             <div class="relative">
@@ -740,11 +655,8 @@
                             </div>
                           </div>
                           <div>
-                            <label
-                              class="block text-sm font-medium text-blue-100 mb-2"
-                              >Signature<span class="text-red-400"
-                                >*</span
-                              ></label
+                            <label class="block text-sm font-medium text-blue-100 mb-2"
+                              >Signature<span class="text-red-400">*</span></label
                             >
                             <div class="relative">
                               <div
@@ -753,12 +665,8 @@
                               >
                                 <div class="text-center">
                                   <div class="mb-2">
-                                    <i
-                                      class="fas fa-signature text-blue-300 text-lg mb-1"
-                                    ></i>
-                                    <p class="text-blue-100 text-xs">
-                                      No signature uploaded
-                                    </p>
+                                    <i class="fas fa-signature text-blue-300 text-lg mb-1"></i>
+                                    <p class="text-blue-100 text-xs">No signature uploaded</p>
                                   </div>
                                   <button
                                     type="button"
@@ -775,10 +683,7 @@
                                 v-else
                                 class="w-full px-3 py-3 border-2 border-emerald-300/40 rounded-xl bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-emerald-500/20 min-h-[70px] flex items-center justify-center relative"
                               >
-                                <div
-                                  v-if="isImage(hodSignaturePreview)"
-                                  class="text-center"
-                                >
+                                <div v-if="isImage(hodSignaturePreview)" class="text-center">
                                   <img
                                     :src="hodSignaturePreview"
                                     alt="HOD Signature"
@@ -792,9 +697,7 @@
                                   <div
                                     class="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-1"
                                   >
-                                    <i
-                                      class="fas fa-file-pdf text-red-400 text-lg"
-                                    ></i>
+                                    <i class="fas fa-file-pdf text-red-400 text-lg"></i>
                                   </div>
                                   <p class="text-xs text-blue-100">
                                     {{ hodSignatureFileName }}
@@ -831,11 +734,8 @@
                             </div>
                           </div>
                           <div>
-                            <label
-                              class="block text-sm font-medium text-blue-100 mb-2"
-                              >Date (mm/dd/yyyy)<span class="text-red-400"
-                                >*</span
-                              ></label
+                            <label class="block text-sm font-medium text-blue-100 mb-2"
+                              >Date (mm/dd/yyyy)<span class="text-red-400">*</span></label
                             >
                             <div class="relative">
                               <input
@@ -860,8 +760,7 @@
                         </h5>
                         <div class="space-y-3">
                           <div>
-                            <label
-                              class="block text-sm font-medium text-blue-100 mb-2"
+                            <label class="block text-sm font-medium text-blue-100 mb-2"
                               >Name<span class="text-red-400">*</span></label
                             >
                             <div class="relative">
@@ -874,11 +773,8 @@
                             </div>
                           </div>
                           <div>
-                            <label
-                              class="block text-sm font-medium text-blue-100 mb-2"
-                              >Signature<span class="text-red-400"
-                                >*</span
-                              ></label
+                            <label class="block text-sm font-medium text-blue-100 mb-2"
+                              >Signature<span class="text-red-400">*</span></label
                             >
                             <div class="relative">
                               <div
@@ -887,12 +783,8 @@
                               >
                                 <div class="text-center">
                                   <div class="mb-2">
-                                    <i
-                                      class="fas fa-signature text-blue-300 text-lg mb-1"
-                                    ></i>
-                                    <p class="text-blue-100 text-xs">
-                                      No signature uploaded
-                                    </p>
+                                    <i class="fas fa-signature text-blue-300 text-lg mb-1"></i>
+                                    <p class="text-blue-100 text-xs">No signature uploaded</p>
                                   </div>
                                   <button
                                     type="button"
@@ -926,9 +818,7 @@
                                   <div
                                     class="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-1"
                                   >
-                                    <i
-                                      class="fas fa-file-pdf text-red-400 text-lg"
-                                    ></i>
+                                    <i class="fas fa-file-pdf text-red-400 text-lg"></i>
                                   </div>
                                   <p class="text-xs text-blue-100">
                                     {{ divDirectorSignatureFileName }}
@@ -965,11 +855,8 @@
                             </div>
                           </div>
                           <div>
-                            <label
-                              class="block text-sm font-medium text-blue-100 mb-2"
-                              >Date (mm/dd/yyyy)<span class="text-red-400"
-                                >*</span
-                              ></label
+                            <label class="block text-sm font-medium text-blue-100 mb-2"
+                              >Date (mm/dd/yyyy)<span class="text-red-400">*</span></label
                             >
                             <div class="relative">
                               <input
@@ -994,8 +881,7 @@
                         </h5>
                         <div class="space-y-3">
                           <div>
-                            <label
-                              class="block text-sm font-medium text-blue-100 mb-2"
+                            <label class="block text-sm font-medium text-blue-100 mb-2"
                               >Name<span class="text-red-400">*</span></label
                             >
                             <div class="relative">
@@ -1008,11 +894,8 @@
                             </div>
                           </div>
                           <div>
-                            <label
-                              class="block text-sm font-medium text-blue-100 mb-2"
-                              >Signature<span class="text-red-400"
-                                >*</span
-                              ></label
+                            <label class="block text-sm font-medium text-blue-100 mb-2"
+                              >Signature<span class="text-red-400">*</span></label
                             >
                             <div class="relative">
                               <div
@@ -1021,12 +904,8 @@
                               >
                                 <div class="text-center">
                                   <div class="mb-2">
-                                    <i
-                                      class="fas fa-signature text-blue-300 text-lg mb-1"
-                                    ></i>
-                                    <p class="text-blue-100 text-xs">
-                                      No signature uploaded
-                                    </p>
+                                    <i class="fas fa-signature text-blue-300 text-lg mb-1"></i>
+                                    <p class="text-blue-100 text-xs">No signature uploaded</p>
                                   </div>
                                   <button
                                     type="button"
@@ -1060,9 +939,7 @@
                                   <div
                                     class="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-1"
                                   >
-                                    <i
-                                      class="fas fa-file-pdf text-red-400 text-lg"
-                                    ></i>
+                                    <i class="fas fa-file-pdf text-red-400 text-lg"></i>
                                   </div>
                                   <p class="text-xs text-blue-100">
                                     {{ directorICTSignatureFileName }}
@@ -1099,11 +976,8 @@
                             </div>
                           </div>
                           <div>
-                            <label
-                              class="block text-sm font-medium text-blue-100 mb-2"
-                              >Date (mm/dd/yyyy)<span class="text-red-400"
-                                >*</span
-                              ></label
+                            <label class="block text-sm font-medium text-blue-100 mb-2"
+                              >Date (mm/dd/yyyy)<span class="text-red-400">*</span></label
                             >
                             <div class="relative">
                               <input
@@ -1128,9 +1002,7 @@
                       >
                         <i class="fas fa-comments text-white text-sm"></i>
                       </div>
-                      <h3
-                        class="text-base font-bold text-white flex items-center"
-                      >
+                      <h3 class="text-base font-bold text-white flex items-center">
                         <i class="fas fa-comment-alt mr-1 text-blue-300"></i>
                         Comments
                       </h3>
@@ -1158,9 +1030,7 @@
                       >
                         <i class="fas fa-cogs text-white text-sm"></i>
                       </div>
-                      <h3
-                        class="text-base font-bold text-white flex items-center"
-                      >
+                      <h3 class="text-base font-bold text-white flex items-center">
                         <i class="fas fa-tools mr-1 text-blue-300"></i>
                         For Implementation
                       </h3>
@@ -1179,8 +1049,7 @@
                         </h5>
                         <div class="space-y-3">
                           <div>
-                            <label
-                              class="block text-sm font-medium text-blue-100 mb-2"
+                            <label class="block text-sm font-medium text-blue-100 mb-2"
                               >Name<span class="text-red-400">*</span></label
                             >
                             <div class="relative">
@@ -1193,11 +1062,8 @@
                             </div>
                           </div>
                           <div>
-                            <label
-                              class="block text-sm font-medium text-blue-100 mb-2"
-                              >Signature<span class="text-red-400"
-                                >*</span
-                              ></label
+                            <label class="block text-sm font-medium text-blue-100 mb-2"
+                              >Signature<span class="text-red-400">*</span></label
                             >
                             <div class="relative">
                               <div
@@ -1206,12 +1072,8 @@
                               >
                                 <div class="text-center">
                                   <div class="mb-1">
-                                    <i
-                                      class="fas fa-signature text-blue-300 text-sm mb-1"
-                                    ></i>
-                                    <p class="text-blue-100 text-xs">
-                                      No signature
-                                    </p>
+                                    <i class="fas fa-signature text-blue-300 text-sm mb-1"></i>
+                                    <p class="text-blue-100 text-xs">No signature</p>
                                   </div>
                                   <button
                                     type="button"
@@ -1228,10 +1090,7 @@
                                 v-else
                                 class="w-full px-2 py-2 border border-blue-300 rounded bg-gray-50 transition-all duration-300 shadow-sm hover:shadow-md min-h-[50px] flex items-center justify-center relative"
                               >
-                                <div
-                                  v-if="isImage(headITSignaturePreview)"
-                                  class="text-center"
-                                >
+                                <div v-if="isImage(headITSignaturePreview)" class="text-center">
                                   <img
                                     :src="headITSignaturePreview"
                                     alt="Head IT Signature"
@@ -1245,9 +1104,7 @@
                                   <div
                                     class="w-8 h-8 bg-red-100 rounded flex items-center justify-center mx-auto mb-1"
                                   >
-                                    <i
-                                      class="fas fa-file-pdf text-red-600 text-sm"
-                                    ></i>
+                                    <i class="fas fa-file-pdf text-red-600 text-sm"></i>
                                   </div>
                                   <p class="text-xs text-gray-600">
                                     {{ headITSignatureFileName }}
@@ -1284,11 +1141,8 @@
                             </div>
                           </div>
                           <div>
-                            <label
-                              class="block text-sm font-medium text-blue-100 mb-2"
-                              >Date (mm/dd/yyyy)<span class="text-red-400"
-                                >*</span
-                              ></label
+                            <label class="block text-sm font-medium text-blue-100 mb-2"
+                              >Date (mm/dd/yyyy)<span class="text-red-400">*</span></label
                             >
                             <div class="relative">
                               <input
@@ -1313,8 +1167,7 @@
                         </h5>
                         <div class="space-y-3">
                           <div>
-                            <label
-                              class="block text-sm font-medium text-blue-100 mb-2"
+                            <label class="block text-sm font-medium text-blue-100 mb-2"
                               >Name<span class="text-red-400">*</span></label
                             >
                             <div class="relative">
@@ -1327,11 +1180,8 @@
                             </div>
                           </div>
                           <div>
-                            <label
-                              class="block text-sm font-medium text-blue-100 mb-2"
-                              >Signature<span class="text-red-400"
-                                >*</span
-                              ></label
+                            <label class="block text-sm font-medium text-blue-100 mb-2"
+                              >Signature<span class="text-red-400">*</span></label
                             >
                             <div class="relative">
                               <div
@@ -1340,12 +1190,8 @@
                               >
                                 <div class="text-center">
                                   <div class="mb-2">
-                                    <i
-                                      class="fas fa-signature text-blue-300 text-lg mb-1"
-                                    ></i>
-                                    <p class="text-blue-100 text-xs">
-                                      No signature uploaded
-                                    </p>
+                                    <i class="fas fa-signature text-blue-300 text-lg mb-1"></i>
+                                    <p class="text-blue-100 text-xs">No signature uploaded</p>
                                   </div>
                                   <button
                                     type="button"
@@ -1362,10 +1208,7 @@
                                 v-else
                                 class="w-full px-3 py-3 border-2 border-purple-300/40 rounded-xl bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-purple-500/20 min-h-[70px] flex items-center justify-center relative"
                               >
-                                <div
-                                  v-if="isImage(ictOfficerSignaturePreview)"
-                                  class="text-center"
-                                >
+                                <div v-if="isImage(ictOfficerSignaturePreview)" class="text-center">
                                   <img
                                     :src="ictOfficerSignaturePreview"
                                     alt="ICT Officer Signature"
@@ -1379,9 +1222,7 @@
                                   <div
                                     class="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-1"
                                   >
-                                    <i
-                                      class="fas fa-file-pdf text-red-400 text-lg"
-                                    ></i>
+                                    <i class="fas fa-file-pdf text-red-400 text-lg"></i>
                                   </div>
                                   <p class="text-xs text-blue-100">
                                     {{ ictOfficerSignatureFileName }}
@@ -1418,11 +1259,8 @@
                             </div>
                           </div>
                           <div>
-                            <label
-                              class="block text-sm font-medium text-blue-100 mb-2"
-                              >Date (mm/dd/yyyy)<span class="text-red-400"
-                                >*</span
-                              ></label
+                            <label class="block text-sm font-medium text-blue-100 mb-2"
+                              >Date (mm/dd/yyyy)<span class="text-red-400">*</span></label
                             >
                             <div class="relative">
                               <input
@@ -1448,23 +1286,15 @@
                       >
                         <i class="fas fa-gavel text-white text-xl"></i>
                       </div>
-                      <h3
-                        class="text-xl font-bold text-white flex items-center"
-                      >
-                        <i
-                          class="fas fa-check-double mr-2 text-emerald-300"
-                        ></i>
+                      <h3 class="text-xl font-bold text-white flex items-center">
+                        <i class="fas fa-check-double mr-2 text-emerald-300"></i>
                         Review Actions
                       </h3>
                     </div>
 
                     <!-- Request Status -->
-                    <div
-                      class="mb-6 p-4 bg-white/10 rounded-xl border border-emerald-300/30"
-                    >
-                      <h4 class="text-sm font-bold text-blue-100 mb-3">
-                        Request Status
-                      </h4>
+                    <div class="mb-6 p-4 bg-white/10 rounded-xl border border-emerald-300/30">
+                      <h4 class="text-sm font-bold text-blue-100 mb-3">Request Status</h4>
                       <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
                         <div class="text-center">
                           <div
@@ -1472,8 +1302,8 @@
                               getApprovalStatus('hod') === 'approved'
                                 ? 'bg-green-500'
                                 : getApprovalStatus('hod') === 'rejected'
-                                ? 'bg-red-500'
-                                : 'bg-yellow-500'
+                                  ? 'bg-red-500'
+                                  : 'bg-yellow-500'
                             "
                             class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1"
                           >
@@ -1482,8 +1312,8 @@
                                 getApprovalStatus('hod') === 'approved'
                                   ? 'fas fa-check'
                                   : getApprovalStatus('hod') === 'rejected'
-                                  ? 'fas fa-times'
-                                  : 'fas fa-clock'
+                                    ? 'fas fa-times'
+                                    : 'fas fa-clock'
                               "
                               class="text-white text-sm"
                             ></i>
@@ -1496,8 +1326,8 @@
                               getApprovalStatus('divisional') === 'approved'
                                 ? 'bg-green-500'
                                 : getApprovalStatus('divisional') === 'rejected'
-                                ? 'bg-red-500'
-                                : 'bg-yellow-500'
+                                  ? 'bg-red-500'
+                                  : 'bg-yellow-500'
                             "
                             class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1"
                           >
@@ -1505,10 +1335,9 @@
                               :class="
                                 getApprovalStatus('divisional') === 'approved'
                                   ? 'fas fa-check'
-                                  : getApprovalStatus('divisional') ===
-                                    'rejected'
-                                  ? 'fas fa-times'
-                                  : 'fas fa-clock'
+                                  : getApprovalStatus('divisional') === 'rejected'
+                                    ? 'fas fa-times'
+                                    : 'fas fa-clock'
                               "
                               class="text-white text-sm"
                             ></i>
@@ -1521,8 +1350,8 @@
                               getApprovalStatus('dict') === 'approved'
                                 ? 'bg-green-500'
                                 : getApprovalStatus('dict') === 'rejected'
-                                ? 'bg-red-500'
-                                : 'bg-yellow-500'
+                                  ? 'bg-red-500'
+                                  : 'bg-yellow-500'
                             "
                             class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1"
                           >
@@ -1531,8 +1360,8 @@
                                 getApprovalStatus('dict') === 'approved'
                                   ? 'fas fa-check'
                                   : getApprovalStatus('dict') === 'rejected'
-                                  ? 'fas fa-times'
-                                  : 'fas fa-clock'
+                                    ? 'fas fa-times'
+                                    : 'fas fa-clock'
                               "
                               class="text-white text-sm"
                             ></i>
@@ -1545,8 +1374,8 @@
                               getApprovalStatus('headOfIt') === 'approved'
                                 ? 'bg-green-500'
                                 : getApprovalStatus('headOfIt') === 'rejected'
-                                ? 'bg-red-500'
-                                : 'bg-yellow-500'
+                                  ? 'bg-red-500'
+                                  : 'bg-yellow-500'
                             "
                             class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1"
                           >
@@ -1555,8 +1384,8 @@
                                 getApprovalStatus('headOfIt') === 'approved'
                                   ? 'fas fa-check'
                                   : getApprovalStatus('headOfIt') === 'rejected'
-                                  ? 'fas fa-times'
-                                  : 'fas fa-clock'
+                                    ? 'fas fa-times'
+                                    : 'fas fa-clock'
                               "
                               class="text-white text-sm"
                             ></i>
@@ -1569,8 +1398,8 @@
                               getApprovalStatus('ict') === 'approved'
                                 ? 'bg-green-500'
                                 : getApprovalStatus('ict') === 'rejected'
-                                ? 'bg-red-500'
-                                : 'bg-yellow-500'
+                                  ? 'bg-red-500'
+                                  : 'bg-yellow-500'
                             "
                             class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1"
                           >
@@ -1579,8 +1408,8 @@
                                 getApprovalStatus('ict') === 'approved'
                                   ? 'fas fa-check'
                                   : getApprovalStatus('ict') === 'rejected'
-                                  ? 'fas fa-times'
-                                  : 'fas fa-clock'
+                                    ? 'fas fa-times'
+                                    : 'fas fa-clock'
                               "
                               class="text-white text-sm"
                             ></i>
@@ -1624,23 +1453,14 @@
                   </div>
 
                   <!-- Footer & Submit (Normal Mode) -->
-                  <div
-                    v-if="!isReviewMode"
-                    class="border-t-2 border-gray-200 pt-3"
-                  >
-                    <div
-                      class="flex flex-col sm:flex-row justify-between gap-3"
-                    >
+                  <div v-if="!isReviewMode" class="border-t-2 border-gray-200 pt-3">
+                    <div class="flex flex-col sm:flex-row justify-between gap-3">
                       <button
                         type="button"
                         @click="onReset"
                         class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all duration-300 font-semibold flex items-center justify-center shadow-lg hover:shadow-xl"
                       >
-                        <svg
-                          class="w-4 h-4 mr-2"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
+                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                           <path
                             fill-rule="evenodd"
                             d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
@@ -1653,11 +1473,7 @@
                         type="submit"
                         class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300 font-semibold flex items-center justify-center shadow-lg hover:shadow-xl"
                       >
-                        <svg
-                          class="w-4 h-4 mr-2"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
+                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                           <path
                             fill-rule="evenodd"
                             d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
@@ -1671,10 +1487,7 @@
                 </section>
 
                 <!-- Right: tabs -->
-                <section
-                  aria-labelledby="module-tabs"
-                  class="lg:col-span-1 space-y-4"
-                >
+                <section aria-labelledby="module-tabs" class="lg:col-span-1 space-y-4">
                   <h2 id="module-tabs" class="sr-only">Module Details</h2>
 
                   <!-- Desktop tabs -->
@@ -1719,23 +1532,15 @@
                         <i
                           :class="[
                             'fas',
-                            openAccordions.has(t.key)
-                              ? 'fa-chevron-up'
-                              : 'fa-chevron-down',
+                            openAccordions.has(t.key) ? 'fa-chevron-up' : 'fa-chevron-down'
                           ]"
                         ></i>
                       </button>
                       <transition name="fade">
                         <div v-show="openAccordions.has(t.key)" class="mt-3">
-                          <component
-                            :is="t.component"
-                            v-model="moduleData[t.key]"
-                          />
+                          <component :is="t.component" v-model="moduleData[t.key]" />
                           <div class="mt-3 text-right">
-                            <button
-                              class="btn-secondary btn-sm"
-                              @click="tryCloseTab(t.key)"
-                            >
+                            <button class="btn-secondary btn-sm" @click="tryCloseTab(t.key)">
                               <i class="fas fa-times mr-1"></i> Remove
                             </button>
                           </div>
@@ -1760,23 +1565,13 @@
         class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
       >
         <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-4">
-          <h3 class="text-lg font-semibold text-gray-800">
-            Remove {{ confirm.label }}?
-          </h3>
+          <h3 class="text-lg font-semibold text-gray-800">Remove {{ confirm.label }}?</h3>
           <p class="text-sm text-gray-600 mt-1">
-            You have unsaved data in this module. Are you sure you want to close
-            it?
+            You have unsaved data in this module. Are you sure you want to close it?
           </p>
           <div class="mt-4 flex justify-end gap-2">
-            <button
-              class="btn-secondary"
-              @click="confirm = { key: '', label: '' }"
-            >
-              Cancel
-            </button>
-            <button class="btn-danger" @click="closeTab(confirm.key)">
-              Remove
-            </button>
+            <button class="btn-secondary" @click="confirm = { key: '', label: '' }">Cancel</button>
+            <button class="btn-danger" @click="closeTab(confirm.key)">Remove</button>
           </div>
         </div>
       </div>
@@ -1795,112 +1590,108 @@
 </template>
 
 <style scoped>
-/* Medical Glass morphism effects */
-.medical-glass-card {
-  background: rgba(59, 130, 246, 0.15);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
-  border: 2px solid rgba(96, 165, 250, 0.3);
-  box-shadow: 0 8px 32px rgba(29, 78, 216, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-
-.medical-card {
-  position: relative;
-  overflow: hidden;
-  background: rgba(59, 130, 246, 0.1);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-}
-
-.medical-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(96, 165, 250, 0.2),
-    transparent
-  );
-  transition: left 0.5s;
-}
-
-.medical-card:hover::before {
-  left: 100%;
-}
-
-.medical-input {
-  position: relative;
-  z-index: 1;
-  color: white;
-}
-
-.medical-input::placeholder {
-  color: rgba(191, 219, 254, 0.6);
-}
-
-.medical-input:focus {
-  border-color: rgba(45, 212, 191, 0.8);
-  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.2);
-}
-
-/* Animations */
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+  /* Medical Glass morphism effects */
+  .medical-glass-card {
+    background: rgba(59, 130, 246, 0.15);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 2px solid rgba(96, 165, 250, 0.3);
+    box-shadow:
+      0 8px 32px rgba(29, 78, 216, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  .medical-card {
+    position: relative;
+    overflow: hidden;
+    background: rgba(59, 130, 246, 0.1);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
   }
-}
 
-@keyframes fade-in-delay {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+  .medical-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.2), transparent);
+    transition: left 0.5s;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  .medical-card:hover::before {
+    left: 100%;
   }
-}
 
-.animate-fade-in {
-  animation: fade-in 1s ease-out;
-}
+  .medical-input {
+    position: relative;
+    z-index: 1;
+    color: white;
+  }
 
-.animate-fade-in-delay {
-  animation: fade-in-delay 1s ease-out 0.3s both;
-}
+  .medical-input::placeholder {
+    color: rgba(191, 219, 254, 0.6);
+  }
 
-/* Review mode styles */
-.review-mode input[readonly],
-.review-mode select[disabled],
-.review-mode textarea[readonly] {
-  background-color: rgba(59, 130, 246, 0.1) !important;
-  border-color: rgba(96, 165, 250, 0.2) !important;
-  cursor: not-allowed;
-}
+  .medical-input:focus {
+    border-color: rgba(45, 212, 191, 0.8);
+    box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.2);
+  }
 
-.review-mode input[type="checkbox"][disabled],
-.review-mode input[type="radio"][disabled] {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
+  /* Animations */
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-in-delay {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 1s ease-out;
+  }
+
+  .animate-fade-in-delay {
+    animation: fade-in-delay 1s ease-out 0.3s both;
+  }
+
+  /* Review mode styles */
+  .review-mode input[readonly],
+  .review-mode select[disabled],
+  .review-mode textarea[readonly] {
+    background-color: rgba(59, 130, 246, 0.1) !important;
+    border-color: rgba(96, 165, 250, 0.2) !important;
+    cursor: not-allowed;
+  }
+
+  .review-mode input[type='checkbox'][disabled],
+  .review-mode input[type='radio'][disabled] {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
 </style>
 
 <script>
-// Wellsoft panel (key fields)
-const WellsoftPanel = {
-  props: ['modelValue'],
-  emits: ['update:modelValue'],
-  template: `<div class="space-y-3">
+  // Wellsoft panel (key fields)
+  const WellsoftPanel = {
+    props: ['modelValue'],
+    emits: ['update:modelValue'],
+    template: `<div class="space-y-3">
     <div>
       <label class="label">Action Requested<span class="text-red-500">*</span></label>
       <div class="flex gap-3">
@@ -1941,74 +1732,67 @@ const WellsoftPanel = {
 <textarea class="input" rows="3" :value="modelValue?.notes || ''" @input="$emit('update:modelValue', { ...modelValue, notes: $event.target.value })"></textarea>
     </div>
   </div>`
-}
+  }
 
-// Jeeva panel (attractive UI mirroring Jeeva form)
-const JeevaPanel = {
-  props: ['modelValue'],
-  emits: ['update:modelValue'],
-  data() {
-    return {
-      open: false,
-      focusIndex: 0,
-      options: [
-        'Use',
-        'Revoke',
-        'Access Rights',
-        'Approval',
-        'Comments',
-        'For Implementation'
-      ]
-    }
-  },
-  methods: {
-    isSelected(label) {
-      const sel = this.modelValue?.selections || []
-      return sel.includes(label)
-    },
-    toggle(label) {
-      // enforce mutual exclusivity between Use and Revoke
-      let sel = [...(this.modelValue?.selections || [])]
-      if (label === 'Use') sel = sel.filter((v) => v !== 'Revoke')
-      if (label === 'Revoke') sel = sel.filter((v) => v !== 'Use')
-      if (sel.includes(label)) sel = sel.filter((v) => v !== label)
-      else sel.push(label)
-      this.$emit('update:modelValue', {
-        ...(this.modelValue || {}),
-        selections: sel
-      })
-    },
-    close() {
-      this.open = false
-    },
-    onKeydown(e) {
-      if (!this.open && (e.key === 'Enter' || e.key === ' ')) {
-        e.preventDefault()
-        this.open = true
-        return
+  // Jeeva panel (attractive UI mirroring Jeeva form)
+  const JeevaPanel = {
+    props: ['modelValue'],
+    emits: ['update:modelValue'],
+    data() {
+      return {
+        open: false,
+        focusIndex: 0,
+        options: ['Use', 'Revoke', 'Access Rights', 'Approval', 'Comments', 'For Implementation']
       }
-      if (!this.open) return
-      if (e.key === 'Escape') {
-        e.preventDefault()
+    },
+    methods: {
+      isSelected(label) {
+        const sel = this.modelValue?.selections || []
+        return sel.includes(label)
+      },
+      toggle(label) {
+        // enforce mutual exclusivity between Use and Revoke
+        let sel = [...(this.modelValue?.selections || [])]
+        if (label === 'Use') sel = sel.filter((v) => v !== 'Revoke')
+        if (label === 'Revoke') sel = sel.filter((v) => v !== 'Use')
+        if (sel.includes(label)) sel = sel.filter((v) => v !== label)
+        else sel.push(label)
+        this.$emit('update:modelValue', {
+          ...(this.modelValue || {}),
+          selections: sel
+        })
+      },
+      close() {
         this.open = false
-        return
+      },
+      onKeydown(e) {
+        if (!this.open && (e.key === 'Enter' || e.key === ' ')) {
+          e.preventDefault()
+          this.open = true
+          return
+        }
+        if (!this.open) return
+        if (e.key === 'Escape') {
+          e.preventDefault()
+          this.open = false
+          return
+        }
+        const max = this.options.length - 1
+        if (e.key === 'ArrowDown') {
+          e.preventDefault()
+          this.focusIndex = Math.min(max, this.focusIndex + 1)
+        }
+        if (e.key === 'ArrowUp') {
+          e.preventDefault()
+          this.focusIndex = Math.max(0, this.focusIndex - 1)
+        }
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          this.toggle(this.options[this.focusIndex])
+        }
       }
-      const max = this.options.length - 1
-      if (e.key === 'ArrowDown') {
-        e.preventDefault()
-        this.focusIndex = Math.min(max, this.focusIndex + 1)
-      }
-      if (e.key === 'ArrowUp') {
-        e.preventDefault()
-        this.focusIndex = Math.max(0, this.focusIndex - 1)
-      }
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault()
-        this.toggle(this.options[this.focusIndex])
-      }
-    }
-  },
-  template: `<div class="space-y-4">
+    },
+    template: `<div class="space-y-4">
     <!-- Multi-select dropdown trigger with chips -->
     <div>
       <label class="label m-0" id="jeeva-modules-label">Module Requested for <span class="text-red-500">*</span></label>
@@ -2120,13 +1904,13 @@ const JeevaPanel = {
       </div>
     </div>
   </div>`
-}
+  }
 
-// Internet panel (key fields)
-const InternetPanel = {
-  props: ['modelValue'],
-  emits: ['update:modelValue'],
-  template: `<div class="space-y-3">
+  // Internet panel (key fields)
+  const InternetPanel = {
+    props: ['modelValue'],
+    emits: ['update:modelValue'],
+    template: `<div class="space-y-3">
     <div>
       <label class="label">Approval - HoD Certification<span class="text-red-500">*</span></label>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -2168,999 +1952,956 @@ const InternetPanel = {
     </div>
   </div>
   `
-}
+  }
 
-// import { ref } from 'vue' // Removed unused import
-import Header from '@/components/header.vue'
-import ModernSidebar from '@/components/ModernSidebar.vue'
-import AppFooter from '@/components/footer.vue'
+  // import { ref } from 'vue' // Removed unused import
+  import Header from '@/components/header.vue'
+  import ModernSidebar from '@/components/ModernSidebar.vue'
+  import AppFooter from '@/components/footer.vue'
 
-export default {
-  name: 'BothServiveForm',
-  components: {
-    WellsoftPanel,
-    JeevaPanel,
-    InternetPanel,
-    Header,
-    ModernSidebar,
-    AppFooter
-  },
-  setup() {
-    // Sidebar state now managed by Pinia - no local state needed
+  export default {
+    name: 'BothServiveForm',
+    components: {
+      WellsoftPanel,
+      JeevaPanel,
+      InternetPanel,
+      Header,
+      ModernSidebar,
+      AppFooter
+    },
+    setup() {
+      // Sidebar state now managed by Pinia - no local state needed
 
-    return {
-      // No local state needed for sidebar
-    }
-  },
-  data() {
-    return {
-      // Signature handling
-      signaturePreview: '',
-      signatureFileName: '',
-      // Approval signatures
-      hodSignaturePreview: '',
-      hodSignatureFileName: '',
-      divDirectorSignaturePreview: '',
-      divDirectorSignatureFileName: '',
-      directorICTSignaturePreview: '',
-      directorICTSignatureFileName: '',
-      // Implementation signatures
-      headITSignaturePreview: '',
-      headITSignatureFileName: '',
-      ictOfficerSignaturePreview: '',
-      ictOfficerSignatureFileName: '',
-      // Jeeva Requested for selector state
-      jeevaItemOpen: false,
-      jeevaItemFocusIndex: 0,
-      jeevaItemOptions: [
-        'Use',
-        'Revoke',
-        'Access Rights',
-        'Approval',
-        'Comments',
-        'For Implementation'
-      ],
-      jeevaItemSelections: [],
-      // From Wellsoft form
-      wellsoftModules: [
-        'Registrar',
-        'Specialist',
-        'Cashier',
-        'Resident Nurse',
-        'Intern Doctor',
-        'Intern Nurse',
-        'Medical Recorder',
-        'Social Worker',
-        'Quality Officer',
-        'Administrator',
-        'Health Attendant'
-      ],
-      // From Jeeva form (names extracted)
-      jeevaModules: [
-        'FINANCIAL ACCOUNTING',
-        'DOCTOR CONSULTATION',
-        'MEDICAL RECORDS',
-        'OUTPATIENT',
-        'NURSING STATION',
-        'INPATIENT',
-        'IP CASHIER',
-        'HIV',
-        'LINEN & LAUNDRY',
-        'FIXED ASSETS',
-        'PMTCT',
-        'PHARMACY',
-        'BILL NOTE',
-        'BLOOD BANK',
-        'ORDER MANAGEMENT',
-        'PRIVATE CREDIT',
-        'LABORATORY',
-        'GENERAL STORE',
-        'IP BILLING',
-        'RADIOLOGY',
-        'PURCHASE',
-        'SCROLLING',
-        'OPERATION THEATRE',
-        'CSSD',
-        'WEB INDENT',
-        'MORTUARY',
-        'GENERAL MAINTENANCE',
-        'PERSONNEL',
-        'MAINTENANCE',
-        'PAYROLL',
-        'CMS',
-        'MIS STATISTICS'
-      ],
-      // Suggested Internet purposes
-      // internetPurposes: ['Research','Training','Remote Work','Telemedicine','Email/Communication'], // Removed duplicate - using the one in form data
+      return {
+        // No local state needed for sidebar
+      }
+    },
+    data() {
+      return {
+        // Signature handling
+        signaturePreview: '',
+        signatureFileName: '',
+        // Approval signatures
+        hodSignaturePreview: '',
+        hodSignatureFileName: '',
+        divDirectorSignaturePreview: '',
+        divDirectorSignatureFileName: '',
+        directorICTSignaturePreview: '',
+        directorICTSignatureFileName: '',
+        // Implementation signatures
+        headITSignaturePreview: '',
+        headITSignatureFileName: '',
+        ictOfficerSignaturePreview: '',
+        ictOfficerSignatureFileName: '',
+        // Jeeva Requested for selector state
+        jeevaItemOpen: false,
+        jeevaItemFocusIndex: 0,
+        jeevaItemOptions: [
+          'Use',
+          'Revoke',
+          'Access Rights',
+          'Approval',
+          'Comments',
+          'For Implementation'
+        ],
+        jeevaItemSelections: [],
+        // From Wellsoft form
+        wellsoftModules: [
+          'Registrar',
+          'Specialist',
+          'Cashier',
+          'Resident Nurse',
+          'Intern Doctor',
+          'Intern Nurse',
+          'Medical Recorder',
+          'Social Worker',
+          'Quality Officer',
+          'Administrator',
+          'Health Attendant'
+        ],
+        // From Jeeva form (names extracted)
+        jeevaModules: [
+          'FINANCIAL ACCOUNTING',
+          'DOCTOR CONSULTATION',
+          'MEDICAL RECORDS',
+          'OUTPATIENT',
+          'NURSING STATION',
+          'INPATIENT',
+          'IP CASHIER',
+          'HIV',
+          'LINEN & LAUNDRY',
+          'FIXED ASSETS',
+          'PMTCT',
+          'PHARMACY',
+          'BILL NOTE',
+          'BLOOD BANK',
+          'ORDER MANAGEMENT',
+          'PRIVATE CREDIT',
+          'LABORATORY',
+          'GENERAL STORE',
+          'IP BILLING',
+          'RADIOLOGY',
+          'PURCHASE',
+          'SCROLLING',
+          'OPERATION THEATRE',
+          'CSSD',
+          'WEB INDENT',
+          'MORTUARY',
+          'GENERAL MAINTENANCE',
+          'PERSONNEL',
+          'MAINTENANCE',
+          'PAYROLL',
+          'CMS',
+          'MIS STATISTICS'
+        ],
+        // Suggested Internet purposes
+        // internetPurposes: ['Research','Training','Remote Work','Telemedicine','Email/Communication'], // Removed duplicate - using the one in form data
 
-      form: {
-        shared: { pfNumber: '', staffName: '', department: '', phone: '' },
-        accessRights: {
-          type: '',
-          tempDate: {
-            month: '',
-            day: '',
-            year: ''
+        form: {
+          shared: { pfNumber: '', staffName: '', department: '', phone: '' },
+          accessRights: {
+            type: '',
+            tempDate: {
+              month: '',
+              day: '',
+              year: ''
+            }
+          },
+          approvals: {
+            hod: {
+              name: '',
+              signature: '',
+              date: ''
+            },
+            divisionalDirector: {
+              name: '',
+              signature: '',
+              date: ''
+            },
+            directorICT: {
+              name: '',
+              signature: '',
+              date: ''
+            }
+          },
+          comments: '',
+          implementation: {
+            headIT: {
+              name: '',
+              signature: '',
+              date: ''
+            },
+            ictOfficer: {
+              name: '',
+              signature: '',
+              date: ''
+            }
           }
         },
-        approvals: {
-          hod: {
-            name: '',
-            signature: '',
-            date: ''
-          },
-          divisionalDirector: {
-            name: '',
-            signature: '',
-            date: ''
-          },
-          directorICT: {
-            name: '',
-            signature: '',
-            date: ''
+
+        selectedWellsoft: [],
+        selectedJeeva: [],
+        wellsoftRequestType: 'use',
+        // search queries
+        wellsoftQuery: '',
+        jeevaQuery: '',
+        internetPurposes: ['', '', '', ''],
+
+        tabs: [],
+        activeTab: '',
+        openAccordions: new Set(),
+        moduleData: {},
+
+        confirm: { key: '', label: '' },
+        toast: { show: false, message: '' },
+        errors: { pfNumber: '', staffName: '' }
+      }
+    },
+    computed: {
+      currentTab() {
+        return this.tabs.find((t) => t.key === this.activeTab) || null
+      },
+      filteredWellsoft() {
+        const q = (this.wellsoftQuery || '').toLowerCase()
+        return !q
+          ? this.wellsoftModules
+          : this.wellsoftModules.filter((m) => m.toLowerCase().includes(q))
+      },
+      filteredJeeva() {
+        const q = (this.jeevaQuery || '').toLowerCase()
+        return !q ? this.jeevaModules : this.jeevaModules.filter((m) => m.toLowerCase().includes(q))
+      },
+
+      summaryErrors() {
+        const list = []
+        // Defensive guards for shared
+        const shared = this.form?.shared || {}
+        if (!shared.pfNumber) list.push('PF Number is required.')
+        if (!shared.staffName) list.push('Staff Name is required.')
+
+        // Defensive guards for inline Jeeva block
+        const ji = this.jeevaInline || {}
+        if (!ji.accessType) list.push('Jeeva Access Rights: Please select Permanent or Temporary.')
+        if (ji.accessType === 'temporary') {
+          if (!ji.tempMonth || !ji.tempDay || !ji.tempYear) {
+            list.push(
+              'Jeeva Access Rights: Please provide complete Temporary Until date (MM/DD/YYYY).'
+            )
           }
-        },
-        comments: '',
-        implementation: {
-          headIT: {
-            name: '',
-            signature: '',
-            date: ''
-          },
-          ictOfficer: {
-            name: '',
-            signature: '',
-            date: ''
+        }
+
+        // Tabs validation (guard against undefined tabs/moduleData)
+        const tabs = Array.isArray(this.tabs) ? this.tabs : []
+        const data = this.moduleData || {}
+        tabs.forEach((t) => {
+          if (!t || !t.key) return
+          const d = data[t.key] || null
+          if (t.type === 'wellsoft' || t.type === 'jeeva') {
+            const access = d && typeof d === 'object' ? d.accessType : undefined
+            if (!access) list.push(`${t.label || 'Module'}: Access Type is required.`)
           }
-        }
-      },
-
-      selectedWellsoft: [],
-      selectedJeeva: [],
-      wellsoftRequestType: 'use',
-      // search queries
-      wellsoftQuery: '',
-      jeevaQuery: '',
-      internetPurposes: ['', '', '', ''],
-
-      tabs: [],
-      activeTab: '',
-      openAccordions: new Set(),
-      moduleData: {},
-
-      confirm: { key: '', label: '' },
-      toast: { show: false, message: '' },
-      errors: { pfNumber: '', staffName: '' }
-    }
-  },
-  computed: {
-    currentTab() {
-      return this.tabs.find((t) => t.key === this.activeTab) || null
-    },
-    filteredWellsoft() {
-      const q = (this.wellsoftQuery || '').toLowerCase()
-      return !q
-        ? this.wellsoftModules
-        : this.wellsoftModules.filter((m) => m.toLowerCase().includes(q))
-    },
-    filteredJeeva() {
-      const q = (this.jeevaQuery || '').toLowerCase()
-      return !q
-        ? this.jeevaModules
-        : this.jeevaModules.filter((m) => m.toLowerCase().includes(q))
-    },
-
-    summaryErrors() {
-      const list = []
-      // Defensive guards for shared
-      const shared = this.form?.shared || {}
-      if (!shared.pfNumber) list.push('PF Number is required.')
-      if (!shared.staffName) list.push('Staff Name is required.')
-
-      // Defensive guards for inline Jeeva block
-      const ji = this.jeevaInline || {}
-      if (!ji.accessType)
-        list.push('Jeeva Access Rights: Please select Permanent or Temporary.')
-      if (ji.accessType === 'temporary') {
-        if (!ji.tempMonth || !ji.tempDay || !ji.tempYear) {
-          list.push(
-            'Jeeva Access Rights: Please provide complete Temporary Until date (MM/DD/YYYY).'
-          )
-        }
-      }
-
-      // Tabs validation (guard against undefined tabs/moduleData)
-      const tabs = Array.isArray(this.tabs) ? this.tabs : []
-      const data = this.moduleData || {}
-      tabs.forEach((t) => {
-        if (!t || !t.key) return
-        const d = data[t.key] || null
-        if (t.type === 'wellsoft' || t.type === 'jeeva') {
-          const access = d && typeof d === 'object' ? d.accessType : undefined
-          if (!access)
-            list.push(`${t.label || 'Module'}: Access Type is required.`)
-        }
-        if (t.type === 'internet' && !this.internetPurposes[0].trim()) {
-          list.push('Internet Purpose is required.')
-        }
-      })
-      return list
-    }
-  },
-  watch: {
-    selectedWellsoft: {
-      handler(v) {
-        this.syncTabs('wellsoft', v)
-      },
-      deep: true
-    },
-    selectedJeeva: {
-      handler(v) {
-        this.syncTabs('jeeva', v)
-      },
-      deep: true
-    }
-  },
-  methods: {
-    // Jeeva Requested for selector handlers
-    isJeevaItemSelected(label) {
-      return this.jeevaItemSelections.includes(label)
-    },
-    toggleJeevaItem(label) {
-      let sel = [...this.jeevaItemSelections]
-      if (label === 'Use') sel = sel.filter((v) => v !== 'Revoke')
-      if (label === 'Revoke') sel = sel.filter((v) => v !== 'Use')
-      if (sel.includes(label)) sel = sel.filter((v) => v !== label)
-      else sel.push(label)
-      this.jeevaItemSelections = sel
-      // propagate into first Jeeva tab if exists
-      const firstJeeva = this.tabs.find((t) => t.type === 'jeeva')
-      if (firstJeeva) {
-        const cur = this.moduleData[firstJeeva.key] || {}
-        this.moduleData[firstJeeva.key] = { ...cur, selections: sel }
-      }
-    },
-    onJeevaItemsKeydown(e) {
-      if (!this.jeevaItemOpen && (e.key === 'Enter' || e.key === ' ')) {
-        e.preventDefault()
-        this.jeevaItemOpen = true
-        return
-      }
-      if (!this.jeevaItemOpen) return
-      if (e.key === 'Escape') {
-        e.preventDefault()
-        this.jeevaItemOpen = false
-        return
-      }
-      const max = this.jeevaItemOptions.length - 1
-      if (e.key === 'ArrowDown') {
-        e.preventDefault()
-        this.jeevaItemFocusIndex = Math.min(max, this.jeevaItemFocusIndex + 1)
-      }
-      if (e.key === 'ArrowUp') {
-        e.preventDefault()
-        this.jeevaItemFocusIndex = Math.max(0, this.jeevaItemFocusIndex - 1)
-      }
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault()
-        this.toggleJeevaItem(this.jeevaItemOptions[this.jeevaItemFocusIndex])
-      }
-    },
-
-    // Tabs
-    syncTabs(type, values) {
-      const prefix = { wellsoft: 'W', jeeva: 'J', internet: 'I' }[type]
-      const newTabs = []
-      const newData = { ...this.moduleData }
-      values.forEach((val) => {
-        const key = `${prefix}:${val}`
-        if (!newData[key]) newData[key] = {}
-        newTabs.push({
-          key,
-          label: val,
-          type,
-          component: this.componentFor(type)
+          if (t.type === 'internet' && !this.internetPurposes[0].trim()) {
+            list.push('Internet Purpose is required.')
+          }
         })
-      })
-      this.tabs = newTabs
-      this.moduleData = newData
-      this.activeTab = this.tabs[0]?.key || ''
-    },
-
-    // Helpers
-    isSelected(type, value) {
-      if (type === 'wellsoft') return this.selectedWellsoft.includes(value)
-      if (type === 'jeeva') return this.selectedJeeva.includes(value)
-      return false
-    },
-    toggleWellsoft(m) {
-      this.selectedWellsoft = this.isSelected('wellsoft', m)
-        ? this.selectedWellsoft.filter((x) => x !== m)
-        : [...this.selectedWellsoft, m]
-    },
-    toggleJeeva(m) {
-      this.selectedJeeva = this.isSelected('jeeva', m)
-        ? this.selectedJeeva.filter((x) => x !== m)
-        : [...this.selectedJeeva, m]
-    },
-    selectAll(type) {
-      if (type === 'wellsoft')
-        this.selectedWellsoft = [...this.wellsoftModules]
-      if (type === 'jeeva') this.selectedJeeva = [...this.jeevaModules]
-    },
-    clearAll(type) {
-      if (type === 'wellsoft') this.selectedWellsoft = []
-      if (type === 'jeeva') this.selectedJeeva = []
-    },
-    componentFor(type) {
-      if (type === 'wellsoft') return 'WellsoftPanel'
-      if (type === 'jeeva') return 'JeevaPanel'
-      return 'InternetPanel'
-    },
-    toggleAccordion(key) {
-      this.openAccordions.has(key)
-        ? this.openAccordions.delete(key)
-        : this.openAccordions.add(key)
-    },
-    tryCloseTab(key) {
-      const t = this.tabs.find((x) => x.key === key)
-      if (!t) return
-      this.confirm = { key, label: t.label }
-    },
-    closeTab(key) {
-      this.tabs = this.tabs.filter((t) => t.key !== key)
-      const data = { ...this.moduleData }
-      delete data[key]
-      this.moduleData = data
-      const [p, v] = key.split(':')
-      if (p === 'W')
-        this.selectedWellsoft = this.selectedWellsoft.filter((x) => x !== v)
-      if (p === 'J')
-        this.selectedJeeva = this.selectedJeeva.filter((x) => x !== v)
-      this.confirm = { key: '', label: '' }
-      this.activeTab = this.tabs[0]?.key || ''
-    },
-
-    // Submit
-    onSubmit() {
-      this.errors = { pfNumber: '', staffName: '' }
-      if (!this.form.shared.pfNumber)
-        this.errors.pfNumber = 'PF Number is required.'
-      if (!this.form.shared.staffName)
-        this.errors.staffName = 'Staff Name is required.'
-      if (this.summaryErrors.length) return
-
-      const payload = {
-        shared: { ...this.form.shared },
-        jeevaInline: { ...this.jeevaInline },
-        modules: this.tabs.map((t) => ({
-          type: t.type,
-          name: t.label,
-          details: this.moduleData[t.key] || {}
-        })),
-        internetPurposes: this.internetPurposes.filter((purpose) =>
-          purpose.trim()
-        ),
-        wellsoftRequestType: this.wellsoftRequestType
+        return list
       }
-      console.log('Submitting payload', payload)
-      this.toast = {
-        show: true,
-        message: 'Combined request submitted. You will receive updates.'
-      }
-      setTimeout(() => (this.toast.show = false), 3000)
     },
-    onReset() {
-      this.form = {
-        shared: { pfNumber: '', staffName: '', department: '', phone: '' },
-        accessRights: {
-          type: '',
-          tempDate: {
-            month: '',
-            day: '',
-            year: ''
-          }
+    watch: {
+      selectedWellsoft: {
+        handler(v) {
+          this.syncTabs('wellsoft', v)
         },
-        approvals: {
-          hod: {
-            name: '',
-            signature: '',
-            date: ''
-          },
-          divisionalDirector: {
-            name: '',
-            signature: '',
-            date: ''
-          },
-          directorICT: {
-            name: '',
-            signature: '',
-            date: ''
-          }
+        deep: true
+      },
+      selectedJeeva: {
+        handler(v) {
+          this.syncTabs('jeeva', v)
         },
-        comments: '',
-        implementation: {
-          headIT: {
-            name: '',
-            signature: '',
-            date: ''
+        deep: true
+      }
+    },
+    methods: {
+      // Jeeva Requested for selector handlers
+      isJeevaItemSelected(label) {
+        return this.jeevaItemSelections.includes(label)
+      },
+      toggleJeevaItem(label) {
+        let sel = [...this.jeevaItemSelections]
+        if (label === 'Use') sel = sel.filter((v) => v !== 'Revoke')
+        if (label === 'Revoke') sel = sel.filter((v) => v !== 'Use')
+        if (sel.includes(label)) sel = sel.filter((v) => v !== label)
+        else sel.push(label)
+        this.jeevaItemSelections = sel
+        // propagate into first Jeeva tab if exists
+        const firstJeeva = this.tabs.find((t) => t.type === 'jeeva')
+        if (firstJeeva) {
+          const cur = this.moduleData[firstJeeva.key] || {}
+          this.moduleData[firstJeeva.key] = { ...cur, selections: sel }
+        }
+      },
+      onJeevaItemsKeydown(e) {
+        if (!this.jeevaItemOpen && (e.key === 'Enter' || e.key === ' ')) {
+          e.preventDefault()
+          this.jeevaItemOpen = true
+          return
+        }
+        if (!this.jeevaItemOpen) return
+        if (e.key === 'Escape') {
+          e.preventDefault()
+          this.jeevaItemOpen = false
+          return
+        }
+        const max = this.jeevaItemOptions.length - 1
+        if (e.key === 'ArrowDown') {
+          e.preventDefault()
+          this.jeevaItemFocusIndex = Math.min(max, this.jeevaItemFocusIndex + 1)
+        }
+        if (e.key === 'ArrowUp') {
+          e.preventDefault()
+          this.jeevaItemFocusIndex = Math.max(0, this.jeevaItemFocusIndex - 1)
+        }
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          this.toggleJeevaItem(this.jeevaItemOptions[this.jeevaItemFocusIndex])
+        }
+      },
+
+      // Tabs
+      syncTabs(type, values) {
+        const prefix = { wellsoft: 'W', jeeva: 'J', internet: 'I' }[type]
+        const newTabs = []
+        const newData = { ...this.moduleData }
+        values.forEach((val) => {
+          const key = `${prefix}:${val}`
+          if (!newData[key]) newData[key] = {}
+          newTabs.push({
+            key,
+            label: val,
+            type,
+            component: this.componentFor(type)
+          })
+        })
+        this.tabs = newTabs
+        this.moduleData = newData
+        this.activeTab = this.tabs[0]?.key || ''
+      },
+
+      // Helpers
+      isSelected(type, value) {
+        if (type === 'wellsoft') return this.selectedWellsoft.includes(value)
+        if (type === 'jeeva') return this.selectedJeeva.includes(value)
+        return false
+      },
+      toggleWellsoft(m) {
+        this.selectedWellsoft = this.isSelected('wellsoft', m)
+          ? this.selectedWellsoft.filter((x) => x !== m)
+          : [...this.selectedWellsoft, m]
+      },
+      toggleJeeva(m) {
+        this.selectedJeeva = this.isSelected('jeeva', m)
+          ? this.selectedJeeva.filter((x) => x !== m)
+          : [...this.selectedJeeva, m]
+      },
+      selectAll(type) {
+        if (type === 'wellsoft') this.selectedWellsoft = [...this.wellsoftModules]
+        if (type === 'jeeva') this.selectedJeeva = [...this.jeevaModules]
+      },
+      clearAll(type) {
+        if (type === 'wellsoft') this.selectedWellsoft = []
+        if (type === 'jeeva') this.selectedJeeva = []
+      },
+      componentFor(type) {
+        if (type === 'wellsoft') return 'WellsoftPanel'
+        if (type === 'jeeva') return 'JeevaPanel'
+        return 'InternetPanel'
+      },
+      toggleAccordion(key) {
+        this.openAccordions.has(key)
+          ? this.openAccordions.delete(key)
+          : this.openAccordions.add(key)
+      },
+      tryCloseTab(key) {
+        const t = this.tabs.find((x) => x.key === key)
+        if (!t) return
+        this.confirm = { key, label: t.label }
+      },
+      closeTab(key) {
+        this.tabs = this.tabs.filter((t) => t.key !== key)
+        const data = { ...this.moduleData }
+        delete data[key]
+        this.moduleData = data
+        const [p, v] = key.split(':')
+        if (p === 'W') this.selectedWellsoft = this.selectedWellsoft.filter((x) => x !== v)
+        if (p === 'J') this.selectedJeeva = this.selectedJeeva.filter((x) => x !== v)
+        this.confirm = { key: '', label: '' }
+        this.activeTab = this.tabs[0]?.key || ''
+      },
+
+      // Submit
+      onSubmit() {
+        this.errors = { pfNumber: '', staffName: '' }
+        if (!this.form.shared.pfNumber) this.errors.pfNumber = 'PF Number is required.'
+        if (!this.form.shared.staffName) this.errors.staffName = 'Staff Name is required.'
+        if (this.summaryErrors.length) return
+
+        const payload = {
+          shared: { ...this.form.shared },
+          jeevaInline: { ...this.jeevaInline },
+          modules: this.tabs.map((t) => ({
+            type: t.type,
+            name: t.label,
+            details: this.moduleData[t.key] || {}
+          })),
+          internetPurposes: this.internetPurposes.filter((purpose) => purpose.trim()),
+          wellsoftRequestType: this.wellsoftRequestType
+        }
+        console.log('Submitting payload', payload)
+        this.toast = {
+          show: true,
+          message: 'Combined request submitted. You will receive updates.'
+        }
+        setTimeout(() => (this.toast.show = false), 3000)
+      },
+      onReset() {
+        this.form = {
+          shared: { pfNumber: '', staffName: '', department: '', phone: '' },
+          accessRights: {
+            type: '',
+            tempDate: {
+              month: '',
+              day: '',
+              year: ''
+            }
           },
-          ictOfficer: {
-            name: '',
-            signature: '',
-            date: ''
+          approvals: {
+            hod: {
+              name: '',
+              signature: '',
+              date: ''
+            },
+            divisionalDirector: {
+              name: '',
+              signature: '',
+              date: ''
+            },
+            directorICT: {
+              name: '',
+              signature: '',
+              date: ''
+            }
+          },
+          comments: '',
+          implementation: {
+            headIT: {
+              name: '',
+              signature: '',
+              date: ''
+            },
+            ictOfficer: {
+              name: '',
+              signature: '',
+              date: ''
+            }
           }
         }
-      }
-      this.selectedWellsoft = []
-      this.selectedJeeva = []
-      this.wellsoftQuery = ''
-      this.jeevaQuery = ''
-      this.internetPurposes = ['', '', '', '']
-      this.wellsoftRequestType = 'use'
-      this.tabs = []
-      this.moduleData = {}
-      this.activeTab = ''
-      this.openAccordions.clear()
-      this.errors = { pfNumber: '', staffName: '' }
-      // Reset signatures
-      this.signaturePreview = ''
-      this.signatureFileName = ''
-      this.hodSignaturePreview = ''
-      this.hodSignatureFileName = ''
-      this.divDirectorSignaturePreview = ''
-      this.divDirectorSignatureFileName = ''
-      this.directorICTSignaturePreview = ''
-      this.directorICTSignatureFileName = ''
-      this.headITSignaturePreview = ''
-      this.headITSignatureFileName = ''
-      this.ictOfficerSignaturePreview = ''
-      this.ictOfficerSignatureFileName = ''
-    },
-
-    // Signature handling methods
-    triggerFileUpload() {
-      this.$refs.signatureInput.click()
-    },
-
-    onSignatureChange(e) {
-      const file = e.target.files[0]
-      this.form.shared.signature = file || null
-
-      if (!file) {
+        this.selectedWellsoft = []
+        this.selectedJeeva = []
+        this.wellsoftQuery = ''
+        this.jeevaQuery = ''
+        this.internetPurposes = ['', '', '', '']
+        this.wellsoftRequestType = 'use'
+        this.tabs = []
+        this.moduleData = {}
+        this.activeTab = ''
+        this.openAccordions.clear()
+        this.errors = { pfNumber: '', staffName: '' }
+        // Reset signatures
         this.signaturePreview = ''
         this.signatureFileName = ''
-        return
-      }
-
-      // Validate file type
-      const allowedTypes = [
-        'image/png',
-        'image/jpeg',
-        'image/jpg',
-        'application/pdf'
-      ]
-      if (!allowedTypes.includes(file.type)) {
-        this.showNotification('Please select a valid file (PNG, JPG, or PDF)')
-        this.clearSignature()
-        return
-      }
-
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        this.showNotification('File size must be less than 5MB')
-        this.clearSignature()
-        return
-      }
-
-      this.signatureFileName = file.name
-
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader()
-        reader.onload = () => {
-          this.signaturePreview = reader.result
-        }
-        reader.readAsDataURL(file)
-      } else {
-        this.signaturePreview = 'pdf'
-      }
-    },
-
-    isImage(preview) {
-      return typeof preview === 'string' && preview !== 'pdf'
-    },
-
-    clearSignature() {
-      this.form.shared.signature = null
-      this.signaturePreview = ''
-      this.signatureFileName = ''
-      if (this.$refs.signatureInput) {
-        this.$refs.signatureInput.value = ''
-      }
-    },
-
-    showNotification(message) {
-      // Simple notification - you can replace with a proper notification system
-      alert(message)
-    },
-
-    // HOD Signature methods
-    triggerHodSignatureUpload() {
-      this.$refs.hodSignatureInput.click()
-    },
-
-    onHodSignatureChange(e) {
-      const file = e.target.files[0]
-      this.form.approvals.hod.signature = file || null
-
-      if (!file) {
         this.hodSignaturePreview = ''
         this.hodSignatureFileName = ''
-        return
-      }
-
-      const allowedTypes = [
-        'image/png',
-        'image/jpeg',
-        'image/jpg',
-        'application/pdf'
-      ]
-      if (!allowedTypes.includes(file.type)) {
-        this.showNotification('Please select a valid file (PNG, JPG, or PDF)')
-        this.clearHodSignature()
-        return
-      }
-
-      if (file.size > 5 * 1024 * 1024) {
-        this.showNotification('File size must be less than 5MB')
-        this.clearHodSignature()
-        return
-      }
-
-      this.hodSignatureFileName = file.name
-
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader()
-        reader.onload = () => {
-          this.hodSignaturePreview = reader.result
-        }
-        reader.readAsDataURL(file)
-      } else {
-        this.hodSignaturePreview = 'pdf'
-      }
-    },
-
-    clearHodSignature() {
-      this.form.approvals.hod.signature = null
-      this.hodSignaturePreview = ''
-      this.hodSignatureFileName = ''
-      if (this.$refs.hodSignatureInput) {
-        this.$refs.hodSignatureInput.value = ''
-      }
-    },
-
-    // Divisional Director Signature methods
-    triggerDivDirectorSignatureUpload() {
-      this.$refs.divDirectorSignatureInput.click()
-    },
-
-    onDivDirectorSignatureChange(e) {
-      const file = e.target.files[0]
-      this.form.approvals.divisionalDirector.signature = file || null
-
-      if (!file) {
         this.divDirectorSignaturePreview = ''
         this.divDirectorSignatureFileName = ''
-        return
-      }
-
-      const allowedTypes = [
-        'image/png',
-        'image/jpeg',
-        'image/jpg',
-        'application/pdf'
-      ]
-      if (!allowedTypes.includes(file.type)) {
-        this.showNotification('Please select a valid file (PNG, JPG, or PDF)')
-        this.clearDivDirectorSignature()
-        return
-      }
-
-      if (file.size > 5 * 1024 * 1024) {
-        this.showNotification('File size must be less than 5MB')
-        this.clearDivDirectorSignature()
-        return
-      }
-
-      this.divDirectorSignatureFileName = file.name
-
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader()
-        reader.onload = () => {
-          this.divDirectorSignaturePreview = reader.result
-        }
-        reader.readAsDataURL(file)
-      } else {
-        this.divDirectorSignaturePreview = 'pdf'
-      }
-    },
-
-    clearDivDirectorSignature() {
-      this.form.approvals.divisionalDirector.signature = null
-      this.divDirectorSignaturePreview = ''
-      this.divDirectorSignatureFileName = ''
-      if (this.$refs.divDirectorSignatureInput) {
-        this.$refs.divDirectorSignatureInput.value = ''
-      }
-    },
-
-    // Director ICT Signature methods
-    triggerDirectorICTSignatureUpload() {
-      this.$refs.directorICTSignatureInput.click()
-    },
-
-    onDirectorICTSignatureChange(e) {
-      const file = e.target.files[0]
-      this.form.approvals.directorICT.signature = file || null
-
-      if (!file) {
         this.directorICTSignaturePreview = ''
         this.directorICTSignatureFileName = ''
-        return
-      }
-
-      const allowedTypes = [
-        'image/png',
-        'image/jpeg',
-        'image/jpg',
-        'application/pdf'
-      ]
-      if (!allowedTypes.includes(file.type)) {
-        this.showNotification('Please select a valid file (PNG, JPG, or PDF)')
-        this.clearDirectorICTSignature()
-        return
-      }
-
-      if (file.size > 5 * 1024 * 1024) {
-        this.showNotification('File size must be less than 5MB')
-        this.clearDirectorICTSignature()
-        return
-      }
-
-      this.directorICTSignatureFileName = file.name
-
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader()
-        reader.onload = () => {
-          this.directorICTSignaturePreview = reader.result
-        }
-        reader.readAsDataURL(file)
-      } else {
-        this.directorICTSignaturePreview = 'pdf'
-      }
-    },
-
-    clearDirectorICTSignature() {
-      this.form.approvals.directorICT.signature = null
-      this.directorICTSignaturePreview = ''
-      this.directorICTSignatureFileName = ''
-      if (this.$refs.directorICTSignatureInput) {
-        this.$refs.directorICTSignatureInput.value = ''
-      }
-    },
-
-    // Head IT Signature methods
-    triggerHeadITSignatureUpload() {
-      this.$refs.headITSignatureInput.click()
-    },
-
-    onHeadITSignatureChange(e) {
-      const file = e.target.files[0]
-      this.form.implementation.headIT.signature = file || null
-
-      if (!file) {
         this.headITSignaturePreview = ''
         this.headITSignatureFileName = ''
-        return
-      }
-
-      const allowedTypes = [
-        'image/png',
-        'image/jpeg',
-        'image/jpg',
-        'application/pdf'
-      ]
-      if (!allowedTypes.includes(file.type)) {
-        this.showNotification('Please select a valid file (PNG, JPG, or PDF)')
-        this.clearHeadITSignature()
-        return
-      }
-
-      if (file.size > 5 * 1024 * 1024) {
-        this.showNotification('File size must be less than 5MB')
-        this.clearHeadITSignature()
-        return
-      }
-
-      this.headITSignatureFileName = file.name
-
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader()
-        reader.onload = () => {
-          this.headITSignaturePreview = reader.result
-        }
-        reader.readAsDataURL(file)
-      } else {
-        this.headITSignaturePreview = 'pdf'
-      }
-    },
-
-    clearHeadITSignature() {
-      this.form.implementation.headIT.signature = null
-      this.headITSignaturePreview = ''
-      this.headITSignatureFileName = ''
-      if (this.$refs.headITSignatureInput) {
-        this.$refs.headITSignatureInput.value = ''
-      }
-    },
-
-    // ICT Officer Signature methods
-    triggerIctOfficerSignatureUpload() {
-      this.$refs.ictOfficerSignatureInput.click()
-    },
-
-    onIctOfficerSignatureChange(e) {
-      const file = e.target.files[0]
-      this.form.implementation.ictOfficer.signature = file || null
-
-      if (!file) {
         this.ictOfficerSignaturePreview = ''
         this.ictOfficerSignatureFileName = ''
-        return
-      }
+      },
 
-      const allowedTypes = [
-        'image/png',
-        'image/jpeg',
-        'image/jpg',
-        'application/pdf'
-      ]
-      if (!allowedTypes.includes(file.type)) {
-        this.showNotification('Please select a valid file (PNG, JPG, or PDF)')
-        this.clearIctOfficerSignature()
-        return
-      }
+      // Signature handling methods
+      triggerFileUpload() {
+        this.$refs.signatureInput.click()
+      },
 
-      if (file.size > 5 * 1024 * 1024) {
-        this.showNotification('File size must be less than 5MB')
-        this.clearIctOfficerSignature()
-        return
-      }
+      onSignatureChange(e) {
+        const file = e.target.files[0]
+        this.form.shared.signature = file || null
 
-      this.ictOfficerSignatureFileName = file.name
-
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader()
-        reader.onload = () => {
-          this.ictOfficerSignaturePreview = reader.result
+        if (!file) {
+          this.signaturePreview = ''
+          this.signatureFileName = ''
+          return
         }
-        reader.readAsDataURL(file)
-      } else {
-        this.ictOfficerSignaturePreview = 'pdf'
-      }
-    },
 
-    clearIctOfficerSignature() {
-      this.form.implementation.ictOfficer.signature = null
-      this.ictOfficerSignaturePreview = ''
-      this.ictOfficerSignatureFileName = ''
-      if (this.$refs.ictOfficerSignatureInput) {
-        this.$refs.ictOfficerSignatureInput.value = ''
+        // Validate file type
+        const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf']
+        if (!allowedTypes.includes(file.type)) {
+          this.showNotification('Please select a valid file (PNG, JPG, or PDF)')
+          this.clearSignature()
+          return
+        }
+
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          this.showNotification('File size must be less than 5MB')
+          this.clearSignature()
+          return
+        }
+
+        this.signatureFileName = file.name
+
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader()
+          reader.onload = () => {
+            this.signaturePreview = reader.result
+          }
+          reader.readAsDataURL(file)
+        } else {
+          this.signaturePreview = 'pdf'
+        }
+      },
+
+      isImage(preview) {
+        return typeof preview === 'string' && preview !== 'pdf'
+      },
+
+      clearSignature() {
+        this.form.shared.signature = null
+        this.signaturePreview = ''
+        this.signatureFileName = ''
+        if (this.$refs.signatureInput) {
+          this.$refs.signatureInput.value = ''
+        }
+      },
+
+      showNotification(message) {
+        // Simple notification - you can replace with a proper notification system
+        alert(message)
+      },
+
+      // HOD Signature methods
+      triggerHodSignatureUpload() {
+        this.$refs.hodSignatureInput.click()
+      },
+
+      onHodSignatureChange(e) {
+        const file = e.target.files[0]
+        this.form.approvals.hod.signature = file || null
+
+        if (!file) {
+          this.hodSignaturePreview = ''
+          this.hodSignatureFileName = ''
+          return
+        }
+
+        const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf']
+        if (!allowedTypes.includes(file.type)) {
+          this.showNotification('Please select a valid file (PNG, JPG, or PDF)')
+          this.clearHodSignature()
+          return
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+          this.showNotification('File size must be less than 5MB')
+          this.clearHodSignature()
+          return
+        }
+
+        this.hodSignatureFileName = file.name
+
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader()
+          reader.onload = () => {
+            this.hodSignaturePreview = reader.result
+          }
+          reader.readAsDataURL(file)
+        } else {
+          this.hodSignaturePreview = 'pdf'
+        }
+      },
+
+      clearHodSignature() {
+        this.form.approvals.hod.signature = null
+        this.hodSignaturePreview = ''
+        this.hodSignatureFileName = ''
+        if (this.$refs.hodSignatureInput) {
+          this.$refs.hodSignatureInput.value = ''
+        }
+      },
+
+      // Divisional Director Signature methods
+      triggerDivDirectorSignatureUpload() {
+        this.$refs.divDirectorSignatureInput.click()
+      },
+
+      onDivDirectorSignatureChange(e) {
+        const file = e.target.files[0]
+        this.form.approvals.divisionalDirector.signature = file || null
+
+        if (!file) {
+          this.divDirectorSignaturePreview = ''
+          this.divDirectorSignatureFileName = ''
+          return
+        }
+
+        const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf']
+        if (!allowedTypes.includes(file.type)) {
+          this.showNotification('Please select a valid file (PNG, JPG, or PDF)')
+          this.clearDivDirectorSignature()
+          return
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+          this.showNotification('File size must be less than 5MB')
+          this.clearDivDirectorSignature()
+          return
+        }
+
+        this.divDirectorSignatureFileName = file.name
+
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader()
+          reader.onload = () => {
+            this.divDirectorSignaturePreview = reader.result
+          }
+          reader.readAsDataURL(file)
+        } else {
+          this.divDirectorSignaturePreview = 'pdf'
+        }
+      },
+
+      clearDivDirectorSignature() {
+        this.form.approvals.divisionalDirector.signature = null
+        this.divDirectorSignaturePreview = ''
+        this.divDirectorSignatureFileName = ''
+        if (this.$refs.divDirectorSignatureInput) {
+          this.$refs.divDirectorSignatureInput.value = ''
+        }
+      },
+
+      // Director ICT Signature methods
+      triggerDirectorICTSignatureUpload() {
+        this.$refs.directorICTSignatureInput.click()
+      },
+
+      onDirectorICTSignatureChange(e) {
+        const file = e.target.files[0]
+        this.form.approvals.directorICT.signature = file || null
+
+        if (!file) {
+          this.directorICTSignaturePreview = ''
+          this.directorICTSignatureFileName = ''
+          return
+        }
+
+        const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf']
+        if (!allowedTypes.includes(file.type)) {
+          this.showNotification('Please select a valid file (PNG, JPG, or PDF)')
+          this.clearDirectorICTSignature()
+          return
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+          this.showNotification('File size must be less than 5MB')
+          this.clearDirectorICTSignature()
+          return
+        }
+
+        this.directorICTSignatureFileName = file.name
+
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader()
+          reader.onload = () => {
+            this.directorICTSignaturePreview = reader.result
+          }
+          reader.readAsDataURL(file)
+        } else {
+          this.directorICTSignaturePreview = 'pdf'
+        }
+      },
+
+      clearDirectorICTSignature() {
+        this.form.approvals.directorICT.signature = null
+        this.directorICTSignaturePreview = ''
+        this.directorICTSignatureFileName = ''
+        if (this.$refs.directorICTSignatureInput) {
+          this.$refs.directorICTSignatureInput.value = ''
+        }
+      },
+
+      // Head IT Signature methods
+      triggerHeadITSignatureUpload() {
+        this.$refs.headITSignatureInput.click()
+      },
+
+      onHeadITSignatureChange(e) {
+        const file = e.target.files[0]
+        this.form.implementation.headIT.signature = file || null
+
+        if (!file) {
+          this.headITSignaturePreview = ''
+          this.headITSignatureFileName = ''
+          return
+        }
+
+        const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf']
+        if (!allowedTypes.includes(file.type)) {
+          this.showNotification('Please select a valid file (PNG, JPG, or PDF)')
+          this.clearHeadITSignature()
+          return
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+          this.showNotification('File size must be less than 5MB')
+          this.clearHeadITSignature()
+          return
+        }
+
+        this.headITSignatureFileName = file.name
+
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader()
+          reader.onload = () => {
+            this.headITSignaturePreview = reader.result
+          }
+          reader.readAsDataURL(file)
+        } else {
+          this.headITSignaturePreview = 'pdf'
+        }
+      },
+
+      clearHeadITSignature() {
+        this.form.implementation.headIT.signature = null
+        this.headITSignaturePreview = ''
+        this.headITSignatureFileName = ''
+        if (this.$refs.headITSignatureInput) {
+          this.$refs.headITSignatureInput.value = ''
+        }
+      },
+
+      // ICT Officer Signature methods
+      triggerIctOfficerSignatureUpload() {
+        this.$refs.ictOfficerSignatureInput.click()
+      },
+
+      onIctOfficerSignatureChange(e) {
+        const file = e.target.files[0]
+        this.form.implementation.ictOfficer.signature = file || null
+
+        if (!file) {
+          this.ictOfficerSignaturePreview = ''
+          this.ictOfficerSignatureFileName = ''
+          return
+        }
+
+        const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf']
+        if (!allowedTypes.includes(file.type)) {
+          this.showNotification('Please select a valid file (PNG, JPG, or PDF)')
+          this.clearIctOfficerSignature()
+          return
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+          this.showNotification('File size must be less than 5MB')
+          this.clearIctOfficerSignature()
+          return
+        }
+
+        this.ictOfficerSignatureFileName = file.name
+
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader()
+          reader.onload = () => {
+            this.ictOfficerSignaturePreview = reader.result
+          }
+          reader.readAsDataURL(file)
+        } else {
+          this.ictOfficerSignaturePreview = 'pdf'
+        }
+      },
+
+      clearIctOfficerSignature() {
+        this.form.implementation.ictOfficer.signature = null
+        this.ictOfficerSignaturePreview = ''
+        this.ictOfficerSignatureFileName = ''
+        if (this.$refs.ictOfficerSignatureInput) {
+          this.$refs.ictOfficerSignatureInput.value = ''
+        }
       }
     }
   }
-}
 </script>
 
 <style scoped>
-/* Medical Background Animations */
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-20px);
-  }
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-/* Define primary color */
-.bg-primary {
-  background-color: #1e40af; /* Blue-700 */
-}
-
-.text-primary {
-  color: #1e40af; /* Blue-700 */
-}
-
-.border-primary {
-  border-color: #1e40af; /* Blue-700 */
-}
-
-.focus\:border-primary:focus {
-  border-color: #1e40af;
-}
-
-/* Custom checkbox and radio styling */
-input[type="checkbox"]:checked,
-input[type="radio"]:checked {
-  background-color: #1e40af;
-  border-color: #1e40af;
-}
-
-input[type="checkbox"]:focus,
-input[type="radio"]:focus {
-  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
-}
-
-/* Smooth transitions */
-.transition-all {
-  transition: all 0.3s ease;
-}
-
-/* Glass morphism effect */
-.backdrop-blur-sm {
-  backdrop-filter: blur(8px);
-}
-
-/* Enhanced form sections */
-.border-l-2 {
-  position: relative;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.1),
-    rgba(255, 255, 255, 0.05)
-  );
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
-
-.border-l-2:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-}
-
-/* Full width responsive container */
-.label {
-  @apply block text-sm font-medium text-gray-700 mb-1;
-}
-.input {
-  @apply w-full rounded-lg border border-gray-300 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary;
-}
-.btn-primary {
-  @apply inline-flex items-center px-6 py-3 rounded-lg bg-primary text-white text-base font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition shadow-md hover:shadow-lg;
-}
-.btn-secondary {
-  @apply inline-flex items-center px-6 py-3 rounded-lg bg-gray-100 text-gray-800 text-base font-semibold hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition shadow-md hover:shadow-lg;
-}
-.btn-danger {
-  @apply inline-flex items-center px-4 py-2 rounded-md bg-red-600 text-white text-sm font-medium hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition;
-}
-.btn-sm {
-  @apply px-2 py-1 text-xs;
-}
-.card {
-  @apply bg-white rounded-lg shadow-md border border-gray-200 p-4 mb-3;
-}
-.error {
-  @apply text-xs text-red-600 mt-1;
-}
-.tab {
-  @apply inline-flex items-center px-3 py-2 rounded-md bg-white border border-gray-200 text-sm text-gray-700 hover:bg-gray-50 transition;
-}
-.tab-active {
-  @apply bg-blue-50 border-blue-300 text-blue-800;
-}
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s, transform 0.2s;
-}
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-  transform: translateY(4px);
-}
-.focus\:ring-primary {
-  --tw-ring-color: #1e40af;
-}
-.option-tile {
-  @apply flex items-center gap-2 px-2 py-2 rounded-md border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 text-left text-sm;
-}
-.option-tile-active {
-  @apply border-blue-300 bg-blue-50;
-}
-
-/* Print styles */
-@media print {
-  .min-h-screen {
-    min-height: auto;
+  /* Medical Background Animations */
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
   }
 
-  button {
-    display: none;
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
   }
 
-  .shadow-xl {
-    box-shadow: none;
+  /* Define primary color */
+  .bg-primary {
+    background-color: #1e40af; /* Blue-700 */
   }
 
-  .bg-gradient-to-br {
-    background: white;
-  }
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .grid-cols-4 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .text-primary {
+    color: #1e40af; /* Blue-700 */
   }
 
-  .grid-cols-3 {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
+  .border-primary {
+    border-color: #1e40af; /* Blue-700 */
   }
 
-  .grid-cols-2 {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 640px) {
-  .lg\:grid-cols-4 {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
+  .focus\:border-primary:focus {
+    border-color: #1e40af;
   }
 
-  .md\:grid-cols-3 {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
+  /* Custom checkbox and radio styling */
+  input[type='checkbox']:checked,
+  input[type='radio']:checked {
+    background-color: #1e40af;
+    border-color: #1e40af;
   }
-}
 
-/* Responsive adjustments */
-@media (max-width: 1024px) {
-  .lg\:col-span-2 {
-    grid-column: span 1;
+  input[type='checkbox']:focus,
+  input[type='radio']:focus {
+    box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
   }
-  .lg\:col-span-1 {
-    grid-column: span 1;
-  }
-}
 
-/* Improve card spacing on smaller screens */
-@media (max-width: 768px) {
+  /* Smooth transitions */
+  .transition-all {
+    transition: all 0.3s ease;
+  }
+
+  /* Glass morphism effect */
+  .backdrop-blur-sm {
+    backdrop-filter: blur(8px);
+  }
+
+  /* Enhanced form sections */
+  .border-l-2 {
+    position: relative;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+
+  .border-l-2:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Full width responsive container */
+  .label {
+    @apply block text-sm font-medium text-gray-700 mb-1;
+  }
+  .input {
+    @apply w-full rounded-lg border border-gray-300 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary;
+  }
+  .btn-primary {
+    @apply inline-flex items-center px-6 py-3 rounded-lg bg-primary text-white text-base font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition shadow-md hover:shadow-lg;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center px-6 py-3 rounded-lg bg-gray-100 text-gray-800 text-base font-semibold hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition shadow-md hover:shadow-lg;
+  }
+  .btn-danger {
+    @apply inline-flex items-center px-4 py-2 rounded-md bg-red-600 text-white text-sm font-medium hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition;
+  }
+  .btn-sm {
+    @apply px-2 py-1 text-xs;
+  }
   .card {
-    padding: 0.75rem;
+    @apply bg-white rounded-lg shadow-md border border-gray-200 p-4 mb-3;
   }
-}
-
-/* Ensure full width utilization */
-.max-w-full {
-  max-width: 100%;
-}
-
-.max-w-8xl {
-  max-width: 88rem; /* 1408px */
-}
-
-/* Responsive grid adjustments */
-@media (max-width: 1024px) {
-  .lg\:col-span-3 {
-    grid-column: span 1;
+  .error {
+    @apply text-xs text-red-600 mt-1;
   }
-}
+  .tab {
+    @apply inline-flex items-center px-3 py-2 rounded-md bg-white border border-gray-200 text-sm text-gray-700 hover:bg-gray-50 transition;
+  }
+  .tab-active {
+    @apply bg-blue-50 border-blue-300 text-blue-800;
+  }
+  .fade-enter-active,
+  .fade-leave-active {
+    transition:
+      opacity 0.2s,
+      transform 0.2s;
+  }
+  .fade-enter-from,
+  .fade-leave-to {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  .focus\:ring-primary {
+    --tw-ring-color: #1e40af;
+  }
+  .option-tile {
+    @apply flex items-center gap-2 px-2 py-2 rounded-md border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 text-left text-sm;
+  }
+  .option-tile-active {
+    @apply border-blue-300 bg-blue-50;
+  }
+
+  /* Print styles */
+  @media print {
+    .min-h-screen {
+      min-height: auto;
+    }
+
+    button {
+      display: none;
+    }
+
+    .shadow-xl {
+      box-shadow: none;
+    }
+
+    .bg-gradient-to-br {
+      background: white;
+    }
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .grid-cols-4 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-cols-3 {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+
+    .grid-cols-2 {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 640px) {
+    .lg\:grid-cols-4 {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+
+    .md\:grid-cols-3 {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 1024px) {
+    .lg\:col-span-2 {
+      grid-column: span 1;
+    }
+    .lg\:col-span-1 {
+      grid-column: span 1;
+    }
+  }
+
+  /* Improve card spacing on smaller screens */
+  @media (max-width: 768px) {
+    .card {
+      padding: 0.75rem;
+    }
+  }
+
+  /* Ensure full width utilization */
+  .max-w-full {
+    max-width: 100%;
+  }
+
+  .max-w-8xl {
+    max-width: 88rem; /* 1408px */
+  }
+
+  /* Responsive grid adjustments */
+  @media (max-width: 1024px) {
+    .lg\:col-span-3 {
+      grid-column: span 1;
+    }
+  }
 </style>

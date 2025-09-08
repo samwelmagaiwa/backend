@@ -42,17 +42,13 @@ class EnhancedUserCombinedAccessService {
     try {
       apiDebugger.logRequest('POST', `${this.baseUrl}/combined-access`)
 
-      const response = await enhancedAPI.post(
-        `${this.baseUrl}/combined-access`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          },
-          // Don't deduplicate form submissions
-          deduplicate: false
-        }
-      )
+      const response = await enhancedAPI.post(`${this.baseUrl}/combined-access`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        },
+        // Don't deduplicate form submissions
+        deduplicate: false
+      })
 
       return {
         success: true,

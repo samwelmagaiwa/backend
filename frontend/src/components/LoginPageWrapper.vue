@@ -5,12 +5,12 @@
 </template>
 
 <script>
-import LoginPage from './LoginPage.vue'
+  import LoginPage from './LoginPage.vue'
 
-export default {
-  name: 'LoginPageWrapper',
-  components: {
-    LoginPage
+  export default {
+    name: 'LoginPageWrapper',
+    components: {
+      LoginPage
+    }
   }
-}
 </script>

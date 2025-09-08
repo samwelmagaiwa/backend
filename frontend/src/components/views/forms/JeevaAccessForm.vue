@@ -30,19 +30,15 @@
                 top: Math.random() * 100 + '%',
                 animationDelay: Math.random() * 3 + 's',
                 animationDuration: Math.random() * 3 + 2 + 's',
-                fontSize: Math.random() * 20 + 10 + 'px',
+                fontSize: Math.random() * 20 + 10 + 'px'
               }"
             >
               <i
                 :class="[
                   'fas',
-                  [
-                    'fa-heartbeat',
-                    'fa-user-md',
-                    'fa-hospital',
-                    'fa-stethoscope',
-                    'fa-plus',
-                  ][Math.floor(Math.random() * 5)],
+                  ['fa-heartbeat', 'fa-user-md', 'fa-hospital', 'fa-stethoscope', 'fa-plus'][
+                    Math.floor(Math.random() * 5)
+                  ]
                 ]"
               ></i>
             </div>
@@ -51,9 +47,7 @@
 
         <div class="max-w-12xl mx-auto relative z-10">
           <!-- Header Section -->
-          <div
-            class="medical-glass-card rounded-t-3xl p-8 mb-0 border-b border-blue-300/30"
-          >
+          <div class="medical-glass-card rounded-t-3xl p-8 mb-0 border-b border-blue-300/30">
             <div class="flex justify-between items-center">
               <!-- Left Logo -->
               <div
@@ -93,11 +87,7 @@
                 <h2
                   class="text-2xl font-bold text-blue-100 tracking-wide drop-shadow-md animate-fade-in-delay"
                 >
-                  {{
-                    isReviewMode
-                      ? "REQUEST REVIEW - " + requestId
-                      : "SYSTEM ACCESS FORM"
-                  }}
+                  {{ isReviewMode ? 'REQUEST REVIEW - ' + requestId : 'SYSTEM ACCESS FORM' }}
                 </h2>
               </div>
 
@@ -191,15 +181,9 @@
                         required
                         :disabled="departmentsLoading"
                       >
-                        <option
-                          value=""
-                          disabled
-                          class="bg-gray-800 text-gray-300"
-                        >
+                        <option value="" disabled class="bg-gray-800 text-gray-300">
                           {{
-                            departmentsLoading
-                              ? "Loading departments..."
-                              : "Select your department"
+                            departmentsLoading ? 'Loading departments...' : 'Select your department'
                           }}
                         </option>
                         <option
@@ -209,7 +193,7 @@
                           class="bg-gray-800 text-white"
                         >
                           {{ dept.name }}
-                          {{ dept.code ? `(${dept.code})` : "" }}
+                          {{ dept.code ? `(${dept.code})` : '' }}
                         </option>
                       </select>
                       <div
@@ -255,12 +239,8 @@
                       >
                         <div class="text-center">
                           <div class="mb-2">
-                            <i
-                              class="fas fa-signature text-teal-300 text-2xl mb-1"
-                            ></i>
-                            <p class="text-blue-100 text-xs">
-                              No signature uploaded
-                            </p>
+                            <i class="fas fa-signature text-teal-300 text-2xl mb-1"></i>
+                            <p class="text-blue-100 text-xs">No signature uploaded</p>
                           </div>
                           <button
                             type="button"
@@ -277,10 +257,7 @@
                         v-else
                         class="w-full px-3 py-3 border-2 border-teal-300/40 rounded-lg bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl min-h-[80px] flex items-center justify-center relative"
                       >
-                        <div
-                          v-if="isImage(signaturePreview)"
-                          class="text-center"
-                        >
+                        <div v-if="isImage(signaturePreview)" class="text-center">
                           <img
                             :src="signaturePreview"
                             alt="Digital Signature"
@@ -351,9 +328,7 @@
 
                 <!-- Request Type -->
                 <div class="mb-4">
-                  <label
-                    class="block text-sm font-bold text-blue-100 mb-2 text-center"
-                  >
+                  <label class="block text-sm font-bold text-blue-100 mb-2 text-center">
                     Module Requested for <span class="text-red-400">*</span>
                   </label>
                   <div class="flex justify-center gap-4 mb-3">
@@ -390,9 +365,7 @@
                   <div
                     class="bg-white/15 rounded-lg p-3 max-h-80 border-2 border-blue-300/30 backdrop-blur-sm overflow-y-auto"
                   >
-                    <div
-                      class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1"
-                    >
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1">
                       <label
                         v-for="module in modules"
                         :key="module.id"
@@ -404,9 +377,7 @@
                           :value="module.id"
                           class="w-3 h-3 text-blue-600 border-blue-300 rounded focus:ring-blue-500 mr-1.5 module-request-editable"
                         />
-                        <span class="text-xs font-medium text-white">{{
-                          module.name
-                        }}</span>
+                        <span class="text-xs font-medium text-white">{{ module.name }}</span>
                       </label>
                     </div>
                   </div>
@@ -440,9 +411,7 @@
                       value="permanent"
                       class="w-4 h-4 text-cyan-600 border-blue-300 focus:ring-cyan-500 mr-3 access-rights-editable"
                     />
-                    <span class="font-medium text-white text-sm"
-                      >Permanent (until retirement)</span
-                    >
+                    <span class="font-medium text-white text-sm">Permanent (until retirement)</span>
                   </div>
 
                   <!-- Temporary Until Option -->
@@ -456,15 +425,10 @@
                         value="temporary"
                         class="w-4 h-4 text-cyan-600 border-blue-300 focus:ring-cyan-500 mr-3 access-rights-editable"
                       />
-                      <span class="font-medium text-white text-sm"
-                        >Temporary Until</span
-                      >
+                      <span class="font-medium text-white text-sm">Temporary Until</span>
                     </div>
 
-                    <div
-                      class="flex items-center gap-1"
-                      v-if="formData.accessType === 'temporary'"
-                    >
+                    <div class="flex items-center gap-1" v-if="formData.accessType === 'temporary'">
                       <input
                         v-model="formData.tempDate.day"
                         type="text"
@@ -514,9 +478,7 @@
                   <div
                     class="bg-white/15 rounded-xl p-4 border border-emerald-300/30 backdrop-blur-sm"
                   >
-                    <h5 class="font-bold text-white mb-3 text-center text-sm">
-                      HoD/BM
-                    </h5>
+                    <h5 class="font-bold text-white mb-3 text-center text-sm">HoD/BM</h5>
                     <div class="space-y-3">
                       <input
                         v-model="formData.approvals.hod.name"
@@ -531,9 +493,7 @@
                         >
                           <div class="text-center">
                             <div class="mb-1">
-                              <i
-                                class="fas fa-signature text-emerald-300 text-sm mb-1"
-                              ></i>
+                              <i class="fas fa-signature text-emerald-300 text-sm mb-1"></i>
                               <p class="text-blue-100 text-xs">No signature</p>
                             </div>
                             <button
@@ -551,10 +511,7 @@
                           v-else
                           class="w-full px-2 py-2 border border-emerald-300/30 rounded-lg bg-white/15 transition-all duration-300 shadow-sm hover:shadow-md min-h-[50px] flex items-center justify-center relative backdrop-blur-sm"
                         >
-                          <div
-                            v-if="isImage(hodSignaturePreview)"
-                            class="text-center"
-                          >
+                          <div v-if="isImage(hodSignaturePreview)" class="text-center">
                             <img
                               :src="hodSignaturePreview"
                               alt="HOD Signature"
@@ -568,9 +525,7 @@
                             <div
                               class="w-8 h-8 bg-red-500/20 rounded flex items-center justify-center mx-auto mb-1"
                             >
-                              <i
-                                class="fas fa-file-pdf text-red-400 text-sm"
-                              ></i>
+                              <i class="fas fa-file-pdf text-red-400 text-sm"></i>
                             </div>
                             <p class="text-xs text-blue-100">
                               {{ hodSignatureFileName }}
@@ -623,15 +578,10 @@
                     <div class="space-y-3">
                       <!-- Decision Section for Divisional Director -->
                       <div
-                        v-if="
-                          userRole === ROLES.DIVISIONAL_DIRECTOR &&
-                          canApproveAtStage()
-                        "
+                        v-if="userRole === ROLES.DIVISIONAL_DIRECTOR && canApproveAtStage()"
                         class="mb-4"
                       >
-                        <label
-                          class="block text-sm font-bold text-blue-100 mb-2"
-                        >
+                        <label class="block text-sm font-bold text-blue-100 mb-2">
                           Decision <span class="text-red-400">*</span>
                         </label>
                         <div class="flex gap-3 mb-3">
@@ -639,53 +589,37 @@
                             class="flex items-center cursor-pointer p-3 border-2 border-blue-300/30 rounded-lg hover:border-emerald-400 hover:bg-white/10 transition-all backdrop-blur-sm"
                           >
                             <input
-                              v-model="
-                                formData.approvals.divisionalDirector.decision
-                              "
+                              v-model="formData.approvals.divisionalDirector.decision"
                               type="radio"
                               value="approve"
                               class="w-4 h-4 text-emerald-600 border-blue-300 focus:ring-emerald-500 mr-2 divisional-approval-editable"
                             />
-                            <span class="font-medium text-white text-sm"
-                              >Approve</span
-                            >
+                            <span class="font-medium text-white text-sm">Approve</span>
                           </label>
                           <label
                             class="flex items-center cursor-pointer p-3 border-2 border-blue-300/30 rounded-lg hover:border-red-400 hover:bg-white/10 transition-all backdrop-blur-sm"
                           >
                             <input
-                              v-model="
-                                formData.approvals.divisionalDirector.decision
-                              "
+                              v-model="formData.approvals.divisionalDirector.decision"
                               type="radio"
                               value="reject"
                               class="w-4 h-4 text-red-600 border-blue-300 focus:ring-red-500 mr-2 divisional-approval-editable"
                             />
-                            <span class="font-medium text-white text-sm"
-                              >Reject</span
-                            >
+                            <span class="font-medium text-white text-sm">Reject</span>
                           </label>
                         </div>
 
                         <!-- Rejection Comments (mandatory when rejecting) -->
                         <div
-                          v-if="
-                            formData.approvals.divisionalDirector.decision ===
-                            'reject'
-                          "
+                          v-if="formData.approvals.divisionalDirector.decision === 'reject'"
                           class="mb-3"
                         >
-                          <label
-                            class="block text-sm font-bold text-blue-100 mb-2"
-                          >
+                          <label class="block text-sm font-bold text-blue-100 mb-2">
                             Reason for Rejection
                             <span class="text-red-400">*</span>
                           </label>
                           <textarea
-                            v-model="
-                              formData.approvals.divisionalDirector
-                                .rejectionComments
-                            "
+                            v-model="formData.approvals.divisionalDirector.rejectionComments"
                             rows="3"
                             class="w-full px-3 py-2 border border-red-300/30 rounded-lg focus:border-red-400 focus:outline-none text-sm bg-white/15 text-white placeholder-blue-200/60 backdrop-blur-sm resize-y divisional-comments-editable"
                             placeholder="Please provide a detailed reason for rejecting this request..."
@@ -707,9 +641,7 @@
                         >
                           <div class="text-center">
                             <div class="mb-1">
-                              <i
-                                class="fas fa-signature text-emerald-300 text-sm mb-1"
-                              ></i>
+                              <i class="fas fa-signature text-emerald-300 text-sm mb-1"></i>
                               <p class="text-blue-100 text-xs">No signature</p>
                             </div>
                             <button
@@ -727,10 +659,7 @@
                           v-else
                           class="w-full px-2 py-2 border border-emerald-300/30 rounded-lg bg-white/15 transition-all duration-300 shadow-sm hover:shadow-md min-h-[50px] flex items-center justify-center relative backdrop-blur-sm"
                         >
-                          <div
-                            v-if="isImage(divDirectorSignaturePreview)"
-                            class="text-center"
-                          >
+                          <div v-if="isImage(divDirectorSignaturePreview)" class="text-center">
                             <img
                               :src="divDirectorSignaturePreview"
                               alt="Divisional Director Signature"
@@ -744,9 +673,7 @@
                             <div
                               class="w-8 h-8 bg-red-500/20 rounded flex items-center justify-center mx-auto mb-1"
                             >
-                              <i
-                                class="fas fa-file-pdf text-red-400 text-sm"
-                              ></i>
+                              <i class="fas fa-file-pdf text-red-400 text-sm"></i>
                             </div>
                             <p class="text-xs text-blue-100">
                               {{ divDirectorSignatureFileName }}
@@ -793,9 +720,7 @@
                   <div
                     class="bg-white/15 rounded-xl p-4 border border-emerald-300/30 backdrop-blur-sm"
                   >
-                    <h5 class="font-bold text-white mb-3 text-center text-sm">
-                      Director of ICT
-                    </h5>
+                    <h5 class="font-bold text-white mb-3 text-center text-sm">Director of ICT</h5>
                     <div class="space-y-3">
                       <input
                         v-model="formData.approvals.directorICT.name"
@@ -810,9 +735,7 @@
                         >
                           <div class="text-center">
                             <div class="mb-1">
-                              <i
-                                class="fas fa-signature text-emerald-300 text-sm mb-1"
-                              ></i>
+                              <i class="fas fa-signature text-emerald-300 text-sm mb-1"></i>
                               <p class="text-blue-100 text-xs">No signature</p>
                             </div>
                             <button
@@ -830,10 +753,7 @@
                           v-else
                           class="w-full px-2 py-2 border border-emerald-300/30 rounded-lg bg-white/15 transition-all duration-300 shadow-sm hover:shadow-md min-h-[50px] flex items-center justify-center relative backdrop-blur-sm"
                         >
-                          <div
-                            v-if="isImage(directorICTSignaturePreview)"
-                            class="text-center"
-                          >
+                          <div v-if="isImage(directorICTSignaturePreview)" class="text-center">
                             <img
                               :src="directorICTSignaturePreview"
                               alt="Director ICT Signature"
@@ -847,9 +767,7 @@
                             <div
                               class="w-8 h-8 bg-red-500/20 rounded flex items-center justify-center mx-auto mb-1"
                             >
-                              <i
-                                class="fas fa-file-pdf text-red-400 text-sm"
-                              ></i>
+                              <i class="fas fa-file-pdf text-red-400 text-sm"></i>
                             </div>
                             <p class="text-xs text-blue-100">
                               {{ directorICTSignatureFileName }}
@@ -943,9 +861,7 @@
                   <div
                     class="bg-white/15 rounded-xl p-4 border border-purple-300/30 backdrop-blur-sm"
                   >
-                    <h5 class="font-bold text-white mb-3 text-center text-sm">
-                      Head of IT
-                    </h5>
+                    <h5 class="font-bold text-white mb-3 text-center text-sm">Head of IT</h5>
                     <div class="space-y-3">
                       <input
                         v-model="formData.implementation.headIT.name"
@@ -960,9 +876,7 @@
                         >
                           <div class="text-center">
                             <div class="mb-1">
-                              <i
-                                class="fas fa-signature text-purple-300 text-sm mb-1"
-                              ></i>
+                              <i class="fas fa-signature text-purple-300 text-sm mb-1"></i>
                               <p class="text-blue-100 text-xs">No signature</p>
                             </div>
                             <button
@@ -980,10 +894,7 @@
                           v-else
                           class="w-full px-2 py-2 border border-purple-300/30 rounded-lg bg-white/15 transition-all duration-300 shadow-sm hover:shadow-md min-h-[50px] flex items-center justify-center relative backdrop-blur-sm"
                         >
-                          <div
-                            v-if="isImage(headITSignaturePreview)"
-                            class="text-center"
-                          >
+                          <div v-if="isImage(headITSignaturePreview)" class="text-center">
                             <img
                               :src="headITSignaturePreview"
                               alt="Head IT Signature"
@@ -997,9 +908,7 @@
                             <div
                               class="w-8 h-8 bg-red-500/20 rounded flex items-center justify-center mx-auto mb-1"
                             >
-                              <i
-                                class="fas fa-file-pdf text-red-400 text-sm"
-                              ></i>
+                              <i class="fas fa-file-pdf text-red-400 text-sm"></i>
                             </div>
                             <p class="text-xs text-blue-100">
                               {{ headITSignatureFileName }}
@@ -1063,9 +972,7 @@
                         >
                           <div class="text-center">
                             <div class="mb-1">
-                              <i
-                                class="fas fa-signature text-purple-300 text-sm mb-1"
-                              ></i>
+                              <i class="fas fa-signature text-purple-300 text-sm mb-1"></i>
                               <p class="text-blue-100 text-xs">No signature</p>
                             </div>
                             <button
@@ -1083,10 +990,7 @@
                           v-else
                           class="w-full px-2 py-2 border border-purple-300/30 rounded-lg bg-white/15 transition-all duration-300 shadow-sm hover:shadow-md min-h-[50px] flex items-center justify-center relative backdrop-blur-sm"
                         >
-                          <div
-                            v-if="isImage(ictOfficerSignaturePreview)"
-                            class="text-center"
-                          >
+                          <div v-if="isImage(ictOfficerSignaturePreview)" class="text-center">
                             <img
                               :src="ictOfficerSignaturePreview"
                               alt="ICT Officer Signature"
@@ -1100,9 +1004,7 @@
                             <div
                               class="w-8 h-8 bg-red-500/20 rounded flex items-center justify-center mx-auto mb-1"
                             >
-                              <i
-                                class="fas fa-file-pdf text-red-400 text-sm"
-                              ></i>
+                              <i class="fas fa-file-pdf text-red-400 text-sm"></i>
                             </div>
                             <p class="text-xs text-blue-100">
                               {{ ictOfficerSignatureFileName }}
@@ -1165,12 +1067,8 @@
                 </div>
 
                 <!-- Request Status -->
-                <div
-                  class="mb-6 p-4 bg-white/10 rounded-xl border border-emerald-300/30"
-                >
-                  <h4 class="text-sm font-bold text-blue-100 mb-3">
-                    Request Status
-                  </h4>
+                <div class="mb-6 p-4 bg-white/10 rounded-xl border border-emerald-300/30">
+                  <h4 class="text-sm font-bold text-blue-100 mb-3">Request Status</h4>
                   <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
                     <div class="text-center">
                       <div
@@ -1178,8 +1076,8 @@
                           getApprovalStatus('hod') === 'approved'
                             ? 'bg-green-500'
                             : getApprovalStatus('hod') === 'rejected'
-                            ? 'bg-red-500'
-                            : 'bg-yellow-500'
+                              ? 'bg-red-500'
+                              : 'bg-yellow-500'
                         "
                         class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1"
                       >
@@ -1188,8 +1086,8 @@
                             getApprovalStatus('hod') === 'approved'
                               ? 'fas fa-check'
                               : getApprovalStatus('hod') === 'rejected'
-                              ? 'fas fa-times'
-                              : 'fas fa-clock'
+                                ? 'fas fa-times'
+                                : 'fas fa-clock'
                           "
                           class="text-white text-sm"
                         ></i>
@@ -1202,8 +1100,8 @@
                           getApprovalStatus('divisional') === 'approved'
                             ? 'bg-green-500'
                             : getApprovalStatus('divisional') === 'rejected'
-                            ? 'bg-red-500'
-                            : 'bg-yellow-500'
+                              ? 'bg-red-500'
+                              : 'bg-yellow-500'
                         "
                         class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1"
                       >
@@ -1212,8 +1110,8 @@
                             getApprovalStatus('divisional') === 'approved'
                               ? 'fas fa-check'
                               : getApprovalStatus('divisional') === 'rejected'
-                              ? 'fas fa-times'
-                              : 'fas fa-clock'
+                                ? 'fas fa-times'
+                                : 'fas fa-clock'
                           "
                           class="text-white text-sm"
                         ></i>
@@ -1226,8 +1124,8 @@
                           getApprovalStatus('dict') === 'approved'
                             ? 'bg-green-500'
                             : getApprovalStatus('dict') === 'rejected'
-                            ? 'bg-red-500'
-                            : 'bg-yellow-500'
+                              ? 'bg-red-500'
+                              : 'bg-yellow-500'
                         "
                         class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1"
                       >
@@ -1236,8 +1134,8 @@
                             getApprovalStatus('dict') === 'approved'
                               ? 'fas fa-check'
                               : getApprovalStatus('dict') === 'rejected'
-                              ? 'fas fa-times'
-                              : 'fas fa-clock'
+                                ? 'fas fa-times'
+                                : 'fas fa-clock'
                           "
                           class="text-white text-sm"
                         ></i>
@@ -1250,8 +1148,8 @@
                           getApprovalStatus('headOfIt') === 'approved'
                             ? 'bg-green-500'
                             : getApprovalStatus('headOfIt') === 'rejected'
-                            ? 'bg-red-500'
-                            : 'bg-yellow-500'
+                              ? 'bg-red-500'
+                              : 'bg-yellow-500'
                         "
                         class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1"
                       >
@@ -1260,8 +1158,8 @@
                             getApprovalStatus('headOfIt') === 'approved'
                               ? 'fas fa-check'
                               : getApprovalStatus('headOfIt') === 'rejected'
-                              ? 'fas fa-times'
-                              : 'fas fa-clock'
+                                ? 'fas fa-times'
+                                : 'fas fa-clock'
                           "
                           class="text-white text-sm"
                         ></i>
@@ -1274,8 +1172,8 @@
                           getApprovalStatus('ict') === 'approved'
                             ? 'bg-green-500'
                             : getApprovalStatus('ict') === 'rejected'
-                            ? 'bg-red-500'
-                            : 'bg-yellow-500'
+                              ? 'bg-red-500'
+                              : 'bg-yellow-500'
                         "
                         class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1"
                       >
@@ -1284,8 +1182,8 @@
                             getApprovalStatus('ict') === 'approved'
                               ? 'fas fa-check'
                               : getApprovalStatus('ict') === 'rejected'
-                              ? 'fas fa-times'
-                              : 'fas fa-clock'
+                                ? 'fas fa-times'
+                                : 'fas fa-clock'
                           "
                           class="text-white text-sm"
                         ></i>
@@ -1333,9 +1231,7 @@
                 <div class="text-center mb-3">
                   <div class="inline-block text-black px-4 py-2 rounded-lg">
                     <p class="font-bold">Directorate of ICT</p>
-                    <p class="text-sm opacity-90">
-                      IT and Telephone Department
-                    </p>
+                    <p class="text-sm opacity-90">IT and Telephone Department</p>
                   </div>
                 </div>
 
@@ -1345,11 +1241,7 @@
                     @click="resetForm"
                     class="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-all duration-300 font-semibold flex items-center shadow-lg hover:shadow-xl"
                   >
-                    <svg
-                      class="w-4 h-4 mr-2"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
+                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                       <path
                         fill-rule="evenodd"
                         d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
@@ -1362,11 +1254,7 @@
                     type="submit"
                     class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300 font-semibold flex items-center shadow-lg hover:shadow-xl"
                   >
-                    <svg
-                      class="w-4 h-4 mr-2"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
+                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                       <path
                         fill-rule="evenodd"
                         d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
@@ -1389,1180 +1277,1088 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import Header from '@/components/header.vue'
-import ModernSidebar from '@/components/ModernSidebar.vue'
-import AppFooter from '@/components/footer.vue'
-import { useAuth } from '@/composables/useAuth'
-import { useDepartments } from '@/composables/useApi'
+  import { ref, onMounted } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
+  import Header from '@/components/header.vue'
+  import ModernSidebar from '@/components/ModernSidebar.vue'
+  import AppFooter from '@/components/footer.vue'
+  import { useAuth } from '@/composables/useAuth'
+  import { useDepartments } from '@/composables/useApi'
 
-export default {
-  name: 'JeevaAccessForm',
-  components: {
-    Header,
-    ModernSidebar,
-    AppFooter
-  },
-  setup() {
-    const route = useRoute()
-    const router = useRouter()
-    const { userRole, ROLES } = useAuth()
-    // Sidebar state now managed by Pinia - no local state needed
-    const isReviewMode = ref(false)
-    const requestId = ref('')
+  export default {
+    name: 'JeevaAccessForm',
+    components: {
+      Header,
+      ModernSidebar,
+      AppFooter
+    },
+    setup() {
+      const route = useRoute()
+      const router = useRouter()
+      const { userRole, ROLES } = useAuth()
+      // Sidebar state now managed by Pinia - no local state needed
+      const isReviewMode = ref(false)
+      const requestId = ref('')
 
-    // Use departments composable
-    const {
-      departments,
-      loading: departmentsLoading,
-      error: departmentsError,
-      fetchDepartments
-    } = useDepartments()
+      // Use departments composable
+      const {
+        departments,
+        loading: departmentsLoading,
+        error: departmentsError,
+        fetchDepartments
+      } = useDepartments()
 
-    // Fetch departments when component mounts
-    onMounted(() => {
-      fetchDepartments()
-    })
+      // Fetch departments when component mounts
+      onMounted(() => {
+        fetchDepartments()
+      })
 
-    return {
-      isReviewMode,
-      requestId,
-      route,
-      router,
-      userRole,
-      ROLES,
-      departments,
-      departmentsLoading,
-      departmentsError,
-      fetchDepartments
-    }
-  },
-  mounted() {
-    this.checkReviewMode()
-  },
-  data() {
-    return {
-      signaturePreview: '',
-      signatureFileName: '',
-      // Approval signatures
-      hodSignaturePreview: '',
-      hodSignatureFileName: '',
-      divDirectorSignaturePreview: '',
-      divDirectorSignatureFileName: '',
-      directorICTSignaturePreview: '',
-      directorICTSignatureFileName: '',
-      // Implementation signatures
-      headITSignaturePreview: '',
-      headITSignatureFileName: '',
-      ictOfficerSignaturePreview: '',
-      ictOfficerSignatureFileName: '',
+      return {
+        isReviewMode,
+        requestId,
+        route,
+        router,
+        userRole,
+        ROLES,
+        departments,
+        departmentsLoading,
+        departmentsError,
+        fetchDepartments
+      }
+    },
+    mounted() {
+      this.checkReviewMode()
+    },
+    data() {
+      return {
+        signaturePreview: '',
+        signatureFileName: '',
+        // Approval signatures
+        hodSignaturePreview: '',
+        hodSignatureFileName: '',
+        divDirectorSignaturePreview: '',
+        divDirectorSignatureFileName: '',
+        directorICTSignaturePreview: '',
+        directorICTSignatureFileName: '',
+        // Implementation signatures
+        headITSignaturePreview: '',
+        headITSignatureFileName: '',
+        ictOfficerSignaturePreview: '',
+        ictOfficerSignatureFileName: '',
 
-      formData: {
-        pfNumber: '',
-        staffName: '',
-        department_id: '',
-        signature: null,
-        requestType: '',
-        selectedModules: [],
-        accessType: '',
-        tempDate: {
-          day: '',
-          month: '',
-          year: ''
-        },
-        approvals: {
-          hod: {
-            name: '',
-            signature: '',
-            date: ''
+        formData: {
+          pfNumber: '',
+          staffName: '',
+          department_id: '',
+          signature: null,
+          requestType: '',
+          selectedModules: [],
+          accessType: '',
+          tempDate: {
+            day: '',
+            month: '',
+            year: ''
           },
-          divisionalDirector: {
-            name: '',
-            signature: '',
-            date: '',
-            decision: '',
-            rejectionComments: ''
+          approvals: {
+            hod: {
+              name: '',
+              signature: '',
+              date: ''
+            },
+            divisionalDirector: {
+              name: '',
+              signature: '',
+              date: '',
+              decision: '',
+              rejectionComments: ''
+            },
+            directorICT: {
+              name: '',
+              signatureDate: ''
+            }
           },
-          directorICT: {
-            name: '',
-            signatureDate: ''
+          comments: '',
+          implementation: {
+            headIT: {
+              name: '',
+              signatureDate: ''
+            },
+            ictOfficer: {
+              name: '',
+              signatureDate: ''
+            }
           }
         },
-        comments: '',
-        implementation: {
-          headIT: {
-            name: '',
-            signatureDate: ''
-          },
-          ictOfficer: {
-            name: '',
-            signatureDate: ''
+        modules: [
+          { id: 'financial_accounting', name: 'FINANCIAL ACCOUNTING' },
+          { id: 'doctor_consultation', name: 'DOCTOR CONSULTATION' },
+          { id: 'medical_records', name: 'MEDICAL RECORDS' },
+          { id: 'outpatient', name: 'OUTPATIENT' },
+          { id: 'nursing_station', name: 'NURSING STATION' },
+          { id: 'inpatient', name: 'INPATIENT' },
+          { id: 'ip_cashier', name: 'IP CASHIER' },
+          { id: 'hiv', name: 'HIV' },
+          { id: 'linen_laundry', name: 'LINEN & LAUNDRY' },
+          { id: 'fixed_assets', name: 'FIXED ASSETS' },
+          { id: 'pmtct', name: 'PMTCT' },
+          { id: 'pharmacy', name: 'PHARMACY' },
+          { id: 'bill_note', name: 'BILL NOTE' },
+          { id: 'blood_bank', name: 'BLOOD BANK' },
+          { id: 'order_management', name: 'ORDER MANAGEMENT' },
+          { id: 'private_credit', name: 'PRIVATE CREDIT' },
+          { id: 'laboratory', name: 'LABORATORY' },
+          { id: 'general_store', name: 'GENERAL STORE' },
+          { id: 'ip_billing', name: 'IP BILLING' },
+          { id: 'radiology', name: 'RADIOLOGY' },
+          { id: 'purchase', name: 'PURCHASE' },
+          { id: 'scrolling', name: 'SCROLLING' },
+          { id: 'operation_theatre', name: 'OPERATION THEATRE' },
+          { id: 'cssd', name: 'CSSD' },
+          { id: 'web_indent', name: 'WEB INDENT' },
+          { id: 'mortuary', name: 'MORTUARY' },
+          { id: 'general_maintenance', name: 'GENERAL MAINTENANCE' },
+          { id: 'personnel', name: 'PERSONNEL' },
+          { id: 'maintenance', name: 'MAINTENANCE' },
+          { id: 'payroll', name: 'PAYROLL' },
+          { id: 'cms', name: 'CMS' },
+          { id: 'mis_statistics', name: 'MIS STATISTICS' }
+        ]
+      }
+    },
+    methods: {
+      submitForm() {
+        // Validate required fields
+        if (!this.formData.pfNumber || !this.formData.staffName || !this.formData.department_id) {
+          this.showNotification(
+            'Please fill in all required fields (PF Number, Staff Name, and Department)'
+          )
+          return
+        }
+
+        if (!this.formData.requestType) {
+          this.showNotification('Please select whether this is for Use or Revoke')
+          return
+        }
+
+        if (this.formData.selectedModules.length === 0) {
+          this.showNotification('Please select at least one module')
+          return
+        }
+
+        if (!this.formData.accessType) {
+          this.showNotification('Please specify the access rights type')
+          return
+        }
+
+        // If temporary access, validate date
+        if (this.formData.accessType === 'temporary') {
+          if (
+            !this.formData.tempDate.day ||
+            !this.formData.tempDate.month ||
+            !this.formData.tempDate.year
+          ) {
+            this.showNotification('Please provide a complete date for temporary access')
+            return
           }
+        }
+
+        // Here you would typically send the data to your backend
+        console.log('Form submitted:', this.formData)
+        this.showNotification('Jeeva Access Request submitted successfully!')
+
+        // Optionally reset form after submission
+        // this.resetForm()
+      },
+
+      triggerFileUpload() {
+        this.$refs.signatureInput.click()
+      },
+
+      onSignatureChange(e) {
+        const file = e.target.files[0]
+        this.formData.signature = file || null
+
+        if (!file) {
+          this.signaturePreview = ''
+          this.signatureFileName = ''
+          return
+        }
+
+        // Validate file type
+        const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf']
+        if (!allowedTypes.includes(file.type)) {
+          this.showNotification('Please select a valid file (PNG, JPG, or PDF)')
+          this.clearSignature()
+          return
+        }
+
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          this.showNotification('File size must be less than 5MB')
+          this.clearSignature()
+          return
+        }
+
+        this.signatureFileName = file.name
+
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader()
+          reader.onload = () => {
+            this.signaturePreview = reader.result
+          }
+          reader.readAsDataURL(file)
+        } else {
+          this.signaturePreview = 'pdf'
         }
       },
-      modules: [
-        { id: 'financial_accounting', name: 'FINANCIAL ACCOUNTING' },
-        { id: 'doctor_consultation', name: 'DOCTOR CONSULTATION' },
-        { id: 'medical_records', name: 'MEDICAL RECORDS' },
-        { id: 'outpatient', name: 'OUTPATIENT' },
-        { id: 'nursing_station', name: 'NURSING STATION' },
-        { id: 'inpatient', name: 'INPATIENT' },
-        { id: 'ip_cashier', name: 'IP CASHIER' },
-        { id: 'hiv', name: 'HIV' },
-        { id: 'linen_laundry', name: 'LINEN & LAUNDRY' },
-        { id: 'fixed_assets', name: 'FIXED ASSETS' },
-        { id: 'pmtct', name: 'PMTCT' },
-        { id: 'pharmacy', name: 'PHARMACY' },
-        { id: 'bill_note', name: 'BILL NOTE' },
-        { id: 'blood_bank', name: 'BLOOD BANK' },
-        { id: 'order_management', name: 'ORDER MANAGEMENT' },
-        { id: 'private_credit', name: 'PRIVATE CREDIT' },
-        { id: 'laboratory', name: 'LABORATORY' },
-        { id: 'general_store', name: 'GENERAL STORE' },
-        { id: 'ip_billing', name: 'IP BILLING' },
-        { id: 'radiology', name: 'RADIOLOGY' },
-        { id: 'purchase', name: 'PURCHASE' },
-        { id: 'scrolling', name: 'SCROLLING' },
-        { id: 'operation_theatre', name: 'OPERATION THEATRE' },
-        { id: 'cssd', name: 'CSSD' },
-        { id: 'web_indent', name: 'WEB INDENT' },
-        { id: 'mortuary', name: 'MORTUARY' },
-        { id: 'general_maintenance', name: 'GENERAL MAINTENANCE' },
-        { id: 'personnel', name: 'PERSONNEL' },
-        { id: 'maintenance', name: 'MAINTENANCE' },
-        { id: 'payroll', name: 'PAYROLL' },
-        { id: 'cms', name: 'CMS' },
-        { id: 'mis_statistics', name: 'MIS STATISTICS' }
-      ]
-    }
-  },
-  methods: {
-    submitForm() {
-      // Validate required fields
-      if (
-        !this.formData.pfNumber ||
-        !this.formData.staffName ||
-        !this.formData.department_id
-      ) {
-        this.showNotification(
-          'Please fill in all required fields (PF Number, Staff Name, and Department)'
-        )
-        return
-      }
 
-      if (!this.formData.requestType) {
-        this.showNotification(
-          'Please select whether this is for Use or Revoke'
-        )
-        return
-      }
+      isImage(preview) {
+        return typeof preview === 'string' && preview !== 'pdf'
+      },
 
-      if (this.formData.selectedModules.length === 0) {
-        this.showNotification('Please select at least one module')
-        return
-      }
-
-      if (!this.formData.accessType) {
-        this.showNotification('Please specify the access rights type')
-        return
-      }
-
-      // If temporary access, validate date
-      if (this.formData.accessType === 'temporary') {
-        if (
-          !this.formData.tempDate.day ||
-          !this.formData.tempDate.month ||
-          !this.formData.tempDate.year
-        ) {
-          this.showNotification(
-            'Please provide a complete date for temporary access'
-          )
-          return
-        }
-      }
-
-      // Here you would typically send the data to your backend
-      console.log('Form submitted:', this.formData)
-      this.showNotification('Jeeva Access Request submitted successfully!')
-
-      // Optionally reset form after submission
-      // this.resetForm()
-    },
-
-    triggerFileUpload() {
-      this.$refs.signatureInput.click()
-    },
-
-    onSignatureChange(e) {
-      const file = e.target.files[0]
-      this.formData.signature = file || null
-
-      if (!file) {
+      clearSignature() {
+        this.formData.signature = null
         this.signaturePreview = ''
         this.signatureFileName = ''
-        return
-      }
-
-      // Validate file type
-      const allowedTypes = [
-        'image/png',
-        'image/jpeg',
-        'image/jpg',
-        'application/pdf'
-      ]
-      if (!allowedTypes.includes(file.type)) {
-        this.showNotification('Please select a valid file (PNG, JPG, or PDF)')
-        this.clearSignature()
-        return
-      }
-
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        this.showNotification('File size must be less than 5MB')
-        this.clearSignature()
-        return
-      }
-
-      this.signatureFileName = file.name
-
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader()
-        reader.onload = () => {
-          this.signaturePreview = reader.result
+        if (this.$refs.signatureInput) {
+          this.$refs.signatureInput.value = ''
         }
-        reader.readAsDataURL(file)
-      } else {
-        this.signaturePreview = 'pdf'
-      }
-    },
-
-    isImage(preview) {
-      return typeof preview === 'string' && preview !== 'pdf'
-    },
-
-    clearSignature() {
-      this.formData.signature = null
-      this.signaturePreview = ''
-      this.signatureFileName = ''
-      if (this.$refs.signatureInput) {
-        this.$refs.signatureInput.value = ''
-      }
-    },
-
-    // HOD Signature methods
-    triggerHodSignatureUpload() {
-      this.$refs.hodSignatureInput.click()
-    },
-
-    onHodSignatureChange(e) {
-      const file = e.target.files[0]
-      this.formData.approvals.hod.signature = file || null
-
-      if (!file) {
-        this.hodSignaturePreview = ''
-        this.hodSignatureFileName = ''
-        return
-      }
-
-      const allowedTypes = [
-        'image/png',
-        'image/jpeg',
-        'image/jpg',
-        'application/pdf'
-      ]
-      if (!allowedTypes.includes(file.type)) {
-        this.showNotification('Please select a valid file (PNG, JPG, or PDF)')
-        this.clearHodSignature()
-        return
-      }
-
-      if (file.size > 5 * 1024 * 1024) {
-        this.showNotification('File size must be less than 5MB')
-        this.clearHodSignature()
-        return
-      }
-
-      this.hodSignatureFileName = file.name
-
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader()
-        reader.onload = () => {
-          this.hodSignaturePreview = reader.result
-        }
-        reader.readAsDataURL(file)
-      } else {
-        this.hodSignaturePreview = 'pdf'
-      }
-    },
-
-    clearHodSignature() {
-      this.formData.approvals.hod.signature = null
-      this.hodSignaturePreview = ''
-      this.hodSignatureFileName = ''
-      if (this.$refs.hodSignatureInput) {
-        this.$refs.hodSignatureInput.value = ''
-      }
-    },
-
-    // Divisional Director Signature methods
-    triggerDivDirectorSignatureUpload() {
-      this.$refs.divDirectorSignatureInput.click()
-    },
-
-    onDivDirectorSignatureChange(e) {
-      const file = e.target.files[0]
-      this.formData.approvals.divisionalDirector.signature = file || null
-
-      if (!file) {
-        this.divDirectorSignaturePreview = ''
-        this.divDirectorSignatureFileName = ''
-        return
-      }
-
-      const allowedTypes = [
-        'image/png',
-        'image/jpeg',
-        'image/jpg',
-        'application/pdf'
-      ]
-      if (!allowedTypes.includes(file.type)) {
-        this.showNotification('Please select a valid file (PNG, JPG, or PDF)')
-        this.clearDivDirectorSignature()
-        return
-      }
-
-      if (file.size > 5 * 1024 * 1024) {
-        this.showNotification('File size must be less than 5MB')
-        this.clearDivDirectorSignature()
-        return
-      }
-
-      this.divDirectorSignatureFileName = file.name
-
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader()
-        reader.onload = () => {
-          this.divDirectorSignaturePreview = reader.result
-        }
-        reader.readAsDataURL(file)
-      } else {
-        this.divDirectorSignaturePreview = 'pdf'
-      }
-    },
-
-    clearDivDirectorSignature() {
-      this.formData.approvals.divisionalDirector.signature = null
-      this.divDirectorSignaturePreview = ''
-      this.divDirectorSignatureFileName = ''
-      if (this.$refs.divDirectorSignatureInput) {
-        this.$refs.divDirectorSignatureInput.value = ''
-      }
-    },
-
-    // Director ICT Signature methods
-    triggerDirectorICTSignatureUpload() {
-      this.$refs.directorICTSignatureInput.click()
-    },
-
-    onDirectorICTSignatureChange(e) {
-      const file = e.target.files[0]
-      this.formData.approvals.directorICT.signatureDate = file || null
-
-      if (!file) {
-        this.directorICTSignaturePreview = ''
-        this.directorICTSignatureFileName = ''
-        return
-      }
-
-      const allowedTypes = [
-        'image/png',
-        'image/jpeg',
-        'image/jpg',
-        'application/pdf'
-      ]
-      if (!allowedTypes.includes(file.type)) {
-        this.showNotification('Please select a valid file (PNG, JPG, or PDF)')
-        this.clearDirectorICTSignature()
-        return
-      }
-
-      if (file.size > 5 * 1024 * 1024) {
-        this.showNotification('File size must be less than 5MB')
-        this.clearDirectorICTSignature()
-        return
-      }
-
-      this.directorICTSignatureFileName = file.name
-
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader()
-        reader.onload = () => {
-          this.directorICTSignaturePreview = reader.result
-        }
-        reader.readAsDataURL(file)
-      } else {
-        this.directorICTSignaturePreview = 'pdf'
-      }
-    },
-
-    clearDirectorICTSignature() {
-      this.formData.approvals.directorICT.signatureDate = null
-      this.directorICTSignaturePreview = ''
-      this.directorICTSignatureFileName = ''
-      if (this.$refs.directorICTSignatureInput) {
-        this.$refs.directorICTSignatureInput.value = ''
-      }
-    },
-
-    // Head IT Signature methods
-    triggerHeadITSignatureUpload() {
-      this.$refs.headITSignatureInput.click()
-    },
-
-    onHeadITSignatureChange(e) {
-      const file = e.target.files[0]
-      this.formData.implementation.headIT.signature = file || null
-
-      if (!file) {
-        this.headITSignaturePreview = ''
-        this.headITSignatureFileName = ''
-        return
-      }
-
-      const allowedTypes = [
-        'image/png',
-        'image/jpeg',
-        'image/jpg',
-        'application/pdf'
-      ]
-      if (!allowedTypes.includes(file.type)) {
-        this.showNotification('Please select a valid file (PNG, JPG, or PDF)')
-        this.clearHeadITSignature()
-        return
-      }
-
-      if (file.size > 5 * 1024 * 1024) {
-        this.showNotification('File size must be less than 5MB')
-        this.clearHeadITSignature()
-        return
-      }
-
-      this.headITSignatureFileName = file.name
-
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader()
-        reader.onload = () => {
-          this.headITSignaturePreview = reader.result
-        }
-        reader.readAsDataURL(file)
-      } else {
-        this.headITSignaturePreview = 'pdf'
-      }
-    },
-
-    clearHeadITSignature() {
-      this.formData.implementation.headIT.signature = null
-      this.headITSignaturePreview = ''
-      this.headITSignatureFileName = ''
-      if (this.$refs.headITSignatureInput) {
-        this.$refs.headITSignatureInput.value = ''
-      }
-    },
-
-    // ICT Officer Signature methods
-    triggerIctOfficerSignatureUpload() {
-      this.$refs.ictOfficerSignatureInput.click()
-    },
-
-    onIctOfficerSignatureChange(e) {
-      const file = e.target.files[0]
-      this.formData.implementation.ictOfficer.signature = file || null
-
-      if (!file) {
-        this.ictOfficerSignaturePreview = ''
-        this.ictOfficerSignatureFileName = ''
-        return
-      }
-
-      const allowedTypes = [
-        'image/png',
-        'image/jpeg',
-        'image/jpg',
-        'application/pdf'
-      ]
-      if (!allowedTypes.includes(file.type)) {
-        this.showNotification('Please select a valid file (PNG, JPG, or PDF)')
-        this.clearIctOfficerSignature()
-        return
-      }
-
-      if (file.size > 5 * 1024 * 1024) {
-        this.showNotification('File size must be less than 5MB')
-        this.clearIctOfficerSignature()
-        return
-      }
-
-      this.ictOfficerSignatureFileName = file.name
-
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader()
-        reader.onload = () => {
-          this.ictOfficerSignaturePreview = reader.result
-        }
-        reader.readAsDataURL(file)
-      } else {
-        this.ictOfficerSignaturePreview = 'pdf'
-      }
-    },
-
-    clearIctOfficerSignature() {
-      this.formData.implementation.ictOfficer.signature = null
-      this.ictOfficerSignaturePreview = ''
-      this.ictOfficerSignatureFileName = ''
-      if (this.$refs.ictOfficerSignatureInput) {
-        this.$refs.ictOfficerSignatureInput.value = ''
-      }
-    },
-
-    resetForm() {
-      this.formData = {
-        pfNumber: '',
-        staffName: '',
-        department_id: '',
-        signature: null,
-        requestType: '',
-        selectedModules: [],
-        accessType: '',
-        tempDate: {
-          day: '',
-          month: '',
-          year: ''
-        },
-        approvals: {
-          hod: {
-            name: '',
-            signature: '',
-            date: ''
-          },
-          divisionalDirector: {
-            name: '',
-            signature: '',
-            date: '',
-            decision: '',
-            rejectionComments: ''
-          },
-          directorICT: {
-            name: '',
-            signatureDate: ''
-          }
-        },
-        comments: '',
-        implementation: {
-          headIT: {
-            name: '',
-            signatureDate: ''
-          },
-          ictOfficer: {
-            name: '',
-            signatureDate: ''
-          }
-        }
-      }
-      this.signaturePreview = ''
-      this.signatureFileName = ''
-      this.hodSignaturePreview = ''
-      this.hodSignatureFileName = ''
-      this.divDirectorSignaturePreview = ''
-      this.divDirectorSignatureFileName = ''
-      this.directorICTSignaturePreview = ''
-      this.directorICTSignatureFileName = ''
-      this.headITSignaturePreview = ''
-      this.headITSignatureFileName = ''
-      this.ictOfficerSignaturePreview = ''
-      this.ictOfficerSignatureFileName = ''
-      this.showNotification('Form has been reset')
-    },
-
-    showNotification(message, type = 'info') {
-      // Simple notification implementation
-      // You can replace this with your preferred notification library
-      console.log(`[${type.toUpperCase()}] ${message}`)
-
-      // For now, using alert - replace with your notification system
-      if (type === 'error') {
-        alert(`Error: ${message}`)
-      } else {
-        alert(message)
-      }
-    },
-
-    checkReviewMode() {
-      // Check if we're in review mode (coming from requests dashboard)
-      if (this.route.query.mode === 'review' && this.route.query.requestId) {
-        this.isReviewMode = true
-        this.requestId = this.route.query.requestId
-        this.populateFormFromQuery()
-        this.makeFormReadOnlyForReview()
-      }
-    },
-
-    populateFormFromQuery() {
-      const query = this.route.query
-
-      // Populate basic information
-      this.formData.pfNumber = query.pfNumber || ''
-      this.formData.staffName = query.staffName || ''
-      this.formData.department_id =
-        query.department_id || query.department || ''
-      this.formData.requestType = query.moduleRequestedFor?.toLowerCase() || ''
-      this.formData.accessType =
-        query.accessType === 'Permanent (until retirement)'
-          ? 'permanent'
-          : 'temporary'
-
-      // Handle temporary date
-      if (query.temporaryUntil) {
-        const date = new Date(query.temporaryUntil)
-        this.formData.tempDate = {
-          day: date.getDate().toString().padStart(2, '0'),
-          month: (date.getMonth() + 1).toString().padStart(2, '0'),
-          year: date.getFullYear().toString()
-        }
-      }
-
-      // Populate selected modules
-      if (query.selectedModules) {
-        try {
-          const modules = JSON.parse(query.selectedModules)
-          this.formData.selectedModules = modules
-        } catch (e) {
-          console.error('Error parsing selected modules:', e)
-        }
-      }
-
-      // Populate comments
-      this.formData.comments = query.comments || ''
-
-      // Set digital signature status
-      if (query.digitalSignature === 'true') {
-        this.signaturePreview = 'review-mode-signature'
-        this.signatureFileName = 'Digital Signature (Submitted)'
-      }
-    },
-
-    makeFormReadOnlyForReview() {
-      // Add readonly attributes to form elements
-      this.$nextTick(() => {
-        const inputs = this.$el.querySelectorAll('input, select, textarea')
-        inputs.forEach((input) => {
-          // Allow HOD to edit specific sections
-          if (this.canHodEdit(input)) {
-            return // Skip making this input readonly
-          }
-
-          if (!input.classList.contains('approval-input')) {
-            input.setAttribute('readonly', true)
-            input.setAttribute('disabled', true)
-          }
-        })
-
-        // Disable checkboxes and radio buttons
-        const checkboxes = this.$el.querySelectorAll(
-          'input[type="checkbox"], input[type="radio"]'
-        )
-        checkboxes.forEach((checkbox) => {
-          // Allow HOD to edit specific checkboxes/radios
-          if (this.canHodEdit(checkbox)) {
-            return // Skip disabling this checkbox
-          }
-
-          if (!checkbox.classList.contains('approval-input')) {
-            checkbox.setAttribute('disabled', true)
-          }
-        })
-      })
-    },
-
-    canHodEdit(element) {
-      // Allow HOD to edit when they are the current approver
-      if (
-        this.userRole === this.ROLES.HEAD_OF_DEPARTMENT &&
-        this.canApproveAtStage()
-      ) {
-        const hodEditableClasses = [
-          'hod-editable',
-          'module-request-editable',
-          'access-rights-editable',
-          'comments-editable',
-          'hod-approval-editable'
-        ]
-
-        if (
-          hodEditableClasses.some((className) =>
-            element.classList.contains(className)
-          )
-        ) {
-          return true
-        }
-      }
-
-      // Allow Divisional Director to edit their approval section
-      if (
-        this.userRole === this.ROLES.DIVISIONAL_DIRECTOR &&
-        this.canApproveAtStage()
-      ) {
-        const divDirectorEditableClasses = [
-          'divisional-director-editable',
-          'divisional-approval-editable',
-          'divisional-comments-editable'
-        ]
-
-        if (
-          divDirectorEditableClasses.some((className) =>
-            element.classList.contains(className)
-          )
-        ) {
-          return true
-        }
-      }
-
-      return false
-    },
-
-    getApprovalStatus(stage) {
-      const query = this.route.query
-      const statusMap = {
-        hod: query.hodApprovalStatus,
-        divisional: query.divisionalStatus,
-        dict: query.dictStatus,
-        headOfIt: query.headOfItStatus,
-        ict: query.ictStatus
-      }
-      return statusMap[stage] || 'pending'
-    },
-
-    canApproveAtStage() {
-      if (!this.isReviewMode) return false
-
-      const query = this.route.query
-      switch (this.userRole) {
-        case this.ROLES.HEAD_OF_DEPARTMENT:
-          return query.hodApprovalStatus === 'pending'
-        case this.ROLES.DIVISIONAL_DIRECTOR:
-          return (
-            query.hodApprovalStatus === 'approved' &&
-            query.divisionalStatus === 'pending'
-          )
-        case this.ROLES.ICT_DIRECTOR:
-          return (
-            query.divisionalStatus === 'approved' &&
-            query.dictStatus === 'pending'
-          )
-        case this.ROLES.HOD_IT:
-          return (
-            query.dictStatus === 'approved' &&
-            query.headOfItStatus === 'pending'
-          )
-        case this.ROLES.ICT_OFFICER:
-          return (
-            query.headOfItStatus === 'approved' && query.ictStatus === 'pending'
-          )
-        default:
-          return false
-      }
-    },
-
-    approveRequest() {
-      if (!this.canApproveAtStage()) {
-        this.showNotification('You cannot approve this request at this stage.')
-        return
-      }
-
-      // Special handling for Divisional Director
-      if (this.userRole === this.ROLES.DIVISIONAL_DIRECTOR) {
-        if (!this.formData.approvals.divisionalDirector.decision) {
-          this.showNotification(
-            'Please select Approve or Reject before submitting.'
-          )
+      },
+
+      // HOD Signature methods
+      triggerHodSignatureUpload() {
+        this.$refs.hodSignatureInput.click()
+      },
+
+      onHodSignatureChange(e) {
+        const file = e.target.files[0]
+        this.formData.approvals.hod.signature = file || null
+
+        if (!file) {
+          this.hodSignaturePreview = ''
+          this.hodSignatureFileName = ''
           return
         }
 
-        if (this.formData.approvals.divisionalDirector.decision === 'reject') {
+        const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf']
+        if (!allowedTypes.includes(file.type)) {
+          this.showNotification('Please select a valid file (PNG, JPG, or PDF)')
+          this.clearHodSignature()
+          return
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+          this.showNotification('File size must be less than 5MB')
+          this.clearHodSignature()
+          return
+        }
+
+        this.hodSignatureFileName = file.name
+
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader()
+          reader.onload = () => {
+            this.hodSignaturePreview = reader.result
+          }
+          reader.readAsDataURL(file)
+        } else {
+          this.hodSignaturePreview = 'pdf'
+        }
+      },
+
+      clearHodSignature() {
+        this.formData.approvals.hod.signature = null
+        this.hodSignaturePreview = ''
+        this.hodSignatureFileName = ''
+        if (this.$refs.hodSignatureInput) {
+          this.$refs.hodSignatureInput.value = ''
+        }
+      },
+
+      // Divisional Director Signature methods
+      triggerDivDirectorSignatureUpload() {
+        this.$refs.divDirectorSignatureInput.click()
+      },
+
+      onDivDirectorSignatureChange(e) {
+        const file = e.target.files[0]
+        this.formData.approvals.divisionalDirector.signature = file || null
+
+        if (!file) {
+          this.divDirectorSignaturePreview = ''
+          this.divDirectorSignatureFileName = ''
+          return
+        }
+
+        const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf']
+        if (!allowedTypes.includes(file.type)) {
+          this.showNotification('Please select a valid file (PNG, JPG, or PDF)')
+          this.clearDivDirectorSignature()
+          return
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+          this.showNotification('File size must be less than 5MB')
+          this.clearDivDirectorSignature()
+          return
+        }
+
+        this.divDirectorSignatureFileName = file.name
+
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader()
+          reader.onload = () => {
+            this.divDirectorSignaturePreview = reader.result
+          }
+          reader.readAsDataURL(file)
+        } else {
+          this.divDirectorSignaturePreview = 'pdf'
+        }
+      },
+
+      clearDivDirectorSignature() {
+        this.formData.approvals.divisionalDirector.signature = null
+        this.divDirectorSignaturePreview = ''
+        this.divDirectorSignatureFileName = ''
+        if (this.$refs.divDirectorSignatureInput) {
+          this.$refs.divDirectorSignatureInput.value = ''
+        }
+      },
+
+      // Director ICT Signature methods
+      triggerDirectorICTSignatureUpload() {
+        this.$refs.directorICTSignatureInput.click()
+      },
+
+      onDirectorICTSignatureChange(e) {
+        const file = e.target.files[0]
+        this.formData.approvals.directorICT.signatureDate = file || null
+
+        if (!file) {
+          this.directorICTSignaturePreview = ''
+          this.directorICTSignatureFileName = ''
+          return
+        }
+
+        const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf']
+        if (!allowedTypes.includes(file.type)) {
+          this.showNotification('Please select a valid file (PNG, JPG, or PDF)')
+          this.clearDirectorICTSignature()
+          return
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+          this.showNotification('File size must be less than 5MB')
+          this.clearDirectorICTSignature()
+          return
+        }
+
+        this.directorICTSignatureFileName = file.name
+
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader()
+          reader.onload = () => {
+            this.directorICTSignaturePreview = reader.result
+          }
+          reader.readAsDataURL(file)
+        } else {
+          this.directorICTSignaturePreview = 'pdf'
+        }
+      },
+
+      clearDirectorICTSignature() {
+        this.formData.approvals.directorICT.signatureDate = null
+        this.directorICTSignaturePreview = ''
+        this.directorICTSignatureFileName = ''
+        if (this.$refs.directorICTSignatureInput) {
+          this.$refs.directorICTSignatureInput.value = ''
+        }
+      },
+
+      // Head IT Signature methods
+      triggerHeadITSignatureUpload() {
+        this.$refs.headITSignatureInput.click()
+      },
+
+      onHeadITSignatureChange(e) {
+        const file = e.target.files[0]
+        this.formData.implementation.headIT.signature = file || null
+
+        if (!file) {
+          this.headITSignaturePreview = ''
+          this.headITSignatureFileName = ''
+          return
+        }
+
+        const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf']
+        if (!allowedTypes.includes(file.type)) {
+          this.showNotification('Please select a valid file (PNG, JPG, or PDF)')
+          this.clearHeadITSignature()
+          return
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+          this.showNotification('File size must be less than 5MB')
+          this.clearHeadITSignature()
+          return
+        }
+
+        this.headITSignatureFileName = file.name
+
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader()
+          reader.onload = () => {
+            this.headITSignaturePreview = reader.result
+          }
+          reader.readAsDataURL(file)
+        } else {
+          this.headITSignaturePreview = 'pdf'
+        }
+      },
+
+      clearHeadITSignature() {
+        this.formData.implementation.headIT.signature = null
+        this.headITSignaturePreview = ''
+        this.headITSignatureFileName = ''
+        if (this.$refs.headITSignatureInput) {
+          this.$refs.headITSignatureInput.value = ''
+        }
+      },
+
+      // ICT Officer Signature methods
+      triggerIctOfficerSignatureUpload() {
+        this.$refs.ictOfficerSignatureInput.click()
+      },
+
+      onIctOfficerSignatureChange(e) {
+        const file = e.target.files[0]
+        this.formData.implementation.ictOfficer.signature = file || null
+
+        if (!file) {
+          this.ictOfficerSignaturePreview = ''
+          this.ictOfficerSignatureFileName = ''
+          return
+        }
+
+        const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf']
+        if (!allowedTypes.includes(file.type)) {
+          this.showNotification('Please select a valid file (PNG, JPG, or PDF)')
+          this.clearIctOfficerSignature()
+          return
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+          this.showNotification('File size must be less than 5MB')
+          this.clearIctOfficerSignature()
+          return
+        }
+
+        this.ictOfficerSignatureFileName = file.name
+
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader()
+          reader.onload = () => {
+            this.ictOfficerSignaturePreview = reader.result
+          }
+          reader.readAsDataURL(file)
+        } else {
+          this.ictOfficerSignaturePreview = 'pdf'
+        }
+      },
+
+      clearIctOfficerSignature() {
+        this.formData.implementation.ictOfficer.signature = null
+        this.ictOfficerSignaturePreview = ''
+        this.ictOfficerSignatureFileName = ''
+        if (this.$refs.ictOfficerSignatureInput) {
+          this.$refs.ictOfficerSignatureInput.value = ''
+        }
+      },
+
+      resetForm() {
+        this.formData = {
+          pfNumber: '',
+          staffName: '',
+          department_id: '',
+          signature: null,
+          requestType: '',
+          selectedModules: [],
+          accessType: '',
+          tempDate: {
+            day: '',
+            month: '',
+            year: ''
+          },
+          approvals: {
+            hod: {
+              name: '',
+              signature: '',
+              date: ''
+            },
+            divisionalDirector: {
+              name: '',
+              signature: '',
+              date: '',
+              decision: '',
+              rejectionComments: ''
+            },
+            directorICT: {
+              name: '',
+              signatureDate: ''
+            }
+          },
+          comments: '',
+          implementation: {
+            headIT: {
+              name: '',
+              signatureDate: ''
+            },
+            ictOfficer: {
+              name: '',
+              signatureDate: ''
+            }
+          }
+        }
+        this.signaturePreview = ''
+        this.signatureFileName = ''
+        this.hodSignaturePreview = ''
+        this.hodSignatureFileName = ''
+        this.divDirectorSignaturePreview = ''
+        this.divDirectorSignatureFileName = ''
+        this.directorICTSignaturePreview = ''
+        this.directorICTSignatureFileName = ''
+        this.headITSignaturePreview = ''
+        this.headITSignatureFileName = ''
+        this.ictOfficerSignaturePreview = ''
+        this.ictOfficerSignatureFileName = ''
+        this.showNotification('Form has been reset')
+      },
+
+      showNotification(message, type = 'info') {
+        // Simple notification implementation
+        // You can replace this with your preferred notification library
+        console.log(`[${type.toUpperCase()}] ${message}`)
+
+        // For now, using alert - replace with your notification system
+        if (type === 'error') {
+          alert(`Error: ${message}`)
+        } else {
+          alert(message)
+        }
+      },
+
+      checkReviewMode() {
+        // Check if we're in review mode (coming from requests dashboard)
+        if (this.route.query.mode === 'review' && this.route.query.requestId) {
+          this.isReviewMode = true
+          this.requestId = this.route.query.requestId
+          this.populateFormFromQuery()
+          this.makeFormReadOnlyForReview()
+        }
+      },
+
+      populateFormFromQuery() {
+        const query = this.route.query
+
+        // Populate basic information
+        this.formData.pfNumber = query.pfNumber || ''
+        this.formData.staffName = query.staffName || ''
+        this.formData.department_id = query.department_id || query.department || ''
+        this.formData.requestType = query.moduleRequestedFor?.toLowerCase() || ''
+        this.formData.accessType =
+          query.accessType === 'Permanent (until retirement)' ? 'permanent' : 'temporary'
+
+        // Handle temporary date
+        if (query.temporaryUntil) {
+          const date = new Date(query.temporaryUntil)
+          this.formData.tempDate = {
+            day: date.getDate().toString().padStart(2, '0'),
+            month: (date.getMonth() + 1).toString().padStart(2, '0'),
+            year: date.getFullYear().toString()
+          }
+        }
+
+        // Populate selected modules
+        if (query.selectedModules) {
+          try {
+            const modules = JSON.parse(query.selectedModules)
+            this.formData.selectedModules = modules
+          } catch (e) {
+            console.error('Error parsing selected modules:', e)
+          }
+        }
+
+        // Populate comments
+        this.formData.comments = query.comments || ''
+
+        // Set digital signature status
+        if (query.digitalSignature === 'true') {
+          this.signaturePreview = 'review-mode-signature'
+          this.signatureFileName = 'Digital Signature (Submitted)'
+        }
+      },
+
+      makeFormReadOnlyForReview() {
+        // Add readonly attributes to form elements
+        this.$nextTick(() => {
+          const inputs = this.$el.querySelectorAll('input, select, textarea')
+          inputs.forEach((input) => {
+            // Allow HOD to edit specific sections
+            if (this.canHodEdit(input)) {
+              return // Skip making this input readonly
+            }
+
+            if (!input.classList.contains('approval-input')) {
+              input.setAttribute('readonly', true)
+              input.setAttribute('disabled', true)
+            }
+          })
+
+          // Disable checkboxes and radio buttons
+          const checkboxes = this.$el.querySelectorAll(
+            'input[type="checkbox"], input[type="radio"]'
+          )
+          checkboxes.forEach((checkbox) => {
+            // Allow HOD to edit specific checkboxes/radios
+            if (this.canHodEdit(checkbox)) {
+              return // Skip disabling this checkbox
+            }
+
+            if (!checkbox.classList.contains('approval-input')) {
+              checkbox.setAttribute('disabled', true)
+            }
+          })
+        })
+      },
+
+      canHodEdit(element) {
+        // Allow HOD to edit when they are the current approver
+        if (this.userRole === this.ROLES.HEAD_OF_DEPARTMENT && this.canApproveAtStage()) {
+          const hodEditableClasses = [
+            'hod-editable',
+            'module-request-editable',
+            'access-rights-editable',
+            'comments-editable',
+            'hod-approval-editable'
+          ]
+
+          if (hodEditableClasses.some((className) => element.classList.contains(className))) {
+            return true
+          }
+        }
+
+        // Allow Divisional Director to edit their approval section
+        if (this.userRole === this.ROLES.DIVISIONAL_DIRECTOR && this.canApproveAtStage()) {
+          const divDirectorEditableClasses = [
+            'divisional-director-editable',
+            'divisional-approval-editable',
+            'divisional-comments-editable'
+          ]
+
           if (
-            !this.formData.approvals.divisionalDirector.rejectionComments?.trim()
+            divDirectorEditableClasses.some((className) => element.classList.contains(className))
           ) {
-            this.showNotification('Please provide a reason for rejection.')
+            return true
+          }
+        }
+
+        return false
+      },
+
+      getApprovalStatus(stage) {
+        const query = this.route.query
+        const statusMap = {
+          hod: query.hodApprovalStatus,
+          divisional: query.divisionalStatus,
+          dict: query.dictStatus,
+          headOfIt: query.headOfItStatus,
+          ict: query.ictStatus
+        }
+        return statusMap[stage] || 'pending'
+      },
+
+      canApproveAtStage() {
+        if (!this.isReviewMode) return false
+
+        const query = this.route.query
+        switch (this.userRole) {
+          case this.ROLES.HEAD_OF_DEPARTMENT:
+            return query.hodApprovalStatus === 'pending'
+          case this.ROLES.DIVISIONAL_DIRECTOR:
+            return query.hodApprovalStatus === 'approved' && query.divisionalStatus === 'pending'
+          case this.ROLES.ICT_DIRECTOR:
+            return query.divisionalStatus === 'approved' && query.dictStatus === 'pending'
+          case this.ROLES.HOD_IT:
+            return query.dictStatus === 'approved' && query.headOfItStatus === 'pending'
+          case this.ROLES.ICT_OFFICER:
+            return query.headOfItStatus === 'approved' && query.ictStatus === 'pending'
+          default:
+            return false
+        }
+      },
+
+      approveRequest() {
+        if (!this.canApproveAtStage()) {
+          this.showNotification('You cannot approve this request at this stage.')
+          return
+        }
+
+        // Special handling for Divisional Director
+        if (this.userRole === this.ROLES.DIVISIONAL_DIRECTOR) {
+          if (!this.formData.approvals.divisionalDirector.decision) {
+            this.showNotification('Please select Approve or Reject before submitting.')
             return
           }
 
-          if (
-            confirm(
-              `Are you sure you want to reject request ${this.requestId}? This will send it back to the Head of Department.`
-            )
-          ) {
-            this.rejectRequestAsDivisionalDirector()
+          if (this.formData.approvals.divisionalDirector.decision === 'reject') {
+            if (!this.formData.approvals.divisionalDirector.rejectionComments?.trim()) {
+              this.showNotification('Please provide a reason for rejection.')
+              return
+            }
+
+            if (
+              confirm(
+                `Are you sure you want to reject request ${this.requestId}? This will send it back to the Head of Department.`
+              )
+            ) {
+              this.rejectRequestAsDivisionalDirector()
+            }
+            return
           }
+
+          if (this.formData.approvals.divisionalDirector.decision === 'approve') {
+            if (confirm(`Are you sure you want to approve request ${this.requestId}?`)) {
+              this.approveRequestAsDivisionalDirector()
+            }
+            return
+          }
+        }
+
+        if (confirm(`Are you sure you want to approve request ${this.requestId}?`)) {
+          // Here you would make an API call to approve the request
+          console.log('Approving request:', this.requestId)
+          this.showNotification('Request approved successfully!')
+
+          // Redirect back to requests list
+          setTimeout(() => {
+            this.router.push('/hod-dashboard/request-list')
+          }, 2000)
+        }
+      },
+
+      approveRequestAsDivisionalDirector() {
+        // Validate required fields for Divisional Director approval
+        if (!this.formData.approvals.divisionalDirector.name?.trim()) {
+          this.showNotification('Please enter your name before approving.')
           return
         }
 
-        if (this.formData.approvals.divisionalDirector.decision === 'approve') {
-          if (
-            confirm(
-              `Are you sure you want to approve request ${this.requestId}?`
-            )
-          ) {
-            this.approveRequestAsDivisionalDirector()
-          }
-          return
-        }
-      }
+        // Here you would make an API call to approve the request as Divisional Director
+        console.log('Divisional Director approving request:', this.requestId, {
+          name: this.formData.approvals.divisionalDirector.name,
+          date: this.formData.approvals.divisionalDirector.date,
+          decision: 'approve'
+        })
 
-      if (
-        confirm(`Are you sure you want to approve request ${this.requestId}?`)
-      ) {
-        // Here you would make an API call to approve the request
-        console.log('Approving request:', this.requestId)
-        this.showNotification('Request approved successfully!')
+        this.showNotification('Request approved successfully! Moving to next approval stage.')
 
         // Redirect back to requests list
         setTimeout(() => {
           this.router.push('/hod-dashboard/request-list')
         }, 2000)
-      }
-    },
+      },
 
-    approveRequestAsDivisionalDirector() {
-      // Validate required fields for Divisional Director approval
-      if (!this.formData.approvals.divisionalDirector.name?.trim()) {
-        this.showNotification('Please enter your name before approving.')
-        return
-      }
+      rejectRequestAsDivisionalDirector() {
+        // Validate required fields for Divisional Director rejection
+        if (!this.formData.approvals.divisionalDirector.name?.trim()) {
+          this.showNotification('Please enter your name before rejecting.')
+          return
+        }
 
-      // Here you would make an API call to approve the request as Divisional Director
-      console.log('Divisional Director approving request:', this.requestId, {
-        name: this.formData.approvals.divisionalDirector.name,
-        date: this.formData.approvals.divisionalDirector.date,
-        decision: 'approve'
-      })
+        if (!this.formData.approvals.divisionalDirector.rejectionComments?.trim()) {
+          this.showNotification('Please provide a reason for rejection.')
+          return
+        }
 
-      this.showNotification(
-        'Request approved successfully! Moving to next approval stage.'
-      )
+        // Here you would make an API call to reject the request and send back to HOD
+        console.log('Divisional Director rejecting request:', this.requestId, {
+          name: this.formData.approvals.divisionalDirector.name,
+          date: this.formData.approvals.divisionalDirector.date,
+          decision: 'reject',
+          rejectionComments: this.formData.approvals.divisionalDirector.rejectionComments
+        })
 
-      // Redirect back to requests list
-      setTimeout(() => {
-        this.router.push('/hod-dashboard/request-list')
-      }, 2000)
-    },
-
-    rejectRequestAsDivisionalDirector() {
-      // Validate required fields for Divisional Director rejection
-      if (!this.formData.approvals.divisionalDirector.name?.trim()) {
-        this.showNotification('Please enter your name before rejecting.')
-        return
-      }
-
-      if (
-        !this.formData.approvals.divisionalDirector.rejectionComments?.trim()
-      ) {
-        this.showNotification('Please provide a reason for rejection.')
-        return
-      }
-
-      // Here you would make an API call to reject the request and send back to HOD
-      console.log('Divisional Director rejecting request:', this.requestId, {
-        name: this.formData.approvals.divisionalDirector.name,
-        date: this.formData.approvals.divisionalDirector.date,
-        decision: 'reject',
-        rejectionComments:
-          this.formData.approvals.divisionalDirector.rejectionComments
-      })
-
-      this.showNotification(
-        'Request rejected and sent back to Head of Department with comments.'
-      )
-
-      // Redirect back to requests list
-      setTimeout(() => {
-        this.router.push('/internal-access/list')
-      }, 2000)
-    },
-
-    rejectRequest() {
-      if (!this.canApproveAtStage()) {
-        this.showNotification('You cannot reject this request at this stage.')
-        return
-      }
-
-      // Special handling for Divisional Director
-      if (this.userRole === this.ROLES.DIVISIONAL_DIRECTOR) {
-        // Set decision to reject and let the form validation handle the rest
-        this.formData.approvals.divisionalDirector.decision = 'reject'
-        this.showNotification(
-          'Please provide a reason for rejection in the comments field below.'
-        )
-        return
-      }
-
-      const reason = prompt('Please provide a reason for rejection:')
-      if (
-        reason &&
-        confirm(`Are you sure you want to reject request ${this.requestId}?`)
-      ) {
-        // Here you would make an API call to reject the request
-        console.log('Rejecting request:', this.requestId, 'Reason:', reason)
-        this.showNotification('Request rejected successfully!')
+        this.showNotification('Request rejected and sent back to Head of Department with comments.')
 
         // Redirect back to requests list
         setTimeout(() => {
           this.router.push('/internal-access/list')
         }, 2000)
-      }
-    },
+      },
 
-    goBackToRequests() {
-      this.router.push('/internal-access/list')
+      rejectRequest() {
+        if (!this.canApproveAtStage()) {
+          this.showNotification('You cannot reject this request at this stage.')
+          return
+        }
+
+        // Special handling for Divisional Director
+        if (this.userRole === this.ROLES.DIVISIONAL_DIRECTOR) {
+          // Set decision to reject and let the form validation handle the rest
+          this.formData.approvals.divisionalDirector.decision = 'reject'
+          this.showNotification(
+            'Please provide a reason for rejection in the comments field below.'
+          )
+          return
+        }
+
+        const reason = prompt('Please provide a reason for rejection:')
+        if (reason && confirm(`Are you sure you want to reject request ${this.requestId}?`)) {
+          // Here you would make an API call to reject the request
+          console.log('Rejecting request:', this.requestId, 'Reason:', reason)
+          this.showNotification('Request rejected successfully!')
+
+          // Redirect back to requests list
+          setTimeout(() => {
+            this.router.push('/internal-access/list')
+          }, 2000)
+        }
+      },
+
+      goBackToRequests() {
+        this.router.push('/internal-access/list')
+      }
     }
   }
-}
 </script>
 
 <style scoped>
-/* Medical Glass morphism effects */
-.medical-glass-card {
-  background: rgba(59, 130, 246, 0.15);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
-  border: 2px solid rgba(96, 165, 250, 0.3);
-  box-shadow: 0 8px 32px rgba(29, 78, 216, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-
-.medical-card {
-  position: relative;
-  overflow: hidden;
-  background: rgba(59, 130, 246, 0.1);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-}
-
-.medical-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(96, 165, 250, 0.2),
-    transparent
-  );
-  transition: left 0.5s;
-}
-
-.medical-card:hover::before {
-  left: 100%;
-}
-
-.medical-input {
-  position: relative;
-  z-index: 1;
-  color: white;
-}
-
-.medical-input::placeholder {
-  color: rgba(191, 219, 254, 0.6);
-}
-
-.medical-input:focus {
-  border-color: rgba(45, 212, 191, 0.8);
-  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.2);
-}
-
-/* Select dropdown styling */
-select.medical-input {
-  background-image: none;
-}
-
-select.medical-input option {
-  background-color: #1f2937;
-  color: white;
-  padding: 8px;
-}
-
-select.medical-input option:hover {
-  background-color: #374151;
-}
-
-select.medical-input option:disabled {
-  color: #9ca3af;
-}
-
-/* Define primary color */
-.bg-primary {
-  background-color: #1e40af; /* Blue-700 */
-}
-
-.text-primary {
-  color: #1e40af; /* Blue-700 */
-}
-
-.border-primary {
-  border-color: #1e40af; /* Blue-700 */
-}
-
-.focus\:border-primary:focus {
-  border-color: #1e40af;
-}
-
-/* Custom checkbox and radio styling */
-input[type="checkbox"]:checked,
-input[type="radio"]:checked {
-  background-color: #1e40af;
-  border-color: #1e40af;
-}
-
-input[type="checkbox"]:focus,
-input[type="radio"]:focus {
-  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
-}
-
-/* Smooth transitions */
-.transition-all {
-  transition: all 0.3s ease;
-}
-
-/* Static Grid Background - No Animations */
-
-/* Glass morphism effect */
-.backdrop-blur-sm {
-  backdrop-filter: blur(8px);
-}
-
-/* Animations */
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-20px);
-  }
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fade-in-delay {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-.animate-fade-in {
-  animation: fade-in 1s ease-out;
-}
-
-.animate-fade-in-delay {
-  animation: fade-in-delay 1s ease-out 0.3s both;
-}
-
-/* Enhanced form sections */
-.border-l-2 {
-  position: relative;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.1),
-    rgba(255, 255, 255, 0.05)
-  );
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
-
-.border-l-2:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-}
-
-/* Print styles */
-@media print {
-  .min-h-screen {
-    min-height: auto;
+  /* Medical Glass morphism effects */
+  .medical-glass-card {
+    background: rgba(59, 130, 246, 0.15);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 2px solid rgba(96, 165, 250, 0.3);
+    box-shadow:
+      0 8px 32px rgba(29, 78, 216, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
 
-  button {
-    display: none;
+  .medical-card {
+    position: relative;
+    overflow: hidden;
+    background: rgba(59, 130, 246, 0.1);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
   }
 
-  .shadow-xl {
-    box-shadow: none;
+  .medical-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.2), transparent);
+    transition: left 0.5s;
   }
 
-  .bg-gradient-to-br {
-    background: white;
-  }
-}
-
-/* Review mode styles */
-.review-mode input[readonly],
-.review-mode select[disabled],
-.review-mode textarea[readonly] {
-  background-color: rgba(59, 130, 246, 0.1) !important;
-  border-color: rgba(96, 165, 250, 0.2) !important;
-  cursor: not-allowed;
-}
-
-.review-mode input[type="checkbox"][disabled],
-.review-mode input[type="radio"][disabled] {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .grid-cols-4 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .medical-card:hover::before {
+    left: 100%;
   }
 
-  .grid-cols-3 {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
+  .medical-input {
+    position: relative;
+    z-index: 1;
+    color: white;
   }
 
-  .grid-cols-2 {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 640px) {
-  .lg\:grid-cols-4 {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
+  .medical-input::placeholder {
+    color: rgba(191, 219, 254, 0.6);
   }
 
-  .md\:grid-cols-3 {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
+  .medical-input:focus {
+    border-color: rgba(45, 212, 191, 0.8);
+    box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.2);
   }
-}
+
+  /* Select dropdown styling */
+  select.medical-input {
+    background-image: none;
+  }
+
+  select.medical-input option {
+    background-color: #1f2937;
+    color: white;
+    padding: 8px;
+  }
+
+  select.medical-input option:hover {
+    background-color: #374151;
+  }
+
+  select.medical-input option:disabled {
+    color: #9ca3af;
+  }
+
+  /* Define primary color */
+  .bg-primary {
+    background-color: #1e40af; /* Blue-700 */
+  }
+
+  .text-primary {
+    color: #1e40af; /* Blue-700 */
+  }
+
+  .border-primary {
+    border-color: #1e40af; /* Blue-700 */
+  }
+
+  .focus\:border-primary:focus {
+    border-color: #1e40af;
+  }
+
+  /* Custom checkbox and radio styling */
+  input[type='checkbox']:checked,
+  input[type='radio']:checked {
+    background-color: #1e40af;
+    border-color: #1e40af;
+  }
+
+  input[type='checkbox']:focus,
+  input[type='radio']:focus {
+    box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+  }
+
+  /* Smooth transitions */
+  .transition-all {
+    transition: all 0.3s ease;
+  }
+
+  /* Static Grid Background - No Animations */
+
+  /* Glass morphism effect */
+  .backdrop-blur-sm {
+    backdrop-filter: blur(8px);
+  }
+
+  /* Animations */
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-in-delay {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-fade-in {
+    animation: fade-in 1s ease-out;
+  }
+
+  .animate-fade-in-delay {
+    animation: fade-in-delay 1s ease-out 0.3s both;
+  }
+
+  /* Enhanced form sections */
+  .border-l-2 {
+    position: relative;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+
+  .border-l-2:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Print styles */
+  @media print {
+    .min-h-screen {
+      min-height: auto;
+    }
+
+    button {
+      display: none;
+    }
+
+    .shadow-xl {
+      box-shadow: none;
+    }
+
+    .bg-gradient-to-br {
+      background: white;
+    }
+  }
+
+  /* Review mode styles */
+  .review-mode input[readonly],
+  .review-mode select[disabled],
+  .review-mode textarea[readonly] {
+    background-color: rgba(59, 130, 246, 0.1) !important;
+    border-color: rgba(96, 165, 250, 0.2) !important;
+    cursor: not-allowed;
+  }
+
+  .review-mode input[type='checkbox'][disabled],
+  .review-mode input[type='radio'][disabled] {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .grid-cols-4 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-cols-3 {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+
+    .grid-cols-2 {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 640px) {
+    .lg\:grid-cols-4 {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+
+    .md\:grid-cols-3 {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+  }
 </style>

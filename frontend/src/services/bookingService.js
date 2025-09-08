@@ -12,15 +12,11 @@ export const bookingService = {
    */
   async submitBooking(formData) {
     try {
-      const response = await apiClient.post(
-        '/booking-service/bookings',
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
+      const response = await apiClient.post('/booking-service/bookings', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
         }
-      )
+      })
       return {
         success: true,
         data: response.data
@@ -29,8 +25,7 @@ export const bookingService = {
       console.error('Booking submission failed:', error)
       return {
         success: false,
-        message:
-          error.response?.data?.message || 'Failed to submit booking request',
+        message: error.response?.data?.message || 'Failed to submit booking request',
         errors: error.response?.data?.errors || {},
         status: error.response?.status
       }
@@ -68,9 +63,7 @@ export const bookingService = {
    */
   async getBookingById(bookingId) {
     try {
-      const response = await apiClient.get(
-        `/booking-service/bookings/${bookingId}`
-      )
+      const response = await apiClient.get(`/booking-service/bookings/${bookingId}`)
       return {
         success: true,
         data: response.data
@@ -79,8 +72,7 @@ export const bookingService = {
       console.error('Failed to fetch booking details:', error)
       return {
         success: false,
-        message:
-          error.response?.data?.message || 'Failed to fetch booking details',
+        message: error.response?.data?.message || 'Failed to fetch booking details',
         status: error.response?.status
       }
     }
@@ -94,15 +86,11 @@ export const bookingService = {
    */
   async updateBooking(bookingId, formData) {
     try {
-      const response = await apiClient.post(
-        `/booking-service/bookings/${bookingId}`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
+      const response = await apiClient.post(`/booking-service/bookings/${bookingId}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
         }
-      )
+      })
       return {
         success: true,
         data: response.data
@@ -125,9 +113,7 @@ export const bookingService = {
    */
   async deleteBooking(bookingId) {
     try {
-      const response = await apiClient.delete(
-        `/booking-service/bookings/${bookingId}`
-      )
+      const response = await apiClient.delete(`/booking-service/bookings/${bookingId}`)
       return {
         success: true,
         data: response.data
@@ -157,8 +143,7 @@ export const bookingService = {
       console.error('Failed to fetch device types:', error)
       return {
         success: false,
-        message:
-          error.response?.data?.message || 'Failed to fetch device types',
+        message: error.response?.data?.message || 'Failed to fetch device types',
         status: error.response?.status
       }
     }
@@ -214,12 +199,9 @@ export const bookingService = {
    */
   async approveBooking(bookingId, adminNotes = '') {
     try {
-      const response = await apiClient.post(
-        `/booking-service/bookings/${bookingId}/approve`,
-        {
-          admin_notes: adminNotes
-        }
-      )
+      const response = await apiClient.post(`/booking-service/bookings/${bookingId}/approve`, {
+        admin_notes: adminNotes
+      })
       return {
         success: true,
         data: response.data
@@ -242,12 +224,9 @@ export const bookingService = {
    */
   async rejectBooking(bookingId, adminNotes) {
     try {
-      const response = await apiClient.post(
-        `/booking-service/bookings/${bookingId}/reject`,
-        {
-          admin_notes: adminNotes
-        }
-      )
+      const response = await apiClient.post(`/booking-service/bookings/${bookingId}/reject`, {
+        admin_notes: adminNotes
+      })
       return {
         success: true,
         data: response.data
@@ -270,10 +249,7 @@ export const bookingService = {
    */
   async testValidation(testData) {
     try {
-      const response = await apiClient.post(
-        '/booking-service/test-validation',
-        testData
-      )
+      const response = await apiClient.post('/booking-service/test-validation', testData)
       return {
         success: true,
         data: response.data
@@ -284,6 +260,48 @@ export const bookingService = {
         success: false,
         message: error.response?.data?.message || 'Validation test failed',
         errors: error.response?.data?.errors || {},
+        status: error.response?.status
+      }
+    }
+  },
+
+  /**
+   * Debug departments endpoint
+   * @returns {Promise<Object>} - API response with debug info
+   */
+  async debugDepartments() {
+    try {
+      const response = await apiClient.get('/booking-service/debug-departments')
+      return {
+        success: true,
+        data: response.data
+      }
+    } catch (error) {
+      console.error('Failed to fetch debug departments:', error)
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to fetch debug departments',
+        status: error.response?.status
+      }
+    }
+  },
+
+  /**
+   * Seed departments if they don't exist
+   * @returns {Promise<Object>} - API response
+   */
+  async seedDepartments() {
+    try {
+      const response = await apiClient.post('/booking-service/seed-departments')
+      return {
+        success: true,
+        data: response.data
+      }
+    } catch (error) {
+      console.error('Failed to seed departments:', error)
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to seed departments',
         status: error.response?.status
       }
     }

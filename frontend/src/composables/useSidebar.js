@@ -54,13 +54,13 @@ export function useSidebar() {
   }
 
   const expandAllSections = () => {
-    Object.keys(expandedSections.value).forEach(section => {
+    Object.keys(expandedSections.value).forEach((section) => {
       setSectionExpanded(section, true)
     })
   }
 
   const collapseAllSections = () => {
-    Object.keys(expandedSections.value).forEach(section => {
+    Object.keys(expandedSections.value).forEach((section) => {
       setSectionExpanded(section, false)
     })
   }

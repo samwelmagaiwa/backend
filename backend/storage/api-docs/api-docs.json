@@ -1,0 +1,1072 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "MNH API",
+        "description": "API documentation for authentication, user management, departments, roles, onboarding, declarations, booking services, and combined service forms.",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000",
+            "description": "Local server"
+        }
+    ],
+    "paths": {
+        "/api/health": {
+            "get": {
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Basic health check",
+                "description": "Paths: Health",
+                "operationId": "15c502bb75c85568157dafca611e16f5",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "ok"
+                                        },
+                                        "timestamp": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/health/detailed": {
+            "get": {
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Detailed health check including database",
+                "operationId": "cdc4b4739d06d793cd3987927f093ab2",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Login",
+                "description": "Paths: Auth",
+                "operationId": "54a8d5fdc5f626a65c9d7353bd58d856",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LoginRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LoginResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid credentials"
+                    }
+                }
+            }
+        },
+        "/api/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logout current session",
+                "operationId": "aa13bb4a15d4fb5bb26cfd5e2f7a44ac",
+                "responses": {
+                    "200": {
+                        "description": "Logged out"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/logout-all": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logout all sessions",
+                "operationId": "c24b8041e185617158b4265265506cc4",
+                "responses": {
+                    "200": {
+                        "description": "Logged out from all sessions"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/sessions": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "List active sessions for current user",
+                "operationId": "c809bb56d6d6d5ff77e97164af2d59af",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/sessions/revoke": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Revoke a specific session by token id",
+                "operationId": "7999754c2a6833ab1f1afb8c0c5c2a21",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RevokeSessionRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Revoked"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/current-user": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Get current authenticated user",
+                "operationId": "505b3bcc7a3ce769323fa4c69448a6e5",
+                "responses": {
+                    "200": {
+                        "description": "Current user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/role-redirect": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Get role-based redirect URL",
+                "operationId": "d981da99d63e1c9e80ce506fce8a2046",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/users": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "List users",
+                "description": "Paths: Admin Users",
+                "operationId": "6b64f292ab26cd198d82bec1260634ca",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "role",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "active",
+                                "inactive",
+                                "all"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Create user",
+                "operationId": "0263bb9e4791b4a7cd1dc738376ca30c",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateUserRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/users/{user}": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get user",
+                "operationId": "bd9fea0240195e92cb5e83173e934625",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Update user",
+                "operationId": "383c9b513723957da35752b5c2d39d38",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateUserRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Delete user",
+                "operationId": "a951a801bfc67da110ff711ff8050bcf",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/users/{user}/toggle-status": {
+            "patch": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Toggle user active status",
+                "operationId": "78523e1c3c01e36d084e57014d2f0c7f",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/users/roles": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "List available roles",
+                "operationId": "26bfa73c1a92c36f6abd9c0d11b0938f",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Role"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/users/departments": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "List available departments",
+                "operationId": "f21331b46aa01ac404e206fe0d213f0b",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Department"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/departments": {
+            "get": {
+                "tags": [
+                    "Departments"
+                ],
+                "summary": "List departments",
+                "description": "Paths: Admin Departments",
+                "operationId": "27b53f7e48133a9b2986c0bf887ef464",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Departments"
+                ],
+                "summary": "Create department",
+                "operationId": "cef4dcd050b109b697bb2711657a9554",
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/departments/{department}": {
+            "get": {
+                "tags": [
+                    "Departments"
+                ],
+                "summary": "Get department",
+                "operationId": "f17f4d78ec945fe634d21c8ffdc17512",
+                "parameters": [
+                    {
+                        "name": "department",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Departments"
+                ],
+                "summary": "Update department",
+                "operationId": "2a55172f4d70358a1aa5af7581af04f4",
+                "parameters": [
+                    {
+                        "name": "department",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Departments"
+                ],
+                "summary": "Delete department",
+                "operationId": "099c5b96c85c3b1d09b371ff697bb26b",
+                "parameters": [
+                    {
+                        "name": "department",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/user-roles": {
+            "get": {
+                "tags": [
+                    "UserRoles"
+                ],
+                "summary": "List users with roles",
+                "description": "Paths: User Roles management",
+                "operationId": "34609c2bdc3f29bfda1e91972ebf8c41",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/user-roles/{user}/assign": {
+            "post": {
+                "tags": [
+                    "UserRoles"
+                ],
+                "summary": "Assign roles to user",
+                "operationId": "38b4bd0d6240950f2bc443b91dd73879",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AssignRolesRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/user-roles/{user}/roles/{role}": {
+            "delete": {
+                "tags": [
+                    "UserRoles"
+                ],
+                "summary": "Remove a role from user",
+                "operationId": "8990691c1b8fb8bef3f2d4fac8a15666",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "role",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/user-roles/{user}/history": {
+            "get": {
+                "tags": [
+                    "UserRoles"
+                ],
+                "summary": "Get user role history",
+                "operationId": "64bed3f0a40b37d176da4bf27e390fa7",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/booking-service/bookings": {
+            "get": {
+                "tags": [
+                    "BookingService"
+                ],
+                "summary": "List bookings",
+                "description": "Paths: Booking Service (basic docs)",
+                "operationId": "63bb8f9bf415683631fa30b07ad922dc",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "BookingService"
+                ],
+                "summary": "Create booking",
+                "operationId": "aee9fbb942a77e657e64ee49b28deab8",
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/user-access": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "List user access requests",
+                "description": "Paths: User Access v1 (basic docs)",
+                "operationId": "a1265959fa6a7d27314aa8bae35ec366",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/combined-access": {
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Create combined access request",
+                "operationId": "c17ae815b3263d6631df483c0ee1e531",
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Role": {
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "admin"
+                    },
+                    "description": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "is_system_role": {
+                        "type": "boolean",
+                        "example": true
+                    }
+                },
+                "type": "object"
+            },
+            "Department": {
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "code": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "description": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "User": {
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "phone": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "pf_number": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "staff_name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "department_id": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    },
+                    "role": {
+                        "description": "Primary role name (derived)",
+                        "type": "string",
+                        "example": "staff"
+                    },
+                    "roles": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "permissions": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "department": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/Department"
+                            }
+                        ],
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "LoginRequest": {
+                "required": [
+                    "email",
+                    "password"
+                ],
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "example": "admin@mnh.go.tz"
+                    },
+                    "password": {
+                        "type": "string",
+                        "example": "12345678"
+                    }
+                },
+                "type": "object"
+            },
+            "LoginResponse": {
+                "properties": {
+                    "user": {
+                        "$ref": "#/components/schemas/User"
+                    },
+                    "token": {
+                        "type": "string"
+                    },
+                    "token_name": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "CreateUserRequest": {
+                "required": [
+                    "name",
+                    "email",
+                    "password",
+                    "password_confirmation",
+                    "role_ids"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    },
+                    "password_confirmation": {
+                        "type": "string"
+                    },
+                    "phone": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "pf_number": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "staff_name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "department_id": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "is_active": {
+                        "type": "boolean",
+                        "default": true
+                    },
+                    "role_ids": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "AssignRolesRequest": {
+                "required": [
+                    "role_ids"
+                ],
+                "properties": {
+                    "role_ids": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "RevokeSessionRequest": {
+                "required": [
+                    "token_id"
+                ],
+                "properties": {
+                    "token_id": {
+                        "type": "integer",
+                        "example": 1
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "Global security scheme: Bearer token (Laravel Sanctum plain text token used as Bearer)",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Health",
+            "description": "Health checks"
+        },
+        {
+            "name": "Auth",
+            "description": "Authentication endpoints"
+        },
+        {
+            "name": "Users",
+            "description": "Admin user management"
+        },
+        {
+            "name": "Departments",
+            "description": "Admin department management"
+        },
+        {
+            "name": "UserRoles",
+            "description": "User role assignment"
+        },
+        {
+            "name": "BookingService",
+            "description": "Booking service management"
+        }
+    ]
+}

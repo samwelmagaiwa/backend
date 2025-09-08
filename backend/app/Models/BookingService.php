@@ -25,10 +25,12 @@ class BookingService extends Model
         'borrower_name',
         'device_type',
         'custom_device',
+        'device_inventory_id', // Link to device inventory
         'department',
         'phone_number',
         'return_date',
         'return_time',
+        'return_date_time', // Combined return date and time
         'reason',
         'signature_path',
         'status',
@@ -46,6 +48,7 @@ class BookingService extends Model
         'booking_date' => 'date',
         'return_date' => 'date',
         'return_time' => 'datetime:H:i',
+        'return_date_time' => 'datetime',
         'approved_at' => 'datetime',
         'device_collected_at' => 'datetime',
         'device_returned_at' => 'datetime',
@@ -105,6 +108,14 @@ class BookingService extends Model
     public function departmentInfo(): BelongsTo
     {
         return $this->belongsTo(Department::class, 'department', 'id');
+    }
+
+    /**
+     * Get the device inventory information.
+     */
+    public function deviceInventory(): BelongsTo
+    {
+        return $this->belongsTo(DeviceInventory::class, 'device_inventory_id');
     }
 
     /**
@@ -203,5 +214,87 @@ class BookingService extends Model
     public function scopeForUser($query, int $userId)
     {
         return $query->where('user_id', $userId);
+    }
+
+    /**
+     * Get the nearest upcoming return date for a specific device inventory.
+     * Used when device is out of stock to inform next requester.
+     */
+    public static function getNearestReturnDateTime(int $deviceInventoryId): ?Carbon
+    {
+        $booking = self::where('device_inventory_id', $deviceInventoryId)
+            ->whereIn('status', ['approved', 'in_use'])
+            ->whereNotNull('return_date_time')
+            ->where('return_date_time', '>', now())
+            ->orderBy('return_date_time', 'asc')
+            ->first();
+
+        return $booking ? $booking->return_date_time : null;
+    }
+
+    /**
+     * Get all active bookings for a device (approved or in_use).
+     */
+    public static function getActiveBookingsForDevice(int $deviceInventoryId)
+    {
+        return self::where('device_inventory_id', $deviceInventoryId)
+            ->whereIn('status', ['approved', 'in_use'])
+            ->with(['user'])
+            ->orderBy('return_date_time', 'asc')
+            ->get();
+    }
+
+    /**
+     * Check if device is available for borrowing.
+     * Returns array with availability status and message.
+     */
+    public static function checkDeviceAvailability(int $deviceInventoryId): array
+    {
+        $deviceInventory = DeviceInventory::find($deviceInventoryId);
+        
+        if (!$deviceInventory) {
+            return [
+                'available' => false,
+                'message' => 'Device not found in inventory.',
+                'can_request' => false
+            ];
+        }
+
+        if (!$deviceInventory->is_active) {
+            return [
+                'available' => false,
+                'message' => 'Device is currently inactive.',
+                'can_request' => false
+            ];
+        }
+
+        if ($deviceInventory->available_quantity > 0) {
+            return [
+                'available' => true,
+                'message' => 'Device is available for borrowing.',
+                'can_request' => true,
+                'available_quantity' => $deviceInventory->available_quantity
+            ];
+        }
+
+        // Device is out of stock, check for nearest return
+        $nearestReturn = self::getNearestReturnDateTime($deviceInventoryId);
+        
+        if ($nearestReturn) {
+            return [
+                'available' => false,
+                'message' => "Device is currently in use by another staff. Kindly check your request after {$nearestReturn->format('M d, Y \\a\\t g:i A')}.",
+                'can_request' => true,
+                'nearest_return' => $nearestReturn,
+                'available_quantity' => 0
+            ];
+        }
+
+        return [
+            'available' => false,
+            'message' => 'Device is currently unavailable with no scheduled return.',
+            'can_request' => true,
+            'available_quantity' => 0
+        ];
     }
 }

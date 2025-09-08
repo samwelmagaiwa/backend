@@ -16,9 +16,7 @@ const apiClient = axios.create({
 // Request interceptor to add auth token
 apiClient.interceptors.request.use(
   (config) => {
-    const token =
-      localStorage.getItem('auth_token') ||
-      sessionStorage.getItem('auth_token')
+    const token = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
@@ -48,7 +46,7 @@ export function useApi() {
   const error = ref('')
 
   // Generic API call function
-  const apiCall = async(method, url, data = null, config = {}) => {
+  const apiCall = async (method, url, data = null, config = {}) => {
     loading.value = true
     error.value = ''
 
@@ -72,8 +70,7 @@ export function useApi() {
         if (status === 401) {
           error.value = 'Authentication failed. Please log in again.'
         } else if (status === 403) {
-          error.value =
-            'Access denied. You do not have permission for this action.'
+          error.value = 'Access denied. You do not have permission for this action.'
         } else if (status >= 500) {
           error.value = 'Server error. Please try again later.'
         } else {
@@ -81,8 +78,7 @@ export function useApi() {
         }
       } else if (err.request) {
         // Network error
-        error.value =
-          'Network error. Please check your connection and try again.'
+        error.value = 'Network error. Please check your connection and try again.'
       } else {
         // Other error
         error.value = err.message || 'An unexpected error occurred'
@@ -122,7 +118,7 @@ export function useDepartments() {
 
   const { get } = useApi()
 
-  const fetchDepartments = async() => {
+  const fetchDepartments = async () => {
     loading.value = true
     error.value = ''
 
@@ -131,11 +127,7 @@ export function useDepartments() {
 
       if (response.success) {
         departments.value = response.data || []
-        console.log(
-          'Departments loaded successfully:',
-          departments.value.length,
-          'departments'
-        )
+        console.log('Departments loaded successfully:', departments.value.length, 'departments')
       } else {
         throw new Error(response.message || 'Failed to fetch departments')
       }
@@ -176,7 +168,7 @@ export function useDepartments() {
 export function useUserAccess() {
   const { post } = useApi()
 
-  const submitAccessRequest = async(formData) => {
+  const submitAccessRequest = async (formData) => {
     const response = await post('/v1/user-access', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
@@ -185,7 +177,7 @@ export function useUserAccess() {
     return response
   }
 
-  const checkSignature = async(pfNumber) => {
+  const checkSignature = async (pfNumber) => {
     const response = await post('/v1/check-signature', { pf_number: pfNumber })
     return response
   }

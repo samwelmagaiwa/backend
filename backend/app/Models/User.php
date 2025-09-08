@@ -27,7 +27,6 @@ class User extends Authenticatable
         'email',
         'phone',
         'password',
-        'role_id',
         'pf_number',
         'staff_name',
         'department_id',
@@ -56,14 +55,6 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_active' => 'boolean',
         ];
-    }
-
-    /**
-     * Legacy single role relationship (kept for backward compatibility)
-     */
-    public function role()
-    {
-        return $this->belongsTo(Role::class);
     }
 
     public function onboarding()
@@ -198,12 +189,13 @@ class User extends Authenticatable
     }
 
     /**
-     * Get user's primary role (use new many-to-many system)
+     * Get user's primary role (use new many-to-many system with priority)
      */
     public function getPrimaryRole()
     {
-        // Get the first role - removed sort_order dependency
-        return $this->roles()->first();
+        // Get the highest priority role from assigned roles
+        $roles = $this->roles;
+        return Role::getHighestPriorityRole($roles);
     }
 
     /**
@@ -223,11 +215,6 @@ class User extends Authenticatable
         
         if ($primaryRole) {
             return $primaryRole->name;
-        }
-        
-        // Fallback: check old role_id system
-        if ($this->role_id && $this->role) {
-            return $this->role->name;
         }
         
         // Last resort: return 'staff' as default

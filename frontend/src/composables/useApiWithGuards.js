@@ -19,12 +19,8 @@ export function useApiWithGuards() {
     }
   })
 
-  const executeRequest = async(requestFn, options = {}) => {
-    const {
-      showLoading = true,
-      throwOnError = false,
-      abortPrevious = true
-    } = options
+  const executeRequest = async (requestFn, options = {}) => {
+    const { showLoading = true, throwOnError = false, abortPrevious = true } = options
 
     // Abort previous request if needed
     if (abortPrevious && abortController.value) {
@@ -66,7 +62,9 @@ export function useApiWithGuards() {
     loading,
     error,
     executeRequest,
-    clearError: () => { error.value = '' }
+    clearError: () => {
+      error.value = ''
+    }
   }
 }
 
@@ -80,12 +78,10 @@ export function useDepartments() {
   const lastFetchTime = ref(0)
   const CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
 
-  const fetchDepartments = async(force = false) => {
+  const fetchDepartments = async (force = false) => {
     // Check if we need to fetch
     const now = Date.now()
-    const shouldFetch = force ||
-                       !isLoaded.value ||
-                       (now - lastFetchTime.value) > CACHE_DURATION
+    const shouldFetch = force || !isLoaded.value || now - lastFetchTime.value > CACHE_DURATION
 
     if (!shouldFetch) {
       console.log('📋 Departments already loaded and fresh, skipping fetch')
@@ -94,10 +90,9 @@ export function useDepartments() {
 
     console.log('📋 Fetching departments...')
 
-    const response = await executeRequest(
-      (config) => enhancedAPI.get('/v1/departments', config),
-      { showLoading: true }
-    )
+    const response = await executeRequest((config) => enhancedAPI.get('/v1/departments', config), {
+      showLoading: true
+    })
 
     if (response?.data) {
       if (response.data.success) {
@@ -175,11 +170,9 @@ export function useDataFetcher(endpoint, options = {}) {
     transform = (data) => data
   } = options
 
-  const fetchData = async(force = false) => {
+  const fetchData = async (force = false) => {
     const now = Date.now()
-    const shouldFetch = force ||
-                       !isLoaded.value ||
-                       (now - lastFetchTime.value) > cacheDuration
+    const shouldFetch = force || !isLoaded.value || now - lastFetchTime.value > cacheDuration
 
     if (!shouldFetch) {
       console.log(`📊 Data for ${endpoint} already loaded and fresh`)
@@ -188,10 +181,9 @@ export function useDataFetcher(endpoint, options = {}) {
 
     console.log(`📊 Fetching data from ${endpoint}...`)
 
-    const response = await executeRequest(
-      (config) => enhancedAPI.get(endpoint, config),
-      { showLoading: true }
-    )
+    const response = await executeRequest((config) => enhancedAPI.get(endpoint, config), {
+      showLoading: true
+    })
 
     if (response?.data) {
       if (response.data.success) {

@@ -34,7 +34,9 @@ apiClient.interceptors.request.use(
     config.startTime = Date.now()
 
     if (APP_CONFIG.DEBUG) {
-      console.log(`🚀 API Request [${config.requestId}]: ${config.method?.toUpperCase()} ${config.url}`)
+      console.log(
+        `🚀 API Request [${config.requestId}]: ${config.method?.toUpperCase()} ${config.url}`
+      )
     }
 
     return config
@@ -51,7 +53,9 @@ apiClient.interceptors.response.use(
     const duration = Date.now() - response.config.startTime
 
     if (APP_CONFIG.DEBUG) {
-      console.log(`✅ API Response [${response.config.requestId}]: ${response.status} (${duration}ms)`)
+      console.log(
+        `✅ API Response [${response.config.requestId}]: ${response.status} (${duration}ms)`
+      )
     }
 
     return response
@@ -86,9 +90,7 @@ export const enhancedAPI = {
    */
   async get(url, config = {}) {
     const key = requestDeduplicator.generateKey('GET', url)
-    return requestDeduplicator.executeRequest(key, () =>
-      apiClient.get(url, config)
-    )
+    return requestDeduplicator.executeRequest(key, () => apiClient.get(url, config))
   },
 
   /**
@@ -100,9 +102,7 @@ export const enhancedAPI = {
 
     if (shouldDeduplicate) {
       const key = requestDeduplicator.generateKey('POST', url, data)
-      return requestDeduplicator.executeRequest(key, () =>
-        apiClient.post(url, data, config)
-      )
+      return requestDeduplicator.executeRequest(key, () => apiClient.post(url, data, config))
     }
 
     return apiClient.post(url, data, config)
@@ -117,9 +117,7 @@ export const enhancedAPI = {
 
     if (shouldDeduplicate) {
       const key = requestDeduplicator.generateKey('PUT', url, data)
-      return requestDeduplicator.executeRequest(key, () =>
-        apiClient.put(url, data, config)
-      )
+      return requestDeduplicator.executeRequest(key, () => apiClient.put(url, data, config))
     }
 
     return apiClient.put(url, data, config)
@@ -134,9 +132,7 @@ export const enhancedAPI = {
 
     if (shouldDeduplicate) {
       const key = requestDeduplicator.generateKey('PATCH', url, data)
-      return requestDeduplicator.executeRequest(key, () =>
-        apiClient.patch(url, data, config)
-      )
+      return requestDeduplicator.executeRequest(key, () => apiClient.patch(url, data, config))
     }
 
     return apiClient.patch(url, data, config)
@@ -151,9 +147,7 @@ export const enhancedAPI = {
 
     if (shouldDeduplicate) {
       const key = requestDeduplicator.generateKey('DELETE', url)
-      return requestDeduplicator.executeRequest(key, () =>
-        apiClient.delete(url, config)
-      )
+      return requestDeduplicator.executeRequest(key, () => apiClient.delete(url, config))
     }
 
     return apiClient.delete(url, config)

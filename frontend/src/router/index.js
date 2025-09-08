@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { ROLES } from '../utils/permissions'
 import { preloadRouteBasedImages } from '../utils/imagePreloader'
-import { enhancedNavigationGuard, syncAuthStores } from '../utils/routeGuards'
+import { enhancedNavigationGuard } from '../utils/routeGuards'
 
 // Lazy load LoginPageWrapper as well for better initial bundle size
 const LoginPageWrapper = () =>
@@ -30,8 +30,7 @@ const routes = [
   {
     path: '/ict-policy',
     name: 'IctPolicy',
-    component: () =>
-      import(/* webpackChunkName: "public" */ '../components/IctPolicy.vue'),
+    component: () => import(/* webpackChunkName: "public" */ '../components/IctPolicy.vue'),
     meta: {
       requiresAuth: false,
       isPublic: true
@@ -40,10 +39,7 @@ const routes = [
   {
     path: '/terms-of-service',
     name: 'TermsOfService',
-    component: () =>
-      import(
-        /* webpackChunkName: "public" */ '../components/TermsOfService.vue'
-      ),
+    component: () => import(/* webpackChunkName: "public" */ '../components/TermsOfService.vue'),
     meta: {
       requiresAuth: false,
       isPublic: true
@@ -81,6 +77,12 @@ const routes = [
     path: '/admin/departments',
     name: 'DepartmentManagement',
     component: () => import('../components/admin/DepartmentManagement.vue'),
+    meta: { requiresAuth: true, roles: [ROLES.ADMIN] }
+  },
+  {
+    path: '/admin/device-inventory',
+    name: 'DeviceInventoryManagement',
+    component: () => import('../components/admin/DeviceInventoryManagement.vue'),
     meta: { requiresAuth: true, roles: [ROLES.ADMIN] }
   },
   {
@@ -225,8 +227,7 @@ const routes = [
   {
     path: '/user-combined-form',
     name: 'UserCombinedForm',
-    component: () =>
-      import('../components/views/forms/UserCombinedAccessForm.vue'),
+    component: () => import('../components/views/forms/UserCombinedAccessForm.vue'),
     meta: {
       requiresAuth: true,
       roles: [ROLES.STAFF]
@@ -250,13 +251,21 @@ const routes = [
       roles: [ROLES.STAFF]
     }
   },
+  {
+    path: '/request-details',
+    name: 'StaffRequestDetails',
+    component: () => import('../components/views/requests/InternalAccessDetails.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: [ROLES.STAFF]
+    }
+  },
 
   // ICT Approval routes (ICT Officer only)
   {
     path: '/ict-approval/requests',
     name: 'RequestsList',
-    component: () =>
-      import('../components/views/ict-approval/RequestsList.vue'),
+    component: () => import('../components/views/ict-approval/RequestsList.vue'),
     meta: {
       requiresAuth: true,
       roles: [ROLES.ICT_OFFICER]
@@ -265,8 +274,7 @@ const routes = [
   {
     path: '/ict-approval/request/:id',
     name: 'RequestDetails',
-    component: () =>
-      import('../components/views/ict-approval/RequestDetails.vue'),
+    component: () => import('../components/views/ict-approval/RequestDetails.vue'),
     meta: {
       requiresAuth: true,
       roles: [ROLES.ICT_OFFICER]
@@ -277,8 +285,7 @@ const routes = [
   {
     path: '/hod-dashboard/request-list',
     name: 'HODDashboardRequestList',
-    component: () =>
-      import('../components/views/requests/InternalAccessList.vue'),
+    component: () => import('../components/views/requests/InternalAccessList.vue'),
     meta: {
       requiresAuth: true,
       roles: [
@@ -299,8 +306,7 @@ const routes = [
   {
     path: '/internal-access/details',
     name: 'InternalAccessDetails',
-    component: () =>
-      import('../components/views/requests/InternalAccessDetails.vue'),
+    component: () => import('../components/views/requests/InternalAccessDetails.vue'),
     meta: {
       requiresAuth: true,
       roles: [
@@ -316,8 +322,7 @@ const routes = [
   {
     path: '/hod-dashboard/debug',
     name: 'HODDashboardDebug',
-    component: () =>
-      import('../components/debug/HODDashboardDebug.vue'),
+    component: () => import('../components/debug/HODDashboardDebug.vue'),
     meta: {
       requiresAuth: true,
       roles: [
@@ -348,8 +353,6 @@ const routes = [
       roles: [ROLES.ADMIN]
     }
   },
-
-
 
   {
     path: '/wellsoft-users',
@@ -397,7 +400,6 @@ const routes = [
     redirect: '/admin-dashboard'
   },
 
-
   // Catch-all route for 404 errors
   {
     path: '/:pathMatch(.*)*',
@@ -418,18 +420,10 @@ const router = createRouter({
   routes
 })
 
-// Enhanced Navigation guards with dual auth store integration
-router.beforeEach(async(to, from, next) => {
+// Navigation guard (Pinia-only)
+router.beforeEach(async (to, from, next) => {
   try {
-    // Import store to access auth state
-    const store = (await import('../store')).default
-
-    // Sync auth stores before navigation
-    await syncAuthStores(store)
-
-    // Use enhanced navigation guard
-    return enhancedNavigationGuard(to, from, next, store)
-
+    return enhancedNavigationGuard(to, from, next)
   } catch (error) {
     console.error('❌ Router: Navigation error:', error)
     next('/login')
@@ -460,9 +454,7 @@ router.afterEach((to, from, failure) => {
 
       // Provide user-friendly error message for critical failures
       if (failure.type === 2) {
-        console.error(
-          'Route not found - this might indicate a missing route definition'
-        )
+        console.error('Route not found - this might indicate a missing route definition')
       }
     }
   }

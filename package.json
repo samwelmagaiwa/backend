@@ -1,0 +1,15 @@
+{
+  "name": "lara-api-vue-dev",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "concurrently \"php backend/artisan serve\" \"php backend/artisan queue:listen --tries=1\" \"npm --prefix frontend run serve\" --names server,queue,frontend",
+    "dev:api": "php backend/artisan serve",
+    "dev:queue": "php backend/artisan queue:listen --tries=1",
+    "dev:frontend": "npm --prefix frontend run serve"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1"
+  }
+}
+

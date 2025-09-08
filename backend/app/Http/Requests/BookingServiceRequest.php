@@ -39,12 +39,19 @@ class BookingServiceRequest extends FormRequest
             ],
             'device_type' => [
                 'required',
-                'string',
-                Rule::in($deviceTypes)
+                'string'
+                // Remove the Rule::in validation to allow inventory device codes
+            ],
+            'device_inventory_id' => [
+                'nullable',
+                'integer',
+                'exists:device_inventory,id'
             ],
             'custom_device' => [
                 'nullable',
-                'required_if:device_type,others',
+                Rule::requiredIf(function () {
+                    return $this->input('device_type') === 'others' && !$this->filled('device_inventory_id');
+                }),
                 'string',
                 'max:255'
             ],
@@ -69,6 +76,10 @@ class BookingServiceRequest extends FormRequest
                 'required',
                 'string',
                 'regex:/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/'
+            ],
+            'return_date_time' => [
+                'nullable',
+                'date'
             ],
             'reason' => [
                 'required',
@@ -103,6 +114,7 @@ class BookingServiceRequest extends FormRequest
             'device_type.in' => 'Please select a valid device type.',
             
             'custom_device.required_if' => 'Please specify the device when "Others" is selected.',
+            'custom_device.required' => 'Please specify the device when "Others" is selected.',
             'custom_device.max' => 'Custom device name cannot exceed 255 characters.',
             
             'department.required' => 'Please select a department.',
@@ -206,8 +218,12 @@ class BookingServiceRequest extends FormRequest
                 'return_date' => $this->return_date,
                 'return_time' => $this->return_time,
                 'device_type' => $this->device_type,
+                'device_inventory_id' => $this->device_inventory_id,
                 'custom_device' => $this->custom_device
             ]);
+            
+            // Validate device type
+            $this->validateDeviceType($validator);
             
             // Additional validation for return date/time combination
             if ($this->has(['return_date', 'return_time'])) {
@@ -244,15 +260,71 @@ class BookingServiceRequest extends FormRequest
                 }
             }
 
-            // Validate custom device when device_type is 'others'
-            if ($this->device_type === 'others' && empty(trim($this->custom_device ?? ''))) {
+            // Validate custom device when device_type is 'others' AND no device_inventory_id is provided
+            if ($this->device_type === 'others' && !$this->device_inventory_id && empty(trim($this->custom_device ?? ''))) {
                 $validator->errors()->add('custom_device', 'Please specify the device when "Others" is selected.');
                 \Log::info('Validation error: Custom device required for others');
+            }
+            
+            // If device_inventory_id is provided, we don't need custom_device even if device_type is 'others'
+            if ($this->device_inventory_id && $this->device_type === 'others') {
+                \Log::info('Device inventory provided with others type - this is acceptable', [
+                    'device_inventory_id' => $this->device_inventory_id,
+                    'device_type' => $this->device_type
+                ]);
             }
             
             \Log::info('Custom validation completed', [
                 'errors' => $validator->errors()->toArray()
             ]);
         });
+    }
+    
+    /**
+     * Validate device type based on whether it's from inventory or predefined types.
+     */
+    private function validateDeviceType($validator): void
+    {
+        $deviceTypes = array_keys(BookingService::getDeviceTypes());
+        
+        // First, validate that device_type is a valid ENUM value
+        if (!in_array($this->device_type, $deviceTypes)) {
+            $validator->errors()->add('device_type', 'Please select a valid device type.');
+            \Log::info('Validation error: Invalid device type', [
+                'device_type' => $this->device_type,
+                'valid_types' => $deviceTypes
+            ]);
+            return;
+        }
+        
+        // If device_inventory_id is provided, validate the inventory device
+        if ($this->device_inventory_id) {
+            $deviceInventory = \App\Models\DeviceInventory::find($this->device_inventory_id);
+            if (!$deviceInventory) {
+                $validator->errors()->add('device_type', 'Selected device not found in inventory.');
+                \Log::info('Validation error: Device inventory not found', ['device_inventory_id' => $this->device_inventory_id]);
+                return;
+            }
+            
+            if (!$deviceInventory->is_active) {
+                $validator->errors()->add('device_type', 'Selected device is not active.');
+                \Log::info('Validation error: Device inventory not active', ['device_inventory_id' => $this->device_inventory_id]);
+                return;
+            }
+            
+            if (!$deviceInventory->isAvailable()) {
+                $validator->errors()->add('device_type', 'Selected device is not available for borrowing.');
+                \Log::info('Validation error: Device inventory not available', ['device_inventory_id' => $this->device_inventory_id]);
+                return;
+            }
+            
+            \Log::info('Device inventory validation passed', [
+                'device_inventory_id' => $this->device_inventory_id,
+                'device_name' => $deviceInventory->device_name,
+                'mapped_device_type' => $this->device_type
+            ]);
+        }
+        
+        \Log::info('Device type validation passed', ['device_type' => $this->device_type]);
     }
 }

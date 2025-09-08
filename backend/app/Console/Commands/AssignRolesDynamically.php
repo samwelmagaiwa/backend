@@ -69,9 +69,6 @@ class AssignRolesDynamically extends Command
         // Clear many-to-many role assignments
         \DB::table('role_user')->delete();
         
-        // Clear legacy role_id assignments
-        \App\Models\User::query()->update(['role_id' => null]);
-        
         // Clear department leadership assignments
         \App\Models\Department::query()->update([
             'hod_user_id' => null,

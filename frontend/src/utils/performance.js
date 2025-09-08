@@ -82,7 +82,7 @@ export function debounce(func, wait, immediate) {
  */
 export function throttle(func, limit) {
   let inThrottle
-  return function(...args) {
+  return function (...args) {
     if (!inThrottle) {
       func.apply(this, args)
       inThrottle = true
@@ -134,9 +134,7 @@ export function monitorPerformance() {
           tcp: perfData.connectEnd - perfData.connectStart,
           ttfb: perfData.responseStart - perfData.requestStart,
           download: perfData.responseEnd - perfData.responseStart,
-          dom:
-            perfData.domContentLoadedEventEnd -
-            perfData.domContentLoadedEventStart,
+          dom: perfData.domContentLoadedEventEnd - perfData.domContentLoadedEventStart,
           total: perfData.loadEventEnd - perfData.navigationStart
         }
 

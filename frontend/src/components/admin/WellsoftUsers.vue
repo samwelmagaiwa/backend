@@ -30,19 +30,15 @@
                 top: Math.random() * 100 + '%',
                 animationDelay: Math.random() * 3 + 's',
                 animationDuration: Math.random() * 3 + 2 + 's',
-                fontSize: Math.random() * 20 + 10 + 'px',
+                fontSize: Math.random() * 20 + 10 + 'px'
               }"
             >
               <i
                 :class="[
                   'fas',
-                  [
-                    'fa-heartbeat',
-                    'fa-user-md',
-                    'fa-hospital',
-                    'fa-stethoscope',
-                    'fa-plus',
-                  ][Math.floor(Math.random() * 5)],
+                  ['fa-heartbeat', 'fa-user-md', 'fa-hospital', 'fa-stethoscope', 'fa-plus'][
+                    Math.floor(Math.random() * 5)
+                  ]
                 ]"
               ></i>
             </div>
@@ -61,82 +57,83 @@
 </template>
 
 <script>
-import Header from '@/components/header.vue'
-import ModernSidebar from '@/components/ModernSidebar.vue'
-import AppFooter from '@/components/footer.vue'
-import UserManagementDropdown from '@/components/UserManagementDropdown.vue'
+  import Header from '@/components/header.vue'
+  import ModernSidebar from '@/components/ModernSidebar.vue'
+  import AppFooter from '@/components/footer.vue'
+  import UserManagementDropdown from '@/components/UserManagementDropdown.vue'
 
-export default {
-  name: 'WellsoftUsersPage',
-  components: {
-    Header,
-    ModernSidebar,
-    AppFooter,
-    UserManagementDropdown
-  },
-  setup() {
-    // Sidebar state now managed by Pinia - no local state needed
+  export default {
+    name: 'WellsoftUsersPage',
+    components: {
+      Header,
+      ModernSidebar,
+      AppFooter,
+      UserManagementDropdown
+    },
+    setup() {
+      // Sidebar state now managed by Pinia - no local state needed
 
-    return {
-      // No local state needed for sidebar
+      return {
+        // No local state needed for sidebar
+      }
     }
   }
-}
 </script>
 
 <style scoped>
-/* Medical Glass morphism effects */
-.medical-glass-card {
-  background: rgba(59, 130, 246, 0.15);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
-  border: 2px solid rgba(96, 165, 250, 0.3);
-  box-shadow: 0 8px 32px rgba(29, 78, 216, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-
-/* Animations */
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
+  /* Medical Glass morphism effects */
+  .medical-glass-card {
+    background: rgba(59, 130, 246, 0.15);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 2px solid rgba(96, 165, 250, 0.3);
+    box-shadow:
+      0 8px 32px rgba(29, 78, 216, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
-  50% {
-    transform: translateY(-20px);
-  }
-}
 
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+  /* Animations */
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
-}
 
-@keyframes fade-in-delay {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+  @keyframes fade-in-delay {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
   }
-}
 
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
+  .animate-fade-in {
+    animation: fade-in 1s ease-out;
+  }
 
-.animate-fade-in {
-  animation: fade-in 1s ease-out;
-}
-
-.animate-fade-in-delay {
-  animation: fade-in-delay 1s ease-out 0.3s both;
-}
+  .animate-fade-in-delay {
+    animation: fade-in-delay 1s ease-out 0.3s both;
+  }
 </style>

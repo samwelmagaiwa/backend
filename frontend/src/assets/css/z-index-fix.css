@@ -23,7 +23,7 @@
 }
 
 /* General notification override */
-[class*="fixed"][class*="top-4"][class*="right-4"] {
+[class*='fixed'][class*='top-4'][class*='right-4'] {
   z-index: 9999 !important;
 }
 

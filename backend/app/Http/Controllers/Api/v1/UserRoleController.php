@@ -189,7 +189,8 @@ class UserRoleController extends Controller
                 'user_email' => $user->email,
                 'roles_added' => $rolesToAdd,
                 'roles_removed' => $rolesToRemove,
-                'updated_by' => $currentUser->id
+                'updated_by' => $currentUser->id,
+                'new_primary_role' => $user->getPrimaryRoleName()
             ]);
 
             DB::commit();
@@ -269,7 +270,8 @@ class UserRoleController extends Controller
                 'user_email' => $user->email,
                 'role_id' => $role->id,
                 'role_name' => $role->name,
-                'removed_by' => $currentUser->id
+                'removed_by' => $currentUser->id,
+                'new_primary_role' => $user->getPrimaryRoleName()
             ]);
 
             DB::commit();

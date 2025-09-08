@@ -18,20 +18,15 @@
                 top: Math.random() * 100 + '%',
                 animationDelay: Math.random() * 3 + 's',
                 animationDuration: Math.random() * 3 + 2 + 's',
-                fontSize: Math.random() * 15 + 8 + 'px',
+                fontSize: Math.random() * 15 + 8 + 'px'
               }"
             >
               <i
                 :class="[
                   'fas',
-                  [
-                    'fa-laptop',
-                    'fa-tv',
-                    'fa-desktop',
-                    'fa-keyboard',
-                    'fa-mouse',
-                    'fa-headphones',
-                  ][Math.floor(Math.random() * 6)],
+                  ['fa-laptop', 'fa-tv', 'fa-desktop', 'fa-keyboard', 'fa-mouse', 'fa-headphones'][
+                    Math.floor(Math.random() * 6)
+                  ]
                 ]"
               ></i>
             </div>
@@ -104,9 +99,7 @@
           </div>
 
           <!-- Main Content -->
-          <div
-            class="booking-glass-card rounded-b-3xl overflow-hidden animate-slide-up"
-          >
+          <div class="booking-glass-card rounded-b-3xl overflow-hidden animate-slide-up">
             <div class="p-8 space-y-8">
               <!-- Back Button -->
               <div class="flex items-center justify-between mb-6">
@@ -145,14 +138,10 @@
                   </h3>
                 </div>
 
-                <div
-                  class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-                >
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   <!-- Borrower Name -->
                   <div class="group">
-                    <label
-                      class="block text-sm font-semibold text-blue-100 mb-2 flex items-center"
-                    >
+                    <label class="block text-sm font-semibold text-blue-100 mb-2 flex items-center">
                       <i class="fas fa-user mr-2 text-teal-300 text-sm"></i>
                       Borrower Name
                     </label>
@@ -165,9 +154,7 @@
 
                   <!-- Department -->
                   <div class="group">
-                    <label
-                      class="block text-sm font-semibold text-blue-100 mb-2 flex items-center"
-                    >
+                    <label class="block text-sm font-semibold text-blue-100 mb-2 flex items-center">
                       <i class="fas fa-building mr-2 text-teal-300 text-sm"></i>
                       Department
                     </label>
@@ -180,9 +167,7 @@
 
                   <!-- Phone Number -->
                   <div class="group">
-                    <label
-                      class="block text-sm font-semibold text-blue-100 mb-2 flex items-center"
-                    >
+                    <label class="block text-sm font-semibold text-blue-100 mb-2 flex items-center">
                       <i class="fas fa-phone mr-2 text-teal-300 text-sm"></i>
                       Phone Number
                     </label>
@@ -195,29 +180,20 @@
 
                   <!-- Device Type -->
                   <div class="group">
-                    <label
-                      class="block text-sm font-semibold text-blue-100 mb-2 flex items-center"
-                    >
+                    <label class="block text-sm font-semibold text-blue-100 mb-2 flex items-center">
                       <i class="fas fa-laptop mr-2 text-teal-300 text-sm"></i>
                       Device Type
                     </label>
                     <div
                       class="px-4 py-3 bg-white/10 border border-blue-300/30 rounded-lg text-white text-sm backdrop-blur-sm"
                     >
-                      {{
-                        getDeviceDisplayName(
-                          request.deviceType,
-                          request.customDevice
-                        )
-                      }}
+                      {{ getDeviceDisplayName(request.deviceType, request.customDevice) }}
                     </div>
                   </div>
 
                   <!-- Booking Date -->
                   <div class="group">
-                    <label
-                      class="block text-sm font-semibold text-blue-100 mb-2 flex items-center"
-                    >
+                    <label class="block text-sm font-semibold text-blue-100 mb-2 flex items-center">
                       <i class="fas fa-calendar mr-2 text-teal-300 text-sm"></i>
                       Booking Date
                     </label>
@@ -230,12 +206,8 @@
 
                   <!-- Return Date & Time -->
                   <div class="group">
-                    <label
-                      class="block text-sm font-semibold text-blue-100 mb-2 flex items-center"
-                    >
-                      <i
-                        class="fas fa-calendar-minus mr-2 text-teal-300 text-sm"
-                      ></i>
+                    <label class="block text-sm font-semibold text-blue-100 mb-2 flex items-center">
+                      <i class="fas fa-calendar-minus mr-2 text-teal-300 text-sm"></i>
                       Return Date & Time
                     </label>
                     <div
@@ -251,9 +223,7 @@
                     <label
                       class="block text-sm font-semibold text-blue-100 mb-2 flex items-center justify-center"
                     >
-                      <i
-                        class="fas fa-signature mr-2 text-teal-300 text-sm"
-                      ></i>
+                      <i class="fas fa-signature mr-2 text-teal-300 text-sm"></i>
                       Signature Status
                     </label>
                     <div
@@ -266,18 +236,11 @@
                         <i class="fas fa-check-circle mr-2"></i>
                         <span class="font-medium">Digitally Signed</span>
                       </div>
-                      <div
-                        v-else
-                        class="flex items-center justify-center text-center"
-                      >
+                      <div v-else class="flex items-center justify-center text-center">
                         <div class="text-center">
                           <div class="mb-2">
-                            <i
-                              class="fas fa-signature text-teal-300 text-2xl mb-2"
-                            ></i>
-                            <p class="text-blue-100 text-sm font-medium">
-                              No signature uploaded
-                            </p>
+                            <i class="fas fa-signature text-teal-300 text-2xl mb-2"></i>
+                            <p class="text-blue-100 text-sm font-medium">No signature uploaded</p>
                           </div>
                         </div>
                       </div>
@@ -287,12 +250,8 @@
 
                 <!-- Reason for Borrowing -->
                 <div class="mt-6">
-                  <label
-                    class="block text-sm font-semibold text-blue-100 mb-2 flex items-center"
-                  >
-                    <i
-                      class="fas fa-comment-alt mr-2 text-teal-300 text-sm"
-                    ></i>
+                  <label class="block text-sm font-semibold text-blue-100 mb-2 flex items-center">
+                    <i class="fas fa-comment-alt mr-2 text-teal-300 text-sm"></i>
                     Reason for Borrowing
                   </label>
                   <div
@@ -304,9 +263,7 @@
 
                 <!-- Digital Signature -->
                 <div v-if="request.signature" class="mt-6">
-                  <label
-                    class="block text-sm font-semibold text-blue-100 mb-2 flex items-center"
-                  >
+                  <label class="block text-sm font-semibold text-blue-100 mb-2 flex items-center">
                     <i class="fas fa-signature mr-2 text-teal-300 text-sm"></i>
                     Digital Signature
                   </label>
@@ -326,12 +283,8 @@
                       <div class="flex items-center text-green-400">
                         <i class="fas fa-check-circle mr-2"></i>
                         <div class="text-center">
-                          <span class="text-sm font-semibold block"
-                            >Verified</span
-                          >
-                          <span class="text-xs text-green-300"
-                            >Signature captured</span
-                          >
+                          <span class="text-sm font-semibold block">Verified</span>
+                          <span class="text-xs text-green-300">Signature captured</span>
                         </div>
                       </div>
                     </div>
@@ -362,9 +315,7 @@
                       <label
                         class="block text-sm font-semibold text-indigo-100 mb-2 flex items-center"
                       >
-                        <i
-                          class="fas fa-search mr-2 text-indigo-300 text-sm"
-                        ></i>
+                        <i class="fas fa-search mr-2 text-indigo-300 text-sm"></i>
                         Device Condition Assessment
                         <span class="text-red-400 ml-1">*</span>
                       </label>
@@ -374,25 +325,14 @@
                           class="w-full px-3 py-3 border border-indigo-300/30 rounded-lg focus:border-indigo-400 focus:outline-none text-white bg-indigo-100/20 focus:bg-indigo-100/30 transition-all backdrop-blur-sm group-hover:border-indigo-400/50 appearance-none cursor-pointer text-sm"
                           required
                         >
-                          <option
-                            value=""
-                            class="bg-indigo-800 text-indigo-300"
-                          >
+                          <option value="" class="bg-indigo-800 text-indigo-300">
                             Select Condition
                           </option>
-                          <option value="good" class="bg-indigo-800 text-white">
-                            Good
-                          </option>
-                          <option
-                            value="minor_issues"
-                            class="bg-indigo-800 text-white"
-                          >
+                          <option value="good" class="bg-indigo-800 text-white">Good</option>
+                          <option value="minor_issues" class="bg-indigo-800 text-white">
                             Minor Issues
                           </option>
-                          <option
-                            value="needs_repair"
-                            class="bg-indigo-800 text-white"
-                          >
+                          <option value="needs_repair" class="bg-indigo-800 text-white">
                             Needs Repair
                           </option>
                         </select>
@@ -425,28 +365,14 @@
                           class="w-full px-3 py-3 border border-indigo-300/30 rounded-lg focus:border-indigo-400 focus:outline-none text-white bg-indigo-100/20 focus:bg-indigo-100/30 transition-all backdrop-blur-sm group-hover:border-indigo-400/50 appearance-none cursor-pointer text-sm"
                           required
                         >
-                          <option
-                            value=""
-                            class="bg-indigo-800 text-indigo-300"
-                          >
+                          <option value="" class="bg-indigo-800 text-indigo-300">
                             Select Status
                           </option>
-                          <option
-                            value="pending"
-                            class="bg-indigo-800 text-white"
-                          >
-                            Pending
-                          </option>
-                          <option
-                            value="returned"
-                            class="bg-indigo-800 text-white"
-                          >
+                          <option value="pending" class="bg-indigo-800 text-white">Pending</option>
+                          <option value="returned" class="bg-indigo-800 text-white">
                             Returned
                           </option>
-                          <option
-                            value="compromised"
-                            class="bg-indigo-800 text-white"
-                          >
+                          <option value="compromised" class="bg-indigo-800 text-white">
                             Compromised
                           </option>
                         </select>
@@ -456,10 +382,7 @@
                           <i class="fas fa-chevron-down text-sm"></i>
                         </div>
                       </div>
-                      <div
-                        v-if="errors.status"
-                        class="text-red-400 text-xs mt-1 flex items-center"
-                      >
+                      <div v-if="errors.status" class="text-red-400 text-xs mt-1 flex items-center">
                         <i class="fas fa-exclamation-circle mr-1"></i>
                         {{ errors.status }}
                       </div>
@@ -471,9 +394,7 @@
                     <label
                       class="block text-sm font-semibold text-indigo-100 mb-2 flex items-center"
                     >
-                      <i
-                        class="fas fa-comment-dots mr-2 text-indigo-300 text-sm"
-                      ></i>
+                      <i class="fas fa-comment-dots mr-2 text-indigo-300 text-sm"></i>
                       Condition Before Issues / Notes
                     </label>
                     <div class="relative">
@@ -494,9 +415,7 @@
                     <label
                       class="block text-sm font-semibold text-indigo-100 mb-2 flex items-center"
                     >
-                      <i
-                        class="fas fa-calendar-check mr-2 text-indigo-300 text-sm"
-                      ></i>
+                      <i class="fas fa-calendar-check mr-2 text-indigo-300 text-sm"></i>
                       Assessment Date
                     </label>
                     <div class="relative">
@@ -513,9 +432,7 @@
                   </div>
 
                   <!-- Action Buttons -->
-                  <div
-                    class="flex justify-between items-center pt-6 border-t border-blue-300/20"
-                  >
+                  <div class="flex justify-between items-center pt-6 border-t border-blue-300/20">
                     <button
                       type="button"
                       @click="goBack"
@@ -532,11 +449,7 @@
                     >
                       <i v-if="!isSubmitting" class="fas fa-save mr-2"></i>
                       <i v-else class="fas fa-spinner fa-spin mr-2"></i>
-                      {{
-                        isSubmitting
-                          ? "Saving Assessment..."
-                          : "Save Assessment"
-                      }}
+                      {{ isSubmitting ? 'Saving Assessment...' : 'Save Assessment' }}
                     </button>
                   </div>
                 </form>
@@ -564,12 +477,9 @@
           >
             <i class="fas fa-check text-green-600 text-3xl"></i>
           </div>
-          <h3 class="text-2xl font-bold text-gray-800 mb-3">
-            Assessment Saved Successfully!
-          </h3>
+          <h3 class="text-2xl font-bold text-gray-800 mb-3">Assessment Saved Successfully!</h3>
           <p class="text-gray-600 mb-6">
-            The device request assessment has been updated and saved to the
-            system.
+            The device request assessment has been updated and saved to the system.
           </p>
           <button
             @click="closeSuccessModal"
@@ -598,374 +508,365 @@
 </template>
 
 <script>
-// import { ref } from 'vue' // Removed unused import
-import Header from '@/components/header.vue'
-import ModernSidebar from '@/components/ModernSidebar.vue'
-import AppFooter from '@/components/footer.vue'
-import axios from 'axios'
+  // import { ref } from 'vue' // Removed unused import
+  import Header from '@/components/header.vue'
+  import ModernSidebar from '@/components/ModernSidebar.vue'
+  import AppFooter from '@/components/footer.vue'
+  import axios from 'axios'
 
-export default {
-  name: 'RequestDetails',
-  components: {
-    Header,
-    ModernSidebar,
-    AppFooter
-  },
-  setup() {
-    // Sidebar state now managed by Pinia - no local state needed
+  export default {
+    name: 'RequestDetails',
+    components: {
+      Header,
+      ModernSidebar,
+      AppFooter
+    },
+    setup() {
+      // Sidebar state now managed by Pinia - no local state needed
 
-    return {
-      // No local state needed for sidebar
-    }
-  },
-  data() {
-    return {
-      request: {},
-      assessment: {
-        deviceCondition: '',
-        status: '',
-        conditionNotes: '',
-        assessmentDate: new Date().toISOString().split('T')[0]
-      },
-      errors: {},
-      isLoading: false,
-      isSubmitting: false,
-      showSuccessModal: false
-    }
-  },
-  async mounted() {
-    await this.fetchRequestDetails()
-  },
-  methods: {
-    async fetchRequestDetails() {
-      this.isLoading = true
-      try {
-        const requestId = this.$route.params.id
-        // Fetch real data from API
-        const response = await axios.get(`/api/device-requests/${requestId}`)
-        this.request = response.data
+      return {
+        // No local state needed for sidebar
+      }
+    },
+    data() {
+      return {
+        request: {},
+        assessment: {
+          deviceCondition: '',
+          status: '',
+          conditionNotes: '',
+          assessmentDate: new Date().toISOString().split('T')[0]
+        },
+        errors: {},
+        isLoading: false,
+        isSubmitting: false,
+        showSuccessModal: false
+      }
+    },
+    async mounted() {
+      await this.fetchRequestDetails()
+    },
+    methods: {
+      async fetchRequestDetails() {
+        this.isLoading = true
+        try {
+          const requestId = this.$route.params.id
+          // Fetch real data from API
+          const response = await axios.get(`/api/device-requests/${requestId}`)
+          this.request = response.data
 
-        // Pre-fill assessment if it exists
-        if (this.request.assessment) {
-          this.assessment = { ...this.request.assessment }
-        }
-      } catch (error) {
-        console.error('Error fetching request details:', error)
-        // Mock data for development
-        const requestId = parseInt(this.$route.params.id)
-        const mockRequests = [
-          {
-            id: 1,
-            borrowerName: 'John Doe',
-            department: 'ICT Department',
-            phoneNumber: '0712345678',
-            deviceType: 'projector',
-            customDevice: '',
-            bookingDate: '2024-01-15',
-            collectionDate: '2024-01-20',
-            returnTime: '14:00',
-            reason: 'Presentation for board meeting',
-            status: 'pending',
-            signature: null
-          },
-          {
-            id: 2,
-            borrowerName: 'Jane Smith',
-            department: 'Finance',
-            phoneNumber: '0723456789',
-            deviceType: 'laptop',
-            customDevice: '',
-            bookingDate: '2024-01-14',
-            collectionDate: '2024-01-18',
-            returnTime: '16:00',
-            reason: 'Financial analysis work',
-            status: 'returned',
-            signature: null
-          },
-          {
-            id: 3,
-            borrowerName: 'Mike Johnson',
-            department: 'Human Resources',
-            phoneNumber: '0734567890',
-            deviceType: 'others',
-            customDevice: 'Wireless Microphone',
-            bookingDate: '2024-01-13',
-            collectionDate: '2024-01-17',
-            returnTime: '12:00',
-            reason: 'Staff training session',
-            status: 'compromised',
-            signature: null
+          // Pre-fill assessment if it exists
+          if (this.request.assessment) {
+            this.assessment = { ...this.request.assessment }
           }
-        ]
+        } catch (error) {
+          console.error('Error fetching request details:', error)
+          // Mock data for development
+          const requestId = parseInt(this.$route.params.id)
+          const mockRequests = [
+            {
+              id: 1,
+              borrowerName: 'John Doe',
+              department: 'ICT Department',
+              phoneNumber: '0712345678',
+              deviceType: 'projector',
+              customDevice: '',
+              bookingDate: '2024-01-15',
+              collectionDate: '2024-01-20',
+              returnTime: '14:00',
+              reason: 'Presentation for board meeting',
+              status: 'pending',
+              signature: null
+            },
+            {
+              id: 2,
+              borrowerName: 'Jane Smith',
+              department: 'Finance',
+              phoneNumber: '0723456789',
+              deviceType: 'laptop',
+              customDevice: '',
+              bookingDate: '2024-01-14',
+              collectionDate: '2024-01-18',
+              returnTime: '16:00',
+              reason: 'Financial analysis work',
+              status: 'returned',
+              signature: null
+            },
+            {
+              id: 3,
+              borrowerName: 'Mike Johnson',
+              department: 'Human Resources',
+              phoneNumber: '0734567890',
+              deviceType: 'others',
+              customDevice: 'Wireless Microphone',
+              bookingDate: '2024-01-13',
+              collectionDate: '2024-01-17',
+              returnTime: '12:00',
+              reason: 'Staff training session',
+              status: 'compromised',
+              signature: null
+            }
+          ]
 
-        this.request = mockRequests.find((r) => r.id === requestId) || {}
-        // Pre-fill assessment with current status
-        this.assessment.status = this.request.status || ''
-      } finally {
-        this.isLoading = false
-      }
-    },
+          this.request = mockRequests.find((r) => r.id === requestId) || {}
+          // Pre-fill assessment with current status
+          this.assessment.status = this.request.status || ''
+        } finally {
+          this.isLoading = false
+        }
+      },
 
-    async saveAssessment() {
-      if (!this.validateAssessment()) {
-        return
-      }
-
-      this.isSubmitting = true
-      try {
-        const requestId = this.$route.params.id
-        const assessmentData = {
-          ...this.assessment,
-          requestId: requestId,
-          assessedBy: 'ICT Officer', // You can get this from user session
-          assessedAt: new Date().toISOString()
+      async saveAssessment() {
+        if (!this.validateAssessment()) {
+          return
         }
 
-        // Replace with your actual API endpoint
-        await axios.put(
-          `/api/device-requests/${requestId}/assessment`,
-          assessmentData
-        )
+        this.isSubmitting = true
+        try {
+          const requestId = this.$route.params.id
+          const assessmentData = {
+            ...this.assessment,
+            requestId: requestId,
+            assessedBy: 'ICT Officer', // You can get this from user session
+            assessedAt: new Date().toISOString()
+          }
 
-        console.log('Assessment saved:', assessmentData)
-        this.showSuccessModal = true
-      } catch (error) {
-        console.error('Error saving assessment:', error)
-        alert('Error saving assessment. Please try again.')
-      } finally {
-        this.isSubmitting = false
+          // Replace with your actual API endpoint
+          await axios.put(`/api/device-requests/${requestId}/assessment`, assessmentData)
+
+          console.log('Assessment saved:', assessmentData)
+          this.showSuccessModal = true
+        } catch (error) {
+          console.error('Error saving assessment:', error)
+          alert('Error saving assessment. Please try again.')
+        } finally {
+          this.isSubmitting = false
+        }
+      },
+
+      validateAssessment() {
+        this.errors = {}
+
+        if (!this.assessment.deviceCondition) {
+          this.errors.deviceCondition = 'Device condition assessment is required'
+        }
+
+        if (!this.assessment.status) {
+          this.errors.status = 'Status is required'
+        }
+
+        return Object.keys(this.errors).length === 0
+      },
+
+      closeSuccessModal() {
+        this.showSuccessModal = false
+        this.goBack()
+      },
+
+      goBack() {
+        this.$router.push('/ict-approval/requests')
+      },
+
+      getDeviceDisplayName(deviceType, customDevice) {
+        if (deviceType === 'others') {
+          return customDevice || 'Other Device'
+        }
+
+        const deviceNames = {
+          projector: 'Projector',
+          tv_remote: 'TV Remote',
+          hdmi_cable: 'HDMI Cable',
+          monitor: 'Monitor',
+          cpu: 'CPU',
+          keyboard: 'Keyboard',
+          pc: 'PC',
+          laptop: 'Laptop'
+        }
+
+        return deviceNames[deviceType] || deviceType
+      },
+
+      formatDate(dateString) {
+        if (!dateString) return ''
+        const date = new Date(dateString)
+        return date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        })
+      },
+
+      getStatusBadgeClass(status) {
+        const classes = {
+          pending: 'bg-yellow-100 text-yellow-800 border border-yellow-200',
+          returned: 'bg-green-100 text-green-800 border border-green-200',
+          compromised: 'bg-red-100 text-red-800 border border-red-200'
+        }
+        return classes[status] || 'bg-gray-100 text-gray-800 border border-gray-200'
+      },
+
+      getStatusIcon(status) {
+        const icons = {
+          pending: 'fas fa-clock',
+          returned: 'fas fa-check-circle',
+          compromised: 'fas fa-exclamation-triangle'
+        }
+        return icons[status] || 'fas fa-question-circle'
+      },
+
+      getStatusText(status) {
+        const texts = {
+          pending: 'Pending',
+          returned: 'Returned',
+          compromised: 'Compromised'
+        }
+        return texts[status] || 'Unknown'
       }
-    },
-
-    validateAssessment() {
-      this.errors = {}
-
-      if (!this.assessment.deviceCondition) {
-        this.errors.deviceCondition = 'Device condition assessment is required'
-      }
-
-      if (!this.assessment.status) {
-        this.errors.status = 'Status is required'
-      }
-
-      return Object.keys(this.errors).length === 0
-    },
-
-    closeSuccessModal() {
-      this.showSuccessModal = false
-      this.goBack()
-    },
-
-    goBack() {
-      this.$router.push('/ict-approval/requests')
-    },
-
-    getDeviceDisplayName(deviceType, customDevice) {
-      if (deviceType === 'others') {
-        return customDevice || 'Other Device'
-      }
-
-      const deviceNames = {
-        projector: 'Projector',
-        tv_remote: 'TV Remote',
-        hdmi_cable: 'HDMI Cable',
-        monitor: 'Monitor',
-        cpu: 'CPU',
-        keyboard: 'Keyboard',
-        pc: 'PC',
-        laptop: 'Laptop'
-      }
-
-      return deviceNames[deviceType] || deviceType
-    },
-
-    formatDate(dateString) {
-      if (!dateString) return ''
-      const date = new Date(dateString)
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      })
-    },
-
-    getStatusBadgeClass(status) {
-      const classes = {
-        pending: 'bg-yellow-100 text-yellow-800 border border-yellow-200',
-        returned: 'bg-green-100 text-green-800 border border-green-200',
-        compromised: 'bg-red-100 text-red-800 border border-red-200'
-      }
-      return (
-        classes[status] || 'bg-gray-100 text-gray-800 border border-gray-200'
-      )
-    },
-
-    getStatusIcon(status) {
-      const icons = {
-        pending: 'fas fa-clock',
-        returned: 'fas fa-check-circle',
-        compromised: 'fas fa-exclamation-triangle'
-      }
-      return icons[status] || 'fas fa-question-circle'
-    },
-
-    getStatusText(status) {
-      const texts = {
-        pending: 'Pending',
-        returned: 'Returned',
-        compromised: 'Compromised'
-      }
-      return texts[status] || 'Unknown'
     }
   }
-}
 </script>
 
 <style scoped>
-/* Glass morphism effects */
-.booking-glass-card {
-  background: rgba(59, 130, 246, 0.15);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
-  border: 2px solid rgba(96, 165, 250, 0.3);
-  box-shadow: 0 8px 32px rgba(29, 78, 216, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-
-.booking-card {
-  position: relative;
-  overflow: hidden;
-  background: rgba(59, 130, 246, 0.1);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-}
-
-.booking-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(96, 165, 250, 0.2),
-    transparent
-  );
-  transition: left 0.5s;
-}
-
-.booking-card:hover::before {
-  left: 100%;
-}
-
-/* Animations */
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
+  /* Glass morphism effects */
+  .booking-glass-card {
+    background: rgba(59, 130, 246, 0.15);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 2px solid rgba(96, 165, 250, 0.3);
+    box-shadow:
+      0 8px 32px rgba(29, 78, 216, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
-  50% {
-    transform: translateY(-15px);
+
+  .booking-card {
+    position: relative;
+    overflow: hidden;
+    background: rgba(59, 130, 246, 0.1);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
   }
-}
 
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+  .booking-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.2), transparent);
+    transition: left 0.5s;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  .booking-card:hover::before {
+    left: 100%;
   }
-}
 
-@keyframes fade-in-delay {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+  /* Animations */
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-15px);
+    }
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
-}
 
-@keyframes slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
+  @keyframes fade-in-delay {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
-}
 
-@keyframes modal-in {
-  from {
-    opacity: 0;
-    transform: scale(0.9) translateY(-20px);
+  @keyframes modal-in {
+    from {
+      opacity: 0;
+      transform: scale(0.9) translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
   }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
   }
-}
 
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-.animate-fade-in {
-  animation: fade-in 1s ease-out;
-}
-
-.animate-fade-in-delay {
-  animation: fade-in-delay 1s ease-out 0.3s both;
-}
-
-.animate-slide-up {
-  animation: slide-up 0.6s ease-out;
-}
-
-.animate-modal-in {
-  animation: modal-in 0.3s ease-out;
-}
-
-/* Focus styles for accessibility */
-input:focus,
-select:focus,
-textarea:focus {
-  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.1);
-}
-
-button:focus {
-  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.3);
-}
-
-/* Loading spinner animation */
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
+  .animate-fade-in {
+    animation: fade-in 1s ease-out;
   }
-  to {
-    transform: rotate(360deg);
+
+  .animate-fade-in-delay {
+    animation: fade-in-delay 1s ease-out 0.3s both;
   }
-}
 
-.fa-spin {
-  animation: spin 1s linear infinite;
-}
+  .animate-slide-up {
+    animation: slide-up 0.6s ease-out;
+  }
 
-/* Smooth transitions */
-* {
-  transition-property: color, background-color, border-color,
-    text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter,
-    backdrop-filter;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 200ms;
-}
+  .animate-modal-in {
+    animation: modal-in 0.3s ease-out;
+  }
+
+  /* Focus styles for accessibility */
+  input:focus,
+  select:focus,
+  textarea:focus {
+    box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.1);
+  }
+
+  button:focus {
+    box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.3);
+  }
+
+  /* Loading spinner animation */
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .fa-spin {
+    animation: spin 1s linear infinite;
+  }
+
+  /* Smooth transitions */
+  * {
+    transition-property:
+      color, background-color, border-color, text-decoration-color, fill, stroke, opacity,
+      box-shadow, transform, filter, backdrop-filter;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 200ms;
+  }
 </style>

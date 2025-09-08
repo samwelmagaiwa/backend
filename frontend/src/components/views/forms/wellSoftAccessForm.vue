@@ -30,19 +30,15 @@
                 top: Math.random() * 100 + '%',
                 animationDelay: Math.random() * 3 + 's',
                 animationDuration: Math.random() * 3 + 2 + 's',
-                fontSize: Math.random() * 20 + 10 + 'px',
+                fontSize: Math.random() * 20 + 10 + 'px'
               }"
             >
               <i
                 :class="[
                   'fas',
-                  [
-                    'fa-heartbeat',
-                    'fa-user-md',
-                    'fa-hospital',
-                    'fa-stethoscope',
-                    'fa-plus',
-                  ][Math.floor(Math.random() * 5)],
+                  ['fa-heartbeat', 'fa-user-md', 'fa-hospital', 'fa-stethoscope', 'fa-plus'][
+                    Math.floor(Math.random() * 5)
+                  ]
                 ]"
               ></i>
             </div>
@@ -51,9 +47,7 @@
 
         <div class="max-w-12xl mx-auto relative z-10">
           <!-- Header Section -->
-          <div
-            class="medical-glass-card rounded-t-3xl p-6 mb-0 border-b border-blue-300/30"
-          >
+          <div class="medical-glass-card rounded-t-3xl p-6 mb-0 border-b border-blue-300/30">
             <div class="flex justify-between items-center">
               <!-- Left Logo -->
               <div
@@ -93,11 +87,7 @@
                 <h2
                   class="text-2xl font-bold text-blue-100 tracking-wide drop-shadow-md animate-fade-in-delay"
                 >
-                  {{
-                    isReviewMode
-                      ? "REQUEST REVIEW - " + requestId
-                      : "SYSTEM ACCESS FORM"
-                  }}
+                  {{ isReviewMode ? 'REQUEST REVIEW - ' + requestId : 'SYSTEM ACCESS FORM' }}
                 </h2>
               </div>
 
@@ -210,12 +200,8 @@
                       >
                         <div class="text-center">
                           <div class="mb-3">
-                            <i
-                              class="fas fa-signature text-teal-300 text-3xl mb-2"
-                            ></i>
-                            <p class="text-blue-100 text-sm">
-                              No signature uploaded
-                            </p>
+                            <i class="fas fa-signature text-teal-300 text-3xl mb-2"></i>
+                            <p class="text-blue-100 text-sm">No signature uploaded</p>
                           </div>
                           <button
                             type="button"
@@ -232,10 +218,7 @@
                         v-else
                         class="w-full px-4 py-4 border-2 border-teal-300/40 rounded-xl bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl min-h-[100px] flex items-center justify-center relative"
                       >
-                        <div
-                          v-if="isImage(signaturePreview)"
-                          class="text-center"
-                        >
+                        <div v-if="isImage(signaturePreview)" class="text-center">
                           <img
                             :src="signaturePreview"
                             alt="Digital Signature"
@@ -344,9 +327,7 @@
                   <div
                     class="bg-white/15 rounded-xl p-4 max-h-96 border-2 border-blue-300/30 backdrop-blur-sm overflow-y-auto"
                   >
-                    <div
-                      class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2"
-                    >
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                       <label
                         v-for="module in modules"
                         :key="module"
@@ -358,9 +339,7 @@
                           :value="module"
                           class="w-4 h-4 text-blue-600 border-blue-300 rounded focus:ring-blue-500 mr-2 module-request-editable"
                         />
-                        <span class="text-xs font-medium text-white">{{
-                          module
-                        }}</span>
+                        <span class="text-xs font-medium text-white">{{ module }}</span>
                       </label>
                     </div>
                   </div>
@@ -394,9 +373,7 @@
                       value="permanent"
                       class="w-4 h-4 text-cyan-600 border-blue-300 focus:ring-cyan-500 mr-3 access-rights-editable"
                     />
-                    <span class="font-medium text-white text-sm"
-                      >Permanent (until retirement)</span
-                    >
+                    <span class="font-medium text-white text-sm">Permanent (until retirement)</span>
                   </div>
 
                   <!-- Temporary Until Option -->
@@ -410,15 +387,10 @@
                         value="temporary"
                         class="w-4 h-4 text-cyan-600 border-blue-300 focus:ring-cyan-500 mr-3 access-rights-editable"
                       />
-                      <span class="font-medium text-white text-sm"
-                        >Temporary Until</span
-                      >
+                      <span class="font-medium text-white text-sm">Temporary Until</span>
                     </div>
 
-                    <div
-                      class="flex items-center gap-1"
-                      v-if="formData.accessType === 'temporary'"
-                    >
+                    <div class="flex items-center gap-1" v-if="formData.accessType === 'temporary'">
                       <input
                         v-model="formData.tempDate.day"
                         type="text"
@@ -468,9 +440,7 @@
                   <div
                     class="bg-white/15 rounded-xl p-4 border border-emerald-300/30 backdrop-blur-sm"
                   >
-                    <h5 class="font-bold text-white mb-3 text-center text-sm">
-                      HoD/BM
-                    </h5>
+                    <h5 class="font-bold text-white mb-3 text-center text-sm">HoD/BM</h5>
                     <div class="space-y-3">
                       <input
                         v-model="formData.approvals.hod.name"
@@ -485,9 +455,7 @@
                         >
                           <div class="text-center">
                             <div class="mb-1">
-                              <i
-                                class="fas fa-signature text-emerald-300 text-sm mb-1"
-                              ></i>
+                              <i class="fas fa-signature text-emerald-300 text-sm mb-1"></i>
                               <p class="text-blue-100 text-xs">No signature</p>
                             </div>
                             <button
@@ -505,10 +473,7 @@
                           v-else
                           class="w-full px-2 py-2 border border-emerald-300/30 rounded-lg bg-white/15 transition-all duration-300 shadow-sm hover:shadow-md min-h-[45px] flex items-center justify-center relative backdrop-blur-sm"
                         >
-                          <div
-                            v-if="isImage(hodSignaturePreview)"
-                            class="text-center"
-                          >
+                          <div v-if="isImage(hodSignaturePreview)" class="text-center">
                             <img
                               :src="hodSignaturePreview"
                               alt="HOD Signature"
@@ -522,9 +487,7 @@
                             <div
                               class="w-6 h-6 bg-red-500/20 rounded flex items-center justify-center mx-auto mb-1"
                             >
-                              <i
-                                class="fas fa-file-pdf text-red-400 text-xs"
-                              ></i>
+                              <i class="fas fa-file-pdf text-red-400 text-xs"></i>
                             </div>
                             <p class="text-xs text-blue-100">
                               {{ hodSignatureFileName }}
@@ -588,9 +551,7 @@
                         >
                           <div class="text-center">
                             <div class="mb-1">
-                              <i
-                                class="fas fa-signature text-emerald-300 text-sm mb-1"
-                              ></i>
+                              <i class="fas fa-signature text-emerald-300 text-sm mb-1"></i>
                               <p class="text-blue-100 text-xs">No signature</p>
                             </div>
                             <button
@@ -608,10 +569,7 @@
                           v-else
                           class="w-full px-2 py-2 border border-emerald-300/30 rounded-lg bg-white/15 transition-all duration-300 shadow-sm hover:shadow-md min-h-[45px] flex items-center justify-center relative backdrop-blur-sm"
                         >
-                          <div
-                            v-if="isImage(divDirectorSignaturePreview)"
-                            class="text-center"
-                          >
+                          <div v-if="isImage(divDirectorSignaturePreview)" class="text-center">
                             <img
                               :src="divDirectorSignaturePreview"
                               alt="Divisional Director Signature"
@@ -625,9 +583,7 @@
                             <div
                               class="w-6 h-6 bg-red-500/20 rounded flex items-center justify-center mx-auto mb-1"
                             >
-                              <i
-                                class="fas fa-file-pdf text-red-400 text-xs"
-                              ></i>
+                              <i class="fas fa-file-pdf text-red-400 text-xs"></i>
                             </div>
                             <p class="text-xs text-blue-100">
                               {{ divDirectorSignatureFileName }}
@@ -674,9 +630,7 @@
                   <div
                     class="bg-white/15 rounded-xl p-4 border border-emerald-300/30 backdrop-blur-sm"
                   >
-                    <h5 class="font-bold text-white mb-3 text-center text-sm">
-                      Director of ICT
-                    </h5>
+                    <h5 class="font-bold text-white mb-3 text-center text-sm">Director of ICT</h5>
                     <div class="space-y-3">
                       <input
                         v-model="formData.approvals.directorICT.name"
@@ -691,9 +645,7 @@
                         >
                           <div class="text-center">
                             <div class="mb-1">
-                              <i
-                                class="fas fa-signature text-emerald-300 text-sm mb-1"
-                              ></i>
+                              <i class="fas fa-signature text-emerald-300 text-sm mb-1"></i>
                               <p class="text-blue-100 text-xs">No signature</p>
                             </div>
                             <button
@@ -711,10 +663,7 @@
                           v-else
                           class="w-full px-2 py-2 border border-emerald-300/30 rounded-lg bg-white/15 transition-all duration-300 shadow-sm hover:shadow-md min-h-[45px] flex items-center justify-center relative backdrop-blur-sm"
                         >
-                          <div
-                            v-if="isImage(directorICTSignaturePreview)"
-                            class="text-center"
-                          >
+                          <div v-if="isImage(directorICTSignaturePreview)" class="text-center">
                             <img
                               :src="directorICTSignaturePreview"
                               alt="Director ICT Signature"
@@ -728,9 +677,7 @@
                             <div
                               class="w-6 h-6 bg-red-500/20 rounded flex items-center justify-center mx-auto mb-1"
                             >
-                              <i
-                                class="fas fa-file-pdf text-red-400 text-xs"
-                              ></i>
+                              <i class="fas fa-file-pdf text-red-400 text-xs"></i>
                             </div>
                             <p class="text-xs text-blue-100">
                               {{ directorICTSignatureFileName }}
@@ -824,9 +771,7 @@
                   <div
                     class="bg-white/15 rounded-xl p-4 border border-purple-300/30 backdrop-blur-sm"
                   >
-                    <h5 class="font-bold text-white mb-3 text-center text-sm">
-                      Head of IT
-                    </h5>
+                    <h5 class="font-bold text-white mb-3 text-center text-sm">Head of IT</h5>
                     <div class="space-y-3">
                       <input
                         v-model="formData.implementation.headIT.name"
@@ -841,9 +786,7 @@
                         >
                           <div class="text-center">
                             <div class="mb-1">
-                              <i
-                                class="fas fa-signature text-purple-300 text-sm mb-1"
-                              ></i>
+                              <i class="fas fa-signature text-purple-300 text-sm mb-1"></i>
                               <p class="text-blue-100 text-xs">No signature</p>
                             </div>
                             <button
@@ -861,10 +804,7 @@
                           v-else
                           class="w-full px-2 py-2 border border-purple-300/30 rounded-lg bg-white/15 transition-all duration-300 shadow-sm hover:shadow-md min-h-[45px] flex items-center justify-center relative backdrop-blur-sm"
                         >
-                          <div
-                            v-if="isImage(headITSignaturePreview)"
-                            class="text-center"
-                          >
+                          <div v-if="isImage(headITSignaturePreview)" class="text-center">
                             <img
                               :src="headITSignaturePreview"
                               alt="Head IT Signature"
@@ -878,9 +818,7 @@
                             <div
                               class="w-6 h-6 bg-red-500/20 rounded flex items-center justify-center mx-auto mb-1"
                             >
-                              <i
-                                class="fas fa-file-pdf text-red-400 text-xs"
-                              ></i>
+                              <i class="fas fa-file-pdf text-red-400 text-xs"></i>
                             </div>
                             <p class="text-xs text-blue-100">
                               {{ headITSignatureFileName }}
@@ -939,9 +877,7 @@
                         >
                           <div class="text-center">
                             <div class="mb-1">
-                              <i
-                                class="fas fa-signature text-purple-300 text-sm mb-1"
-                              ></i>
+                              <i class="fas fa-signature text-purple-300 text-sm mb-1"></i>
                               <p class="text-blue-100 text-xs">No signature</p>
                             </div>
                             <button
@@ -959,10 +895,7 @@
                           v-else
                           class="w-full px-2 py-2 border border-purple-300/30 rounded-lg bg-white/15 transition-all duration-300 shadow-sm hover:shadow-md min-h-[45px] flex items-center justify-center relative backdrop-blur-sm"
                         >
-                          <div
-                            v-if="isImage(ictOfficerSignaturePreview)"
-                            class="text-center"
-                          >
+                          <div v-if="isImage(ictOfficerSignaturePreview)" class="text-center">
                             <img
                               :src="ictOfficerSignaturePreview"
                               alt="ICT Officer Signature"
@@ -976,9 +909,7 @@
                             <div
                               class="w-6 h-6 bg-red-500/20 rounded flex items-center justify-center mx-auto mb-1"
                             >
-                              <i
-                                class="fas fa-file-pdf text-red-400 text-xs"
-                              ></i>
+                              <i class="fas fa-file-pdf text-red-400 text-xs"></i>
                             </div>
                             <p class="text-xs text-blue-100">
                               {{ ictOfficerSignatureFileName }}
@@ -1036,12 +967,8 @@
                 </div>
 
                 <!-- Request Status -->
-                <div
-                  class="mb-6 p-4 bg-white/10 rounded-xl border border-emerald-300/30"
-                >
-                  <h4 class="text-sm font-bold text-blue-100 mb-3">
-                    Request Status
-                  </h4>
+                <div class="mb-6 p-4 bg-white/10 rounded-xl border border-emerald-300/30">
+                  <h4 class="text-sm font-bold text-blue-100 mb-3">Request Status</h4>
                   <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
                     <div class="text-center">
                       <div
@@ -1049,8 +976,8 @@
                           getApprovalStatus('hod') === 'approved'
                             ? 'bg-green-500'
                             : getApprovalStatus('hod') === 'rejected'
-                            ? 'bg-red-500'
-                            : 'bg-yellow-500'
+                              ? 'bg-red-500'
+                              : 'bg-yellow-500'
                         "
                         class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1"
                       >
@@ -1059,8 +986,8 @@
                             getApprovalStatus('hod') === 'approved'
                               ? 'fas fa-check'
                               : getApprovalStatus('hod') === 'rejected'
-                              ? 'fas fa-times'
-                              : 'fas fa-clock'
+                                ? 'fas fa-times'
+                                : 'fas fa-clock'
                           "
                           class="text-white text-sm"
                         ></i>
@@ -1073,8 +1000,8 @@
                           getApprovalStatus('divisional') === 'approved'
                             ? 'bg-green-500'
                             : getApprovalStatus('divisional') === 'rejected'
-                            ? 'bg-red-500'
-                            : 'bg-yellow-500'
+                              ? 'bg-red-500'
+                              : 'bg-yellow-500'
                         "
                         class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1"
                       >
@@ -1083,8 +1010,8 @@
                             getApprovalStatus('divisional') === 'approved'
                               ? 'fas fa-check'
                               : getApprovalStatus('divisional') === 'rejected'
-                              ? 'fas fa-times'
-                              : 'fas fa-clock'
+                                ? 'fas fa-times'
+                                : 'fas fa-clock'
                           "
                           class="text-white text-sm"
                         ></i>
@@ -1097,8 +1024,8 @@
                           getApprovalStatus('dict') === 'approved'
                             ? 'bg-green-500'
                             : getApprovalStatus('dict') === 'rejected'
-                            ? 'bg-red-500'
-                            : 'bg-yellow-500'
+                              ? 'bg-red-500'
+                              : 'bg-yellow-500'
                         "
                         class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1"
                       >
@@ -1107,8 +1034,8 @@
                             getApprovalStatus('dict') === 'approved'
                               ? 'fas fa-check'
                               : getApprovalStatus('dict') === 'rejected'
-                              ? 'fas fa-times'
-                              : 'fas fa-clock'
+                                ? 'fas fa-times'
+                                : 'fas fa-clock'
                           "
                           class="text-white text-sm"
                         ></i>
@@ -1121,8 +1048,8 @@
                           getApprovalStatus('headOfIt') === 'approved'
                             ? 'bg-green-500'
                             : getApprovalStatus('headOfIt') === 'rejected'
-                            ? 'bg-red-500'
-                            : 'bg-yellow-500'
+                              ? 'bg-red-500'
+                              : 'bg-yellow-500'
                         "
                         class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1"
                       >
@@ -1131,8 +1058,8 @@
                             getApprovalStatus('headOfIt') === 'approved'
                               ? 'fas fa-check'
                               : getApprovalStatus('headOfIt') === 'rejected'
-                              ? 'fas fa-times'
-                              : 'fas fa-clock'
+                                ? 'fas fa-times'
+                                : 'fas fa-clock'
                           "
                           class="text-white text-sm"
                         ></i>
@@ -1145,8 +1072,8 @@
                           getApprovalStatus('ict') === 'approved'
                             ? 'bg-green-500'
                             : getApprovalStatus('ict') === 'rejected'
-                            ? 'bg-red-500'
-                            : 'bg-yellow-500'
+                              ? 'bg-red-500'
+                              : 'bg-yellow-500'
                         "
                         class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1"
                       >
@@ -1155,8 +1082,8 @@
                             getApprovalStatus('ict') === 'approved'
                               ? 'fas fa-check'
                               : getApprovalStatus('ict') === 'rejected'
-                              ? 'fas fa-times'
-                              : 'fas fa-clock'
+                                ? 'fas fa-times'
+                                : 'fas fa-clock'
                           "
                           class="text-white text-sm"
                         ></i>
@@ -1204,9 +1131,7 @@
                 <div class="text-center mb-4">
                   <div class="inline-block text-black px-3 py-1 rounded-lg">
                     <p class="font-bold text-sm">Directorate of ICT</p>
-                    <p class="text-xs opacity-90">
-                      IT and Telephone Department
-                    </p>
+                    <p class="text-xs opacity-90">IT and Telephone Department</p>
                   </div>
                 </div>
 
@@ -1239,933 +1164,889 @@
 </template>
 
 <script>
-import { ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import Header from '@/components/header.vue'
-import ModernSidebar from '@/components/ModernSidebar.vue'
-import AppFooter from '@/components/footer.vue'
-import { useAuth } from '@/composables/useAuth'
+  import { ref } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
+  import Header from '@/components/header.vue'
+  import ModernSidebar from '@/components/ModernSidebar.vue'
+  import AppFooter from '@/components/footer.vue'
+  import { useAuth } from '@/composables/useAuth'
 
-export default {
-  name: 'WellSoftAccessForm',
-  components: {
-    Header,
-    ModernSidebar,
-    AppFooter
-  },
-  setup() {
-    const route = useRoute()
-    const router = useRouter()
-    const { userRole, ROLES } = useAuth()
-    // Sidebar state now managed by Pinia - no local state needed
-    const isReviewMode = ref(false)
-    const requestId = ref('')
+  export default {
+    name: 'WellSoftAccessForm',
+    components: {
+      Header,
+      ModernSidebar,
+      AppFooter
+    },
+    setup() {
+      const route = useRoute()
+      const router = useRouter()
+      const { userRole, ROLES } = useAuth()
+      // Sidebar state now managed by Pinia - no local state needed
+      const isReviewMode = ref(false)
+      const requestId = ref('')
 
-    return {
-      isReviewMode,
-      requestId,
-      route,
-      router,
-      userRole,
-      ROLES
-    }
-  },
-  mounted() {
-    this.checkReviewMode()
-  },
-  data() {
-    return {
-      signaturePreview: '',
-      signatureFileName: '',
-      // Approval signatures
-      hodSignaturePreview: '',
-      hodSignatureFileName: '',
-      divDirectorSignaturePreview: '',
-      divDirectorSignatureFileName: '',
-      directorICTSignaturePreview: '',
-      directorICTSignatureFileName: '',
-      // Implementation signatures
-      headITSignaturePreview: '',
-      headITSignatureFileName: '',
-      ictOfficerSignaturePreview: '',
-      ictOfficerSignatureFileName: '',
-      formData: {
-        pfNumber: '',
-        staffName: '',
-        department: '',
-        signature: null,
-        requestType: '',
-        selectedModules: [],
-        accessType: '',
-        tempDate: {
-          day: '',
-          month: '',
-          year: ''
-        },
-        approvals: {
-          hod: {
-            name: '',
-            signature: '',
-            date: ''
+      return {
+        isReviewMode,
+        requestId,
+        route,
+        router,
+        userRole,
+        ROLES
+      }
+    },
+    mounted() {
+      this.checkReviewMode()
+    },
+    data() {
+      return {
+        signaturePreview: '',
+        signatureFileName: '',
+        // Approval signatures
+        hodSignaturePreview: '',
+        hodSignatureFileName: '',
+        divDirectorSignaturePreview: '',
+        divDirectorSignatureFileName: '',
+        directorICTSignaturePreview: '',
+        directorICTSignatureFileName: '',
+        // Implementation signatures
+        headITSignaturePreview: '',
+        headITSignatureFileName: '',
+        ictOfficerSignaturePreview: '',
+        ictOfficerSignatureFileName: '',
+        formData: {
+          pfNumber: '',
+          staffName: '',
+          department: '',
+          signature: null,
+          requestType: '',
+          selectedModules: [],
+          accessType: '',
+          tempDate: {
+            day: '',
+            month: '',
+            year: ''
           },
-          divisionalDirector: {
-            name: '',
-            signature: '',
-            date: ''
+          approvals: {
+            hod: {
+              name: '',
+              signature: '',
+              date: ''
+            },
+            divisionalDirector: {
+              name: '',
+              signature: '',
+              date: ''
+            },
+            directorICT: {
+              name: '',
+              signatureDate: '',
+              date: ''
+            }
           },
-          directorICT: {
-            name: '',
-            signatureDate: '',
-            date: ''
+          comments: '',
+          implementation: {
+            headIT: {
+              name: '',
+              signatureDate: ''
+            },
+            ictOfficer: {
+              name: '',
+              signatureDate: ''
+            }
           }
         },
-        comments: '',
-        implementation: {
-          headIT: {
-            name: '',
-            signatureDate: ''
-          },
-          ictOfficer: {
-            name: '',
-            signatureDate: ''
-          }
-        }
-      },
-      modules: [
-        'Registrar',
-        'Specialist',
-        'Cashier',
-        'Resident Nurse',
-        'Intern Doctor',
-        'Intern Nurse',
-        'Medical Recorder',
-        'Social Worker',
-        'Quality Officer',
-        'Administrator',
-        'Health Attendant'
-      ]
-    }
-  },
-  methods: {
-    submitForm() {
-      // Validate required fields
-      if (!this.formData.pfNumber || !this.formData.staffName) {
-        this.showNotification(
-          'Please fill in all required fields (PF Number and Staff Name)'
-        )
-        return
+        modules: [
+          'Registrar',
+          'Specialist',
+          'Cashier',
+          'Resident Nurse',
+          'Intern Doctor',
+          'Intern Nurse',
+          'Medical Recorder',
+          'Social Worker',
+          'Quality Officer',
+          'Administrator',
+          'Health Attendant'
+        ]
       }
-
-      if (!this.formData.requestType) {
-        this.showNotification(
-          'Please select whether this is for Use or Revoke'
-        )
-        return
-      }
-
-      if (this.formData.selectedModules.length === 0) {
-        this.showNotification('Please select at least one module')
-        return
-      }
-
-      if (!this.formData.accessType) {
-        this.showNotification('Please specify the access rights type')
-        return
-      }
-
-      // If temporary access, validate date
-      if (this.formData.accessType === 'temporary') {
-        if (
-          !this.formData.tempDate.day ||
-          !this.formData.tempDate.month ||
-          !this.formData.tempDate.year
-        ) {
-          this.showNotification(
-            'Please provide a complete date for temporary access'
-          )
+    },
+    methods: {
+      submitForm() {
+        // Validate required fields
+        if (!this.formData.pfNumber || !this.formData.staffName) {
+          this.showNotification('Please fill in all required fields (PF Number and Staff Name)')
           return
         }
-      }
 
-      // Here you would typically send the data to your backend
-      console.log('Form submitted:', this.formData)
-      this.showNotification('Wellsoft Access Request submitted successfully!')
+        if (!this.formData.requestType) {
+          this.showNotification('Please select whether this is for Use or Revoke')
+          return
+        }
 
-      // Optionally reset form after submission
-      // this.resetForm()
-    },
+        if (this.formData.selectedModules.length === 0) {
+          this.showNotification('Please select at least one module')
+          return
+        }
 
-    triggerFileUpload() {
-      this.$refs.signatureInput.click()
-    },
+        if (!this.formData.accessType) {
+          this.showNotification('Please specify the access rights type')
+          return
+        }
 
-    onSignatureChange(e) {
-      const file = e.target.files[0]
-      this.formData.signature = file || null
+        // If temporary access, validate date
+        if (this.formData.accessType === 'temporary') {
+          if (
+            !this.formData.tempDate.day ||
+            !this.formData.tempDate.month ||
+            !this.formData.tempDate.year
+          ) {
+            this.showNotification('Please provide a complete date for temporary access')
+            return
+          }
+        }
 
-      if (!file) {
+        // Here you would typically send the data to your backend
+        console.log('Form submitted:', this.formData)
+        this.showNotification('Wellsoft Access Request submitted successfully!')
+
+        // Optionally reset form after submission
+        // this.resetForm()
+      },
+
+      triggerFileUpload() {
+        this.$refs.signatureInput.click()
+      },
+
+      onSignatureChange(e) {
+        const file = e.target.files[0]
+        this.formData.signature = file || null
+
+        if (!file) {
+          this.signaturePreview = ''
+          this.signatureFileName = ''
+          return
+        }
+
+        // Validate file type
+        const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf']
+        if (!allowedTypes.includes(file.type)) {
+          this.showNotification('Please select a valid file (PNG, JPG, or PDF)')
+          this.clearSignature()
+          return
+        }
+
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          this.showNotification('File size must be less than 5MB')
+          this.clearSignature()
+          return
+        }
+
+        this.signatureFileName = file.name
+
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader()
+          reader.onload = () => {
+            this.signaturePreview = reader.result
+          }
+          reader.readAsDataURL(file)
+        } else {
+          this.signaturePreview = 'pdf'
+        }
+      },
+
+      isImage(preview) {
+        return typeof preview === 'string' && preview !== 'pdf'
+      },
+
+      clearSignature() {
+        this.formData.signature = null
         this.signaturePreview = ''
         this.signatureFileName = ''
-        return
-      }
-
-      // Validate file type
-      const allowedTypes = [
-        'image/png',
-        'image/jpeg',
-        'image/jpg',
-        'application/pdf'
-      ]
-      if (!allowedTypes.includes(file.type)) {
-        this.showNotification('Please select a valid file (PNG, JPG, or PDF)')
-        this.clearSignature()
-        return
-      }
-
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        this.showNotification('File size must be less than 5MB')
-        this.clearSignature()
-        return
-      }
-
-      this.signatureFileName = file.name
-
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader()
-        reader.onload = () => {
-          this.signaturePreview = reader.result
+        if (this.$refs.signatureInput) {
+          this.$refs.signatureInput.value = ''
         }
-        reader.readAsDataURL(file)
-      } else {
-        this.signaturePreview = 'pdf'
-      }
-    },
+      },
 
-    isImage(preview) {
-      return typeof preview === 'string' && preview !== 'pdf'
-    },
+      // Generic signature upload handler
+      handleSignatureUpload(type, file) {
+        if (!file) {
+          this[`${type}SignaturePreview`] = ''
+          this[`${type}SignatureFileName`] = ''
+          return
+        }
 
-    clearSignature() {
-      this.formData.signature = null
-      this.signaturePreview = ''
-      this.signatureFileName = ''
-      if (this.$refs.signatureInput) {
-        this.$refs.signatureInput.value = ''
-      }
-    },
+        const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf']
+        if (!allowedTypes.includes(file.type)) {
+          this.showNotification('Please select a valid file (PNG, JPG, or PDF)')
+          this.clearSpecificSignature(type)
+          return
+        }
 
-    // Generic signature upload handler
-    handleSignatureUpload(type, file) {
-      if (!file) {
+        if (file.size > 5 * 1024 * 1024) {
+          this.showNotification('File size must be less than 5MB')
+          this.clearSpecificSignature(type)
+          return
+        }
+
+        this[`${type}SignatureFileName`] = file.name
+
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader()
+          reader.onload = () => {
+            this[`${type}SignaturePreview`] = reader.result
+          }
+          reader.readAsDataURL(file)
+        } else {
+          this[`${type}SignaturePreview`] = 'pdf'
+        }
+      },
+
+      clearSpecificSignature(type) {
         this[`${type}SignaturePreview`] = ''
         this[`${type}SignatureFileName`] = ''
-        return
-      }
-
-      const allowedTypes = [
-        'image/png',
-        'image/jpeg',
-        'image/jpg',
-        'application/pdf'
-      ]
-      if (!allowedTypes.includes(file.type)) {
-        this.showNotification('Please select a valid file (PNG, JPG, or PDF)')
-        this.clearSpecificSignature(type)
-        return
-      }
-
-      if (file.size > 5 * 1024 * 1024) {
-        this.showNotification('File size must be less than 5MB')
-        this.clearSpecificSignature(type)
-        return
-      }
-
-      this[`${type}SignatureFileName`] = file.name
-
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader()
-        reader.onload = () => {
-          this[`${type}SignaturePreview`] = reader.result
+        const refName = `${type}SignatureInput`
+        if (this.$refs[refName]) {
+          this.$refs[refName].value = ''
         }
-        reader.readAsDataURL(file)
-      } else {
-        this[`${type}SignaturePreview`] = 'pdf'
-      }
-    },
+      },
 
-    clearSpecificSignature(type) {
-      this[`${type}SignaturePreview`] = ''
-      this[`${type}SignatureFileName`] = ''
-      const refName = `${type}SignatureInput`
-      if (this.$refs[refName]) {
-        this.$refs[refName].value = ''
-      }
-    },
+      // Specific signature methods
+      triggerHodSignatureUpload() {
+        this.$refs.hodSignatureInput.click()
+      },
+      onHodSignatureChange(e) {
+        this.handleSignatureUpload('hod', e.target.files[0])
+      },
+      clearHodSignature() {
+        this.clearSpecificSignature('hod')
+      },
 
-    // Specific signature methods
-    triggerHodSignatureUpload() {
-      this.$refs.hodSignatureInput.click()
-    },
-    onHodSignatureChange(e) {
-      this.handleSignatureUpload('hod', e.target.files[0])
-    },
-    clearHodSignature() {
-      this.clearSpecificSignature('hod')
-    },
+      triggerDivDirectorSignatureUpload() {
+        this.$refs.divDirectorSignatureInput.click()
+      },
+      onDivDirectorSignatureChange(e) {
+        this.handleSignatureUpload('divDirector', e.target.files[0])
+      },
+      clearDivDirectorSignature() {
+        this.clearSpecificSignature('divDirector')
+      },
 
-    triggerDivDirectorSignatureUpload() {
-      this.$refs.divDirectorSignatureInput.click()
-    },
-    onDivDirectorSignatureChange(e) {
-      this.handleSignatureUpload('divDirector', e.target.files[0])
-    },
-    clearDivDirectorSignature() {
-      this.clearSpecificSignature('divDirector')
-    },
+      triggerDirectorICTSignatureUpload() {
+        this.$refs.directorICTSignatureInput.click()
+      },
+      onDirectorICTSignatureChange(e) {
+        this.handleSignatureUpload('directorICT', e.target.files[0])
+      },
+      clearDirectorICTSignature() {
+        this.clearSpecificSignature('directorICT')
+      },
 
-    triggerDirectorICTSignatureUpload() {
-      this.$refs.directorICTSignatureInput.click()
-    },
-    onDirectorICTSignatureChange(e) {
-      this.handleSignatureUpload('directorICT', e.target.files[0])
-    },
-    clearDirectorICTSignature() {
-      this.clearSpecificSignature('directorICT')
-    },
+      triggerHeadITSignatureUpload() {
+        this.$refs.headITSignatureInput.click()
+      },
+      onHeadITSignatureChange(e) {
+        this.handleSignatureUpload('headIT', e.target.files[0])
+      },
+      clearHeadITSignature() {
+        this.clearSpecificSignature('headIT')
+      },
 
-    triggerHeadITSignatureUpload() {
-      this.$refs.headITSignatureInput.click()
-    },
-    onHeadITSignatureChange(e) {
-      this.handleSignatureUpload('headIT', e.target.files[0])
-    },
-    clearHeadITSignature() {
-      this.clearSpecificSignature('headIT')
-    },
+      triggerIctOfficerSignatureUpload() {
+        this.$refs.ictOfficerSignatureInput.click()
+      },
+      onIctOfficerSignatureChange(e) {
+        this.handleSignatureUpload('ictOfficer', e.target.files[0])
+      },
+      clearIctOfficerSignature() {
+        this.clearSpecificSignature('ictOfficer')
+      },
 
-    triggerIctOfficerSignatureUpload() {
-      this.$refs.ictOfficerSignatureInput.click()
-    },
-    onIctOfficerSignatureChange(e) {
-      this.handleSignatureUpload('ictOfficer', e.target.files[0])
-    },
-    clearIctOfficerSignature() {
-      this.clearSpecificSignature('ictOfficer')
-    },
-
-    resetForm() {
-      this.formData = {
-        pfNumber: '',
-        staffName: '',
-        department: '',
-        signature: null,
-        requestType: '',
-        selectedModules: [],
-        accessType: '',
-        tempDate: {
-          day: '',
-          month: '',
-          year: ''
-        },
-        approvals: {
-          hod: {
-            name: '',
-            signature: '',
-            date: ''
+      resetForm() {
+        this.formData = {
+          pfNumber: '',
+          staffName: '',
+          department: '',
+          signature: null,
+          requestType: '',
+          selectedModules: [],
+          accessType: '',
+          tempDate: {
+            day: '',
+            month: '',
+            year: ''
           },
-          divisionalDirector: {
-            name: '',
-            signature: '',
-            date: ''
+          approvals: {
+            hod: {
+              name: '',
+              signature: '',
+              date: ''
+            },
+            divisionalDirector: {
+              name: '',
+              signature: '',
+              date: ''
+            },
+            directorICT: {
+              name: '',
+              signatureDate: '',
+              date: ''
+            }
           },
-          directorICT: {
-            name: '',
-            signatureDate: '',
-            date: ''
-          }
-        },
-        comments: '',
-        implementation: {
-          headIT: {
-            name: '',
-            signatureDate: ''
-          },
-          ictOfficer: {
-            name: '',
-            signatureDate: ''
+          comments: '',
+          implementation: {
+            headIT: {
+              name: '',
+              signatureDate: ''
+            },
+            ictOfficer: {
+              name: '',
+              signatureDate: ''
+            }
           }
         }
-      }
-      this.signaturePreview = ''
-      this.signatureFileName = ''
-      this.hodSignaturePreview = ''
-      this.hodSignatureFileName = ''
-      this.divDirectorSignaturePreview = ''
-      this.divDirectorSignatureFileName = ''
-      this.directorICTSignaturePreview = ''
-      this.directorICTSignatureFileName = ''
-      this.headITSignaturePreview = ''
-      this.headITSignatureFileName = ''
-      this.ictOfficerSignaturePreview = ''
-      this.ictOfficerSignatureFileName = ''
-      this.showNotification('Form has been reset')
-    },
+        this.signaturePreview = ''
+        this.signatureFileName = ''
+        this.hodSignaturePreview = ''
+        this.hodSignatureFileName = ''
+        this.divDirectorSignaturePreview = ''
+        this.divDirectorSignatureFileName = ''
+        this.directorICTSignaturePreview = ''
+        this.directorICTSignatureFileName = ''
+        this.headITSignaturePreview = ''
+        this.headITSignatureFileName = ''
+        this.ictOfficerSignaturePreview = ''
+        this.ictOfficerSignatureFileName = ''
+        this.showNotification('Form has been reset')
+      },
 
-    showNotification(message) {
-      // Simple notification - you can replace with a proper notification system
-      alert(message)
-    },
+      showNotification(message) {
+        // Simple notification - you can replace with a proper notification system
+        alert(message)
+      },
 
-    checkReviewMode() {
-      // Check if we're in review mode (coming from requests dashboard)
-      if (this.route.query.mode === 'review' && this.route.query.requestId) {
-        this.isReviewMode = true
-        this.requestId = this.route.query.requestId
-        this.populateFormFromQuery()
-        this.makeFormReadOnlyForReview()
-      }
-    },
-
-    populateFormFromQuery() {
-      const query = this.route.query
-
-      // Populate basic information
-      this.formData.pfNumber = query.pfNumber || ''
-      this.formData.staffName = query.staffName || ''
-      this.formData.department = query.department || ''
-      this.formData.requestType = query.moduleRequestedFor?.toLowerCase() || ''
-      this.formData.accessType =
-        query.accessType === 'Permanent (until retirement)'
-          ? 'permanent'
-          : 'temporary'
-
-      // Handle temporary date
-      if (query.temporaryUntil) {
-        const date = new Date(query.temporaryUntil)
-        this.formData.tempDate = {
-          day: date.getDate().toString().padStart(2, '0'),
-          month: (date.getMonth() + 1).toString().padStart(2, '0'),
-          year: date.getFullYear().toString()
+      checkReviewMode() {
+        // Check if we're in review mode (coming from requests dashboard)
+        if (this.route.query.mode === 'review' && this.route.query.requestId) {
+          this.isReviewMode = true
+          this.requestId = this.route.query.requestId
+          this.populateFormFromQuery()
+          this.makeFormReadOnlyForReview()
         }
-      }
+      },
 
-      // Populate selected modules
-      if (query.selectedModules) {
-        try {
-          const modules = JSON.parse(query.selectedModules)
-          this.formData.selectedModules = modules
-        } catch (e) {
-          console.error('Error parsing selected modules:', e)
+      populateFormFromQuery() {
+        const query = this.route.query
+
+        // Populate basic information
+        this.formData.pfNumber = query.pfNumber || ''
+        this.formData.staffName = query.staffName || ''
+        this.formData.department = query.department || ''
+        this.formData.requestType = query.moduleRequestedFor?.toLowerCase() || ''
+        this.formData.accessType =
+          query.accessType === 'Permanent (until retirement)' ? 'permanent' : 'temporary'
+
+        // Handle temporary date
+        if (query.temporaryUntil) {
+          const date = new Date(query.temporaryUntil)
+          this.formData.tempDate = {
+            day: date.getDate().toString().padStart(2, '0'),
+            month: (date.getMonth() + 1).toString().padStart(2, '0'),
+            year: date.getFullYear().toString()
+          }
         }
-      }
 
-      // Populate comments
-      this.formData.comments = query.comments || ''
-
-      // Set digital signature status
-      if (query.digitalSignature === 'true') {
-        this.signaturePreview = 'review-mode-signature'
-        this.signatureFileName = 'Digital Signature (Submitted)'
-      }
-    },
-
-    makeFormReadOnlyForReview() {
-      // Add readonly attributes to form elements
-      this.$nextTick(() => {
-        const inputs = this.$el.querySelectorAll('input, select, textarea')
-        inputs.forEach((input) => {
-          // Allow HOD to edit specific sections
-          if (this.canHodEdit(input)) {
-            return // Skip making this input readonly
+        // Populate selected modules
+        if (query.selectedModules) {
+          try {
+            const modules = JSON.parse(query.selectedModules)
+            this.formData.selectedModules = modules
+          } catch (e) {
+            console.error('Error parsing selected modules:', e)
           }
+        }
 
-          if (!input.classList.contains('approval-input')) {
-            input.setAttribute('readonly', true)
-            input.setAttribute('disabled', true)
-          }
+        // Populate comments
+        this.formData.comments = query.comments || ''
+
+        // Set digital signature status
+        if (query.digitalSignature === 'true') {
+          this.signaturePreview = 'review-mode-signature'
+          this.signatureFileName = 'Digital Signature (Submitted)'
+        }
+      },
+
+      makeFormReadOnlyForReview() {
+        // Add readonly attributes to form elements
+        this.$nextTick(() => {
+          const inputs = this.$el.querySelectorAll('input, select, textarea')
+          inputs.forEach((input) => {
+            // Allow HOD to edit specific sections
+            if (this.canHodEdit(input)) {
+              return // Skip making this input readonly
+            }
+
+            if (!input.classList.contains('approval-input')) {
+              input.setAttribute('readonly', true)
+              input.setAttribute('disabled', true)
+            }
+          })
+
+          // Disable checkboxes and radio buttons
+          const checkboxes = this.$el.querySelectorAll(
+            'input[type="checkbox"], input[type="radio"]'
+          )
+          checkboxes.forEach((checkbox) => {
+            // Allow HOD to edit specific checkboxes/radios
+            if (this.canHodEdit(checkbox)) {
+              return // Skip disabling this checkbox
+            }
+
+            if (!checkbox.classList.contains('approval-input')) {
+              checkbox.setAttribute('disabled', true)
+            }
+          })
         })
+      },
 
-        // Disable checkboxes and radio buttons
-        const checkboxes = this.$el.querySelectorAll(
-          'input[type="checkbox"], input[type="radio"]'
-        )
-        checkboxes.forEach((checkbox) => {
-          // Allow HOD to edit specific checkboxes/radios
-          if (this.canHodEdit(checkbox)) {
-            return // Skip disabling this checkbox
-          }
-
-          if (!checkbox.classList.contains('approval-input')) {
-            checkbox.setAttribute('disabled', true)
-          }
-        })
-      })
-    },
-
-    canHodEdit(element) {
-      // Only allow HOD to edit when they are the current approver
-      if (this.userRole !== this.ROLES.HEAD_OF_DEPARTMENT) {
-        return false
-      }
-
-      // Check if HOD can approve at this stage
-      if (!this.canApproveAtStage()) {
-        return false
-      }
-
-      // Allow editing of specific sections for HOD
-      const editableClasses = [
-        'hod-editable',
-        'module-request-editable',
-        'access-rights-editable',
-        'comments-editable',
-        'hod-approval-editable'
-      ]
-
-      return editableClasses.some((className) =>
-        element.classList.contains(className)
-      )
-    },
-
-    getApprovalStatus(stage) {
-      const query = this.route.query
-      const statusMap = {
-        hod: query.hodApprovalStatus,
-        divisional: query.divisionalStatus,
-        dict: query.dictStatus,
-        headOfIt: query.headOfItStatus,
-        ict: query.ictStatus
-      }
-      return statusMap[stage] || 'pending'
-    },
-
-    canApproveAtStage() {
-      if (!this.isReviewMode) return false
-
-      const query = this.route.query
-      switch (this.userRole) {
-        case this.ROLES.HEAD_OF_DEPARTMENT:
-          return query.hodApprovalStatus === 'pending'
-        case this.ROLES.DIVISIONAL_DIRECTOR:
-          return (
-            query.hodApprovalStatus === 'approved' &&
-            query.divisionalStatus === 'pending'
-          )
-        case this.ROLES.ICT_DIRECTOR:
-          return (
-            query.divisionalStatus === 'approved' &&
-            query.dictStatus === 'pending'
-          )
-        case this.ROLES.HOD_IT:
-          return (
-            query.dictStatus === 'approved' &&
-            query.headOfItStatus === 'pending'
-          )
-        case this.ROLES.ICT_OFFICER:
-          return (
-            query.headOfItStatus === 'approved' && query.ictStatus === 'pending'
-          )
-        default:
+      canHodEdit(element) {
+        // Only allow HOD to edit when they are the current approver
+        if (this.userRole !== this.ROLES.HEAD_OF_DEPARTMENT) {
           return false
-      }
-    },
+        }
 
-    approveRequest() {
-      if (!this.canApproveAtStage()) {
-        this.showNotification('You cannot approve this request at this stage.')
-        return
-      }
+        // Check if HOD can approve at this stage
+        if (!this.canApproveAtStage()) {
+          return false
+        }
 
-      if (
-        confirm(`Are you sure you want to approve request ${this.requestId}?`)
-      ) {
-        // Here you would make an API call to approve the request
-        console.log('Approving request:', this.requestId)
-        this.showNotification('Request approved successfully!')
+        // Allow editing of specific sections for HOD
+        const editableClasses = [
+          'hod-editable',
+          'module-request-editable',
+          'access-rights-editable',
+          'comments-editable',
+          'hod-approval-editable'
+        ]
 
-        // Redirect back to requests list
-        setTimeout(() => {
-          this.router.push('/hod-dashboard/request-list')
-        }, 2000)
-      }
-    },
+        return editableClasses.some((className) => element.classList.contains(className))
+      },
 
-    rejectRequest() {
-      if (!this.canApproveAtStage()) {
-        this.showNotification('You cannot reject this request at this stage.')
-        return
-      }
+      getApprovalStatus(stage) {
+        const query = this.route.query
+        const statusMap = {
+          hod: query.hodApprovalStatus,
+          divisional: query.divisionalStatus,
+          dict: query.dictStatus,
+          headOfIt: query.headOfItStatus,
+          ict: query.ictStatus
+        }
+        return statusMap[stage] || 'pending'
+      },
 
-      const reason = prompt('Please provide a reason for rejection:')
-      if (
-        reason &&
-        confirm(`Are you sure you want to reject request ${this.requestId}?`)
-      ) {
-        // Here you would make an API call to reject the request
-        console.log('Rejecting request:', this.requestId, 'Reason:', reason)
-        this.showNotification('Request rejected successfully!')
+      canApproveAtStage() {
+        if (!this.isReviewMode) return false
 
-        // Redirect back to requests list
-        setTimeout(() => {
-          this.router.push('/hod-dashboard/request-list')
-        }, 2000)
-      }
-    },
+        const query = this.route.query
+        switch (this.userRole) {
+          case this.ROLES.HEAD_OF_DEPARTMENT:
+            return query.hodApprovalStatus === 'pending'
+          case this.ROLES.DIVISIONAL_DIRECTOR:
+            return query.hodApprovalStatus === 'approved' && query.divisionalStatus === 'pending'
+          case this.ROLES.ICT_DIRECTOR:
+            return query.divisionalStatus === 'approved' && query.dictStatus === 'pending'
+          case this.ROLES.HOD_IT:
+            return query.dictStatus === 'approved' && query.headOfItStatus === 'pending'
+          case this.ROLES.ICT_OFFICER:
+            return query.headOfItStatus === 'approved' && query.ictStatus === 'pending'
+          default:
+            return false
+        }
+      },
 
-    goBackToRequests() {
-      this.router.push('/hod-dashboard/request-list')
-    },
+      approveRequest() {
+        if (!this.canApproveAtStage()) {
+          this.showNotification('You cannot approve this request at this stage.')
+          return
+        }
 
-    goBack() {
-      if (this.isReviewMode) {
-        this.goBackToRequests()
-      } else {
-        this.$router.push('/user-dashboard')
+        if (confirm(`Are you sure you want to approve request ${this.requestId}?`)) {
+          // Here you would make an API call to approve the request
+          console.log('Approving request:', this.requestId)
+          this.showNotification('Request approved successfully!')
+
+          // Redirect back to requests list
+          setTimeout(() => {
+            this.router.push('/hod-dashboard/request-list')
+          }, 2000)
+        }
+      },
+
+      rejectRequest() {
+        if (!this.canApproveAtStage()) {
+          this.showNotification('You cannot reject this request at this stage.')
+          return
+        }
+
+        const reason = prompt('Please provide a reason for rejection:')
+        if (reason && confirm(`Are you sure you want to reject request ${this.requestId}?`)) {
+          // Here you would make an API call to reject the request
+          console.log('Rejecting request:', this.requestId, 'Reason:', reason)
+          this.showNotification('Request rejected successfully!')
+
+          // Redirect back to requests list
+          setTimeout(() => {
+            this.router.push('/hod-dashboard/request-list')
+          }, 2000)
+        }
+      },
+
+      goBackToRequests() {
+        this.router.push('/hod-dashboard/request-list')
+      },
+
+      goBack() {
+        if (this.isReviewMode) {
+          this.goBackToRequests()
+        } else {
+          this.$router.push('/user-dashboard')
+        }
       }
     }
   }
-}
 </script>
 
 <style scoped>
-/* Medical Glass morphism effects */
-.medical-glass-card {
-  background: rgba(59, 130, 246, 0.15);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
-  border: 2px solid rgba(96, 165, 250, 0.3);
-  box-shadow: 0 8px 32px rgba(29, 78, 216, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-
-.medical-card {
-  position: relative;
-  overflow: hidden;
-  background: rgba(59, 130, 246, 0.1);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-}
-
-.medical-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(96, 165, 250, 0.2),
-    transparent
-  );
-  transition: left 0.5s;
-}
-
-.medical-card:hover::before {
-  left: 100%;
-}
-
-.medical-input {
-  position: relative;
-  z-index: 1;
-  color: white;
-}
-
-.medical-input::placeholder {
-  color: rgba(191, 219, 254, 0.6);
-}
-
-.medical-input:focus {
-  border-color: rgba(45, 212, 191, 0.8);
-  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.2);
-}
-
-/* Define primary color */
-.bg-primary {
-  background-color: #1e40af; /* Blue-700 */
-}
-
-.text-primary {
-  color: #1e40af; /* Blue-700 */
-}
-
-.border-primary {
-  border-color: #1e40af; /* Blue-700 */
-}
-
-.focus\:border-primary:focus {
-  border-color: #1e40af;
-}
-
-/* Custom width classes */
-.w-30 {
-  width: 7.5rem;
-}
-
-.w-40 {
-  width: 10rem;
-}
-
-.w-65 {
-  width: 16.25rem;
-}
-
-.w-90 {
-  width: 22.5rem;
-}
-
-.w-200 {
-  width: 50rem;
-}
-
-.h-16 {
-  height: 4rem;
-}
-
-.h-20 {
-  height: 5rem;
-}
-
-.max-w-30 {
-  max-width: 7.5rem;
-}
-
-.max-h-30 {
-  max-height: 7.5rem;
-}
-
-.ml-90 {
-  margin-left: 22.5rem;
-}
-
-.pr-98 {
-  padding-right: 24.5rem;
-}
-
-.gap-100 {
-  gap: 25rem;
-}
-
-.max-h-500 {
-  max-height: 125rem;
-}
-
-.border-1 {
-  border-width: 1px;
-}
-
-.border-t-3 {
-  border-top-width: 3px;
-}
-
-/* Animations */
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-20px);
-  }
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fade-in-delay {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-.animate-fade-in {
-  animation: fade-in 1s ease-out;
-}
-
-.animate-fade-in-delay {
-  animation: fade-in-delay 1s ease-out 0.3s both;
-}
-
-/* Animation for logos */
-@keyframes flipX {
-  0% {
-    transform: rotateY(0);
-  }
-  50% {
-    transform: rotateY(180deg);
-  }
-  100% {
-    transform: rotateY(360deg);
-  }
-}
-
-.animate-flipX {
-  animation: flipX 3s ease-in-out infinite;
-}
-
-/* Custom checkbox and radio styling */
-input[type="checkbox"]:checked,
-input[type="radio"]:checked {
-  background-color: #1e40af;
-  border-color: #1e40af;
-}
-
-input[type="checkbox"]:focus,
-input[type="radio"]:focus {
-  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
-}
-
-/* Smooth transitions */
-.transition-all {
-  transition: all 0.3s ease;
-}
-
-/* Static Grid Background - No Animations */
-
-/* Glass morphism effect */
-.backdrop-blur-sm {
-  backdrop-filter: blur(8px);
-}
-
-/* Enhanced form sections */
-.border-l-2 {
-  position: relative;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.1),
-    rgba(255, 255, 255, 0.05)
-  );
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
-
-.border-l-2:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-}
-
-/* Print styles */
-@media print {
-  .min-h-screen {
-    min-height: auto;
+  /* Medical Glass morphism effects */
+  .medical-glass-card {
+    background: rgba(59, 130, 246, 0.15);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 2px solid rgba(96, 165, 250, 0.3);
+    box-shadow:
+      0 8px 32px rgba(29, 78, 216, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
 
-  button {
-    display: none;
+  .medical-card {
+    position: relative;
+    overflow: hidden;
+    background: rgba(59, 130, 246, 0.1);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
   }
 
-  .shadow-xl {
-    box-shadow: none;
+  .medical-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.2), transparent);
+    transition: left 0.5s;
   }
 
-  .bg-gradient-to-br {
-    background: white;
-  }
-}
-
-/* Review mode styles */
-.review-mode input[readonly],
-.review-mode select[disabled],
-.review-mode textarea[readonly] {
-  background-color: rgba(59, 130, 246, 0.1) !important;
-  border-color: rgba(96, 165, 250, 0.2) !important;
-  cursor: not-allowed;
-}
-
-.review-mode input[type="checkbox"][disabled],
-.review-mode input[type="radio"][disabled] {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .grid-cols-4 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .medical-card:hover::before {
+    left: 100%;
   }
 
-  .grid-cols-3 {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
+  .medical-input {
+    position: relative;
+    z-index: 1;
+    color: white;
   }
 
-  .grid-cols-2 {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
+  .medical-input::placeholder {
+    color: rgba(191, 219, 254, 0.6);
+  }
+
+  .medical-input:focus {
+    border-color: rgba(45, 212, 191, 0.8);
+    box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.2);
+  }
+
+  /* Define primary color */
+  .bg-primary {
+    background-color: #1e40af; /* Blue-700 */
+  }
+
+  .text-primary {
+    color: #1e40af; /* Blue-700 */
+  }
+
+  .border-primary {
+    border-color: #1e40af; /* Blue-700 */
+  }
+
+  .focus\:border-primary:focus {
+    border-color: #1e40af;
+  }
+
+  /* Custom width classes */
+  .w-30 {
+    width: 7.5rem;
   }
 
   .w-40 {
-    width: 100%;
+    width: 10rem;
   }
 
   .w-65 {
-    width: 100%;
+    width: 16.25rem;
   }
 
   .w-90 {
-    width: 100%;
+    width: 22.5rem;
   }
 
   .w-200 {
-    width: 100%;
+    width: 50rem;
   }
 
-  .ml-90 {
-    margin-left: 0;
-  }
-
-  .pr-98 {
-    padding-right: 0;
-  }
-
-  .gap-100 {
-    gap: 1rem;
-  }
-}
-
-@media (max-width: 640px) {
-  .lg\:grid-cols-4 {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
-  }
-
-  .md\:grid-cols-3 {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
-  }
-
-  .w-30 {
-    width: 5rem;
-  }
-
-  .h-20 {
+  .h-16 {
     height: 4rem;
   }
 
+  .h-20 {
+    height: 5rem;
+  }
+
   .max-w-30 {
-    max-width: 5rem;
+    max-width: 7.5rem;
   }
 
   .max-h-30 {
-    max-height: 4rem;
+    max-height: 7.5rem;
   }
-}
+
+  .ml-90 {
+    margin-left: 22.5rem;
+  }
+
+  .pr-98 {
+    padding-right: 24.5rem;
+  }
+
+  .gap-100 {
+    gap: 25rem;
+  }
+
+  .max-h-500 {
+    max-height: 125rem;
+  }
+
+  .border-1 {
+    border-width: 1px;
+  }
+
+  .border-t-3 {
+    border-top-width: 3px;
+  }
+
+  /* Animations */
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-in-delay {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-fade-in {
+    animation: fade-in 1s ease-out;
+  }
+
+  .animate-fade-in-delay {
+    animation: fade-in-delay 1s ease-out 0.3s both;
+  }
+
+  /* Animation for logos */
+  @keyframes flipX {
+    0% {
+      transform: rotateY(0);
+    }
+    50% {
+      transform: rotateY(180deg);
+    }
+    100% {
+      transform: rotateY(360deg);
+    }
+  }
+
+  .animate-flipX {
+    animation: flipX 3s ease-in-out infinite;
+  }
+
+  /* Custom checkbox and radio styling */
+  input[type='checkbox']:checked,
+  input[type='radio']:checked {
+    background-color: #1e40af;
+    border-color: #1e40af;
+  }
+
+  input[type='checkbox']:focus,
+  input[type='radio']:focus {
+    box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+  }
+
+  /* Smooth transitions */
+  .transition-all {
+    transition: all 0.3s ease;
+  }
+
+  /* Static Grid Background - No Animations */
+
+  /* Glass morphism effect */
+  .backdrop-blur-sm {
+    backdrop-filter: blur(8px);
+  }
+
+  /* Enhanced form sections */
+  .border-l-2 {
+    position: relative;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+
+  .border-l-2:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Print styles */
+  @media print {
+    .min-h-screen {
+      min-height: auto;
+    }
+
+    button {
+      display: none;
+    }
+
+    .shadow-xl {
+      box-shadow: none;
+    }
+
+    .bg-gradient-to-br {
+      background: white;
+    }
+  }
+
+  /* Review mode styles */
+  .review-mode input[readonly],
+  .review-mode select[disabled],
+  .review-mode textarea[readonly] {
+    background-color: rgba(59, 130, 246, 0.1) !important;
+    border-color: rgba(96, 165, 250, 0.2) !important;
+    cursor: not-allowed;
+  }
+
+  .review-mode input[type='checkbox'][disabled],
+  .review-mode input[type='radio'][disabled] {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .grid-cols-4 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-cols-3 {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+
+    .grid-cols-2 {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+
+    .w-40 {
+      width: 100%;
+    }
+
+    .w-65 {
+      width: 100%;
+    }
+
+    .w-90 {
+      width: 100%;
+    }
+
+    .w-200 {
+      width: 100%;
+    }
+
+    .ml-90 {
+      margin-left: 0;
+    }
+
+    .pr-98 {
+      padding-right: 0;
+    }
+
+    .gap-100 {
+      gap: 1rem;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .lg\:grid-cols-4 {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+
+    .md\:grid-cols-3 {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+
+    .w-30 {
+      width: 5rem;
+    }
+
+    .h-20 {
+      height: 4rem;
+    }
+
+    .max-w-30 {
+      max-width: 5rem;
+    }
+
+    .max-h-30 {
+      max-height: 4rem;
+    }
+  }
 </style>

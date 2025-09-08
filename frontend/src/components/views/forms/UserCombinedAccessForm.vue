@@ -30,19 +30,15 @@
                 top: Math.random() * 100 + '%',
                 animationDelay: Math.random() * 3 + 's',
                 animationDuration: Math.random() * 3 + 2 + 's',
-                fontSize: Math.random() * 20 + 10 + 'px',
+                fontSize: Math.random() * 20 + 10 + 'px'
               }"
             >
               <i
                 :class="[
                   'fas',
-                  [
-                    'fa-heartbeat',
-                    'fa-user-md',
-                    'fa-hospital',
-                    'fa-stethoscope',
-                    'fa-plus',
-                  ][Math.floor(Math.random() * 5)],
+                  ['fa-heartbeat', 'fa-user-md', 'fa-hospital', 'fa-stethoscope', 'fa-plus'][
+                    Math.floor(Math.random() * 5)
+                  ]
                 ]"
               ></i>
             </div>
@@ -51,9 +47,7 @@
 
         <div class="max-w-12xl mx-auto relative z-10">
           <!-- Header Section -->
-          <div
-            class="medical-glass-card rounded-t-3xl p-4 mb-0 border-b border-blue-300/30"
-          >
+          <div class="medical-glass-card rounded-t-3xl p-4 mb-0 border-b border-blue-300/30">
             <div class="flex justify-between items-center">
               <!-- Left Logo -->
               <div
@@ -142,17 +136,13 @@
                       <div
                         class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-lg"
                       ></div>
-                      <i
-                        class="fas fa-user-md text-white text-lg relative z-10 drop-shadow-lg"
-                      ></i>
+                      <i class="fas fa-user-md text-white text-lg relative z-10 drop-shadow-lg"></i>
                       <div
                         class="absolute top-1 right-1 w-1 h-1 bg-white/60 rounded-full animate-ping"
                       ></div>
                     </div>
                     <div>
-                      <h3
-                        class="text-lg font-bold text-white flex items-center"
-                      >
+                      <h3 class="text-lg font-bold text-white flex items-center">
                         <i class="fas fa-id-card mr-2 text-blue-300"></i>
                         Applicant Details
                       </h3>
@@ -173,9 +163,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <!-- PF Number -->
                       <div class="group">
-                        <label
-                          class="block text-sm font-bold text-blue-100 mb-2 flex items-center"
-                        >
+                        <label class="block text-sm font-bold text-blue-100 mb-2 flex items-center">
                           <i class="fas fa-id-badge mr-2 text-blue-300"></i>
                           PF Number <span class="text-red-400 ml-1">*</span>
                         </label>
@@ -196,9 +184,7 @@
                             <i class="fas fa-hashtag"></i>
                           </div>
                         </div>
-                        <p
-                          class="text-xs text-blue-200/60 mt-1 italic flex items-center"
-                        >
+                        <p class="text-xs text-blue-200/60 mt-1 italic flex items-center">
                           <i class="fas fa-info-circle mr-1"></i>
                           e.g. 12345
                         </p>
@@ -206,9 +192,7 @@
 
                       <!-- Staff Name -->
                       <div class="group">
-                        <label
-                          class="block text-sm font-bold text-blue-100 mb-2 flex items-center"
-                        >
+                        <label class="block text-sm font-bold text-blue-100 mb-2 flex items-center">
                           <i class="fas fa-user mr-2 text-blue-300"></i>
                           Staff Name <span class="text-red-400 ml-1">*</span>
                         </label>
@@ -229,9 +213,7 @@
                             <i class="fas fa-user-circle"></i>
                           </div>
                         </div>
-                        <p
-                          class="text-xs text-blue-200/60 mt-1 italic flex items-center"
-                        >
+                        <p class="text-xs text-blue-200/60 mt-1 italic flex items-center">
                           <i class="fas fa-info-circle mr-1"></i>
                           e.g. Jane Doe
                         </p>
@@ -242,9 +224,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <!-- Phone Number -->
                       <div class="group">
-                        <label
-                          class="block text-sm font-bold text-blue-100 mb-2 flex items-center"
-                        >
+                        <label class="block text-sm font-bold text-blue-100 mb-2 flex items-center">
                           <i class="fas fa-phone mr-2 text-blue-300"></i>
                           Phone Number <span class="text-red-400 ml-1">*</span>
                         </label>
@@ -265,9 +245,7 @@
                             <i class="fas fa-mobile-alt"></i>
                           </div>
                         </div>
-                        <p
-                          class="text-xs text-blue-200/60 mt-1 italic flex items-center"
-                        >
+                        <p class="text-xs text-blue-200/60 mt-1 italic flex items-center">
                           <i class="fas fa-info-circle mr-1"></i>
                           e.g. 0712 000 000
                         </p>
@@ -275,9 +253,7 @@
 
                       <!-- Department -->
                       <div class="group">
-                        <label
-                          class="block text-sm font-bold text-blue-100 mb-2 flex items-center"
-                        >
+                        <label class="block text-sm font-bold text-blue-100 mb-2 flex items-center">
                           <i class="fas fa-building mr-2 text-blue-300"></i>
                           Department <span class="text-red-400 ml-1">*</span>
                         </label>
@@ -308,9 +284,7 @@
                             class="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/10 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
                           ></div>
                         </div>
-                        <p
-                          class="text-xs text-blue-200/60 mt-1 italic flex items-center"
-                        >
+                        <p class="text-xs text-blue-200/60 mt-1 italic flex items-center">
                           <i class="fas fa-info-circle mr-1"></i>
                           Select your department
                         </p>
@@ -322,21 +296,16 @@
                       class="bg-gradient-to-r from-blue-500/10 to-blue-500/10 p-3 rounded-lg border border-blue-300/20 backdrop-blur-sm"
                     >
                       <div class="group">
-                        <label
-                          class="block text-sm font-bold text-blue-100 mb-2 flex items-center"
-                        >
+                        <label class="block text-sm font-bold text-blue-100 mb-2 flex items-center">
                           <i class="fas fa-signature mr-2 text-blue-300"></i>
                           Digital Signature
                           <span class="text-red-400 ml-1">*</span>
-                          <span
-                            class="ml-2 text-xs text-blue-300/70 font-normal"
+                          <span class="ml-2 text-xs text-blue-300/70 font-normal"
                             >(PNG, JPG, JPEG)</span
                           >
                         </label>
 
-                        <div
-                          class="flex flex-col md:flex-row gap-3 items-start"
-                        >
+                        <div class="flex flex-col md:flex-row gap-3 items-start">
                           <!-- Signature Display Box -->
                           <div
                             class="relative w-full md:w-64 h-14 border-2 border-blue-300/30 rounded-lg bg-blue-100/20 focus-within:bg-blue-100/30 focus-within:border-blue-400 overflow-hidden backdrop-blur-sm group-hover:border-blue-400/50 transition-all duration-300"
@@ -354,17 +323,10 @@
                             </div>
 
                             <!-- Placeholder Text -->
-                            <div
-                              v-else
-                              class="w-full h-full flex items-center justify-center"
-                            >
+                            <div v-else class="w-full h-full flex items-center justify-center">
                               <div class="text-center">
-                                <i
-                                  class="fas fa-signature text-blue-400/50 text-lg mb-1"
-                                ></i>
-                                <p class="text-xs text-blue-400 italic">
-                                  Signature here
-                                </p>
+                                <i class="fas fa-signature text-blue-400/50 text-lg mb-1"></i>
+                                <p class="text-xs text-blue-400 italic">Signature here</p>
                               </div>
                             </div>
 
@@ -401,11 +363,7 @@
                               </span>
                             </button>
 
-                            <p
-                              class="text-xs text-blue-200/70 italic"
-                            >
-                              Max: 5MB
-                            </p>
+                            <p class="text-xs text-blue-200/70 italic">Max: 5MB</p>
                           </div>
                         </div>
                       </div>
@@ -445,9 +403,7 @@
                       ></div>
                     </div>
                     <div>
-                      <h3
-                        class="text-lg font-bold text-white flex items-center"
-                      >
+                      <h3 class="text-lg font-bold text-white flex items-center">
                         <i class="fas fa-cogs mr-2 text-blue-300"></i>
                         Select Services
                       </h3>
@@ -498,17 +454,11 @@
                                   v-if="formData.services.jeeva"
                                   class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"
                                 ></div>
-                                <i
-                                  class="fas fa-file-medical text-lg relative z-10"
-                                ></i>
+                                <i class="fas fa-file-medical text-lg relative z-10"></i>
                               </div>
                               <div>
-                                <h4 class="font-bold text-white text-base">
-                                  Jeeva Access
-                                </h4>
-                                <p class="text-xs text-blue-200/80">
-                                  Medical records system
-                                </p>
+                                <h4 class="font-bold text-white text-base">Jeeva Access</h4>
+                                <p class="text-xs text-blue-200/80">Medical records system</p>
                               </div>
                             </div>
                             <div
@@ -528,20 +478,12 @@
 
                           <!-- Service Features -->
                           <div class="space-y-1">
-                            <div
-                              class="flex items-center text-xs text-blue-100/70"
-                            >
-                              <i
-                                class="fas fa-check-circle mr-1 text-blue-400"
-                              ></i>
+                            <div class="flex items-center text-xs text-blue-100/70">
+                              <i class="fas fa-check-circle mr-1 text-blue-400"></i>
                               Patient Records
                             </div>
-                            <div
-                              class="flex items-center text-xs text-blue-100/70"
-                            >
-                              <i
-                                class="fas fa-check-circle mr-1 text-blue-400"
-                              ></i>
+                            <div class="flex items-center text-xs text-blue-100/70">
+                              <i class="fas fa-check-circle mr-1 text-blue-400"></i>
                               Medical History
                             </div>
                           </div>
@@ -589,17 +531,11 @@
                                   v-if="formData.services.wellsoft"
                                   class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"
                                 ></div>
-                                <i
-                                  class="fas fa-laptop-medical text-lg relative z-10"
-                                ></i>
+                                <i class="fas fa-laptop-medical text-lg relative z-10"></i>
                               </div>
                               <div>
-                                <h4 class="font-bold text-white text-base">
-                                  Wellsoft Access
-                                </h4>
-                                <p class="text-xs text-blue-200/80">
-                                  Hospital management
-                                </p>
+                                <h4 class="font-bold text-white text-base">Wellsoft Access</h4>
+                                <p class="text-xs text-blue-200/80">Hospital management</p>
                               </div>
                             </div>
                             <div
@@ -619,20 +555,12 @@
 
                           <!-- Service Features -->
                           <div class="space-y-1">
-                            <div
-                              class="flex items-center text-xs text-blue-100/70"
-                            >
-                              <i
-                                class="fas fa-check-circle mr-1 text-blue-400"
-                              ></i>
+                            <div class="flex items-center text-xs text-blue-100/70">
+                              <i class="fas fa-check-circle mr-1 text-blue-400"></i>
                               Patient Management
                             </div>
-                            <div
-                              class="flex items-center text-xs text-blue-100/70"
-                            >
-                              <i
-                                class="fas fa-check-circle mr-1 text-blue-400"
-                              ></i>
+                            <div class="flex items-center text-xs text-blue-100/70">
+                              <i class="fas fa-check-circle mr-1 text-blue-400"></i>
                               Hospital Operations
                             </div>
                           </div>
@@ -680,17 +608,11 @@
                                   v-if="formData.services.internet"
                                   class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"
                                 ></div>
-                                <i
-                                  class="fas fa-wifi text-lg relative z-10"
-                                ></i>
+                                <i class="fas fa-wifi text-lg relative z-10"></i>
                               </div>
                               <div>
-                                <h4 class="font-bold text-white text-base">
-                                  Internet Access
-                                </h4>
-                                <p class="text-xs text-blue-200/80">
-                                  Internet connectivity
-                                </p>
+                                <h4 class="font-bold text-white text-base">Internet Access</h4>
+                                <p class="text-xs text-blue-200/80">Internet connectivity</p>
                               </div>
                             </div>
                             <div
@@ -710,20 +632,12 @@
 
                           <!-- Service Features -->
                           <div class="space-y-1">
-                            <div
-                              class="flex items-center text-xs text-blue-100/70"
-                            >
-                              <i
-                                class="fas fa-check-circle mr-1 text-blue-400"
-                              ></i>
+                            <div class="flex items-center text-xs text-blue-100/70">
+                              <i class="fas fa-check-circle mr-1 text-blue-400"></i>
                               Web Access
                             </div>
-                            <div
-                              class="flex items-center text-xs text-blue-100/70"
-                            >
-                              <i
-                                class="fas fa-check-circle mr-1 text-blue-400"
-                              ></i>
+                            <div class="flex items-center text-xs text-blue-100/70">
+                              <i class="fas fa-check-circle mr-1 text-blue-400"></i>
                               Email & Communication
                             </div>
                           </div>
@@ -737,12 +651,8 @@
                     v-if="!hasSelectedService"
                     class="mt-6 p-4 bg-red-500/20 border-2 border-red-400/40 rounded-xl backdrop-blur-sm"
                   >
-                    <p
-                      class="text-red-300 text-sm font-medium flex items-center"
-                    >
-                      <i
-                        class="fas fa-exclamation-triangle mr-2 text-red-400"
-                      ></i>
+                    <p class="text-red-300 text-sm font-medium flex items-center">
+                      <i class="fas fa-exclamation-triangle mr-2 text-red-400"></i>
                       Please select at least one service to continue.
                     </p>
                   </div>
@@ -773,17 +683,13 @@
                       <div
                         class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-lg"
                       ></div>
-                      <i
-                        class="fas fa-wifi text-white text-lg relative z-10 drop-shadow-lg"
-                      ></i>
+                      <i class="fas fa-wifi text-white text-lg relative z-10 drop-shadow-lg"></i>
                       <div
                         class="absolute top-1 right-1 w-1 h-1 bg-white/60 rounded-full animate-ping"
                       ></div>
                     </div>
                     <div>
-                      <h3
-                        class="text-lg font-bold text-white flex items-center"
-                      >
+                      <h3 class="text-lg font-bold text-white flex items-center">
                         <i class="fas fa-globe mr-2 text-blue-300"></i>
                         Internet Purpose
                       </h3>
@@ -814,8 +720,8 @@
                     </div>
                     <p class="text-xs text-blue-200 mt-2 italic">
                       <i class="fas fa-info-circle mr-1"></i>
-                      Please provide at least one purpose for internet access.
-                      You can add up to 4 purposes.
+                      Please provide at least one purpose for internet access. You can add up to 4
+                      purposes.
                     </p>
                   </div>
                 </div>
@@ -837,7 +743,6 @@
                 ></div>
 
                 <div class="relative z-10">
-
                   <div class="flex justify-between items-center">
                     <button
                       type="button"
@@ -852,12 +757,9 @@
                       :disabled="isSubmitting || !hasSelectedService"
                       class="px-5 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-semibold flex items-center shadow-lg hover:shadow-xl text-sm transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                     >
-                      <i
-                        v-if="isSubmitting"
-                        class="fas fa-spinner fa-spin mr-2"
-                      ></i>
+                      <i v-if="isSubmitting" class="fas fa-spinner fa-spin mr-2"></i>
                       <i v-else class="fas fa-paper-plane mr-2"></i>
-                      {{ isSubmitting ? "Submitting..." : "Submit Request" }}
+                      {{ isSubmitting ? 'Submitting...' : 'Submit Request' }}
                     </button>
                   </div>
                 </div>
@@ -885,9 +787,7 @@
           >
             <i class="fas fa-check text-green-600 text-2xl"></i>
           </div>
-          <h3 class="text-xl font-bold text-gray-800 mb-2">
-            Request Submitted!
-          </h3>
+          <h3 class="text-xl font-bold text-gray-800 mb-2">Request Submitted!</h3>
           <p class="text-gray-600 mb-4">
             Your Combined Access Request has been submitted successfully.
           </p>
@@ -919,9 +819,7 @@
               v-if="formData.services.internet && hasInternetPurposes"
               class="mt-3 pt-3 border-t border-blue-200"
             >
-              <p class="text-sm text-blue-800 font-medium mb-2">
-                Internet Purposes:
-              </p>
+              <p class="text-sm text-blue-800 font-medium mb-2">Internet Purposes:</p>
               <div class="space-y-1">
                 <div
                   v-for="(purpose, index) in filledInternetPurposes"
@@ -952,87 +850,96 @@
 </template>
 
 <script>
-import ModernSidebar from '@/components/ModernSidebar.vue'
-import AppFooter from '@/components/footer.vue'
-import AppHeader from '@/components/AppHeader.vue'
-import userCombinedAccessService from '@/services/userCombinedAccessService'
+  import ModernSidebar from '@/components/ModernSidebar.vue'
+  import AppFooter from '@/components/footer.vue'
+  import AppHeader from '@/components/AppHeader.vue'
+  import userCombinedAccessService from '@/services/userCombinedAccessService'
 
-export default {
-  name: 'UserCombinedAccessForm',
-  components: {
-    ModernSidebar,
-    AppFooter,
-    AppHeader
-  },
-  setup() {
-    // Sidebar state now managed by Pinia - no local state needed
+  export default {
+    name: 'UserCombinedAccessForm',
+    components: {
+      ModernSidebar,
+      AppFooter,
+      AppHeader
+    },
+    setup() {
+      // Sidebar state now managed by Pinia - no local state needed
 
-    return {
-      // No local state needed for sidebar
-    }
-  },
-  data() {
-    return {
-      isSubmitting: false,
-      showSuccessModal: false,
-      signaturePreview: '',
-      signatureFileName: '',
-      departments: [],
-      formData: {
-        // Applicant Details
-        pfNumber: '',
-        staffName: '',
-        department: '',
-        phoneNumber: '',
-        signature: null,
-        // Services Selection
-        services: {
-          jeeva: false,
-          wellsoft: false,
-          internet: false
-        },
-        // Internet Purposes (only used when internet service is selected)
-        internetPurposes: ['', '', '', '']
+      return {
+        // No local state needed for sidebar
       }
-    }
-  },
-
-  computed: {
-    hasSelectedService() {
-      return (
-        this.formData.services.jeeva ||
-        this.formData.services.wellsoft ||
-        this.formData.services.internet
-      )
     },
-    hasInternetPurposes() {
-      return this.formData.internetPurposes.some(
-        (purpose) => purpose.trim() !== ''
-      )
+    data() {
+      return {
+        isSubmitting: false,
+        showSuccessModal: false,
+        signaturePreview: '',
+        signatureFileName: '',
+        departments: [],
+        formData: {
+          // Applicant Details
+          pfNumber: '',
+          staffName: '',
+          department: '',
+          phoneNumber: '',
+          signature: null,
+          // Services Selection
+          services: {
+            jeeva: false,
+            wellsoft: false,
+            internet: false
+          },
+          // Internet Purposes (only used when internet service is selected)
+          internetPurposes: ['', '', '', '']
+        }
+      }
     },
-    filledInternetPurposes() {
-      return this.formData.internetPurposes.filter(
-        (purpose) => purpose.trim() !== ''
-      )
-    }
-  },
 
-  async mounted() {
-    // Load departments when component is mounted
-    await this.loadDepartments()
-  },
+    computed: {
+      hasSelectedService() {
+        return (
+          this.formData.services.jeeva ||
+          this.formData.services.wellsoft ||
+          this.formData.services.internet
+        )
+      },
+      hasInternetPurposes() {
+        return this.formData.internetPurposes.some((purpose) => purpose.trim() !== '')
+      },
+      filledInternetPurposes() {
+        return this.formData.internetPurposes.filter((purpose) => purpose.trim() !== '')
+      }
+    },
 
-  methods: {
-    async loadDepartments() {
-      try {
-        const response = await userCombinedAccessService.getDepartments()
-        if (response.success && response.data && response.data.data) {
-          this.departments = response.data.data.map((dept) => ({
-            id: dept.id,
-            name: dept.name
-          }))
-        } else {
-          console.error('Failed to load departments:', response)
+    async mounted() {
+      // Load departments when component is mounted
+      await this.loadDepartments()
+    },
+
+    methods: {
+      async loadDepartments() {
+        try {
+          const response = await userCombinedAccessService.getDepartments()
+          if (response.success && response.data && response.data.data) {
+            this.departments = response.data.data.map((dept) => ({
+              id: dept.id,
+              name: dept.name
+            }))
+          } else {
+            console.error('Failed to load departments:', response)
+            // Fallback to static list if API fails
+            this.departments = [
+              { id: 1, name: 'Administration' },
+              { id: 2, name: 'ICT Department' },
+              { id: 3, name: 'Finance' },
+              { id: 4, name: 'Human Resources' },
+              { id: 5, name: 'Nursing' },
+              { id: 6, name: 'Laboratory' },
+              { id: 7, name: 'Radiology' }
+            ]
+          }
+        } catch (error) {
+          console.error('Error loading departments:', error)
           // Fallback to static list if API fails
           this.departments = [
             { id: 1, name: 'Administration' },
@@ -1044,586 +951,538 @@ export default {
             { id: 7, name: 'Radiology' }
           ]
         }
-      } catch (error) {
-        console.error('Error loading departments:', error)
-        // Fallback to static list if API fails
-        this.departments = [
-          { id: 1, name: 'Administration' },
-          { id: 2, name: 'ICT Department' },
-          { id: 3, name: 'Finance' },
-          { id: 4, name: 'Human Resources' },
-          { id: 5, name: 'Nursing' },
-          { id: 6, name: 'Laboratory' },
-          { id: 7, name: 'Radiology' }
-        ]
-      }
-    },
-    async submitForm() {
-      // Validate required fields
-      if (
-        !this.formData.pfNumber ||
-        !this.formData.staffName ||
-        !this.formData.department ||
-        !this.formData.phoneNumber
-      ) {
-        this.showNotification(
-          'Please fill in all required applicant details',
-          'error'
-        )
-        return
-      }
+      },
+      async submitForm() {
+        // Validate required fields
+        if (
+          !this.formData.pfNumber ||
+          !this.formData.staffName ||
+          !this.formData.department ||
+          !this.formData.phoneNumber
+        ) {
+          this.showNotification('Please fill in all required applicant details', 'error')
+          return
+        }
 
-      if (!this.formData.signature) {
-        this.showNotification('Please upload your signature', 'error')
-        return
-      }
+        if (!this.formData.signature) {
+          this.showNotification('Please upload your signature', 'error')
+          return
+        }
 
-      if (!this.hasSelectedService) {
-        this.showNotification('Please select at least one service', 'error')
-        return
-      }
+        if (!this.hasSelectedService) {
+          this.showNotification('Please select at least one service', 'error')
+          return
+        }
 
-      // Validate internet purposes if internet service is selected
-      if (
-        this.formData.services.internet &&
-        !this.formData.internetPurposes[0]
-      ) {
-        this.showNotification(
-          'Please provide at least one internet purpose',
-          'error'
-        )
-        return
-      }
+        // Validate internet purposes if internet service is selected
+        if (this.formData.services.internet && !this.formData.internetPurposes[0]) {
+          this.showNotification('Please provide at least one internet purpose', 'error')
+          return
+        }
 
-      this.isSubmitting = true
+        this.isSubmitting = true
 
-      try {
-        // Prepare form data for API submission
-        const formData = new FormData()
+        try {
+          // Prepare form data for API submission
+          const formData = new FormData()
 
-        // Add basic fields
-        formData.append('pf_number', this.formData.pfNumber)
-        formData.append('staff_name', this.formData.staffName)
-        formData.append('phone_number', this.formData.phoneNumber)
-        formData.append('department_id', this.formData.department)
-        formData.append('signature', this.formData.signature)
+          // Add basic fields
+          formData.append('pf_number', this.formData.pfNumber)
+          formData.append('staff_name', this.formData.staffName)
+          formData.append('phone_number', this.formData.phoneNumber)
+          formData.append('department_id', this.formData.department)
+          formData.append('signature', this.formData.signature)
 
-        // Prepare request types array
-        const requestTypes = []
-        if (this.formData.services.jeeva) requestTypes.push('jeeva_access')
-        if (this.formData.services.wellsoft) requestTypes.push('wellsoft')
-        if (this.formData.services.internet)
-          requestTypes.push('internet_access_request')
+          // Prepare request types array
+          const requestTypes = []
+          if (this.formData.services.jeeva) requestTypes.push('jeeva_access')
+          if (this.formData.services.wellsoft) requestTypes.push('wellsoft')
+          if (this.formData.services.internet) requestTypes.push('internet_access_request')
 
-        // Add request types
-        requestTypes.forEach((type, index) => {
-          formData.append(`request_type[${index}]`, type)
-        })
-
-        // Add internet purposes if internet service is selected
-        if (this.formData.services.internet) {
-          const purposes = this.formData.internetPurposes.filter(
-            (purpose) => purpose.trim() !== ''
-          )
-          purposes.forEach((purpose, index) => {
-            formData.append(`internetPurposes[${index}]`, purpose)
+          // Add request types
+          requestTypes.forEach((type, index) => {
+            formData.append(`request_type[${index}]`, type)
           })
-        }
 
-        console.log('Submitting combined access request:', {
-          pfNumber: this.formData.pfNumber,
-          staffName: this.formData.staffName,
-          requestTypes,
-          hasSignature: !!this.formData.signature
-        })
-
-        // Submit to API
-        const response = await userCombinedAccessService.submitCombinedRequest(
-          formData
-        )
-
-        if (response.success) {
-          console.log(
-            'Combined access request submitted successfully:',
-            response.data
-          )
-          this.showSuccessModal = true
-          this.resetForm()
-          this.showNotification(
-            'Combined access request submitted successfully!',
-            'success'
-          )
-        } else {
-          console.error('API Error:', response)
-
-          // Handle validation errors
-          if (response.errors && Object.keys(response.errors).length > 0) {
-            const errorMessages = Object.values(response.errors).flat()
-            this.showNotification(
-              errorMessages[0] || 'Validation failed',
-              'error'
+          // Add internet purposes if internet service is selected
+          if (this.formData.services.internet) {
+            const purposes = this.formData.internetPurposes.filter(
+              (purpose) => purpose.trim() !== ''
             )
-          } else {
-            this.showNotification(
-              response.message || 'Failed to submit request',
-              'error'
-            )
+            purposes.forEach((purpose, index) => {
+              formData.append(`internetPurposes[${index}]`, purpose)
+            })
           }
+
+          console.log('Submitting combined access request:', {
+            pfNumber: this.formData.pfNumber,
+            staffName: this.formData.staffName,
+            requestTypes,
+            hasSignature: !!this.formData.signature
+          })
+
+          // Submit to API
+          const response = await userCombinedAccessService.submitCombinedRequest(formData)
+
+          if (response.success) {
+            console.log('Combined access request submitted successfully:', response.data)
+            this.showSuccessModal = true
+            this.resetForm()
+            this.showNotification('Combined access request submitted successfully!', 'success')
+          } else {
+            console.error('API Error:', response)
+
+            // Handle validation errors
+            if (response.errors && Object.keys(response.errors).length > 0) {
+              const errorMessages = Object.values(response.errors).flat()
+              this.showNotification(errorMessages[0] || 'Validation failed', 'error')
+            } else {
+              this.showNotification(response.message || 'Failed to submit request', 'error')
+            }
+          }
+        } catch (error) {
+          console.error('Error submitting combined access request:', error)
+          this.showNotification(
+            'Network error. Please check your connection and try again.',
+            'error'
+          )
+        } finally {
+          this.isSubmitting = false
         }
-      } catch (error) {
-        console.error('Error submitting combined access request:', error)
-        this.showNotification(
-          'Network error. Please check your connection and try again.',
-          'error'
-        )
-      } finally {
-        this.isSubmitting = false
-      }
-    },
+      },
 
-    resetForm() {
-      this.formData = {
-        pfNumber: '',
-        staffName: '',
-        department: '',
-        phoneNumber: '',
-        signature: null,
-        services: {
-          jeeva: false,
-          wellsoft: false,
-          internet: false
-        },
-        internetPurposes: ['', '', '', '']
-      }
-      this.clearSignature()
-      this.showNotification('Form has been reset', 'info')
-    },
+      resetForm() {
+        this.formData = {
+          pfNumber: '',
+          staffName: '',
+          department: '',
+          phoneNumber: '',
+          signature: null,
+          services: {
+            jeeva: false,
+            wellsoft: false,
+            internet: false
+          },
+          internetPurposes: ['', '', '', '']
+        }
+        this.clearSignature()
+        this.showNotification('Form has been reset', 'info')
+      },
 
-    triggerFileUpload() {
-      this.$refs.signatureInput.click()
-    },
+      triggerFileUpload() {
+        this.$refs.signatureInput.click()
+      },
 
-    onSignatureChange(e) {
-      const file = e.target.files[0]
-      this.formData.signature = file || null
+      onSignatureChange(e) {
+        const file = e.target.files[0]
+        this.formData.signature = file || null
 
-      if (!file) {
+        if (!file) {
+          this.signaturePreview = ''
+          this.signatureFileName = ''
+          return
+        }
+
+        // Validate file type
+        const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf']
+        if (!allowedTypes.includes(file.type)) {
+          this.showNotification('Please select a valid file (PNG, JPG, or PDF)', 'error')
+          this.clearSignature()
+          return
+        }
+
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          this.showNotification('File size must be less than 5MB', 'error')
+          this.clearSignature()
+          return
+        }
+
+        this.signatureFileName = file.name
+
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader()
+          reader.onload = () => {
+            this.signaturePreview = reader.result
+          }
+          reader.readAsDataURL(file)
+        } else {
+          this.signaturePreview = 'pdf'
+        }
+      },
+
+      isImage(preview) {
+        return typeof preview === 'string' && preview !== 'pdf'
+      },
+
+      clearSignature() {
+        this.formData.signature = null
         this.signaturePreview = ''
         this.signatureFileName = ''
-        return
-      }
-
-      // Validate file type
-      const allowedTypes = [
-        'image/png',
-        'image/jpeg',
-        'image/jpg',
-        'application/pdf'
-      ]
-      if (!allowedTypes.includes(file.type)) {
-        this.showNotification(
-          'Please select a valid file (PNG, JPG, or PDF)',
-          'error'
-        )
-        this.clearSignature()
-        return
-      }
-
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        this.showNotification('File size must be less than 5MB', 'error')
-        this.clearSignature()
-        return
-      }
-
-      this.signatureFileName = file.name
-
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader()
-        reader.onload = () => {
-          this.signaturePreview = reader.result
+        if (this.$refs.signatureInput) {
+          this.$refs.signatureInput.value = ''
         }
-        reader.readAsDataURL(file)
-      } else {
-        this.signaturePreview = 'pdf'
-      }
-    },
+      },
 
-    isImage(preview) {
-      return typeof preview === 'string' && preview !== 'pdf'
-    },
+      goBack() {
+        this.$router.push('/user-dashboard')
+      },
 
-    clearSignature() {
-      this.formData.signature = null
-      this.signaturePreview = ''
-      this.signatureFileName = ''
-      if (this.$refs.signatureInput) {
-        this.$refs.signatureInput.value = ''
-      }
-    },
-
-    goBack() {
-      this.$router.push('/user-dashboard')
-    },
-
-    closeSuccessModal() {
-      this.showSuccessModal = false
-      // Redirect to Request Status page with success parameters
-      this.$router.push({
-        path: '/request-status',
-        query: {
-          success: 'true',
-          type: 'Combined Access Request',
-          id: 'REQ-' + Date.now()
-        }
-      })
-    },
-
-    showNotification(message, type = 'info') {
-      // Simple notification - you can replace with a proper notification system
-      const colors = {
-        success: 'green',
-        error: 'red',
-        info: 'blue'
-      }
-
-      // Create a simple toast notification
-      const toast = document.createElement('div')
-      toast.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white font-semibold z-50 bg-${colors[type]}-600 transform transition-all duration-300`
-      toast.textContent = message
-      document.body.appendChild(toast)
-
-      // Animate in
-      setTimeout(() => {
-        toast.style.transform = 'translateX(0)'
-      }, 100)
-
-      // Remove after 3 seconds
-      setTimeout(() => {
-        toast.style.transform = 'translateX(100%)'
-        setTimeout(() => {
-          if (document.body.contains(toast)) {
-            document.body.removeChild(toast)
+      closeSuccessModal() {
+        this.showSuccessModal = false
+        // Redirect to Request Status page with success parameters
+        this.$router.push({
+          path: '/request-status',
+          query: {
+            success: 'true',
+            type: 'Combined Access Request',
+            id: 'REQ-' + Date.now()
           }
-        }, 300)
-      }, 3000)
+        })
+      },
+
+      showNotification(message, type = 'info') {
+        // Simple notification - you can replace with a proper notification system
+        const colors = {
+          success: 'green',
+          error: 'red',
+          info: 'blue'
+        }
+
+        // Create a simple toast notification
+        const toast = document.createElement('div')
+        toast.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white font-semibold z-50 bg-${colors[type]}-600 transform transition-all duration-300`
+        toast.textContent = message
+        document.body.appendChild(toast)
+
+        // Animate in
+        setTimeout(() => {
+          toast.style.transform = 'translateX(0)'
+        }, 100)
+
+        // Remove after 3 seconds
+        setTimeout(() => {
+          toast.style.transform = 'translateX(100%)'
+          setTimeout(() => {
+            if (document.body.contains(toast)) {
+              document.body.removeChild(toast)
+            }
+          }, 300)
+        }, 3000)
+      }
     }
   }
-}
 </script>
 
 <style scoped>
-/* Medical Glass morphism effects */
-.medical-glass-card {
-  background: rgba(59, 130, 246, 0.15);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
-  border: 2px solid rgba(96, 165, 250, 0.3);
-  box-shadow: 0 8px 32px rgba(29, 78, 216, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-
-.medical-card {
-  position: relative;
-  overflow: hidden;
-  background: rgba(59, 130, 246, 0.1);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-}
-
-.medical-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(96, 165, 250, 0.2),
-    transparent
-  );
-  transition: left 0.5s;
-}
-
-.medical-card:hover::before {
-  left: 100%;
-}
-
-.medical-input {
-  position: relative;
-  z-index: 1;
-  color: white;
-}
-
-.medical-input::placeholder {
-  color: rgba(191, 219, 254, 0.6);
-}
-
-.medical-input:focus {
-  border-color: rgba(59, 130, 246, 0.8);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-}
-
-/* Animations */
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-20px);
-  }
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fade-in-delay {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-.animate-fade-in {
-  animation: fade-in 1s ease-out;
-}
-
-.animate-fade-in-delay {
-  animation: fade-in-delay 1s ease-out 0.3s both;
-}
-
-/* Custom transitions and animations */
-.transition-all {
-  transition: all 0.3s ease;
-}
-
-/* Hover effects */
-.transform:hover {
-  transform: translateY(-2px) scale(1.02);
-}
-
-/* Focus styles */
-input:focus,
-select:focus,
-textarea:focus {
-  transform: translateY(-1px);
-  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
-}
-
-/* Animation for form sections */
-.border-l-4 {
-  animation: slideInLeft 0.6s ease-out;
-}
-
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-/* Hover effects for form sections */
-.border-l-4:hover {
-  transform: translateX(4px);
-  transition: transform 0.3s ease;
-}
-
-/* Button animations */
-button:hover:not(:disabled) {
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-}
-
-button:active:not(:disabled) {
-  transform: translateY(0) scale(1.02);
-}
-
-/* Loading spinner */
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.fa-spin {
-  animation: spin 1s linear infinite;
-}
-
-/* Modal animations */
-@keyframes modalFadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9) translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-.fixed.inset-0 {
-  animation: modalFadeIn 0.3s ease-out;
-}
-
-/* Service card hover effects */
-label:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-}
-
-/* Checkbox animations */
-input[type="checkbox"]:checked + label {
-  transform: scale(1.02);
-}
-
-/* File input styling */
-input[type="file"]::-webkit-file-upload-button {
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-  border: none;
-  color: white;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-input[type="file"]::-webkit-file-upload-button:hover {
-  background: linear-gradient(135deg, #1d4ed8, #1e40af);
-  transform: translateY(-1px);
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .grid-cols-2 {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
+  /* Medical Glass morphism effects */
+  .medical-glass-card {
+    background: rgba(59, 130, 246, 0.15);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 2px solid rgba(96, 165, 250, 0.3);
+    box-shadow:
+      0 8px 32px rgba(29, 78, 216, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
 
-  .md\:col-span-2 {
-    grid-column: span 1;
+  .medical-card {
+    position: relative;
+    overflow: hidden;
+    background: rgba(59, 130, 246, 0.1);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
   }
 
-  .px-8 {
-    padding-left: 1rem;
-    padding-right: 1rem;
+  .medical-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.2), transparent);
+    transition: left 0.5s;
   }
 
-  .grid-cols-1.md\:grid-cols-3 {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
-  }
-}
-
-/* Print styles */
-@media print {
-  .min-h-screen {
-    min-height: auto;
+  .medical-card:hover::before {
+    left: 100%;
   }
 
-  button {
-    display: none !important;
+  .medical-input {
+    position: relative;
+    z-index: 1;
+    color: white;
   }
 
-  .shadow-xl {
-    box-shadow: none;
+  .medical-input::placeholder {
+    color: rgba(191, 219, 254, 0.6);
   }
 
-  .bg-gradient-to-br {
-    background: white !important;
+  .medical-input:focus {
+    border-color: rgba(59, 130, 246, 0.8);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
   }
 
-  .rounded-t-2xl,
-  .rounded-b-2xl {
-    border-radius: 0 !important;
+  /* Animations */
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
   }
 
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-in-delay {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-fade-in {
+    animation: fade-in 1s ease-out;
+  }
+
+  .animate-fade-in-delay {
+    animation: fade-in-delay 1s ease-out 0.3s both;
+  }
+
+  /* Custom transitions and animations */
+  .transition-all {
+    transition: all 0.3s ease;
+  }
+
+  /* Hover effects */
+  .transform:hover {
+    transform: translateY(-2px) scale(1.02);
+  }
+
+  /* Focus styles */
+  input:focus,
+  select:focus,
+  textarea:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+  }
+
+  /* Animation for form sections */
   .border-l-4 {
-    border-left: 3px solid #000 !important;
+    animation: slideInLeft 0.6s ease-out;
   }
 
-  .bg-gray-50 {
-    background: #f9f9f9 !important;
+  @keyframes slideInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
   }
-}
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
+  /* Hover effects for form sections */
+  .border-l-4:hover {
+    transform: translateX(4px);
+    transition: transform 0.3s ease;
+  }
 
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
-}
+  /* Button animations */
+  button:hover:not(:disabled) {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  }
 
-::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
-}
+  button:active:not(:disabled) {
+    transform: translateY(0) scale(1.02);
+  }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #a1a1a1;
-}
+  /* Loading spinner */
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
 
-/* Focus styles for accessibility */
-button:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
-}
+  .fa-spin {
+    animation: spin 1s linear infinite;
+  }
 
-/* Disabled button styles */
-button:disabled {
-  transform: none !important;
-  box-shadow: none !important;
-}
+  /* Modal animations */
+  @keyframes modalFadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9) translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
 
-/* Input validation styles */
-input:invalid {
-  border-color: #3b82f6;
-}
+  .fixed.inset-0 {
+    animation: modalFadeIn 0.3s ease-out;
+  }
 
-input:valid {
-  border-color: #3b82f6;
-}
+  /* Service card hover effects */
+  label:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  }
 
-/* Smooth transitions for all interactive elements */
-* {
-  transition: all 0.2s ease;
-}
+  /* Checkbox animations */
+  input[type='checkbox']:checked + label {
+    transform: scale(1.02);
+  }
 
-/* Service selection cards */
-.service-card {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
+  /* File input styling */
+  input[type='file']::-webkit-file-upload-button {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
 
-.service-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
+  input[type='file']::-webkit-file-upload-button:hover {
+    background: linear-gradient(135deg, #1d4ed8, #1e40af);
+    transform: translateY(-1px);
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .grid-cols-2 {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+
+    .md\:col-span-2 {
+      grid-column: span 1;
+    }
+
+    .px-8 {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    .grid-cols-1.md\:grid-cols-3 {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+  }
+
+  /* Print styles */
+  @media print {
+    .min-h-screen {
+      min-height: auto;
+    }
+
+    button {
+      display: none !important;
+    }
+
+    .shadow-xl {
+      box-shadow: none;
+    }
+
+    .bg-gradient-to-br {
+      background: white !important;
+    }
+
+    .rounded-t-2xl,
+    .rounded-b-2xl {
+      border-radius: 0 !important;
+    }
+
+    .border-l-4 {
+      border-left: 3px solid #000 !important;
+    }
+
+    .bg-gray-50 {
+      background: #f9f9f9 !important;
+    }
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
+  }
+
+  /* Focus styles for accessibility */
+  button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+  }
+
+  /* Disabled button styles */
+  button:disabled {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Input validation styles */
+  input:invalid {
+    border-color: #3b82f6;
+  }
+
+  input:valid {
+    border-color: #3b82f6;
+  }
+
+  /* Smooth transitions for all interactive elements */
+  * {
+    transition: all 0.2s ease;
+  }
+
+  /* Service selection cards */
+  .service-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .service-card:hover {
+    transform: translateY(-4px);
+    box-shadow:
+      0 20px 25px -5px rgba(0, 0, 0, 0.1),
+      0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
 </style>

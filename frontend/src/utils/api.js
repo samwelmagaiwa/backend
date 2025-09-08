@@ -32,4 +32,3 @@ export async function fetchInternetUsers(params = {}) {
     throw error
   }
 }
-

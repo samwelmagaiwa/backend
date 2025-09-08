@@ -24,18 +24,14 @@ class PersonalInfoService {
           meta: response.data.meta
         }
       } else {
-        throw new Error(
-          response.data.message || 'Failed to get personal information'
-        )
+        throw new Error(response.data.message || 'Failed to get personal information')
       }
     } catch (error) {
       console.error('Error getting personal info from user access:', error)
       return {
         success: false,
         error:
-          error.response?.data?.message ||
-          error.message ||
-          'Failed to get personal information'
+          error.response?.data?.message || error.message || 'Failed to get personal information'
       }
     }
   }
@@ -46,9 +42,7 @@ class PersonalInfoService {
    */
   async getUserAccessRequestsForHOD() {
     try {
-      const response = await apiClient.get(
-        '/both-service-form/hod/user-access-requests'
-      )
+      const response = await apiClient.get('/both-service-form/hod/user-access-requests')
 
       if (response.data.success) {
         return {
@@ -57,18 +51,14 @@ class PersonalInfoService {
           meta: response.data.meta
         }
       } else {
-        throw new Error(
-          response.data.message || 'Failed to get user access requests'
-        )
+        throw new Error(response.data.message || 'Failed to get user access requests')
       }
     } catch (error) {
       console.error('Error getting user access requests for HOD:', error)
       return {
         success: false,
         error:
-          error.response?.data?.message ||
-          error.message ||
-          'Failed to get user access requests'
+          error.response?.data?.message || error.message || 'Failed to get user access requests'
       }
     }
   }
@@ -89,9 +79,7 @@ class PersonalInfoService {
         path: personalInfo.signature?.path || null,
         url: personalInfo.signature?.url || null,
         exists: personalInfo.signature?.exists || false,
-        status: personalInfo.signature?.exists
-          ? 'Uploaded'
-          : 'No signature uploaded'
+        status: personalInfo.signature?.exists ? 'Uploaded' : 'No signature uploaded'
       },
       requestDetails: personalInfo.request_details || {},
       userDetails: personalInfo.user_details || {}
@@ -105,9 +93,7 @@ class PersonalInfoService {
    */
   getRequestTypeDisplay(requestType) {
     if (Array.isArray(requestType)) {
-      const typeNames = requestType.map((type) =>
-        this.getSingleRequestTypeDisplay(type)
-      )
+      const typeNames = requestType.map((type) => this.getSingleRequestTypeDisplay(type))
       return typeNames.join(', ')
     }
     return this.getSingleRequestTypeDisplay(requestType)
@@ -179,10 +165,7 @@ class PersonalInfoService {
       errors.department = 'Department is required'
     }
 
-    if (
-      !personalInfo.contactNumber ||
-      personalInfo.contactNumber.trim() === ''
-    ) {
+    if (!personalInfo.contactNumber || personalInfo.contactNumber.trim() === '') {
       errors.contactNumber = 'Contact Number is required'
     } else {
       // Validate contact number format

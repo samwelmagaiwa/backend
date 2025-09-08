@@ -36,13 +36,10 @@ apiClient.interceptors.request.use(
 
     // Log request in debug mode
     if (typeof window !== 'undefined' && APP_CONFIG.DEBUG) {
-      console.log(
-        `🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`,
-        {
-          headers: config.headers,
-          data: config.data
-        }
-      )
+      console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`, {
+        headers: config.headers,
+        data: config.data
+      })
     }
 
     return config
@@ -61,9 +58,7 @@ apiClient.interceptors.response.use(
     // Log response in debug mode
     if (typeof window !== 'undefined' && APP_CONFIG.DEBUG) {
       console.log(
-        `✅ API Response: ${response.config.method?.toUpperCase()} ${
-          response.config.url
-        }`,
+        `✅ API Response: ${response.config.method?.toUpperCase()} ${response.config.url}`,
         {
           status: response.status,
           data: response.data
@@ -76,23 +71,16 @@ apiClient.interceptors.response.use(
   (error) => {
     // Log error in debug mode
     if (typeof window !== 'undefined' && APP_CONFIG.DEBUG) {
-      console.error(
-        `❌ API Error: ${error.config?.method?.toUpperCase()} ${
-          error.config?.url
-        }`,
-        {
-          status: error.response?.status,
-          message: error.response?.data?.message || error.message,
-          data: error.response?.data
-        }
-      )
+      console.error(`❌ API Error: ${error.config?.method?.toUpperCase()} ${error.config?.url}`, {
+        status: error.response?.status,
+        message: error.response?.data?.message || error.message,
+        data: error.response?.data
+      })
     }
 
     // Handle 401 Unauthorized (token expired or invalid)
     if (error.response?.status === 401) {
-      console.warn(
-        '🔐 Authentication failed - clearing tokens and redirecting to login'
-      )
+      console.warn('🔐 Authentication failed - clearing tokens and redirecting to login')
 
       // Clear invalid token
       localStorage.removeItem('auth_token')
@@ -100,10 +88,7 @@ apiClient.interceptors.response.use(
       localStorage.removeItem('session_data')
 
       // Redirect to login if not already there
-      if (
-        window.location.pathname !== '/' &&
-        window.location.pathname !== '/login'
-      ) {
+      if (window.location.pathname !== '/' && window.location.pathname !== '/login') {
         window.location.href = '/'
       }
     }
@@ -274,13 +259,9 @@ export const authAPI = {
         }
       }
 
-      const response = await apiClient.post(
-        '/onboarding/submit-declaration',
-        requestData,
-        {
-          headers: headers
-        }
-      )
+      const response = await apiClient.post('/onboarding/submit-declaration', requestData, {
+        headers: headers
+      })
 
       return {
         success: true,
@@ -396,13 +377,10 @@ export const authAPI = {
 
   async bulkResetOnboarding(userIds, resetType = 'all') {
     try {
-      const response = await apiClient.post(
-        '/admin/users/bulk-reset-onboarding',
-        {
-          user_ids: userIds,
-          reset_type: resetType
-        }
-      )
+      const response = await apiClient.post('/admin/users/bulk-reset-onboarding', {
+        user_ids: userIds,
+        reset_type: resetType
+      })
       return {
         success: true,
         data: response.data.data

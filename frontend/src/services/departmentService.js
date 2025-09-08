@@ -9,7 +9,7 @@ class DepartmentService {
       timeout: 10000,
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        Accept: 'application/json'
       }
     })
 
@@ -181,7 +181,10 @@ class DepartmentService {
   async getFormData(departmentId = null) {
     try {
       const params = departmentId ? { department_id: departmentId } : {}
-      console.log('Making request to:', `${this.api.defaults.baseURL}/admin/departments/create-form-data`)
+      console.log(
+        'Making request to:',
+        `${this.api.defaults.baseURL}/admin/departments/create-form-data`
+      )
       console.log('With params:', params)
       const response = await this.api.get('/admin/departments/create-form-data', { params })
       console.log('Form data response received:', response)

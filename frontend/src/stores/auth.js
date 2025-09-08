@@ -58,7 +58,7 @@ export const useAuthStore = defineStore('auth', () => {
       'ict_director',
       'ict_officer'
     ]
-    return approverRoles.includes(role) || userRoles.value.some(r => approverRoles.includes(r))
+    return approverRoles.includes(role) || userRoles.value.some((r) => approverRoles.includes(r))
   })
 
   // Actions
@@ -169,7 +169,7 @@ export const useAuthStore = defineStore('auth', () => {
       }
       // If roles is an array of objects, extract the name property
       else if (authData.user.roles.length > 0 && typeof authData.user.roles[0] === 'object') {
-        rolesArray = authData.user.roles.map(role => role.name || role)
+        rolesArray = authData.user.roles.map((role) => role.name || role)
       }
     }
     // If no roles array but we have a primary role, create array with that role
@@ -203,7 +203,7 @@ export const useAuthStore = defineStore('auth', () => {
         }
         // If roles is an array of objects, extract the name property
         else if (userData.roles.length > 0 && typeof userData.roles[0] === 'object') {
-          rolesArray = userData.roles.map(role => role.name || role)
+          rolesArray = userData.roles.map((role) => role.name || role)
         }
       }
       userRoles.value = rolesArray
@@ -250,9 +250,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const hasRole = (roles) => {
     const rolesToCheck = Array.isArray(roles) ? roles : [roles]
-    return rolesToCheck.some(role =>
-      userRole.value === role || userRoles.value.includes(role)
-    )
+    return rolesToCheck.some((role) => userRole.value === role || userRoles.value.includes(role))
   }
 
   const hasAnyRole = (roles) => {
@@ -260,7 +258,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   // Sync with Vuex store
-  const syncWithVuex = async() => {
+  const syncWithVuex = async () => {
     try {
       const store = (await import('../store')).default
       const vuexUser = store.getters['auth/user']

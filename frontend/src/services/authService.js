@@ -156,8 +156,7 @@ export const authService = {
     } catch (error) {
       return {
         success: false,
-        message:
-          error.response?.data?.message || 'Failed to get active sessions'
+        message: error.response?.data?.message || 'Failed to get active sessions'
       }
     }
   },

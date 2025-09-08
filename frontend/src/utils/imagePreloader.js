@@ -185,9 +185,7 @@ export function preloadRouteBasedImages(routePath) {
  */
 export function cleanupPreloadedImages() {
   // Remove preload links that are no longer needed
-  const preloadLinks = document.querySelectorAll(
-    'link[rel="preload"][as="image"]'
-  )
+  const preloadLinks = document.querySelectorAll('link[rel="preload"][as="image"]')
 
   preloadLinks.forEach((link) => {
     // Remove after a delay to ensure images are cached

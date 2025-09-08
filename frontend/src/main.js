@@ -1,7 +1,6 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
-import store from './store'
 import pinia from './stores' // Add Pinia
 
 // Import CSS files with error handling
@@ -19,7 +18,6 @@ try {
   const app = createApp(App)
 
   // Use plugins (but don't mount yet)
-  app.use(store)
   app.use(pinia) // Add Pinia
 
   // Global error handler
@@ -36,18 +34,11 @@ try {
   authStore.initializeAuth()
   console.log('✅ Pinia auth store initialized')
 
-  // Restore Vuex authentication session BEFORE router setup
-  console.log('🔄 Restoring Vuex authentication session before router setup...')
-  const sessionResult = await store.dispatch('auth/restoreSession')
-  console.log('✅ Vuex authentication session restoration completed:', sessionResult)
-
-  // Sync Pinia with Vuex
-  console.log('🔄 Syncing Pinia auth with Vuex...')
-  await authStore.syncWithVuex()
-  console.log('✅ Pinia-Vuex auth sync completed')
+  // Pinia only: Vuex removed
+  console.log('🔄 Pinia-only auth initialized')
 
   // Add a small delay to ensure all state is stabilized
-  await new Promise(resolve => setTimeout(resolve, 100))
+  await new Promise((resolve) => setTimeout(resolve, 100))
 
   // Now add router after auth is fully restored
   app.use(router)
@@ -58,7 +49,7 @@ try {
   console.log('✅ Vue application mounted successfully')
 
   // Initialize sidebar state with Pinia immediately after mount
-  setTimeout(async() => {
+  setTimeout(async () => {
     try {
       console.log('🔄 Initializing sidebar state with Pinia...')
       const { useSidebarStore } = await import('./stores/sidebar')
@@ -71,7 +62,7 @@ try {
   }, 50) // Reduced delay since auth is already restored
 
   // Initialize performance optimizations after app mount
-  setTimeout(async() => {
+  setTimeout(async () => {
     try {
       const { initializePerformanceOptimizations } = await import('./utils/performance')
       initializePerformanceOptimizations()
@@ -82,7 +73,7 @@ try {
   }, 100)
 
   // Initialize smart image preloading based on user state
-  setTimeout(async() => {
+  setTimeout(async () => {
     try {
       const { initializeImagePreloading } = await import('./utils/imagePreloader')
       const authModule = await import('./utils/auth')
@@ -101,7 +92,6 @@ try {
       console.warn('⚠️ Image preloading failed:', preloadError)
     }
   }, 500) // Small delay to ensure auth is initialized
-
 } catch (error) {
   console.error('❌ Failed to start Vue application:', error)
 

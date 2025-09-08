@@ -4,7 +4,7 @@ use App\Http\Controllers\Api\v1\AuthController;
 
 use App\Http\Controllers\Api\v1\OnboardingController;
 use App\Http\Controllers\Api\v1\AdminController;
-use App\Http\Controllers\Api\V1\UserAccessController;
+use App\Http\Controllers\Api\v1\UserAccessController;
 use App\Http\Controllers\Api\v1\BookingServiceController;
 use App\Http\Controllers\Api\v1\DeclarationController;
 use App\Http\Controllers\Api\v1\BothServiceFormController;
@@ -13,6 +13,9 @@ use App\Http\Controllers\Api\v1\AdminDepartmentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/', function () {
+    return redirect('/api/documentation');
+});
 
 // Public routes
     // Health check endpoint
@@ -51,13 +54,8 @@ use Illuminate\Support\Facades\Route;
     });
     
     // Authentication routes
-    Route::post('/login', [AuthController::class, 'login'])->name('login');
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    Route::post('/logout-all', [AuthController::class, 'logoutAll'])->name('logout-all');
-    Route::get('/active-sessions', [AuthController::class, 'getActiveSessions'])->name('active-sessions');
-    Route::post('/revoke-session', [AuthController::class, 'revokeSession'])->name('revoke-session');
-    Route::get('/role-redirect', [AuthController::class, 'getRoleBasedRedirect'])->name('role-redirect');
-Route::post('/register', [AuthController::class, 'register'])->name('register');
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login')->name('login');
+    Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:register')->name('register');
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -107,10 +105,10 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     
     // Authentication routes
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    Route::post('/logout-all', [AuthController::class, 'logoutAll'])->name('logout-all');
-    Route::get('/sessions', [AuthController::class, 'getActiveSessions'])->name('sessions');
-    Route::post('/sessions/revoke', [AuthController::class, 'revokeSession'])->name('sessions.revoke');
+    Route::post('/logout', [AuthController::class, 'logout'])->middleware('throttle:sensitive')->name('logout');
+    Route::post('/logout-all', [AuthController::class, 'logoutAll'])->middleware('throttle:sensitive')->name('logout-all');
+    Route::get('/sessions', [AuthController::class, 'getActiveSessions'])->middleware('throttle:api')->name('sessions');
+    Route::post('/sessions/revoke', [AuthController::class, 'revokeSession'])->middleware('throttle:sensitive')->name('sessions.revoke');
     Route::get('/current-user', [AuthController::class, 'getCurrentUser'])->name('current-user');
     Route::get('/role-redirect', [AuthController::class, 'getRoleBasedRedirect'])->name('role-redirect');
 
@@ -137,8 +135,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // Admin routes (Admin only)
     Route::prefix('admin')->group(function () {
         // Legacy admin routes
-        Route::get('/users', [AdminController::class, 'getUsers'])->name('admin.users.index');
-        Route::get('/users/{userId}', [AdminController::class, 'getUserDetails'])->name('admin.users.show');
         Route::post('/users/reset-onboarding', [AdminController::class, 'resetUserOnboarding'])->name('admin.users.reset-onboarding');
         Route::post('/users/bulk-reset-onboarding', [AdminController::class, 'bulkResetOnboarding'])->name('admin.users.bulk-reset-onboarding');
         Route::get('/onboarding/stats', [AdminController::class, 'getOnboardingStats'])->name('admin.onboarding.stats');
@@ -200,6 +196,16 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('user-access/pending-status', [UserAccessController::class, 'checkPendingRequests']);
     });
 
+    // Request Status routes (for staff users to view their requests)
+    Route::prefix('request-status')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Api\v1\RequestStatusController::class, 'index'])->name('request-status.index');
+        Route::get('/details', [\App\Http\Controllers\Api\v1\RequestStatusController::class, 'show'])->name('request-status.show');
+        Route::get('/statistics', [\App\Http\Controllers\Api\v1\RequestStatusController::class, 'statistics'])->name('request-status.statistics');
+        Route::get('/types', [\App\Http\Controllers\Api\v1\RequestStatusController::class, 'getRequestTypes'])->name('request-status.types');
+        Route::get('/statuses', [\App\Http\Controllers\Api\v1\RequestStatusController::class, 'getStatusOptions'])->name('request-status.statuses');
+        Route::get('/debug', [\App\Http\Controllers\Api\v1\RequestStatusController::class, 'debug'])->name('request-status.debug');
+    });
+
     // Booking Service routes
     Route::prefix('booking-service')->group(function () {
         // CRUD operations
@@ -209,8 +215,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('device-types', [BookingServiceController::class, 'getDeviceTypes'])->name('booking-service.device-types');
         Route::get('departments', [BookingServiceController::class, 'getDepartments'])->name('booking-service.departments');
         Route::get('statistics', [BookingServiceController::class, 'getStatistics'])->name('booking-service.statistics');
+        Route::get('debug-departments', [BookingServiceController::class, 'debugDepartments'])->name('booking-service.debug-departments');
+        Route::post('seed-departments', [BookingServiceController::class, 'seedDepartments'])->name('booking-service.seed-departments');
         
 
+        
+        // Device availability checking
+        Route::get('devices/{deviceInventoryId}/availability', [BookingServiceController::class, 'checkDeviceAvailability'])->name('booking-service.device-availability');
+        Route::get('devices/{deviceInventoryId}/bookings', [BookingServiceController::class, 'getDeviceBookings'])->name('booking-service.device-bookings');
         
         // Admin actions
         Route::post('bookings/{bookingService}/approve', [BookingServiceController::class, 'approve'])->name('booking-service.approve');
@@ -288,6 +300,18 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{department}/details', [\App\Http\Controllers\Api\v1\DepartmentHodController::class, 'getHodDetails'])->name('department-hod.details');
         Route::delete('/{department}/remove', [\App\Http\Controllers\Api\v1\DepartmentHodController::class, 'removeHod'])->name('department-hod.remove');
         Route::delete('/{department}/delete', [\App\Http\Controllers\Api\v1\DepartmentHodController::class, 'deleteHod'])->name('department-hod.delete');
+    });
+
+    // Device Inventory Management routes (Admin only)
+    Route::prefix('device-inventory')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Api\v1\DeviceInventoryController::class, 'index'])->name('device-inventory.index');
+        Route::post('/', [\App\Http\Controllers\Api\v1\DeviceInventoryController::class, 'store'])->name('device-inventory.store');
+        Route::get('/available', [\App\Http\Controllers\Api\v1\DeviceInventoryController::class, 'getAvailableDevices'])->name('device-inventory.available');
+        Route::get('/statistics', [\App\Http\Controllers\Api\v1\DeviceInventoryController::class, 'getStatistics'])->name('device-inventory.statistics');
+        Route::post('/fix-quantities', [\App\Http\Controllers\Api\v1\DeviceInventoryController::class, 'fixQuantities'])->name('device-inventory.fix-quantities');
+        Route::get('/{deviceInventory}', [\App\Http\Controllers\Api\v1\DeviceInventoryController::class, 'show'])->name('device-inventory.show');
+        Route::put('/{deviceInventory}', [\App\Http\Controllers\Api\v1\DeviceInventoryController::class, 'update'])->name('device-inventory.update');
+        Route::delete('/{deviceInventory}', [\App\Http\Controllers\Api\v1\DeviceInventoryController::class, 'destroy'])->name('device-inventory.destroy');
     });
 
     // COMMENTED OUT: Individual form routes - now using Combined Access Form only

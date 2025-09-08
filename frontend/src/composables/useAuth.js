@@ -1,28 +1,28 @@
 import { computed } from 'vue'
-import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import { ROLES, getDefaultDashboard } from '../utils/permissions'
 
 /**
  * Auth composable that provides authentication functionality
- * using Vuex store and Vue Router
+ * using Pinia auth store and Vue Router
  */
 export function useAuth() {
-  const store = useStore()
   const router = useRouter()
+  const authStore = useAuthStore()
 
-  // Computed properties from store
-  const user = computed(() => store.getters['auth/user'])
-  const token = computed(() => store.getters['auth/token'])
-  const isAuthenticated = computed(() => store.getters['auth/isAuthenticated'])
-  const userPermissions = computed(() => store.getters['auth/userPermissions'])
-  const userRole = computed(() => store.getters['auth/userRole'])
-  const userRoles = computed(() => store.getters['auth/userRoles'])
-  const isLoading = computed(() => store.getters['auth/loading'])
-  const error = computed(() => store.getters['auth/error'])
-  const isAdmin = computed(() => store.getters['auth/isAdmin'])
-  const isStaff = computed(() => store.getters['auth/isStaff'])
-  const isApprover = computed(() => store.getters['auth/isApprover'])
+  // Computed properties from Pinia store
+  const user = computed(() => authStore.user)
+  const token = computed(() => authStore.token)
+  const isAuthenticated = computed(() => authStore.isAuthenticated)
+  const userPermissions = computed(() => authStore.userPermissions)
+  const userRole = computed(() => authStore.userRole)
+  const userRoles = computed(() => authStore.userRoles)
+  const isLoading = computed(() => authStore.isLoading)
+  const error = computed(() => authStore.error)
+  const isAdmin = computed(() => authStore.isAdmin)
+  const isStaff = computed(() => authStore.isStaff)
+  const isApprover = computed(() => authStore.isApprover)
   const userName = computed(() => user.value?.name || 'User')
 
   /**
@@ -30,52 +30,35 @@ export function useAuth() {
    * @param {Object} credentials - { email, password }
    * @returns {Promise<Object>} - Login result
    */
-  const login = async(credentials) => {
+  const login = async (credentials) => {
     try {
-      const result = await store.dispatch('auth/login', credentials)
+      const { authService } = await import('@/services/authService')
+      const result = await authService.login(credentials)
 
       if (result.success) {
-        console.log('✅ Login successful, navigating to dashboard...')
+        const { user, token } = result.data
 
-        // Navigate to appropriate dashboard based on user role
-        const userRole = result.user?.role
-        const userRoles = result.user?.roles || []
+        // Set Pinia auth data
+        authStore.setAuthData({ user, token })
 
-        console.log('🔍 Login redirect logic:', {
-          userRole,
-          userRoles,
-          user: result.user
-        })
-
-        // Use centralized function to get default dashboard for user role
-        let redirectPath = getDefaultDashboard(userRole) || '/user-dashboard'
-
-        console.log('🎯 Determined redirect path from role:', userRole, '->', redirectPath)
-
-        // Check if user needs onboarding (except admin)
-        if (result.user?.needs_onboarding && userRole !== 'admin') {
-          console.log('🔄 User needs onboarding, redirecting to onboarding...')
+        // Determine redirect path
+        let redirectPath = getDefaultDashboard(authStore.userRole) || '/user-dashboard'
+        if (user?.needs_onboarding && authStore.userRole !== 'admin') {
           redirectPath = '/onboarding'
         }
-
-        // Check if there's a redirect query parameter
         const redirectTo = router.currentRoute.value.query.redirect
         if (redirectTo && typeof redirectTo === 'string') {
-          console.log('🔄 Using redirect query parameter:', redirectTo)
           redirectPath = redirectTo
         }
 
-        console.log('✅ Final redirect path:', redirectPath)
-
-        // Navigate to the determined path
         await router.push(redirectPath)
-
-        return result
+        return { success: true, user }
       }
 
       return result
     } catch (error) {
       console.error('❌ Login error in composable:', error)
+      authStore.setError(error.message || 'Login failed')
       return {
         success: false,
         message: error.message || 'Login failed'
@@ -87,25 +70,17 @@ export function useAuth() {
    * Logout current user
    * @returns {Promise<Object>} - Logout result
    */
-  const logout = async() => {
+  const logout = async () => {
     try {
-      const result = await store.dispatch('auth/logout')
-
-      if (result.success) {
-        console.log('✅ Logout successful, redirecting to login...')
-        await router.push('/login')
-      }
-
-      return result
-    } catch (error) {
-      console.error('❌ Logout error in composable:', error)
-      // Even if logout fails, clear local state and redirect
-      await store.dispatch('auth/logout')
+      const { authService } = await import('@/services/authService')
+      await authService.logout()
+      authStore.clearAuth()
       await router.push('/login')
-      return {
-        success: true,
-        message: 'Logged out locally'
-      }
+      return { success: true }
+    } catch (error) {
+      authStore.clearAuth()
+      await router.push('/login')
+      return { success: true }
     }
   }
 
@@ -113,25 +88,17 @@ export function useAuth() {
    * Logout from all sessions
    * @returns {Promise<Object>} - Logout all result
    */
-  const logoutAll = async() => {
+  const logoutAll = async () => {
     try {
-      const result = await store.dispatch('auth/logoutAll')
-
-      if (result.success) {
-        console.log('✅ Logout all successful, redirecting to login...')
-        await router.push('/login')
-      }
-
-      return result
-    } catch (error) {
-      console.error('❌ Logout all error in composable:', error)
-      // Even if logout fails, clear local state and redirect
-      await store.dispatch('auth/logout')
+      const { authService } = await import('@/services/authService')
+      const result = await authService.logoutAll()
+      authStore.clearAuth()
       await router.push('/login')
-      return {
-        success: true,
-        message: 'Logged out locally'
-      }
+      return result.success ? result : { success: true }
+    } catch (error) {
+      authStore.clearAuth()
+      await router.push('/login')
+      return { success: true }
     }
   }
 
@@ -140,14 +107,14 @@ export function useAuth() {
    * @param {Object} userData - Updated user data
    */
   const updateUser = (userData) => {
-    store.dispatch('auth/updateUser', userData)
+    authStore.updateUser(userData)
   }
 
   /**
    * Clear authentication error
    */
   const clearError = () => {
-    store.dispatch('auth/clearError')
+    authStore.clearError()
   }
 
   /**
@@ -156,7 +123,7 @@ export function useAuth() {
    * @returns {boolean} - Whether user has permission
    */
   const hasPermission = (permission) => {
-    return userPermissions.value.includes(permission)
+    return authStore.hasPermission(permission)
   }
 
   /**
@@ -165,13 +132,7 @@ export function useAuth() {
    * @returns {boolean} - Whether user has any of the roles
    */
   const hasRole = (roles) => {
-    const rolesToCheck = Array.isArray(roles) ? roles : [roles]
-    const currentRole = userRole.value
-    const currentRoles = userRoles.value
-
-    return rolesToCheck.some(role =>
-      currentRole === role || currentRoles.includes(role)
-    )
+    return authStore.hasRole(roles)
   }
 
   /**
@@ -180,10 +141,7 @@ export function useAuth() {
    * @returns {boolean} - Whether user can access route
    */
   const canAccessRoute = (route) => {
-    if (!route.meta?.roles) {
-      return true // No role restriction
-    }
-
+    if (!route.meta?.roles) return true
     return hasRole(route.meta.roles)
   }
 

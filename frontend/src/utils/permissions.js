@@ -47,14 +47,13 @@ export const ROLE_PERMISSIONS = {
       '/onboarding'
     ],
     dashboards: ['divisional-dashboard'],
-    forms: [
-      'jeeva-access',
-      'wellsoft-access',
-      'internet-access',
-      'both-service-form'
-    ],
+    forms: ['jeeva-access', 'wellsoft-access', 'internet-access', 'both-service-form'],
     userManagement: [],
-    requestsManagement: ['hod-dashboard/request-list', 'internal-access/list', 'internal-access/details']
+    requestsManagement: [
+      'hod-dashboard/request-list',
+      'internal-access/list',
+      'internal-access/details'
+    ]
   },
 
   [ROLES.HEAD_OF_DEPARTMENT]: {
@@ -70,16 +69,10 @@ export const ROLE_PERMISSIONS = {
       '/onboarding'
     ],
     dashboards: ['hod-dashboard'],
-    forms: [
-      'jeeva-access',
-      'wellsoft-access',
-      'internet-access',
-      'both-service-form'
-    ],
+    forms: ['jeeva-access', 'wellsoft-access', 'internet-access', 'both-service-form'],
     userManagement: [],
     requestsManagement: ['internal-access/list', 'internal-access/details']
   },
-
 
   [ROLES.ICT_DIRECTOR]: {
     routes: [
@@ -94,14 +87,13 @@ export const ROLE_PERMISSIONS = {
       '/onboarding'
     ],
     dashboards: ['dict-dashboard'],
-    forms: [
-      'jeeva-access',
-      'wellsoft-access',
-      'internet-access',
-      'both-service-form'
-    ],
+    forms: ['jeeva-access', 'wellsoft-access', 'internet-access', 'both-service-form'],
     userManagement: [],
-    requestsManagement: ['hod-dashboard/request-list', 'internal-access/list', 'internal-access/details']
+    requestsManagement: [
+      'hod-dashboard/request-list',
+      'internal-access/list',
+      'internal-access/details'
+    ]
   },
 
   [ROLES.STAFF]: {
@@ -139,12 +131,7 @@ export const ROLE_PERMISSIONS = {
       '/onboarding'
     ],
     dashboards: ['ict-dashboard'],
-    forms: [
-      'jeeva-access',
-      'wellsoft-access',
-      'internet-access',
-      'both-service-form'
-    ],
+    forms: ['jeeva-access', 'wellsoft-access', 'internet-access', 'both-service-form'],
     userManagement: [],
     deviceManagement: ['ict-approval/requests', 'ict-approval/request/:id'],
     requestsManagement: ['internal-access/list', 'internal-access/details']
@@ -152,12 +139,7 @@ export const ROLE_PERMISSIONS = {
 }
 
 // Public routes that don't require authentication
-export const PUBLIC_ROUTES = [
-  '/',
-  '/login',
-  '/ict-policy',
-  '/terms-of-service'
-]
+export const PUBLIC_ROUTES = ['/', '/login', '/ict-policy', '/terms-of-service']
 
 // Onboarding routes (accessible to authenticated non-admin users)
 export const ONBOARDING_ROUTES = ['/onboarding']

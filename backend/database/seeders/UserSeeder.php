@@ -282,16 +282,11 @@ class UserSeeder extends Seeder
             $userRoles = $userData['roles'] ?? ['staff'];
             unset($userData['roles']);
             
-            // Get the primary role for role_id assignment
+            // Determine primary role for logging/info only
             $primaryRoleName = $userRoles[0] ?? 'staff';
             $primaryRole = $roles[$primaryRoleName] ?? $roles['staff'];
             
-            // Add role_id to user data for backward compatibility
-            if ($primaryRole) {
-                $userData['role_id'] = $primaryRole->id;
-            }
-            
-            // Create or update user
+            // Create or update user (no legacy role_id)
             $user = User::firstOrCreate(
                 ['email' => $userData['email']], 
                 $userData
@@ -312,8 +307,7 @@ class UserSeeder extends Seeder
             
             $departmentName = $user->department ? $user->department->name : 'No Department';
             $assignedRoles = implode(', ', $userRoles);
-            $primaryRoleInfo = $primaryRole ? " (role_id: {$primaryRole->id})" : '';
-            $this->command->info("Created user: {$user->name} ({$departmentName}) - Roles: {$assignedRoles}{$primaryRoleInfo}");
+            $this->command->info("Created user: {$user->name} ({$departmentName}) - Roles: {$assignedRoles}");
         }
 
         // Update department relationships

@@ -66,17 +66,13 @@ class EnhancedBookingService {
     try {
       apiDebugger.logRequest('POST', `${this.baseUrl}/bookings`)
 
-      const response = await enhancedAPI.post(
-        `${this.baseUrl}/bookings`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          },
-          // Don't deduplicate booking submissions
-          deduplicate: false
-        }
-      )
+      const response = await enhancedAPI.post(`${this.baseUrl}/bookings`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        },
+        // Don't deduplicate booking submissions
+        deduplicate: false
+      })
 
       return {
         success: true,
@@ -152,13 +148,9 @@ class EnhancedBookingService {
     try {
       apiDebugger.logRequest('PUT', `${this.baseUrl}/bookings/${id}`)
 
-      const response = await enhancedAPI.put(
-        `${this.baseUrl}/bookings/${id}`,
-        data,
-        {
-          deduplicate: false // Don't deduplicate updates
-        }
-      )
+      const response = await enhancedAPI.put(`${this.baseUrl}/bookings/${id}`, data, {
+        deduplicate: false // Don't deduplicate updates
+      })
 
       return {
         success: true,
@@ -183,13 +175,9 @@ class EnhancedBookingService {
     try {
       apiDebugger.logRequest('POST', `${this.baseUrl}/bookings/${id}/approve`)
 
-      const response = await enhancedAPI.post(
-        `${this.baseUrl}/bookings/${id}/approve`,
-        data,
-        {
-          deduplicate: false // Don't deduplicate approval actions
-        }
-      )
+      const response = await enhancedAPI.post(`${this.baseUrl}/bookings/${id}/approve`, data, {
+        deduplicate: false // Don't deduplicate approval actions
+      })
 
       return {
         success: true,
@@ -213,13 +201,9 @@ class EnhancedBookingService {
     try {
       apiDebugger.logRequest('POST', `${this.baseUrl}/bookings/${id}/reject`)
 
-      const response = await enhancedAPI.post(
-        `${this.baseUrl}/bookings/${id}/reject`,
-        data,
-        {
-          deduplicate: false // Don't deduplicate rejection actions
-        }
-      )
+      const response = await enhancedAPI.post(`${this.baseUrl}/bookings/${id}/reject`, data, {
+        deduplicate: false // Don't deduplicate rejection actions
+      })
 
       return {
         success: true,

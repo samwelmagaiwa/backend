@@ -25,9 +25,7 @@ export const userCombinedAccessService = {
       console.error('Combined access request submission failed:', error)
       return {
         success: false,
-        message:
-          error.response?.data?.message ||
-          'Failed to submit combined access request',
+        message: error.response?.data?.message || 'Failed to submit combined access request',
         errors: error.response?.data?.errors || {},
         status: error.response?.status
       }
@@ -72,8 +70,7 @@ export const userCombinedAccessService = {
       console.error('Failed to fetch request details:', error)
       return {
         success: false,
-        message:
-          error.response?.data?.message || 'Failed to fetch request details',
+        message: error.response?.data?.message || 'Failed to fetch request details',
         status: error.response?.status
       }
     }
@@ -87,15 +84,11 @@ export const userCombinedAccessService = {
    */
   async updateRequest(requestId, formData) {
     try {
-      const response = await apiClient.post(
-        `/v1/user-access/${requestId}`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
+      const response = await apiClient.post(`/v1/user-access/${requestId}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
         }
-      )
+      })
       return {
         success: true,
         data: response.data

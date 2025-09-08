@@ -43,9 +43,7 @@
               National Hospital
             </span>
             <div class="flex items-center gap-1 mt-0.5">
-              <div
-                class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"
-              ></div>
+              <div class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
               <span class="text-xs text-emerald-300 font-medium">Online</span>
             </div>
           </div>
@@ -58,7 +56,7 @@
           <i
             :class="[
               isCollapsed ? 'fas fa-chevron-right' : 'fas fa-chevron-left',
-              'text-slate-300 text-sm group-hover:text-white transition-colors',
+              'text-slate-300 text-sm group-hover:text-white transition-colors'
             ]"
           ></i>
         </button>
@@ -76,7 +74,7 @@
               class="relative flex items-center px-4 py-2 text-sm transition-all duration-300 cursor-pointer backdrop-blur-sm group"
               :class="[
                 isCollapsed ? 'justify-center' : '',
-                'text-slate-200 hover:bg-gradient-to-r hover:from-blue-600/20 hover:via-teal-600/20 hover:to-cyan-600/20 hover:text-white',
+                'text-slate-200 hover:bg-gradient-to-r hover:from-blue-600/20 hover:via-teal-600/20 hover:to-cyan-600/20 hover:text-white'
               ]"
               @click="!isCollapsed && (showDashboard = !showDashboard)"
             >
@@ -95,7 +93,7 @@
                 <i
                   :class="[
                     'fas text-xs text-slate-400 absolute transition-transform duration-200',
-                    showDashboard ? 'fa-minus' : 'fa-plus',
+                    showDashboard ? 'fa-minus' : 'fa-plus'
                   ]"
                 ></i>
               </div>
@@ -107,9 +105,7 @@
                 <i class="fas fa-tachometer-alt text-xs drop-shadow-lg"></i>
               </div>
 
-              <span
-                v-show="!isCollapsed"
-                class="font-semibold tracking-wide drop-shadow-lg"
+              <span v-show="!isCollapsed" class="font-semibold tracking-wide drop-shadow-lg"
                 >Dashboard</span
               >
             </div>
@@ -127,24 +123,18 @@
                 v-if="showDashboard && !isCollapsed"
                 class="tree-children ml-6 border-l border-slate-600/30 pl-4 space-y-1"
               >
-                <li
-                  v-for="item in dashboardItems"
-                  :key="item.path"
-                  class="tree-leaf"
-                >
+                <li v-for="item in dashboardItems" :key="item.path" class="tree-leaf">
                   <router-link
                     :to="item.path"
                     class="relative flex items-center rounded-lg px-3 py-2 text-sm transition-all duration-300 backdrop-blur-sm group overflow-hidden"
                     :class="[
                       $route.path === item.path
                         ? 'bg-gradient-to-r from-blue-500/40 via-teal-500/40 to-cyan-500/40 text-white shadow-xl border border-blue-400/50'
-                        : 'text-slate-300 hover:bg-gradient-to-r hover:from-blue-600/30 hover:via-teal-600/30 hover:to-cyan-600/30 hover:text-white hover:shadow-lg',
+                        : 'text-slate-300 hover:bg-gradient-to-r hover:from-blue-600/30 hover:via-teal-600/30 hover:to-cyan-600/30 hover:text-white hover:shadow-lg'
                     ]"
                   >
                     <!-- Tree Connector -->
-                    <div
-                      class="absolute -left-4 top-1/2 w-3 h-px bg-slate-600/30"
-                    ></div>
+                    <div class="absolute -left-4 top-1/2 w-3 h-px bg-slate-600/30"></div>
                     <div
                       class="absolute -left-4 top-1/2 w-1 h-1 bg-slate-600/50 rounded-full transform -translate-y-0.5"
                     ></div>
@@ -159,10 +149,9 @@
                     >
                       <i :class="[item.icon, 'text-xs drop-shadow-lg']"></i>
                     </div>
-                    <span
-                      class="relative font-medium tracking-wide drop-shadow-lg"
-                      >{{ item.displayName }}</span
-                    >
+                    <span class="relative font-medium tracking-wide drop-shadow-lg">{{
+                      item.displayName
+                    }}</span>
 
                     <!-- Active Indicator -->
                     <div
@@ -179,9 +168,7 @@
         <!-- User Management Section (Admin only) -->
         <li v-if="userManagementItems.length > 0" class="mt-6">
           <div v-show="!isCollapsed" class="px-3 py-2">
-            <h3
-              class="text-xs font-semibold text-blue-200 uppercase tracking-wider drop-shadow-sm"
-            >
+            <h3 class="text-xs font-semibold text-blue-200 uppercase tracking-wider drop-shadow-sm">
               User Management
             </h3>
           </div>
@@ -196,16 +183,11 @@
                 class="flex items-center rounded-md mx-2 px-3 py-2 text-sm transition-colors cursor-pointer flex-1 backdrop-blur-sm"
                 :class="[
                   isCollapsed ? 'justify-center' : '',
-                  'text-blue-100 hover:bg-blue-700/30 hover:text-white',
+                  'text-blue-100 hover:bg-blue-700/30 hover:text-white'
                 ]"
                 @click="!isCollapsed && (showUserMgmt = !showUserMgmt)"
               >
-                <i
-                  :class="[
-                    'fas fa-users',
-                    isCollapsed ? 'text-lg' : 'text-base mr-3',
-                  ]"
-                ></i>
+                <i :class="['fas fa-users', isCollapsed ? 'text-lg' : 'text-base mr-3']"></i>
                 <span v-show="!isCollapsed">User Management</span>
               </div>
             </div>
@@ -216,12 +198,7 @@
               class="mr-2 p-2 rounded-md text-blue-200 hover:bg-blue-700/30 transition-colors backdrop-blur-sm"
               :aria-expanded="showUserMgmt.toString()"
             >
-              <i
-                :class="[
-                  'fas text-xs',
-                  showUserMgmt ? 'fa-chevron-up' : 'fa-chevron-down',
-                ]"
-              ></i>
+              <i :class="['fas text-xs', showUserMgmt ? 'fa-chevron-up' : 'fa-chevron-down']"></i>
             </button>
           </div>
 
@@ -239,7 +216,8 @@
                 class="bg-gradient-to-br from-blue-50 via-blue-50 to-cyan-50 rounded-xl border-2 border-blue-200/50 overflow-hidden shadow-xl"
                 style="
                   backdrop-filter: blur(10px);
-                  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3),
+                  box-shadow:
+                    0 10px 25px -5px rgba(59, 130, 246, 0.3),
                     0 0 0 1px rgba(59, 130, 246, 0.1),
                     inset 0 1px 0 rgba(255, 255, 255, 0.2);
                 "
@@ -254,7 +232,7 @@
                     :class="[
                       $route.path === item.path
                         ? 'bg-blue-100 text-blue-700 shadow-md'
-                        : 'text-gray-700 hover:bg-blue-100 hover:text-blue-700 hover:shadow-md hover:transform hover:scale-105',
+                        : 'text-gray-700 hover:bg-blue-100 hover:text-blue-700 hover:shadow-md hover:transform hover:scale-105'
                     ]"
                   >
                     <!-- Hover gradient overlay -->
@@ -265,12 +243,7 @@
                     <div
                       class="w-8 h-8 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center mr-3 group-hover:from-blue-200 group-hover:to-blue-300 transition-all duration-300 shadow-lg border border-blue-300/50"
                     >
-                      <i
-                        :class="[
-                          item.icon,
-                          'text-blue-600 text-sm drop-shadow-sm',
-                        ]"
-                      ></i>
+                      <i :class="[item.icon, 'text-blue-600 text-sm drop-shadow-sm']"></i>
                     </div>
                     <div class="flex-1 relative z-10">
                       <p class="font-semibold drop-shadow-sm">
@@ -304,14 +277,12 @@
               class="relative flex items-center px-4 py-2 text-sm transition-all duration-300 cursor-pointer backdrop-blur-sm group"
               :class="[
                 isCollapsed ? 'justify-center' : '',
-                $route.path.startsWith('/hod-dashboard/request-list') || $route.path.startsWith('/internal-access')
+                $route.path.startsWith('/hod-dashboard/request-list') ||
+                $route.path.startsWith('/internal-access')
                   ? 'text-white'
-                  : 'text-slate-200 hover:bg-gradient-to-r hover:from-orange-600/20 hover:via-amber-600/20 hover:to-yellow-600/20 hover:text-white',
+                  : 'text-slate-200 hover:bg-gradient-to-r hover:from-orange-600/20 hover:via-amber-600/20 hover:to-yellow-600/20 hover:text-white'
               ]"
-              @click="
-                !isCollapsed &&
-                  (showRequestsManagement = !showRequestsManagement)
-              "
+              @click="!isCollapsed && (showRequestsManagement = !showRequestsManagement)"
             >
               <!-- Tree Lines -->
               <div
@@ -328,7 +299,7 @@
                 <i
                   :class="[
                     'fas text-xs text-slate-400 absolute transition-transform duration-200',
-                    showRequestsManagement ? 'fa-minus' : 'fa-plus',
+                    showRequestsManagement ? 'fa-minus' : 'fa-plus'
                   ]"
                 ></i>
               </div>
@@ -340,15 +311,16 @@
                 <i class="fas fa-clipboard-check text-xs drop-shadow-lg"></i>
               </div>
 
-              <span
-                v-show="!isCollapsed"
-                class="font-semibold tracking-wide drop-shadow-lg"
+              <span v-show="!isCollapsed" class="font-semibold tracking-wide drop-shadow-lg"
                 >Requests Management</span
               >
 
               <!-- Active Indicator -->
               <div
-                v-if="$route.path.startsWith('/hod-dashboard/request-list') || $route.path.startsWith('/internal-access')"
+                v-if="
+                  $route.path.startsWith('/hod-dashboard/request-list') ||
+                  $route.path.startsWith('/internal-access')
+                "
                 class="absolute right-2 w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse shadow-lg"
               ></div>
             </div>
@@ -374,13 +346,11 @@
                     :class="[
                       $route.path === '/hod-dashboard/request-list'
                         ? 'bg-gradient-to-r from-orange-500/40 via-amber-500/40 to-yellow-500/40 text-white shadow-xl border border-orange-400/50'
-                        : 'text-slate-300 hover:bg-gradient-to-r hover:from-orange-600/30 hover:via-amber-600/30 hover:to-yellow-600/30 hover:text-white hover:shadow-lg',
+                        : 'text-slate-300 hover:bg-gradient-to-r hover:from-orange-600/30 hover:via-amber-600/30 hover:to-yellow-600/30 hover:text-white hover:shadow-lg'
                     ]"
                   >
                     <!-- Tree Connector -->
-                    <div
-                      class="absolute -left-4 top-1/2 w-3 h-px bg-slate-600/30"
-                    ></div>
+                    <div class="absolute -left-4 top-1/2 w-3 h-px bg-slate-600/30"></div>
                     <div
                       class="absolute -left-4 top-1/2 w-1 h-1 bg-slate-600/50 rounded-full transform -translate-y-0.5"
                     ></div>
@@ -396,8 +366,7 @@
                       <i class="fas fa-list text-xs drop-shadow-lg"></i>
                     </div>
                     <div class="relative flex-1">
-                      <span
-                        class="font-medium tracking-wide drop-shadow-lg block"
+                      <span class="font-medium tracking-wide drop-shadow-lg block"
                         >Access Requests</span
                       >
                       <span
@@ -416,19 +385,14 @@
 
                 <!-- Request Details Node (Dynamic) -->
                 <li
-                  v-if="
-                    $route.query.id &&
-                    $route.path === '/internal-access/details'
-                  "
+                  v-if="$route.query.id && $route.path === '/internal-access/details'"
                   class="tree-leaf"
                 >
                   <div
                     class="relative flex items-center rounded-lg px-3 py-2 text-sm transition-all duration-300 backdrop-blur-sm bg-gradient-to-r from-amber-500/40 via-yellow-500/40 to-orange-500/40 text-white shadow-xl border border-amber-400/50"
                   >
                     <!-- Tree Connector -->
-                    <div
-                      class="absolute -left-4 top-1/2 w-3 h-px bg-slate-600/30"
-                    ></div>
+                    <div class="absolute -left-4 top-1/2 w-3 h-px bg-slate-600/30"></div>
                     <div
                       class="absolute -left-4 top-1/2 w-1 h-1 bg-slate-600/50 rounded-full transform -translate-y-0.5"
                     ></div>
@@ -436,18 +400,13 @@
                     <div
                       class="relative flex items-center justify-center w-5 h-5 rounded bg-gradient-to-br from-amber-500/50 via-yellow-500/50 to-orange-500/50 transition-all duration-300 shadow border border-white/20 mr-3"
                     >
-                      <i
-                        class="fas fa-clipboard-check text-xs drop-shadow-lg"
-                      ></i>
+                      <i class="fas fa-clipboard-check text-xs drop-shadow-lg"></i>
                     </div>
                     <div class="relative flex-1">
-                      <span
-                        class="font-medium tracking-wide drop-shadow-lg block"
+                      <span class="font-medium tracking-wide drop-shadow-lg block"
                         >Request Details</span
                       >
-                      <span class="text-xs opacity-80"
-                        >ID: {{ $route.query.id }}</span
-                      >
+                      <span class="text-xs opacity-80">ID: {{ $route.query.id }}</span>
                     </div>
 
                     <!-- Active Indicator -->
@@ -471,11 +430,9 @@
                 isCollapsed ? 'justify-center' : '',
                 $route.path.startsWith('/ict-approval')
                   ? 'text-white'
-                  : 'text-slate-200 hover:bg-gradient-to-r hover:from-teal-600/20 hover:via-cyan-600/20 hover:to-emerald-600/20 hover:text-white',
+                  : 'text-slate-200 hover:bg-gradient-to-r hover:from-teal-600/20 hover:via-cyan-600/20 hover:to-emerald-600/20 hover:text-white'
               ]"
-              @click="
-                !isCollapsed && (showDeviceManagement = !showDeviceManagement)
-              "
+              @click="!isCollapsed && (showDeviceManagement = !showDeviceManagement)"
             >
               <!-- Tree Lines -->
               <div
@@ -492,7 +449,7 @@
                 <i
                   :class="[
                     'fas text-xs text-slate-400 absolute transition-transform duration-200',
-                    showDeviceManagement ? 'fa-minus' : 'fa-plus',
+                    showDeviceManagement ? 'fa-minus' : 'fa-plus'
                   ]"
                 ></i>
               </div>
@@ -504,9 +461,7 @@
                 <i class="fas fa-clipboard-list text-xs drop-shadow-lg"></i>
               </div>
 
-              <span
-                v-show="!isCollapsed"
-                class="font-semibold tracking-wide drop-shadow-lg"
+              <span v-show="!isCollapsed" class="font-semibold tracking-wide drop-shadow-lg"
                 >Device Management</span
               >
 
@@ -538,13 +493,11 @@
                     :class="[
                       $route.path === '/ict-approval/requests'
                         ? 'bg-gradient-to-r from-teal-500/40 via-cyan-500/40 to-emerald-500/40 text-white shadow-xl border border-teal-400/50'
-                        : 'text-slate-300 hover:bg-gradient-to-r hover:from-teal-600/30 hover:via-cyan-600/30 hover:to-emerald-600/30 hover:text-white hover:shadow-lg',
+                        : 'text-slate-300 hover:bg-gradient-to-r hover:from-teal-600/30 hover:via-cyan-600/30 hover:to-emerald-600/30 hover:text-white hover:shadow-lg'
                     ]"
                   >
                     <!-- Tree Connector -->
-                    <div
-                      class="absolute -left-4 top-1/2 w-3 h-px bg-slate-600/30"
-                    ></div>
+                    <div class="absolute -left-4 top-1/2 w-3 h-px bg-slate-600/30"></div>
                     <div
                       class="absolute -left-4 top-1/2 w-1 h-1 bg-slate-600/50 rounded-full transform -translate-y-0.5"
                     ></div>
@@ -560,8 +513,7 @@
                       <i class="fas fa-list text-xs drop-shadow-lg"></i>
                     </div>
                     <div class="relative flex-1">
-                      <span
-                        class="font-medium tracking-wide drop-shadow-lg block"
+                      <span class="font-medium tracking-wide drop-shadow-lg block"
                         >All Requests</span
                       >
                       <span
@@ -584,9 +536,7 @@
                     class="relative flex items-center rounded-lg px-3 py-2 text-sm transition-all duration-300 backdrop-blur-sm bg-gradient-to-r from-cyan-500/40 via-emerald-500/40 to-teal-500/40 text-white shadow-xl border border-cyan-400/50"
                   >
                     <!-- Tree Connector -->
-                    <div
-                      class="absolute -left-4 top-1/2 w-3 h-px bg-slate-600/30"
-                    ></div>
+                    <div class="absolute -left-4 top-1/2 w-3 h-px bg-slate-600/30"></div>
                     <div
                       class="absolute -left-4 top-1/2 w-1 h-1 bg-slate-600/50 rounded-full transform -translate-y-0.5"
                     ></div>
@@ -594,18 +544,13 @@
                     <div
                       class="relative flex items-center justify-center w-5 h-5 rounded bg-gradient-to-br from-cyan-500/50 via-emerald-500/50 to-teal-500/50 transition-all duration-300 shadow border border-white/20 mr-3"
                     >
-                      <i
-                        class="fas fa-clipboard-check text-xs drop-shadow-lg"
-                      ></i>
+                      <i class="fas fa-clipboard-check text-xs drop-shadow-lg"></i>
                     </div>
                     <div class="relative flex-1">
-                      <span
-                        class="font-medium tracking-wide drop-shadow-lg block"
+                      <span class="font-medium tracking-wide drop-shadow-lg block"
                         >Request Details</span
                       >
-                      <span class="text-xs opacity-80"
-                        >ID: {{ $route.params.id }}</span
-                      >
+                      <span class="text-xs opacity-80">ID: {{ $route.params.id }}</span>
                     </div>
 
                     <!-- Active Indicator -->
@@ -623,11 +568,8 @@
       </ul>
     </nav>
 
-
     <!-- Footer / Logout -->
-    <div
-      class="relative border-t border-slate-600/20 p-4 mt-auto"
-    >
+    <div class="relative border-t border-slate-600/20 p-4 mt-auto">
       <!-- Background Pattern -->
       <div
         class="absolute inset-0 bg-gradient-to-r from-red-500/5 via-orange-500/5 to-red-500/5 backdrop-blur-sm"
@@ -649,9 +591,7 @@
         >
           <i class="fas fa-sign-out-alt text-sm drop-shadow-lg"></i>
         </div>
-        <span
-          v-show="!isCollapsed"
-          class="relative ml-3 font-semibold tracking-wide drop-shadow-lg"
+        <span v-show="!isCollapsed" class="relative ml-3 font-semibold tracking-wide drop-shadow-lg"
           >Logout</span
         >
       </button>
@@ -667,385 +607,383 @@
         </div>
         <div class="text-xs text-slate-500">ICT Management System</div>
       </div>
-      <div v-show="isCollapsed" class="mt-1 text-xs text-slate-400 text-center">
-        ©
-      </div>
+      <div v-show="isCollapsed" class="mt-1 text-xs text-slate-400 text-center">©</div>
     </div>
   </aside>
 </template>
 
 <script>
-import { computed, ref, watch, onMounted, nextTick } from 'vue'
-import { useRouter } from 'vue-router'
-import { ROLE_PERMISSIONS, ROLES } from '../utils/permissions'
-import { useAuth } from '../composables/useAuth'
-import auth from '../utils/auth'
-import { logoutGuard } from '@/utils/logoutGuard'
+  import { computed, ref, watch, onMounted, nextTick } from 'vue'
+  import { useRouter } from 'vue-router'
+  import { ROLE_PERMISSIONS, ROLES } from '../utils/permissions'
+  import { useAuth } from '../composables/useAuth'
+  import auth from '../utils/auth'
+  import { logoutGuard } from '@/utils/logoutGuard'
 
-export default {
-  name: 'DynamicSidebar',
-  props: {
-    collapsed: {
-      type: Boolean,
-      default: false
-    }
-  },
-  emits: ['update:collapsed'],
-  setup(props, { emit }) {
-    const router = useRouter()
-    const { currentUser, userRole, logout, isAuthenticated, isLoading } =
-      useAuth()
-
-    // Stable role tracking to prevent flickering
-    const stableUserRole = ref(null)
-
-    // Watch for authentication state changes with debouncing
-    watch([isAuthenticated, userRole], ([authenticated, role]) => {
-      if (authenticated && role) {
-        stableUserRole.value = role
-        console.log('🔄 Sidebar: Auth state updated - Role:', role)
+  export default {
+    name: 'DynamicSidebar',
+    props: {
+      collapsed: {
+        type: Boolean,
+        default: false
       }
-      // Don't immediately clear the role to prevent flickering during refresh
-    }, { immediate: true })
+    },
+    emits: ['update:collapsed'],
+    setup(props, { emit }) {
+      const router = useRouter()
+      const { currentUser, userRole, logout, isAuthenticated, isLoading } = useAuth()
 
-    // Initialize auth state on mount
-    onMounted(async() => {
-      console.log('🔄 Sidebar mounted - checking auth state')
-      console.log('  - isAuthenticated:', isAuthenticated.value)
-      console.log('  - userRole:', userRole.value)
-      console.log('  - isLoading:', isLoading.value)
+      // Stable role tracking to prevent flickering
+      const stableUserRole = ref(null)
 
-      // Check if we have stored auth data
-      const token = localStorage.getItem('auth_token')
-      const userData = localStorage.getItem('user_data')
-
-      if (token && userData) {
-        try {
-          const user = JSON.parse(userData)
-          if (user.role) {
-            // Set stable role immediately from stored data
-            stableUserRole.value = user.role
-            console.log('✅ Sidebar: Set stable role from stored data:', user.role)
+      // Watch for authentication state changes with debouncing
+      watch(
+        [isAuthenticated, userRole],
+        ([authenticated, role]) => {
+          if (authenticated && role) {
+            stableUserRole.value = role
+            console.log('🔄 Sidebar: Auth state updated - Role:', role)
           }
-        } catch (error) {
-          console.error('Failed to parse stored user data:', error)
-        }
+          // Don't immediately clear the role to prevent flickering during refresh
+        },
+        { immediate: true }
+      )
 
-        // If not authenticated, reinitialize in background
-        if (!isAuthenticated.value && !isLoading.value) {
-          console.log('🔄 Sidebar: Reinitializing auth in background...')
-          await nextTick() // Wait for next tick to avoid blocking UI
-          auth.initializeAuth()
-        }
-      }
+      // Initialize auth state on mount
+      onMounted(async () => {
+        console.log('🔄 Sidebar mounted - checking auth state')
+        console.log('  - isAuthenticated:', isAuthenticated.value)
+        console.log('  - userRole:', userRole.value)
+        console.log('  - isLoading:', isLoading.value)
 
-      // If already authenticated, use current role
-      if (isAuthenticated.value && userRole.value) {
-        stableUserRole.value = userRole.value
-        console.log('✅ Sidebar: Using current auth role:', userRole.value)
-      }
-    })
+        // Check if we have stored auth data
+        const token = localStorage.getItem('auth_token')
+        const userData = localStorage.getItem('user_data')
 
-    // Local state
-    const showUserMgmt = ref(false)
-    const showDeviceManagement = ref(false)
-    const showRequestsManagement = ref(false)
-    const showDashboard = ref(true) // Dashboard expanded by default
-
-    // Computed property for v-model implementation
-    const isCollapsed = computed({
-      get: () => props.collapsed,
-      set: (value) => emit('update:collapsed', value)
-    })
-
-    const containerWidthClass = computed(() =>
-      isCollapsed.value ? 'w-16' : 'w-64'
-    )
-
-    // Get menu items based on stable user role
-    const menuItems = computed(() => {
-      const role = stableUserRole.value || userRole.value
-      if (!role) return []
-
-      const permissions = ROLE_PERMISSIONS[role]
-      if (!permissions) return []
-
-      return permissions.routes
-        .map((route) => {
-          const metadata = getRouteMetadata(route)
-          return {
-            path: route,
-            ...metadata
+        if (token && userData) {
+          try {
+            const user = JSON.parse(userData)
+            if (user.role) {
+              // Set stable role immediately from stored data
+              stableUserRole.value = user.role
+              console.log('✅ Sidebar: Set stable role from stored data:', user.role)
+            }
+          } catch (error) {
+            console.error('Failed to parse stored user data:', error)
           }
-        })
-        .filter((item) => item.name)
-    })
 
-    // Categorize menu items
-    const dashboardItems = computed(() =>
-      menuItems.value.filter((item) => item.category === 'dashboard')
-    )
-
-    const userManagementItems = computed(() =>
-      menuItems.value.filter((item) => item.category === 'user-management')
-    )
-
-    // formItems removed - forms are now only accessible through Submit New Request button
-
-    const deviceManagementItems = computed(() =>
-      menuItems.value.filter((item) => item.category === 'device-management')
-    )
-
-    const requestsManagementItems = computed(() =>
-      menuItems.value.filter((item) => item.category === 'requests-management')
-    )
-
-    // Methods
-    function toggleCollapse() {
-      isCollapsed.value = !isCollapsed.value
-    }
-
-    function getRoleDisplayName(role) {
-      const roleNames = {
-        [ROLES.ADMIN]: 'Administrator',
-        [ROLES.DIVISIONAL_DIRECTOR]: 'Divisional Director',
-        [ROLES.HEAD_OF_DEPARTMENT]: 'Head of Department',
-
-        [ROLES.ICT_DIRECTOR]: 'ICT Director',
-        [ROLES.STAFF]: 'Staff Member',
-        [ROLES.ICT_OFFICER]: 'ICT Officer'
-      }
-      return roleNames[role] || role
-    }
-
-    // Form-related methods removed - forms are now only accessible through Submit New Request button
-
-    async function handleLogout() {
-      try {
-        await logoutGuard.executeLogout(async() => {
-          await logout()
-        })
-        router.push('/')
-      } catch (error) {
-        console.error('Logout failed:', error)
-        // Force redirect even if logout fails
-        router.push('/')
-      }
-    }
-
-
-    function getRouteMetadata(route) {
-      // Updated route metadata mapping based on current permissions
-      const metadata = {
-        // Dashboards
-        '/admin-dashboard': {
-          name: 'AdminDashboard',
-          displayName: 'Admin Dashboard',
-          icon: 'fas fa-user-shield',
-          category: 'dashboard',
-          description: 'Administrative control panel'
-        },
-        '/user-dashboard': {
-          name: 'UserDashboard',
-          displayName: 'User Dashboard',
-          icon: 'fas fa-user',
-          category: 'dashboard',
-          description: 'User portal and services'
-        },
-        '/dict-dashboard': {
-          name: 'DictDashboard',
-          displayName: 'ICT Director Dashboard',
-          icon: 'fas fa-user-cog',
-          category: 'dashboard',
-          description: 'ICT Director control panel'
-        },
-        '/hod-dashboard': {
-          name: 'HodDashboard',
-          displayName: 'HOD Dashboard',
-          icon: 'fas fa-user-tie',
-          category: 'dashboard',
-          description: 'Head of Department panel'
-        },
-        '/hod-it-dashboard': {
-          name: 'HodItDashboard',
-          displayName: 'HOD IT Dashboard',
-          icon: 'fas fa-laptop-code',
-          category: 'dashboard',
-          description: 'Head of IT Department panel'
-        },
-        '/divisional-dashboard': {
-          name: 'DivisionalDashboard',
-          displayName: 'Divisional Dashboard',
-          icon: 'fas fa-building',
-          category: 'dashboard',
-          description: 'Divisional Director panel'
-        },
-        '/ict-dashboard': {
-          name: 'IctDashboard',
-          displayName: 'ICT Dashboard',
-          icon: 'fas fa-laptop-code',
-          category: 'dashboard',
-          description: 'ICT Officer panel'
-        },
-
-        // User Management (Admin only)
-        '/jeeva-users': {
-          name: 'JeevaUsers',
-          displayName: 'Jeeva Users',
-          icon: 'fas fa-file-medical',
-          category: 'user-management',
-          description: 'Manage Jeeva system users'
-        },
-        '/wellsoft-users': {
-          name: 'WellsoftUsers',
-          displayName: 'Wellsoft Users',
-          icon: 'fas fa-laptop-medical',
-          category: 'user-management',
-          description: 'Manage Wellsoft system users'
-        },
-        '/internet-users': {
-          name: 'InternetUsers',
-          displayName: 'Internet Users',
-          icon: 'fas fa-wifi',
-          category: 'user-management',
-          description: 'Manage internet access users'
-        },
-
-        // Access Forms (Approval workflows)
-        '/jeeva-access': {
-          name: 'JeevaAccessForm',
-          displayName: 'Jeeva Access',
-          icon: 'fas fa-file-medical',
-          category: 'access-form',
-          description: 'Jeeva system access form'
-        },
-        '/wellsoft-access': {
-          name: 'WellsoftAccessForm',
-          displayName: 'Wellsoft Access',
-          icon: 'fas fa-laptop-medical',
-          category: 'access-form',
-          description: 'Wellsoft system access form'
-        },
-        '/internet-access': {
-          name: 'InternetAccessForm',
-          displayName: 'Internet Access',
-          icon: 'fas fa-wifi',
-          category: 'access-form',
-          description: 'Internet access form'
-        },
-        '/both-service-form': {
-          name: 'BothServiceForm',
-          displayName: 'Combined Services',
-          icon: 'fas fa-file-alt',
-          category: 'access-form',
-          description: 'Multiple service access form'
-        },
-
-        // User Forms (Staff submissions)
-        '/user-combined-form': {
-          name: 'UserCombinedForm',
-          displayName: 'Access Request',
-          icon: 'fas fa-file-plus',
-          category: 'user-form',
-          description: 'Submit access request'
-        },
-        '/booking-service': {
-          name: 'BookingService',
-          displayName: 'Device Booking',
-          icon: 'fas fa-calendar-plus',
-          category: 'user-form',
-          description: 'Book devices and equipment'
-        },
-
-        // Device Management (ICT Officer only)
-        '/ict-approval/requests': {
-          name: 'RequestsList',
-          displayName: 'Device Requests',
-          icon: 'fas fa-clipboard-list',
-          category: 'device-management',
-          description: 'Manage device borrowing requests'
-        },
-        '/ict-approval/request/:id': {
-          name: 'RequestDetails',
-          displayName: 'Request Details',
-          icon: 'fas fa-clipboard-check',
-          category: 'device-management',
-          description: 'View and assess device requests'
-        },
-
-        // Requests Management (for approvers)
-        '/hod-dashboard/request-list': {
-          name: 'HODDashboardRequestList',
-          displayName: 'Access Requests',
-          icon: 'fas fa-clipboard-check',
-          category: 'requests-management',
-          description: 'Review access requests'
-        },
-        '/internal-access/list': {
-          name: 'InternalAccessList',
-          displayName: 'Access Requests',
-          icon: 'fas fa-clipboard-check',
-          category: 'requests-management',
-          description: 'Review access requests'
-        },
-        '/internal-access/details': {
-          name: 'InternalAccessDetails',
-          displayName: 'Request Details',
-          icon: 'fas fa-file-signature',
-          category: 'requests-management',
-          description: 'Review and approve requests'
+          // If not authenticated, reinitialize in background
+          if (!isAuthenticated.value && !isLoading.value) {
+            console.log('🔄 Sidebar: Reinitializing auth in background...')
+            await nextTick() // Wait for next tick to avoid blocking UI
+            auth.initializeAuth()
+          }
         }
-      }
 
-      return metadata[route] || {}
-    }
+        // If already authenticated, use current role
+        if (isAuthenticated.value && userRole.value) {
+          stableUserRole.value = userRole.value
+          console.log('✅ Sidebar: Using current auth role:', userRole.value)
+        }
+      })
 
-    return {
-      // State
-      isCollapsed,
-      showUserMgmt,
-      showDeviceManagement,
-      showRequestsManagement,
-      showDashboard,
-      stableUserRole,
+      // Local state
+      const showUserMgmt = ref(false)
+      const showDeviceManagement = ref(false)
+      const showRequestsManagement = ref(false)
+      const showDashboard = ref(true) // Dashboard expanded by default
 
-      // Computed
-      currentUser,
-      userRole,
-      isAuthenticated,
-      isLoading,
-      containerWidthClass,
-      dashboardItems,
-      userManagementItems,
-      deviceManagementItems,
-      requestsManagementItems,
+      // Computed property for v-model implementation
+      const isCollapsed = computed({
+        get: () => props.collapsed,
+        set: (value) => emit('update:collapsed', value)
+      })
+
+      const containerWidthClass = computed(() => (isCollapsed.value ? 'w-16' : 'w-64'))
+
+      // Get menu items based on stable user role
+      const menuItems = computed(() => {
+        const role = stableUserRole.value || userRole.value
+        if (!role) return []
+
+        const permissions = ROLE_PERMISSIONS[role]
+        if (!permissions) return []
+
+        return permissions.routes
+          .map((route) => {
+            const metadata = getRouteMetadata(route)
+            return {
+              path: route,
+              ...metadata
+            }
+          })
+          .filter((item) => item.name)
+      })
+
+      // Categorize menu items
+      const dashboardItems = computed(() =>
+        menuItems.value.filter((item) => item.category === 'dashboard')
+      )
+
+      const userManagementItems = computed(() =>
+        menuItems.value.filter((item) => item.category === 'user-management')
+      )
+
+      // formItems removed - forms are now only accessible through Submit New Request button
+
+      const deviceManagementItems = computed(() =>
+        menuItems.value.filter((item) => item.category === 'device-management')
+      )
+
+      const requestsManagementItems = computed(() =>
+        menuItems.value.filter((item) => item.category === 'requests-management')
+      )
 
       // Methods
-      toggleCollapse,
-      getRoleDisplayName,
-      handleLogout
+      function toggleCollapse() {
+        isCollapsed.value = !isCollapsed.value
+      }
+
+      function getRoleDisplayName(role) {
+        const roleNames = {
+          [ROLES.ADMIN]: 'Administrator',
+          [ROLES.DIVISIONAL_DIRECTOR]: 'Divisional Director',
+          [ROLES.HEAD_OF_DEPARTMENT]: 'Head of Department',
+
+          [ROLES.ICT_DIRECTOR]: 'ICT Director',
+          [ROLES.STAFF]: 'Staff Member',
+          [ROLES.ICT_OFFICER]: 'ICT Officer'
+        }
+        return roleNames[role] || role
+      }
+
+      // Form-related methods removed - forms are now only accessible through Submit New Request button
+
+      async function handleLogout() {
+        try {
+          await logoutGuard.executeLogout(async () => {
+            await logout()
+          })
+          router.push('/')
+        } catch (error) {
+          console.error('Logout failed:', error)
+          // Force redirect even if logout fails
+          router.push('/')
+        }
+      }
+
+      function getRouteMetadata(route) {
+        // Updated route metadata mapping based on current permissions
+        const metadata = {
+          // Dashboards
+          '/admin-dashboard': {
+            name: 'AdminDashboard',
+            displayName: 'Admin Dashboard',
+            icon: 'fas fa-user-shield',
+            category: 'dashboard',
+            description: 'Administrative control panel'
+          },
+          '/user-dashboard': {
+            name: 'UserDashboard',
+            displayName: 'User Dashboard',
+            icon: 'fas fa-user',
+            category: 'dashboard',
+            description: 'User portal and services'
+          },
+          '/dict-dashboard': {
+            name: 'DictDashboard',
+            displayName: 'ICT Director Dashboard',
+            icon: 'fas fa-user-cog',
+            category: 'dashboard',
+            description: 'ICT Director control panel'
+          },
+          '/hod-dashboard': {
+            name: 'HodDashboard',
+            displayName: 'HOD Dashboard',
+            icon: 'fas fa-user-tie',
+            category: 'dashboard',
+            description: 'Head of Department panel'
+          },
+          '/hod-it-dashboard': {
+            name: 'HodItDashboard',
+            displayName: 'HOD IT Dashboard',
+            icon: 'fas fa-laptop-code',
+            category: 'dashboard',
+            description: 'Head of IT Department panel'
+          },
+          '/divisional-dashboard': {
+            name: 'DivisionalDashboard',
+            displayName: 'Divisional Dashboard',
+            icon: 'fas fa-building',
+            category: 'dashboard',
+            description: 'Divisional Director panel'
+          },
+          '/ict-dashboard': {
+            name: 'IctDashboard',
+            displayName: 'ICT Dashboard',
+            icon: 'fas fa-laptop-code',
+            category: 'dashboard',
+            description: 'ICT Officer panel'
+          },
+
+          // User Management (Admin only)
+          '/jeeva-users': {
+            name: 'JeevaUsers',
+            displayName: 'Jeeva Users',
+            icon: 'fas fa-file-medical',
+            category: 'user-management',
+            description: 'Manage Jeeva system users'
+          },
+          '/wellsoft-users': {
+            name: 'WellsoftUsers',
+            displayName: 'Wellsoft Users',
+            icon: 'fas fa-laptop-medical',
+            category: 'user-management',
+            description: 'Manage Wellsoft system users'
+          },
+          '/internet-users': {
+            name: 'InternetUsers',
+            displayName: 'Internet Users',
+            icon: 'fas fa-wifi',
+            category: 'user-management',
+            description: 'Manage internet access users'
+          },
+
+          // Access Forms (Approval workflows)
+          '/jeeva-access': {
+            name: 'JeevaAccessForm',
+            displayName: 'Jeeva Access',
+            icon: 'fas fa-file-medical',
+            category: 'access-form',
+            description: 'Jeeva system access form'
+          },
+          '/wellsoft-access': {
+            name: 'WellsoftAccessForm',
+            displayName: 'Wellsoft Access',
+            icon: 'fas fa-laptop-medical',
+            category: 'access-form',
+            description: 'Wellsoft system access form'
+          },
+          '/internet-access': {
+            name: 'InternetAccessForm',
+            displayName: 'Internet Access',
+            icon: 'fas fa-wifi',
+            category: 'access-form',
+            description: 'Internet access form'
+          },
+          '/both-service-form': {
+            name: 'BothServiceForm',
+            displayName: 'Combined Services',
+            icon: 'fas fa-file-alt',
+            category: 'access-form',
+            description: 'Multiple service access form'
+          },
+
+          // User Forms (Staff submissions)
+          '/user-combined-form': {
+            name: 'UserCombinedForm',
+            displayName: 'Access Request',
+            icon: 'fas fa-file-plus',
+            category: 'user-form',
+            description: 'Submit access request'
+          },
+          '/booking-service': {
+            name: 'BookingService',
+            displayName: 'Device Booking',
+            icon: 'fas fa-calendar-plus',
+            category: 'user-form',
+            description: 'Book devices and equipment'
+          },
+
+          // Device Management (ICT Officer only)
+          '/ict-approval/requests': {
+            name: 'RequestsList',
+            displayName: 'Device Requests',
+            icon: 'fas fa-clipboard-list',
+            category: 'device-management',
+            description: 'Manage device borrowing requests'
+          },
+          '/ict-approval/request/:id': {
+            name: 'RequestDetails',
+            displayName: 'Request Details',
+            icon: 'fas fa-clipboard-check',
+            category: 'device-management',
+            description: 'View and assess device requests'
+          },
+
+          // Requests Management (for approvers)
+          '/hod-dashboard/request-list': {
+            name: 'HODDashboardRequestList',
+            displayName: 'Access Requests',
+            icon: 'fas fa-clipboard-check',
+            category: 'requests-management',
+            description: 'Review access requests'
+          },
+          '/internal-access/list': {
+            name: 'InternalAccessList',
+            displayName: 'Access Requests',
+            icon: 'fas fa-clipboard-check',
+            category: 'requests-management',
+            description: 'Review access requests'
+          },
+          '/internal-access/details': {
+            name: 'InternalAccessDetails',
+            displayName: 'Request Details',
+            icon: 'fas fa-file-signature',
+            category: 'requests-management',
+            description: 'Review and approve requests'
+          }
+        }
+
+        return metadata[route] || {}
+      }
+
+      return {
+        // State
+        isCollapsed,
+        showUserMgmt,
+        showDeviceManagement,
+        showRequestsManagement,
+        showDashboard,
+        stableUserRole,
+
+        // Computed
+        currentUser,
+        userRole,
+        isAuthenticated,
+        isLoading,
+        containerWidthClass,
+        dashboardItems,
+        userManagementItems,
+        deviceManagementItems,
+        requestsManagementItems,
+
+        // Methods
+        toggleCollapse,
+        getRoleDisplayName,
+        handleLogout
+      }
     }
   }
-}
 </script>
 
 <style scoped>
-/* Custom scrollbar */
-aside::-webkit-scrollbar {
-  width: 6px;
-}
+  /* Custom scrollbar */
+  aside::-webkit-scrollbar {
+    width: 6px;
+  }
 
-aside::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.15);
-  border-radius: 3px;
-}
+  aside::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.15);
+    border-radius: 3px;
+  }
 
-aside::-webkit-scrollbar-track {
-  background-color: transparent;
-}
+  aside::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
 
-/* Active route indicator */
-.router-link-active {
-  @apply bg-indigo-100 text-indigo-700;
-}
+  /* Active route indicator */
+  .router-link-active {
+    @apply bg-indigo-100 text-indigo-700;
+  }
 </style>

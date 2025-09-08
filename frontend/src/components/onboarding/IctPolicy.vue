@@ -2,14 +2,9 @@
   <div class="relative">
     <!-- Timer and Scroll Indicator -->
     <div class="fixed top-0 left-0 right-0 z-50">
-      <div
-        class="w-full px-6 py-2 flex items-center justify-center min-h-[80px]"
-      >
+      <div class="w-full px-6 py-2 flex items-center justify-center min-h-[80px]">
         <!-- Timer Active State -->
-        <div
-          v-if="!timerFinished"
-          class="flex items-center justify-center w-full max-w-lg"
-        >
+        <div v-if="!timerFinished" class="flex items-center justify-center w-full max-w-lg">
           <div
             class="bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-2xl px-6 py-4 shadow-xl border border-white/20 text-center"
           >
@@ -23,9 +18,7 @@
                 <div class="text-2xl font-bold text-white mb-1">
                   {{ formatTime(timeRemaining) }}
                 </div>
-                <p class="text-amber-100 text-xs">
-                  Please wait {{ timeRemaining }}s
-                </p>
+                <p class="text-amber-100 text-xs">Please wait {{ timeRemaining }}s</p>
               </div>
               <div class="w-12 h-12">
                 <svg class="w-12 h-12 transform -rotate-90" viewBox="0 0 48 48">
@@ -45,9 +38,7 @@
                     stroke-width="3"
                     fill="none"
                     :stroke-dasharray="125.66"
-                    :stroke-dashoffset="
-                      125.66 - (125.66 * progressPercentage) / 100
-                    "
+                    :stroke-dashoffset="125.66 - (125.66 * progressPercentage) / 100"
                     class="transition-all duration-1000 ease-out"
                   />
                 </svg>
@@ -118,69 +109,69 @@
 </template>
 
 <script>
-import IctPolicyMain from '../IctPolicy.vue'
+  import IctPolicyMain from '../IctPolicy.vue'
 
-export default {
-  name: 'OnboardingIctPolicy',
-  components: {
-    IctPolicyMain
-  },
-  emits: ['policy-accepted', 'go-back'],
-  data() {
-    return {
-      timeRemaining: 5, // 5 seconds timer
-      timerFinished: false,
-      policyAccepted: false,
-      timer: null
-    }
-  },
-  computed: {
-    progressPercentage() {
-      return ((5 - this.timeRemaining) / 5) * 100
-    }
-  },
-  mounted() {
-    this.startTimer()
-  },
-  beforeUnmount() {
-    if (this.timer) {
-      clearInterval(this.timer)
-    }
-  },
-  methods: {
-    startTimer() {
-      this.timer = setInterval(() => {
-        if (this.timeRemaining > 0) {
-          this.timeRemaining--
-        } else {
-          this.timerFinished = true
-          clearInterval(this.timer)
-        }
-      }, 1000)
+  export default {
+    name: 'OnboardingIctPolicy',
+    components: {
+      IctPolicyMain
     },
-    formatTime(seconds) {
-      const minutes = Math.floor(seconds / 60)
-      const remainingSeconds = seconds % 60
-      return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
+    emits: ['policy-accepted', 'go-back'],
+    data() {
+      return {
+        timeRemaining: 5, // 5 seconds timer
+        timerFinished: false,
+        policyAccepted: false,
+        timer: null
+      }
     },
-    acceptPolicy() {
-      // Show success message
-      this.showSuccessMessage(
-        'ICT Policy accepted successfully! You may now proceed with your access request.'
-      )
+    computed: {
+      progressPercentage() {
+        return ((5 - this.timeRemaining) / 5) * 100
+      }
+    },
+    mounted() {
+      this.startTimer()
+    },
+    beforeUnmount() {
+      if (this.timer) {
+        clearInterval(this.timer)
+      }
+    },
+    methods: {
+      startTimer() {
+        this.timer = setInterval(() => {
+          if (this.timeRemaining > 0) {
+            this.timeRemaining--
+          } else {
+            this.timerFinished = true
+            clearInterval(this.timer)
+          }
+        }, 1000)
+      },
+      formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60)
+        const remainingSeconds = seconds % 60
+        return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
+      },
+      acceptPolicy() {
+        // Show success message
+        this.showSuccessMessage(
+          'ICT Policy accepted successfully! You may now proceed with your access request.'
+        )
 
-      // Emit event after a short delay to show the message
-      setTimeout(() => {
-        this.$emit('policy-accepted')
-      }, 2000)
-    },
+        // Emit event after a short delay to show the message
+        setTimeout(() => {
+          this.$emit('policy-accepted')
+        }, 2000)
+      },
 
-    showSuccessMessage(message) {
-      // Create success toast notification
-      const toast = document.createElement('div')
-      toast.className =
-        'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-8 py-6 rounded-2xl shadow-2xl z-50 max-w-md text-center border border-white/20'
-      toast.innerHTML = `
+      showSuccessMessage(message) {
+        // Create success toast notification
+        const toast = document.createElement('div')
+        toast.className =
+          'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-8 py-6 rounded-2xl shadow-2xl z-50 max-w-md text-center border border-white/20'
+        toast.innerHTML = `
         <div class="flex items-center justify-center mb-3">
           <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-3">
             <i class="fas fa-check-circle text-2xl"></i>
@@ -190,35 +181,35 @@ export default {
         <p class="text-emerald-100 leading-relaxed">${message}</p>
       `
 
-      // Add backdrop
-      const backdrop = document.createElement('div')
-      backdrop.className = 'fixed inset-0 bg-black/50 z-40 backdrop-blur-sm'
+        // Add backdrop
+        const backdrop = document.createElement('div')
+        backdrop.className = 'fixed inset-0 bg-black/50 z-40 backdrop-blur-sm'
 
-      document.body.appendChild(backdrop)
-      document.body.appendChild(toast)
+        document.body.appendChild(backdrop)
+        document.body.appendChild(toast)
 
-      // Remove after 2 seconds
-      setTimeout(() => {
-        if (document.body.contains(toast)) {
-          document.body.removeChild(toast)
-        }
-        if (document.body.contains(backdrop)) {
-          document.body.removeChild(backdrop)
-        }
-      }, 2000)
-    },
-    goBack() {
-      this.$emit('go-back')
+        // Remove after 2 seconds
+        setTimeout(() => {
+          if (document.body.contains(toast)) {
+            document.body.removeChild(toast)
+          }
+          if (document.body.contains(backdrop)) {
+            document.body.removeChild(backdrop)
+          }
+        }, 2000)
+      },
+      goBack() {
+        this.$emit('go-back')
+      }
     }
   }
-}
 </script>
 
 <style scoped>
-/* Ensure the timer overlay stays on top */
-.fixed {
-  position: fixed;
-  z-index: 50;
-}
+  /* Ensure the timer overlay stays on top */
+  .fixed {
+    position: fixed;
+    z-index: 50;
+  }
 </style>
 "

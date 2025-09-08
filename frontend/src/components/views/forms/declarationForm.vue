@@ -26,19 +26,15 @@
             top: Math.random() * 100 + '%',
             animationDelay: Math.random() * 3 + 's',
             animationDuration: Math.random() * 3 + 2 + 's',
-            fontSize: Math.random() * 20 + 10 + 'px',
+            fontSize: Math.random() * 20 + 10 + 'px'
           }"
         >
           <i
             :class="[
               'fas',
-              [
-                'fa-heartbeat',
-                'fa-user-md',
-                'fa-hospital',
-                'fa-stethoscope',
-                'fa-plus',
-              ][Math.floor(Math.random() * 5)],
+              ['fa-heartbeat', 'fa-user-md', 'fa-hospital', 'fa-stethoscope', 'fa-plus'][
+                Math.floor(Math.random() * 5)
+              ]
             ]"
           ></i>
         </div>
@@ -47,14 +43,10 @@
 
     <div class="max-w-8xl mx-auto relative z-10">
       <!-- Header Section -->
-      <div
-        class="medical-glass-card rounded-t-3xl p-6 mb-0 border-b border-blue-300/30"
-      >
+      <div class="medical-glass-card rounded-t-3xl p-6 mb-0 border-b border-blue-300/30">
         <div class="flex justify-between items-center">
           <!-- Left Logo -->
-          <div
-            class="w-28 h-28 mr-6 transform hover:scale-110 transition-transform duration-300"
-          >
+          <div class="w-28 h-28 mr-6 transform hover:scale-110 transition-transform duration-300">
             <div
               class="w-full h-full bg-gradient-to-br from-blue-500/20 to-teal-500/20 rounded-2xl backdrop-blur-sm border-2 border-blue-300/40 flex items-center justify-center shadow-2xl hover:shadow-blue-500/25"
             >
@@ -94,9 +86,7 @@
           </div>
 
           <!-- Right Logo -->
-          <div
-            class="w-28 h-28 ml-6 transform hover:scale-110 transition-transform duration-300"
-          >
+          <div class="w-28 h-28 ml-6 transform hover:scale-110 transition-transform duration-300">
             <div
               class="w-full h-full bg-gradient-to-br from-teal-500/20 to-blue-500/20 rounded-2xl backdrop-blur-sm border-2 border-teal-300/40 flex items-center justify-center shadow-2xl hover:shadow-teal-500/25"
             >
@@ -132,10 +122,9 @@
                 </h3>
                 <div class="text-blue-100 leading-relaxed space-y-3">
                   <p class="text-sm font-medium">
-                    These declarations have been designed to certify that users
-                    acknowledge that they are aware of Muhimbili National
-                    Hospital Acceptable Information and Communication Technology
-                    use policy and agree to abide by their terms.
+                    These declarations have been designed to certify that users acknowledge that
+                    they are aware of Muhimbili National Hospital Acceptable Information and
+                    Communication Technology use policy and agree to abide by their terms.
                   </p>
                 </div>
               </div>
@@ -268,38 +257,29 @@
               </h3>
             </div>
 
-            <div
-              class="bg-white/15 p-6 rounded-xl backdrop-blur-sm border-2 border-blue-300/30"
-            >
-              <div
-                class="text-blue-100 leading-relaxed text-lg space-y-5 text-justify"
-              >
+            <div class="bg-white/15 p-6 rounded-xl backdrop-blur-sm border-2 border-blue-300/30">
+              <div class="text-blue-100 leading-relaxed text-lg space-y-5 text-justify">
                 <p>
                   I
                   <strong class="text-blue-300">{{
-                    formData.fullName || "______________________"
+                    formData.fullName || '______________________'
                   }}</strong>
                   PF No.
-                  <strong class="text-blue-300">{{
-                    formData.pfNumber || "______"
-                  }}</strong>
-                  acknowledge that Muhimbili National Hospital acceptable ICT
-                  use policy has been made available to me for adequate review
-                  and understanding.
+                  <strong class="text-blue-300">{{ formData.pfNumber || '______' }}</strong>
+                  acknowledge that Muhimbili National Hospital acceptable ICT use policy has been
+                  made available to me for adequate review and understanding.
                 </p>
 
                 <p>
-                  I certify that I have been given ample opportunity to read and
-                  understand it, and ask questions about my responsibilities on
-                  it. I am, therefore, aware that I am accountable to all its
-                  terms and requirements; and that I shall abide by them.
+                  I certify that I have been given ample opportunity to read and understand it, and
+                  ask questions about my responsibilities on it. I am, therefore, aware that I am
+                  accountable to all its terms and requirements; and that I shall abide by them.
                 </p>
 
                 <p>
-                  I also understand that failure to abide by them; Muhimbili
-                  National Hospital shall take against me appropriate
-                  disciplinary action or legal action, or both, as the case may
-                  be.
+                  I also understand that failure to abide by them; Muhimbili National Hospital shall
+                  take against me appropriate disciplinary action or legal action, or both, as the
+                  case may be.
                 </p>
               </div>
             </div>
@@ -335,9 +315,7 @@
                   >
                     <div class="text-center">
                       <div class="mb-1">
-                        <i
-                          class="fas fa-signature text-blue-300 text-sm mb-1"
-                        ></i>
+                        <i class="fas fa-signature text-blue-300 text-sm mb-1"></i>
                         <p class="text-blue-100 text-xs">No signature</p>
                       </div>
                       <button
@@ -445,18 +423,13 @@
                   ></div>
                 </div>
               </div>
-              <label
-                for="agreement"
-                class="text-sm text-blue-100 leading-relaxed flex-1"
-              >
+              <label for="agreement" class="text-sm text-blue-100 leading-relaxed flex-1">
                 <span class="font-bold text-red-300 flex items-center gap-2"
-                  ><i class="fas fa-exclamation-triangle"></i>I hereby confirm
-                  that:</span
+                  ><i class="fas fa-exclamation-triangle"></i>I hereby confirm that:</span
                 >
-                I have read, understood, and agree to abide by all terms and
-                conditions of the Muhimbili National Hospital Acceptable ICT Use
-                Policy. I acknowledge that violation of this policy may result
-                in disciplinary action or legal consequences.
+                I have read, understood, and agree to abide by all terms and conditions of the
+                Muhimbili National Hospital Acceptable ICT Use Policy. I acknowledge that violation
+                of this policy may result in disciplinary action or legal consequences.
               </label>
             </div>
           </div>
@@ -471,7 +444,7 @@
               >
                 <i v-if="isSubmitting" class="fas fa-spinner fa-spin mr-3"></i>
                 <i v-else class="fas fa-file-signature mr-3"></i>
-                {{ isSubmitting ? "Submitting..." : "Submit Declaration" }}
+                {{ isSubmitting ? 'Submitting...' : 'Submit Declaration' }}
               </button>
             </div>
           </div>
@@ -491,559 +464,538 @@
 </template>
 
 <script>
-export default {
-  name: 'DeclarationForm',
-  emits: ['form-submitted', 'go-back'],
-  data() {
-    return {
-      isSubmitting: false,
-      signaturePreview: '',
-      signatureFileName: '',
-      departments: [
-        'Administration',
-        'Anesthesiology',
-        'Cardiology',
-        'Dermatology',
-        'Emergency Medicine',
-        'Endocrinology',
-        'Gastroenterology',
-        'General Surgery',
-        'Gynecology',
-        'Hematology',
-        'ICT Department',
-        'Internal Medicine',
-        'Laboratory',
-        'Nephrology',
-        'Neurology',
-        'Nursing',
-        'Obstetrics',
-        'Oncology',
-        'Ophthalmology',
-        'Orthopedics',
-        'Pediatrics',
-        'Pharmacy',
-        'Psychiatry',
-        'Pulmonology',
-        'Radiology',
-        'Rehabilitation',
-        'Urology',
-        'Other'
-      ],
-      formData: {
-        fullName: '',
-        pfNumber: '',
-        department: '',
-        jobTitle: '',
-        signature: null,
-        date: '',
-        agreement: false
+  export default {
+    name: 'DeclarationForm',
+    emits: ['form-submitted', 'go-back'],
+    data() {
+      return {
+        isSubmitting: false,
+        signaturePreview: '',
+        signatureFileName: '',
+        departments: [
+          'Administration',
+          'Anesthesiology',
+          'Cardiology',
+          'Dermatology',
+          'Emergency Medicine',
+          'Endocrinology',
+          'Gastroenterology',
+          'General Surgery',
+          'Gynecology',
+          'Hematology',
+          'ICT Department',
+          'Internal Medicine',
+          'Laboratory',
+          'Nephrology',
+          'Neurology',
+          'Nursing',
+          'Obstetrics',
+          'Oncology',
+          'Ophthalmology',
+          'Orthopedics',
+          'Pediatrics',
+          'Pharmacy',
+          'Psychiatry',
+          'Pulmonology',
+          'Radiology',
+          'Rehabilitation',
+          'Urology',
+          'Other'
+        ],
+        formData: {
+          fullName: '',
+          pfNumber: '',
+          department: '',
+          jobTitle: '',
+          signature: null,
+          date: '',
+          agreement: false
+        }
       }
-    }
-  },
-
-  computed: {
-    isFormValid() {
-      return (
-        this.formData.fullName &&
-        this.formData.pfNumber &&
-        this.formData.department &&
-        this.formData.jobTitle &&
-        this.formData.date &&
-        this.formData.agreement &&
-        (this.formData.signature || this.signaturePreview)
-      )
-    }
-  },
-
-  methods: {
-    loadSignature() {
-      this.$refs.signatureInput.click()
     },
 
-    onSignatureChange(e) {
-      const file = e.target.files[0]
-      this.formData.signature = file || null
+    computed: {
+      isFormValid() {
+        return (
+          this.formData.fullName &&
+          this.formData.pfNumber &&
+          this.formData.department &&
+          this.formData.jobTitle &&
+          this.formData.date &&
+          this.formData.agreement &&
+          (this.formData.signature || this.signaturePreview)
+        )
+      }
+    },
 
-      if (!file) {
+    methods: {
+      loadSignature() {
+        this.$refs.signatureInput.click()
+      },
+
+      onSignatureChange(e) {
+        const file = e.target.files[0]
+        this.formData.signature = file || null
+
+        if (!file) {
+          this.signaturePreview = ''
+          this.signatureFileName = ''
+          return
+        }
+
+        // Validate file type
+        const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf']
+        if (!allowedTypes.includes(file.type)) {
+          this.showNotification('Please select a valid file (PNG, JPG, JPEG, PDF)', 'error')
+          this.clearSignature()
+          return
+        }
+
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          this.showNotification('File size must be less than 5MB', 'error')
+          this.clearSignature()
+          return
+        }
+
+        this.signatureFileName = file.name
+
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader()
+          reader.onload = () => {
+            this.signaturePreview = reader.result
+          }
+          reader.readAsDataURL(file)
+        } else {
+          this.signaturePreview = 'pdf'
+        }
+      },
+
+      isImage(preview) {
+        return typeof preview === 'string' && preview !== 'pdf'
+      },
+
+      clearSignature() {
+        this.formData.signature = null
         this.signaturePreview = ''
         this.signatureFileName = ''
-        return
-      }
-
-      // Validate file type
-      const allowedTypes = [
-        'image/png',
-        'image/jpeg',
-        'image/jpg',
-        'application/pdf'
-      ]
-      if (!allowedTypes.includes(file.type)) {
-        this.showNotification(
-          'Please select a valid file (PNG, JPG, JPEG, PDF)',
-          'error'
-        )
-        this.clearSignature()
-        return
-      }
-
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        this.showNotification('File size must be less than 5MB', 'error')
-        this.clearSignature()
-        return
-      }
-
-      this.signatureFileName = file.name
-
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader()
-        reader.onload = () => {
-          this.signaturePreview = reader.result
+        if (this.$refs.signatureInput) {
+          this.$refs.signatureInput.value = ''
         }
-        reader.readAsDataURL(file)
-      } else {
-        this.signaturePreview = 'pdf'
-      }
-    },
+      },
 
-    isImage(preview) {
-      return typeof preview === 'string' && preview !== 'pdf'
-    },
-
-    clearSignature() {
-      this.formData.signature = null
-      this.signaturePreview = ''
-      this.signatureFileName = ''
-      if (this.$refs.signatureInput) {
-        this.$refs.signatureInput.value = ''
-      }
-    },
-
-    async submitDeclaration() {
-      if (!this.isFormValid) {
-        this.showNotification(
-          'Please fill in all required fields and agree to the terms',
-          'error'
-        )
-        return
-      }
-
-      try {
-        // Show loading state
-        this.isSubmitting = true
-        this.showNotification('Submitting declaration...', 'info')
-
-        // Prepare form data for submission
-        const declarationData = {
-          fullName: this.formData.fullName,
-          pfNumber: this.formData.pfNumber,
-          department: this.formData.department,
-          jobTitle: this.formData.jobTitle,
-          date: this.formData.date,
-          agreement: this.formData.agreement
-        }
-
-        // Create FormData for file upload if signature exists
-        const formData = new FormData()
-
-        // Add declaration data with proper type conversion
-        Object.keys(declarationData).forEach((key) => {
-          let value = declarationData[key]
-          // Convert boolean to string for FormData, but ensure it's a proper boolean string
-          if (typeof value === 'boolean') {
-            value = value ? '1' : '0' // Use 1/0 instead of true/false for better backend handling
-          }
-          formData.append(key, value)
-        })
-
-        // Log the form data for debugging
-        console.log('Form data being sent:', {
-          ...declarationData,
-          hasSignature: !!this.formData.signature
-        })
-
-        // Add signature file if present
-        if (this.formData.signature) {
-          formData.append('signature', this.formData.signature)
-        }
-
-        // Import API client and submit
-        const { authAPI } = await import('../../../utils/apiClient')
-        const result = await authAPI.submitDeclaration(formData)
-
-        if (result.success) {
-          console.log('Declaration submitted successfully:', result.data)
+      async submitDeclaration() {
+        if (!this.isFormValid) {
           this.showNotification(
-            'Declaration submitted successfully!',
-            'success'
-          )
-
-          // Emit event to parent component with the declaration data
-          setTimeout(() => {
-            this.$emit('form-submitted', declarationData)
-          }, 1500) // Wait 1.5 seconds to show success message
-        } else {
-          console.error('Declaration submission failed:', result.error)
-          this.showNotification(
-            result.error || 'Failed to submit declaration',
+            'Please fill in all required fields and agree to the terms',
             'error'
           )
+          return
+        }
 
-          // Show validation errors if present
-          if (result.errors) {
-            Object.values(result.errors).forEach((errorArray) => {
-              errorArray.forEach((error) => {
-                this.showNotification(error, 'error')
-              })
-            })
+        try {
+          // Show loading state
+          this.isSubmitting = true
+          this.showNotification('Submitting declaration...', 'info')
+
+          // Prepare form data for submission
+          const declarationData = {
+            fullName: this.formData.fullName,
+            pfNumber: this.formData.pfNumber,
+            department: this.formData.department,
+            jobTitle: this.formData.jobTitle,
+            date: this.formData.date,
+            agreement: this.formData.agreement
           }
+
+          // Create FormData for file upload if signature exists
+          const formData = new FormData()
+
+          // Add declaration data with proper type conversion
+          Object.keys(declarationData).forEach((key) => {
+            let value = declarationData[key]
+            // Convert boolean to string for FormData, but ensure it's a proper boolean string
+            if (typeof value === 'boolean') {
+              value = value ? '1' : '0' // Use 1/0 instead of true/false for better backend handling
+            }
+            formData.append(key, value)
+          })
+
+          // Log the form data for debugging
+          console.log('Form data being sent:', {
+            ...declarationData,
+            hasSignature: !!this.formData.signature
+          })
+
+          // Add signature file if present
+          if (this.formData.signature) {
+            formData.append('signature', this.formData.signature)
+          }
+
+          // Import API client and submit
+          const { authAPI } = await import('../../../utils/apiClient')
+          const result = await authAPI.submitDeclaration(formData)
+
+          if (result.success) {
+            console.log('Declaration submitted successfully:', result.data)
+            this.showNotification('Declaration submitted successfully!', 'success')
+
+            // Emit event to parent component with the declaration data
+            setTimeout(() => {
+              this.$emit('form-submitted', declarationData)
+            }, 1500) // Wait 1.5 seconds to show success message
+          } else {
+            console.error('Declaration submission failed:', result.error)
+            this.showNotification(result.error || 'Failed to submit declaration', 'error')
+
+            // Show validation errors if present
+            if (result.errors) {
+              Object.values(result.errors).forEach((errorArray) => {
+                errorArray.forEach((error) => {
+                  this.showNotification(error, 'error')
+                })
+              })
+            }
+          }
+        } catch (error) {
+          console.error('Error submitting declaration:', error)
+          this.showNotification('An error occurred while submitting the declaration', 'error')
+        } finally {
+          this.isSubmitting = false
         }
-      } catch (error) {
-        console.error('Error submitting declaration:', error)
-        this.showNotification(
-          'An error occurred while submitting the declaration',
-          'error'
-        )
-      } finally {
-        this.isSubmitting = false
-      }
-    },
+      },
 
-    resetForm() {
-      this.formData = {
-        fullName: '',
-        pfNumber: '',
-        department: '',
-        jobTitle: '',
-        signature: null,
-        date: '',
-        agreement: false
-      }
-      this.signaturePreview = ''
-      this.signatureFileName = ''
-      this.showNotification('Form has been reset', 'info')
-    },
-
-    printForm() {
-      window.print()
-    },
-
-    showNotification(message, type = 'info') {
-      const colors = {
-        success: 'green',
-        error: 'red',
-        info: 'blue'
-      }
-
-      // Create a simple toast notification
-      const toast = document.createElement('div')
-      toast.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white font-semibold z-50 bg-${colors[type]}-600 shadow-lg`
-      toast.textContent = message
-      document.body.appendChild(toast)
-
-      setTimeout(() => {
-        if (document.body.contains(toast)) {
-          document.body.removeChild(toast)
+      resetForm() {
+        this.formData = {
+          fullName: '',
+          pfNumber: '',
+          department: '',
+          jobTitle: '',
+          signature: null,
+          date: '',
+          agreement: false
         }
-      }, 4000)
+        this.signaturePreview = ''
+        this.signatureFileName = ''
+        this.showNotification('Form has been reset', 'info')
+      },
+
+      printForm() {
+        window.print()
+      },
+
+      showNotification(message, type = 'info') {
+        const colors = {
+          success: 'green',
+          error: 'red',
+          info: 'blue'
+        }
+
+        // Create a simple toast notification
+        const toast = document.createElement('div')
+        toast.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white font-semibold z-50 bg-${colors[type]}-600 shadow-lg`
+        toast.textContent = message
+        document.body.appendChild(toast)
+
+        setTimeout(() => {
+          if (document.body.contains(toast)) {
+            document.body.removeChild(toast)
+          }
+        }, 4000)
+      },
+
+      goBack() {
+        this.$emit('go-back')
+      }
     },
 
-    goBack() {
-      this.$emit('go-back')
+    mounted() {
+      // Set current date as default
+      const today = new Date().toISOString().split('T')[0]
+      this.formData.date = today
     }
-  },
-
-  mounted() {
-    // Set current date as default
-    const today = new Date().toISOString().split('T')[0]
-    this.formData.date = today
   }
-}
 </script>
 
 <style scoped>
-/* Medical Glass morphism effects */
-.medical-glass-card {
-  background: rgba(59, 130, 246, 0.15);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
-  border: 2px solid rgba(96, 165, 250, 0.3);
-  box-shadow: 0 8px 32px rgba(29, 78, 216, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-
-.medical-card {
-  position: relative;
-  overflow: hidden;
-  background: rgba(59, 130, 246, 0.1);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-}
-
-.medical-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(96, 165, 250, 0.2),
-    transparent
-  );
-  transition: left 0.5s;
-}
-
-.medical-card:hover::before {
-  left: 100%;
-}
-
-.medical-input {
-  position: relative;
-  z-index: 1;
-  color: white;
-}
-
-.medical-input::placeholder {
-  color: rgba(191, 219, 254, 0.6);
-}
-
-.medical-input:focus {
-  border-color: rgba(45, 212, 191, 0.8);
-  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.2);
-}
-
-/* Select dropdown styling */
-select.medical-input {
-  background-image: none;
-}
-
-select.medical-input option {
-  background-color: #1f2937;
-  color: white;
-  padding: 8px;
-}
-
-select.medical-input option:hover {
-  background-color: #374151;
-}
-
-select.medical-input option:disabled {
-  color: #9ca3af;
-}
-
-/* Animations */
-@keyframes blob {
-  0% {
-    transform: translate(0px, 0px) scale(1);
-  }
-  33% {
-    transform: translate(30px, -50px) scale(1.1);
-  }
-  66% {
-    transform: translate(-20px, 20px) scale(0.9);
-  }
-  100% {
-    transform: translate(0px, 0px) scale(1);
-  }
-}
-
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-20px);
-  }
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fade-in-delay {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-blob {
-  animation: blob 7s infinite;
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-.animate-fade-in {
-  animation: fade-in 1s ease-out;
-}
-
-.animate-fade-in-delay {
-  animation: fade-in-delay 1s ease-out 0.3s both;
-}
-
-.animation-delay-2000 {
-  animation-delay: 2s;
-}
-
-.animation-delay-4000 {
-  animation-delay: 4s;
-}
-
-/* Custom transitions and animations */
-.transition-all {
-  transition: all 0.3s ease;
-}
-
-/* Glass morphism effect */
-.backdrop-blur-sm {
-  backdrop-filter: blur(8px);
-}
-
-/* Enhanced form sections */
-.border-l-4 {
-  position: relative;
-  transition: all 0.3s ease;
-}
-
-.border-l-4:hover {
-  transform: translateX(2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-}
-
-/* Print styles */
-@media print {
-  .min-h-screen {
-    min-height: auto;
+  /* Medical Glass morphism effects */
+  .medical-glass-card {
+    background: rgba(59, 130, 246, 0.15);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 2px solid rgba(96, 165, 250, 0.3);
+    box-shadow:
+      0 8px 32px rgba(29, 78, 216, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
 
-  button {
-    display: none !important;
+  .medical-card {
+    position: relative;
+    overflow: hidden;
+    background: rgba(59, 130, 246, 0.1);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
   }
 
-  .shadow-xl {
-    box-shadow: none;
+  .medical-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.2), transparent);
+    transition: left 0.5s;
   }
 
-  .bg-gradient-to-br {
-    background: white !important;
+  .medical-card:hover::before {
+    left: 100%;
   }
 
-  .rounded-t-2xl,
-  .rounded-b-2xl {
-    border-radius: 0 !important;
+  .medical-input {
+    position: relative;
+    z-index: 1;
+    color: white;
   }
 
+  .medical-input::placeholder {
+    color: rgba(191, 219, 254, 0.6);
+  }
+
+  .medical-input:focus {
+    border-color: rgba(45, 212, 191, 0.8);
+    box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.2);
+  }
+
+  /* Select dropdown styling */
+  select.medical-input {
+    background-image: none;
+  }
+
+  select.medical-input option {
+    background-color: #1f2937;
+    color: white;
+    padding: 8px;
+  }
+
+  select.medical-input option:hover {
+    background-color: #374151;
+  }
+
+  select.medical-input option:disabled {
+    color: #9ca3af;
+  }
+
+  /* Animations */
+  @keyframes blob {
+    0% {
+      transform: translate(0px, 0px) scale(1);
+    }
+    33% {
+      transform: translate(30px, -50px) scale(1.1);
+    }
+    66% {
+      transform: translate(-20px, 20px) scale(0.9);
+    }
+    100% {
+      transform: translate(0px, 0px) scale(1);
+    }
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-in-delay {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-blob {
+    animation: blob 7s infinite;
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-fade-in {
+    animation: fade-in 1s ease-out;
+  }
+
+  .animate-fade-in-delay {
+    animation: fade-in-delay 1s ease-out 0.3s both;
+  }
+
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+
+  /* Custom transitions and animations */
+  .transition-all {
+    transition: all 0.3s ease;
+  }
+
+  /* Glass morphism effect */
+  .backdrop-blur-sm {
+    backdrop-filter: blur(8px);
+  }
+
+  /* Enhanced form sections */
   .border-l-4 {
-    border-left: 2px solid #000 !important;
+    position: relative;
+    transition: all 0.3s ease;
   }
 
-  .bg-blue-50,
-  .bg-green-50,
-  .bg-yellow-50,
-  .bg-red-50 {
-    background: #f9f9f9 !important;
+  .border-l-4:hover {
+    transform: translateX(2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
   }
 
-  .text-white {
-    color: #000 !important;
+  /* Print styles */
+  @media print {
+    .min-h-screen {
+      min-height: auto;
+    }
+
+    button {
+      display: none !important;
+    }
+
+    .shadow-xl {
+      box-shadow: none;
+    }
+
+    .bg-gradient-to-br {
+      background: white !important;
+    }
+
+    .rounded-t-2xl,
+    .rounded-b-2xl {
+      border-radius: 0 !important;
+    }
+
+    .border-l-4 {
+      border-left: 2px solid #000 !important;
+    }
+
+    .bg-blue-50,
+    .bg-green-50,
+    .bg-yellow-50,
+    .bg-red-50 {
+      background: #f9f9f9 !important;
+    }
+
+    .text-white {
+      color: #000 !important;
+    }
+
+    .bg-red-600 {
+      background: #000 !important;
+      color: #fff !important;
+    }
   }
 
-  .bg-red-600 {
-    background: #000 !important;
-    color: #fff !important;
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .grid-cols-2 {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+
+    .md\:col-span-2 {
+      grid-column: span 1;
+    }
   }
-}
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .grid-cols-2 {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
+  /* Custom input focus styles */
+  input:focus,
+  select:focus,
+  textarea:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
 
-  .md\:col-span-2 {
-    grid-column: span 1;
+  /* Checkbox custom styling */
+  input[type='checkbox']:checked {
+    background-color: #dc2626;
+    border-color: #dc2626;
   }
-}
 
-/* Custom input focus styles */
-input:focus,
-select:focus,
-textarea:focus {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-/* Checkbox custom styling */
-input[type="checkbox"]:checked {
-  background-color: #dc2626;
-  border-color: #dc2626;
-}
-
-/* Animation for form sections */
-.border-l-4 {
-  animation: slideInLeft 0.5s ease-out;
-}
-
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
+  /* Animation for form sections */
+  .border-l-4 {
+    animation: slideInLeft 0.5s ease-out;
   }
-  to {
-    opacity: 1;
-    transform: translateX(0);
+
+  @keyframes slideInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
   }
-}
 
-/* Button hover effects */
-button:hover:not(:disabled) {
-  transform: translateY(-2px) scale(1.02);
-}
+  /* Button hover effects */
+  button:hover:not(:disabled) {
+    transform: translateY(-2px) scale(1.02);
+  }
 
-button:active:not(:disabled) {
-  transform: translateY(0) scale(0.98);
-}
+  button:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+  }
 
-/* Signature area hover effects */
-.border-dashed:hover {
-  border-color: #10b981;
-  background-color: #f0fdf4;
-}
+  /* Signature area hover effects */
+  .border-dashed:hover {
+    border-color: #10b981;
+    background-color: #f0fdf4;
+  }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
 
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
-}
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
 
-::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 3px;
-}
+  ::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+  }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #a1a1a1;
-}
+  ::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
+  }
 </style>
 "

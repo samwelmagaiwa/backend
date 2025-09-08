@@ -7,6 +7,8 @@ use App\Http\Middleware\BothServiceFormRoleMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Middleware\HandleCors;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
+use Illuminate\Foundation\Configuration\Exceptions;
+use Illuminate\Auth\AuthenticationException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -17,15 +19,23 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function ($middleware) {
         $middleware->prependToGroup('api', HandleCors::class);
-        $middleware->prependToGroup('api', EnsureFrontendRequestsAreStateful::class);
+        // Removed EnsureFrontendRequestsAreStateful from API group to keep API stateless and avoid CSRF on API routes
         $middleware->alias([
             'browserbackarrow' => BrowserBackArrowMiddleware::class,
             'abilities' => CheckTokenAbilities::class,
             'role' => RoleMiddleware::class,
             'both.service.role' => BothServiceFormRoleMiddleware::class,
-            'admin' => \App\Http\Middleware\AdminMiddleware::class,
+            'admin' => App\Http\Middleware\AdminMiddleware::class,
         ]);
     })
-    ->withExceptions(function ($exceptions) {
-        // Configure exception handling here if needed
+    ->withExceptions(function (Exceptions $exceptions) {
+        // Return JSON 401 for API unauthenticated requests instead of redirecting
+        $exceptions->render(function (AuthenticationException $e, $request) {
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthenticated.'
+                ], 401);
+            }
+        });
     })->create();

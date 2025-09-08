@@ -6,7 +6,8 @@
     <div
       class="bg-gradient-to-br from-blue-50 via-white to-blue-100 rounded-3xl max-w-md w-full transform transition-all duration-500 scale-100 animate-slideUp border-2 border-blue-300/60"
       style="
-        box-shadow: 0 35px 60px -12px rgba(29, 78, 216, 0.5),
+        box-shadow:
+          0 35px 60px -12px rgba(29, 78, 216, 0.5),
           0 25px 50px -12px rgba(59, 130, 246, 0.3),
           0 0 0 1px rgba(59, 130, 246, 0.4),
           inset 0 2px 0 rgba(255, 255, 255, 0.9);
@@ -34,16 +35,10 @@
             <div
               class="absolute inset-0 bg-gradient-to-br from-blue-300/50 to-transparent rounded-xl"
             ></div>
-            <i
-              class="fas fa-trophy text-white text-lg drop-shadow-lg relative z-10"
-            ></i>
+            <i class="fas fa-trophy text-white text-lg drop-shadow-lg relative z-10"></i>
           </div>
-          <h2 class="text-xl font-bold text-white mb-1 drop-shadow-lg">
-            Congratulations!
-          </h2>
-          <p class="text-blue-100 text-sm font-medium drop-shadow-sm">
-            Head of Department
-          </p>
+          <h2 class="text-xl font-bold text-white mb-1 drop-shadow-lg">Congratulations!</h2>
+          <p class="text-blue-100 text-sm font-medium drop-shadow-sm">Head of Department</p>
         </div>
       </div>
 
@@ -74,9 +69,7 @@
             >
               <i class="fas fa-check text-white text-xs drop-shadow-sm"></i>
             </div>
-            <span class="text-blue-800 font-semibold text-sm"
-              >Terms of Service Accepted</span
-            >
+            <span class="text-blue-800 font-semibold text-sm">Terms of Service Accepted</span>
           </div>
 
           <div
@@ -87,9 +80,7 @@
             >
               <i class="fas fa-check text-white text-xs drop-shadow-sm"></i>
             </div>
-            <span class="text-blue-900 font-semibold text-sm"
-              >ICT Policy Acknowledged</span
-            >
+            <span class="text-blue-900 font-semibold text-sm">ICT Policy Acknowledged</span>
           </div>
 
           <div
@@ -100,9 +91,7 @@
             >
               <i class="fas fa-check text-white text-xs drop-shadow-sm"></i>
             </div>
-            <span class="text-blue-900 font-semibold text-sm"
-              >Declaration Form Submitted</span
-            >
+            <span class="text-blue-900 font-semibold text-sm">Declaration Form Submitted</span>
           </div>
         </div>
 
@@ -128,89 +117,89 @@
 </template>
 
 <script>
-export default {
-  name: 'SuccessPopup',
-  props: {
-    userName: {
-      type: String,
-      required: true
+  export default {
+    name: 'SuccessPopup',
+    props: {
+      userName: {
+        type: String,
+        required: true
+      },
+      message: {
+        type: String,
+        default:
+          'You have successfully completed the onboarding process. Now you can proceed with your requests.'
+      }
     },
-    message: {
-      type: String,
-      default:
-        'You have successfully completed the onboarding process. Now you can proceed with your requests.'
-    }
-  },
-  emits: ['continue'],
-  methods: {
-    handleContinue() {
-      console.log('🎯 SuccessPopup: Continue button clicked')
-      console.log('🚀 SuccessPopup: Emitting continue event')
-      this.$emit('continue')
+    emits: ['continue'],
+    methods: {
+      handleContinue() {
+        console.log('🎯 SuccessPopup: Continue button clicked')
+        console.log('🚀 SuccessPopup: Emitting continue event')
+        this.$emit('continue')
+      }
     }
   }
-}
 </script>
 
 <style scoped>
-/* Enhanced slide up animation */
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-.animate-slideUp {
-  animation: slideUp 0.5s ease-out;
-}
-
-/* Floating animation for trophy */
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-5px);
-  }
-}
-
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
-
-/* Simple backdrop blur */
-.backdrop-blur-sm {
-  backdrop-filter: blur(4px);
-}
-
-/* Responsive design */
-@media (max-width: 640px) {
-  .max-w-md {
-    max-width: 90vw;
+  /* Enhanced slide up animation */
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
   }
 
-  .p-6 {
-    padding: 1rem;
-  }
-}
-
-/* Accessibility */
-@media (prefers-reduced-motion: reduce) {
   .animate-slideUp {
-    animation: none;
+    animation: slideUp 0.5s ease-out;
   }
-}
 
-/* Focus styles */
-button:focus {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
-}
+  /* Floating animation for trophy */
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-5px);
+    }
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  /* Simple backdrop blur */
+  .backdrop-blur-sm {
+    backdrop-filter: blur(4px);
+  }
+
+  /* Responsive design */
+  @media (max-width: 640px) {
+    .max-w-md {
+      max-width: 90vw;
+    }
+
+    .p-6 {
+      padding: 1rem;
+    }
+  }
+
+  /* Accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-slideUp {
+      animation: none;
+    }
+  }
+
+  /* Focus styles */
+  button:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
 </style>
 "

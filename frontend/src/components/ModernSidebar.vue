@@ -2,20 +2,35 @@
   <aside
     v-if="shouldShowSidebar"
     class="h-screen flex flex-col transition-all duration-300 ease-in-out overflow-hidden relative shadow-2xl"
-    :class="[
-      isCollapsed ? 'w-16' : 'w-72'
-    ]"
+    :class="[isCollapsed ? 'w-16' : 'w-72']"
     aria-label="Sidebar navigation"
-    style="background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 25%, #1d4ed8 50%, #1e40af 75%, #1e3a8a 100%); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1); border-right: 1px solid rgba(59, 130, 246, 0.4);"
+    style="
+      background: linear-gradient(
+        135deg,
+        #1e3a8a 0%,
+        #1e40af 25%,
+        #1d4ed8 50%,
+        #1e40af 75%,
+        #1e3a8a 100%
+      );
+      box-shadow:
+        0 25px 50px -12px rgba(0, 0, 0, 0.25),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
+      border-right: 1px solid rgba(59, 130, 246, 0.4);
+    "
   >
     <!-- Enhanced Background Layers -->
     <div class="absolute inset-0">
       <!-- Primary shadow layer -->
-      <div class="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-transparent to-blue-800/30 rounded-2xl m-1"></div>
+      <div
+        class="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-transparent to-blue-800/30 rounded-2xl m-1"
+      ></div>
       <!-- Decorative Border -->
       <div class="absolute inset-0 border-2 border-dashed border-blue-300/20 rounded-2xl m-2"></div>
       <!-- Inner glow -->
-      <div class="absolute inset-0 bg-gradient-to-t from-transparent via-blue-400/5 to-blue-300/10 rounded-2xl m-3"></div>
+      <div
+        class="absolute inset-0 bg-gradient-to-t from-transparent via-blue-400/5 to-blue-300/10 rounded-2xl m-3"
+      ></div>
     </div>
 
     <!-- Main Content Container -->
@@ -58,7 +73,9 @@
               ></span>
             </div>
             <!-- Hover effect -->
-            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+            <div
+              class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"
+            ></div>
           </button>
 
           <!-- Brand/Logo (when expanded) -->
@@ -70,7 +87,9 @@
             }"
           >
             <div class="flex items-center space-x-2">
-              <div class="w-8 h-8 bg-gradient-to-br from-blue-500/30 to-blue-600/30 rounded-lg backdrop-blur-sm border border-blue-400/50 flex items-center justify-center shadow-lg">
+              <div
+                class="w-8 h-8 bg-gradient-to-br from-blue-500/30 to-blue-600/30 rounded-lg backdrop-blur-sm border border-blue-400/50 flex items-center justify-center shadow-lg"
+              >
                 <i class="fas fa-hospital text-white text-sm"></i>
               </div>
               <span class="text-white font-bold text-lg tracking-wide">MNH</span>
@@ -85,34 +104,57 @@
             v-if="!isCollapsed"
             class="profile-expanded opacity-100 transform translate-y-0 transition-all duration-500 ease-out"
           >
-            <div class="flex items-center space-x-3 p-3 rounded-xl bg-blue-600/60 border border-blue-500/40 backdrop-blur-sm hover:bg-blue-600/80 transition-all duration-300 group cursor-pointer">
+            <div
+              class="flex items-center space-x-3 p-3 rounded-xl bg-blue-600/60 border border-blue-500/40 backdrop-blur-sm hover:bg-blue-600/80 transition-all duration-300 group cursor-pointer"
+            >
               <!-- User Avatar -->
               <div class="relative">
-                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg border-2 border-white/20 group-hover:scale-110 transition-transform duration-300 relative overflow-hidden">
+                <div
+                  class="w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg border-2 border-white/20 group-hover:scale-110 transition-transform duration-300 relative overflow-hidden"
+                >
                   <!-- Avatar background layers -->
-                  <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
-                  <span class="text-white font-bold text-lg relative z-10 drop-shadow-lg">{{ userInitials }}</span>
+                  <div
+                    class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"
+                  ></div>
+                  <span class="text-white font-bold text-lg relative z-10 drop-shadow-lg">{{
+                    userInitials
+                  }}</span>
                   <!-- Online indicator -->
-                  <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-white shadow-sm animate-pulse"></div>
+                  <div
+                    class="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-white shadow-sm animate-pulse"
+                  ></div>
                 </div>
                 <!-- Avatar glow -->
-                <div class="absolute inset-0 bg-orange-500/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+                <div
+                  class="absolute inset-0 bg-orange-500/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"
+                ></div>
               </div>
 
               <!-- User Info -->
               <div class="flex-1 min-w-0">
-                <h3 class="text-white font-bold text-sm truncate group-hover:text-orange-100 transition-colors duration-300">
+                <h3
+                  class="text-white font-bold text-sm truncate group-hover:text-orange-100 transition-colors duration-300"
+                >
                   {{ userName || 'JOHN DOE' }}
                 </h3>
-                <p class="text-blue-100 text-xs truncate opacity-80 group-hover:opacity-100 transition-opacity duration-300">
+                <p
+                  class="text-blue-100 text-xs truncate opacity-80 group-hover:opacity-100 transition-opacity duration-300"
+                >
                   {{ getRoleDisplayName(userRole) }}
                 </p>
               </div>
 
               <!-- Profile chevron -->
-              <div class="w-5 h-5 text-blue-200 group-hover:text-white transition-colors duration-300">
+              <div
+                class="w-5 h-5 text-blue-200 group-hover:text-white transition-colors duration-300"
+              >
                 <svg class="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                  />
                 </svg>
               </div>
             </div>
@@ -124,20 +166,27 @@
             class="profile-collapsed opacity-100 transform translate-y-0 transition-all duration-500 ease-out flex justify-center"
           >
             <div class="relative group cursor-pointer">
-              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg border-2 border-white/20 group-hover:scale-110 transition-transform duration-300 relative overflow-hidden">
+              <div
+                class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg border-2 border-white/20 group-hover:scale-110 transition-transform duration-300 relative overflow-hidden"
+              >
                 <!-- Avatar background layers -->
                 <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
-                <span class="text-white font-bold text-sm relative z-10 drop-shadow-lg">{{ userInitials }}</span>
+                <span class="text-white font-bold text-sm relative z-10 drop-shadow-lg">{{
+                  userInitials
+                }}</span>
                 <!-- Online indicator -->
-                <div class="absolute bottom-0 right-0 w-2 h-2 bg-green-400 rounded-full border border-white shadow-sm animate-pulse"></div>
+                <div
+                  class="absolute bottom-0 right-0 w-2 h-2 bg-green-400 rounded-full border border-white shadow-sm animate-pulse"
+                ></div>
               </div>
               <!-- Avatar glow -->
-              <div class="absolute inset-0 bg-orange-500/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+              <div
+                class="absolute inset-0 bg-orange-500/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"
+              ></div>
             </div>
           </div>
         </div>
       </div>
-
 
       <!-- Navigation Menu -->
       <nav class="flex-1 space-y-1 overflow-y-auto custom-scrollbar">
@@ -156,7 +205,12 @@
               stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7"
+              />
             </svg>
           </div>
 
@@ -167,8 +221,8 @@
               'max-h-96 opacity-100': isCollapsed || expandedSections.dashboard
             }"
             :style="{
-              maxHeight: (isCollapsed || expandedSections.dashboard) ? '24rem' : '0',
-              opacity: (isCollapsed || expandedSections.dashboard) ? '1' : '0'
+              maxHeight: isCollapsed || expandedSections.dashboard ? '24rem' : '0',
+              opacity: isCollapsed || expandedSections.dashboard ? '1' : '0'
             }"
           >
             <router-link
@@ -190,7 +244,9 @@
               >
                 <i :class="[item.icon, 'text-current']"></i>
               </div>
-              <span v-if="!isCollapsed" class="truncate uppercase tracking-wide">{{ item.displayName.toUpperCase() }}</span>
+              <span v-if="!isCollapsed" class="truncate uppercase tracking-wide">{{
+                item.displayName.toUpperCase()
+              }}</span>
               <!-- Active indicator -->
               <div
                 v-if="route.path === item.path && !isCollapsed"
@@ -215,7 +271,12 @@
               stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7"
+              />
             </svg>
           </div>
 
@@ -226,8 +287,8 @@
               'max-h-96 opacity-100': isCollapsed || expandedSections.userManagement
             }"
             :style="{
-              maxHeight: (isCollapsed || expandedSections.userManagement) ? '24rem' : '0',
-              opacity: (isCollapsed || expandedSections.userManagement) ? '1' : '0'
+              maxHeight: isCollapsed || expandedSections.userManagement ? '24rem' : '0',
+              opacity: isCollapsed || expandedSections.userManagement ? '1' : '0'
             }"
           >
             <router-link
@@ -249,7 +310,9 @@
               >
                 <i :class="[item.icon, 'text-current']"></i>
               </div>
-              <span v-if="!isCollapsed" class="truncate uppercase tracking-wide">{{ item.displayName.toUpperCase() }}</span>
+              <span v-if="!isCollapsed" class="truncate uppercase tracking-wide">{{
+                item.displayName.toUpperCase()
+              }}</span>
               <!-- Active indicator -->
               <div
                 v-if="route.path === item.path && !isCollapsed"
@@ -274,7 +337,12 @@
               stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7"
+              />
             </svg>
           </div>
 
@@ -285,8 +353,8 @@
               'max-h-96 opacity-100': isCollapsed || expandedSections.requestsManagement
             }"
             :style="{
-              maxHeight: (isCollapsed || expandedSections.requestsManagement) ? '24rem' : '0',
-              opacity: (isCollapsed || expandedSections.requestsManagement) ? '1' : '0'
+              maxHeight: isCollapsed || expandedSections.requestsManagement ? '24rem' : '0',
+              opacity: isCollapsed || expandedSections.requestsManagement ? '1' : '0'
             }"
           >
             <router-link
@@ -308,7 +376,9 @@
               >
                 <i :class="[item.icon, 'text-current']"></i>
               </div>
-              <span v-if="!isCollapsed" class="truncate uppercase tracking-wide">{{ item.displayName.toUpperCase() }}</span>
+              <span v-if="!isCollapsed" class="truncate uppercase tracking-wide">{{
+                item.displayName.toUpperCase()
+              }}</span>
               <!-- Active indicator -->
               <div
                 v-if="route.path === item.path && !isCollapsed"
@@ -333,7 +403,12 @@
               stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7"
+              />
             </svg>
           </div>
 
@@ -344,8 +419,8 @@
               'max-h-96 opacity-100': isCollapsed || expandedSections.deviceManagement
             }"
             :style="{
-              maxHeight: (isCollapsed || expandedSections.deviceManagement) ? '24rem' : '0',
-              opacity: (isCollapsed || expandedSections.deviceManagement) ? '1' : '0'
+              maxHeight: isCollapsed || expandedSections.deviceManagement ? '24rem' : '0',
+              opacity: isCollapsed || expandedSections.deviceManagement ? '1' : '0'
             }"
           >
             <router-link
@@ -367,7 +442,9 @@
               >
                 <i :class="[item.icon, 'text-current']"></i>
               </div>
-              <span v-if="!isCollapsed" class="truncate uppercase tracking-wide">{{ item.displayName.toUpperCase() }}</span>
+              <span v-if="!isCollapsed" class="truncate uppercase tracking-wide">{{
+                item.displayName.toUpperCase()
+              }}</span>
               <!-- Active indicator -->
               <div
                 v-if="route.path === item.path && !isCollapsed"
@@ -392,7 +469,12 @@
             :class="isCollapsed ? '' : 'mr-3'"
           >
             <svg class="w-5 h-5 text-current" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </div>
           <span v-if="!isCollapsed" class="truncate uppercase tracking-wide">HELP CENTER</span>
@@ -410,16 +492,17 @@
             :class="isCollapsed ? '' : 'mr-3'"
           >
             <svg class="w-5 h-5 text-current" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+              />
             </svg>
           </div>
           <span v-if="!isCollapsed" class="truncate uppercase tracking-wide">LOG OUT</span>
         </button>
-
-
       </div>
-
-
     </div>
 
     <!-- Help Modal -->
@@ -434,9 +517,16 @@
       >
         <!-- Header -->
         <div class="bg-gradient-to-r from-blue-600 to-blue-700 p-6 text-center shadow-lg">
-          <div class="w-16 h-16 bg-blue-500/30 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm border border-blue-300/40 shadow-lg">
+          <div
+            class="w-16 h-16 bg-blue-500/30 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm border border-blue-300/40 shadow-lg"
+          >
             <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </div>
           <h3 class="text-xl font-bold text-white mb-2">Help & Support</h3>
@@ -445,10 +535,24 @@
         <!-- Body -->
         <div class="p-6">
           <div class="space-y-4">
-            <div class="flex items-center p-3 rounded-lg shadow-sm border bg-blue-50 border-blue-100">
-              <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3 shadow-md">
-                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+            <div
+              class="flex items-center p-3 rounded-lg shadow-sm border bg-blue-50 border-blue-100"
+            >
+              <div
+                class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3 shadow-md"
+              >
+                <svg
+                  class="w-5 h-5 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                  />
                 </svg>
               </div>
               <div>
@@ -457,10 +561,24 @@
               </div>
             </div>
 
-            <div class="flex items-center p-3 rounded-lg shadow-sm border bg-blue-50 border-blue-100">
-              <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3 shadow-md">
-                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            <div
+              class="flex items-center p-3 rounded-lg shadow-sm border bg-blue-50 border-blue-100"
+            >
+              <div
+                class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3 shadow-md"
+              >
+                <svg
+                  class="w-5 h-5 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  />
                 </svg>
               </div>
               <div>
@@ -469,10 +587,24 @@
               </div>
             </div>
 
-            <div class="flex items-center p-3 rounded-lg shadow-sm border bg-blue-50 border-blue-100">
-              <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3 shadow-md">
-                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            <div
+              class="flex items-center p-3 rounded-lg shadow-sm border bg-blue-50 border-blue-100"
+            >
+              <div
+                class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3 shadow-md"
+              >
+                <svg
+                  class="w-5 h-5 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                  />
                 </svg>
               </div>
               <div>
@@ -498,826 +630,870 @@
 </template>
 
 <script>
-import { computed, ref, watch, onMounted, onUnmounted, nextTick } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { ROLE_PERMISSIONS, ROLES } from '../utils/permissions'
-import { useAuth } from '../composables/useAuth'
-import { useSidebar } from '../composables/useSidebar'
-import { useAuthStore } from '../stores/auth'
-import auth from '../utils/auth'
-import { logoutGuard } from '@/utils/logoutGuard'
+  import { computed, ref, watch, onMounted, onUnmounted, nextTick } from 'vue'
+  import { useRouter, useRoute } from 'vue-router'
+  import { ROLE_PERMISSIONS, ROLES } from '../utils/permissions'
+  import { useAuth } from '../composables/useAuth'
+  import { useSidebar } from '../composables/useSidebar'
+  import { useAuthStore } from '../stores/auth'
+  import auth from '../utils/auth'
+  import { logoutGuard } from '@/utils/logoutGuard'
 
-export default {
-  name: 'ModernSidebar',
-  // Remove props and emits since we're using Vuex now
-  // props: {
-  //   collapsed: {
-  //     type: Boolean,
-  //     default: false
-  //   }
-  // },
-  // emits: ['update:collapsed'],
-  setup() {
-    const router = useRouter()
-    const route = useRoute()
-    const { currentUser, userRole, logout, isAuthenticated, isLoading } = useAuth()
-    const {
-      isCollapsed,
-      expandedSections,
-      toggleSidebar,
-      toggleSection,
-      setSectionExpanded: _setSectionExpanded,
-      setCollapsed
-    } = useSidebar()
+  export default {
+    name: 'ModernSidebar',
+    // Remove props and emits since we're using Vuex now
+    // props: {
+    //   collapsed: {
+    //     type: Boolean,
+    //     default: false
+    //   }
+    // },
+    // emits: ['update:collapsed'],
+    setup() {
+      const router = useRouter()
+      const route = useRoute()
+      const { currentUser, userRole, logout, isAuthenticated, isLoading } = useAuth()
+      const {
+        isCollapsed,
+        expandedSections,
+        toggleSidebar,
+        toggleSection,
+        setSectionExpanded: _setSectionExpanded,
+        setCollapsed
+      } = useSidebar()
 
-    // Use Pinia auth store for additional reliability
-    const piniaAuthStore = useAuthStore()
+      // Use Pinia auth store for additional reliability
+      const piniaAuthStore = useAuthStore()
 
-    // Ensure Pinia auth is initialized
-    if (!piniaAuthStore.isInitialized) {
-      piniaAuthStore.initializeAuth()
-    }
-
-    // Local state
-    const stableUserRole = ref(null)
-    const searchQuery = ref('')
-    const showHelpModal = ref(false)
-    // expandedSections now comes from useSidebar composable
-
-    // Responsive behavior
-    const isSmallScreen = ref(window.innerWidth < 768)
-
-    // Watch for screen size changes
-    const handleResize = () => {
-      isSmallScreen.value = window.innerWidth < 768
-      if (isSmallScreen.value && !isCollapsed.value) {
-        setCollapsed(true)
+      // Ensure Pinia auth is initialized
+      if (!piniaAuthStore.isInitialized) {
+        piniaAuthStore.initializeAuth()
       }
-    }
 
-    // Watch for authentication state changes
-    watch([isAuthenticated, userRole], ([authenticated, role]) => {
-      try {
-        console.log('🔄 Sidebar: Auth state changed:', { authenticated, role })
-        if (authenticated && role) {
-          stableUserRole.value = role
-          console.log('✅ Sidebar: Stable user role set to:', role)
-        }
-      } catch (error) {
-        console.warn('Error in auth state watcher:', error)
-      }
-    }, { immediate: true })
+      // Local state
+      const stableUserRole = ref(null)
+      const searchQuery = ref('')
+      const showHelpModal = ref(false)
+      // expandedSections now comes from useSidebar composable
 
-    // Initialize auth state and setup event listeners on mount
-    onMounted(async() => {
-      // Setup resize listener
-      window.addEventListener('resize', handleResize)
-      handleResize() // Initial check
+      // Responsive behavior
+      const isSmallScreen = ref(window.innerWidth < 768)
 
-      // Initialize auth state
-      const token = localStorage.getItem('auth_token')
-      const userData = localStorage.getItem('user_data')
-
-      if (token && userData) {
-        try {
-          const user = JSON.parse(userData)
-          if (user.role) {
-            stableUserRole.value = user.role
-          }
-        } catch (error) {
-          console.error('Failed to parse stored user data:', error)
-        }
-
-        if (!isAuthenticated?.value && !isLoading?.value) {
-          await nextTick()
-          auth.initializeAuth()
+      // Watch for screen size changes
+      const handleResize = () => {
+        isSmallScreen.value = window.innerWidth < 768
+        if (isSmallScreen.value && !isCollapsed.value) {
+          setCollapsed(true)
         }
       }
 
-      if (isAuthenticated?.value && userRole?.value) {
-        stableUserRole.value = userRole.value
-      }
-    })
-
-    // Cleanup event listeners on unmount
-    onUnmounted(() => {
-      window.removeEventListener('resize', handleResize)
-    })
-
-    // Computed properties
-    // isCollapsed now comes from useSidebar composable
-
-    const userName = computed(() => {
-      try {
-        return currentUser?.value?.name || piniaAuthStore?.user?.name || 'JOHN DOE'
-      } catch (error) {
-        console.warn('Error getting userName:', error)
-        return 'JOHN DOE'
-      }
-    })
-
-    const userInitials = computed(() => {
-      try {
-        const name = userName.value || 'JOHN DOE'
-        return name.split(' ').map(n => n?.[0] || '').join('').toUpperCase().slice(0, 2) || 'JD'
-      } catch (error) {
-        console.warn('Error getting userInitials:', error)
-        return 'JD'
-      }
-    })
-
-    // Enhanced sidebar visibility logic with dual auth store support
-    const shouldShowSidebar = computed(() => {
-      try {
-        // Check both Vuex and Pinia auth states for maximum reliability
-        const vuexAuth = isAuthenticated?.value || false
-        const vuexRole = userRole?.value || null
-        const vuexLoading = isLoading?.value || false
-
-        const piniaAuth = piniaAuthStore?.isAuthenticated || false
-        const piniaRole = piniaAuthStore?.userRole || null
-        const piniaLoading = piniaAuthStore?.isLoading || false
-
-        // Use the most reliable source (prefer Pinia if both are available)
-        const hasAuth = piniaAuth || vuexAuth
-        const hasRole = piniaRole || vuexRole || stableUserRole?.value
-        const notLoading = !piniaLoading && !vuexLoading
-
-        console.log('🔍 Sidebar visibility check (dual auth):', {
-          vuex: { auth: vuexAuth, role: vuexRole, loading: vuexLoading },
-          pinia: { auth: piniaAuth, role: piniaRole, loading: piniaLoading },
-          stable: { role: stableUserRole?.value },
-          final: { hasAuth, hasRole, notLoading },
-          shouldShow: hasAuth && hasRole && notLoading
-        })
-
-        return hasAuth && hasRole && notLoading
-      } catch (error) {
-        console.warn('Error in shouldShowSidebar computed:', error)
-        return false
-      }
-    })
-
-    // Route metadata function (moved before computed properties)
-    function getRouteMetadata(route) {
-      const metadata = {
-        // Dashboards
-        '/admin-dashboard': {
-          name: 'AdminDashboard',
-          displayName: 'Admin Dashboard',
-          icon: 'fas fa-user-shield',
-          category: 'dashboard',
-          description: 'Administrative control panel'
-        },
-        '/user-dashboard': {
-          name: 'UserDashboard',
-          displayName: 'User Dashboard',
-          icon: 'fas fa-home',
-          category: 'dashboard',
-          description: 'User portal and services'
-        },
-        '/dict-dashboard': {
-          name: 'DictDashboard',
-          displayName: 'ICT Director Dashboard',
-          icon: 'fas fa-user-cog',
-          category: 'dashboard',
-          description: 'ICT Director control panel'
-        },
-        '/hod-dashboard': {
-          name: 'HodDashboard',
-          displayName: 'HOD Dashboard',
-          icon: 'fas fa-user-tie',
-          category: 'dashboard',
-          description: 'Head of Department panel'
-        },
-        '/divisional-dashboard': {
-          name: 'DivisionalDashboard',
-          displayName: 'Divisional Dashboard',
-          icon: 'fas fa-building',
-          category: 'dashboard',
-          description: 'Divisional Director panel'
-        },
-        '/ict-dashboard': {
-          name: 'IctDashboard',
-          displayName: 'ICT Dashboard',
-          icon: 'fas fa-laptop-code',
-          category: 'dashboard',
-          description: 'ICT Officer panel'
-        },
-
-        // User Management (Admin only)
-        '/service-users': {
-          name: 'ServiceUsers',
-          displayName: 'Service Granted',
-          icon: 'fas fa-check-circle',
-          category: 'user-management',
-          description: 'Manage granted services'
-        },
-
-        // Device Management (ICT Officer only)
-        '/ict-approval/requests': {
-          name: 'RequestsList',
-          displayName: 'Device Requests',
-          icon: 'fas fa-clipboard-list',
-          category: 'device-management',
-          description: 'Manage device borrowing requests'
-        },
-        '/ict-approval/request/:id': {
-          name: 'RequestDetails',
-          displayName: 'Request Details',
-          icon: 'fas fa-clipboard-check',
-          category: 'device-management',
-          description: 'View and assess device requests'
-        },
-
-        // Requests Management (for approvers)
-        '/hod-dashboard/request-list': {
-          name: 'HODDashboardRequestList',
-          displayName: 'Access Requests',
-          icon: 'fas fa-clipboard-check',
-          category: 'requests-management',
-          description: 'Review access requests'
-        },
-        '/internal-access/details': {
-          name: 'InternalAccessDetails',
-          displayName: 'Request Details',
-          icon: 'fas fa-file-signature',
-          category: 'requests-management',
-          description: 'Review and approve requests'
-        }
-      }
-
-      return metadata[route] || {}
-    }
-
-    // Get menu items based on enhanced role detection
-    const menuItems = computed(() => {
-      try {
-        // Use the most reliable role source
-        const role = piniaAuthStore?.userRole || userRole?.value || stableUserRole?.value
-        if (!role) {
-          console.log('🔍 Menu items: No role found')
-          return []
-        }
-
-        console.log('🔍 Menu items: Using role:', role)
-        const permissions = ROLE_PERMISSIONS[role]
-        if (!permissions || !permissions.routes) {
-          console.log('🔍 Menu items: No permissions found for role:', role)
-          return []
-        }
-
-        const items = permissions.routes
-          .map((route) => {
-            try {
-              const metadata = getRouteMetadata(route)
-              return {
-                path: route,
-                ...metadata
-              }
-            } catch (error) {
-              console.warn('Error getting metadata for route:', route, error)
-              return null
+      // Watch for authentication state changes
+      watch(
+        [isAuthenticated, userRole],
+        ([authenticated, role]) => {
+          try {
+            console.log('🔄 Sidebar: Auth state changed:', { authenticated, role })
+            if (authenticated && role) {
+              stableUserRole.value = role
+              console.log('✅ Sidebar: Stable user role set to:', role)
             }
+          } catch (error) {
+            console.warn('Error in auth state watcher:', error)
+          }
+        },
+        { immediate: true }
+      )
+
+      // Initialize auth state and setup event listeners on mount
+      onMounted(async () => {
+        // Setup resize listener
+        window.addEventListener('resize', handleResize)
+        handleResize() // Initial check
+
+        // Initialize auth state
+        const token = localStorage.getItem('auth_token')
+        const userData = localStorage.getItem('user_data')
+
+        if (token && userData) {
+          try {
+            const user = JSON.parse(userData)
+            if (user.role) {
+              stableUserRole.value = user.role
+            }
+          } catch (error) {
+            console.error('Failed to parse stored user data:', error)
+          }
+
+          if (!isAuthenticated?.value && !isLoading?.value) {
+            await nextTick()
+            auth.initializeAuth()
+          }
+        }
+
+        if (isAuthenticated?.value && userRole?.value) {
+          stableUserRole.value = userRole.value
+        }
+      })
+
+      // Cleanup event listeners on unmount
+      onUnmounted(() => {
+        window.removeEventListener('resize', handleResize)
+      })
+
+      // Computed properties
+      // isCollapsed now comes from useSidebar composable
+
+      const userName = computed(() => {
+        try {
+          return currentUser?.value?.name || piniaAuthStore?.user?.name || 'JOHN DOE'
+        } catch (error) {
+          console.warn('Error getting userName:', error)
+          return 'JOHN DOE'
+        }
+      })
+
+      const userInitials = computed(() => {
+        try {
+          const name = userName.value || 'JOHN DOE'
+          return (
+            name
+              .split(' ')
+              .map((n) => n?.[0] || '')
+              .join('')
+              .toUpperCase()
+              .slice(0, 2) || 'JD'
+          )
+        } catch (error) {
+          console.warn('Error getting userInitials:', error)
+          return 'JD'
+        }
+      })
+
+      // Enhanced sidebar visibility logic with dual auth store support
+      const shouldShowSidebar = computed(() => {
+        try {
+          // Check both Vuex and Pinia auth states for maximum reliability
+          const vuexAuth = isAuthenticated?.value || false
+          const vuexRole = userRole?.value || null
+          const vuexLoading = isLoading?.value || false
+
+          const piniaAuth = piniaAuthStore?.isAuthenticated || false
+          const piniaRole = piniaAuthStore?.userRole || null
+          const piniaLoading = piniaAuthStore?.isLoading || false
+
+          // Use the most reliable source (prefer Pinia if both are available)
+          const hasAuth = piniaAuth || vuexAuth
+          const hasRole = piniaRole || vuexRole || stableUserRole?.value
+          const notLoading = !piniaLoading && !vuexLoading
+
+          console.log('🔍 Sidebar visibility check (dual auth):', {
+            vuex: { auth: vuexAuth, role: vuexRole, loading: vuexLoading },
+            pinia: { auth: piniaAuth, role: piniaRole, loading: piniaLoading },
+            stable: { role: stableUserRole?.value },
+            final: { hasAuth, hasRole, notLoading },
+            shouldShow: hasAuth && hasRole && notLoading
           })
-          .filter((item) => item && item.name)
 
-        console.log('🔍 Menu items computed:', items.length, 'items for role:', role)
-        return items
-      } catch (error) {
-        console.error('Error computing menu items:', error)
-        return []
+          return hasAuth && hasRole && notLoading
+        } catch (error) {
+          console.warn('Error in shouldShowSidebar computed:', error)
+          return false
+        }
+      })
+
+      // Route metadata function (moved before computed properties)
+      function getRouteMetadata(route) {
+        const metadata = {
+          // Dashboards
+          '/admin-dashboard': {
+            name: 'AdminDashboard',
+            displayName: 'Admin Dashboard',
+            icon: 'fas fa-user-shield',
+            category: 'dashboard',
+            description: 'Administrative control panel'
+          },
+          '/user-dashboard': {
+            name: 'UserDashboard',
+            displayName: 'User Dashboard',
+            icon: 'fas fa-home',
+            category: 'dashboard',
+            description: 'User portal and services'
+          },
+          '/dict-dashboard': {
+            name: 'DictDashboard',
+            displayName: 'ICT Director Dashboard',
+            icon: 'fas fa-user-cog',
+            category: 'dashboard',
+            description: 'ICT Director control panel'
+          },
+          '/hod-dashboard': {
+            name: 'HodDashboard',
+            displayName: 'HOD Dashboard',
+            icon: 'fas fa-user-tie',
+            category: 'dashboard',
+            description: 'Head of Department panel'
+          },
+          '/divisional-dashboard': {
+            name: 'DivisionalDashboard',
+            displayName: 'Divisional Dashboard',
+            icon: 'fas fa-building',
+            category: 'dashboard',
+            description: 'Divisional Director panel'
+          },
+          '/ict-dashboard': {
+            name: 'IctDashboard',
+            displayName: 'ICT Dashboard',
+            icon: 'fas fa-laptop-code',
+            category: 'dashboard',
+            description: 'ICT Officer panel'
+          },
+
+          // User Management (Admin only)
+          '/service-users': {
+            name: 'ServiceUsers',
+            displayName: 'Service Granted',
+            icon: 'fas fa-check-circle',
+            category: 'user-management',
+            description: 'Manage granted services'
+          },
+
+          // Device Management (ICT Officer only)
+          '/ict-approval/requests': {
+            name: 'RequestsList',
+            displayName: 'Device Requests',
+            icon: 'fas fa-clipboard-list',
+            category: 'device-management',
+            description: 'Manage device borrowing requests'
+          },
+          '/ict-approval/request/:id': {
+            name: 'RequestDetails',
+            displayName: 'Request Details',
+            icon: 'fas fa-clipboard-check',
+            category: 'device-management',
+            description: 'View and assess device requests'
+          },
+
+          // Requests Management (for approvers)
+          '/hod-dashboard/request-list': {
+            name: 'HODDashboardRequestList',
+            displayName: 'Access Requests',
+            icon: 'fas fa-clipboard-check',
+            category: 'requests-management',
+            description: 'Review access requests'
+          },
+          '/internal-access/details': {
+            name: 'InternalAccessDetails',
+            displayName: 'Request Details',
+            icon: 'fas fa-file-signature',
+            category: 'requests-management',
+            description: 'Review and approve requests'
+          }
+        }
+
+        return metadata[route] || {}
       }
-    })
 
-    // Categorize menu items
-    const dashboardItems = computed(() => {
-      try {
-        return menuItems?.value?.filter((item) => item?.category === 'dashboard') || []
-      } catch (error) {
-        console.warn('Error filtering dashboard items:', error)
-        return []
-      }
-    })
+      // Get menu items based on enhanced role detection
+      const menuItems = computed(() => {
+        try {
+          // Use the most reliable role source
+          const role = piniaAuthStore?.userRole || userRole?.value || stableUserRole?.value
+          if (!role) {
+            console.log('🔍 Menu items: No role found')
+            return []
+          }
 
-    const userManagementItems = computed(() => {
-      try {
-        return menuItems?.value?.filter((item) => item?.category === 'user-management') || []
-      } catch (error) {
-        console.warn('Error filtering user management items:', error)
-        return []
-      }
-    })
+          console.log('🔍 Menu items: Using role:', role)
+          const permissions = ROLE_PERMISSIONS[role]
+          if (!permissions || !permissions.routes) {
+            console.log('🔍 Menu items: No permissions found for role:', role)
+            return []
+          }
 
-    const deviceManagementItems = computed(() => {
-      try {
-        return menuItems?.value?.filter((item) => item?.category === 'device-management') || []
-      } catch (error) {
-        console.warn('Error filtering device management items:', error)
-        return []
-      }
-    })
+          const items = permissions.routes
+            .map((route) => {
+              try {
+                const metadata = getRouteMetadata(route)
+                return {
+                  path: route,
+                  ...metadata
+                }
+              } catch (error) {
+                console.warn('Error getting metadata for route:', route, error)
+                return null
+              }
+            })
+            .filter((item) => item && item.name)
 
-    const requestsManagementItems = computed(() => {
-      try {
-        return menuItems?.value?.filter((item) => item?.category === 'requests-management') || []
-      } catch (error) {
-        console.warn('Error filtering requests management items:', error)
-        return []
-      }
-    })
+          console.log('🔍 Menu items computed:', items.length, 'items for role:', role)
+          return items
+        } catch (error) {
+          console.error('Error computing menu items:', error)
+          return []
+        }
+      })
 
-    // Filtered items based on search
-    const filteredDashboardItems = computed(() => {
-      try {
-        if (!searchQuery?.value) return dashboardItems?.value || []
-        return dashboardItems?.value?.filter(item =>
-          item?.displayName?.toLowerCase().includes(searchQuery.value.toLowerCase())
-        ) || []
-      } catch (error) {
-        console.error('Error filtering dashboard items:', error)
-        return dashboardItems?.value || []
-      }
-    })
+      // Categorize menu items
+      const dashboardItems = computed(() => {
+        try {
+          return menuItems?.value?.filter((item) => item?.category === 'dashboard') || []
+        } catch (error) {
+          console.warn('Error filtering dashboard items:', error)
+          return []
+        }
+      })
 
-    const filteredUserManagementItems = computed(() => {
-      try {
-        if (!searchQuery?.value) return userManagementItems?.value || []
-        return userManagementItems?.value?.filter(item =>
-          item?.displayName?.toLowerCase().includes(searchQuery.value.toLowerCase())
-        ) || []
-      } catch (error) {
-        console.error('Error filtering user management items:', error)
-        return userManagementItems?.value || []
-      }
-    })
+      const userManagementItems = computed(() => {
+        try {
+          return menuItems?.value?.filter((item) => item?.category === 'user-management') || []
+        } catch (error) {
+          console.warn('Error filtering user management items:', error)
+          return []
+        }
+      })
 
-    const filteredDeviceManagementItems = computed(() => {
-      try {
-        if (!searchQuery?.value) return deviceManagementItems?.value || []
-        return deviceManagementItems?.value?.filter(item =>
-          item?.displayName?.toLowerCase().includes(searchQuery.value.toLowerCase())
-        ) || []
-      } catch (error) {
-        console.error('Error filtering device management items:', error)
-        return deviceManagementItems?.value || []
-      }
-    })
+      const deviceManagementItems = computed(() => {
+        try {
+          return menuItems?.value?.filter((item) => item?.category === 'device-management') || []
+        } catch (error) {
+          console.warn('Error filtering device management items:', error)
+          return []
+        }
+      })
 
-    const filteredRequestsManagementItems = computed(() => {
-      try {
-        if (!searchQuery?.value) return requestsManagementItems?.value || []
-        return requestsManagementItems?.value?.filter(item =>
-          item?.displayName?.toLowerCase().includes(searchQuery.value.toLowerCase())
-        ) || []
-      } catch (error) {
-        console.error('Error filtering requests management items:', error)
-        return requestsManagementItems?.value || []
-      }
-    })
+      const requestsManagementItems = computed(() => {
+        try {
+          return menuItems?.value?.filter((item) => item?.category === 'requests-management') || []
+        } catch (error) {
+          console.warn('Error filtering requests management items:', error)
+          return []
+        }
+      })
 
-    // Methods
-    function toggleCollapse() {
-      toggleSidebar()
-      console.log('🔄 Sidebar toggled via Pinia')
-    }
+      // Filtered items based on search
+      const filteredDashboardItems = computed(() => {
+        try {
+          if (!searchQuery?.value) return dashboardItems?.value || []
+          return (
+            dashboardItems?.value?.filter((item) =>
+              item?.displayName?.toLowerCase().includes(searchQuery.value.toLowerCase())
+            ) || []
+          )
+        } catch (error) {
+          console.error('Error filtering dashboard items:', error)
+          return dashboardItems?.value || []
+        }
+      })
 
-    function toggleSectionLocal(section) {
-      toggleSection(section)
-    }
+      const filteredUserManagementItems = computed(() => {
+        try {
+          if (!searchQuery?.value) return userManagementItems?.value || []
+          return (
+            userManagementItems?.value?.filter((item) =>
+              item?.displayName?.toLowerCase().includes(searchQuery.value.toLowerCase())
+            ) || []
+          )
+        } catch (error) {
+          console.error('Error filtering user management items:', error)
+          return userManagementItems?.value || []
+        }
+      })
 
-    function showHelp() {
-      showHelpModal.value = true
-    }
+      const filteredDeviceManagementItems = computed(() => {
+        try {
+          if (!searchQuery?.value) return deviceManagementItems?.value || []
+          return (
+            deviceManagementItems?.value?.filter((item) =>
+              item?.displayName?.toLowerCase().includes(searchQuery.value.toLowerCase())
+            ) || []
+          )
+        } catch (error) {
+          console.error('Error filtering device management items:', error)
+          return deviceManagementItems?.value || []
+        }
+      })
 
-    function getRoleDisplayName(role) {
-      if (!role) return 'User'
-
-      const roleNames = {
-        [ROLES.ADMIN]: 'Administrator',
-        [ROLES.DIVISIONAL_DIRECTOR]: 'Divisional Director',
-        [ROLES.HEAD_OF_DEPARTMENT]: 'Head of Department',
-        [ROLES.ICT_DIRECTOR]: 'ICT Director',
-        [ROLES.STAFF]: 'D. IN MEDICINE',
-        [ROLES.ICT_OFFICER]: 'ICT Officer'
-      }
-      return roleNames[role] || role
-    }
-
-    async function handleLogout() {
-      try {
-        await logoutGuard.executeLogout(async() => {
-          await logout()
-        })
-        router.push('/')
-      } catch (error) {
-        console.error('Logout failed:', error)
-        router.push('/')
-      }
-    }
-
-    // Theme is automatically initialized by useTheme composable
-
-    return {
-      // State
-      isCollapsed,
-      searchQuery,
-      showHelpModal,
-      stableUserRole,
-      expandedSections,
-
-      // Router
-      route,
-
-      // Computed
-      currentUser,
-      userRole,
-      isAuthenticated,
-      isLoading,
-      userName,
-      userInitials,
-      shouldShowSidebar,
-      dashboardItems,
-      userManagementItems,
-      deviceManagementItems,
-      requestsManagementItems,
-      filteredDashboardItems,
-      filteredUserManagementItems,
-      filteredDeviceManagementItems,
-      filteredRequestsManagementItems,
+      const filteredRequestsManagementItems = computed(() => {
+        try {
+          if (!searchQuery?.value) return requestsManagementItems?.value || []
+          return (
+            requestsManagementItems?.value?.filter((item) =>
+              item?.displayName?.toLowerCase().includes(searchQuery.value.toLowerCase())
+            ) || []
+          )
+        } catch (error) {
+          console.error('Error filtering requests management items:', error)
+          return requestsManagementItems?.value || []
+        }
+      })
 
       // Methods
-      toggleCollapse,
-      toggleSectionLocal,
-      showHelp,
-      getRoleDisplayName,
-      handleLogout
-    }
-  },
-  directives: {
-    tooltip: {
-      mounted(el, binding) {
-        if (binding.value && typeof binding.value === 'string') {
-          el.title = binding.value
+      function toggleCollapse() {
+        toggleSidebar()
+        console.log('🔄 Sidebar toggled via Pinia')
+      }
+
+      function toggleSectionLocal(section) {
+        toggleSection(section)
+      }
+
+      function showHelp() {
+        showHelpModal.value = true
+      }
+
+      function getRoleDisplayName(role) {
+        if (!role) return 'User'
+
+        const roleNames = {
+          [ROLES.ADMIN]: 'Administrator',
+          [ROLES.DIVISIONAL_DIRECTOR]: 'Divisional Director',
+          [ROLES.HEAD_OF_DEPARTMENT]: 'Head of Department',
+          [ROLES.ICT_DIRECTOR]: 'ICT Director',
+          [ROLES.STAFF]: 'D. IN MEDICINE',
+          [ROLES.ICT_OFFICER]: 'ICT Officer'
         }
-      },
-      updated(el, binding) {
-        if (binding.value && typeof binding.value === 'string') {
-          el.title = binding.value
-        } else {
+        return roleNames[role] || role
+      }
+
+      async function handleLogout() {
+        try {
+          await logoutGuard.executeLogout(async () => {
+            await logout()
+          })
+          router.push('/')
+        } catch (error) {
+          console.error('Logout failed:', error)
+          router.push('/')
+        }
+      }
+
+      // Theme is automatically initialized by useTheme composable
+
+      return {
+        // State
+        isCollapsed,
+        searchQuery,
+        showHelpModal,
+        stableUserRole,
+        expandedSections,
+
+        // Router
+        route,
+
+        // Computed
+        currentUser,
+        userRole,
+        isAuthenticated,
+        isLoading,
+        userName,
+        userInitials,
+        shouldShowSidebar,
+        dashboardItems,
+        userManagementItems,
+        deviceManagementItems,
+        requestsManagementItems,
+        filteredDashboardItems,
+        filteredUserManagementItems,
+        filteredDeviceManagementItems,
+        filteredRequestsManagementItems,
+
+        // Methods
+        toggleCollapse,
+        toggleSectionLocal,
+        showHelp,
+        getRoleDisplayName,
+        handleLogout
+      }
+    },
+    directives: {
+      tooltip: {
+        mounted(el, binding) {
+          if (binding.value && typeof binding.value === 'string') {
+            el.title = binding.value
+          }
+        },
+        updated(el, binding) {
+          if (binding.value && typeof binding.value === 'string') {
+            el.title = binding.value
+          } else {
+            el.removeAttribute('title')
+          }
+        },
+        unmounted(el) {
           el.removeAttribute('title')
         }
-      },
-      unmounted(el) {
-        el.removeAttribute('title')
       }
     }
   }
-}
 </script>
 
 <style scoped>
-/* Custom scrollbar */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 4px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.3);
-  border-radius: 2px;
-  box-shadow: inset 0 0 2px rgba(255, 255, 255, 0.2);
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background-color: transparent;
-}
-
-/* Enhanced shadow effects */
-.shadow-sm {
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05), 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-}
-
-.shadow-md {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-
-.shadow-lg {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-
-.shadow-2xl {
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-
-/* Multi-layer background effects */
-.bg-gradient-to-br {
-  --tw-gradient-from: transparent;
-  --tw-gradient-to: transparent;
-  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
-  background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
-}
-
-.bg-gradient-to-t {
-  --tw-gradient-from: transparent;
-  --tw-gradient-to: transparent;
-  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
-  background-image: linear-gradient(to top, var(--tw-gradient-stops));
-}
-
-/* Gradient color utilities */
-.from-black\/10 {
-  --tw-gradient-from: rgba(0, 0, 0, 0.1);
-  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(0, 0, 0, 0));
-}
-
-.via-transparent {
-  --tw-gradient-stops: var(--tw-gradient-from), transparent, var(--tw-gradient-to, transparent);
-}
-
-.to-black\/20 {
-  --tw-gradient-to: rgba(0, 0, 0, 0.2);
-}
-
-.from-transparent {
-  --tw-gradient-from: transparent;
-  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, transparent);
-}
-
-.via-white\/5 {
-  --tw-gradient-stops: var(--tw-gradient-from), rgba(255, 255, 255, 0.05), var(--tw-gradient-to, rgba(255, 255, 255, 0));
-}
-
-.to-white\/10 {
-  --tw-gradient-to: rgba(255, 255, 255, 0.1);
-}
-
-/* Enhanced hover effects */
-.hover\:scale-102:hover {
-  transform: scale(1.02);
-}
-
-.scale-105 {
-  transform: scale(1.05);
-}
-
-/* Fallback for transform utilities */
-.transform {
-  --tw-translate-x: 0;
-  --tw-translate-y: 0;
-  --tw-rotate: 0;
-  --tw-skew-x: 0;
-  --tw-skew-y: 0;
-  --tw-scale-x: 1;
-  --tw-scale-y: 1;
-  --tw-transform: translateX(var(--tw-translate-x)) translateY(var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-  transform: var(--tw-transform);
-}
-
-.hover\:transform:hover {
-  transform: var(--tw-transform);
-}
-
-/* Smooth transitions */
-.transition-all {
-  transition-property: all;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.transition-transform {
-  transition-property: transform;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 200ms;
-}
-
-.transition-colors {
-  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 200ms;
-}
-
-/* Backdrop blur support */
-.backdrop-blur-sm {
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-}
-
-/* Focus styles */
-.focus\:ring-2:focus {
-  outline: 2px solid transparent;
-  outline-offset: 2px;
-  box-shadow: 0 0 0 2px var(--tw-ring-color);
-}
-
-/* Section header styles */
-.section-header {
-  position: relative;
-  overflow: hidden;
-}
-
-.section-header::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-  transform: translateX(-100%);
-  transition: transform 0.6s ease;
-}
-
-.section-header:hover::before {
-  transform: translateX(100%);
-}
-
-/* Navigation item enhanced styles */
-.nav-item {
-  position: relative;
-  overflow: hidden;
-}
-
-.nav-item::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-  transition: left 0.5s ease;
-}
-
-.nav-item:hover::before {
-  left: 100%;
-}
-
-/* Active indicator pulse animation */
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
+  /* Custom scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
   }
-  50% {
-    opacity: 0.7;
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    box-shadow: inset 0 0 2px rgba(255, 255, 255, 0.2);
   }
-}
 
-.active-indicator {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* Layered shadow for depth */
-.layered-shadow {
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.12),
-    0 1px 2px rgba(0, 0, 0, 0.24),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-}
-
-/* Glassmorphism effect */
-.glass-effect {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-/* Enhanced Menu Toggle Button */
-.menu-toggle-btn {
-  position: relative;
-  z-index: 10;
-}
-
-.menu-toggle-btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
-}
-
-.menu-toggle-btn:active {
-  transform: scale(0.95);
-}
-
-/* Profile Section Animations */
-.profile-expanded {
-  animation: slideInFromLeft 0.5s ease-out;
-}
-
-.profile-collapsed {
-  animation: slideInFromLeft 0.5s ease-out;
-}
-
-.search-expanded {
-  animation: slideInFromLeft 0.6s ease-out;
-  animation-delay: 0.1s;
-  animation-fill-mode: both;
-}
-
-.search-collapsed {
-  animation: slideInFromLeft 0.6s ease-out;
-  animation-delay: 0.1s;
-  animation-fill-mode: both;
-}
-
-@keyframes slideInFromLeft {
-  0% {
-    opacity: 0;
-    transform: translateX(-20px);
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background-color: transparent;
   }
-  100% {
-    opacity: 1;
-    transform: translateX(0);
+
+  /* Enhanced shadow effects */
+  .shadow-sm {
+    box-shadow:
+      0 1px 2px 0 rgba(0, 0, 0, 0.05),
+      0 1px 3px 0 rgba(0, 0, 0, 0.1);
   }
-}
 
-/* Enhanced Sidebar Transitions */
-.h-screen {
-  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
+  .shadow-md {
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
 
-/* Profile hover effects */
-.profile-expanded .group:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-}
+  .shadow-lg {
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
 
-.profile-collapsed .group:hover {
-  transform: translateY(-1px) scale(1.05);
-}
+  .shadow-2xl {
+    box-shadow:
+      0 25px 50px -12px rgba(0, 0, 0, 0.25),
+      0 0 0 1px rgba(255, 255, 255, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
 
-/* Search input enhancements */
-.search-expanded input:focus {
-  transform: scale(1.02);
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
-}
+  /* Multi-layer background effects */
+  .bg-gradient-to-br {
+    --tw-gradient-from: transparent;
+    --tw-gradient-to: transparent;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+    background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
+  }
 
-/* Brand logo animation */
-.brand-logo {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
+  .bg-gradient-to-t {
+    --tw-gradient-from: transparent;
+    --tw-gradient-to: transparent;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+    background-image: linear-gradient(to top, var(--tw-gradient-stops));
+  }
 
-/* Navigation items enhanced transitions */
-.nav-item {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
+  /* Gradient color utilities */
+  .from-black\/10 {
+    --tw-gradient-from: rgba(0, 0, 0, 0.1);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(0, 0, 0, 0));
+  }
 
-.nav-item:hover {
-  transform: translateX(4px) scale(1.02);
-}
+  .via-transparent {
+    --tw-gradient-stops: var(--tw-gradient-from), transparent, var(--tw-gradient-to, transparent);
+  }
 
-/* Section headers enhanced */
-.section-header {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
+  .to-black\/20 {
+    --tw-gradient-to: rgba(0, 0, 0, 0.2);
+  }
 
-.section-header:hover {
-  transform: translateX(2px);
-  background: rgba(37, 99, 235, 0.3);
-  border-radius: 8px;
-  padding-left: 16px;
-  padding-right: 16px;
-}
+  .from-transparent {
+    --tw-gradient-from: transparent;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, transparent);
+  }
 
-/* Bottom section buttons */
-.bottom-section button {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
+  .via-white\/5 {
+    --tw-gradient-stops:
+      var(--tw-gradient-from), rgba(255, 255, 255, 0.05),
+      var(--tw-gradient-to, rgba(255, 255, 255, 0));
+  }
 
-.bottom-section button:hover {
-  transform: translateX(4px) scale(1.02);
-  background: rgba(37, 99, 235, 0.6);
-}
+  .to-white\/10 {
+    --tw-gradient-to: rgba(255, 255, 255, 0.1);
+  }
 
-/* Staggered animation for navigation items */
-.nav-item:nth-child(1) { animation-delay: 0.1s; }
-.nav-item:nth-child(2) { animation-delay: 0.2s; }
-.nav-item:nth-child(3) { animation-delay: 0.3s; }
-.nav-item:nth-child(4) { animation-delay: 0.4s; }
-.nav-item:nth-child(5) { animation-delay: 0.5s; }
+  /* Enhanced hover effects */
+  .hover\:scale-102:hover {
+    transform: scale(1.02);
+  }
 
-/* Responsive design helpers */
-@media (max-width: 768px) {
-  .sidebar-mobile {
-    position: fixed;
-    z-index: 50;
-    left: 0;
+  .scale-105 {
+    transform: scale(1.05);
+  }
+
+  /* Fallback for transform utilities */
+  .transform {
+    --tw-translate-x: 0;
+    --tw-translate-y: 0;
+    --tw-rotate: 0;
+    --tw-skew-x: 0;
+    --tw-skew-y: 0;
+    --tw-scale-x: 1;
+    --tw-scale-y: 1;
+    --tw-transform: translateX(var(--tw-translate-x)) translateY(var(--tw-translate-y))
+      rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y))
+      scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+    transform: var(--tw-transform);
+  }
+
+  .hover\:transform:hover {
+    transform: var(--tw-transform);
+  }
+
+  /* Smooth transitions */
+  .transition-all {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .transition-transform {
+    transition-property: transform;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 200ms;
+  }
+
+  .transition-colors {
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 200ms;
+  }
+
+  /* Backdrop blur support */
+  .backdrop-blur-sm {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  /* Focus styles */
+  .focus\:ring-2:focus {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px var(--tw-ring-color);
+  }
+
+  /* Section header styles */
+  .section-header {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .section-header::before {
+    content: '';
+    position: absolute;
     top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
   }
 
-  /* Faster transitions on mobile */
-  .h-screen {
-    transition: width 0.3s ease-in-out;
+  .section-header:hover::before {
+    transform: translateX(100%);
   }
 
+  /* Navigation item enhanced styles */
+  .nav-item {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .nav-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .nav-item:hover::before {
+    left: 100%;
+  }
+
+  /* Active indicator pulse animation */
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+
+  .active-indicator {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* Layered shadow for depth */
+  .layered-shadow {
+    box-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.12),
+      0 1px 2px rgba(0, 0, 0, 0.24),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+  }
+
+  /* Glassmorphism effect */
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  /* Enhanced Menu Toggle Button */
   .menu-toggle-btn {
-    padding: 12px;
+    position: relative;
+    z-index: 10;
   }
 
-  /* Reduce animations on mobile for performance */
-  .profile-expanded,
-  .profile-collapsed,
-  .search-expanded,
-  .search-collapsed {
-    animation: none;
+  .menu-toggle-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
   }
-}
+
+  .menu-toggle-btn:active {
+    transform: scale(0.95);
+  }
+
+  /* Profile Section Animations */
+  .profile-expanded {
+    animation: slideInFromLeft 0.5s ease-out;
+  }
+
+  .profile-collapsed {
+    animation: slideInFromLeft 0.5s ease-out;
+  }
+
+  .search-expanded {
+    animation: slideInFromLeft 0.6s ease-out;
+    animation-delay: 0.1s;
+    animation-fill-mode: both;
+  }
+
+  .search-collapsed {
+    animation: slideInFromLeft 0.6s ease-out;
+    animation-delay: 0.1s;
+    animation-fill-mode: both;
+  }
+
+  @keyframes slideInFromLeft {
+    0% {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  /* Enhanced Sidebar Transitions */
+  .h-screen {
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Profile hover effects */
+  .profile-expanded .group:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+
+  .profile-collapsed .group:hover {
+    transform: translateY(-1px) scale(1.05);
+  }
+
+  /* Search input enhancements */
+  .search-expanded input:focus {
+    transform: scale(1.02);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+  }
+
+  /* Brand logo animation */
+  .brand-logo {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Navigation items enhanced transitions */
+  .nav-item {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .nav-item:hover {
+    transform: translateX(4px) scale(1.02);
+  }
+
+  /* Section headers enhanced */
+  .section-header {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .section-header:hover {
+    transform: translateX(2px);
+    background: rgba(37, 99, 235, 0.3);
+    border-radius: 8px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  /* Bottom section buttons */
+  .bottom-section button {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .bottom-section button:hover {
+    transform: translateX(4px) scale(1.02);
+    background: rgba(37, 99, 235, 0.6);
+  }
+
+  /* Staggered animation for navigation items */
+  .nav-item:nth-child(1) {
+    animation-delay: 0.1s;
+  }
+  .nav-item:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  .nav-item:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+  .nav-item:nth-child(4) {
+    animation-delay: 0.4s;
+  }
+  .nav-item:nth-child(5) {
+    animation-delay: 0.5s;
+  }
+
+  /* Responsive design helpers */
+  @media (max-width: 768px) {
+    .sidebar-mobile {
+      position: fixed;
+      z-index: 50;
+      left: 0;
+      top: 0;
+    }
+
+    /* Faster transitions on mobile */
+    .h-screen {
+      transition: width 0.3s ease-in-out;
+    }
+
+    .menu-toggle-btn {
+      padding: 12px;
+    }
+
+    /* Reduce animations on mobile for performance */
+    .profile-expanded,
+    .profile-collapsed,
+    .search-expanded,
+    .search-collapsed {
+      animation: none;
+    }
+  }
 </style>

@@ -38,15 +38,9 @@ const mapBackendRole = (backendRoleName) => {
   console.log('🔍 Backend role received:', backendRoleName)
 
   // Handle undefined or null roles
-  if (
-    !backendRoleName ||
-    backendRoleName === 'undefined' ||
-    backendRoleName === 'null'
-  ) {
+  if (!backendRoleName || backendRoleName === 'undefined' || backendRoleName === 'null') {
     console.error('❌ Backend returned invalid role:', backendRoleName)
-    console.error(
-      '❌ This indicates a database issue - user has no role assigned!'
-    )
+    console.error('❌ This indicates a database issue - user has no role assigned!')
     console.log('🔄 Defaulting to "staff" role as fallback')
     return ROLES.STAFF // Default to staff role
   }
@@ -82,9 +76,7 @@ const onboardingUtils = {
     }
 
     // Fallback to localStorage
-    const completedUsers = JSON.parse(
-      localStorage.getItem('onboarding_completed') || '[]'
-    )
+    const completedUsers = JSON.parse(localStorage.getItem('onboarding_completed') || '[]')
     return !completedUsers.includes(user.id)
   },
 
@@ -103,15 +95,10 @@ const onboardingUtils = {
         }
 
         // Update localStorage for compatibility
-        const completedUsers = JSON.parse(
-          localStorage.getItem('onboarding_completed') || '[]'
-        )
+        const completedUsers = JSON.parse(localStorage.getItem('onboarding_completed') || '[]')
         if (!completedUsers.includes(userId)) {
           completedUsers.push(userId)
-          localStorage.setItem(
-            'onboarding_completed',
-            JSON.stringify(completedUsers)
-          )
+          localStorage.setItem('onboarding_completed', JSON.stringify(completedUsers))
         }
         return true
       }
@@ -132,9 +119,7 @@ const onboardingUtils = {
     }
 
     // Fallback to localStorage
-    const completedUsers = JSON.parse(
-      localStorage.getItem('onboarding_completed') || '[]'
-    )
+    const completedUsers = JSON.parse(localStorage.getItem('onboarding_completed') || '[]')
     return completedUsers.includes(user.id)
   }
 }
@@ -215,10 +200,7 @@ export const auth = {
         localStorage.setItem('user_data', JSON.stringify(mappedUser))
         localStorage.setItem('session_data', JSON.stringify(sessionData))
 
-        console.log(
-          '✅ Token stored in localStorage:',
-          token.substring(0, 20) + '...'
-        )
+        console.log('✅ Token stored in localStorage:', token.substring(0, 20) + '...')
         console.log('✅ User data stored:', mappedUser.name, mappedUser.role)
         console.log('✅ Session info stored:', result.data.token_name)
 
@@ -229,10 +211,7 @@ export const auth = {
         authState.tokenName = result.data.token_name
         authState.sessionInfo = result.data.session_info
 
-        console.log(
-          '✅ Auth state updated - isAuthenticated:',
-          authState.isAuthenticated
-        )
+        console.log('✅ Auth state updated - isAuthenticated:', authState.isAuthenticated)
 
         return { success: true, user: mappedUser }
       } else {
@@ -281,10 +260,7 @@ export const auth = {
       authState.sessionInfo = null
       authState.activeSessions = []
 
-      console.warn(
-        'Logout API call failed, but local state cleared:',
-        error.message
-      )
+      console.warn('Logout API call failed, but local state cleared:', error.message)
       return { success: true }
     } finally {
       authState.loading = false
@@ -398,17 +374,11 @@ export const auth = {
       if (userResult.success) {
         // Update user data from backend
         const backendUser = userResult.data
-        console.log(
-          '🔄 Background verification - Raw backend user:',
-          backendUser
-        )
+        console.log('🔄 Background verification - Raw backend user:', backendUser)
         console.log('🔍 Background - user.role:', backendUser.role)
         console.log('🔍 Background - user.role_name:', backendUser.role_name)
         console.log('🔍 Background - user.roles:', backendUser.roles)
-        console.log(
-          '🔍 Background - user.permissions:',
-          backendUser.permissions
-        )
+        console.log('🔍 Background - user.permissions:', backendUser.permissions)
 
         const mappedUser = {
           ...backendUser,
@@ -430,10 +400,7 @@ export const auth = {
         ) {
           this.clearAuthData()
           // Redirect to login
-          if (
-            window.location.pathname !== '/' &&
-            window.location.pathname !== '/login'
-          ) {
+          if (window.location.pathname !== '/' && window.location.pathname !== '/login') {
             window.location.href = '/login'
           }
         }
@@ -442,14 +409,10 @@ export const auth = {
       // Check if it's an authentication error
       if (
         error.message &&
-        (error.message.includes('401') ||
-          error.message.includes('Unauthorized'))
+        (error.message.includes('401') || error.message.includes('Unauthorized'))
       ) {
         this.clearAuthData()
-        if (
-          window.location.pathname !== '/' &&
-          window.location.pathname !== '/login'
-        ) {
+        if (window.location.pathname !== '/' && window.location.pathname !== '/login') {
           window.location.href = '/login'
         }
       }
@@ -479,12 +442,7 @@ export const auth = {
   // Get default dashboard for current user
   getDefaultDashboard() {
     const dashboard = getDefaultDashboard(this.userRole)
-    console.log(
-      '🏠 Getting default dashboard for role:',
-      this.userRole,
-      '→',
-      dashboard
-    )
+    console.log('🏠 Getting default dashboard for role:', this.userRole, '→', dashboard)
     return dashboard
   },
 
@@ -517,10 +475,7 @@ export const auth = {
     } catch (error) {
       // Even if logout fails, clear local state
       this.clearAuthData()
-      console.warn(
-        'LogoutAll API call failed, but local state cleared:',
-        error.message
-      )
+      console.warn('LogoutAll API call failed, but local state cleared:', error.message)
       return { success: true }
     } finally {
       authState.loading = false
@@ -606,13 +561,9 @@ export const useAuth = () => {
     }),
 
     // Onboarding state
-    needsOnboarding: computed(() =>
-      onboardingUtils.needsOnboarding(authState.user)
-    ),
+    needsOnboarding: computed(() => onboardingUtils.needsOnboarding(authState.user)),
     hasCompletedOnboarding: computed(() =>
-      authState.user
-        ? onboardingUtils.hasCompletedOnboarding(authState.user.id)
-        : false
+      authState.user ? onboardingUtils.hasCompletedOnboarding(authState.user.id) : false
     ),
 
     defaultDashboard: computed(() => getDefaultDashboard(authState.user?.role)),
@@ -624,8 +575,7 @@ export const useAuth = () => {
     getActiveSessions: auth.getActiveSessions.bind(auth),
     revokeSession: auth.revokeSession.bind(auth),
     clearError: auth.clearError.bind(auth),
-    markOnboardingComplete: (userId) =>
-      onboardingUtils.markOnboardingComplete(userId),
+    markOnboardingComplete: (userId) => onboardingUtils.markOnboardingComplete(userId),
 
     // Session info
     currentSession: computed(() => auth.currentSession),

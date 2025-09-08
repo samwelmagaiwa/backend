@@ -18,20 +18,15 @@
                 top: Math.random() * 100 + '%',
                 animationDelay: Math.random() * 3 + 's',
                 animationDuration: Math.random() * 3 + 2 + 's',
-                fontSize: Math.random() * 15 + 8 + 'px',
+                fontSize: Math.random() * 15 + 8 + 'px'
               }"
             >
               <i
                 :class="[
                   'fas',
-                  [
-                    'fa-laptop',
-                    'fa-tv',
-                    'fa-desktop',
-                    'fa-keyboard',
-                    'fa-mouse',
-                    'fa-headphones',
-                  ][Math.floor(Math.random() * 6)],
+                  ['fa-laptop', 'fa-tv', 'fa-desktop', 'fa-keyboard', 'fa-mouse', 'fa-headphones'][
+                    Math.floor(Math.random() * 6)
+                  ]
                 ]"
               ></i>
             </div>
@@ -104,9 +99,7 @@
           </div>
 
           <!-- Main Content -->
-          <div
-            class="booking-glass-card rounded-b-3xl overflow-hidden animate-slide-up"
-          >
+          <div class="booking-glass-card rounded-b-3xl overflow-hidden animate-slide-up">
             <div class="p-8">
               <!-- Stats Cards -->
               <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -138,9 +131,7 @@
                       <i class="fas fa-check-circle text-white text-lg"></i>
                     </div>
                     <div class="ml-4">
-                      <p class="text-sm font-semibold text-green-200">
-                        Returned
-                      </p>
+                      <p class="text-sm font-semibold text-green-200">Returned</p>
                       <p class="text-2xl font-bold text-white">
                         {{ stats.returned }}
                       </p>
@@ -155,14 +146,10 @@
                     <div
                       class="w-12 h-12 bg-gradient-to-br from-red-500 to-pink-600 rounded-lg flex items-center justify-center shadow-lg"
                     >
-                      <i
-                        class="fas fa-exclamation-triangle text-white text-lg"
-                      ></i>
+                      <i class="fas fa-exclamation-triangle text-white text-lg"></i>
                     </div>
                     <div class="ml-4">
-                      <p class="text-sm font-semibold text-red-200">
-                        Compromised
-                      </p>
+                      <p class="text-sm font-semibold text-red-200">Compromised</p>
                       <p class="text-2xl font-bold text-white">
                         {{ stats.compromised }}
                       </p>
@@ -316,10 +303,7 @@
                           <div class="flex items-center">
                             <i class="fas fa-laptop text-teal-300 mr-2"></i>
                             <span class="text-sm text-white">{{
-                              getDeviceDisplayName(
-                                request.deviceType,
-                                request.customDevice
-                              )
+                              getDeviceDisplayName(request.deviceType, request.customDevice)
                             }}</span>
                           </div>
                         </td>
@@ -333,18 +317,13 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                           <div class="flex items-center">
-                            <div
-                              v-if="request.signature"
-                              class="flex items-center text-green-400"
-                            >
+                            <div v-if="request.signature" class="flex items-center text-green-400">
                               <i class="fas fa-check-circle mr-2"></i>
                               <span class="text-sm font-medium">Signed</span>
                             </div>
                             <div v-else class="flex items-center text-red-400">
                               <i class="fas fa-times-circle mr-2"></i>
-                              <span class="text-sm font-medium"
-                                >Not Signed</span
-                              >
+                              <span class="text-sm font-medium">Not Signed</span>
                             </div>
                           </div>
                         </td>
@@ -353,10 +332,7 @@
                             :class="getStatusBadgeClass(request.status)"
                             class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium"
                           >
-                            <i
-                              :class="getStatusIcon(request.status)"
-                              class="mr-1"
-                            ></i>
+                            <i :class="getStatusIcon(request.status)" class="mr-1"></i>
                             {{ getStatusText(request.status) }}
                           </span>
                         </td>
@@ -372,7 +348,7 @@
                               <i
                                 class="fas fa-chevron-down ml-2 text-xs transition-transform duration-200"
                                 :class="{
-                                  'rotate-180': openDropdown === request.id,
+                                  'rotate-180': openDropdown === request.id
                                 }"
                               ></i>
                             </button>
@@ -390,7 +366,8 @@
                                 v-if="openDropdown === request.id"
                                 class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-50 overflow-hidden"
                                 style="
-                                  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1),
+                                  box-shadow:
+                                    0 10px 25px -5px rgba(0, 0, 0, 0.1),
                                     0 10px 10px -5px rgba(0, 0, 0, 0.04);
                                 "
                               >
@@ -403,15 +380,11 @@
                                   <div
                                     class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-blue-200 transition-colors duration-200"
                                   >
-                                    <i
-                                      class="fas fa-eye text-blue-600 text-sm"
-                                    ></i>
+                                    <i class="fas fa-eye text-blue-600 text-sm"></i>
                                   </div>
                                   <div class="flex-1">
                                     <p class="font-medium">View Details</p>
-                                    <p class="text-xs text-gray-500">
-                                      Review request information
-                                    </p>
+                                    <p class="text-xs text-gray-500">Review request information</p>
                                   </div>
                                 </router-link>
 
@@ -424,22 +397,17 @@
                                   class="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-700 transition-colors duration-200 group"
                                   :disabled="request.status === 'cancelled'"
                                   :class="{
-                                    'opacity-50 cursor-not-allowed':
-                                      request.status === 'cancelled',
+                                    'opacity-50 cursor-not-allowed': request.status === 'cancelled'
                                   }"
                                 >
                                   <div
                                     class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-yellow-200 transition-colors duration-200"
                                   >
-                                    <i
-                                      class="fas fa-ban text-yellow-600 text-sm"
-                                    ></i>
+                                    <i class="fas fa-ban text-yellow-600 text-sm"></i>
                                   </div>
                                   <div class="flex-1 text-left">
                                     <p class="font-medium">Cancel Request</p>
-                                    <p class="text-xs text-gray-500">
-                                      Cancel this request
-                                    </p>
+                                    <p class="text-xs text-gray-500">Cancel this request</p>
                                   </div>
                                 </button>
 
@@ -454,15 +422,11 @@
                                   <div
                                     class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-red-200 transition-colors duration-200"
                                   >
-                                    <i
-                                      class="fas fa-trash text-red-600 text-sm"
-                                    ></i>
+                                    <i class="fas fa-trash text-red-600 text-sm"></i>
                                   </div>
                                   <div class="flex-1 text-left">
                                     <p class="font-medium">Delete Request</p>
-                                    <p class="text-xs text-gray-500">
-                                      Permanently remove
-                                    </p>
+                                    <p class="text-xs text-gray-500">Permanently remove</p>
                                   </div>
                                 </button>
                               </div>
@@ -474,23 +438,18 @@
                   </table>
 
                   <!-- Empty State -->
-                  <div
-                    v-if="filteredRequests.length === 0"
-                    class="text-center py-12"
-                  >
+                  <div v-if="filteredRequests.length === 0" class="text-center py-12">
                     <div
                       class="w-24 h-24 bg-gradient-to-br from-blue-500/20 to-teal-500/20 rounded-full flex items-center justify-center mx-auto mb-4"
                     >
                       <i class="fas fa-inbox text-blue-300 text-3xl"></i>
                     </div>
-                    <h3 class="text-lg font-medium text-white mb-2">
-                      No requests found
-                    </h3>
+                    <h3 class="text-lg font-medium text-white mb-2">No requests found</h3>
                     <p class="text-blue-300">
                       {{
                         searchQuery || statusFilter
-                          ? "Try adjusting your filters"
-                          : "No device borrowing requests have been submitted yet."
+                          ? 'Try adjusting your filters'
+                          : 'No device borrowing requests have been submitted yet.'
                       }}
                     </p>
                   </div>
@@ -502,8 +461,7 @@
                   class="px-6 py-4 border-t border-blue-300/30 flex items-center justify-between"
                 >
                   <div class="text-sm text-blue-300">
-                    Showing {{ filteredRequests.length }} of
-                    {{ requests.length }} requests
+                    Showing {{ filteredRequests.length }} of {{ requests.length }} requests
                   </div>
                   <div class="flex space-x-2">
                     <!-- Add pagination controls here if needed -->
@@ -535,326 +493,318 @@
 </template>
 
 <script>
-// import { ref } from 'vue' // Removed unused import
-import Header from '@/components/header.vue'
-import ModernSidebar from '@/components/ModernSidebar.vue'
-import AppFooter from '@/components/footer.vue'
-import axios from 'axios'
+  // import { ref } from 'vue' // Removed unused import
+  import Header from '@/components/header.vue'
+  import ModernSidebar from '@/components/ModernSidebar.vue'
+  import AppFooter from '@/components/footer.vue'
+  import axios from 'axios'
 
-export default {
-  name: 'RequestsList',
-  components: {
-    Header,
-    ModernSidebar,
-    AppFooter
-  },
-  setup() {
-    // Sidebar state now managed by Pinia - no local state needed
+  export default {
+    name: 'RequestsList',
+    components: {
+      Header,
+      ModernSidebar,
+      AppFooter
+    },
+    setup() {
+      // Sidebar state now managed by Pinia - no local state needed
 
-    return {
-      // No local state needed for sidebar
-    }
-  },
-  data() {
-    return {
-      requests: [],
-      searchQuery: '',
-      statusFilter: '',
-      isLoading: false,
-      openDropdown: null,
-      stats: {
-        pending: 0,
-        returned: 0,
-        compromised: 0,
-        total: 0
-      }
-    }
-  },
-  computed: {
-    filteredRequests() {
-      let filtered = this.requests
-
-      // Filter by search query
-      if (this.searchQuery) {
-        const query = this.searchQuery.toLowerCase()
-        filtered = filtered.filter(
-          (request) =>
-            request.borrowerName.toLowerCase().includes(query) ||
-            request.department.toLowerCase().includes(query) ||
-            this.getDeviceDisplayName(request.deviceType, request.customDevice)
-              .toLowerCase()
-              .includes(query)
-        )
-      }
-
-      // Filter by status
-      if (this.statusFilter) {
-        filtered = filtered.filter(
-          (request) => request.status === this.statusFilter
-        )
-      }
-
-      return filtered
-    }
-  },
-  async mounted() {
-    await this.fetchRequests()
-  },
-  methods: {
-    async fetchRequests() {
-      this.isLoading = true
-      try {
-        // Fetch real data from API
-        const response = await axios.get('/api/device-requests')
-        this.requests = response.data
-        this.calculateStats()
-      } catch (error) {
-        console.error('Error fetching requests:', error)
-        // Show user-friendly error message
-        alert('Unable to load requests. Please check your connection and try again.')
-        // No mock data - use real API data only
-        this.requests = []
-        this.calculateStats()
-      } finally {
-        this.isLoading = false
+      return {
+        // No local state needed for sidebar
       }
     },
-
-    calculateStats() {
-      this.stats = {
-        pending: this.requests.filter((r) => r.status === 'pending').length,
-        returned: this.requests.filter((r) => r.status === 'returned').length,
-        compromised: this.requests.filter((r) => r.status === 'compromised')
-          .length,
-        total: this.requests.length
+    data() {
+      return {
+        requests: [],
+        searchQuery: '',
+        statusFilter: '',
+        isLoading: false,
+        openDropdown: null,
+        stats: {
+          pending: 0,
+          returned: 0,
+          compromised: 0,
+          total: 0
+        }
       }
     },
+    computed: {
+      filteredRequests() {
+        let filtered = this.requests
 
-    async refreshRequests() {
+        // Filter by search query
+        if (this.searchQuery) {
+          const query = this.searchQuery.toLowerCase()
+          filtered = filtered.filter(
+            (request) =>
+              request.borrowerName.toLowerCase().includes(query) ||
+              request.department.toLowerCase().includes(query) ||
+              this.getDeviceDisplayName(request.deviceType, request.customDevice)
+                .toLowerCase()
+                .includes(query)
+          )
+        }
+
+        // Filter by status
+        if (this.statusFilter) {
+          filtered = filtered.filter((request) => request.status === this.statusFilter)
+        }
+
+        return filtered
+      }
+    },
+    async mounted() {
       await this.fetchRequests()
     },
+    methods: {
+      async fetchRequests() {
+        this.isLoading = true
+        try {
+          // Fetch real data from API
+          const response = await axios.get('/api/device-requests')
+          this.requests = response.data
+          this.calculateStats()
+        } catch (error) {
+          console.error('Error fetching requests:', error)
+          // Show user-friendly error message
+          alert('Unable to load requests. Please check your connection and try again.')
+          // No mock data - use real API data only
+          this.requests = []
+          this.calculateStats()
+        } finally {
+          this.isLoading = false
+        }
+      },
 
-    viewRequest(requestId) {
-      this.$router.push(`/ict-approval/request/${requestId}`)
-    },
+      calculateStats() {
+        this.stats = {
+          pending: this.requests.filter((r) => r.status === 'pending').length,
+          returned: this.requests.filter((r) => r.status === 'returned').length,
+          compromised: this.requests.filter((r) => r.status === 'compromised').length,
+          total: this.requests.length
+        }
+      },
 
-    getDeviceDisplayName(deviceType, customDevice) {
-      if (deviceType === 'others') {
-        return customDevice || 'Other Device'
-      }
+      async refreshRequests() {
+        await this.fetchRequests()
+      },
 
-      const deviceNames = {
-        projector: 'Projector',
-        tv_remote: 'TV Remote',
-        hdmi_cable: 'HDMI Cable',
-        monitor: 'Monitor',
-        cpu: 'CPU',
-        keyboard: 'Keyboard',
-        pc: 'PC',
-        laptop: 'Laptop'
-      }
+      viewRequest(requestId) {
+        this.$router.push(`/ict-approval/request/${requestId}`)
+      },
 
-      return deviceNames[deviceType] || deviceType
-    },
-
-    formatDate(dateString) {
-      if (!dateString) return ''
-      const date = new Date(dateString)
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-      })
-    },
-
-    getStatusBadgeClass(status) {
-      const classes = {
-        pending: 'bg-yellow-100 text-yellow-800 border border-yellow-200',
-        returned: 'bg-green-100 text-green-800 border border-green-200',
-        compromised: 'bg-red-100 text-red-800 border border-red-200'
-      }
-      return (
-        classes[status] || 'bg-gray-100 text-gray-800 border border-gray-200'
-      )
-    },
-
-    getStatusIcon(status) {
-      const icons = {
-        pending: 'fas fa-clock',
-        returned: 'fas fa-check-circle',
-        compromised: 'fas fa-exclamation-triangle'
-      }
-      return icons[status] || 'fas fa-question-circle'
-    },
-
-    getStatusText(status) {
-      const texts = {
-        pending: 'Pending',
-        returned: 'Returned',
-        compromised: 'Compromised'
-      }
-      return texts[status] || 'Unknown'
-    },
-
-    // Dropdown methods
-    toggleActionsDropdown(requestId) {
-      this.openDropdown = this.openDropdown === requestId ? null : requestId
-    },
-
-    closeDropdown() {
-      this.openDropdown = null
-    },
-
-    // Action methods
-    async cancelRequest(requestId) {
-      try {
-        // Show confirmation dialog
-        if (!confirm('Are you sure you want to cancel this request?')) {
-          return
+      getDeviceDisplayName(deviceType, customDevice) {
+        if (deviceType === 'others') {
+          return customDevice || 'Other Device'
         }
 
-        // Find the request and update its status
-        const requestIndex = this.requests.findIndex(
-          (req) => req.id === requestId
-        )
-        if (requestIndex !== -1) {
-          this.requests[requestIndex].status = 'cancelled'
+        const deviceNames = {
+          projector: 'Projector',
+          tv_remote: 'TV Remote',
+          hdmi_cable: 'HDMI Cable',
+          monitor: 'Monitor',
+          cpu: 'CPU',
+          keyboard: 'Keyboard',
+          pc: 'PC',
+          laptop: 'Laptop'
         }
 
-        // Here you would typically make an API call to update the status
-        // await axios.put(`/api/device-requests/${requestId}/cancel`)
+        return deviceNames[deviceType] || deviceType
+      },
 
-        this.closeDropdown()
-        this.calculateStats()
+      formatDate(dateString) {
+        if (!dateString) return ''
+        const date = new Date(dateString)
+        return date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        })
+      },
 
-        // Show success message (you can implement a toast notification)
-        console.log(`Request ${requestId} has been cancelled`)
-      } catch (error) {
-        console.error('Error cancelling request:', error)
-        // Show error message
-        alert('Error cancelling request. Please try again.')
-      }
-    },
-
-    async deleteRequest(requestId) {
-      try {
-        // Show confirmation dialog
-        if (
-          !confirm(
-            'Are you sure you want to delete this request? This action cannot be undone.'
-          )
-        ) {
-          return
+      getStatusBadgeClass(status) {
+        const classes = {
+          pending: 'bg-yellow-100 text-yellow-800 border border-yellow-200',
+          returned: 'bg-green-100 text-green-800 border border-green-200',
+          compromised: 'bg-red-100 text-red-800 border border-red-200'
         }
+        return classes[status] || 'bg-gray-100 text-gray-800 border border-gray-200'
+      },
 
-        // Remove the request from the list
-        this.requests = this.requests.filter((req) => req.id !== requestId)
+      getStatusIcon(status) {
+        const icons = {
+          pending: 'fas fa-clock',
+          returned: 'fas fa-check-circle',
+          compromised: 'fas fa-exclamation-triangle'
+        }
+        return icons[status] || 'fas fa-question-circle'
+      },
 
-        // Here you would typically make an API call to delete the request
-        // await axios.delete(`/api/device-requests/${requestId}`)
+      getStatusText(status) {
+        const texts = {
+          pending: 'Pending',
+          returned: 'Returned',
+          compromised: 'Compromised'
+        }
+        return texts[status] || 'Unknown'
+      },
 
-        this.closeDropdown()
-        this.calculateStats()
+      // Dropdown methods
+      toggleActionsDropdown(requestId) {
+        this.openDropdown = this.openDropdown === requestId ? null : requestId
+      },
 
-        // Show success message (you can implement a toast notification)
-        console.log(`Request ${requestId} has been deleted`)
-      } catch (error) {
-        console.error('Error deleting request:', error)
-        // Show error message
-        alert('Error deleting request. Please try again.')
+      closeDropdown() {
+        this.openDropdown = null
+      },
+
+      // Action methods
+      async cancelRequest(requestId) {
+        try {
+          // Show confirmation dialog
+          if (!confirm('Are you sure you want to cancel this request?')) {
+            return
+          }
+
+          // Find the request and update its status
+          const requestIndex = this.requests.findIndex((req) => req.id === requestId)
+          if (requestIndex !== -1) {
+            this.requests[requestIndex].status = 'cancelled'
+          }
+
+          // Here you would typically make an API call to update the status
+          // await axios.put(`/api/device-requests/${requestId}/cancel`)
+
+          this.closeDropdown()
+          this.calculateStats()
+
+          // Show success message (you can implement a toast notification)
+          console.log(`Request ${requestId} has been cancelled`)
+        } catch (error) {
+          console.error('Error cancelling request:', error)
+          // Show error message
+          alert('Error cancelling request. Please try again.')
+        }
+      },
+
+      async deleteRequest(requestId) {
+        try {
+          // Show confirmation dialog
+          if (
+            !confirm('Are you sure you want to delete this request? This action cannot be undone.')
+          ) {
+            return
+          }
+
+          // Remove the request from the list
+          this.requests = this.requests.filter((req) => req.id !== requestId)
+
+          // Here you would typically make an API call to delete the request
+          // await axios.delete(`/api/device-requests/${requestId}`)
+
+          this.closeDropdown()
+          this.calculateStats()
+
+          // Show success message (you can implement a toast notification)
+          console.log(`Request ${requestId} has been deleted`)
+        } catch (error) {
+          console.error('Error deleting request:', error)
+          // Show error message
+          alert('Error deleting request. Please try again.')
+        }
       }
     }
   }
-}
 </script>
 
 <style scoped>
-/* Glass morphism effects */
-.booking-glass-card {
-  background: rgba(59, 130, 246, 0.15);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
-  border: 2px solid rgba(96, 165, 250, 0.3);
-  box-shadow: 0 8px 32px rgba(29, 78, 216, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-
-/* Animations */
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
+  /* Glass morphism effects */
+  .booking-glass-card {
+    background: rgba(59, 130, 246, 0.15);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 2px solid rgba(96, 165, 250, 0.3);
+    box-shadow:
+      0 8px 32px rgba(29, 78, 216, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
-  50% {
-    transform: translateY(-15px);
+
+  /* Animations */
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-15px);
+    }
   }
-}
 
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  @keyframes fade-in-delay {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
-}
 
-@keyframes fade-in-delay {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
   }
-}
 
-@keyframes slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
+  .animate-fade-in {
+    animation: fade-in 1s ease-out;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  .animate-fade-in-delay {
+    animation: fade-in-delay 1s ease-out 0.3s both;
   }
-}
 
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
+  .animate-slide-up {
+    animation: slide-up 0.6s ease-out;
+  }
 
-.animate-fade-in {
-  animation: fade-in 1s ease-out;
-}
+  /* Focus styles for accessibility */
+  input:focus,
+  select:focus {
+    box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.1);
+  }
 
-.animate-fade-in-delay {
-  animation: fade-in-delay 1s ease-out 0.3s both;
-}
+  button:focus {
+    box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.3);
+  }
 
-.animate-slide-up {
-  animation: slide-up 0.6s ease-out;
-}
-
-/* Focus styles for accessibility */
-input:focus,
-select:focus {
-  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.1);
-}
-
-button:focus {
-  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.3);
-}
-
-/* Smooth transitions */
-* {
-  transition-property: color, background-color, border-color,
-    text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter,
-    backdrop-filter;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 200ms;
-}
+  /* Smooth transitions */
+  * {
+    transition-property:
+      color, background-color, border-color, text-decoration-color, fill, stroke, opacity,
+      box-shadow, transform, filter, backdrop-filter;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 200ms;
+  }
 </style>

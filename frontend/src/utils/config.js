@@ -31,9 +31,7 @@ export const validateConfig = () => {
 
   if (missing.length > 0) {
     console.error('❌ Missing required environment variables:', missing)
-    console.error(
-      'Please check your .env file and ensure all required variables are set.'
-    )
+    console.error('Please check your .env file and ensure all required variables are set.')
     return false
   }
 
@@ -41,11 +39,7 @@ export const validateConfig = () => {
 }
 
 // Log configuration in development (only if not in production)
-if (
-  typeof window !== 'undefined' &&
-  APP_CONFIG.DEBUG &&
-  ENVIRONMENT.IS_DEVELOPMENT
-) {
+if (typeof window !== 'undefined' && APP_CONFIG.DEBUG && ENVIRONMENT.IS_DEVELOPMENT) {
   console.log('🔧 Application Configuration:', {
     api: API_CONFIG,
     app: APP_CONFIG,

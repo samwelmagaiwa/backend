@@ -96,6 +96,54 @@ class Role extends Model
     }
 
     /**
+     * Get role hierarchy priority (higher number = higher priority)
+     */
+    public function getPriority(): int
+    {
+        return $this->getRolePriority($this->name);
+    }
+
+    /**
+     * Get role priority based on role name
+     */
+    public static function getRolePriority(string $roleName): int
+    {
+        $hierarchy = [
+            'admin' => 100,
+            'dict' => 90,
+            'divisional_director' => 80,
+            'head_of_department' => 70,
+            'ict_officer' => 60,
+            'hod_it' => 55,
+            'staff' => 10,
+        ];
+
+        return $hierarchy[$roleName] ?? 5; // Default priority for unknown roles
+    }
+
+    /**
+     * Check if this role has higher priority than another role
+     */
+    public function hasHigherPriorityThan(Role $otherRole): bool
+    {
+        return $this->getPriority() > $otherRole->getPriority();
+    }
+
+    /**
+     * Get the highest priority role from a collection of roles
+     */
+    public static function getHighestPriorityRole($roles)
+    {
+        if (empty($roles) || $roles->isEmpty()) {
+            return null;
+        }
+
+        return $roles->sortByDesc(function ($role) {
+            return $role->getPriority();
+        })->first();
+    }
+
+    /**
      * Boot method to set default sort order
      */
     protected static function boot()

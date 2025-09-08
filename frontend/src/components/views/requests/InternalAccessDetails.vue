@@ -28,7 +28,7 @@
                 top: Math.random() * 100 + '%',
                 animationDelay: Math.random() * 3 + 's',
                 animationDuration: Math.random() * 3 + 2 + 's',
-                fontSize: Math.random() * 20 + 10 + 'px',
+                fontSize: Math.random() * 20 + 10 + 'px'
               }"
             >
               <i
@@ -39,19 +39,17 @@
                     'fa-user-check',
                     'fa-stamp',
                     'fa-signature',
-                    'fa-check-double',
-                  ][Math.floor(Math.random() * 5)],
+                    'fa-check-double'
+                  ][Math.floor(Math.random() * 5)]
                 ]"
               ></i>
             </div>
           </div>
         </div>
 
-        <div class="max-w-full mx-auto relative z-10">
+        <div class="max-w-full mx-auto relative z-10 pb-4">
           <!-- Header Section -->
-          <div
-            class="medical-glass-card rounded-t-3xl p-6 mb-0 border-b border-blue-300/30"
-          >
+          <div class="medical-glass-card rounded-t-3xl p-6 mb-0 border-b border-blue-300/30">
             <div class="flex justify-between items-center">
               <!-- Left Logo -->
               <div
@@ -92,7 +90,11 @@
                   class="text-lg font-bold text-blue-100 tracking-wide drop-shadow-md animate-fade-in-delay"
                 >
                   Request ID: {{ requestData?.id }} -
-                  {{ getRoleDisplayName(userRole) }} Review
+                  {{
+                    userRole === ROLES.STAFF
+                      ? 'Request Details'
+                      : getRoleDisplayName(userRole) + ' Review'
+                  }}
                 </h2>
               </div>
 
@@ -131,12 +133,42 @@
                     :class="getStatusBadgeClass(requestData?.currentStatus)"
                     class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium"
                   >
-                    <i
-                      :class="getStatusIcon(requestData?.currentStatus)"
-                      class="mr-2"
-                    ></i>
+                    <i :class="getStatusIcon(requestData?.currentStatus)" class="mr-2"></i>
                     {{ getStatusText(requestData?.currentStatus) }}
                   </span>
+                </div>
+              </div>
+
+              <!-- Out of Stock Warning for Booking Service -->
+              <div
+                v-if="isBookingService && isDeviceOutOfStock"
+                class="bg-gradient-to-r from-red-600/25 to-orange-600/25 border-2 border-red-400/40 p-6 rounded-2xl backdrop-blur-sm mb-8 animate-pulse"
+              >
+                <div class="flex items-center space-x-4 mb-4">
+                  <div
+                    class="w-14 h-14 bg-gradient-to-br from-red-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg"
+                  >
+                    <i class="fas fa-exclamation-triangle text-white text-xl"></i>
+                  </div>
+                  <h3 class="text-xl font-bold text-white flex items-center">
+                    <i class="fas fa-times-circle mr-2 text-red-300"></i>
+                    Device Availability Notice
+                  </h3>
+                </div>
+
+                <div class="bg-red-500/20 border border-red-400/30 rounded-xl p-4">
+                  <div class="flex items-start space-x-3">
+                    <i class="fas fa-info-circle text-red-300 text-lg mt-1 flex-shrink-0"></i>
+                    <div>
+                      <p class="text-white font-semibold mb-2">
+                        Device you requested is still in use - no available device in stock
+                      </p>
+                      <p class="text-red-100 text-sm">
+                        The device "{{ getRequestedDeviceName() }}" is currently out of stock. Your
+                        request will be processed once the device becomes available.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -156,26 +188,43 @@
                   </h3>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                <!-- Approval Steps - Different layout for booking service vs access requests -->
+                <div v-if="isBookingService" class="flex justify-center">
+                  <!-- For Booking Service: Only ICT Officer -->
+                  <div class="flex flex-col items-center">
+                    <div
+                      :class="getApprovalStepClass('ict')"
+                      class="w-20 h-20 rounded-full flex items-center justify-center mb-4 shadow-lg"
+                    >
+                      <i :class="getApprovalStepIcon('ict')" class="text-white text-2xl"></i>
+                    </div>
+                    <h4 class="text-lg font-semibold text-white text-center">ICT Officer</h4>
+                    <p :class="getApprovalStatusTextClass('ict')" class="text-sm text-center mt-2">
+                      {{ getApprovalStatusText('ict') }}
+                    </p>
+                    <p
+                      v-if="requestData?.ictApprovalDate"
+                      class="text-sm text-blue-300 text-center mt-1"
+                    >
+                      {{ formatDate(requestData.ictApprovalDate) }}
+                    </p>
+                  </div>
+                </div>
+
+                <div v-else class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                  <!-- For Access Requests: Full approval chain -->
+
                   <!-- HOD Approval -->
                   <div class="flex flex-col items-center">
                     <div
                       :class="getApprovalStepClass('hod')"
                       class="w-16 h-16 rounded-full flex items-center justify-center mb-3 shadow-lg"
                     >
-                      <i
-                        :class="getApprovalStepIcon('hod')"
-                        class="text-white text-xl"
-                      ></i>
+                      <i :class="getApprovalStepIcon('hod')" class="text-white text-xl"></i>
                     </div>
-                    <h4 class="text-sm font-semibold text-white text-center">
-                      Head of Department
-                    </h4>
-                    <p
-                      :class="getApprovalStatusTextClass('hod')"
-                      class="text-xs text-center mt-1"
-                    >
-                      {{ getApprovalStatusText("hod") }}
+                    <h4 class="text-sm font-semibold text-white text-center">Head of Department</h4>
+                    <p :class="getApprovalStatusTextClass('hod')" class="text-xs text-center mt-1">
+                      {{ getApprovalStatusText('hod') }}
                     </p>
                     <p
                       v-if="requestData?.hodApprovalDate"
@@ -191,10 +240,7 @@
                       :class="getApprovalStepClass('divisional')"
                       class="w-16 h-16 rounded-full flex items-center justify-center mb-3 shadow-lg"
                     >
-                      <i
-                        :class="getApprovalStepIcon('divisional')"
-                        class="text-white text-xl"
-                      ></i>
+                      <i :class="getApprovalStepIcon('divisional')" class="text-white text-xl"></i>
                     </div>
                     <h4 class="text-sm font-semibold text-white text-center">
                       Divisional Director
@@ -203,7 +249,7 @@
                       :class="getApprovalStatusTextClass('divisional')"
                       class="text-xs text-center mt-1"
                     >
-                      {{ getApprovalStatusText("divisional") }}
+                      {{ getApprovalStatusText('divisional') }}
                     </p>
                     <p
                       v-if="requestData?.divisionalApprovalDate"
@@ -219,19 +265,11 @@
                       :class="getApprovalStepClass('dict')"
                       class="w-16 h-16 rounded-full flex items-center justify-center mb-3 shadow-lg"
                     >
-                      <i
-                        :class="getApprovalStepIcon('dict')"
-                        class="text-white text-xl"
-                      ></i>
+                      <i :class="getApprovalStepIcon('dict')" class="text-white text-xl"></i>
                     </div>
-                    <h4 class="text-sm font-semibold text-white text-center">
-                      DICT
-                    </h4>
-                    <p
-                      :class="getApprovalStatusTextClass('dict')"
-                      class="text-xs text-center mt-1"
-                    >
-                      {{ getApprovalStatusText("dict") }}
+                    <h4 class="text-sm font-semibold text-white text-center">DICT</h4>
+                    <p :class="getApprovalStatusTextClass('dict')" class="text-xs text-center mt-1">
+                      {{ getApprovalStatusText('dict') }}
                     </p>
                     <p
                       v-if="requestData?.dictApprovalDate"
@@ -247,19 +285,14 @@
                       :class="getApprovalStepClass('headOfIt')"
                       class="w-16 h-16 rounded-full flex items-center justify-center mb-3 shadow-lg"
                     >
-                      <i
-                        :class="getApprovalStepIcon('headOfIt')"
-                        class="text-white text-xl"
-                      ></i>
+                      <i :class="getApprovalStepIcon('headOfIt')" class="text-white text-xl"></i>
                     </div>
-                    <h4 class="text-sm font-semibold text-white text-center">
-                      Head of IT
-                    </h4>
+                    <h4 class="text-sm font-semibold text-white text-center">Head of IT</h4>
                     <p
                       :class="getApprovalStatusTextClass('headOfIt')"
                       class="text-xs text-center mt-1"
                     >
-                      {{ getApprovalStatusText("headOfIt") }}
+                      {{ getApprovalStatusText('headOfIt') }}
                     </p>
                     <p
                       v-if="requestData?.headOfItApprovalDate"
@@ -275,19 +308,11 @@
                       :class="getApprovalStepClass('ict')"
                       class="w-16 h-16 rounded-full flex items-center justify-center mb-3 shadow-lg"
                     >
-                      <i
-                        :class="getApprovalStepIcon('ict')"
-                        class="text-white text-xl"
-                      ></i>
+                      <i :class="getApprovalStepIcon('ict')" class="text-white text-xl"></i>
                     </div>
-                    <h4 class="text-sm font-semibold text-white text-center">
-                      ICT Officer
-                    </h4>
-                    <p
-                      :class="getApprovalStatusTextClass('ict')"
-                      class="text-xs text-center mt-1"
-                    >
-                      {{ getApprovalStatusText("ict") }}
+                    <h4 class="text-sm font-semibold text-white text-center">ICT Officer</h4>
+                    <p :class="getApprovalStatusTextClass('ict')" class="text-xs text-center mt-1">
+                      {{ getApprovalStatusText('ict') }}
                     </p>
                     <p
                       v-if="requestData?.ictApprovalDate"
@@ -315,15 +340,9 @@
                   </h3>
                 </div>
 
-                <div
-                  class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-                >
-                  <div
-                    class="bg-white/10 p-4 rounded-xl border border-teal-300/30"
-                  >
-                    <label
-                      class="block text-sm font-semibold text-blue-100 mb-2"
-                    >
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div class="bg-white/10 p-4 rounded-xl border border-teal-300/30">
+                    <label class="block text-sm font-semibold text-blue-100 mb-2">
                       <i class="fas fa-hashtag mr-2"></i>PF Number
                     </label>
                     <p class="text-white font-medium">
@@ -331,12 +350,8 @@
                     </p>
                   </div>
 
-                  <div
-                    class="bg-white/10 p-4 rounded-xl border border-teal-300/30"
-                  >
-                    <label
-                      class="block text-sm font-semibold text-blue-100 mb-2"
-                    >
+                  <div class="bg-white/10 p-4 rounded-xl border border-teal-300/30">
+                    <label class="block text-sm font-semibold text-blue-100 mb-2">
                       <i class="fas fa-user mr-2"></i>Staff Name
                     </label>
                     <p class="text-white font-medium">
@@ -344,12 +359,8 @@
                     </p>
                   </div>
 
-                  <div
-                    class="bg-white/10 p-4 rounded-xl border border-teal-300/30"
-                  >
-                    <label
-                      class="block text-sm font-semibold text-blue-100 mb-2"
-                    >
+                  <div class="bg-white/10 p-4 rounded-xl border border-teal-300/30">
+                    <label class="block text-sm font-semibold text-blue-100 mb-2">
                       <i class="fas fa-building mr-2"></i>Department
                     </label>
                     <p class="text-white font-medium">
@@ -357,12 +368,8 @@
                     </p>
                   </div>
 
-                  <div
-                    class="bg-white/10 p-4 rounded-xl border border-teal-300/30"
-                  >
-                    <label
-                      class="block text-sm font-semibold text-blue-100 mb-2"
-                    >
+                  <div class="bg-white/10 p-4 rounded-xl border border-teal-300/30">
+                    <label class="block text-sm font-semibold text-blue-100 mb-2">
                       <i class="fas fa-signature mr-2"></i>Digital Signature
                     </label>
                     <div class="flex items-center">
@@ -375,7 +382,7 @@
                         class="mr-2"
                       ></i>
                       <span class="text-white font-medium">{{
-                        requestData?.digitalSignature ? "Signed" : "Not Signed"
+                        requestData?.digitalSignature ? 'Signed' : 'Not Signed'
                       }}</span>
                     </div>
                   </div>
@@ -390,10 +397,7 @@
                   <div
                     class="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg"
                   >
-                    <i
-                      :class="getTypeIcon(requestData?.type)"
-                      class="text-white text-xl"
-                    ></i>
+                    <i :class="getTypeIcon(requestData?.type)" class="text-white text-xl"></i>
                   </div>
                   <h3 class="text-xl font-bold text-white flex items-center">
                     <i class="fas fa-cogs mr-2 text-blue-300"></i>
@@ -402,12 +406,8 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div
-                    class="bg-white/10 p-4 rounded-xl border border-blue-300/30"
-                  >
-                    <label
-                      class="block text-sm font-semibold text-blue-100 mb-2"
-                    >
+                  <div class="bg-white/10 p-4 rounded-xl border border-blue-300/30">
+                    <label class="block text-sm font-semibold text-blue-100 mb-2">
                       <i class="fas fa-layer-group mr-2"></i>Request Type
                     </label>
                     <div class="flex items-center">
@@ -415,10 +415,7 @@
                         :class="getTypeIconClass(requestData?.type)"
                         class="w-8 h-8 rounded-lg flex items-center justify-center mr-3"
                       >
-                        <i
-                          :class="getTypeIcon(requestData?.type)"
-                          class="text-white text-sm"
-                        ></i>
+                        <i :class="getTypeIcon(requestData?.type)" class="text-white text-sm"></i>
                       </div>
                       <span class="text-white font-medium">{{
                         getTypeDisplayName(requestData?.type)
@@ -426,12 +423,8 @@
                     </div>
                   </div>
 
-                  <div
-                    class="bg-white/10 p-4 rounded-xl border border-blue-300/30"
-                  >
-                    <label
-                      class="block text-sm font-semibold text-blue-100 mb-2"
-                    >
+                  <div class="bg-white/10 p-4 rounded-xl border border-blue-300/30">
+                    <label class="block text-sm font-semibold text-blue-100 mb-2">
                       <i class="fas fa-calendar mr-2"></i>Submission Date
                     </label>
                     <p class="text-white font-medium">
@@ -439,12 +432,8 @@
                     </p>
                   </div>
 
-                  <div
-                    class="bg-white/10 p-4 rounded-xl border border-blue-300/30"
-                  >
-                    <label
-                      class="block text-sm font-semibold text-blue-100 mb-2"
-                    >
+                  <div class="bg-white/10 p-4 rounded-xl border border-blue-300/30">
+                    <label class="block text-sm font-semibold text-blue-100 mb-2">
                       <i class="fas fa-toggle-on mr-2"></i>Module Requested For
                     </label>
                     <p class="text-white font-medium">
@@ -452,21 +441,14 @@
                     </p>
                   </div>
 
-                  <div
-                    class="bg-white/10 p-4 rounded-xl border border-blue-300/30"
-                  >
-                    <label
-                      class="block text-sm font-semibold text-blue-100 mb-2"
-                    >
+                  <div class="bg-white/10 p-4 rounded-xl border border-blue-300/30">
+                    <label class="block text-sm font-semibold text-blue-100 mb-2">
                       <i class="fas fa-key mr-2"></i>Access Rights
                     </label>
                     <p class="text-white font-medium">
                       {{ requestData?.accessType }}
                     </p>
-                    <p
-                      v-if="requestData?.temporaryUntil"
-                      class="text-blue-300 text-sm mt-1"
-                    >
+                    <p v-if="requestData?.temporaryUntil" class="text-blue-300 text-sm mt-1">
                       Until: {{ formatDate(requestData.temporaryUntil) }}
                     </p>
                   </div>
@@ -477,9 +459,7 @@
                   <label class="block text-sm font-semibold text-blue-100 mb-3">
                     <i class="fas fa-list mr-2"></i>Selected Modules
                   </label>
-                  <div
-                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"
-                  >
+                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                     <div
                       v-for="module in requestData.selectedModules"
                       :key="module"
@@ -508,9 +488,7 @@
                     Comments
                   </h3>
                 </div>
-                <div
-                  class="bg-white/10 p-4 rounded-xl border border-purple-300/30"
-                >
+                <div class="bg-white/10 p-4 rounded-xl border border-purple-300/30">
                   <p class="text-white">{{ requestData.comments }}</p>
                 </div>
               </div>
@@ -553,7 +531,7 @@
                     class="px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-300 font-bold flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <i class="fas fa-check mr-3"></i>
-                    {{ isProcessing ? "Processing..." : "Approve Request" }}
+                    {{ isProcessing ? 'Processing...' : 'Approve Request' }}
                   </button>
 
                   <button
@@ -562,16 +540,17 @@
                     class="px-8 py-4 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-xl hover:from-red-700 hover:to-pink-700 transition-all duration-300 font-bold flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <i class="fas fa-times mr-3"></i>
-                    {{ isProcessing ? "Processing..." : "Reject Request" }}
+                    {{ isProcessing ? 'Processing...' : 'Reject Request' }}
                   </button>
                 </div>
               </div>
             </div>
           </div>
         </div>
+
+        <!-- Footer positioned within main content area -->
+        <AppFooter />
       </main>
-      <!-- Footer -->
-      <AppFooter />
     </div>
 
     <!-- Loading Modal -->
@@ -614,591 +593,716 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import Header from '@/components/header.vue'
-import ModernSidebar from '@/components/ModernSidebar.vue'
-import AppFooter from '@/components/footer.vue'
-import { useAuth } from '@/composables/useAuth'
-// Import personalInfoService for API calls
-// Note: We'll import it dynamically in the loadRequestData method to avoid import issues
+  import { ref, computed, onMounted } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
+  import Header from '@/components/header.vue'
+  import ModernSidebar from '@/components/ModernSidebar.vue'
+  import AppFooter from '@/components/footer.vue'
+  import { useAuth } from '@/composables/useAuth'
+  import requestStatusService from '@/services/requestStatusService'
+  import deviceInventoryService from '@/services/deviceInventoryService'
+  // Import personalInfoService for API calls
+  // Note: We'll import it dynamically in the loadRequestData method to avoid import issues
 
-export default {
-  name: 'InternalAccessDetails',
-  components: {
-    Header,
-    ModernSidebar,
-    AppFooter
-  },
-  setup() {
-    const route = useRoute()
-    const router = useRouter()
-    const { userRole, ROLES, getRoleDisplayName } = useAuth()
+  export default {
+    name: 'InternalAccessDetails',
+    components: {
+      Header,
+      ModernSidebar,
+      AppFooter
+    },
+    setup() {
+      const route = useRoute()
+      const router = useRouter()
+      const { userRole, ROLES, getRoleDisplayName } = useAuth()
 
-    // Reactive data
-    // Sidebar state now managed by Pinia - no local state needed
-    const sidebarCollapsed = ref(false)
-    const requestData = ref(null)
-    const isLoading = ref(true)
-    const isProcessing = ref(false)
-    const approvalComments = ref('')
-    const showSuccessModal = ref(false)
-    const successMessage = ref({ title: '', text: '' })
+      // Reactive data
+      // Sidebar state now managed by Pinia - no local state needed
+      const sidebarCollapsed = ref(false)
+      const requestData = ref(null)
+      const isLoading = ref(true)
+      const isProcessing = ref(false)
+      const approvalComments = ref('')
+      const showSuccessModal = ref(false)
+      const successMessage = ref({ title: '', text: '' })
+      const deviceInventoryData = ref(null)
 
-    // Mock request data - replace with actual API call
-    const mockRequestData = {
-      'REQ-001': {
-        id: 'REQ-001',
-        type: 'jeeva',
-        staffName: 'Dr. John Doe',
-        pfNumber: 'PF001234',
-        department: 'Cardiology',
-        digitalSignature: true,
-        moduleRequestedFor: 'Use',
-        selectedModules: [
-          'DOCTOR CONSULTATION',
-          'MEDICAL RECORDS',
-          'OUTPATIENT'
-        ],
-        accessType: 'Permanent (until retirement)',
-        temporaryUntil: null,
-        submissionDate: '2024-01-15',
-        currentStatus: 'pending',
-        hodApprovalStatus: 'pending',
-        divisionalStatus: 'pending',
-        dictStatus: 'pending',
-        headOfItStatus: 'pending',
-        ictStatus: 'pending',
-        comments:
-          'Need access for patient consultation and medical record management.',
-        hodApprovalDate: null,
-        divisionalApprovalDate: null,
-        dictApprovalDate: null,
-        headOfItApprovalDate: null,
-        ictApprovalDate: null
-      },
-      'REQ-002': {
-        id: 'REQ-002',
-        type: 'wellsoft',
-        staffName: 'Jane Smith',
-        pfNumber: 'PF005678',
-        department: 'Nursing',
-        digitalSignature: false,
-        moduleRequestedFor: 'Use',
-        selectedModules: ['NURSING STATION', 'INPATIENT', 'MEDICATION'],
-        accessType: 'Temporary Until',
-        temporaryUntil: '2024-06-30',
-        submissionDate: '2024-01-14',
-        currentStatus: 'pending',
-        hodApprovalStatus: 'approved',
-        divisionalStatus: 'pending',
-        dictStatus: 'pending',
-        headOfItStatus: 'pending',
-        ictStatus: 'pending',
-        comments: 'Temporary assignment to nursing station for 6 months.',
-        hodApprovalDate: '2024-01-16',
-        divisionalApprovalDate: null,
-        dictApprovalDate: null,
-        headOfItApprovalDate: null,
-        ictApprovalDate: null
-      }
-    }
-
-    // Computed properties
-    const canTakeAction = computed(() => {
-      if (!requestData.value) return false
-
-      switch (userRole.value) {
-        case ROLES.HEAD_OF_DEPARTMENT:
-          return requestData.value.hodApprovalStatus === 'pending'
-        case ROLES.DIVISIONAL_DIRECTOR:
-          return (
-            requestData.value.hodApprovalStatus === 'approved' &&
-            requestData.value.divisionalStatus === 'pending'
-          )
-        case ROLES.ICT_DIRECTOR:
-          return (
-            requestData.value.divisionalStatus === 'approved' &&
-            requestData.value.dictStatus === 'pending'
-          )
-
-        case ROLES.ICT_OFFICER:
-          return (
-            requestData.value.headOfItStatus === 'approved' &&
-            requestData.value.ictStatus === 'pending'
-          )
-        default:
-          return false
-      }
-    })
-
-    // Methods
-    const getTypeDisplayName = (type) => {
-      const names = {
-        jeeva: 'Jeeva Access',
-        wellsoft: 'Wellsoft Access',
-        internet: 'Internet Access',
-        combined: 'Combined Services'
-      }
-      return names[type] || type
-    }
-
-    const getTypeIcon = (type) => {
-      const icons = {
-        jeeva: 'fas fa-database',
-        wellsoft: 'fas fa-laptop-medical',
-        internet: 'fas fa-wifi',
-        combined: 'fas fa-layer-group'
-      }
-      return icons[type] || 'fas fa-file'
-    }
-
-    const getTypeIconClass = (type) => {
-      const classes = {
-        jeeva: 'bg-gradient-to-br from-purple-500 to-indigo-600',
-        wellsoft: 'bg-gradient-to-br from-yellow-500 to-orange-600',
-        internet: 'bg-gradient-to-br from-green-500 to-emerald-600',
-        combined: 'bg-gradient-to-br from-blue-500 to-cyan-600'
-      }
-      return classes[type] || 'bg-gradient-to-br from-gray-500 to-gray-600'
-    }
-
-    const getStatusBadgeClass = (status) => {
-      const classes = {
-        pending: 'bg-yellow-100 text-yellow-800 border border-yellow-200',
-        approved: 'bg-green-100 text-green-800 border border-green-200',
-        rejected: 'bg-red-100 text-red-800 border border-red-200'
-      }
-      return (
-        classes[status] || 'bg-gray-100 text-gray-800 border border-gray-200'
-      )
-    }
-
-    const getStatusIcon = (status) => {
-      const icons = {
-        pending: 'fas fa-clock',
-        approved: 'fas fa-check-circle',
-        rejected: 'fas fa-times-circle'
-      }
-      return icons[status] || 'fas fa-question-circle'
-    }
-
-    const getStatusText = (status) => {
-      const texts = {
-        pending: 'Pending',
-        approved: 'Approved',
-        rejected: 'Rejected'
-      }
-      return texts[status] || 'Unknown'
-    }
-
-    const getApprovalStepClass = (step) => {
-      if (!requestData.value) return 'bg-gray-500'
-
-      const statuses = {
-        hod: requestData.value.hodApprovalStatus,
-        divisional: requestData.value.divisionalStatus,
-        dict: requestData.value.dictStatus,
-        headOfIt: requestData.value.headOfItStatus,
-        ict: requestData.value.ictStatus
+      // Mock request data - replace with actual API call
+      const mockRequestData = {
+        'REQ-001': {
+          id: 'REQ-001',
+          type: 'jeeva',
+          staffName: 'Dr. John Doe',
+          pfNumber: 'PF001234',
+          department: 'Cardiology',
+          digitalSignature: true,
+          moduleRequestedFor: 'Use',
+          selectedModules: ['DOCTOR CONSULTATION', 'MEDICAL RECORDS', 'OUTPATIENT'],
+          accessType: 'Permanent (until retirement)',
+          temporaryUntil: null,
+          submissionDate: '2024-01-15',
+          currentStatus: 'pending',
+          hodApprovalStatus: 'pending',
+          divisionalStatus: 'pending',
+          dictStatus: 'pending',
+          headOfItStatus: 'pending',
+          ictStatus: 'pending',
+          comments: 'Need access for patient consultation and medical record management.',
+          hodApprovalDate: null,
+          divisionalApprovalDate: null,
+          dictApprovalDate: null,
+          headOfItApprovalDate: null,
+          ictApprovalDate: null
+        },
+        'REQ-002': {
+          id: 'REQ-002',
+          type: 'wellsoft',
+          staffName: 'Jane Smith',
+          pfNumber: 'PF005678',
+          department: 'Nursing',
+          digitalSignature: false,
+          moduleRequestedFor: 'Use',
+          selectedModules: ['NURSING STATION', 'INPATIENT', 'MEDICATION'],
+          accessType: 'Temporary Until',
+          temporaryUntil: '2024-06-30',
+          submissionDate: '2024-01-14',
+          currentStatus: 'pending',
+          hodApprovalStatus: 'approved',
+          divisionalStatus: 'pending',
+          dictStatus: 'pending',
+          headOfItStatus: 'pending',
+          ictStatus: 'pending',
+          comments: 'Temporary assignment to nursing station for 6 months.',
+          hodApprovalDate: '2024-01-16',
+          divisionalApprovalDate: null,
+          dictApprovalDate: null,
+          headOfItApprovalDate: null,
+          ictApprovalDate: null
+        }
       }
 
-      const status = statuses[step]
-
-      if (status === 'approved')
-        return 'bg-gradient-to-br from-green-500 to-emerald-600'
-      if (status === 'rejected')
-        return 'bg-gradient-to-br from-red-500 to-pink-600'
-      if (status === 'pending')
-        return 'bg-gradient-to-br from-yellow-500 to-orange-600'
-      return 'bg-gradient-to-br from-gray-500 to-gray-600'
-    }
-
-    const getApprovalStepIcon = (step) => {
-      if (!requestData.value) return 'fas fa-clock'
-
-      const statuses = {
-        hod: requestData.value.hodApprovalStatus,
-        divisional: requestData.value.divisionalStatus,
-        dict: requestData.value.dictStatus,
-        headOfIt: requestData.value.headOfItStatus,
-        ict: requestData.value.ictStatus
-      }
-
-      const status = statuses[step]
-
-      if (status === 'approved') return 'fas fa-check'
-      if (status === 'rejected') return 'fas fa-times'
-      if (status === 'pending') return 'fas fa-clock'
-      return 'fas fa-minus'
-    }
-
-    const getApprovalStatusText = (step) => {
-      if (!requestData.value) return 'Pending'
-
-      const statuses = {
-        hod: requestData.value.hodApprovalStatus,
-        divisional: requestData.value.divisionalStatus,
-        dict: requestData.value.dictStatus,
-        headOfIt: requestData.value.headOfItStatus,
-        ict: requestData.value.ictStatus
-      }
-
-      const status = statuses[step]
-
-      if (status === 'approved') return 'Approved'
-      if (status === 'rejected') return 'Rejected'
-      if (status === 'pending') return 'Pending'
-      return 'Not Started'
-    }
-
-    const getApprovalStatusTextClass = (step) => {
-      if (!requestData.value) return 'text-gray-400'
-
-      const statuses = {
-        hod: requestData.value.hodApprovalStatus,
-        divisional: requestData.value.divisionalStatus,
-        dict: requestData.value.dictStatus,
-        headOfIt: requestData.value.headOfItStatus,
-        ict: requestData.value.ictStatus
-      }
-
-      const status = statuses[step]
-
-      if (status === 'approved') return 'text-green-400'
-      if (status === 'rejected') return 'text-red-400'
-      if (status === 'pending') return 'text-yellow-400'
-      return 'text-gray-400'
-    }
-
-    const formatDate = (dateString) => {
-      if (!dateString) return ''
-      const date = new Date(dateString)
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
+      // Computed properties
+      const isBookingService = computed(() => {
+        return requestData.value?.type === 'booking_service'
       })
-    }
 
-    const loadRequestData = async() => {
-      isLoading.value = true
-      try {
-        const requestId = route.query.id
-        const requestType = route.query.type
-        const userAccessId = route.query.userAccessId
+      const isDeviceOutOfStock = computed(() => {
+        if (!isBookingService.value || !deviceInventoryData.value) {
+          return false
+        }
 
-        console.log('Loading request data:', { requestId, requestType, userAccessId })
+        // Check if the requested device is out of stock
+        return deviceInventoryData.value.available_quantity === 0
+      })
 
-        // If we have a userAccessId, fetch real data from API
-        if (userAccessId) {
-          try {
-            // Import the service dynamically to avoid import issues
-            const { default: personalInfoService } = await import('@/services/personalInfoService')
-            
-            const result = await personalInfoService.getPersonalInfoFromUserAccess(userAccessId)
-            
-            if (result.success) {
-              // Transform API data to match component structure
-              const apiData = result.data
-              
-              requestData.value = {
-                id: requestId,
-                type: requestType,
-                staffName: apiData.personal_information?.staff_name || apiData.pf_number || 'Unknown',
-                pfNumber: apiData.personal_information?.pf_number || apiData.pf_number || 'Unknown',
-                department: apiData.personal_information?.department || apiData.department || 'Unknown',
-                digitalSignature: apiData.personal_information?.signature?.exists || apiData.signature?.exists || false,
-                moduleRequestedFor: 'Use', // Default value
-                selectedModules: Array.isArray(apiData.request_details?.request_type) 
-                  ? apiData.request_details.request_type 
-                  : [apiData.request_details?.request_type || requestType],
-                accessType: 'Permanent (until retirement)', // Default value
-                temporaryUntil: null,
-                submissionDate: apiData.request_details?.submission_date || apiData.request_details?.created_at || new Date().toISOString().split('T')[0],
-                currentStatus: apiData.request_details?.status || 'pending',
-                hodApprovalStatus: 'pending', // Since this is for HOD approval
-                divisionalStatus: 'pending',
-                dictStatus: 'pending',
-                headOfItStatus: 'pending',
-                ictStatus: 'pending',
-                comments: apiData.request_details?.purpose ? 
-                  (Array.isArray(apiData.request_details.purpose) ? 
-                    apiData.request_details.purpose.join(', ') : 
-                    apiData.request_details.purpose) : 
-                  'No comments provided',
-                hodApprovalDate: null,
-                divisionalApprovalDate: null,
-                dictApprovalDate: null,
-                headOfItApprovalDate: null,
-                ictApprovalDate: null
+      const canTakeAction = computed(() => {
+        if (!requestData.value) return false
+
+        // Staff users cannot take approval actions - they can only view
+        if (userRole.value === ROLES.STAFF) return false
+
+        // For booking service, only ICT Officer can take action
+        if (isBookingService.value) {
+          return userRole.value === ROLES.ICT_OFFICER && requestData.value.ictStatus === 'pending'
+        }
+
+        // For access requests, follow the full approval chain
+        switch (userRole.value) {
+          case ROLES.HEAD_OF_DEPARTMENT:
+            return requestData.value.hodApprovalStatus === 'pending'
+          case ROLES.DIVISIONAL_DIRECTOR:
+            return (
+              requestData.value.hodApprovalStatus === 'approved' &&
+              requestData.value.divisionalStatus === 'pending'
+            )
+          case ROLES.ICT_DIRECTOR:
+            return (
+              requestData.value.divisionalStatus === 'approved' &&
+              requestData.value.dictStatus === 'pending'
+            )
+
+          case ROLES.ICT_OFFICER:
+            return (
+              requestData.value.headOfItStatus === 'approved' &&
+              requestData.value.ictStatus === 'pending'
+            )
+          default:
+            return false
+        }
+      })
+
+      // Methods
+      const getTypeDisplayName = (type) => {
+        const names = {
+          jeeva: 'Jeeva Access',
+          wellsoft: 'Wellsoft Access',
+          internet: 'Internet Access',
+          combined_access: 'Combined Access',
+          booking_service: 'Device Booking',
+          combined: 'Combined Services'
+        }
+        return names[type] || type
+      }
+
+      const getTypeIcon = (type) => {
+        const icons = {
+          jeeva: 'fas fa-database',
+          wellsoft: 'fas fa-laptop-medical',
+          internet: 'fas fa-wifi',
+          combined_access: 'fas fa-layer-group',
+          booking_service: 'fas fa-calendar-check',
+          combined: 'fas fa-layer-group'
+        }
+        return icons[type] || 'fas fa-file'
+      }
+
+      const getTypeIconClass = (type) => {
+        const classes = {
+          jeeva: 'bg-gradient-to-br from-purple-500 to-indigo-600',
+          wellsoft: 'bg-gradient-to-br from-yellow-500 to-orange-600',
+          internet: 'bg-gradient-to-br from-green-500 to-emerald-600',
+          combined_access: 'bg-gradient-to-br from-blue-500 to-cyan-600',
+          booking_service: 'bg-gradient-to-br from-orange-500 to-red-600',
+          combined: 'bg-gradient-to-br from-blue-500 to-cyan-600'
+        }
+        return classes[type] || 'bg-gradient-to-br from-gray-500 to-gray-600'
+      }
+
+      const getStatusBadgeClass = (status) => {
+        const classes = {
+          pending: 'bg-yellow-100 text-yellow-800 border border-yellow-200',
+          approved: 'bg-green-100 text-green-800 border border-green-200',
+          rejected: 'bg-red-100 text-red-800 border border-red-200'
+        }
+        return classes[status] || 'bg-gray-100 text-gray-800 border border-gray-200'
+      }
+
+      const getStatusIcon = (status) => {
+        const icons = {
+          pending: 'fas fa-clock',
+          approved: 'fas fa-check-circle',
+          rejected: 'fas fa-times-circle'
+        }
+        return icons[status] || 'fas fa-question-circle'
+      }
+
+      const getStatusText = (status) => {
+        const texts = {
+          pending: 'Pending',
+          approved: 'Approved',
+          rejected: 'Rejected'
+        }
+        return texts[status] || 'Unknown'
+      }
+
+      const getApprovalStepClass = (step) => {
+        if (!requestData.value) return 'bg-gray-500'
+
+        const statuses = {
+          hod: requestData.value.hodApprovalStatus,
+          divisional: requestData.value.divisionalStatus,
+          dict: requestData.value.dictStatus,
+          headOfIt: requestData.value.headOfItStatus,
+          ict: requestData.value.ictStatus
+        }
+
+        const status = statuses[step]
+
+        if (status === 'approved') return 'bg-gradient-to-br from-green-500 to-emerald-600'
+        if (status === 'rejected') return 'bg-gradient-to-br from-red-500 to-pink-600'
+        if (status === 'pending') return 'bg-gradient-to-br from-yellow-500 to-orange-600'
+        if (status === null) return 'bg-gradient-to-br from-gray-400 to-gray-500 opacity-50'
+        return 'bg-gradient-to-br from-gray-500 to-gray-600'
+      }
+
+      const getApprovalStepIcon = (step) => {
+        if (!requestData.value) return 'fas fa-clock'
+
+        const statuses = {
+          hod: requestData.value.hodApprovalStatus,
+          divisional: requestData.value.divisionalStatus,
+          dict: requestData.value.dictStatus,
+          headOfIt: requestData.value.headOfItStatus,
+          ict: requestData.value.ictStatus
+        }
+
+        const status = statuses[step]
+
+        if (status === 'approved') return 'fas fa-check'
+        if (status === 'rejected') return 'fas fa-times'
+        if (status === 'pending') return 'fas fa-clock'
+        return 'fas fa-minus'
+      }
+
+      const getApprovalStatusText = (step) => {
+        if (!requestData.value) return 'Pending'
+
+        const statuses = {
+          hod: requestData.value.hodApprovalStatus,
+          divisional: requestData.value.divisionalStatus,
+          dict: requestData.value.dictStatus,
+          headOfIt: requestData.value.headOfItStatus,
+          ict: requestData.value.ictStatus
+        }
+
+        const status = statuses[step]
+
+        // For booking service, non-ICT steps should be hidden (null)
+        if (isBookingService.value && step !== 'ict' && status === null) {
+          return 'Not Required'
+        }
+
+        if (status === 'approved') return 'Approved'
+        if (status === 'rejected') return 'Rejected'
+        if (status === 'pending') return 'Pending'
+        if (status === null) return 'Not Required'
+        return 'Not Started'
+      }
+
+      const getApprovalStatusTextClass = (step) => {
+        if (!requestData.value) return 'text-gray-400'
+
+        const statuses = {
+          hod: requestData.value.hodApprovalStatus,
+          divisional: requestData.value.divisionalStatus,
+          dict: requestData.value.dictStatus,
+          headOfIt: requestData.value.headOfItStatus,
+          ict: requestData.value.ictStatus
+        }
+
+        const status = statuses[step]
+
+        if (status === 'approved') return 'text-green-400'
+        if (status === 'rejected') return 'text-red-400'
+        if (status === 'pending') return 'text-yellow-400'
+        return 'text-gray-400'
+      }
+
+      const formatDate = (dateString) => {
+        if (!dateString) return ''
+        const date = new Date(dateString)
+        return date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        })
+      }
+
+      const getRequestedDeviceName = () => {
+        if (!requestData.value) return 'Unknown Device'
+
+        // For booking service, get the device name from selectedModules or deviceType
+        if (isBookingService.value) {
+          if (requestData.value.selectedModules && requestData.value.selectedModules.length > 0) {
+            return requestData.value.selectedModules[0]
+          }
+          if (requestData.value.deviceType) {
+            return requestData.value.deviceType
+          }
+        }
+
+        return 'Unknown Device'
+      }
+
+      const loadDeviceInventoryData = async () => {
+        if (!isBookingService.value || !requestData.value) {
+          return
+        }
+
+        try {
+          // If the request has a device_inventory_id, load that specific device
+          if (requestData.value.device_inventory_id) {
+            const response = await deviceInventoryService.getDevice(
+              requestData.value.device_inventory_id
+            )
+            if (response.success) {
+              deviceInventoryData.value = response.data.data
+            }
+          } else {
+            // If no device_inventory_id, try to find by device name
+            const deviceName = getRequestedDeviceName()
+            const response = await deviceInventoryService.getAvailableDevices()
+            if (response.success && response.data && response.data.data) {
+              const matchingDevice = response.data.data.find(
+                (device) =>
+                  device.device_name.toLowerCase().includes(deviceName.toLowerCase()) ||
+                  deviceName.toLowerCase().includes(device.device_name.toLowerCase())
+              )
+              if (matchingDevice) {
+                deviceInventoryData.value = matchingDevice
               }
-              
-              console.log('✅ Real request data loaded:', requestData.value)
-            } else {
-              throw new Error(result.error || 'Failed to load request data')
-            }
-          } catch (apiError) {
-            console.error('❌ API Error:', apiError)
-            // Fallback to mock data if API fails
-            requestData.value = mockRequestData[requestId] || null
-            
-            if (!requestData.value) {
-              throw new Error('Request not found in both API and mock data')
             }
           }
-        } else {
-          // Fallback to mock data if no userAccessId
-          console.log('No userAccessId provided, using mock data')
+        } catch (error) {
+          console.error('Error loading device inventory data:', error)
+        }
+      }
+
+      const loadRequestData = async () => {
+        isLoading.value = true
+        try {
+          const requestId = route.query.id
+          const requestType = route.query.type
+          const userAccessId = route.query.userAccessId
+
+          console.log('Loading request data:', { requestId, requestType, userAccessId })
+
+          // Try to load from request status API first
+          if (requestId && requestType) {
+            try {
+              const response = await requestStatusService.getRequestDetails(requestId, requestType)
+
+              if (response.success) {
+                requestData.value = response.data
+                console.log('✅ Request data loaded from API:', requestData.value)
+                // Load device inventory data if this is a booking service
+                await loadDeviceInventoryData()
+                return
+              } else {
+                console.warn('⚠️ Request status API failed:', response.error)
+              }
+            } catch (apiError) {
+              console.warn('⚠️ Request status API error:', apiError)
+            }
+          }
+
+          // Fallback to personalInfoService if we have userAccessId
+          if (userAccessId) {
+            try {
+              // Import the service dynamically to avoid import issues
+              const { default: personalInfoService } = await import(
+                '@/services/personalInfoService'
+              )
+
+              const result = await personalInfoService.getPersonalInfoFromUserAccess(userAccessId)
+
+              if (result.success) {
+                // Transform API data to match component structure
+                const apiData = result.data
+
+                requestData.value = {
+                  id: requestId,
+                  type: requestType,
+                  staffName:
+                    apiData.personal_information?.staff_name || apiData.pf_number || 'Unknown',
+                  pfNumber:
+                    apiData.personal_information?.pf_number || apiData.pf_number || 'Unknown',
+                  department:
+                    apiData.personal_information?.department || apiData.department || 'Unknown',
+                  digitalSignature:
+                    apiData.personal_information?.signature?.exists ||
+                    apiData.signature?.exists ||
+                    false,
+                  moduleRequestedFor: 'Use', // Default value
+                  selectedModules: Array.isArray(apiData.request_details?.request_type)
+                    ? apiData.request_details.request_type
+                    : [apiData.request_details?.request_type || requestType],
+                  accessType: 'Permanent (until retirement)', // Default value
+                  temporaryUntil: null,
+                  submissionDate:
+                    apiData.request_details?.submission_date ||
+                    apiData.request_details?.created_at ||
+                    new Date().toISOString().split('T')[0],
+                  currentStatus: apiData.request_details?.status || 'pending',
+                  hodApprovalStatus: 'pending', // Since this is for HOD approval
+                  divisionalStatus: 'pending',
+                  dictStatus: 'pending',
+                  headOfItStatus: 'pending',
+                  ictStatus: 'pending',
+                  comments: apiData.request_details?.purpose
+                    ? Array.isArray(apiData.request_details.purpose)
+                      ? apiData.request_details.purpose.join(', ')
+                      : apiData.request_details.purpose
+                    : 'No comments provided',
+                  hodApprovalDate: null,
+                  divisionalApprovalDate: null,
+                  dictApprovalDate: null,
+                  headOfItApprovalDate: null,
+                  ictApprovalDate: null
+                }
+
+                console.log('✅ Fallback request data loaded:', requestData.value)
+                // Load device inventory data if this is a booking service
+                await loadDeviceInventoryData()
+                return
+              } else {
+                throw new Error(result.error || 'Failed to load request data')
+              }
+            } catch (apiError) {
+              console.error('❌ PersonalInfo API Error:', apiError)
+            }
+          }
+
+          // Final fallback to mock data
+          console.log('Using mock data as final fallback')
           requestData.value = mockRequestData[requestId] || null
-          
+
           if (!requestData.value) {
-            throw new Error('Request not found')
+            throw new Error('Request not found in any data source')
           }
+
+          // Load device inventory data if this is a booking service
+          await loadDeviceInventoryData()
+        } catch (error) {
+          console.error('Error loading request:', error)
+          alert('Error loading request details: ' + error.message)
+
+          // Navigate back based on user role
+          if (userRole.value === ROLES.STAFF) {
+            router.push('/request-status')
+          } else {
+            router.push('/hod-dashboard/request-list')
+          }
+        } finally {
+          isLoading.value = false
         }
-      } catch (error) {
-        console.error('Error loading request:', error)
-        alert('Error loading request details: ' + error.message)
-        router.push('/hod-dashboard/request-list')
-      } finally {
-        isLoading.value = false
       }
-    }
 
-    const approveRequest = async() => {
-      if (!confirm('Are you sure you want to approve this request?')) return
+      const approveRequest = async () => {
+        if (!confirm('Are you sure you want to approve this request?')) return
 
-      isProcessing.value = true
-      try {
-        console.log('Approving request:', requestData.value.id, 'as', userRole.value)
-        
-        // TODO: Implement real API call for approval
-        // For now, simulate the API call
-        await new Promise((resolve) => setTimeout(resolve, 1500))
+        isProcessing.value = true
+        try {
+          console.log('Approving request:', requestData.value.id, 'as', userRole.value)
 
-        // Update the appropriate approval status
-        const currentDate = new Date().toISOString().split('T')[0]
+          // TODO: Implement real API call for approval
+          // For now, simulate the API call
+          await new Promise((resolve) => setTimeout(resolve, 1500))
 
-        switch (userRole.value) {
-          case ROLES.HEAD_OF_DEPARTMENT:
-            requestData.value.hodApprovalStatus = 'approved'
-            requestData.value.hodApprovalDate = currentDate
-            break
-          case ROLES.DIVISIONAL_DIRECTOR:
-            requestData.value.divisionalStatus = 'approved'
-            requestData.value.divisionalApprovalDate = currentDate
-            break
-          case ROLES.ICT_DIRECTOR:
-            requestData.value.dictStatus = 'approved'
-            requestData.value.dictApprovalDate = currentDate
-            break
-          case ROLES.ICT_OFFICER:
-            requestData.value.ictStatus = 'approved'
-            requestData.value.ictApprovalDate = currentDate
-            requestData.value.currentStatus = 'approved'
-            break
+          // Update the appropriate approval status
+          const currentDate = new Date().toISOString().split('T')[0]
+
+          switch (userRole.value) {
+            case ROLES.HEAD_OF_DEPARTMENT:
+              requestData.value.hodApprovalStatus = 'approved'
+              requestData.value.hodApprovalDate = currentDate
+              break
+            case ROLES.DIVISIONAL_DIRECTOR:
+              requestData.value.divisionalStatus = 'approved'
+              requestData.value.divisionalApprovalDate = currentDate
+              break
+            case ROLES.ICT_DIRECTOR:
+              requestData.value.dictStatus = 'approved'
+              requestData.value.dictApprovalDate = currentDate
+              break
+            case ROLES.ICT_OFFICER:
+              requestData.value.ictStatus = 'approved'
+              requestData.value.ictApprovalDate = currentDate
+              requestData.value.currentStatus = 'approved'
+              break
+          }
+
+          successMessage.value = {
+            title: 'Request Approved!',
+            text: `Request ${requestData.value.id} has been successfully approved.`
+          }
+          showSuccessModal.value = true
+
+          console.log('✅ Request approved successfully')
+        } catch (error) {
+          console.error('❌ Error approving request:', error)
+          alert('Error approving request. Please try again.')
+        } finally {
+          isProcessing.value = false
         }
-
-        successMessage.value = {
-          title: 'Request Approved!',
-          text: `Request ${requestData.value.id} has been successfully approved.`
-        }
-        showSuccessModal.value = true
-        
-        console.log('✅ Request approved successfully')
-      } catch (error) {
-        console.error('❌ Error approving request:', error)
-        alert('Error approving request. Please try again.')
-      } finally {
-        isProcessing.value = false
       }
-    }
 
-    const rejectRequest = async() => {
-      if (!confirm('Are you sure you want to reject this request?')) return
+      const rejectRequest = async () => {
+        if (!confirm('Are you sure you want to reject this request?')) return
 
-      isProcessing.value = true
-      try {
-        console.log('Rejecting request:', requestData.value.id, 'as', userRole.value)
-        
-        // TODO: Implement real API call for rejection
-        // For now, simulate the API call
-        await new Promise((resolve) => setTimeout(resolve, 1500))
+        isProcessing.value = true
+        try {
+          console.log('Rejecting request:', requestData.value.id, 'as', userRole.value)
 
-        // Update the appropriate approval status
-        const currentDate = new Date().toISOString().split('T')[0]
+          // TODO: Implement real API call for rejection
+          // For now, simulate the API call
+          await new Promise((resolve) => setTimeout(resolve, 1500))
 
-        switch (userRole.value) {
-          case ROLES.HEAD_OF_DEPARTMENT:
-            requestData.value.hodApprovalStatus = 'rejected'
-            requestData.value.hodApprovalDate = currentDate
-            break
-          case ROLES.DIVISIONAL_DIRECTOR:
-            requestData.value.divisionalStatus = 'rejected'
-            requestData.value.divisionalApprovalDate = currentDate
-            break
-          case ROLES.ICT_DIRECTOR:
-            requestData.value.dictStatus = 'rejected'
-            requestData.value.dictApprovalDate = currentDate
-            break
-          case ROLES.ICT_OFFICER:
-            requestData.value.ictStatus = 'rejected'
-            requestData.value.ictApprovalDate = currentDate
-            break
+          // Update the appropriate approval status
+          const currentDate = new Date().toISOString().split('T')[0]
+
+          switch (userRole.value) {
+            case ROLES.HEAD_OF_DEPARTMENT:
+              requestData.value.hodApprovalStatus = 'rejected'
+              requestData.value.hodApprovalDate = currentDate
+              break
+            case ROLES.DIVISIONAL_DIRECTOR:
+              requestData.value.divisionalStatus = 'rejected'
+              requestData.value.divisionalApprovalDate = currentDate
+              break
+            case ROLES.ICT_DIRECTOR:
+              requestData.value.dictStatus = 'rejected'
+              requestData.value.dictApprovalDate = currentDate
+              break
+            case ROLES.ICT_OFFICER:
+              requestData.value.ictStatus = 'rejected'
+              requestData.value.ictApprovalDate = currentDate
+              break
+          }
+
+          requestData.value.currentStatus = 'rejected'
+
+          successMessage.value = {
+            title: 'Request Rejected!',
+            text: `Request ${requestData.value.id} has been rejected.`
+          }
+          showSuccessModal.value = true
+
+          console.log('✅ Request rejected successfully')
+        } catch (error) {
+          console.error('❌ Error rejecting request:', error)
+          alert('Error rejecting request. Please try again.')
+        } finally {
+          isProcessing.value = false
         }
-
-        requestData.value.currentStatus = 'rejected'
-
-        successMessage.value = {
-          title: 'Request Rejected!',
-          text: `Request ${requestData.value.id} has been rejected.`
-        }
-        showSuccessModal.value = true
-        
-        console.log('✅ Request rejected successfully')
-      } catch (error) {
-        console.error('❌ Error rejecting request:', error)
-        alert('Error rejecting request. Please try again.')
-      } finally {
-        isProcessing.value = false
       }
-    }
 
-    const goBack = () => {
-      router.push('/hod-dashboard/request-list')
-    }
+      const goBack = () => {
+        // Navigate back based on user role
+        if (userRole.value === ROLES.STAFF) {
+          router.push('/request-status')
+        } else {
+          router.push('/hod-dashboard/request-list')
+        }
+      }
 
-    const closeSuccessModal = () => {
-      showSuccessModal.value = false
-      // Optionally redirect back to list
-      setTimeout(() => {
-        goBack()
-      }, 500)
-    }
+      const closeSuccessModal = () => {
+        showSuccessModal.value = false
+        // Optionally redirect back to list
+        setTimeout(() => {
+          goBack()
+        }, 500)
+      }
 
-    // Lifecycle
-    onMounted(async() => {
-      await loadRequestData()
-    })
+      // Lifecycle
+      onMounted(async () => {
+        await loadRequestData()
+      })
 
-    return {
-      sidebarCollapsed,
-      requestData,
-      isLoading,
-      isProcessing,
-      approvalComments,
-      showSuccessModal,
-      successMessage,
-      canTakeAction,
-      userRole,
-      ROLES,
-      getRoleDisplayName,
-      getTypeDisplayName,
-      getTypeIcon,
-      getTypeIconClass,
-      getStatusBadgeClass,
-      getStatusIcon,
-      getStatusText,
-      getApprovalStepClass,
-      getApprovalStepIcon,
-      getApprovalStatusText,
-      getApprovalStatusTextClass,
-      formatDate,
-      approveRequest,
-      rejectRequest,
-      goBack,
-      closeSuccessModal
+      return {
+        sidebarCollapsed,
+        requestData,
+        isLoading,
+        isProcessing,
+        approvalComments,
+        showSuccessModal,
+        successMessage,
+        canTakeAction,
+        isBookingService,
+        isDeviceOutOfStock,
+        deviceInventoryData,
+        userRole,
+        ROLES,
+        getRoleDisplayName,
+        getTypeDisplayName,
+        getTypeIcon,
+        getTypeIconClass,
+        getStatusBadgeClass,
+        getStatusIcon,
+        getStatusText,
+        getApprovalStepClass,
+        getApprovalStepIcon,
+        getApprovalStatusText,
+        getApprovalStatusTextClass,
+        formatDate,
+        getRequestedDeviceName,
+        loadDeviceInventoryData,
+        approveRequest,
+        rejectRequest,
+        goBack,
+        closeSuccessModal
+      }
     }
   }
-}
 </script>
 
 <style scoped>
-/* Glass morphism effects */
-.medical-glass-card {
-  background: rgba(59, 130, 246, 0.15);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
-  border: 2px solid rgba(96, 165, 250, 0.3);
-  box-shadow: 0 8px 32px rgba(29, 78, 216, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-
-/* Animations */
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
+  /* Glass morphism effects */
+  .medical-glass-card {
+    background: rgba(59, 130, 246, 0.15);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 2px solid rgba(96, 165, 250, 0.3);
+    box-shadow:
+      0 8px 32px rgba(29, 78, 216, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
-  50% {
-    transform: translateY(-15px);
+
+  /* Animations */
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-15px);
+    }
   }
-}
 
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  @keyframes fade-in-delay {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
-}
 
-@keyframes fade-in-delay {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  .animate-fade-in {
+    animation: fade-in 1s ease-out;
   }
-}
 
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
+  .animate-fade-in-delay {
+    animation: fade-in-delay 1s ease-out 0.3s both;
+  }
 
-.animate-fade-in {
-  animation: fade-in 1s ease-out;
-}
+  /* Focus styles for accessibility */
+  textarea:focus,
+  button:focus {
+    box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.3);
+  }
 
-.animate-fade-in-delay {
-  animation: fade-in-delay 1s ease-out 0.3s both;
-}
+  /* Smooth transitions */
+  * {
+    transition-property:
+      color, background-color, border-color, text-decoration-color, fill, stroke, opacity,
+      box-shadow, transform, filter, backdrop-filter;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 200ms;
+  }
 
-/* Focus styles for accessibility */
-textarea:focus,
-button:focus {
-  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.3);
-}
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
 
-/* Smooth transitions */
-* {
-  transition-property: color, background-color, border-color,
-    text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter,
-    backdrop-filter;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 200ms;
-}
+  ::-webkit-scrollbar-track {
+    background: rgba(59, 130, 246, 0.1);
+  }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
+  ::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.3);
+    border-radius: 4px;
+  }
 
-::-webkit-scrollbar-track {
-  background: rgba(59, 130, 246, 0.1);
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(59, 130, 246, 0.3);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(59, 130, 246, 0.5);
-}
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(59, 130, 246, 0.5);
+  }
 </style>

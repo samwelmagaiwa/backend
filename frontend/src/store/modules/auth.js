@@ -7,8 +7,11 @@ function normalizeUserData(user) {
   if (!user) return null
 
   // Determine the primary role from multiple possible sources
-  const primaryRole = user.role || user.primary_role || user.role_name ||
-                     (user.roles && user.roles.length > 0 ? user.roles[0] : 'staff')
+  const primaryRole =
+    user.role ||
+    user.primary_role ||
+    user.role_name ||
+    (user.roles && user.roles.length > 0 ? user.roles[0] : 'staff')
 
   // Ensure roles is always an array of strings
   let rolesArray = []
@@ -19,7 +22,7 @@ function normalizeUserData(user) {
     }
     // If roles is an array of objects, extract the name property
     else if (user.roles.length > 0 && typeof user.roles[0] === 'object') {
-      rolesArray = user.roles.map(role => role.name || role)
+      rolesArray = user.roles.map((role) => role.name || role)
     }
   }
   // If no roles array but we have a primary role, create array with that role
@@ -342,8 +345,12 @@ const getters = {
   userRole: (state) => {
     if (!state.user) return null
     // Use the normalized role field first, then fallback to other sources
-    return state.user.role || state.user.primary_role || state.user.role_name ||
-           (state.user.roles && state.user.roles.length > 0 ? state.user.roles[0] : null)
+    return (
+      state.user.role ||
+      state.user.primary_role ||
+      state.user.role_name ||
+      (state.user.roles && state.user.roles.length > 0 ? state.user.roles[0] : null)
+    )
   },
   userRoles: (state) => state.user?.roles || [],
   loading: (state) => state.loading,
@@ -352,10 +359,8 @@ const getters = {
   authInitialized: (state) => state.authInitialized,
   restoringSession: (state) => state.restoringSession,
   isAuthReady: (state) => state.authInitialized && !state.restoringSession,
-  isAdmin: (state) =>
-    state.user?.role === 'admin' || (state.user?.roles || []).includes('admin'),
-  isStaff: (state) =>
-    state.user?.role === 'staff' || (state.user?.roles || []).includes('staff'),
+  isAdmin: (state) => state.user?.role === 'admin' || (state.user?.roles || []).includes('admin'),
+  isStaff: (state) => state.user?.role === 'staff' || (state.user?.roles || []).includes('staff'),
   isApprover: (state) => {
     const role = state.user?.role
     const approverRoles = [

@@ -121,16 +121,16 @@ When clicking on a request row or "View" button:
 ```javascript
 // Navigate to appropriate form based on request type
 const routes = {
-  combined: "/internal-access/details",
-};
+  combined: '/internal-access/details'
+}
 
 router.push({
   path: route,
   query: {
     id: request.id,
-    type: request.type,
-  },
-});
+    type: request.type
+  }
+})
 ```
 
 ### Form Pre-filling:

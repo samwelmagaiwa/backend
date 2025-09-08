@@ -30,14 +30,10 @@
 
     <div class="max-w-8xl mx-auto relative z-10">
       <!-- Professional Header -->
-      <div
-        class="medical-glass-card rounded-t-3xl p-8 mb-0 border-b border-blue-300/30"
-      >
+      <div class="medical-glass-card rounded-t-3xl p-8 mb-0 border-b border-blue-300/30">
         <div class="text-center">
           <div class="flex items-center justify-center mb-4">
-            <h1
-              class="text-4xl font-bold text-white tracking-wide drop-shadow-lg"
-            >
+            <h1 class="text-4xl font-bold text-white tracking-wide drop-shadow-lg">
               TERMS OF SERVICE
             </h1>
           </div>
@@ -48,9 +44,7 @@
         </div>
 
         <!-- Version Control Information -->
-        <div
-          class="bg-white/10 backdrop-blur-sm px-6 py-4 border-t border-blue-300/30 mt-6"
-        >
+        <div class="bg-white/10 backdrop-blur-sm px-6 py-4 border-t border-blue-300/30 mt-6">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             <div class="text-center md:text-left">
               <span class="font-semibold text-blue-100">Version:</span>
@@ -58,15 +52,11 @@
             </div>
             <div class="text-center">
               <span class="font-semibold text-blue-100">Approved:</span>
-              <span class="text-emerald-300 font-bold ml-1"
-                >November 22, 2019</span
-              >
+              <span class="text-emerald-300 font-bold ml-1">November 22, 2019</span>
             </div>
             <div class="text-center md:text-right">
               <span class="font-semibold text-blue-100">Last Updated:</span>
-              <span class="text-yellow-300 font-bold ml-1"
-                >January 15, 2025</span
-              >
+              <span class="text-yellow-300 font-bold ml-1">January 15, 2025</span>
             </div>
           </div>
         </div>
@@ -90,18 +80,14 @@
             <div class="ml-16">
               <p class="text-blue-100 leading-relaxed mb-4">
                 By using
-                <strong class="text-cyan-300"
-                  >Muhimbili National Hospital (MNH) ICT systems</strong
-                >, you agree to follow these Terms of Service, the Acceptable
-                ICT Use Policy, and all relevant laws.
+                <strong class="text-cyan-300">Muhimbili National Hospital (MNH) ICT systems</strong
+                >, you agree to follow these Terms of Service, the Acceptable ICT Use Policy, and
+                all relevant laws.
               </p>
-              <div
-                class="bg-white/15 rounded-xl p-4 border-2 border-cyan-300/30 backdrop-blur-sm"
-              >
+              <div class="bg-white/15 rounded-xl p-4 border-2 border-cyan-300/30 backdrop-blur-sm">
                 <p class="text-sm text-blue-100">
-                  <strong class="text-cyan-300">Covered Systems:</strong> Jeeva
-                  (Medical Records), Wellsoft (Hospital Management), and
-                  Internet Services
+                  <strong class="text-cyan-300">Covered Systems:</strong> Jeeva (Medical Records),
+                  Wellsoft (Hospital Management), and Internet Services
                 </p>
               </div>
             </div>
@@ -123,56 +109,38 @@
             </div>
             <div class="ml-16">
               <p class="text-blue-100 leading-relaxed mb-4">
-                You are authorized to use MNH ICT systems for the following
-                purposes:
+                You are authorized to use MNH ICT systems for the following purposes:
               </p>
               <div class="grid md:grid-cols-1 gap-4">
                 <div class="space-y-3">
                   <div class="flex items-start">
                     <i
                       class="fas fa-check-circle text-emerald-400 mt-1 mr-3"
-                      style="
-                        font-family: 'Font Awesome 6 Free';
-                        font-weight: 900;
-                      "
+                      style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                     ></i>
                     <span class="text-blue-100"
-                      ><strong class="text-emerald-300"
-                        >Official Hospital Duties:</strong
-                      >
-                      Use ICT systems only for authorized MNH work
-                      activities</span
+                      ><strong class="text-emerald-300">Official Hospital Duties:</strong> Use ICT
+                      systems only for authorized MNH work activities</span
                     >
                   </div>
                   <div class="flex items-start">
                     <i
                       class="fas fa-check-circle text-emerald-400 mt-1 mr-3"
-                      style="
-                        font-family: 'Font Awesome 6 Free';
-                        font-weight: 900;
-                      "
+                      style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                     ></i>
                     <span class="text-blue-100"
-                      ><strong class="text-emerald-300"
-                        >Authorized Information Access:</strong
-                      >
-                      Access only the information you are permitted to
-                      view</span
+                      ><strong class="text-emerald-300">Authorized Information Access:</strong>
+                      Access only the information you are permitted to view</span
                     >
                   </div>
                   <div class="flex items-start">
                     <i
                       class="fas fa-check-circle text-emerald-400 mt-1 mr-3"
-                      style="
-                        font-family: 'Font Awesome 6 Free';
-                        font-weight: 900;
-                      "
+                      style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                     ></i>
                     <span class="text-blue-100"
-                      ><strong class="text-emerald-300"
-                        >Credential Security:</strong
-                      >
-                      Keep your login credentials confidential and secure</span
+                      ><strong class="text-emerald-300">Credential Security:</strong> Keep your
+                      login credentials confidential and secure</span
                     >
                   </div>
                 </div>
@@ -185,9 +153,8 @@
                     class="fas fa-info-circle text-emerald-400 mr-2"
                     style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                   ></i>
-                  <strong class="text-emerald-300">Remember:</strong> All system
-                  usage must align with your job responsibilities and hospital
-                  policies.
+                  <strong class="text-emerald-300">Remember:</strong> All system usage must align
+                  with your job responsibilities and hospital policies.
                 </p>
               </div>
             </div>
@@ -210,8 +177,7 @@
             <div class="ml-16">
               <p class="text-blue-100 leading-relaxed mb-4">
                 <strong class="text-emerald-300"
-                  >You must NOT engage in any of the following
-                  activities:</strong
+                  >You must NOT engage in any of the following activities:</strong
                 >
               </p>
 
@@ -221,15 +187,10 @@
                   <div
                     class="bg-white/15 rounded-xl p-4 border-2 border-emerald-300/30 backdrop-blur-sm"
                   >
-                    <h4
-                      class="font-bold text-emerald-300 mb-3 flex items-center"
-                    >
+                    <h4 class="font-bold text-emerald-300 mb-3 flex items-center">
                       <i
                         class="fas fa-ban text-emerald-400 mr-2"
-                        style="
-                          font-family: 'Font Awesome 6 Free';
-                          font-weight: 900;
-                        "
+                        style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                       ></i>
                       Illegal & Inappropriate Activities
                     </h4>
@@ -237,30 +198,21 @@
                       <li class="flex items-start">
                         <i
                           class="fas fa-times text-emerald-400 mr-2 mt-1"
-                          style="
-                            font-family: 'Font Awesome 6 Free';
-                            font-weight: 900;
-                          "
+                          style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Illegal activities or political campaigning
                       </li>
                       <li class="flex items-start">
                         <i
                           class="fas fa-times text-emerald-400 mr-2 mt-1"
-                          style="
-                            font-family: 'Font Awesome 6 Free';
-                            font-weight: 900;
-                          "
+                          style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Accessing obscene, pornographic, or offensive materials
                       </li>
                       <li class="flex items-start">
                         <i
                           class="fas fa-times text-emerald-400 mr-2 mt-1"
-                          style="
-                            font-family: 'Font Awesome 6 Free';
-                            font-weight: 900;
-                          "
+                          style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Sharing discriminatory content
                       </li>
@@ -270,15 +222,10 @@
                   <div
                     class="bg-white/15 rounded-xl p-4 border-2 border-emerald-300/30 backdrop-blur-sm"
                   >
-                    <h4
-                      class="font-bold text-emerald-300 mb-3 flex items-center"
-                    >
+                    <h4 class="font-bold text-emerald-300 mb-3 flex items-center">
                       <i
                         class="fas fa-shield-halved text-emerald-400 mr-2"
-                        style="
-                          font-family: 'Font Awesome 6 Free';
-                          font-weight: 900;
-                        "
+                        style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                       ></i>
                       Security Violations
                     </h4>
@@ -286,30 +233,21 @@
                       <li class="flex items-start">
                         <i
                           class="fas fa-times text-emerald-400 mr-2 mt-1"
-                          style="
-                            font-family: 'Font Awesome 6 Free';
-                            font-weight: 900;
-                          "
+                          style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Installing unauthorized software
                       </li>
                       <li class="flex items-start">
                         <i
                           class="fas fa-times text-emerald-400 mr-2 mt-1"
-                          style="
-                            font-family: 'Font Awesome 6 Free';
-                            font-weight: 900;
-                          "
+                          style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Disabling security controls
                       </li>
                       <li class="flex items-start">
                         <i
                           class="fas fa-times text-emerald-400 mr-2 mt-1"
-                          style="
-                            font-family: 'Font Awesome 6 Free';
-                            font-weight: 900;
-                          "
+                          style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Bypassing system authentication
                       </li>
@@ -321,15 +259,10 @@
                   <div
                     class="bg-white/15 rounded-xl p-4 border-2 border-emerald-300/30 backdrop-blur-sm"
                   >
-                    <h4
-                      class="font-bold text-emerald-300 mb-3 flex items-center"
-                    >
+                    <h4 class="font-bold text-emerald-300 mb-3 flex items-center">
                       <i
                         class="fas fa-globe text-emerald-400 mr-2"
-                        style="
-                          font-family: 'Font Awesome 6 Free';
-                          font-weight: 900;
-                        "
+                        style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                       ></i>
                       Misuse of Internet
                     </h4>
@@ -337,30 +270,21 @@
                       <li class="flex items-start">
                         <i
                           class="fas fa-times text-emerald-400 mr-2 mt-1"
-                          style="
-                            font-family: 'Font Awesome 6 Free';
-                            font-weight: 900;
-                          "
+                          style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Gambling or personal shopping
                       </li>
                       <li class="flex items-start">
                         <i
                           class="fas fa-times text-emerald-400 mr-2 mt-1"
-                          style="
-                            font-family: 'Font Awesome 6 Free';
-                            font-weight: 900;
-                          "
+                          style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Streaming unrelated to work
                       </li>
                       <li class="flex items-start">
                         <i
                           class="fas fa-times text-emerald-400 mr-2 mt-1"
-                          style="
-                            font-family: 'Font Awesome 6 Free';
-                            font-weight: 900;
-                          "
+                          style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Sending spam or chain emails
                       </li>
@@ -370,15 +294,10 @@
                   <div
                     class="bg-white/15 rounded-xl p-4 border-2 border-emerald-300/30 backdrop-blur-sm"
                   >
-                    <h4
-                      class="font-bold text-emerald-300 mb-3 flex items-center"
-                    >
+                    <h4 class="font-bold text-emerald-300 mb-3 flex items-center">
                       <i
                         class="fas fa-user-secret text-emerald-400 mr-2"
-                        style="
-                          font-family: 'Font Awesome 6 Free';
-                          font-weight: 900;
-                        "
+                        style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                       ></i>
                       Confidentiality Breaches
                     </h4>
@@ -386,30 +305,21 @@
                       <li class="flex items-start">
                         <i
                           class="fas fa-times text-emerald-400 mr-2 mt-1"
-                          style="
-                            font-family: 'Font Awesome 6 Free';
-                            font-weight: 900;
-                          "
+                          style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Disclosing patient information without authorization
                       </li>
                       <li class="flex items-start">
                         <i
                           class="fas fa-times text-emerald-400 mr-2 mt-1"
-                          style="
-                            font-family: 'Font Awesome 6 Free';
-                            font-weight: 900;
-                          "
+                          style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Sharing confidential hospital data
                       </li>
                       <li class="flex items-start">
                         <i
                           class="fas fa-times text-emerald-400 mr-2 mt-1"
-                          style="
-                            font-family: 'Font Awesome 6 Free';
-                            font-weight: 900;
-                          "
+                          style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Attempting unauthorized access
                       </li>
@@ -426,9 +336,9 @@
                     class="fas fa-exclamation-triangle text-emerald-400 mr-2"
                     style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                   ></i>
-                  <strong class="text-emerald-300">Warning:</strong> Violation
-                  of these prohibited actions may result in immediate
-                  disciplinary action, access termination, or legal proceedings.
+                  <strong class="text-emerald-300">Warning:</strong> Violation of these prohibited
+                  actions may result in immediate disciplinary action, access termination, or legal
+                  proceedings.
                 </p>
               </div>
             </div>
@@ -446,14 +356,12 @@
               >
                 <span class="text-white font-bold text-lg">4</span>
               </div>
-              <h2 class="text-xl font-bold text-white">
-                SECURITY REQUIREMENTS
-              </h2>
+              <h2 class="text-xl font-bold text-white">SECURITY REQUIREMENTS</h2>
             </div>
             <div class="ml-16">
               <p class="text-blue-100 leading-relaxed mb-4">
-                To maintain system security and protect hospital data, you must
-                follow these requirements:
+                To maintain system security and protect hospital data, you must follow these
+                requirements:
               </p>
 
               <!-- Security Requirements Grid -->
@@ -462,15 +370,10 @@
                   <div
                     class="bg-white/15 rounded-xl p-4 border-2 border-emerald-300/30 backdrop-blur-sm"
                   >
-                    <h4
-                      class="font-bold text-emerald-300 mb-3 flex items-center"
-                    >
+                    <h4 class="font-bold text-emerald-300 mb-3 flex items-center">
                       <i
                         class="fas fa-key text-emerald-400 mr-2"
-                        style="
-                          font-family: 'Font Awesome 6 Free';
-                          font-weight: 900;
-                        "
+                        style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                       ></i>
                       Password Management
                     </h4>
@@ -478,30 +381,21 @@
                       <li class="flex items-start">
                         <i
                           class="fas fa-arrow-right text-emerald-400 mr-2 mt-1"
-                          style="
-                            font-family: 'Font Awesome 6 Free';
-                            font-weight: 900;
-                          "
+                          style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Change default passwords on first login
                       </li>
                       <li class="flex items-start">
                         <i
                           class="fas fa-arrow-right text-emerald-400 mr-2 mt-1"
-                          style="
-                            font-family: 'Font Awesome 6 Free';
-                            font-weight: 900;
-                          "
+                          style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Update passwords every 90 days
                       </li>
                       <li class="flex items-start">
                         <i
                           class="fas fa-arrow-right text-emerald-400 mr-2 mt-1"
-                          style="
-                            font-family: 'Font Awesome 6 Free';
-                            font-weight: 900;
-                          "
+                          style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Use strong passwords with letters, numbers, and symbols
                       </li>
@@ -513,15 +407,10 @@
                   <div
                     class="bg-white/15 rounded-xl p-4 border-2 border-emerald-300/30 backdrop-blur-sm"
                   >
-                    <h4
-                      class="font-bold text-emerald-300 mb-3 flex items-center"
-                    >
+                    <h4 class="font-bold text-emerald-300 mb-3 flex items-center">
                       <i
                         class="fas fa-laptop text-emerald-400 mr-2"
-                        style="
-                          font-family: 'Font Awesome 6 Free';
-                          font-weight: 900;
-                        "
+                        style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                       ></i>
                       Device Security
                     </h4>
@@ -529,30 +418,21 @@
                       <li class="flex items-start">
                         <i
                           class="fas fa-arrow-right text-emerald-400 mr-2 mt-1"
-                          style="
-                            font-family: 'Font Awesome 6 Free';
-                            font-weight: 900;
-                          "
+                          style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Lock your computer when unattended
                       </li>
                       <li class="flex items-start">
                         <i
                           class="fas fa-arrow-right text-emerald-400 mr-2 mt-1"
-                          style="
-                            font-family: 'Font Awesome 6 Free';
-                            font-weight: 900;
-                          "
+                          style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Keep devices updated with security patches
                       </li>
                       <li class="flex items-start">
                         <i
                           class="fas fa-arrow-right text-emerald-400 mr-2 mt-1"
-                          style="
-                            font-family: 'Font Awesome 6 Free';
-                            font-weight: 900;
-                          "
+                          style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Maintain current antivirus software
                       </li>
@@ -569,9 +449,8 @@
                     class="fas fa-exclamation-triangle text-emerald-400 mr-2"
                     style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                   ></i>
-                  <strong class="text-emerald-300">Critical:</strong> Failure to
-                  follow security requirements may result in immediate
-                  suspension of access privileges.
+                  <strong class="text-emerald-300">Critical:</strong> Failure to follow security
+                  requirements may result in immediate suspension of access privileges.
                 </p>
               </div>
             </div>
@@ -589,30 +468,23 @@
               >
                 <span class="text-white font-bold text-lg">5</span>
               </div>
-              <h2 class="text-xl font-bold text-white">
-                MONITORING AND COMPLIANCE
-              </h2>
+              <h2 class="text-xl font-bold text-white">MONITORING AND COMPLIANCE</h2>
             </div>
             <div class="ml-16">
               <div
                 class="bg-white/15 rounded-xl p-6 border-2 border-emerald-300/30 backdrop-blur-sm"
               >
-                <h3 class="text-lg font-bold text-emerald-300 mb-4">
-                  System Monitoring
-                </h3>
+                <h3 class="text-lg font-bold text-emerald-300 mb-4">System Monitoring</h3>
                 <p class="text-blue-100 mb-4">
                   <strong class="text-emerald-300"
                     >MNH reserves the right to monitor system usage</strong
                   >
-                  to ensure compliance with hospital policies and maintain
-                  security.
+                  to ensure compliance with hospital policies and maintain security.
                 </p>
 
                 <div class="grid md:grid-cols-2 gap-4 mb-4">
                   <div>
-                    <h4 class="font-semibold text-emerald-300 mb-2">
-                      Monitored Activities:
-                    </h4>
+                    <h4 class="font-semibold text-emerald-300 mb-2">Monitored Activities:</h4>
                     <ul class="text-sm text-blue-100 space-y-1">
                       <li>• Email communications</li>
                       <li>• Internet browsing history</li>
@@ -621,9 +493,7 @@
                     </ul>
                   </div>
                   <div>
-                    <h4 class="font-semibold text-emerald-300 mb-2">
-                      Compliance Actions:
-                    </h4>
+                    <h4 class="font-semibold text-emerald-300 mb-2">Compliance Actions:</h4>
                     <ul class="text-sm text-blue-100 space-y-1">
                       <li>• Disciplinary action</li>
                       <li>• Access termination</li>
@@ -639,14 +509,10 @@
                   <p class="text-sm text-blue-100">
                     <i
                       class="fas fa-info-circle text-emerald-400 mr-2"
-                      style="
-                        font-family: 'Font Awesome 6 Free';
-                        font-weight: 900;
-                      "
+                      style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                     ></i>
-                    <strong class="text-emerald-300">Note:</strong> Any
-                    violation of these terms may result in immediate
-                    disciplinary action, termination of employment, or legal
+                    <strong class="text-emerald-300">Note:</strong> Any violation of these terms may
+                    result in immediate disciplinary action, termination of employment, or legal
                     action as deemed appropriate by hospital management.
                   </p>
                 </div>
@@ -676,10 +542,7 @@
                   <h4 class="font-bold text-emerald-300 mb-3 flex items-center">
                     <i
                       class="fas fa-user-check text-emerald-400 mr-2"
-                      style="
-                        font-family: 'Font Awesome 6 Free';
-                        font-weight: 900;
-                      "
+                      style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                     ></i>
                     Your Responsibility
                   </h4>
@@ -702,17 +565,12 @@
                   <h4 class="font-bold text-emerald-300 mb-3 flex items-center">
                     <i
                       class="fas fa-hospital text-emerald-400 mr-2"
-                      style="
-                        font-family: 'Font Awesome 6 Free';
-                        font-weight: 900;
-                      "
+                      style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                     ></i>
                     Hospital Disclaimer
                   </h4>
                   <p class="text-sm text-blue-100 mb-3">
-                    <strong class="text-emerald-300"
-                      >MNH is not responsible</strong
-                    >
+                    <strong class="text-emerald-300">MNH is not responsible</strong>
                     for personal data stored on hospital ICT systems.
                   </p>
                   <ul class="text-sm text-blue-100 space-y-1">
@@ -740,35 +598,24 @@
               Questions or Concerns?
             </h3>
             <p class="text-blue-100 mb-4">
-              If you have questions about these Terms of Service or need
-              clarification, contact:
+              If you have questions about these Terms of Service or need clarification, contact:
             </p>
             <div class="grid md:grid-cols-2 gap-4">
               <div
                 class="bg-white/15 rounded-xl p-4 border-2 border-emerald-300/30 backdrop-blur-sm"
               >
-                <h4 class="font-semibold text-emerald-300 mb-2">
-                  ICT Department
-                </h4>
+                <h4 class="font-semibold text-emerald-300 mb-2">ICT Department</h4>
                 <p class="text-sm text-blue-100">Email: ict@muhimbili.go.tz</p>
                 <p class="text-sm text-blue-100">Phone: +255 22 221 5701</p>
-                <p class="text-sm text-blue-100">
-                  Office: ICT Building, Ground Floor
-                </p>
+                <p class="text-sm text-blue-100">Office: ICT Building, Ground Floor</p>
               </div>
               <div
                 class="bg-white/15 rounded-xl p-4 border-2 border-emerald-300/30 backdrop-blur-sm"
               >
-                <h4 class="font-semibold text-emerald-300 mb-2">
-                  Legal & Compliance
-                </h4>
-                <p class="text-sm text-blue-100">
-                  Email: info@mloganzila.go.tz
-                </p>
+                <h4 class="font-semibold text-emerald-300 mb-2">Legal & Compliance</h4>
+                <p class="text-sm text-blue-100">Email: info@mloganzila.go.tz</p>
                 <p class="text-sm text-blue-100">Phone: +255 22 221 5701</p>
-                <p class="text-sm text-blue-100">
-                  Office: Administration Block, 3rd Floor
-                </p>
+                <p class="text-sm text-blue-100">Office: Administration Block, 3rd Floor</p>
               </div>
             </div>
           </div>
@@ -795,9 +642,8 @@
                 By requesting access to
                 <strong class="text-indigo-300">Jeeva</strong>,
                 <strong class="text-indigo-300">Wellsoft</strong>, or
-                <strong class="text-indigo-300">Internet services</strong>, you
-                confirm that you understand and agree to comply with these Terms
-                of Service.
+                <strong class="text-indigo-300">Internet services</strong>, you confirm that you
+                understand and agree to comply with these Terms of Service.
               </p>
 
               <!-- Checkbox for Agreement -->
@@ -813,14 +659,12 @@
                   />
                   <span class="text-blue-100 leading-relaxed">
                     <strong class="text-white"
-                      >I acknowledge that I have read and understood these Terms
-                      of Service.</strong
+                      >I acknowledge that I have read and understood these Terms of Service.</strong
                     ><br />
                     <span class="text-blue-200 text-sm">
                       <strong>
-                        I agree to comply with all terms and conditions outlined
-                        above. I understand that violations may result in
-                        disciplinary action, termination, or legal
+                        I agree to comply with all terms and conditions outlined above. I understand
+                        that violations may result in disciplinary action, termination, or legal
                         proceedings.</strong
                       >
                     </span>
@@ -858,8 +702,8 @@
           class="inline-block bg-white/10 backdrop-blur-sm border border-blue-300/30 px-6 py-3 rounded-xl shadow-lg"
         >
           <p class="text-sm text-blue-100">
-            © 2025 Muhimbili National Hospital - ICT Department | Terms
-            effective as of publication date
+            © 2025 Muhimbili National Hospital - ICT Department | Terms effective as of publication
+            date
           </p>
         </div>
       </div>
@@ -868,252 +712,241 @@
 </template>
 
 <script>
-export default {
-  name: 'TermsOfService',
-  emits: ['terms-accepted', 'go-back'],
-  data() {
-    return {
-      acknowledged: false
-    }
-  },
-  methods: {
-    getIconStyle(index) {
-      // Use index to create deterministic but varied positions
-      const seed = index * 137.508 // Golden angle for good distribution
+  export default {
+    name: 'TermsOfService',
+    emits: ['terms-accepted', 'go-back'],
+    data() {
       return {
-        left: ((seed * 7) % 100) + '%',
-        top: ((seed * 11) % 100) + '%',
-        animationDelay: ((seed * 3) % 3) + 's',
-        animationDuration: ((seed * 2) % 3) + 2 + 's',
-        fontSize: ((seed * 5) % 20) + 10 + 'px'
+        acknowledged: false
       }
     },
-    getIconClass(index) {
-      const icons = [
-        'fa-heartbeat',
-        'fa-user-md',
-        'fa-hospital',
-        'fa-stethoscope',
-        'fa-plus'
-      ]
-      return ['fas', icons[index % icons.length]]
-    },
-    acceptTerms() {
-      if (this.acknowledged) {
-        // Store acknowledgment in localStorage with timestamp
-        const acknowledgment = {
-          acknowledged: true,
-          timestamp: new Date().toISOString(),
-          version: '1.3'
+    methods: {
+      getIconStyle(index) {
+        // Use index to create deterministic but varied positions
+        const seed = index * 137.508 // Golden angle for good distribution
+        return {
+          left: ((seed * 7) % 100) + '%',
+          top: ((seed * 11) % 100) + '%',
+          animationDelay: ((seed * 3) % 3) + 's',
+          animationDuration: ((seed * 2) % 3) + 2 + 's',
+          fontSize: ((seed * 5) % 20) + 10 + 'px'
         }
-        localStorage.setItem(
-          'termsOfServiceAcknowledged',
-          JSON.stringify(acknowledgment)
-        )
-
-        // Show success message
-        this.showNotification(
-          'Terms of Service accepted successfully!',
-          'success'
-        )
-
-        // Emit event to parent component (OnboardingFlow)
-        this.$emit('terms-accepted', acknowledgment)
-      }
-    },
-
-    goBack() {
-      // Emit go-back event to parent component
-      this.$emit('go-back')
-    },
-
-    showNotification(message, type = 'info') {
-      // Simple notification system
-      const colors = {
-        success: 'green',
-        error: 'red',
-        info: 'blue'
-      }
-
-      const toast = document.createElement('div')
-      toast.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white font-semibold z-50 bg-${colors[type]}-600 shadow-lg`
-      toast.textContent = message
-      document.body.appendChild(toast)
-
-      setTimeout(() => {
-        if (document.body.contains(toast)) {
-          document.body.removeChild(toast)
-        }
-      }, 5000)
-    },
-
-    checkExistingAcknowledgment() {
-      // Check if user has already acknowledged this version
-      const stored = localStorage.getItem('termsOfServiceAcknowledged')
-      if (stored) {
-        try {
-          const acknowledgment = JSON.parse(stored)
-          if (acknowledgment.version === '1.3' && acknowledgment.acknowledged) {
-            this.acknowledged = true
+      },
+      getIconClass(index) {
+        const icons = ['fa-heartbeat', 'fa-user-md', 'fa-hospital', 'fa-stethoscope', 'fa-plus']
+        return ['fas', icons[index % icons.length]]
+      },
+      acceptTerms() {
+        if (this.acknowledged) {
+          // Store acknowledgment in localStorage with timestamp
+          const acknowledgment = {
+            acknowledged: true,
+            timestamp: new Date().toISOString(),
+            version: '1.3'
           }
-        } catch (e) {
-          // Invalid stored data, ignore
+          localStorage.setItem('termsOfServiceAcknowledged', JSON.stringify(acknowledgment))
+
+          // Show success message
+          this.showNotification('Terms of Service accepted successfully!', 'success')
+
+          // Emit event to parent component (OnboardingFlow)
+          this.$emit('terms-accepted', acknowledgment)
+        }
+      },
+
+      goBack() {
+        // Emit go-back event to parent component
+        this.$emit('go-back')
+      },
+
+      showNotification(message, type = 'info') {
+        // Simple notification system
+        const colors = {
+          success: 'green',
+          error: 'red',
+          info: 'blue'
+        }
+
+        const toast = document.createElement('div')
+        toast.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white font-semibold z-50 bg-${colors[type]}-600 shadow-lg`
+        toast.textContent = message
+        document.body.appendChild(toast)
+
+        setTimeout(() => {
+          if (document.body.contains(toast)) {
+            document.body.removeChild(toast)
+          }
+        }, 5000)
+      },
+
+      checkExistingAcknowledgment() {
+        // Check if user has already acknowledged this version
+        const stored = localStorage.getItem('termsOfServiceAcknowledged')
+        if (stored) {
+          try {
+            const acknowledgment = JSON.parse(stored)
+            if (acknowledgment.version === '1.3' && acknowledgment.acknowledged) {
+              this.acknowledged = true
+            }
+          } catch (e) {
+            // Invalid stored data, ignore
+          }
         }
       }
-    }
-  },
-  mounted() {
-    // Add smooth scroll behavior
-    document.documentElement.style.scrollBehavior = 'smooth'
+    },
+    mounted() {
+      // Add smooth scroll behavior
+      document.documentElement.style.scrollBehavior = 'smooth'
 
-    // Check for existing acknowledgment
-    this.checkExistingAcknowledgment()
-  },
-  beforeUnmount() {
-    // Reset scroll behavior
-    document.documentElement.style.scrollBehavior = 'auto'
+      // Check for existing acknowledgment
+      this.checkExistingAcknowledgment()
+    },
+    beforeUnmount() {
+      // Reset scroll behavior
+      document.documentElement.style.scrollBehavior = 'auto'
+    }
   }
-}
 </script>
 
 <style scoped>
-/* Custom font imports */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
+  /* Custom font imports */
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
-/* Apply custom font */
-* {
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    sans-serif;
-}
-
-/* Medical Glass morphism effects */
-.medical-glass-card {
-  background: rgba(59, 130, 246, 0.15);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
-  border: 2px solid rgba(96, 165, 250, 0.3);
-  box-shadow: 0 8px 32px rgba(29, 78, 216, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-
-.medical-card {
-  position: relative;
-  overflow: hidden;
-  background: rgba(59, 130, 246, 0.1);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-}
-
-.medical-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(96, 165, 250, 0.2),
-    transparent
-  );
-  transition: left 0.5s;
-}
-
-.medical-card:hover::before {
-  left: 100%;
-}
-
-/* Animations */
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-20px);
-  }
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-/* Compact hover effects */
-.bg-white:hover {
-  transform: translateY(-2px);
-  transition: transform 0.2s ease;
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(to bottom, #3b82f6, #1d4ed8);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(to bottom, #2563eb, #1e40af);
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-  .lg\:grid-cols-2 {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
+  /* Apply custom font */
+  * {
+    font-family:
+      'Inter',
+      -apple-system,
+      BlinkMacSystemFont,
+      'Segoe UI',
+      Roboto,
+      sans-serif;
   }
 
-  .text-2xl {
-    font-size: 1.5rem;
+  /* Medical Glass morphism effects */
+  .medical-glass-card {
+    background: rgba(59, 130, 246, 0.15);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 2px solid rgba(96, 165, 250, 0.3);
+    box-shadow:
+      0 8px 32px rgba(29, 78, 216, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
 
-  .text-xl {
-    font-size: 1.125rem;
-  }
-}
-
-/* Print styles */
-@media print {
-  .min-h-screen {
-    min-height: auto;
+  .medical-card {
+    position: relative;
+    overflow: hidden;
+    background: rgba(59, 130, 246, 0.1);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
   }
 
-  .bg-gradient-to-br,
-  .bg-gradient-to-r {
-    background: white !important;
-    color: black !important;
+  .medical-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.2), transparent);
+    transition: left 0.5s;
   }
 
-  .shadow-xl,
-  .shadow-lg {
-    box-shadow: none !important;
+  .medical-card:hover::before {
+    left: 100%;
   }
 
-  .rounded-2xl,
-  .rounded-xl {
-    border-radius: 8px !important;
+  /* Animations */
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
   }
-}
 
-/* Accessibility improvements */
-@media (prefers-reduced-motion: reduce) {
-  .transform:hover {
-    transform: none;
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
   }
-}
 
-/* Focus styles for accessibility */
-button:focus,
-a:focus {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
-}
+  /* Compact hover effects */
+  .bg-white:hover {
+    transform: translateY(-2px);
+    transition: transform 0.2s ease;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, #3b82f6, #1d4ed8);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to bottom, #2563eb, #1e40af);
+  }
+
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .lg\:grid-cols-2 {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+
+    .text-2xl {
+      font-size: 1.5rem;
+    }
+
+    .text-xl {
+      font-size: 1.125rem;
+    }
+  }
+
+  /* Print styles */
+  @media print {
+    .min-h-screen {
+      min-height: auto;
+    }
+
+    .bg-gradient-to-br,
+    .bg-gradient-to-r {
+      background: white !important;
+      color: black !important;
+    }
+
+    .shadow-xl,
+    .shadow-lg {
+      box-shadow: none !important;
+    }
+
+    .rounded-2xl,
+    .rounded-xl {
+      border-radius: 8px !important;
+    }
+  }
+
+  /* Accessibility improvements */
+  @media (prefers-reduced-motion: reduce) {
+    .transform:hover {
+      transform: none;
+    }
+  }
+
+  /* Focus styles for accessibility */
+  button:focus,
+  a:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
 </style>
 "

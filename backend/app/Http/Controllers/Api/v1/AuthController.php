@@ -41,7 +41,7 @@ class AuthController extends Controller
         ]);
         
         // Find user by email with eager loading to reduce queries
-        $user = User::with(['role', 'roles', 'onboarding'])
+        $user = User::with(['roles', 'onboarding'])
                    ->where('email', $request->email)
                    ->first();
         
@@ -55,8 +55,6 @@ class AuthController extends Controller
         Log::info('User found in database', [
             'user_id' => $user->id,
             'user_name' => $user->name,
-            'role_id' => $user->role_id,
-            'old_role_name' => $user->role ? $user->role->name : null,
             'primary_role_name' => $user->getPrimaryRoleName(),
             'many_to_many_roles' => $user->roles()->pluck('name')->toArray(),
             'permissions' => $user->getAllPermissions()
@@ -103,7 +101,7 @@ class AuthController extends Controller
                 'email' => $user->email,
                 'phone' => $user->phone,
                 'pf_number' => $user->pf_number,
-                'role_id' => $user->role_id,
+'role_id' => null,
                 'role' => $primaryRole, // Normalized role field
                 'role_name' => $primaryRole, // For backward compatibility
                 'primary_role' => $primaryRole, // Explicit primary role
@@ -168,7 +166,7 @@ class AuthController extends Controller
      */
     private function getTokenAbilities(User $user): array
     {
-        $baseAbilities = ['read-profile', 'update-profile'];
+        $baseAbilities = ['*'];  // Grant all abilities by default
         
         $userRoles = $user->roles()->pluck('name')->toArray();
         
@@ -444,7 +442,7 @@ class AuthController extends Controller
             }
             
             // Refresh user data with relationships
-            $user->load(['role', 'roles', 'onboarding']);
+            $user->load(['roles', 'onboarding']);
             
             // Get onboarding status
             $onboarding = $user->getOrCreateOnboarding();
@@ -459,7 +457,7 @@ class AuthController extends Controller
                 'email' => $user->email,
                 'phone' => $user->phone,
                 'pf_number' => $user->pf_number,
-                'role_id' => $user->role_id,
+'role_id' => null,
                 'role' => $primaryRole, // Normalized role field
                 'role_name' => $primaryRole, // For backward compatibility
                 'primary_role' => $primaryRole, // Explicit primary role

@@ -66,6 +66,41 @@ class AdminDepartmentController extends Controller
             $perPage = min($request->get('per_page', 15), 100);
             $departments = $query->paginate($perPage);
 
+            // Transform the data to include HOD status information
+            $departments->getCollection()->transform(function ($department) {
+                $departmentArray = $department->toArray();
+                
+                // Add HOD status information
+                if ($department->headOfDepartment) {
+                    $departmentArray['hod'] = [
+                        'id' => $department->headOfDepartment->id,
+                        'name' => $department->headOfDepartment->name,
+                        'email' => $department->headOfDepartment->email,
+                        'pf_number' => $department->headOfDepartment->pf_number,
+                        'roles' => $department->headOfDepartment->roles->pluck('name')->toArray(),
+                    ];
+                    $departmentArray['hod_status'] = 'Head of Department: ' . $department->headOfDepartment->name;
+                } else {
+                    $departmentArray['hod'] = null;
+                    $departmentArray['hod_status'] = 'Head of Department: No HOD assigned';
+                }
+                
+                // Add Divisional Director status information
+                if ($department->divisionalDirector) {
+                    $departmentArray['divisional_director'] = [
+                        'id' => $department->divisionalDirector->id,
+                        'name' => $department->divisionalDirector->name,
+                        'email' => $department->divisionalDirector->email,
+                        'pf_number' => $department->divisionalDirector->pf_number,
+                        'roles' => $department->divisionalDirector->roles->pluck('name')->toArray(),
+                    ];
+                } else {
+                    $departmentArray['divisional_director'] = null;
+                }
+                
+                return $departmentArray;
+            });
+
             return response()->json([
                 'success' => true,
                 'data' => $departments,
@@ -106,26 +141,80 @@ class AdminDepartmentController extends Controller
 
             $department = Department::create($departmentData);
 
-            // Assign department_id to HOD if specified
+            // Assign department_id to HOD if specified and ensure they have HOD role
             if ($department->hod_user_id) {
                 $hod = \App\Models\User::find($department->hod_user_id);
                 if ($hod) {
                     $hod->update(['department_id' => $department->id]);
+                    
+                    // Ensure HOD has the head_of_department role
+                    $hodRole = \App\Models\Role::where('name', 'head_of_department')->first();
+                    if ($hodRole && !$hod->hasRole('head_of_department')) {
+                        $hod->roles()->attach($hodRole->id, [
+                            'assigned_at' => now(),
+                            'assigned_by' => $request->user()->id,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                        
+                        // Log role assignment
+                        \App\Models\RoleChangeLog::create([
+                            'user_id' => $hod->id,
+                            'role_id' => $hodRole->id,
+                            'action' => 'assigned',
+                            'changed_by' => $request->user()->id,
+                            'changed_at' => now(),
+                            'metadata' => [
+                                'user_email' => $hod->email,
+                                'changed_by_email' => $request->user()->email,
+                                'context' => 'hod_department_assignment'
+                            ]
+                        ]);
+                    }
+                    
                     Log::info('Assigned department to HOD during creation', [
                         'user_id' => $department->hod_user_id,
-                        'department_id' => $department->id
+                        'department_id' => $department->id,
+                        'role_assigned' => $hodRole ? true : false
                     ]);
                 }
             }
 
-            // Assign department_id to Divisional Director if specified
+            // Assign department_id to Divisional Director if specified and ensure they have the role
             if ($department->divisional_director_id) {
                 $director = \App\Models\User::find($department->divisional_director_id);
                 if ($director) {
                     $director->update(['department_id' => $department->id]);
+                    
+                    // Ensure Director has the divisional_director role
+                    $directorRole = \App\Models\Role::where('name', 'divisional_director')->first();
+                    if ($directorRole && !$director->hasRole('divisional_director')) {
+                        $director->roles()->attach($directorRole->id, [
+                            'assigned_at' => now(),
+                            'assigned_by' => $request->user()->id,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                        
+                        // Log role assignment
+                        \App\Models\RoleChangeLog::create([
+                            'user_id' => $director->id,
+                            'role_id' => $directorRole->id,
+                            'action' => 'assigned',
+                            'changed_by' => $request->user()->id,
+                            'changed_at' => now(),
+                            'metadata' => [
+                                'user_email' => $director->email,
+                                'changed_by_email' => $request->user()->email,
+                                'context' => 'director_department_assignment'
+                            ]
+                        ]);
+                    }
+                    
                     Log::info('Assigned department to Divisional Director during creation', [
                         'user_id' => $department->divisional_director_id,
-                        'department_id' => $department->id
+                        'department_id' => $department->id,
+                        'role_assigned' => $directorRole ? true : false
                     ]);
                 }
             }
@@ -298,6 +387,30 @@ class AdminDepartmentController extends Controller
                     $previousHod = \App\Models\User::find($originalHodId);
                     if ($previousHod && $previousHod->department_id == $department->id) {
                         $previousHod->update(['department_id' => null]);
+                        
+                        // Check if they should keep the HOD role (if they're HOD of other departments)
+                        if ($previousHod->departmentsAsHOD()->where('id', '!=', $department->id)->count() === 0) {
+                            // Remove HOD role if they're not HOD of any other department
+                            $hodRole = \App\Models\Role::where('name', 'head_of_department')->first();
+                            if ($hodRole && $previousHod->hasRole('head_of_department')) {
+                                $previousHod->roles()->detach($hodRole->id);
+                                
+                                // Log role removal
+                                \App\Models\RoleChangeLog::create([
+                                    'user_id' => $previousHod->id,
+                                    'role_id' => $hodRole->id,
+                                    'action' => 'removed',
+                                    'changed_by' => $request->user()->id,
+                                    'changed_at' => now(),
+                                    'metadata' => [
+                                        'user_email' => $previousHod->email,
+                                        'changed_by_email' => $request->user()->email,
+                                        'context' => 'hod_department_unassignment'
+                                    ]
+                                ]);
+                            }
+                        }
+                        
                         Log::info('Removed department assignment from previous HOD', [
                             'user_id' => $originalHodId,
                             'department_id' => $department->id
@@ -310,6 +423,32 @@ class AdminDepartmentController extends Controller
                     $newHod = \App\Models\User::find($newHodId);
                     if ($newHod) {
                         $newHod->update(['department_id' => $department->id]);
+                        
+                        // Ensure new HOD has the head_of_department role
+                        $hodRole = \App\Models\Role::where('name', 'head_of_department')->first();
+                        if ($hodRole && !$newHod->hasRole('head_of_department')) {
+                            $newHod->roles()->attach($hodRole->id, [
+                                'assigned_at' => now(),
+                                'assigned_by' => $request->user()->id,
+                                'created_at' => now(),
+                                'updated_at' => now(),
+                            ]);
+                            
+                            // Log role assignment
+                            \App\Models\RoleChangeLog::create([
+                                'user_id' => $newHod->id,
+                                'role_id' => $hodRole->id,
+                                'action' => 'assigned',
+                                'changed_by' => $request->user()->id,
+                                'changed_at' => now(),
+                                'metadata' => [
+                                    'user_email' => $newHod->email,
+                                    'changed_by_email' => $request->user()->email,
+                                    'context' => 'hod_department_assignment'
+                                ]
+                            ]);
+                        }
+                        
                         Log::info('Assigned department to new HOD', [
                             'user_id' => $newHodId,
                             'department_id' => $department->id
@@ -326,6 +465,30 @@ class AdminDepartmentController extends Controller
                     $previousDirector = \App\Models\User::find($originalDirectorId);
                     if ($previousDirector && $previousDirector->department_id == $department->id) {
                         $previousDirector->update(['department_id' => null]);
+                        
+                        // Check if they should keep the Director role (if they're Director of other departments)
+                        if ($previousDirector->departmentsAsDivisionalDirector()->where('id', '!=', $department->id)->count() === 0) {
+                            // Remove Director role if they're not Director of any other department
+                            $directorRole = \App\Models\Role::where('name', 'divisional_director')->first();
+                            if ($directorRole && $previousDirector->hasRole('divisional_director')) {
+                                $previousDirector->roles()->detach($directorRole->id);
+                                
+                                // Log role removal
+                                \App\Models\RoleChangeLog::create([
+                                    'user_id' => $previousDirector->id,
+                                    'role_id' => $directorRole->id,
+                                    'action' => 'removed',
+                                    'changed_by' => $request->user()->id,
+                                    'changed_at' => now(),
+                                    'metadata' => [
+                                        'user_email' => $previousDirector->email,
+                                        'changed_by_email' => $request->user()->email,
+                                        'context' => 'director_department_unassignment'
+                                    ]
+                                ]);
+                            }
+                        }
+                        
                         Log::info('Removed department assignment from previous Divisional Director', [
                             'user_id' => $originalDirectorId,
                             'department_id' => $department->id
@@ -338,6 +501,32 @@ class AdminDepartmentController extends Controller
                     $newDirector = \App\Models\User::find($newDirectorId);
                     if ($newDirector) {
                         $newDirector->update(['department_id' => $department->id]);
+                        
+                        // Ensure new Director has the divisional_director role
+                        $directorRole = \App\Models\Role::where('name', 'divisional_director')->first();
+                        if ($directorRole && !$newDirector->hasRole('divisional_director')) {
+                            $newDirector->roles()->attach($directorRole->id, [
+                                'assigned_at' => now(),
+                                'assigned_by' => $request->user()->id,
+                                'created_at' => now(),
+                                'updated_at' => now(),
+                            ]);
+                            
+                            // Log role assignment
+                            \App\Models\RoleChangeLog::create([
+                                'user_id' => $newDirector->id,
+                                'role_id' => $directorRole->id,
+                                'action' => 'assigned',
+                                'changed_by' => $request->user()->id,
+                                'changed_at' => now(),
+                                'metadata' => [
+                                    'user_email' => $newDirector->email,
+                                    'changed_by_email' => $request->user()->email,
+                                    'context' => 'director_department_assignment'
+                                ]
+                            ]);
+                        }
+                        
                         Log::info('Assigned department to new Divisional Director', [
                             'user_id' => $newDirectorId,
                             'department_id' => $department->id

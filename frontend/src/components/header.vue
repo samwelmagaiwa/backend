@@ -16,9 +16,7 @@
             />
           </div>
           <div>
-            <h1 class="text-lg font-bold text-white tracking-wide">
-              Muhimbili National Hospital
-            </h1>
+            <h1 class="text-lg font-bold text-white tracking-wide">Muhimbili National Hospital</h1>
             <p class="text-xs text-blue-200">ICT Access Management System</p>
           </div>
         </div>
@@ -40,9 +38,7 @@
               <div
                 class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-full"
               ></div>
-              <i
-                class="fas fa-user text-white text-sm relative z-10 drop-shadow-lg"
-              ></i>
+              <i class="fas fa-user text-white text-sm relative z-10 drop-shadow-lg"></i>
               <!-- Online Status Indicator -->
               <div
                 class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-400 rounded-full border border-white"
@@ -87,7 +83,13 @@
                   0 4px 6px -1px rgba(59, 130, 246, 0.2),
                   inset 0 1px 0 rgba(255, 255, 255, 0.8),
                   inset 0 -1px 0 rgba(59, 130, 246, 0.1);
-                border-image: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(147, 197, 253, 0.6), rgba(59, 130, 246, 0.8)) 1;
+                border-image: linear-gradient(
+                    135deg,
+                    rgba(59, 130, 246, 0.8),
+                    rgba(147, 197, 253, 0.6),
+                    rgba(59, 130, 246, 0.8)
+                  )
+                  1;
               "
             >
               <!-- User Info Header -->
@@ -102,9 +104,15 @@
                 "
               >
                 <!-- Multi-layer background effects -->
-                <div class="absolute inset-0 bg-gradient-to-br from-blue-500/20 via-transparent to-blue-900/20"></div>
-                <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
-                <div class="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-300/50 to-transparent"></div>
+                <div
+                  class="absolute inset-0 bg-gradient-to-br from-blue-500/20 via-transparent to-blue-900/20"
+                ></div>
+                <div
+                  class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                ></div>
+                <div
+                  class="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-300/50 to-transparent"
+                ></div>
                 <div class="flex items-center space-x-3 relative z-10">
                   <!-- User Avatar Large -->
                   <div
@@ -121,9 +129,7 @@
                     <div
                       class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-full"
                     ></div>
-                    <i
-                      class="fas fa-user text-white text-lg relative z-10 drop-shadow-lg"
-                    ></i>
+                    <i class="fas fa-user text-white text-lg relative z-10 drop-shadow-lg"></i>
                     <!-- Online Status -->
                     <div
                       class="absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white animate-pulse"
@@ -148,7 +154,9 @@
                           border: 1px solid rgba(147, 197, 253, 0.5);
                         "
                       >
-                        <div class="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-blue-600/20"></div>
+                        <div
+                          class="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-blue-600/20"
+                        ></div>
                         <div class="relative z-10">
                           <i class="fas fa-id-badge mr-1"></i>
                           {{ formatRole(safeCurrentUser.role || safeCurrentUser.role_name) }}
@@ -232,10 +240,14 @@
                 </button>
 
                 <!-- Debug Info (Temporary - Remove after testing) -->
-                <div v-if="isDevelopment" class="px-4 py-2 text-xs text-gray-500 border-t border-gray-200">
-                  Debug: Role = "{{ safeCurrentUser.role || safeCurrentUser.role_name || 'undefined' }}" |
-                  Roles = {{ safeCurrentUser.roles || '[]' }} |
-                  Is Admin = {{ isAdmin ? 'YES' : 'NO' }}
+                <div
+                  v-if="isDevelopment"
+                  class="px-4 py-2 text-xs text-gray-500 border-t border-gray-200"
+                >
+                  Debug: Role = "{{
+                    safeCurrentUser.role || safeCurrentUser.role_name || 'undefined'
+                  }}" | Roles = {{ safeCurrentUser.roles || '[]' }} | Is Admin =
+                  {{ isAdmin ? 'YES' : 'NO' }}
                 </div>
 
                 <!-- Divider -->
@@ -305,7 +317,9 @@
         class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all duration-300 scale-100 overflow-hidden"
       >
         <!-- Header -->
-        <div class="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 p-6 text-center shadow-lg">
+        <div
+          class="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 p-6 text-center shadow-lg"
+        >
           <div
             class="w-16 h-16 bg-blue-500/30 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm border border-blue-300/40 shadow-lg"
           >
@@ -317,7 +331,9 @@
         <!-- Body -->
         <div class="p-6">
           <div class="space-y-4">
-            <div class="flex items-center p-3 bg-blue-50 rounded-lg shadow-sm border border-blue-100">
+            <div
+              class="flex items-center p-3 bg-blue-50 rounded-lg shadow-sm border border-blue-100"
+            >
               <div
                 class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3 shadow-md"
               >
@@ -329,7 +345,9 @@
               </div>
             </div>
 
-            <div class="flex items-center p-3 bg-blue-50 rounded-lg shadow-sm border border-blue-100">
+            <div
+              class="flex items-center p-3 bg-blue-50 rounded-lg shadow-sm border border-blue-100"
+            >
               <div
                 class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3 shadow-md"
               >
@@ -341,7 +359,9 @@
               </div>
             </div>
 
-            <div class="flex items-center p-3 bg-blue-50 rounded-lg shadow-sm border border-blue-100">
+            <div
+              class="flex items-center p-3 bg-blue-50 rounded-lg shadow-sm border border-blue-100"
+            >
               <div
                 class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3 shadow-md"
               >
@@ -370,56 +390,67 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useAuth } from '@/composables/useAuth'
-import { useRouter } from 'vue-router'
-import { logoutGuard } from '@/utils/logoutGuard'
+  import { ref, computed, onMounted, onUnmounted } from 'vue'
+  import { useAuth } from '@/composables/useAuth'
+  import { useRouter } from 'vue-router'
+  import { logoutGuard } from '@/utils/logoutGuard'
 
-export default {
-  name: 'HeaderComponent',
-  setup() {
-    const { user: currentUser, logout: authLogout } = useAuth()
-    const router = useRouter()
+  export default {
+    name: 'HeaderComponent',
+    setup() {
+      const { user: currentUser, logout: authLogout } = useAuth()
+      const router = useRouter()
 
-    // Reactive state
-    const showProfileDropdown = ref(false)
-    const showHelpModal = ref(false)
-    const profileDropdown = ref(null)
+      // Reactive state
+      const showProfileDropdown = ref(false)
+      const showHelpModal = ref(false)
+      const profileDropdown = ref(null)
 
-    // Environment check using Vue CLI's process.env - safely handle undefined
-    const isDevelopment = computed(() => {
-      try {
-        return process.env.NODE_ENV === 'development'
-      } catch (error) {
-        console.warn('Error accessing NODE_ENV:', error)
-        return false
-      }
-    })
+      // Environment check using Vue CLI's process.env - safely handle undefined
+      const isDevelopment = computed(() => {
+        try {
+          return process.env.NODE_ENV === 'development'
+        } catch (error) {
+          console.warn('Error accessing NODE_ENV:', error)
+          return false
+        }
+      })
 
-    // Enhanced admin check to handle multiple role sources - safely handle undefined
-    const isAdmin = computed(() => {
-      try {
-        // Safely access currentUser with null checks
-        const user = currentUser?.value
-        if (!user || typeof user !== 'object') return false
+      // Enhanced admin check to handle multiple role sources - safely handle undefined
+      const isAdmin = computed(() => {
+        try {
+          // Safely access currentUser with null checks
+          const user = currentUser?.value
+          if (!user || typeof user !== 'object') return false
 
-        // Check multiple possible role sources with safe access
-        const role = user.role || user.role_name || user.primary_role || null
-        const roles = Array.isArray(user.roles) ? user.roles : []
+          // Check multiple possible role sources with safe access
+          const role = user.role || user.role_name || user.primary_role || null
+          const roles = Array.isArray(user.roles) ? user.roles : []
 
-        // Check if user is admin via role field or roles array
-        return role === 'admin' || roles.includes('admin')
-      } catch (error) {
-        console.warn('Error in isAdmin computed:', error)
-        return false
-      }
-    })
+          // Check if user is admin via role field or roles array
+          return role === 'admin' || roles.includes('admin')
+        } catch (error) {
+          console.warn('Error in isAdmin computed:', error)
+          return false
+        }
+      })
 
-    // Safe current user computed property with fallbacks
-    const safeCurrentUser = computed(() => {
-      try {
-        const user = currentUser?.value
-        if (!user || typeof user !== 'object') {
+      // Safe current user computed property with fallbacks
+      const safeCurrentUser = computed(() => {
+        try {
+          const user = currentUser?.value
+          if (!user || typeof user !== 'object') {
+            return {
+              name: 'User',
+              email: 'user@example.com',
+              role: null,
+              role_name: null,
+              roles: []
+            }
+          }
+          return user
+        } catch (error) {
+          console.warn('Error accessing currentUser:', error)
           return {
             name: 'User',
             email: 'user@example.com',
@@ -428,244 +459,234 @@ export default {
             roles: []
           }
         }
-        return user
-      } catch (error) {
-        console.warn('Error accessing currentUser:', error)
-        return {
-          name: 'User',
-          email: 'user@example.com',
-          role: null,
-          role_name: null,
-          roles: []
+      })
+
+      // Methods
+      const toggleProfileDropdown = () => {
+        showProfileDropdown.value = !showProfileDropdown.value
+      }
+
+      const closeProfileDropdown = () => {
+        showProfileDropdown.value = false
+      }
+
+      const formatRole = (role) => {
+        if (!role) return 'User'
+
+        const roleMap = {
+          admin: 'Administrator',
+          ict_officer: 'ICT Officer',
+          head_of_department: 'Head of Department',
+
+          divisional_director: 'Divisional Director',
+          ict_director: 'ICT Director',
+          staff: 'Staff Member'
         }
-      }
-    })
 
-    // Methods
-    const toggleProfileDropdown = () => {
-      showProfileDropdown.value = !showProfileDropdown.value
-    }
-
-    const closeProfileDropdown = () => {
-      showProfileDropdown.value = false
-    }
-
-    const formatRole = (role) => {
-      if (!role) return 'User'
-
-      const roleMap = {
-        admin: 'Administrator',
-        ict_officer: 'ICT Officer',
-        head_of_department: 'Head of Department',
-
-        divisional_director: 'Divisional Director',
-        ict_director: 'ICT Director',
-        staff: 'Staff Member'
+        return roleMap[role] || role.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())
       }
 
-      return roleMap[role] || role.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
-    }
+      const goToDashboard = () => {
+        closeProfileDropdown()
 
-    const goToDashboard = () => {
-      closeProfileDropdown()
+        try {
+          // Navigate to appropriate dashboard based on user role - safely access user data
+          const user = safeCurrentUser.value
+          const userRole = user?.role || user?.role_name || user?.primary_role
 
-      try {
-        // Navigate to appropriate dashboard based on user role - safely access user data
-        const user = safeCurrentUser.value
-        const userRole = user?.role || user?.role_name || user?.primary_role
-
-        if (userRole) {
-          switch (userRole) {
-            case 'admin':
-              router.push('/admin-dashboard')
-              break
-            case 'ict_officer':
-              router.push('/ict-dashboard')
-              break
-            case 'head_of_department':
-              router.push('/hod-dashboard')
-              break
-            case 'divisional_director':
-              router.push('/divisional-dashboard')
-              break
-            case 'ict_director':
-              router.push('/dict-dashboard')
-              break
-            case 'staff':
-              router.push('/user-dashboard')
-              break
-            default:
-              router.push('/user-dashboard')
+          if (userRole) {
+            switch (userRole) {
+              case 'admin':
+                router.push('/admin-dashboard')
+                break
+              case 'ict_officer':
+                router.push('/ict-dashboard')
+                break
+              case 'head_of_department':
+                router.push('/hod-dashboard')
+                break
+              case 'divisional_director':
+                router.push('/divisional-dashboard')
+                break
+              case 'ict_director':
+                router.push('/dict-dashboard')
+                break
+              case 'staff':
+                router.push('/user-dashboard')
+                break
+              default:
+                router.push('/user-dashboard')
+            }
+          } else {
+            router.push('/user-dashboard')
           }
-        } else {
+        } catch (error) {
+          console.warn('Error in goToDashboard:', error)
           router.push('/user-dashboard')
         }
-      } catch (error) {
-        console.warn('Error in goToDashboard:', error)
-        router.push('/user-dashboard')
       }
-    }
 
-    const goToProfile = () => {
-      closeProfileDropdown()
-      router.push('/profile')
-    }
-
-    const openOnboardingReset = () => {
-      closeProfileDropdown()
-      router.push('/admin/onboarding-reset')
-    }
-
-    const showHelp = () => {
-      closeProfileDropdown()
-      showHelpModal.value = true
-    }
-
-    const logout = async() => {
-      closeProfileDropdown()
-
-      try {
-        await logoutGuard.executeLogout(async() => {
-          await authLogout()
-        })
-        router.push('/login')
-      } catch (error) {
-        console.error('Logout error:', error)
-        // Force redirect to login even if logout fails
-        router.push('/login')
-      }
-    }
-
-    // Click outside to close dropdown
-    const handleClickOutside = (event) => {
-      if (profileDropdown.value && !profileDropdown.value.contains(event.target)) {
+      const goToProfile = () => {
         closeProfileDropdown()
+        router.push('/profile')
       }
-    }
 
-    // Lifecycle
-    onMounted(() => {
-      document.addEventListener('click', handleClickOutside)
-    })
+      const openOnboardingReset = () => {
+        closeProfileDropdown()
+        router.push('/admin/onboarding-reset')
+      }
 
-    onUnmounted(() => {
-      document.removeEventListener('click', handleClickOutside)
-    })
+      const showHelp = () => {
+        closeProfileDropdown()
+        showHelpModal.value = true
+      }
 
-    return {
-      currentUser,
-      safeCurrentUser,
-      showProfileDropdown,
-      showHelpModal,
-      profileDropdown,
-      isDevelopment,
-      isAdmin,
-      toggleProfileDropdown,
-      closeProfileDropdown,
-      formatRole,
-      goToDashboard,
-      goToProfile,
-      openOnboardingReset,
-      showHelp,
-      logout
+      const logout = async () => {
+        closeProfileDropdown()
+
+        try {
+          await logoutGuard.executeLogout(async () => {
+            await authLogout()
+          })
+          router.push('/login')
+        } catch (error) {
+          console.error('Logout error:', error)
+          // Force redirect to login even if logout fails
+          router.push('/login')
+        }
+      }
+
+      // Click outside to close dropdown
+      const handleClickOutside = (event) => {
+        if (profileDropdown.value && !profileDropdown.value.contains(event.target)) {
+          closeProfileDropdown()
+        }
+      }
+
+      // Lifecycle
+      onMounted(() => {
+        document.addEventListener('click', handleClickOutside)
+      })
+
+      onUnmounted(() => {
+        document.removeEventListener('click', handleClickOutside)
+      })
+
+      return {
+        currentUser,
+        safeCurrentUser,
+        showProfileDropdown,
+        showHelpModal,
+        profileDropdown,
+        isDevelopment,
+        isAdmin,
+        toggleProfileDropdown,
+        closeProfileDropdown,
+        formatRole,
+        goToDashboard,
+        goToProfile,
+        openOnboardingReset,
+        showHelp,
+        logout
+      }
     }
   }
-}
 </script>
 
 <style scoped>
-/* Header specific styles */
-header {
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  position: relative;
-  z-index: 50;
-}
-
-/* Profile dropdown specific z-index */
-.profile-dropdown {
-  z-index: 9999 !important;
-  position: absolute !important;
-  top: 100% !important;
-  right: 0 !important;
-}
-
-/* Ensure dropdown container has proper stacking context */
-.relative {
-  position: relative;
-  z-index: 100;
-}
-
-/* Button hover effects */
-button:hover {
-  transform: translateY(-1px);
-}
-
-/* Dropdown shadow */
-.shadow-2xl {
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .w-72 {
-    width: calc(100vw - 2rem);
-    max-width: 20rem;
+  /* Header specific styles */
+  header {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    position: relative;
+    z-index: 50;
   }
 
-  .flex.justify-between {
-    flex-direction: column;
-    gap: 0.5rem;
+  /* Profile dropdown specific z-index */
+  .profile-dropdown {
+    z-index: 9999 !important;
+    position: absolute !important;
+    top: 100% !important;
+    right: 0 !important;
   }
 
+  /* Ensure dropdown container has proper stacking context */
   .relative {
-    position: static;
+    position: relative;
+    z-index: 100;
   }
 
-  .absolute.right-0 {
-    position: fixed;
-    right: 1rem;
-    left: 1rem;
-    width: auto;
+  /* Button hover effects */
+  button:hover {
+    transform: translateY(-1px);
   }
-}
 
-/* Animation improvements */
-.transition-all {
-  transition: all 0.3s ease;
-}
-
-/* Profile button active state */
-.focus\:ring-2:focus {
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
-}
-
-/* Dropdown item hover effects */
-.hover\:bg-blue-50:hover {
-  background-color: rgba(239, 246, 255, 1);
-}
-
-.hover\:bg-red-50:hover {
-  background-color: rgba(254, 242, 242, 1);
-}
-
-/* Status indicator animation */
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
+  /* Dropdown shadow */
+  .shadow-2xl {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   }
-  50% {
-    opacity: 0.5;
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .w-72 {
+      width: calc(100vw - 2rem);
+      max-width: 20rem;
+    }
+
+    .flex.justify-between {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .relative {
+      position: static;
+    }
+
+    .absolute.right-0 {
+      position: fixed;
+      right: 1rem;
+      left: 1rem;
+      width: auto;
+    }
   }
-}
 
-.animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
+  /* Animation improvements */
+  .transition-all {
+    transition: all 0.3s ease;
+  }
 
-/* Global override for dropdown visibility */
-:deep(.profile-dropdown) {
-  z-index: 9999 !important;
-  position: absolute !important;
-}
+  /* Profile button active state */
+  .focus\:ring-2:focus {
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+  }
+
+  /* Dropdown item hover effects */
+  .hover\:bg-blue-50:hover {
+    background-color: rgba(239, 246, 255, 1);
+  }
+
+  .hover\:bg-red-50:hover {
+    background-color: rgba(254, 242, 242, 1);
+  }
+
+  /* Status indicator animation */
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  .animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* Global override for dropdown visibility */
+  :deep(.profile-dropdown) {
+    z-index: 9999 !important;
+    position: absolute !important;
+  }
 </style>

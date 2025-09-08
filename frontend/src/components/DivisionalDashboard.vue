@@ -30,19 +30,15 @@
                 top: Math.random() * 100 + '%',
                 animationDelay: Math.random() * 3 + 's',
                 animationDuration: Math.random() * 3 + 2 + 's',
-                fontSize: Math.random() * 20 + 10 + 'px',
+                fontSize: Math.random() * 20 + 10 + 'px'
               }"
             >
               <i
                 :class="[
                   'fas',
-                  [
-                    'fa-heartbeat',
-                    'fa-user-md',
-                    'fa-hospital',
-                    'fa-stethoscope',
-                    'fa-plus',
-                  ][Math.floor(Math.random() * 5)],
+                  ['fa-heartbeat', 'fa-user-md', 'fa-hospital', 'fa-stethoscope', 'fa-plus'][
+                    Math.floor(Math.random() * 5)
+                  ]
                 ]"
               ></i>
             </div>
@@ -51,9 +47,7 @@
 
         <div class="max-w-full mx-auto relative z-10">
           <!-- Header Section -->
-          <div
-            class="medical-glass-card rounded-t-3xl p-4 mb-0 border-b border-blue-300/30"
-          >
+          <div class="medical-glass-card rounded-t-3xl p-4 mb-0 border-b border-blue-300/30">
             <div class="text-center">
               <h2
                 class="text-xl font-bold text-blue-100 tracking-wide drop-shadow-md animate-fade-in-delay"
@@ -76,13 +70,9 @@
                     >
                       <i class="fas fa-file-alt text-white text-xl"></i>
                     </div>
-                    <h3 class="text-lg font-semibold text-white drop-shadow-md">
-                      TOTAL FORMS
-                    </h3>
+                    <h3 class="text-lg font-semibold text-white drop-shadow-md">TOTAL FORMS</h3>
                   </div>
-                  <p class="text-3xl font-bold text-blue-100 drop-shadow-lg">
-                    1,234
-                  </p>
+                  <p class="text-3xl font-bold text-blue-100 drop-shadow-lg">1,234</p>
                 </div>
 
                 <div
@@ -94,13 +84,9 @@
                     >
                       <i class="fas fa-check-circle text-white text-xl"></i>
                     </div>
-                    <h3 class="text-lg font-semibold text-white drop-shadow-md">
-                      FORMS APPROVED
-                    </h3>
+                    <h3 class="text-lg font-semibold text-white drop-shadow-md">FORMS APPROVED</h3>
                   </div>
-                  <p class="text-3xl font-bold text-blue-100 drop-shadow-lg">
-                    56
-                  </p>
+                  <p class="text-3xl font-bold text-blue-100 drop-shadow-lg">56</p>
                 </div>
 
                 <div
@@ -116,9 +102,7 @@
                       PENDING REQUESTS
                     </h3>
                   </div>
-                  <p class="text-3xl font-bold text-blue-100 drop-shadow-lg">
-                    89
-                  </p>
+                  <p class="text-3xl font-bold text-blue-100 drop-shadow-lg">89</p>
                 </div>
 
                 <div
@@ -130,13 +114,9 @@
                     >
                       <i class="fas fa-database text-white text-xl"></i>
                     </div>
-                    <h3 class="text-lg font-semibold text-white drop-shadow-md">
-                      JEEVA REQUESTS
-                    </h3>
+                    <h3 class="text-lg font-semibold text-white drop-shadow-md">JEEVA REQUESTS</h3>
                   </div>
-                  <p class="text-3xl font-bold text-blue-100 drop-shadow-lg">
-                    70
-                  </p>
+                  <p class="text-3xl font-bold text-blue-100 drop-shadow-lg">70</p>
                 </div>
 
                 <div
@@ -152,9 +132,7 @@
                       WELLSOFT REQUESTS
                     </h3>
                   </div>
-                  <p class="text-3xl font-bold text-blue-100 drop-shadow-lg">
-                    89
-                  </p>
+                  <p class="text-3xl font-bold text-blue-100 drop-shadow-lg">89</p>
                 </div>
 
                 <div
@@ -166,13 +144,9 @@
                     >
                       <i class="fas fa-wifi text-white text-xl"></i>
                     </div>
-                    <h3 class="text-lg font-semibold text-white drop-shadow-md">
-                      INTERNET ACCESS
-                    </h3>
+                    <h3 class="text-lg font-semibold text-white drop-shadow-md">INTERNET ACCESS</h3>
                   </div>
-                  <p class="text-3xl font-bold text-blue-100 drop-shadow-lg">
-                    900
-                  </p>
+                  <p class="text-3xl font-bold text-blue-100 drop-shadow-lg">900</p>
                 </div>
               </div>
 
@@ -187,137 +161,133 @@
 </template>
 
 <script>
-import { onMounted } from 'vue'
-import Header from '@/components/header.vue'
-import ModernSidebar from './ModernSidebar.vue'
-import AppFooter from '@/components/footer.vue'
-import { useAuth } from '@/composables/useAuth'
+  import { onMounted } from 'vue'
+  import Header from '@/components/header.vue'
+  import ModernSidebar from './ModernSidebar.vue'
+  import AppFooter from '@/components/footer.vue'
+  import { useAuth } from '@/composables/useAuth'
 
-export default {
-  name: 'DivisionalDashboard',
-  components: {
-    Header,
-    ModernSidebar,
-    AppFooter
-  },
-  setup() {
-    const { userName, ROLES, requireRole } = useAuth()
+  export default {
+    name: 'DivisionalDashboard',
+    components: {
+      Header,
+      ModernSidebar,
+      AppFooter
+    },
+    setup() {
+      const { userName, ROLES, requireRole } = useAuth()
 
-    // Local state
-    // Sidebar state now managed by Pinia - no local state needed
+      // Local state
+      // Sidebar state now managed by Pinia - no local state needed
 
-    // Guard this route - only Divisional Directors can access
-    onMounted(() => {
-      requireRole([ROLES.DIVISIONAL_DIRECTOR])
-    })
+      // Guard this route - only Divisional Directors can access
+      onMounted(() => {
+        requireRole([ROLES.DIVISIONAL_DIRECTOR])
+      })
 
-    return {
-      userName
+      return {
+        userName
+      }
     }
   }
-}
 </script>
 
 <style scoped>
-.text-primary {
-  color: #1e40af;
-}
-
-/* Medical Glass morphism effects */
-.medical-glass-card {
-  background: rgba(59, 130, 246, 0.15);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
-  border: 2px solid rgba(96, 165, 250, 0.3);
-  box-shadow: 0 8px 32px rgba(29, 78, 216, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-
-.medical-card {
-  position: relative;
-  overflow: hidden;
-  background: rgba(59, 130, 246, 0.1);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-}
-
-.medical-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(96, 165, 250, 0.2),
-    transparent
-  );
-  transition: left 0.5s;
-}
-
-.medical-card:hover::before {
-  left: 100%;
-}
-
-/* Animations */
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
+  .text-primary {
+    color: #1e40af;
   }
-  50% {
-    transform: translateY(-20px);
+
+  /* Medical Glass morphism effects */
+  .medical-glass-card {
+    background: rgba(59, 130, 246, 0.15);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 2px solid rgba(96, 165, 250, 0.3);
+    box-shadow:
+      0 8px 32px rgba(29, 78, 216, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
-}
 
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+  .medical-card {
+    position: relative;
+    overflow: hidden;
+    background: rgba(59, 130, 246, 0.1);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  .medical-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.2), transparent);
+    transition: left 0.5s;
   }
-}
 
-@keyframes fade-in-delay {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+  .medical-card:hover::before {
+    left: 100%;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  /* Animations */
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
   }
-}
 
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 
-.animate-fade-in {
-  animation: fade-in 1s ease-out;
-}
+  @keyframes fade-in-delay {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 
-.animate-fade-in-delay {
-  animation: fade-in-delay 1s ease-out 0.3s both;
-}
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
 
-/* Hover effects for cards */
-.hover-card {
-  transition: all 0.3s ease;
-}
+  .animate-fade-in {
+    animation: fade-in 1s ease-out;
+  }
 
-.hover-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
-}
+  .animate-fade-in-delay {
+    animation: fade-in-delay 1s ease-out 0.3s both;
+  }
 
-/* Button hover effects */
-button:hover {
-  transform: translateY(-1px);
-}
+  /* Hover effects for cards */
+  .hover-card {
+    transition: all 0.3s ease;
+  }
+
+  .hover-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+  }
+
+  /* Button hover effects */
+  button:hover {
+    transform: translateY(-1px);
+  }
 </style>

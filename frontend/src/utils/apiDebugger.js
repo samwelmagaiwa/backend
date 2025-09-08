@@ -43,11 +43,12 @@ class ApiDebugger {
    * Check for duplicate requests
    */
   checkForDuplicates(newRequest) {
-    const recentDuplicates = this.requests.filter(req =>
-      req.id !== newRequest.id &&
-      req.method === newRequest.method &&
-      req.url === newRequest.url &&
-      newRequest.timestamp - req.timestamp < this.duplicateThreshold
+    const recentDuplicates = this.requests.filter(
+      (req) =>
+        req.id !== newRequest.id &&
+        req.method === newRequest.method &&
+        req.url === newRequest.url &&
+        newRequest.timestamp - req.timestamp < this.duplicateThreshold
     )
 
     if (recentDuplicates.length > 0) {
@@ -55,7 +56,10 @@ class ApiDebugger {
       console.warn(`Method: ${newRequest.method}`)
       console.warn(`URL: ${newRequest.url}`)
       console.warn(`Count: ${recentDuplicates.length + 1}`)
-      console.warn('Times:', [newRequest, ...recentDuplicates].map(r => r.time))
+      console.warn(
+        'Times:',
+        [newRequest, ...recentDuplicates].map((r) => r.time)
+      )
       console.warn('Stack trace:')
       console.trace()
       console.groupEnd()
@@ -75,8 +79,8 @@ class ApiDebugger {
    * Get recent requests
    */
   getRecentRequests(seconds = 10) {
-    const cutoff = Date.now() - (seconds * 1000)
-    return this.requests.filter(req => req.timestamp > cutoff)
+    const cutoff = Date.now() - seconds * 1000
+    return this.requests.filter((req) => req.timestamp > cutoff)
   }
 
   /**
@@ -87,7 +91,7 @@ class ApiDebugger {
     const groups = {}
 
     // Group by method:url
-    recent.forEach(req => {
+    recent.forEach((req) => {
       const key = `${req.method}:${req.url}`
       if (!groups[key]) {
         groups[key] = []
@@ -114,7 +118,7 @@ class ApiDebugger {
     const methodCounts = {}
     const urlCounts = {}
 
-    recent.forEach(req => {
+    recent.forEach((req) => {
       methodCounts[req.method] = (methodCounts[req.method] || 0) + 1
       urlCounts[req.url] = (urlCounts[req.url] || 0) + 1
     })
@@ -125,7 +129,7 @@ class ApiDebugger {
       totalDuplicates: Object.values(duplicates).reduce((sum, group) => sum + group.length, 0),
       methodCounts,
       urlCounts: Object.entries(urlCounts)
-        .sort(([,a], [,b]) => b - a)
+        .sort(([, a], [, b]) => b - a)
         .slice(0, 10), // Top 10 URLs
       timeRange: `${seconds} seconds`
     }
@@ -153,7 +157,7 @@ class ApiDebugger {
       console.group('🚨 Duplicate Requests')
       Object.entries(duplicates).forEach(([key, requests]) => {
         console.group(`${key} (${requests.length} requests)`)
-        requests.forEach(req => {
+        requests.forEach((req) => {
           console.log(`${req.time} - ${req.id}`)
         })
         console.groupEnd()
@@ -201,14 +205,14 @@ class ApiDebugger {
    */
   monitorEndpoint(endpoint, seconds = 30) {
     const requests = this.getRecentRequests(seconds)
-      .filter(req => req.url.includes(endpoint))
+      .filter((req) => req.url.includes(endpoint))
       .sort((a, b) => b.timestamp - a.timestamp)
 
     console.group(`🔍 Monitoring: ${endpoint}`)
     console.log(`Requests in last ${seconds} seconds: ${requests.length}`)
 
     if (requests.length > 0) {
-      requests.forEach(req => {
+      requests.forEach((req) => {
         console.log(`${req.method} ${req.url} at ${req.time}`)
       })
     } else {

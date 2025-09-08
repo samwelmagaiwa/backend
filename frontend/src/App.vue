@@ -12,11 +12,7 @@
     </div>
 
     <!-- Loading screen during auth initialization -->
-    <AuthLoadingScreen
-      v-if="!isAuthReady"
-      :message="loadingMessage"
-      :progress="loadingProgress"
-    />
+    <AuthLoadingScreen v-if="!isAuthReady" :message="loadingMessage" :progress="loadingProgress" />
 
     <!-- Main content -->
     <main v-else>
@@ -47,126 +43,130 @@
 </template>
 
 <script>
-import { computed, onMounted, ref } from 'vue'
-import { useStore } from 'vuex'
-import AuthLoadingScreen from './components/AuthLoadingScreen.vue'
+  import { computed, onMounted, ref } from 'vue'
+  import AuthLoadingScreen from './components/AuthLoadingScreen.vue'
+  import { useAuthStore } from './stores/auth'
 
-export default {
-  name: 'App',
-  components: {
-    AuthLoadingScreen
-  },
+  export default {
+    name: 'App',
+    components: {
+      AuthLoadingScreen
+    },
 
-  setup() {
-    const store = useStore()
-    const showDebug = ref(false)
-    const authError = ref(null)
+    setup() {
+      const authStore = useAuthStore()
+      const showDebug = ref(false)
 
-    // Computed properties from Vuex store
-    const isAuthReady = computed(() => store.getters['auth/isAuthReady'])
-    const restoringSession = computed(() => store.getters['auth/restoringSession'])
-    const sessionRestored = computed(() => store.getters['auth/sessionRestored'])
-    const isAuthenticated = computed(() => store.getters['auth/isAuthenticated'])
-    const currentUser = computed(() => store.getters['auth/user'])
-    const userRole = computed(() => store.getters['auth/userRole'])
+      // Computed properties from Pinia auth store
+      const isAuthReady = computed(() => authStore.isInitialized)
+      const restoringSession = computed(() => false)
+      const sessionRestored = computed(() => authStore.isInitialized)
+      const isAuthenticated = computed(() => authStore.isAuthenticated)
+      const currentUser = computed(() => authStore.user)
+      const userRole = computed(() => authStore.userRole)
+      const authError = computed(() => authStore.error)
 
-    // Loading message based on current state
-    const loadingMessage = computed(() => {
-      if (restoringSession.value) {
-        return 'Restoring your session...'
-      }
-      if (!sessionRestored.value) {
-        return 'Initializing authentication...'
-      }
-      return 'Preparing application...'
-    })
-
-    // Loading progress based on current state
-    const loadingProgress = computed(() => {
-      if (!sessionRestored.value) {
-        return 30
-      }
-      if (restoringSession.value) {
-        return 60
-      }
-      if (isAuthReady.value) {
-        return 100
-      }
-      return 80
-    })
-
-    // Initialize authentication on app mount
-    onMounted(async() => {
-      console.log('🔄 App: Mounted, auth should already be initialized in main.js')
-
-      // Log current auth state
-      console.log('🔍 App: Current auth state:', {
-        isAuthReady: isAuthReady.value,
-        restoringSession: restoringSession.value,
-        sessionRestored: sessionRestored.value,
-        isAuthenticated: isAuthenticated.value,
-        userRole: userRole.value,
-        userName: currentUser.value?.name
+      // Loading message based on current state
+      const loadingMessage = computed(() => {
+        if (restoringSession.value) {
+          return 'Restoring your session...'
+        }
+        if (!sessionRestored.value) {
+          return 'Initializing authentication...'
+        }
+        return 'Preparing application...'
       })
-    })
 
-    // Clear auth error
-    const clearAuthError = () => {
-      authError.value = null
-    }
+      // Loading progress based on current state
+      const loadingProgress = computed(() => {
+        if (!sessionRestored.value) {
+          return 30
+        }
+        if (restoringSession.value) {
+          return 60
+        }
+        if (isAuthReady.value) {
+          return 100
+        }
+        return 80
+      })
 
-    return {
-      // Debug
-      showDebug,
+      // Initialize authentication on app mount
+      onMounted(async () => {
+        console.log('🔄 App: Mounted, auth should already be initialized in main.js')
 
-      // Auth state
-      isAuthReady,
-      restoringSession,
-      sessionRestored,
-      isAuthenticated,
-      currentUser,
-      userRole,
-      authError,
-      loadingMessage,
-      loadingProgress,
+        // Log current auth state
+        console.log('🔍 App: Current auth state:', {
+          isAuthReady: isAuthReady.value,
+          restoringSession: restoringSession.value,
+          sessionRestored: sessionRestored.value,
+          isAuthenticated: isAuthenticated.value,
+          userRole: userRole.value,
+          userName: currentUser.value?.name
+        })
+      })
 
-      // Methods
-      clearAuthError
+      // Clear auth error
+      const clearAuthError = () => {
+        authStore.clearError()
+      }
+
+      return {
+        // Debug
+        showDebug,
+
+        // Auth state
+        isAuthReady,
+        restoringSession,
+        sessionRestored,
+        isAuthenticated,
+        currentUser,
+        userRole,
+        authError,
+        loadingMessage,
+        loadingProgress,
+
+        // Methods
+        clearAuthError
+      }
     }
   }
-}
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
-  min-height: 100vh;
-}
+  #app {
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: #2c3e50;
+    min-height: 100vh;
+  }
 
-main {
-  min-height: 100vh;
-}
+  main {
+    min-height: 100vh;
+  }
 
-/* Global styles */
-* {
-  box-sizing: border-box;
-}
+  /* Global styles */
+  * {
+    box-sizing: border-box;
+  }
 
-body {
-  margin: 0;
-  padding: 0;
-}
+  body {
+    margin: 0;
+    padding: 0;
+  }
 
-/* Loading animation */
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
+  /* Loading animation */
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
 
-.animate-spin {
-  animation: spin 1s linear infinite;
-}
+  .animate-spin {
+    animation: spin 1s linear infinite;
+  }
 </style>

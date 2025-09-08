@@ -67,7 +67,7 @@ class RequestDeduplicator {
     }
 
     const requestPromise = requestFn()
-      .then(response => {
+      .then((response) => {
         // Cache successful GET responses
         if (key.startsWith('GET:')) {
           this.requestCache.set(key, {
@@ -77,7 +77,7 @@ class RequestDeduplicator {
         }
         return response
       })
-      .catch(error => {
+      .catch((error) => {
         // Don't cache errors
         throw error
       })

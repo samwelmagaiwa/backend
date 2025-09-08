@@ -1,25 +1,17 @@
 <template>
-  <div
-    class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden"
-  >
+  <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
     <!-- Enhanced Header -->
-    <div
-      class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200"
-    >
+    <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
       <div class="flex items-center justify-between">
         <div class="flex items-center">
-          <div
-            class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center mr-3"
-          >
+          <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center mr-3">
             <i class="fas fa-table text-indigo-600"></i>
           </div>
           <div>
             <h3 class="text-lg font-bold text-gray-900">
               <slot name="title">{{ title }}</slot>
             </h3>
-            <p class="text-sm text-gray-600" v-if="total">
-              {{ total }} total records
-            </p>
+            <p class="text-sm text-gray-600" v-if="total">{{ total }} total records</p>
           </div>
         </div>
         <div class="flex items-center space-x-4">
@@ -73,15 +65,11 @@
           <tr v-else-if="!rows || rows.length === 0">
             <td :colspan="columns.length" class="px-6 py-12 text-center">
               <div class="flex flex-col items-center">
-                <div
-                  class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-3"
-                >
+                <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-3">
                   <i class="fas fa-inbox text-gray-400 text-xl"></i>
                 </div>
                 <p class="text-gray-500 font-medium">No records found</p>
-                <p class="text-gray-400 text-sm">
-                  Try adjusting your search criteria
-                </p>
+                <p class="text-gray-400 text-sm">Try adjusting your search criteria</p>
               </div>
             </td>
           </tr>
@@ -103,16 +91,14 @@
                     'inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold',
                     row.status === 'Active'
                       ? 'bg-green-100 text-green-800 border border-green-200'
-                      : 'bg-red-100 text-red-800 border border-red-200',
+                      : 'bg-red-100 text-red-800 border border-red-200'
                   ]"
                 >
                   <span
                     class="w-2 h-2 rounded-full mr-2"
-                    :class="
-                      row.status === 'Active' ? 'bg-green-500' : 'bg-red-500'
-                    "
+                    :class="row.status === 'Active' ? 'bg-green-500' : 'bg-red-500'"
                   ></span>
-                  {{ row.status || "Inactive" }}
+                  {{ row.status || 'Inactive' }}
                 </span>
               </template>
               <template v-else>
@@ -128,9 +114,7 @@
 
     <!-- Enhanced Pagination -->
     <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
-      <div
-        class="flex flex-col sm:flex-row items-center justify-between space-y-3 sm:space-y-0"
-      >
+      <div class="flex flex-col sm:flex-row items-center justify-between space-y-3 sm:space-y-0">
         <div class="flex items-center space-x-4">
           <div class="text-sm text-gray-700">
             Showing <span class="font-semibold">{{ pageStart + 1 }}</span> -
@@ -179,85 +163,83 @@
 </template>
 
 <script>
-export default {
-  name: 'DataTable',
-  props: {
-    title: { type: String, default: '' },
-    columns: { type: Array, required: true },
-    rows: { type: Array, default: () => [] },
-    loading: { type: Boolean, default: false },
-    total: { type: Number, default: 0 },
-    page: { type: Number, default: 1 },
-    perPage: { type: Number, default: 10 }
-  },
-  data() {
-    return {
-      pageLocal: this.page,
-      perPageLocal: this.perPage
-    }
-  },
-  computed: {
-    pageStart() {
-      return (this.pageLocal - 1) * this.perPageLocal
+  export default {
+    name: 'DataTable',
+    props: {
+      title: { type: String, default: '' },
+      columns: { type: Array, required: true },
+      rows: { type: Array, default: () => [] },
+      loading: { type: Boolean, default: false },
+      total: { type: Number, default: 0 },
+      page: { type: Number, default: 1 },
+      perPage: { type: Number, default: 10 }
     },
-    pageEnd() {
-      return this.pageStart + this.perPageLocal
-    }
-  },
-  methods: {
-    goTo(newPage) {
-      this.pageLocal = newPage
-      this.$emit('paginate', {
-        page: this.pageLocal,
-        perPage: this.perPageLocal
-      })
+    data() {
+      return {
+        pageLocal: this.page,
+        perPageLocal: this.perPage
+      }
     },
-    changePerPage() {
-      this.pageLocal = 1
-      this.$emit('paginate', {
-        page: this.pageLocal,
-        perPage: this.perPageLocal
-      })
+    computed: {
+      pageStart() {
+        return (this.pageLocal - 1) * this.perPageLocal
+      },
+      pageEnd() {
+        return this.pageStart + this.perPageLocal
+      }
     },
-    // Support nested keys like 'approvals.hod.name'
-    getValue(row, col) {
-      const raw = col.key
-        .split('.')
-        .reduce((acc, k) => (acc ? acc[k] : undefined), row)
-      return col.format ? col.format(raw) : raw
-    }
-  },
-  watch: {
-    page(val) {
-      this.pageLocal = val
+    methods: {
+      goTo(newPage) {
+        this.pageLocal = newPage
+        this.$emit('paginate', {
+          page: this.pageLocal,
+          perPage: this.perPageLocal
+        })
+      },
+      changePerPage() {
+        this.pageLocal = 1
+        this.$emit('paginate', {
+          page: this.pageLocal,
+          perPage: this.perPageLocal
+        })
+      },
+      // Support nested keys like 'approvals.hod.name'
+      getValue(row, col) {
+        const raw = col.key.split('.').reduce((acc, k) => (acc ? acc[k] : undefined), row)
+        return col.format ? col.format(raw) : raw
+      }
     },
-    perPage(val) {
-      this.perPageLocal = val
+    watch: {
+      page(val) {
+        this.pageLocal = val
+      },
+      perPage(val) {
+        this.perPageLocal = val
+      }
     }
   }
-}
 </script>
 
 <style scoped>
-/* Responsive helpers */
-@media (max-width: 640px) {
-  table thead {
-    display: none;
+  /* Responsive helpers */
+  @media (max-width: 640px) {
+    table thead {
+      display: none;
+    }
+    table tr {
+      display: block;
+      margin-bottom: 0.75rem;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    table td {
+      display: flex;
+      justify-content: space-between;
+    }
+    table td::before {
+      content: attr(data-label);
+      font-weight: 600;
+      color: #6b7280;
+      margin-right: 1rem;
+    }
   }
-  table tr {
-    display: block;
-    margin-bottom: 0.75rem;
-    border-bottom: 1px solid #e5e7eb;
-  }
-  table td {
-    display: flex;
-    justify-content: space-between;
-  }
-  table td::before {
-    content: attr(data-label);
-    font-weight: 600;
-    color: #6b7280;
-    margin-right: 1rem;
-  }
-}
 </style>
