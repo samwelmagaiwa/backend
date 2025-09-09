@@ -89,8 +89,27 @@ const requestStatusService = {
         error: error.message,
         response: error.response?.data,
         status: error.response?.status,
+        statusText: error.response?.statusText,
+        headers: error.response?.headers,
+        config: {
+          url: error.config?.url,
+          method: error.config?.method,
+          params: error.config?.params
+        },
         params: { id, type }
       })
+
+      // Additional detailed logging for debugging
+      console.log('Full error object:', error)
+      if (error.response) {
+        console.log('Response data:', error.response.data)
+        console.log('Response status:', error.response.status)
+        console.log('Response headers:', error.response.headers)
+      } else if (error.request) {
+        console.log('Request was made but no response:', error.request)
+      } else {
+        console.log('Error setting up request:', error.message)
+      }
 
       return {
         success: false,

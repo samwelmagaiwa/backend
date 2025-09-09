@@ -305,6 +305,28 @@ export const bookingService = {
         status: error.response?.status
       }
     }
+  },
+
+  /**
+   * Check if user has any pending booking requests
+   * @returns {Promise<Object>} - API response with pending request info
+   */
+  async checkPendingRequests() {
+    try {
+      const response = await apiClient.get('/booking-service/check-pending-requests')
+      return {
+        success: true,
+        data: response.data
+      }
+    } catch (error) {
+      console.error('Failed to check pending requests:', error)
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to check pending requests',
+        status: error.response?.status,
+        has_pending_request: false
+      }
+    }
   }
 }
 

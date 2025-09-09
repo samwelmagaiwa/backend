@@ -99,8 +99,29 @@
             </div>
           </div>
 
+          <!-- Loading Screen -->
+          <div
+            v-if="isCheckingPendingRequests"
+            class="booking-glass-card rounded-b-3xl overflow-hidden animate-slide-up"
+          >
+            <div class="p-8 text-center">
+              <div class="flex flex-col items-center space-y-4">
+                <div
+                  class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg animate-bounce-gentle"
+                >
+                  <i class="fas fa-spinner fa-spin text-white text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white">Checking Your Requests...</h3>
+                <p class="text-blue-200 text-sm">Please wait while we verify your booking status</p>
+              </div>
+            </div>
+          </div>
+
           <!-- Main Form -->
-          <div class="booking-glass-card rounded-b-3xl overflow-hidden animate-slide-up">
+          <div
+            v-else-if="!hasPendingRequest"
+            class="booking-glass-card rounded-b-3xl overflow-hidden animate-slide-up"
+          >
             <form @submit.prevent="submitBooking" class="p-6 space-y-6">
               <!-- Booking Information Section -->
               <div
@@ -213,18 +234,19 @@
                             v-for="device in availableDevices"
                             :key="device.id"
                             :value="device.id"
-                            :disabled="!device.can_borrow"
                             :class="
-                              device.can_borrow
+                              device.available_quantity > 0
                                 ? 'bg-blue-800 text-white'
-                                : 'bg-gray-700 text-gray-400'
+                                : 'bg-yellow-700 text-yellow-200'
                             "
                           >
                             {{ device.device_name }} -
                             <span v-if="device.available_quantity > 0" class="text-green-300">
                               {{ device.available_quantity }} available
                             </span>
-                            <span v-else class="text-red-400"> Out of Stock </span>
+                            <span v-else class="text-orange-300">
+                              Out of Stock (Can still request)
+                            </span>
                           </option>
                           <option value="others" class="bg-blue-800 text-white">
                             Others (Not in inventory)
@@ -660,16 +682,16 @@
             <!-- Animated Success Icon -->
             <div class="relative mx-auto mb-6">
               <div
-                class="w-20 h-20 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto shadow-2xl animate-bounce-gentle border-4 border-white/50"
+                class="w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center mx-auto shadow-2xl animate-bounce-gentle border-4 border-white/50"
               >
                 <i class="fas fa-check text-white text-3xl animate-check-mark"></i>
               </div>
               <!-- Success Ring Animation -->
               <div
-                class="absolute inset-0 w-20 h-20 border-4 border-green-400/30 rounded-full animate-ping"
+                class="absolute inset-0 w-20 h-20 border-4 border-blue-400/30 rounded-full animate-ping"
               ></div>
               <div
-                class="absolute inset-0 w-20 h-20 border-2 border-green-300/50 rounded-full animate-pulse"
+                class="absolute inset-0 w-20 h-20 border-2 border-blue-300/50 rounded-full animate-pulse"
               ></div>
             </div>
 
@@ -729,12 +751,12 @@
                 class="flex items-center p-3 bg-white/60 rounded-xl border border-blue-200/30 hover:bg-white/80 transition-all duration-300 group"
               >
                 <div
-                  class="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center mr-4 shadow-md group-hover:scale-110 transition-transform duration-300"
+                  class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mr-4 shadow-md group-hover:scale-110 transition-transform duration-300"
                 >
                   <i class="fas fa-user text-white text-sm"></i>
                 </div>
                 <div class="flex-1">
-                  <p class="text-xs font-medium text-green-600 uppercase tracking-wide">Borrower</p>
+                  <p class="text-xs font-medium text-blue-600 uppercase tracking-wide">Borrower</p>
                   <p class="text-sm font-bold text-gray-800">{{ formData.borrowerName }}</p>
                 </div>
               </div>
@@ -744,12 +766,12 @@
                 class="flex items-center p-3 bg-white/60 rounded-xl border border-blue-200/30 hover:bg-white/80 transition-all duration-300 group"
               >
                 <div
-                  class="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center mr-4 shadow-md group-hover:scale-110 transition-transform duration-300"
+                  class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mr-4 shadow-md group-hover:scale-110 transition-transform duration-300"
                 >
                   <i class="fas fa-calendar-check text-white text-sm"></i>
                 </div>
                 <div class="flex-1">
-                  <p class="text-xs font-medium text-purple-600 uppercase tracking-wide">
+                  <p class="text-xs font-medium text-blue-600 uppercase tracking-wide">
                     Return Date
                   </p>
                   <p class="text-sm font-bold text-gray-800">
@@ -793,6 +815,181 @@
         </div>
       </div>
     </div>
+
+    <!-- Pending Request Modal -->
+    <div
+      v-if="showPendingRequestModal"
+      class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in"
+    >
+      <div
+        class="bg-gradient-to-br from-white via-orange-50/50 to-orange-100/30 rounded-3xl shadow-2xl max-w-lg w-full transform transition-all duration-500 scale-100 animate-modal-bounce border-2 border-orange-200/50 backdrop-blur-lg"
+      >
+        <!-- Pending Header with Animation -->
+        <div class="relative overflow-hidden rounded-t-3xl">
+          <!-- Animated Background Pattern -->
+          <div
+            class="absolute inset-0 bg-gradient-to-r from-orange-500/10 via-yellow-600/5 to-orange-500/10 animate-pulse"
+          ></div>
+          <div
+            class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-orange-400/20 to-transparent rounded-full blur-2xl animate-float"
+          ></div>
+          <div
+            class="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-yellow-300/15 to-transparent rounded-full blur-xl animate-float"
+            style="animation-delay: 1s"
+          ></div>
+
+          <div class="relative z-10 p-8 text-center">
+            <!-- Animated Warning Icon -->
+            <div class="relative mx-auto mb-6">
+              <div
+                class="w-20 h-20 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center mx-auto shadow-2xl animate-bounce-gentle border-4 border-white/50"
+              >
+                <i class="fas fa-exclamation-triangle text-white text-3xl animate-check-mark"></i>
+              </div>
+              <!-- Warning Ring Animation -->
+              <div
+                class="absolute inset-0 w-20 h-20 border-4 border-orange-400/30 rounded-full animate-ping"
+              ></div>
+              <div
+                class="absolute inset-0 w-20 h-20 border-2 border-orange-300/50 rounded-full animate-pulse"
+              ></div>
+            </div>
+
+            <!-- Warning Title -->
+            <h3
+              class="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-3 animate-slide-up"
+            >
+              ⚠️ Pending Request Found
+            </h3>
+
+            <!-- Warning Message -->
+            <p
+              class="text-gray-600 mb-6 leading-relaxed animate-slide-up"
+              style="animation-delay: 0.2s"
+            >
+              You already have a pending booking request. Please wait for it to be processed before
+              submitting a new request.
+            </p>
+          </div>
+        </div>
+
+        <!-- Pending Request Details Card -->
+        <div class="px-8 pb-6" v-if="pendingRequestInfo">
+          <div
+            class="bg-gradient-to-r from-orange-50 to-orange-100/50 rounded-2xl p-6 mb-6 border border-orange-200/50 shadow-inner animate-slide-up"
+            style="animation-delay: 0.4s"
+          >
+            <!-- Details Header -->
+            <div class="flex items-center justify-center mb-4">
+              <div
+                class="w-8 h-8 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center mr-3 shadow-lg"
+              >
+                <i class="fas fa-clipboard-list text-white text-sm"></i>
+              </div>
+              <h4 class="text-lg font-bold text-orange-800">📋 Your Pending Request</h4>
+            </div>
+
+            <!-- Details Grid -->
+            <div class="space-y-4">
+              <!-- Device Info -->
+              <div
+                class="flex items-center p-3 bg-white/60 rounded-xl border border-orange-200/30 hover:bg-white/80 transition-all duration-300 group"
+              >
+                <div
+                  class="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center mr-4 shadow-md group-hover:scale-110 transition-transform duration-300"
+                >
+                  <i class="fas fa-laptop text-white text-sm"></i>
+                </div>
+                <div class="flex-1">
+                  <p class="text-xs font-medium text-orange-600 uppercase tracking-wide">Device</p>
+                  <p class="text-sm font-bold text-gray-800">
+                    {{ pendingRequestInfo.device_name }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Booking Date Info -->
+              <div
+                class="flex items-center p-3 bg-white/60 rounded-xl border border-orange-200/30 hover:bg-white/80 transition-all duration-300 group"
+              >
+                <div
+                  class="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center mr-4 shadow-md group-hover:scale-110 transition-transform duration-300"
+                >
+                  <i class="fas fa-calendar text-white text-sm"></i>
+                </div>
+                <div class="flex-1">
+                  <p class="text-xs font-medium text-orange-600 uppercase tracking-wide">
+                    Booking Date
+                  </p>
+                  <p class="text-sm font-bold text-gray-800">
+                    {{ formatDisplayDate(pendingRequestInfo.booking_date) }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Status Info -->
+              <div
+                class="flex items-center p-3 bg-white/60 rounded-xl border border-orange-200/30 hover:bg-white/80 transition-all duration-300 group"
+              >
+                <div
+                  class="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center mr-4 shadow-md group-hover:scale-110 transition-transform duration-300"
+                >
+                  <i class="fas fa-clock text-white text-sm"></i>
+                </div>
+                <div class="flex-1">
+                  <p class="text-xs font-medium text-orange-600 uppercase tracking-wide">Status</p>
+                  <p class="text-sm font-bold text-gray-800 capitalize">
+                    {{ pendingRequestInfo.status }} / {{ pendingRequestInfo.ict_approve }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Status Badge -->
+            <div class="mt-4 text-center">
+              <span
+                class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-orange-400 to-yellow-500 text-white text-xs font-bold rounded-full shadow-lg animate-pulse"
+              >
+                <i class="fas fa-hourglass-half mr-2"></i>
+                AWAITING APPROVAL
+              </span>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex gap-3">
+            <button
+              @click="viewPendingRequest"
+              class="flex-1 bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white py-4 px-6 rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-orange-300/50 animate-slide-up border-2 border-orange-500/30"
+              style="animation-delay: 0.6s"
+            >
+              <i class="fas fa-eye mr-3 text-lg"></i>
+              View Request
+            </button>
+
+            <button
+              @click="closePendingRequestModal"
+              class="flex-1 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white py-4 px-6 rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-gray-300/50 animate-slide-up border-2 border-gray-500/30"
+              style="animation-delay: 0.8s"
+            >
+              <i class="fas fa-arrow-left mr-3 text-lg"></i>
+              Dashboard
+            </button>
+          </div>
+        </div>
+
+        <!-- Decorative Elements -->
+        <div class="absolute top-4 right-4 text-orange-300/30 animate-spin-slow">
+          <i class="fas fa-cog text-2xl"></i>
+        </div>
+        <div
+          class="absolute bottom-4 left-4 text-yellow-300/30 animate-bounce"
+          style="animation-delay: 2s"
+        >
+          <i class="fas fa-exclamation-circle text-xl"></i>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -802,6 +999,7 @@
   import AppHeader from '@/components/AppHeader.vue'
   import bookingService from '@/services/bookingService'
   import deviceInventoryService from '@/services/deviceInventoryService'
+  import ictApprovalService from '@/services/ictApprovalService'
   import { useAuthStore } from '@/stores/auth'
 
   export default {
@@ -849,30 +1047,97 @@
         availableDevices: [],
         isLoadingDevices: false,
         deviceAvailabilityInfo: null, // Store availability info for out-of-stock devices
-        showAvailabilityWarning: false
+        showAvailabilityWarning: false,
+        hasPendingRequest: false, // Track if user has pending request
+        pendingRequestInfo: null, // Store pending request details
+        showPendingRequestModal: false, // Show modal for pending request
+        isCheckingPendingRequests: true // Show loading while checking for pending requests
       }
     },
     async mounted() {
-      // Load departments and available devices when component is mounted
-      await this.loadDepartments()
-      await this.loadAvailableDevices()
+      // Check if user has pending requests first
+      await this.checkPendingRequests()
 
-      // Auto-populate borrower name from authenticated user
-      this.populateBorrowerName()
+      // Only proceed if no pending request found
+      if (!this.hasPendingRequest) {
+        // Load departments and available devices when component is mounted
+        await this.loadDepartments()
+        await this.loadAvailableDevices()
 
-      // Debug: Check if time input is working
-      console.log('BookingService mounted, returnTime field:', this.formData.returnTime)
+        // Auto-populate borrower name from authenticated user
+        this.populateBorrowerName()
 
-      // Set a default time if none is set (optional)
-      if (!this.formData.returnTime) {
-        // Set default return time to 5 PM
-        this.formData.returnTime = '17:00'
+        // Debug: Check if time input is working
+        console.log('BookingService mounted, returnTime field:', this.formData.returnTime)
+
+        // Set a default time if none is set (optional)
+        if (!this.formData.returnTime) {
+          // Set default return time to 5 PM
+          this.formData.returnTime = '17:00'
+        }
+
+        // Initialize real-time validation
+        this.initializeValidation()
       }
-
-      // Initialize real-time validation
-      this.initializeValidation()
     },
     methods: {
+      /**
+       * Check if user has any pending booking requests
+       */
+      async checkPendingRequests() {
+        try {
+          this.isCheckingPendingRequests = true
+          const response = await fetch('/api/booking-service/check-pending-requests', {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${this.authStore.token}`,
+              'Content-Type': 'application/json',
+              Accept: 'application/json'
+            }
+          })
+
+          const result = await response.json()
+
+          if (result.success) {
+            this.hasPendingRequest = result.has_pending_request
+
+            if (this.hasPendingRequest && result.pending_request) {
+              this.pendingRequestInfo = result.pending_request
+              this.showPendingRequestModal = true
+              console.log('🚫 User has pending request:', result.pending_request)
+            } else {
+              console.log('✅ No pending requests found')
+            }
+          } else {
+            console.error('Failed to check pending requests:', result.message)
+          }
+        } catch (error) {
+          console.error('Error checking pending requests:', error)
+        } finally {
+          this.isCheckingPendingRequests = false
+        }
+      },
+
+      /**
+       * Handle user decision to view their pending request
+       */
+      viewPendingRequest() {
+        if (this.pendingRequestInfo && this.pendingRequestInfo.request_url) {
+          this.$router.push(this.pendingRequestInfo.request_url)
+        } else {
+          // Fallback to request status page
+          this.$router.push('/request-status')
+        }
+      },
+
+      /**
+       * Close pending request modal and go back to dashboard
+       */
+      closePendingRequestModal() {
+        this.showPendingRequestModal = false
+        this.$router.push('/user-dashboard')
+      },
+
       async checkDeviceAvailability(deviceInventoryId) {
         try {
           const response = await fetch(
@@ -971,6 +1236,15 @@
           return device.device_code.toLowerCase()
         }
 
+        // Special mapping for device_code that doesn't match enum exactly
+        if (device.device_code) {
+          const deviceCodeLower = device.device_code.toLowerCase()
+          if (deviceCodeLower === 'hdmi') {
+            console.log('Mapping HDMI device_code to hdmi_cable')
+            return 'hdmi_cable'
+          }
+        }
+
         // Fallback to device_name mapping
         return this.mapDeviceNameToType(device.device_name)
       },
@@ -986,15 +1260,16 @@
         if (deviceNameLower.includes('keyboard')) return 'keyboard'
         if (deviceNameLower.includes('pc') || deviceNameLower.includes('computer')) return 'pc'
         if (deviceNameLower.includes('tv') && deviceNameLower.includes('remote')) return 'tv_remote'
-        if (deviceNameLower.includes('hdmi') && deviceNameLower.includes('cable'))
-          return 'hdmi_cable'
+        if (deviceNameLower.includes('hdmi')) return 'hdmi_cable'
 
         // Partial matches for common device types
         if (deviceNameLower.includes('laptop') || deviceNameLower.includes('notebook')) return 'pc'
         if (deviceNameLower.includes('screen') || deviceNameLower.includes('display'))
           return 'monitor'
-        if (deviceNameLower.includes('remote')) return 'tv_remote'
-        if (deviceNameLower.includes('cable')) return 'hdmi_cable'
+        if (deviceNameLower.includes('remote') && !deviceNameLower.includes('hdmi'))
+          return 'tv_remote'
+        if (deviceNameLower.includes('cable') && !deviceNameLower.includes('hdmi'))
+          return 'hdmi_cable'
 
         // Additional matches
         if (deviceNameLower.includes('tv') || deviceNameLower.includes('television'))
@@ -1004,9 +1279,13 @@
 
         // For inventory devices that don't match any pattern, use 'others'
         // The backend validation will handle this case properly when device_inventory_id is provided
-        console.log(
-          'Device name not recognized, using others (but device_inventory_id will be provided):',
-          deviceName
+        console.warn(
+          'Device name not recognized, defaulting to "others" (device_inventory_id will be used by backend):',
+          {
+            deviceName: deviceName,
+            deviceNameLower: deviceNameLower,
+            suggestedFix: 'Consider updating the device mapping logic or device_code in inventory'
+          }
         )
         return 'others'
       },
@@ -1136,14 +1415,15 @@
           if (this.formData.deviceType && !validDeviceTypes.includes(this.formData.deviceType)) {
             this.errors.deviceType = 'Invalid device type selected'
           } else {
-            // Check if selected device is available
+            // Allow selection of any device (including out-of-stock)
             if (this.formData.deviceInventoryId && this.formData.deviceInventoryId !== 'others') {
               const selectedDevice = this.availableDevices.find(
                 (d) => d.id == this.formData.deviceInventoryId
               )
-              if (!selectedDevice || !selectedDevice.can_borrow) {
-                this.errors.deviceType = 'Selected device is not available for borrowing'
+              if (!selectedDevice) {
+                this.errors.deviceType = 'Selected device not found in inventory'
               } else {
+                // Clear any previous errors - device can be selected even if out of stock
                 this.errors.deviceType = ''
               }
             } else {
@@ -1364,14 +1644,15 @@
           this.errors.customDevice = 'Please specify the device'
         }
 
-        // Check if selected device is available
+        // Allow selection of any device (including out-of-stock)
         if (this.formData.deviceInventoryId && this.formData.deviceInventoryId !== 'others') {
           const selectedDevice = this.availableDevices.find(
             (d) => d.id == this.formData.deviceInventoryId
           )
-          if (!selectedDevice || !selectedDevice.can_borrow) {
-            this.errors.deviceType = 'Selected device is not available for borrowing'
+          if (!selectedDevice) {
+            this.errors.deviceType = 'Selected device not found in inventory'
           }
+          // Note: We don't check can_borrow here anymore - allow out-of-stock devices
         }
 
         if (!this.formData.reason.trim()) {
@@ -1409,6 +1690,15 @@
 
       async submitBooking() {
         if (!this.validateForm()) {
+          return
+        }
+
+        // Double-check for pending requests before submitting
+        await this.checkPendingRequests()
+        if (this.hasPendingRequest) {
+          alert(
+            'You have a pending booking request. Please wait for it to be processed before submitting a new request.'
+          )
           return
         }
 
@@ -1458,6 +1748,9 @@
 
           if (response.success) {
             console.log('Booking submitted successfully:', response.data)
+
+            // Auto-capture user details for ICT approval system
+            await this.linkUserDetailsToICTApproval(response.data)
             console.log('Device info before showing modal:', {
               deviceInventoryId: this.formData.deviceInventoryId,
               selectedDeviceInfo: this.selectedDeviceInfo,
@@ -1469,9 +1762,16 @@
               this.deviceAvailabilityInfo = response.data.availability_info
             }
 
-            this.showSuccessModal = true
-            // Don't reset form immediately - wait for modal to close
-            // this.resetForm()
+            // Redirect immediately to request status page to prevent multiple submissions
+            this.resetForm()
+            this.$router.push({
+              path: '/request-status',
+              query: {
+                success: 'true',
+                type: 'Device Booking Request',
+                id: 'BOOK-' + Date.now()
+              }
+            })
           } else {
             console.error('API Error:', response)
 
@@ -1606,7 +1906,7 @@
         this.showSuccessModal = false
         // Reset form after modal is closed
         this.resetForm()
-        // Redirect to Request Status page with success parameters
+        // Always redirect to Request Status page to prevent multiple submissions
         this.$router.push({
           path: '/request-status',
           query: {
@@ -1619,6 +1919,47 @@
 
       goBack() {
         this.$router.push('/user-dashboard')
+      },
+
+      /**
+       * Auto-capture user details and link to ICT approval system
+       * This is called automatically after successful booking submission
+       */
+      async linkUserDetailsToICTApproval(bookingData) {
+        try {
+          // Get user ID from auth store
+          const userId = this.authStore.user?.id || this.authStore.userId
+          if (!userId) {
+            console.warn('⚠️ User ID not available for auto-capture')
+            return
+          }
+
+          const bookingId = bookingData.id || bookingData.booking_id
+          if (!bookingId) {
+            console.warn('⚠️ Booking ID not available for auto-capture')
+            return
+          }
+
+          console.log('🔗 Auto-capturing user details for ICT approval...', {
+            bookingId,
+            userId,
+            borrowerName: this.formData.borrowerName,
+            department: this.formData.department
+          })
+
+          // Link user details to booking for ICT approval system
+          const response = await ictApprovalService.linkUserDetailsToBooking(bookingId, userId)
+
+          if (response.success) {
+            console.log('✅ User details successfully linked to ICT approval system')
+          } else {
+            console.warn('⚠️ Failed to link user details to ICT approval system:', response.message)
+            // Don't show error to user as this is a background process
+          }
+        } catch (error) {
+          console.error('❌ Error linking user details to ICT approval system:', error)
+          // Don't show error to user as this is a background process
+        }
       }
     }
   }

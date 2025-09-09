@@ -302,12 +302,7 @@
               requestData.value = response.data
               console.log('✅ Request data loaded:', requestData.value)
             } else {
-              console.error('❌ Failed to load request:', {
-                error: response.error,
-                status: response.status,
-                data: response.data,
-                fullResponse: response
-              })
+              console.error('❌ Failed to load request:', response.error)
               requestData.value = null
             }
           } else {

@@ -74,6 +74,36 @@ class BookingServiceController extends Controller
                 'request_data' => $request->except(['signature'])
             ]);
             
+            // Check if user already has a pending request
+            $existingPendingRequest = BookingService::where('user_id', $request->user()->id)
+                ->whereIn('status', ['pending'])
+                ->whereIn('ict_approve', ['pending'])
+                ->first();
+                
+            if ($existingPendingRequest) {
+                Log::info('User attempted to create booking with existing pending request', [
+                    'user_id' => $request->user()->id,
+                    'existing_request_id' => $existingPendingRequest->id,
+                    'existing_request_status' => $existingPendingRequest->status,
+                    'existing_ict_status' => $existingPendingRequest->ict_approve
+                ]);
+                
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You cannot submit a new booking request while you have a pending request. Please wait for your current request to be processed.',
+                    'existing_request' => [
+                        'id' => $existingPendingRequest->id,
+                        'device_type' => $existingPendingRequest->device_type,
+                        'custom_device' => $existingPendingRequest->custom_device,
+                        'booking_date' => $existingPendingRequest->booking_date,
+                        'status' => $existingPendingRequest->status,
+                        'ict_approve' => $existingPendingRequest->ict_approve,
+                        'created_at' => $existingPendingRequest->created_at,
+                        'request_url' => '/request-details?id=' . $existingPendingRequest->id . '&type=booking_service'
+                    ]
+                ], 422);
+            }
+            
             try {
                 $validatedData = $request->validated();
                 Log::info('Validation passed successfully');
@@ -106,6 +136,19 @@ class BookingServiceController extends Controller
                         'success' => false,
                         'message' => 'Selected device not found in inventory'
                     ], 400);
+                }
+                
+                // Auto-determine device_type from inventory device
+                $autoDetectedDeviceType = $this->mapInventoryDeviceToType($deviceInventory);
+                if ($autoDetectedDeviceType) {
+                    $validatedData['device_type'] = $autoDetectedDeviceType;
+                    Log::info('Auto-detected device_type from inventory', [
+                        'device_inventory_id' => $deviceInventory->id,
+                        'device_name' => $deviceInventory->device_name,
+                        'device_code' => $deviceInventory->device_code,
+                        'detected_type' => $autoDetectedDeviceType,
+                        'original_frontend_type' => $request->input('device_type')
+                    ]);
                 }
                 
                 // Check device availability using new enhanced logic
@@ -216,14 +259,30 @@ class BookingServiceController extends Controller
     {
         try {
             // Check if user can view this booking
-            if ((!$request->user()->role || $request->user()->role->name !== 'admin') && $bookingService->user_id !== $request->user()->id) {
+            $user = $request->user();
+            $canView = false;
+            
+            // Admin can view any booking
+            if ($user->hasAnyRole(['admin'])) {
+                $canView = true;
+            }
+            // ICT officers can view any booking for approval purposes
+            elseif ($user->hasAnyRole(['ict_officer', 'ict_director'])) {
+                $canView = true;
+            }
+            // Users can view their own bookings
+            elseif ($bookingService->user_id === $user->id) {
+                $canView = true;
+            }
+            
+            if (!$canView) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Unauthorized to view this booking'
                 ], 403);
             }
 
-            $bookingService->load(['user', 'approvedBy', 'departmentInfo']);
+            $bookingService->load(['user', 'approvedBy', 'departmentInfo', 'ictApprovedBy']);
 
             return response()->json([
                 'success' => true,
@@ -607,6 +666,222 @@ class BookingServiceController extends Controller
     }
 
     /**
+     * Get all bookings for ICT approval review (pending, approved, rejected).
+     */
+    public function getIctApprovalRequests(Request $request): JsonResponse
+    {
+        try {
+            // Check if user has ICT officer role
+            if (!$request->user()->hasAnyRole(['ict_officer', 'admin', 'ict_director'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized. ICT officer access required.'
+                ], 403);
+            }
+
+            $query = BookingService::with([
+                'user:id,name,email,phone,pf_number,department_id',
+                'user.department:id,name,code',
+                'departmentInfo:id,name,code',
+                'deviceInventory:id,device_name,device_code,description',
+                'ictApprovedBy:id,name'
+            ]);
+
+            // Apply filters
+            if ($request->filled('ict_status')) {
+                $query->byIctApprovalStatus($request->ict_status);
+            }
+
+            if ($request->filled('device_type')) {
+                $query->byDeviceType($request->device_type);
+            }
+
+            if ($request->filled('department')) {
+                $query->where('department', $request->department);
+            }
+
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('borrower_name', 'LIKE', "%{$search}%")
+                      ->orWhere('department', 'LIKE', "%{$search}%")
+                      ->orWhere('device_type', 'LIKE', "%{$search}%")
+                      ->orWhere('custom_device', 'LIKE', "%{$search}%");
+                });
+            }
+
+            if ($request->filled('start_date') && $request->filled('end_date')) {
+                $query->byDateRange($request->start_date, $request->end_date);
+            }
+
+            // Pagination with custom ordering (pending first, then by creation date desc)
+            $perPage = $request->get('per_page', 50);
+            $bookings = $query->orderByRaw(
+                "CASE 
+                    WHEN ict_approve = 'pending' THEN 1 
+                    WHEN ict_approve = 'approved' THEN 2 
+                    WHEN ict_approve = 'rejected' THEN 3 
+                    ELSE 4 
+                END"
+            )->orderBy('created_at', 'desc')->paginate($perPage);
+
+            Log::info('ICT approval requests retrieved', [
+                'total' => $bookings->total(),
+                'current_page' => $bookings->currentPage(),
+                'per_page' => $bookings->perPage(),
+                'user_id' => $request->user()->id
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'data' => $bookings,
+                'message' => 'ICT approval requests retrieved successfully'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error retrieving ICT approval requests: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error retrieving ICT approval requests',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * ICT Officer: Approve booking ICT request.
+     */
+    public function ictApprove(Request $request, BookingService $bookingService): JsonResponse
+    {
+        try {
+            // Check if user has ICT officer role
+            if (!$request->user()->hasAnyRole(['ict_officer', 'admin', 'ict_director'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized. ICT officer access required.'
+                ], 403);
+            }
+
+            if ($bookingService->ict_approve !== 'pending') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Can only approve pending ICT requests'
+                ], 400);
+            }
+
+            $bookingService->update([
+                'ict_approve' => 'approved',
+                'ict_approved_by' => $request->user()->id,
+                'ict_approved_at' => now(),
+                'ict_notes' => $request->input('ict_notes', ''),
+                // Update main status to approved when ICT approves
+                'status' => 'approved',
+                'approved_by' => $request->user()->id,
+                'approved_at' => now()
+            ]);
+
+            $bookingService->load([
+                'user:id,name,email,phone,pf_number,department_id',
+                'user.department:id,name,code',
+                'departmentInfo:id,name,code',
+                'deviceInventory:id,device_name,device_code,description',
+                'ictApprovedBy:id,name'
+            ]);
+
+            Log::info('Booking ICT approved and main status updated', [
+                'booking_id' => $bookingService->id,
+                'ict_approved_by' => $request->user()->id,
+                'borrower_name' => $bookingService->borrower_name,
+                'main_status' => 'approved',
+                'ict_status' => 'approved'
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'data' => $bookingService,
+                'message' => 'Booking approved successfully by ICT Officer'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error ICT approving booking: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error ICT approving booking',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * ICT Officer: Reject booking ICT request.
+     */
+    public function ictReject(Request $request, BookingService $bookingService): JsonResponse
+    {
+        try {
+            // Check if user has ICT officer role
+            if (!$request->user()->hasAnyRole(['ict_officer', 'admin', 'ict_director'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized. ICT officer access required.'
+                ], 403);
+            }
+
+            if ($bookingService->ict_approve !== 'pending') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Can only reject pending ICT requests'
+                ], 400);
+            }
+
+            $request->validate([
+                'ict_notes' => 'required|string|max:1000'
+            ]);
+
+            $bookingService->update([
+                'ict_approve' => 'rejected',
+                'ict_approved_by' => $request->user()->id,
+                'ict_approved_at' => now(),
+                'ict_notes' => $request->input('ict_notes'),
+                // Update main status to rejected when ICT rejects
+                'status' => 'rejected',
+                'approved_by' => $request->user()->id,
+                'approved_at' => now()
+            ]);
+
+            $bookingService->load([
+                'user:id,name,email,phone,pf_number,department_id',
+                'user.department:id,name,code',
+                'departmentInfo:id,name,code',
+                'deviceInventory:id,device_name,device_code,description',
+                'ictApprovedBy:id,name'
+            ]);
+
+            Log::info('Booking ICT rejected and main status updated', [
+                'booking_id' => $bookingService->id,
+                'ict_rejected_by' => $request->user()->id,
+                'borrower_name' => $bookingService->borrower_name,
+                'reason' => $request->input('ict_notes'),
+                'main_status' => 'rejected',
+                'ict_status' => 'rejected'
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'data' => $bookingService,
+                'message' => 'Booking rejected successfully by ICT Officer'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error ICT rejecting booking: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error ICT rejecting booking',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Debug endpoint to check departments.
      */
     public function debugDepartments(): JsonResponse
@@ -642,6 +917,56 @@ class BookingServiceController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error retrieving debug information',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Check if user has any pending booking requests.
+     */
+    public function checkPendingRequests(Request $request): JsonResponse
+    {
+        try {
+            $pendingRequest = BookingService::where('user_id', $request->user()->id)
+                ->whereIn('status', ['pending'])
+                ->whereIn('ict_approve', ['pending'])
+                ->with(['deviceInventory'])
+                ->first();
+                
+            if ($pendingRequest) {
+                return response()->json([
+                    'success' => true,
+                    'has_pending_request' => true,
+                    'message' => 'You have a pending booking request. Please wait for it to be processed before submitting a new request.',
+                    'pending_request' => [
+                        'id' => $pendingRequest->id,
+                        'device_type' => $pendingRequest->device_type,
+                        'custom_device' => $pendingRequest->custom_device,
+                        'device_name' => $pendingRequest->device_type === 'others' && $pendingRequest->custom_device 
+                            ? $pendingRequest->custom_device 
+                            : (BookingService::getDeviceTypes()[$pendingRequest->device_type] ?? $pendingRequest->device_type),
+                        'booking_date' => $pendingRequest->booking_date,
+                        'return_date' => $pendingRequest->return_date,
+                        'status' => $pendingRequest->status,
+                        'ict_approve' => $pendingRequest->ict_approve,
+                        'created_at' => $pendingRequest->created_at,
+                        'request_url' => '/request-details?id=' . $pendingRequest->id . '&type=booking_service'
+                    ]
+                ]);
+            }
+            
+            return response()->json([
+                'success' => true,
+                'has_pending_request' => false,
+                'message' => 'No pending requests found. You can submit a new booking request.'
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Error checking pending requests: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error checking pending requests',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -742,5 +1067,67 @@ class BookingServiceController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Map device inventory to valid device_type enum value.
+     */
+    private function mapInventoryDeviceToType(DeviceInventory $device): ?string
+    {
+        $validDeviceTypes = [
+            'projector',
+            'tv_remote', 
+            'hdmi_cable',
+            'monitor',
+            'cpu',
+            'keyboard',
+            'pc',
+            'others'
+        ];
+
+        // First, try to use device_code if it's a valid ENUM value
+        if ($device->device_code && in_array(strtolower($device->device_code), $validDeviceTypes)) {
+            return strtolower($device->device_code);
+        }
+        
+        // Special mapping for device_code that doesn't match enum exactly
+        if ($device->device_code) {
+            $deviceCodeLower = strtolower($device->device_code);
+            if ($deviceCodeLower === 'hdmi') {
+                return 'hdmi_cable';
+            }
+        }
+
+        // Fallback to device_name mapping
+        $deviceNameLower = strtolower($device->device_name);
+        
+        // Direct matches
+        if (str_contains($deviceNameLower, 'projector')) return 'projector';
+        if (str_contains($deviceNameLower, 'monitor')) return 'monitor';
+        if (str_contains($deviceNameLower, 'cpu')) return 'cpu';
+        if (str_contains($deviceNameLower, 'keyboard')) return 'keyboard';
+        if (str_contains($deviceNameLower, 'pc') || str_contains($deviceNameLower, 'computer')) return 'pc';
+        if (str_contains($deviceNameLower, 'tv') && str_contains($deviceNameLower, 'remote')) return 'tv_remote';
+        if (str_contains($deviceNameLower, 'hdmi')) return 'hdmi_cable';
+        
+        // Partial matches for common device types
+        if (str_contains($deviceNameLower, 'laptop') || str_contains($deviceNameLower, 'notebook')) return 'pc';
+        if (str_contains($deviceNameLower, 'screen') || str_contains($deviceNameLower, 'display')) return 'monitor';
+        if (str_contains($deviceNameLower, 'remote') && !str_contains($deviceNameLower, 'hdmi')) return 'tv_remote';
+        if (str_contains($deviceNameLower, 'cable') && !str_contains($deviceNameLower, 'hdmi')) return 'hdmi_cable';
+        
+        // Additional matches
+        if (str_contains($deviceNameLower, 'tv') || str_contains($deviceNameLower, 'television')) return 'tv_remote';
+        if (str_contains($deviceNameLower, 'desktop')) return 'pc';
+        if (str_contains($deviceNameLower, 'project')) return 'projector';
+        
+        // For inventory devices that don't match any pattern, use 'others'
+        Log::info('Device name not recognized in backend mapping, using others', [
+            'device_id' => $device->id,
+            'device_name' => $device->device_name,
+            'device_code' => $device->device_code
+        ]);
+        
+        return 'others';
     }
 }

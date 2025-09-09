@@ -4,6 +4,38 @@
  */
 
 import { useAuthStore } from '@/stores/auth'
+import { useNotificationStore } from '@/stores/notification'
+import bookingService from '@/services/bookingService'
+
+/**
+ * Check if user has a pending booking request that should lock the booking service page
+ * @param {String} userRole - User role
+ * @returns {Promise<Object>} - { hasPendingRequest: boolean, pendingRequestInfo?: Object }
+ */
+export async function checkPendingBookingRequest(userRole) {
+  try {
+    // Only check for staff users
+    if (userRole !== 'staff') {
+      return { hasPendingRequest: false }
+    }
+
+    const response = await bookingService.checkPendingRequests()
+
+    if (response.success && response.data) {
+      return {
+        hasPendingRequest: response.data.has_pending_request,
+        pendingRequestInfo: response.data.pending_request || null,
+        message: response.data.message || null
+      }
+    }
+
+    return { hasPendingRequest: false }
+  } catch (error) {
+    console.error('❌ Route Guard: Error checking pending booking request:', error)
+    // On error, don't block access
+    return { hasPendingRequest: false }
+  }
+}
 
 /**
  * Check if user has required role for route access
@@ -158,6 +190,35 @@ export async function checkRouteAccess(route) {
           hasAccess: false,
           redirectTo: userDefaultDashboard || '/login',
           reason: `Redirecting to correct dashboard for role ${userRole}`
+        }
+      }
+    }
+
+    // Special check for booking service page - prevent access if user has pending request
+    if (route.path === '/booking-service' && userRole === 'staff') {
+      const pendingCheck = await checkPendingBookingRequest(userRole)
+
+      if (pendingCheck.hasPendingRequest) {
+        console.log(
+          '🚫 Route Guard: Blocking booking service access - user has pending request:',
+          pendingCheck.pendingRequestInfo
+        )
+
+        // Store pending booking info and show notification
+        try {
+          const notificationStore = useNotificationStore()
+          notificationStore.setPendingBookingInfo(pendingCheck.pendingRequestInfo)
+          notificationStore.showBookingLockNotification(pendingCheck.pendingRequestInfo)
+        } catch (error) {
+          console.warn('Failed to show booking lock notification:', error)
+        }
+
+        return {
+          hasAccess: false,
+          redirectTo: '/request-status',
+          reason:
+            'User has a pending booking request. Access to booking service is locked until request is processed.',
+          pendingRequestInfo: pendingCheck.pendingRequestInfo
         }
       }
     }

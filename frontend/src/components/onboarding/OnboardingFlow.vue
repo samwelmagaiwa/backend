@@ -62,6 +62,7 @@
       <SuccessPopup
         v-if="currentStep === 'success'"
         :user-name="userName"
+        :user-role-display="userRoleDisplay"
         message="You have successfully completed the onboarding process. Now you can proceed with your requests."
         @continue="completeOnboarding"
       />
@@ -100,7 +101,8 @@
       return {
         currentStep: 'terms-popup', // Always start from beginning
         loading: true,
-        backendStatus: null
+        backendStatus: null,
+        userRoleDisplay: 'Staff Member' // Default role display
       }
     },
 
@@ -126,6 +128,11 @@
           if (result.success) {
             console.log('✅ Backend onboarding status:', result.data)
             this.backendStatus = result.data
+
+            // Set user role display from backend data
+            if (result.data.user_info && result.data.user_info.role_display) {
+              this.userRoleDisplay = result.data.user_info.role_display
+            }
 
             // If user has completed onboarding, show success
             if (result.data.progress && result.data.progress.completed) {
@@ -261,11 +268,17 @@
         console.log('🔄 OnboardingFlow: completeOnboarding() called')
 
         // Mark user as having completed onboarding
-        const success = await this.markOnboardingComplete()
-        console.log('📊 markOnboardingComplete result:', success)
+        const result = await this.markOnboardingComplete()
+        console.log('📊 markOnboardingComplete result:', result)
 
-        if (success) {
+        if (result.success) {
           console.log('✅ Onboarding marked as complete, cleaning up and emitting event')
+
+          // Update user role display from completion response if available
+          if (result.data && result.data.user_info && result.data.user_info.role_display) {
+            this.userRoleDisplay = result.data.user_info.role_display
+          }
+
           // Clean up the step tracking since onboarding is complete
           this.clearOnboardingStep()
           console.log('🚀 Emitting onboarding-complete event')
@@ -295,14 +308,14 @@
               completedUsers.push(this.userId)
               localStorage.setItem('onboarding_completed', JSON.stringify(completedUsers))
             }
-            return true
+            return { success: true, data: result.data }
           } else {
             console.error('Failed to complete onboarding:', result.error)
-            return false
+            return { success: false, error: result.error }
           }
         } catch (error) {
           console.error('Error completing onboarding:', error)
-          return false
+          return { success: false, error: error.message }
         }
       },
 

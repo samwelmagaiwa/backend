@@ -131,9 +131,9 @@
                       <i class="fas fa-check-circle text-white text-lg"></i>
                     </div>
                     <div class="ml-4">
-                      <p class="text-sm font-semibold text-green-200">Returned</p>
+                      <p class="text-sm font-semibold text-green-200">Approved</p>
                       <p class="text-2xl font-bold text-white">
-                        {{ stats.returned }}
+                        {{ stats.approved }}
                       </p>
                     </div>
                   </div>
@@ -146,12 +146,12 @@
                     <div
                       class="w-12 h-12 bg-gradient-to-br from-red-500 to-pink-600 rounded-lg flex items-center justify-center shadow-lg"
                     >
-                      <i class="fas fa-exclamation-triangle text-white text-lg"></i>
+                      <i class="fas fa-times-circle text-white text-lg"></i>
                     </div>
                     <div class="ml-4">
-                      <p class="text-sm font-semibold text-red-200">Compromised</p>
+                      <p class="text-sm font-semibold text-red-200">Rejected</p>
                       <p class="text-2xl font-bold text-white">
-                        {{ stats.compromised }}
+                        {{ stats.rejected }}
                       </p>
                     </div>
                   </div>
@@ -199,13 +199,13 @@
 
                   <div class="flex gap-4">
                     <select
-                      v-model="statusFilter"
+                      v-model="ictStatusFilter"
                       class="px-4 py-3 bg-white/15 border border-blue-300/30 rounded-lg focus:border-teal-400 focus:outline-none text-white backdrop-blur-sm transition-all appearance-none cursor-pointer text-sm"
                     >
-                      <option value="">All Status</option>
-                      <option value="pending">Pending</option>
-                      <option value="returned">Returned</option>
-                      <option value="compromised">Compromised</option>
+                      <option value="">All ICT Status</option>
+                      <option value="pending">Pending ICT</option>
+                      <option value="approved">Approved</option>
+                      <option value="rejected">Rejected</option>
                     </select>
 
                     <button
@@ -234,6 +234,11 @@
                   <table class="w-full">
                     <thead class="bg-blue-800/50">
                       <tr>
+                        <th
+                          class="px-6 py-4 text-left text-sm font-semibold text-blue-100 uppercase tracking-wider"
+                        >
+                          <i class="fas fa-hashtag mr-2"></i>Request ID
+                        </th>
                         <th
                           class="px-6 py-4 text-left text-sm font-semibold text-blue-100 uppercase tracking-wider"
                         >
@@ -280,44 +285,75 @@
                         <td class="px-6 py-4 whitespace-nowrap">
                           <div class="flex items-center">
                             <div
+                              class="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-lg mr-3"
+                            >
+                              <i class="fas fa-hashtag text-white text-sm"></i>
+                            </div>
+                            <div>
+                              <div class="text-sm font-medium text-white">
+                                {{
+                                  request.request_id ||
+                                  `REQ-${request.id.toString().padStart(6, '0')}`
+                                }}
+                              </div>
+                              <div class="text-xs text-purple-300">ID: {{ request.id }}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                          <div class="flex items-center">
+                            <div
                               class="w-10 h-10 bg-gradient-to-br from-teal-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg mr-3"
                             >
                               <i class="fas fa-user text-white text-sm"></i>
                             </div>
                             <div>
                               <div class="text-sm font-medium text-white">
-                                {{ request.borrowerName }}
+                                {{
+                                  request.borrower_name || request.borrowerName || 'Unknown User'
+                                }}
                               </div>
                               <div class="text-sm text-blue-300">
-                                {{ request.phoneNumber }}
+                                {{ request.borrower_phone || request.phoneNumber || 'No phone' }}
+                              </div>
+                              <div v-if="request.pf_number" class="text-xs text-teal-300">
+                                PF: {{ request.pf_number }}
                               </div>
                             </div>
                           </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                          <div class="text-sm text-white">
-                            {{ request.department }}
+                          <div class="text-sm text-white font-medium">
+                            {{ request.department || 'Unknown Department' }}
                           </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                           <div class="flex items-center">
                             <i class="fas fa-laptop text-teal-300 mr-2"></i>
-                            <span class="text-sm text-white">{{
-                              getDeviceDisplayName(request.deviceType, request.customDevice)
+                            <span class="text-sm text-white font-medium">{{
+                              request.device_name ||
+                              getDeviceDisplayName(
+                                request.device_type || request.deviceType,
+                                request.custom_device || request.customDevice
+                              )
                             }}</span>
                           </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                          <div class="text-sm text-white">
-                            {{ formatDate(request.bookingDate) }}
+                          <div class="text-sm text-white font-medium">
+                            {{ formatDate(request.booking_date || request.bookingDate) }}
                           </div>
                           <div class="text-xs text-blue-300">
-                            Return: {{ formatDate(request.collectionDate) }}
+                            Return:
+                            {{ formatDate(request.collection_date || request.collectionDate) }}
                           </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                           <div class="flex items-center">
-                            <div v-if="request.signature" class="flex items-center text-green-400">
+                            <div
+                              v-if="request.has_signature || request.signature"
+                              class="flex items-center text-green-400"
+                            >
                               <i class="fas fa-check-circle mr-2"></i>
                               <span class="text-sm font-medium">Signed</span>
                             </div>
@@ -329,11 +365,14 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                           <span
-                            :class="getStatusBadgeClass(request.status)"
+                            :class="getStatusBadgeClass(request.ict_approve || 'pending')"
                             class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium"
                           >
-                            <i :class="getStatusIcon(request.status)" class="mr-1"></i>
-                            {{ getStatusText(request.status) }}
+                            <i
+                              :class="getStatusIcon(request.ict_approve || 'pending')"
+                              class="mr-1"
+                            ></i>
+                            {{ getStatusText(request.ict_approve || 'pending') }}
                           </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center">
@@ -391,42 +430,52 @@
                                 <!-- Divider -->
                                 <div class="border-t border-gray-100"></div>
 
-                                <!-- Cancel Action -->
+                                <!-- Approve Action -->
                                 <button
-                                  @click="cancelRequest(request.id)"
-                                  class="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-700 transition-colors duration-200 group"
-                                  :disabled="request.status === 'cancelled'"
+                                  @click="approveRequest(request.id)"
+                                  class="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors duration-200 group"
+                                  :disabled="request.ict_approve === 'approved'"
                                   :class="{
-                                    'opacity-50 cursor-not-allowed': request.status === 'cancelled'
+                                    'opacity-50 cursor-not-allowed':
+                                      request.ict_approve === 'approved'
                                   }"
                                 >
                                   <div
-                                    class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-yellow-200 transition-colors duration-200"
+                                    class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-green-200 transition-colors duration-200"
                                   >
-                                    <i class="fas fa-ban text-yellow-600 text-sm"></i>
+                                    <i class="fas fa-check text-green-600 text-sm"></i>
                                   </div>
                                   <div class="flex-1 text-left">
-                                    <p class="font-medium">Cancel Request</p>
-                                    <p class="text-xs text-gray-500">Cancel this request</p>
+                                    <p class="font-medium">Approve Request</p>
+                                    <p class="text-xs text-gray-500">
+                                      Grant device borrowing access
+                                    </p>
                                   </div>
                                 </button>
 
                                 <!-- Divider -->
                                 <div class="border-t border-gray-100"></div>
 
-                                <!-- Delete Action -->
+                                <!-- Reject Action -->
                                 <button
-                                  @click="deleteRequest(request.id)"
+                                  @click="rejectRequest(request.id)"
                                   class="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-700 transition-colors duration-200 group"
+                                  :disabled="request.ict_approve === 'rejected'"
+                                  :class="{
+                                    'opacity-50 cursor-not-allowed':
+                                      request.ict_approve === 'rejected'
+                                  }"
                                 >
                                   <div
                                     class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-red-200 transition-colors duration-200"
                                   >
-                                    <i class="fas fa-trash text-red-600 text-sm"></i>
+                                    <i class="fas fa-times text-red-600 text-sm"></i>
                                   </div>
                                   <div class="flex-1 text-left">
-                                    <p class="font-medium">Delete Request</p>
-                                    <p class="text-xs text-gray-500">Permanently remove</p>
+                                    <p class="font-medium">Reject Request</p>
+                                    <p class="text-xs text-gray-500">
+                                      Deny device borrowing access
+                                    </p>
                                   </div>
                                 </button>
                               </div>
@@ -447,7 +496,7 @@
                     <h3 class="text-lg font-medium text-white mb-2">No requests found</h3>
                     <p class="text-blue-300">
                       {{
-                        searchQuery || statusFilter
+                        searchQuery || ictStatusFilter
                           ? 'Try adjusting your filters'
                           : 'No device borrowing requests have been submitted yet.'
                       }}
@@ -493,11 +542,10 @@
 </template>
 
 <script>
-  // import { ref } from 'vue' // Removed unused import
   import Header from '@/components/header.vue'
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppFooter from '@/components/footer.vue'
-  import axios from 'axios'
+  import deviceBorrowingService from '@/services/deviceBorrowingService'
 
   export default {
     name: 'RequestsList',
@@ -517,15 +565,25 @@
       return {
         requests: [],
         searchQuery: '',
-        statusFilter: '',
+        ictStatusFilter: '',
+        deviceTypeFilter: '',
+        departmentFilter: '',
         isLoading: false,
         openDropdown: null,
+        isProcessing: false,
         stats: {
           pending: 0,
+          approved: 0,
+          rejected: 0,
           returned: 0,
           compromised: 0,
           total: 0
-        }
+        },
+        showApprovalModal: false,
+        approvalNotes: '',
+        selectedRequestId: null,
+        actionType: null, // 'approve' or 'reject'
+        searchDebounce: null
       }
     },
     computed: {
@@ -537,17 +595,26 @@
           const query = this.searchQuery.toLowerCase()
           filtered = filtered.filter(
             (request) =>
-              request.borrowerName.toLowerCase().includes(query) ||
-              request.department.toLowerCase().includes(query) ||
-              this.getDeviceDisplayName(request.deviceType, request.customDevice)
+              (request.borrower_name || request.borrowerName || '').toLowerCase().includes(query) ||
+              (request.department || '').toLowerCase().includes(query) ||
+              (
+                request.device_name ||
+                this.getDeviceDisplayName(
+                  request.device_type || request.deviceType,
+                  request.custom_device || request.customDevice
+                )
+              )
                 .toLowerCase()
-                .includes(query)
+                .includes(query) ||
+              (request.request_id || '').toLowerCase().includes(query)
           )
         }
 
-        // Filter by status
-        if (this.statusFilter) {
-          filtered = filtered.filter((request) => request.status === this.statusFilter)
+        // Filter by ICT status (client-side filtering for better responsiveness)
+        if (this.ictStatusFilter) {
+          filtered = filtered.filter(
+            (request) => (request.ict_approve || 'pending') === this.ictStatusFilter
+          )
         }
 
         return filtered
@@ -556,19 +623,59 @@
     async mounted() {
       await this.fetchRequests()
     },
+    watch: {
+      // Watch for filter changes and refresh data
+      ictStatusFilter: {
+        handler() {
+          this.fetchRequests()
+        },
+        immediate: false
+      },
+      searchQuery: {
+        handler() {
+          // Debounce search to avoid too many API calls
+          clearTimeout(this.searchDebounce)
+          this.searchDebounce = setTimeout(() => {
+            this.fetchRequests()
+          }, 300)
+        },
+        immediate: false
+      }
+    },
+    beforeUnmount() {
+      // Clean up debounce timer
+      if (this.searchDebounce) {
+        clearTimeout(this.searchDebounce)
+      }
+    },
     methods: {
       async fetchRequests() {
         this.isLoading = true
         try {
-          // Fetch real data from API
-          const response = await axios.get('/api/device-requests')
-          this.requests = response.data
-          this.calculateStats()
+          // Fetch all device borrowing requests for ICT approval from booking_service table
+          const response = await deviceBorrowingService.getAllRequests({
+            search: this.searchQuery || undefined,
+            device_type: this.deviceTypeFilter || undefined,
+            department: this.departmentFilter || undefined,
+            ict_status: this.ictStatusFilter || undefined,
+            per_page: 50
+          })
+
+          if (response.success) {
+            this.requests = response.data.data || []
+            console.log('✅ Device borrowing requests loaded:', this.requests.length)
+
+            // Also fetch statistics
+            await this.fetchStatistics()
+          } else {
+            console.error('❌ Failed to fetch requests:', response.message)
+            throw new Error(response.message || 'Failed to fetch requests')
+          }
         } catch (error) {
           console.error('Error fetching requests:', error)
-          // Show user-friendly error message
-          alert('Unable to load requests. Please check your connection and try again.')
-          // No mock data - use real API data only
+          alert(
+            'Unable to load device borrowing requests. Please check your connection and try again.'
+          )
           this.requests = []
           this.calculateStats()
         } finally {
@@ -576,9 +683,17 @@
         }
       },
 
+      async fetchStatistics() {
+        // For now, calculate stats from loaded requests
+        // In future, we can add a dedicated API endpoint
+        this.calculateStats()
+      },
+
       calculateStats() {
         this.stats = {
-          pending: this.requests.filter((r) => r.status === 'pending').length,
+          pending: this.requests.filter((r) => r.ict_approve === 'pending').length,
+          approved: this.requests.filter((r) => r.ict_approve === 'approved').length,
+          rejected: this.requests.filter((r) => r.ict_approve === 'rejected').length,
           returned: this.requests.filter((r) => r.status === 'returned').length,
           compromised: this.requests.filter((r) => r.status === 'compromised').length,
           total: this.requests.length
@@ -594,59 +709,23 @@
       },
 
       getDeviceDisplayName(deviceType, customDevice) {
-        if (deviceType === 'others') {
-          return customDevice || 'Other Device'
-        }
-
-        const deviceNames = {
-          projector: 'Projector',
-          tv_remote: 'TV Remote',
-          hdmi_cable: 'HDMI Cable',
-          monitor: 'Monitor',
-          cpu: 'CPU',
-          keyboard: 'Keyboard',
-          pc: 'PC',
-          laptop: 'Laptop'
-        }
-
-        return deviceNames[deviceType] || deviceType
+        return deviceBorrowingService.getDeviceDisplayName(deviceType, customDevice)
       },
 
       formatDate(dateString) {
-        if (!dateString) return ''
-        const date = new Date(dateString)
-        return date.toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric'
-        })
+        return deviceBorrowingService.formatDate(dateString)
       },
 
       getStatusBadgeClass(status) {
-        const classes = {
-          pending: 'bg-yellow-100 text-yellow-800 border border-yellow-200',
-          returned: 'bg-green-100 text-green-800 border border-green-200',
-          compromised: 'bg-red-100 text-red-800 border border-red-200'
-        }
-        return classes[status] || 'bg-gray-100 text-gray-800 border border-gray-200'
+        return deviceBorrowingService.getStatusBadgeClass(status)
       },
 
       getStatusIcon(status) {
-        const icons = {
-          pending: 'fas fa-clock',
-          returned: 'fas fa-check-circle',
-          compromised: 'fas fa-exclamation-triangle'
-        }
-        return icons[status] || 'fas fa-question-circle'
+        return deviceBorrowingService.getStatusIcon(status)
       },
 
       getStatusText(status) {
-        const texts = {
-          pending: 'Pending',
-          returned: 'Returned',
-          compromised: 'Compromised'
-        }
-        return texts[status] || 'Unknown'
+        return deviceBorrowingService.getStatusText(status)
       },
 
       // Dropdown methods
@@ -659,58 +738,93 @@
       },
 
       // Action methods
-      async cancelRequest(requestId) {
+      async approveRequest(requestId) {
         try {
-          // Show confirmation dialog
-          if (!confirm('Are you sure you want to cancel this request?')) {
-            return
-          }
+          this.selectedRequestId = requestId
+          this.actionType = 'approve'
 
-          // Find the request and update its status
-          const requestIndex = this.requests.findIndex((req) => req.id === requestId)
-          if (requestIndex !== -1) {
-            this.requests[requestIndex].status = 'cancelled'
-          }
+          const confirmed = confirm(
+            'Are you sure you want to approve this device borrowing request?'
+          )
+          if (!confirmed) return
 
-          // Here you would typically make an API call to update the status
-          // await axios.put(`/api/device-requests/${requestId}/cancel`)
-
+          this.isProcessing = true
           this.closeDropdown()
-          this.calculateStats()
 
-          // Show success message (you can implement a toast notification)
-          console.log(`Request ${requestId} has been cancelled`)
+          // Get optional notes from user
+          const notes = prompt('Add approval notes (optional):') || ''
+
+          const response = await deviceBorrowingService.approveRequest(requestId, notes)
+
+          if (response.success) {
+            // Update local request status
+            const requestIndex = this.requests.findIndex((req) => req.id === requestId)
+            if (requestIndex !== -1) {
+              this.requests[requestIndex].ict_approve = 'approved'
+              this.requests[requestIndex].ict_notes = notes
+              this.requests[requestIndex].ict_approved_at = new Date().toISOString()
+            }
+
+            this.calculateStats()
+            alert('Device borrowing request approved successfully!')
+            console.log('✅ Request approved:', requestId)
+          } else {
+            throw new Error(response.message || 'Failed to approve request')
+          }
         } catch (error) {
-          console.error('Error cancelling request:', error)
-          // Show error message
-          alert('Error cancelling request. Please try again.')
+          console.error('❌ Error approving request:', error)
+          alert('Error approving request: ' + error.message)
+        } finally {
+          this.isProcessing = false
+          this.selectedRequestId = null
+          this.actionType = null
         }
       },
 
-      async deleteRequest(requestId) {
+      async rejectRequest(requestId) {
         try {
-          // Show confirmation dialog
-          if (
-            !confirm('Are you sure you want to delete this request? This action cannot be undone.')
-          ) {
+          this.selectedRequestId = requestId
+          this.actionType = 'reject'
+
+          const confirmed = confirm(
+            'Are you sure you want to reject this device borrowing request?'
+          )
+          if (!confirmed) return
+
+          // Get rejection reason (required)
+          const reason = prompt('Please provide a rejection reason (required):')
+          if (!reason || reason.trim() === '') {
+            alert('Rejection reason is required')
             return
           }
 
-          // Remove the request from the list
-          this.requests = this.requests.filter((req) => req.id !== requestId)
-
-          // Here you would typically make an API call to delete the request
-          // await axios.delete(`/api/device-requests/${requestId}`)
-
+          this.isProcessing = true
           this.closeDropdown()
-          this.calculateStats()
 
-          // Show success message (you can implement a toast notification)
-          console.log(`Request ${requestId} has been deleted`)
+          const response = await deviceBorrowingService.rejectRequest(requestId, reason)
+
+          if (response.success) {
+            // Update local request status
+            const requestIndex = this.requests.findIndex((req) => req.id === requestId)
+            if (requestIndex !== -1) {
+              this.requests[requestIndex].ict_approve = 'rejected'
+              this.requests[requestIndex].ict_notes = reason
+              this.requests[requestIndex].ict_approved_at = new Date().toISOString()
+            }
+
+            this.calculateStats()
+            alert('Device borrowing request rejected successfully!')
+            console.log('✅ Request rejected:', requestId)
+          } else {
+            throw new Error(response.message || 'Failed to reject request')
+          }
         } catch (error) {
-          console.error('Error deleting request:', error)
-          // Show error message
-          alert('Error deleting request. Please try again.')
+          console.error('❌ Error rejecting request:', error)
+          alert('Error rejecting request: ' + error.message)
+        } finally {
+          this.isProcessing = false
+          this.selectedRequestId = null
+          this.actionType = null
         }
       }
     }

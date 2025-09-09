@@ -19,6 +19,9 @@
       <router-view />
     </main>
 
+    <!-- Notification System -->
+    <NotificationSystem />
+
     <!-- Global error notification -->
     <div
       v-if="authError"
@@ -45,12 +48,14 @@
 <script>
   import { computed, onMounted, ref } from 'vue'
   import AuthLoadingScreen from './components/AuthLoadingScreen.vue'
+  import NotificationSystem from './components/NotificationSystem.vue'
   import { useAuthStore } from './stores/auth'
 
   export default {
     name: 'App',
     components: {
-      AuthLoadingScreen
+      AuthLoadingScreen,
+      NotificationSystem
     },
 
     setup() {

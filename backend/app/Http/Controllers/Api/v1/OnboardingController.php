@@ -27,6 +27,11 @@ class OnboardingController extends Controller
                 'data' => [
                     'needs_onboarding' => $user->needsOnboarding(),
                     'current_step' => $onboarding->current_step,
+                    'user_info' => [
+                        'name' => $user->name,
+                        'role' => $user->getPrimaryRoleName(),
+                        'role_display' => $user->getDisplayRoleNames(),
+                    ],
                     'progress' => [
                         'terms_accepted' => $onboarding->terms_accepted,
                         'terms_accepted_at' => $onboarding->terms_accepted_at,
@@ -365,7 +370,12 @@ class OnboardingController extends Controller
                 'data' => [
                     'completed' => true,
                     'completed_at' => $onboarding->completed_at,
-                    'needs_onboarding' => false
+                    'needs_onboarding' => false,
+                    'user_info' => [
+                        'name' => $user->name,
+                        'role' => $user->getPrimaryRoleName(),
+                        'role_display' => $user->getDisplayRoleNames(),
+                    ]
                 ]
             ]);
         } catch (\Exception $e) {

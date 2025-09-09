@@ -1,0 +1,1520 @@
+<template>
+  <div class="flex flex-col h-screen">
+    <Header />
+    <div class="flex flex-1 overflow-hidden">
+      <ModernSidebar />
+      <main
+        class="flex-1 p-6 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative"
+      >
+        <!-- Background Pattern -->
+        <div class="absolute inset-0 overflow-hidden">
+          <div class="absolute inset-0 opacity-5">
+            <div class="grid grid-cols-12 gap-8 h-full transform rotate-45">
+              <div
+                v-for="i in 48"
+                :key="i"
+                class="bg-white rounded-full w-2 h-2 animate-pulse"
+                :style="{ animationDelay: i * 0.1 + 's' }"
+              ></div>
+            </div>
+          </div>
+          <div class="absolute inset-0">
+            <div
+              v-for="i in 15"
+              :key="i"
+              class="absolute text-white opacity-10 animate-float"
+              :style="{
+                left: Math.random() * 100 + '%',
+                top: Math.random() * 100 + '%',
+                animationDelay: Math.random() * 3 + 's',
+                animationDuration: Math.random() * 3 + 2 + 's',
+                fontSize: Math.random() * 20 + 10 + 'px'
+              }"
+            >
+              <i
+                :class="[
+                  'fas',
+                  [
+                    'fa-clipboard-check',
+                    'fa-user-check',
+                    'fa-stamp',
+                    'fa-signature',
+                    'fa-check-double'
+                  ][Math.floor(Math.random() * 5)]
+                ]"
+              ></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="max-w-full mx-auto relative z-10 pb-4">
+          <!-- Header Section -->
+          <div class="medical-glass-card rounded-t-3xl p-6 mb-0 border-b border-blue-300/30">
+            <div class="flex justify-between items-center">
+              <!-- Left Logo -->
+              <div
+                class="w-28 h-28 mr-6 transform hover:scale-110 transition-transform duration-300"
+              >
+                <div
+                  class="w-full h-full bg-gradient-to-br from-blue-500/20 to-teal-500/20 rounded-2xl backdrop-blur-sm border-2 border-blue-300/40 flex items-center justify-center shadow-2xl hover:shadow-blue-500/25"
+                >
+                  <img
+                    src="/assets/images/ngao2.png"
+                    alt="National Shield"
+                    class="max-w-18 max-h-18 object-contain"
+                  />
+                </div>
+              </div>
+
+              <!-- Center Content -->
+              <div class="text-center flex-1">
+                <h1
+                  class="text-3xl font-bold text-white mb-4 tracking-wide drop-shadow-lg animate-fade-in"
+                >
+                  MUHIMBILI NATIONAL HOSPITAL
+                </h1>
+                <div class="relative inline-block mb-4">
+                  <div
+                    class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-3 rounded-full text-lg font-bold shadow-2xl transform hover:scale-105 transition-all duration-300 border-2 border-blue-400/60"
+                  >
+                    <span class="relative z-10 flex items-center gap-2">
+                      <i :class="getTypeIcon(requestData?.type)"></i>
+                      {{ getTypeDisplayName(requestData?.type) }} REQUEST
+                    </span>
+                    <div
+                      class="absolute inset-0 bg-gradient-to-r from-blue-700 to-blue-800 rounded-full opacity-0 hover:opacity-100 transition-opacity duration-300"
+                    ></div>
+                  </div>
+                </div>
+                <h2
+                  class="text-lg font-bold text-blue-100 tracking-wide drop-shadow-md animate-fade-in-delay"
+                >
+                  Request ID: {{ requestData?.id }} -
+                  {{
+                    userRole === ROLES.STAFF
+                      ? 'Request Details'
+                      : getRoleDisplayName(userRole) + ' Review'
+                  }}
+                </h2>
+              </div>
+
+              <!-- Right Logo -->
+              <div
+                class="w-28 h-28 ml-6 transform hover:scale-110 transition-transform duration-300"
+              >
+                <div
+                  class="w-full h-full bg-gradient-to-br from-teal-500/20 to-blue-500/20 rounded-2xl backdrop-blur-sm border-2 border-teal-300/40 flex items-center justify-center shadow-2xl hover:shadow-teal-500/25"
+                >
+                  <img
+                    src="/assets/images/logo2.png"
+                    alt="Muhimbili Logo"
+                    class="max-w-18 max-h-18 object-contain"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Main Content -->
+          <div class="medical-glass-card rounded-b-3xl overflow-hidden">
+            <div class="p-6 space-y-8">
+              <!-- Back Button -->
+              <div class="flex justify-between items-center">
+                <button
+                  @click="goBack"
+                  class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-lg hover:from-gray-700 hover:to-gray-800 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
+                >
+                  <i class="fas fa-arrow-left mr-2"></i>
+                  Back to Requests
+                </button>
+
+                <div class="flex items-center space-x-4">
+                  <span
+                    :class="getStatusBadgeClass(requestData?.currentStatus)"
+                    class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium"
+                  >
+                    <i :class="getStatusIcon(requestData?.currentStatus)" class="mr-2"></i>
+                    {{ getStatusText(requestData?.currentStatus) }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Out of Stock Warning for Booking Service -->
+              <div
+                v-if="isBookingService && isDeviceOutOfStock"
+                class="bg-gradient-to-r from-red-600/25 to-orange-600/25 border-2 border-red-400/40 p-6 rounded-2xl backdrop-blur-sm mb-8 animate-pulse"
+              >
+                <div class="flex items-center space-x-4 mb-4">
+                  <div
+                    class="w-14 h-14 bg-gradient-to-br from-red-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg"
+                  >
+                    <i class="fas fa-exclamation-triangle text-white text-xl"></i>
+                  </div>
+                  <h3 class="text-xl font-bold text-white flex items-center">
+                    <i class="fas fa-times-circle mr-2 text-red-300"></i>
+                    Device Availability Notice
+                  </h3>
+                </div>
+
+                <div class="bg-red-500/20 border border-red-400/30 rounded-xl p-4">
+                  <div class="flex items-start space-x-3">
+                    <i class="fas fa-info-circle text-red-300 text-lg mt-1 flex-shrink-0"></i>
+                    <div>
+                      <p class="text-white font-semibold mb-2">
+                        Device you requested is still in use - no available device in stock
+                      </p>
+                      <p class="text-red-100 text-sm">
+                        The device "{{ getRequestedDeviceName() }}" is currently out of stock. Your
+                        request will be processed once the device becomes available.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Approval Trail -->
+              <div
+                class="bg-gradient-to-r from-blue-600/30 to-blue-700/30 border-2 border-blue-400/50 p-6 rounded-xl backdrop-blur-sm shadow-lg hover:shadow-blue-500/25 transition-all duration-300"
+              >
+                <div class="flex items-center space-x-3 mb-6">
+                  <div
+                    class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md"
+                  >
+                    <i class="fas fa-route text-white text-sm"></i>
+                  </div>
+                  <h3 class="text-lg font-bold text-white flex items-center">
+                    <i class="fas fa-clipboard-check mr-2 text-blue-300"></i>
+                    Approval Trail
+                  </h3>
+                </div>
+
+                <!-- Compact Cards for Booking Service -->
+                <div v-if="isBookingService" class="space-y-4">
+                  <!-- ICT Officer Status Card -->
+                  <div class="bg-gradient-to-r from-blue-600/20 to-blue-700/20 border border-blue-400/40 rounded-lg p-4 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center space-x-3">
+                        <div
+                          :class="getApprovalStepClass('ict')"
+                          class="w-10 h-10 rounded-lg flex items-center justify-center shadow-md"
+                        >
+                          <i :class="getApprovalStepIcon('ict')" class="text-white text-sm"></i>
+                        </div>
+                        <div>
+                          <h4 class="text-white font-semibold text-sm">ICT Officer</h4>
+                          <p :class="getApprovalStatusTextClass('ict')" class="text-xs font-medium">
+                            {{ getApprovalStatusText('ict') }}
+                          </p>
+                        </div>
+                      </div>
+                      <div class="text-right">
+                        <p class="text-xs text-blue-300">
+                          {{ requestData?.ict_approved_at ? formatDate(requestData.ict_approved_at) : requestData?.ictApprovalDate ? formatDate(requestData.ictApprovalDate) : 'Pending' }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- ICT Officer Comments Card (Compact) -->
+                  <div 
+                    v-if="(requestData?.ictNotes && requestData?.ictNotes.trim()) || (requestData?.ict_notes && requestData?.ict_notes.trim())"
+                    class="mt-3"
+                  >
+                    <div 
+                      :class="getIctCommentsCardClass()"
+                      class="rounded-lg p-4 backdrop-blur-sm border transition-all duration-300 hover:shadow-lg"
+                    >
+                      <!-- Compact Header -->
+                      <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center space-x-2">
+                          <div 
+                            :class="getIctCommentsIconBgClass()"
+                            class="w-8 h-8 rounded-lg flex items-center justify-center shadow-sm"
+                          >
+                            <i :class="getIctCommentsIcon()" class="text-white text-sm"></i>
+                          </div>
+                          <div>
+                            <h5 class="text-white font-semibold text-sm">ICT Comments</h5>
+                            <p class="text-xs opacity-75" :class="getIctCommentsTextColor()">
+                              {{ requestData?.ictStatus === 'rejected' ? 'Rejection' : requestData?.ictStatus === 'approved' ? 'Approval' : 'Review' }} Reason
+                            </p>
+                          </div>
+                        </div>
+                        <div 
+                          :class="getIctCommentsStatusBadgeClass()"
+                          class="px-2 py-1 rounded text-xs font-semibold uppercase"
+                        >
+                          {{ requestData?.ictStatus }}
+                        </div>
+                      </div>
+                      
+                      <!-- Comment Content -->
+                      <div class="mb-3">
+                        <p class="text-white text-sm leading-relaxed">
+                          {{ requestData?.ictNotes || requestData?.ict_notes }}
+                        </p>
+                      </div>
+                      
+                      <!-- Footer -->
+                      <div class="flex justify-between items-center text-xs" :class="getIctCommentsTextColor()">
+                        <div class="flex items-center space-x-1">
+                          <i class="fas fa-calendar-alt"></i>
+                          <span>{{ requestData?.ict_approved_at ? formatDateTime(requestData.ict_approved_at) : requestData?.ictApprovalDate ? formatDateTime(requestData.ictApprovalDate) : 'Pending' }}</span>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                          <i class="fas fa-user"></i>
+                          <span>{{ requestData?.ict_approved_by_name || requestData?.ictApprovedBy || 'ICT Dept.' }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- For Access Requests: Full approval chain -->
+                <div v-else class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                  <!-- HOD Approval -->
+                  <div class="flex flex-col items-center">
+                    <div
+                      :class="getApprovalStepClass('hod')"
+                      class="w-12 h-12 rounded-full flex items-center justify-center mb-2 shadow-md"
+                    >
+                      <i :class="getApprovalStepIcon('hod')" class="text-white text-sm"></i>
+                    </div>
+                    <h4 class="text-xs font-semibold text-white text-center">HOD</h4>
+                    <p :class="getApprovalStatusTextClass('hod')" class="text-xs text-center mt-1">
+                      {{ getApprovalStatusText('hod') }}
+                    </p>
+                    <p
+                      v-if="requestData?.hodApprovalDate"
+                      class="text-xs text-blue-300 text-center mt-1"
+                    >
+                      {{ formatDate(requestData.hodApprovalDate) }}
+                    </p>
+                  </div>
+
+                  <!-- Divisional Director -->
+                  <div class="flex flex-col items-center">
+                    <div
+                      :class="getApprovalStepClass('divisional')"
+                      class="w-12 h-12 rounded-full flex items-center justify-center mb-2 shadow-md"
+                    >
+                      <i :class="getApprovalStepIcon('divisional')" class="text-white text-sm"></i>
+                    </div>
+                    <h4 class="text-xs font-semibold text-white text-center">Divisional</h4>
+                    <p
+                      :class="getApprovalStatusTextClass('divisional')"
+                      class="text-xs text-center mt-1"
+                    >
+                      {{ getApprovalStatusText('divisional') }}
+                    </p>
+                    <p
+                      v-if="requestData?.divisionalApprovalDate"
+                      class="text-xs text-blue-300 text-center mt-1"
+                    >
+                      {{ formatDate(requestData.divisionalApprovalDate) }}
+                    </p>
+                  </div>
+
+                  <!-- DICT -->
+                  <div class="flex flex-col items-center">
+                    <div
+                      :class="getApprovalStepClass('dict')"
+                      class="w-12 h-12 rounded-full flex items-center justify-center mb-2 shadow-md"
+                    >
+                      <i :class="getApprovalStepIcon('dict')" class="text-white text-sm"></i>
+                    </div>
+                    <h4 class="text-xs font-semibold text-white text-center">DICT</h4>
+                    <p :class="getApprovalStatusTextClass('dict')" class="text-xs text-center mt-1">
+                      {{ getApprovalStatusText('dict') }}
+                    </p>
+                    <p
+                      v-if="requestData?.dictApprovalDate"
+                      class="text-xs text-blue-300 text-center mt-1"
+                    >
+                      {{ formatDate(requestData.dictApprovalDate) }}
+                    </p>
+                  </div>
+
+                  <!-- Head of IT -->
+                  <div class="flex flex-col items-center">
+                    <div
+                      :class="getApprovalStepClass('headOfIt')"
+                      class="w-12 h-12 rounded-full flex items-center justify-center mb-2 shadow-md"
+                    >
+                      <i :class="getApprovalStepIcon('headOfIt')" class="text-white text-sm"></i>
+                    </div>
+                    <h4 class="text-xs font-semibold text-white text-center">Head IT</h4>
+                    <p
+                      :class="getApprovalStatusTextClass('headOfIt')"
+                      class="text-xs text-center mt-1"
+                    >
+                      {{ getApprovalStatusText('headOfIt') }}
+                    </p>
+                    <p
+                      v-if="requestData?.headOfItApprovalDate"
+                      class="text-xs text-blue-300 text-center mt-1"
+                    >
+                      {{ formatDate(requestData.headOfItApprovalDate) }}
+                    </p>
+                  </div>
+
+                  <!-- ICT Officer -->
+                  <div class="flex flex-col items-center">
+                    <div
+                      :class="getApprovalStepClass('ict')"
+                      class="w-12 h-12 rounded-full flex items-center justify-center mb-2 shadow-md"
+                    >
+                      <i :class="getApprovalStepIcon('ict')" class="text-white text-sm"></i>
+                    </div>
+                    <h4 class="text-xs font-semibold text-white text-center">ICT Officer</h4>
+                    <p :class="getApprovalStatusTextClass('ict')" class="text-xs text-center mt-1">
+                      {{ getApprovalStatusText('ict') }}
+                    </p>
+                    <p
+                      v-if="requestData?.ictApprovalDate"
+                      class="text-xs text-blue-300 text-center mt-1"
+                    >
+                      {{ formatDate(requestData.ictApprovalDate) }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              </div>
+
+              <!-- Staff Details Section -->
+              <div
+                class="bg-gradient-to-r from-teal-600/25 to-blue-600/25 border-2 border-teal-400/40 p-6 rounded-2xl backdrop-blur-sm"
+              >
+                <div class="flex items-center space-x-4 mb-6">
+                  <div
+                    class="w-14 h-14 bg-gradient-to-br from-teal-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg"
+                  >
+                    <i class="fas fa-user-md text-white text-xl"></i>
+                  </div>
+                  <h3 class="text-xl font-bold text-white flex items-center">
+                    <i class="fas fa-id-card mr-2 text-teal-300"></i>
+                    Staff Information
+                  </h3>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div class="bg-white/10 p-4 rounded-xl border border-teal-300/30">
+                    <label class="block text-sm font-semibold text-blue-100 mb-2">
+                      <i class="fas fa-hashtag mr-2"></i>PF Number
+                    </label>
+                    <p class="text-white font-medium">
+                      {{ requestData?.pfNumber }}
+                    </p>
+                  </div>
+
+                  <div class="bg-white/10 p-4 rounded-xl border border-teal-300/30">
+                    <label class="block text-sm font-semibold text-blue-100 mb-2">
+                      <i class="fas fa-user mr-2"></i>Staff Name
+                    </label>
+                    <p class="text-white font-medium">
+                      {{ requestData?.staffName }}
+                    </p>
+                  </div>
+
+                  <div class="bg-white/10 p-4 rounded-xl border border-teal-300/30">
+                    <label class="block text-sm font-semibold text-blue-100 mb-2">
+                      <i class="fas fa-building mr-2"></i>Department
+                    </label>
+                    <p class="text-white font-medium">
+                      {{ requestData?.department }}
+                    </p>
+                  </div>
+
+                  <div class="bg-white/10 p-4 rounded-xl border border-teal-300/30">
+                    <label class="block text-sm font-semibold text-blue-100 mb-2">
+                      <i class="fas fa-signature mr-2"></i>Digital Signature
+                    </label>
+                    <div class="flex items-center">
+                      <i
+                        :class="
+                          requestData?.digitalSignature
+                            ? 'fas fa-check-circle text-green-400'
+                            : 'fas fa-times-circle text-red-400'
+                        "
+                        class="mr-2"
+                      ></i>
+                      <span class="text-white font-medium">{{
+                        requestData?.digitalSignature ? 'Signed' : 'Not Signed'
+                      }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Request Details Section -->
+              <div
+                class="bg-gradient-to-r from-blue-600/25 to-cyan-600/25 border-2 border-blue-400/40 p-6 rounded-2xl backdrop-blur-sm"
+              >
+                <div class="flex items-center space-x-4 mb-6">
+                  <div
+                    class="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg"
+                  >
+                    <i :class="getTypeIcon(requestData?.type)" class="text-white text-xl"></i>
+                  </div>
+                  <h3 class="text-xl font-bold text-white flex items-center">
+                    <i class="fas fa-cogs mr-2 text-blue-300"></i>
+                    Request Details
+                  </h3>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div class="bg-white/10 p-4 rounded-xl border border-blue-300/30">
+                    <label class="block text-sm font-semibold text-blue-100 mb-2">
+                      <i class="fas fa-layer-group mr-2"></i>Request Type
+                    </label>
+                    <div class="flex items-center">
+                      <div
+                        :class="getTypeIconClass(requestData?.type)"
+                        class="w-8 h-8 rounded-lg flex items-center justify-center mr-3"
+                      >
+                        <i :class="getTypeIcon(requestData?.type)" class="text-white text-sm"></i>
+                      </div>
+                      <span class="text-white font-medium">{{
+                        getTypeDisplayName(requestData?.type)
+                      }}</span>
+                    </div>
+                  </div>
+
+                  <div class="bg-white/10 p-4 rounded-xl border border-blue-300/30">
+                    <label class="block text-sm font-semibold text-blue-100 mb-2">
+                      <i class="fas fa-calendar mr-2"></i>Submission Date
+                    </label>
+                    <p class="text-white font-medium">
+                      {{ formatDate(requestData?.submissionDate) }}
+                    </p>
+                  </div>
+
+                  <div class="bg-white/10 p-4 rounded-xl border border-blue-300/30">
+                    <label class="block text-sm font-semibold text-blue-100 mb-2">
+                      <i class="fas fa-toggle-on mr-2"></i>Module Requested For
+                    </label>
+                    <p class="text-white font-medium">
+                      {{ requestData?.moduleRequestedFor }}
+                    </p>
+                  </div>
+
+                  <div class="bg-white/10 p-4 rounded-xl border border-blue-300/30">
+                    <label class="block text-sm font-semibold text-blue-100 mb-2">
+                      <i class="fas fa-key mr-2"></i>Access Rights
+                    </label>
+                    <p class="text-white font-medium">
+                      {{ requestData?.accessType }}
+                    </p>
+                    <p v-if="requestData?.temporaryUntil" class="text-blue-300 text-sm mt-1">
+                      Until: {{ formatDate(requestData.temporaryUntil) }}
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Selected Modules -->
+                <div v-if="requestData?.selectedModules?.length" class="mt-6">
+                  <label class="block text-sm font-semibold text-blue-100 mb-3">
+                    <i class="fas fa-list mr-2"></i>Selected Modules
+                  </label>
+                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div
+                      v-for="module in requestData.selectedModules"
+                      :key="module"
+                      class="bg-white/10 p-3 rounded-lg border border-blue-300/30 flex items-center"
+                    >
+                      <i class="fas fa-check-circle text-green-400 mr-2"></i>
+                      <span class="text-white text-sm">{{ module }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Comments Section -->
+              <div
+                v-if="requestData?.comments"
+                class="bg-gradient-to-r from-purple-600/25 to-indigo-600/25 border-2 border-purple-400/40 p-6 rounded-2xl backdrop-blur-sm"
+              >
+                <div class="flex items-center space-x-4 mb-4">
+                  <div
+                    class="w-14 h-14 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg"
+                  >
+                    <i class="fas fa-comments text-white text-xl"></i>
+                  </div>
+                  <h3 class="text-xl font-bold text-white flex items-center">
+                    <i class="fas fa-comment-alt mr-2 text-purple-300"></i>
+                    Comments
+                  </h3>
+                </div>
+                <div class="bg-white/10 p-4 rounded-xl border border-purple-300/30">
+                  <p class="text-white">{{ requestData.comments }}</p>
+                </div>
+              </div>
+
+              <!-- Approval Actions -->
+              <div
+                v-if="canTakeAction"
+                class="bg-gradient-to-r from-emerald-600/25 to-green-600/25 border-2 border-emerald-400/40 p-6 rounded-2xl backdrop-blur-sm"
+              >
+                <div class="flex items-center space-x-4 mb-6">
+                  <div
+                    class="w-14 h-14 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg"
+                  >
+                    <i class="fas fa-gavel text-white text-xl"></i>
+                  </div>
+                  <h3 class="text-xl font-bold text-white flex items-center">
+                    <i class="fas fa-check-double mr-2 text-emerald-300"></i>
+                    Approval Actions
+                  </h3>
+                </div>
+
+                <!-- Comments Input -->
+                <div class="mb-6">
+                  <label class="block text-sm font-semibold text-blue-100 mb-3">
+                    <i class="fas fa-comment mr-2"></i>Add Comments (Optional)
+                  </label>
+                  <textarea
+                    v-model="approvalComments"
+                    rows="4"
+                    class="w-full px-4 py-3 bg-white/15 border border-emerald-300/30 rounded-xl focus:border-emerald-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 resize-y"
+                    placeholder="Enter your comments or reasons for approval/rejection..."
+                  ></textarea>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                  <button
+                    @click="approveRequest"
+                    :disabled="isProcessing"
+                    class="px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-300 font-bold flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <i class="fas fa-check mr-3"></i>
+                    {{ isProcessing ? 'Processing...' : 'Approve Request' }}
+                  </button>
+
+                  <button
+                    @click="rejectRequest"
+                    :disabled="isProcessing"
+                    class="px-8 py-4 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-xl hover:from-red-700 hover:to-pink-700 transition-all duration-300 font-bold flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <i class="fas fa-times mr-3"></i>
+                    {{ isProcessing ? 'Processing...' : 'Reject Request' }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer positioned within main content area -->
+        <AppFooter />
+      </main>
+    </div>
+
+    <!-- Loading Modal -->
+    <div
+      v-if="isLoading"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    >
+      <div class="bg-white rounded-xl shadow-2xl p-8 text-center">
+        <div
+          class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"
+        ></div>
+        <p class="text-gray-600">Loading request details...</p>
+      </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div
+      v-if="showSuccessModal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    >
+      <div class="bg-white rounded-xl shadow-2xl p-8 text-center max-w-md mx-4">
+        <div
+          class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4"
+        >
+          <i class="fas fa-check text-green-600 text-2xl"></i>
+        </div>
+        <h3 class="text-xl font-bold text-gray-800 mb-2">
+          {{ successMessage.title }}
+        </h3>
+        <p class="text-gray-600 mb-6">{{ successMessage.text }}</p>
+        <button
+          @click="closeSuccessModal"
+          class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 font-semibold"
+        >
+          Continue
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+  import { ref, computed, onMounted } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
+  import Header from '@/components/header.vue'
+  import ModernSidebar from '@/components/ModernSidebar.vue'
+  import AppFooter from '@/components/footer.vue'
+  import { useAuth } from '@/composables/useAuth'
+  import requestStatusService from '@/services/requestStatusService'
+  import deviceInventoryService from '@/services/deviceInventoryService'
+  // Import personalInfoService for API calls
+  // Note: We'll import it dynamically in the loadRequestData method to avoid import issues
+
+  export default {
+    name: 'InternalAccessDetails',
+    components: {
+      Header,
+      ModernSidebar,
+      AppFooter
+    },
+    setup() {
+      const route = useRoute()
+      const router = useRouter()
+      const { userRole, ROLES, getRoleDisplayName } = useAuth()
+
+      // Reactive data
+      // Sidebar state now managed by Pinia - no local state needed
+      const sidebarCollapsed = ref(false)
+      const requestData = ref(null)
+      const isLoading = ref(true)
+      const isProcessing = ref(false)
+      const approvalComments = ref('')
+      const showSuccessModal = ref(false)
+      const successMessage = ref({ title: '', text: '' })
+      const deviceInventoryData = ref(null)
+
+      // Mock request data - replace with actual API call
+      const mockRequestData = {
+        'REQ-001': {
+          id: 'REQ-001',
+          type: 'jeeva',
+          staffName: 'Dr. John Doe',
+          pfNumber: 'PF001234',
+          department: 'Cardiology',
+          digitalSignature: true,
+          moduleRequestedFor: 'Use',
+          selectedModules: ['DOCTOR CONSULTATION', 'MEDICAL RECORDS', 'OUTPATIENT'],
+          accessType: 'Permanent (until retirement)',
+          temporaryUntil: null,
+          submissionDate: '2024-01-15',
+          currentStatus: 'pending',
+          hodApprovalStatus: 'pending',
+          divisionalStatus: 'pending',
+          dictStatus: 'pending',
+          headOfItStatus: 'pending',
+          ictStatus: 'pending',
+          comments: 'Need access for patient consultation and medical record management.',
+          hodApprovalDate: null,
+          divisionalApprovalDate: null,
+          dictApprovalDate: null,
+          headOfItApprovalDate: null,
+          ictApprovalDate: null
+        },
+        'REQ-002': {
+          id: 'REQ-002',
+          type: 'wellsoft',
+          staffName: 'Jane Smith',
+          pfNumber: 'PF005678',
+          department: 'Nursing',
+          digitalSignature: false,
+          moduleRequestedFor: 'Use',
+          selectedModules: ['NURSING STATION', 'INPATIENT', 'MEDICATION'],
+          accessType: 'Temporary Until',
+          temporaryUntil: '2024-06-30',
+          submissionDate: '2024-01-14',
+          currentStatus: 'pending',
+          hodApprovalStatus: 'approved',
+          divisionalStatus: 'pending',
+          dictStatus: 'pending',
+          headOfItStatus: 'pending',
+          ictStatus: 'pending',
+          comments: 'Temporary assignment to nursing station for 6 months.',
+          hodApprovalDate: '2024-01-16',
+          divisionalApprovalDate: null,
+          dictApprovalDate: null,
+          headOfItApprovalDate: null,
+          ictApprovalDate: null
+        }
+      }
+
+      // Computed properties
+      const isBookingService = computed(() => {
+        return requestData.value?.type === 'booking_service'
+      })
+
+      const isDeviceOutOfStock = computed(() => {
+        if (!isBookingService.value || !deviceInventoryData.value) {
+          return false
+        }
+
+        // Check if the requested device is out of stock
+        return deviceInventoryData.value.available_quantity === 0
+      })
+
+      const canTakeAction = computed(() => {
+        if (!requestData.value) return false
+
+        // Staff users cannot take approval actions - they can only view
+        if (userRole.value === ROLES.STAFF) return false
+
+        // For booking service, only ICT Officer can take action
+        if (isBookingService.value) {
+          return userRole.value === ROLES.ICT_OFFICER && requestData.value.ictStatus === 'pending'
+        }
+
+        // For access requests, follow the full approval chain
+        switch (userRole.value) {
+          case ROLES.HEAD_OF_DEPARTMENT:
+            return requestData.value.hodApprovalStatus === 'pending'
+          case ROLES.DIVISIONAL_DIRECTOR:
+            return (
+              requestData.value.hodApprovalStatus === 'approved' &&
+              requestData.value.divisionalStatus === 'pending'
+            )
+          case ROLES.ICT_DIRECTOR:
+            return (
+              requestData.value.divisionalStatus === 'approved' &&
+              requestData.value.dictStatus === 'pending'
+            )
+
+          case ROLES.ICT_OFFICER:
+            return (
+              requestData.value.headOfItStatus === 'approved' &&
+              requestData.value.ictStatus === 'pending'
+            )
+          default:
+            return false
+        }
+      })
+
+      // Methods
+      const getTypeDisplayName = (type) => {
+        const names = {
+          jeeva: 'Jeeva Access',
+          wellsoft: 'Wellsoft Access',
+          internet: 'Internet Access',
+          combined_access: 'Combined Access',
+          booking_service: 'Device Booking',
+          combined: 'Combined Services'
+        }
+        return names[type] || type
+      }
+
+      const getTypeIcon = (type) => {
+        const icons = {
+          jeeva: 'fas fa-database',
+          wellsoft: 'fas fa-laptop-medical',
+          internet: 'fas fa-wifi',
+          combined_access: 'fas fa-layer-group',
+          booking_service: 'fas fa-calendar-check',
+          combined: 'fas fa-layer-group'
+        }
+        return icons[type] || 'fas fa-file'
+      }
+
+      const getTypeIconClass = (type) => {
+        const classes = {
+          jeeva: 'bg-gradient-to-br from-purple-500 to-indigo-600',
+          wellsoft: 'bg-gradient-to-br from-yellow-500 to-orange-600',
+          internet: 'bg-gradient-to-br from-green-500 to-emerald-600',
+          combined_access: 'bg-gradient-to-br from-blue-500 to-cyan-600',
+          booking_service: 'bg-gradient-to-br from-orange-500 to-red-600',
+          combined: 'bg-gradient-to-br from-blue-500 to-cyan-600'
+        }
+        return classes[type] || 'bg-gradient-to-br from-gray-500 to-gray-600'
+      }
+
+      const getStatusBadgeClass = (status) => {
+        const classes = {
+          pending: 'bg-yellow-100 text-yellow-800 border border-yellow-200',
+          approved: 'bg-green-100 text-green-800 border border-green-200',
+          rejected: 'bg-red-100 text-red-800 border border-red-200'
+        }
+        return classes[status] || 'bg-gray-100 text-gray-800 border border-gray-200'
+      }
+
+      const getStatusIcon = (status) => {
+        const icons = {
+          pending: 'fas fa-clock',
+          approved: 'fas fa-check-circle',
+          rejected: 'fas fa-times-circle'
+        }
+        return icons[status] || 'fas fa-question-circle'
+      }
+
+      const getStatusText = (status) => {
+        const texts = {
+          pending: 'Pending',
+          approved: 'Approved',
+          rejected: 'Rejected'
+        }
+        return texts[status] || 'Unknown'
+      }
+
+      const getApprovalStepClass = (step) => {
+        if (!requestData.value) return 'bg-gray-500'
+
+        const statuses = {
+          hod: requestData.value.hodApprovalStatus,
+          divisional: requestData.value.divisionalStatus,
+          dict: requestData.value.dictStatus,
+          headOfIt: requestData.value.headOfItStatus,
+          ict: requestData.value.ictStatus
+        }
+
+        const status = statuses[step]
+
+        if (status === 'approved') return 'bg-gradient-to-br from-green-500 to-emerald-600'
+        if (status === 'rejected') return 'bg-gradient-to-br from-red-500 to-pink-600'
+        if (status === 'pending') return 'bg-gradient-to-br from-yellow-500 to-orange-600'
+        if (status === null) return 'bg-gradient-to-br from-gray-400 to-gray-500 opacity-50'
+        return 'bg-gradient-to-br from-gray-500 to-gray-600'
+      }
+
+      const getApprovalStepIcon = (step) => {
+        if (!requestData.value) return 'fas fa-clock'
+
+        const statuses = {
+          hod: requestData.value.hodApprovalStatus,
+          divisional: requestData.value.divisionalStatus,
+          dict: requestData.value.dictStatus,
+          headOfIt: requestData.value.headOfItStatus,
+          ict: requestData.value.ictStatus
+        }
+
+        const status = statuses[step]
+
+        if (status === 'approved') return 'fas fa-check'
+        if (status === 'rejected') return 'fas fa-times'
+        if (status === 'pending') return 'fas fa-clock'
+        return 'fas fa-minus'
+      }
+
+      const getApprovalStatusText = (step) => {
+        if (!requestData.value) return 'Pending'
+
+        const statuses = {
+          hod: requestData.value.hodApprovalStatus,
+          divisional: requestData.value.divisionalStatus,
+          dict: requestData.value.dictStatus,
+          headOfIt: requestData.value.headOfItStatus,
+          ict: requestData.value.ictStatus
+        }
+
+        const status = statuses[step]
+
+        // For booking service, non-ICT steps should be hidden (null)
+        if (isBookingService.value && step !== 'ict' && status === null) {
+          return 'Not Required'
+        }
+
+        if (status === 'approved') return 'Approved'
+        if (status === 'rejected') return 'Rejected'
+        if (status === 'pending') return 'Pending'
+        if (status === null) return 'Not Required'
+        return 'Not Started'
+      }
+
+      const getApprovalStatusTextClass = (step) => {
+        if (!requestData.value) return 'text-gray-400'
+
+        const statuses = {
+          hod: requestData.value.hodApprovalStatus,
+          divisional: requestData.value.divisionalStatus,
+          dict: requestData.value.dictStatus,
+          headOfIt: requestData.value.headOfItStatus,
+          ict: requestData.value.ictStatus
+        }
+
+        const status = statuses[step]
+
+        if (status === 'approved') return 'text-green-400'
+        if (status === 'rejected') return 'text-red-400'
+        if (status === 'pending') return 'text-yellow-400'
+        return 'text-gray-400'
+      }
+
+      const formatDate = (dateString) => {
+        if (!dateString) return ''
+        const date = new Date(dateString)
+        return date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        })
+      }
+
+      const formatDateTime = (dateString) => {
+        if (!dateString) return ''
+        const date = new Date(dateString)
+        return date.toLocaleString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        })
+      }
+
+      // ICT Comments UI/UX Methods
+      const getIctCommentsCardClass = () => {
+        if (!requestData.value?.ictStatus) return 'bg-gradient-to-br from-blue-600/30 to-indigo-700/30 border-blue-400/40'
+        
+        const status = requestData.value.ictStatus
+        if (status === 'approved') {
+          return 'bg-gradient-to-br from-blue-600/25 to-green-600/25 border-blue-400/60 shadow-blue-500/30'
+        } else if (status === 'rejected') {
+          return 'bg-gradient-to-br from-blue-600/25 to-red-600/25 border-blue-400/60 shadow-blue-500/25'
+        }
+        return 'bg-gradient-to-br from-blue-600/25 to-yellow-600/25 border-blue-400/60 shadow-blue-500/25'
+      }
+
+      const getIctCommentsIconBgClass = () => {
+        if (!requestData.value?.ictStatus) return 'bg-gradient-to-br from-blue-500 to-blue-700'
+        
+        const status = requestData.value.ictStatus
+        if (status === 'approved') {
+          return 'bg-gradient-to-br from-blue-500 to-green-600'
+        } else if (status === 'rejected') {
+          return 'bg-gradient-to-br from-blue-500 to-red-600'
+        }
+        return 'bg-gradient-to-br from-blue-500 to-yellow-600'
+      }
+
+      const getIctCommentsIcon = () => {
+        if (!requestData.value?.ictStatus) return 'fas fa-comment'
+        
+        const status = requestData.value.ictStatus
+        if (status === 'approved') {
+          return 'fas fa-check-circle'
+        } else if (status === 'rejected') {
+          return 'fas fa-times-circle'
+        }
+        return 'fas fa-clock'
+      }
+
+      const getIctCommentsTextColor = () => {
+        if (!requestData.value?.ictStatus) return 'text-blue-200'
+        
+        const status = requestData.value.ictStatus
+        if (status === 'approved') {
+          return 'text-blue-200'
+        } else if (status === 'rejected') {
+          return 'text-blue-200'
+        }
+        return 'text-blue-200'
+      }
+
+      const getIctCommentsStatusBadgeClass = () => {
+        if (!requestData.value?.ictStatus) return 'bg-blue-600 text-blue-100'
+        
+        const status = requestData.value.ictStatus
+        if (status === 'approved') {
+          return 'bg-green-600 text-green-100 border border-blue-400/50'
+        } else if (status === 'rejected') {
+          return 'bg-red-600 text-red-100 border border-blue-400/50'
+        }
+        return 'bg-yellow-600 text-yellow-100 border border-blue-400/50'
+      }
+
+      const getIctCommentsBorderClass = () => {
+        if (!requestData.value?.ictStatus) return 'border-blue-400'
+        
+        const status = requestData.value.ictStatus
+        if (status === 'approved') {
+          return 'border-blue-400'
+        } else if (status === 'rejected') {
+          return 'border-blue-400'
+        }
+        return 'border-blue-400'
+      }
+
+      const getIctCommentsContentBgClass = () => {
+        if (!requestData.value?.ictStatus) return 'bg-blue-600/20 border-blue-400/30'
+        
+        const status = requestData.value.ictStatus
+        if (status === 'approved') {
+          return 'bg-blue-600/15 border-blue-400/30'
+        } else if (status === 'rejected') {
+          return 'bg-blue-600/15 border-blue-400/30'
+        }
+        return 'bg-blue-600/15 border-blue-400/30'
+      }
+
+      const getIctCommentsQuoteIconBgClass = () => {
+        if (!requestData.value?.ictStatus) return 'bg-blue-500/60'
+        
+        const status = requestData.value.ictStatus
+        if (status === 'approved') {
+          return 'bg-blue-500/60'
+        } else if (status === 'rejected') {
+          return 'bg-blue-500/60'
+        }
+        return 'bg-blue-500/60'
+      }
+
+      const getRequestedDeviceName = () => {
+        if (!requestData.value) return 'Unknown Device'
+
+        // For booking service, get the device name from selectedModules or deviceType
+        if (isBookingService.value) {
+          if (requestData.value.selectedModules && requestData.value.selectedModules.length > 0) {
+            return requestData.value.selectedModules[0]
+          }
+          if (requestData.value.deviceType) {
+            return requestData.value.deviceType
+          }
+        }
+
+        return 'Unknown Device'
+      }
+
+      const loadDeviceInventoryData = async () => {
+        if (!isBookingService.value || !requestData.value) {
+          return
+        }
+
+        try {
+          // If the request has a device_inventory_id, load that specific device
+          if (requestData.value.device_inventory_id) {
+            const response = await deviceInventoryService.getDevice(
+              requestData.value.device_inventory_id
+            )
+            if (response.success) {
+              deviceInventoryData.value = response.data.data
+            }
+          } else {
+            // If no device_inventory_id, try to find by device name
+            const deviceName = getRequestedDeviceName()
+            const response = await deviceInventoryService.getAvailableDevices()
+            if (response.success && response.data && response.data.data) {
+              const matchingDevice = response.data.data.find(
+                (device) =>
+                  device.device_name.toLowerCase().includes(deviceName.toLowerCase()) ||
+                  deviceName.toLowerCase().includes(device.device_name.toLowerCase())
+              )
+              if (matchingDevice) {
+                deviceInventoryData.value = matchingDevice
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Error loading device inventory data:', error)
+        }
+      }
+
+      const loadRequestData = async () => {
+        isLoading.value = true
+        try {
+          const requestId = route.query.id
+          const requestType = route.query.type
+          const userAccessId = route.query.userAccessId
+
+          console.log('🔍 Loading request data:', { requestId, requestType, userAccessId })
+          console.log('🔍 Current route:', route.fullPath)
+          console.log('🔍 User role:', userRole.value)
+
+          // Try to load from request status API first
+          if (requestId && requestType) {
+            try {
+              const response = await requestStatusService.getRequestDetails(requestId, requestType)
+
+              if (response.success) {
+                requestData.value = response.data
+                console.log('✅ Request data loaded from API:', requestData.value)
+                // Load device inventory data if this is a booking service
+                await loadDeviceInventoryData()
+                return
+              } else {
+                console.warn('⚠️ Request status API failed:', response.error)
+              }
+            } catch (apiError) {
+              console.warn('⚠️ Request status API error:', apiError)
+            }
+          }
+
+          // Fallback to personalInfoService if we have userAccessId
+          if (userAccessId) {
+            try {
+              // Import the service dynamically to avoid import issues
+              const { default: personalInfoService } = await import(
+                '@/services/personalInfoService'
+              )
+
+              const result = await personalInfoService.getPersonalInfoFromUserAccess(userAccessId)
+
+              if (result.success) {
+                // Transform API data to match component structure
+                const apiData = result.data
+
+                requestData.value = {
+                  id: requestId,
+                  type: requestType,
+                  staffName:
+                    apiData.personal_information?.staff_name || apiData.pf_number || 'Unknown',
+                  pfNumber:
+                    apiData.personal_information?.pf_number || apiData.pf_number || 'Unknown',
+                  department:
+                    apiData.personal_information?.department || apiData.department || 'Unknown',
+                  digitalSignature:
+                    apiData.personal_information?.signature?.exists ||
+                    apiData.signature?.exists ||
+                    false,
+                  moduleRequestedFor: 'Use', // Default value
+                  selectedModules: Array.isArray(apiData.request_details?.request_type)
+                    ? apiData.request_details.request_type
+                    : [apiData.request_details?.request_type || requestType],
+                  accessType: 'Permanent (until retirement)', // Default value
+                  temporaryUntil: null,
+                  submissionDate:
+                    apiData.request_details?.submission_date ||
+                    apiData.request_details?.created_at ||
+                    new Date().toISOString().split('T')[0],
+                  currentStatus: apiData.request_details?.status || 'pending',
+                  hodApprovalStatus: 'pending', // Since this is for HOD approval
+                  divisionalStatus: 'pending',
+                  dictStatus: 'pending',
+                  headOfItStatus: 'pending',
+                  ictStatus: 'pending',
+                  comments: apiData.request_details?.purpose
+                    ? Array.isArray(apiData.request_details.purpose)
+                      ? apiData.request_details.purpose.join(', ')
+                      : apiData.request_details.purpose
+                    : 'No comments provided',
+                  hodApprovalDate: null,
+                  divisionalApprovalDate: null,
+                  dictApprovalDate: null,
+                  headOfItApprovalDate: null,
+                  ictApprovalDate: null
+                }
+
+                console.log('✅ Fallback request data loaded:', requestData.value)
+                // Load device inventory data if this is a booking service
+                await loadDeviceInventoryData()
+                return
+              } else {
+                throw new Error(result.error || 'Failed to load request data')
+              }
+            } catch (apiError) {
+              console.error('❌ PersonalInfo API Error:', apiError)
+            }
+          }
+
+          // Final fallback to mock data
+          console.log('Using mock data as final fallback')
+          requestData.value = mockRequestData[requestId] || null
+
+          if (!requestData.value) {
+            throw new Error('Request not found in any data source')
+          }
+
+          // Load device inventory data if this is a booking service
+          await loadDeviceInventoryData()
+        } catch (error) {
+          console.error('❌ Error loading request:', error)
+          
+          // Show detailed error information
+          const errorMessage = `Error loading request details:
+
+Request ID: ${route.query.id}
+Request Type: ${route.query.type}
+User Access ID: ${route.query.userAccessId}
+
+Error: ${error.message}
+
+Would you like to go to the debug page to troubleshoot?`
+          
+          if (confirm(errorMessage)) {
+            // Navigate to debug page with current parameters
+            const params = new URLSearchParams()
+            if (route.query.id) params.append('id', route.query.id)
+            if (route.query.type) params.append('type', route.query.type)
+            if (route.query.userAccessId) params.append('userAccessId', route.query.userAccessId)
+            
+            router.push(`/debug/request-details?${params.toString()}`)
+          } else {
+            // Navigate back based on user role
+            if (userRole.value === ROLES.STAFF) {
+              router.push('/request-status')
+            } else {
+              router.push('/hod-dashboard/request-list')
+            }
+          }
+        } finally {
+          isLoading.value = false
+        }
+      }
+
+      const approveRequest = async () => {
+        if (!confirm('Are you sure you want to approve this request?')) return
+
+        isProcessing.value = true
+        try {
+          console.log('Approving request:', requestData.value.id, 'as', userRole.value)
+
+          // TODO: Implement real API call for approval
+          // For now, simulate the API call
+          await new Promise((resolve) => setTimeout(resolve, 1500))
+
+          // Update the appropriate approval status
+          const currentDate = new Date().toISOString().split('T')[0]
+
+          switch (userRole.value) {
+            case ROLES.HEAD_OF_DEPARTMENT:
+              requestData.value.hodApprovalStatus = 'approved'
+              requestData.value.hodApprovalDate = currentDate
+              break
+            case ROLES.DIVISIONAL_DIRECTOR:
+              requestData.value.divisionalStatus = 'approved'
+              requestData.value.divisionalApprovalDate = currentDate
+              break
+            case ROLES.ICT_DIRECTOR:
+              requestData.value.dictStatus = 'approved'
+              requestData.value.dictApprovalDate = currentDate
+              break
+            case ROLES.ICT_OFFICER:
+              requestData.value.ictStatus = 'approved'
+              requestData.value.ictApprovalDate = currentDate
+              requestData.value.currentStatus = 'approved'
+              break
+          }
+
+          successMessage.value = {
+            title: 'Request Approved!',
+            text: `Request ${requestData.value.id} has been successfully approved.`
+          }
+          showSuccessModal.value = true
+
+          console.log('✅ Request approved successfully')
+        } catch (error) {
+          console.error('❌ Error approving request:', error)
+          alert('Error approving request. Please try again.')
+        } finally {
+          isProcessing.value = false
+        }
+      }
+
+      const rejectRequest = async () => {
+        if (!confirm('Are you sure you want to reject this request?')) return
+
+        isProcessing.value = true
+        try {
+          console.log('Rejecting request:', requestData.value.id, 'as', userRole.value)
+
+          // TODO: Implement real API call for rejection
+          // For now, simulate the API call
+          await new Promise((resolve) => setTimeout(resolve, 1500))
+
+          // Update the appropriate approval status
+          const currentDate = new Date().toISOString().split('T')[0]
+
+          switch (userRole.value) {
+            case ROLES.HEAD_OF_DEPARTMENT:
+              requestData.value.hodApprovalStatus = 'rejected'
+              requestData.value.hodApprovalDate = currentDate
+              break
+            case ROLES.DIVISIONAL_DIRECTOR:
+              requestData.value.divisionalStatus = 'rejected'
+              requestData.value.divisionalApprovalDate = currentDate
+              break
+            case ROLES.ICT_DIRECTOR:
+              requestData.value.dictStatus = 'rejected'
+              requestData.value.dictApprovalDate = currentDate
+              break
+            case ROLES.ICT_OFFICER:
+              requestData.value.ictStatus = 'rejected'
+              requestData.value.ictApprovalDate = currentDate
+              break
+          }
+
+          requestData.value.currentStatus = 'rejected'
+
+          successMessage.value = {
+            title: 'Request Rejected!',
+            text: `Request ${requestData.value.id} has been rejected.`
+          }
+          showSuccessModal.value = true
+
+          console.log('✅ Request rejected successfully')
+        } catch (error) {
+          console.error('❌ Error rejecting request:', error)
+          alert('Error rejecting request. Please try again.')
+        } finally {
+          isProcessing.value = false
+        }
+      }
+
+      const goBack = () => {
+        // Navigate back based on user role
+        if (userRole.value === ROLES.STAFF) {
+          router.push('/request-status')
+        } else {
+          router.push('/hod-dashboard/request-list')
+        }
+      }
+
+      const closeSuccessModal = () => {
+        showSuccessModal.value = false
+        // Optionally redirect back to list
+        setTimeout(() => {
+          goBack()
+        }, 500)
+      }
+
+      // Lifecycle
+      onMounted(async () => {
+        await loadRequestData()
+      })
+
+      return {
+        sidebarCollapsed,
+        requestData,
+        isLoading,
+        isProcessing,
+        approvalComments,
+        showSuccessModal,
+        successMessage,
+        canTakeAction,
+        isBookingService,
+        isDeviceOutOfStock,
+        deviceInventoryData,
+        userRole,
+        ROLES,
+        getRoleDisplayName,
+        getTypeDisplayName,
+        getTypeIcon,
+        getTypeIconClass,
+        getStatusBadgeClass,
+        getStatusIcon,
+        getStatusText,
+        getApprovalStepClass,
+        getApprovalStepIcon,
+        getApprovalStatusText,
+        getApprovalStatusTextClass,
+        formatDate,
+        formatDateTime,
+        getRequestedDeviceName,
+        loadDeviceInventoryData,
+        approveRequest,
+        rejectRequest,
+        goBack,
+        closeSuccessModal,
+        // ICT Comments methods
+        getIctCommentsCardClass,
+        getIctCommentsIconBgClass,
+        getIctCommentsIcon,
+        getIctCommentsTextColor,
+        getIctCommentsStatusBadgeClass,
+        getIctCommentsBorderClass,
+        getIctCommentsContentBgClass,
+        getIctCommentsQuoteIconBgClass
+      }
+    }
+  }
+</script>
+
+<style scoped>
+  /* Glass morphism effects */
+  .medical-glass-card {
+    background: rgba(59, 130, 246, 0.15);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 2px solid rgba(96, 165, 250, 0.3);
+    box-shadow:
+      0 8px 32px rgba(29, 78, 216, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  /* Shimmer animation for ICT comments */
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  .animate-shimmer {
+    animation: shimmer 3s ease-in-out infinite;
+  }
+
+  /* Animations */
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-15px);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-in-delay {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-fade-in {
+    animation: fade-in 1s ease-out;
+  }
+
+  .animate-fade-in-delay {
+    animation: fade-in-delay 1s ease-out 0.3s both;
+  }
+
+  /* Focus styles for accessibility */
+  textarea:focus,
+  button:focus {
+    box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.3);
+  }
+
+  /* Smooth transitions */
+  * {
+    transition-property:
+      color, background-color, border-color, text-decoration-color, fill, stroke, opacity,
+      box-shadow, transform, filter, backdrop-filter;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 200ms;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: rgba(59, 130, 246, 0.1);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.3);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(59, 130, 246, 0.5);
+  }
+</style>

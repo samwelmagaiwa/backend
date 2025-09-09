@@ -39,6 +39,54 @@
           <!-- Main Content -->
           <div class="medical-glass-card rounded-b-3xl overflow-hidden">
             <div class="p-6 space-y-6">
+              <!-- Pending Booking Restriction Message -->
+              <div
+                v-if="showPendingBookingMessage"
+                class="medical-card bg-gradient-to-r from-yellow-600/25 to-orange-700/25 border-2 border-yellow-400/40 p-6 rounded-2xl mb-6"
+              >
+                <div class="flex items-center space-x-4">
+                  <div
+                    class="w-16 h-16 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg"
+                  >
+                    <i class="fas fa-exclamation-triangle text-white text-2xl"></i>
+                  </div>
+                  <div class="flex-1">
+                    <h3 class="text-xl font-bold text-white mb-2">
+                      Pending Booking Request Restriction
+                    </h3>
+                    <p class="text-yellow-100/90 text-sm mb-3">
+                      You cannot submit a new booking request because you already have a pending
+                      booking request that needs to be processed.
+                    </p>
+                    <div class="flex items-center space-x-4">
+                      <div
+                        class="bg-yellow-500/20 px-3 py-1 rounded-full border border-yellow-400/30"
+                      >
+                        <span class="text-yellow-300 text-sm font-medium">
+                          Policy: One pending booking at a time
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex flex-col space-y-2">
+                    <button
+                      v-if="pendingBookingId"
+                      @click="viewPendingBookingDetails"
+                      class="px-4 py-2 bg-yellow-500/20 hover:bg-yellow-500/30 border border-yellow-400/30 rounded-lg text-yellow-300 text-sm font-medium transition-colors"
+                    >
+                      <i class="fas fa-eye mr-1"></i>
+                      View Pending Request
+                    </button>
+                    <button
+                      @click="showPendingBookingMessage = false"
+                      class="w-8 h-8 bg-yellow-500/20 hover:bg-yellow-500/30 rounded-lg flex items-center justify-center transition-colors"
+                    >
+                      <i class="fas fa-times text-yellow-300"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               <!-- Success Message (shown after submission) -->
               <div
                 v-if="showSuccessMessage"
@@ -170,6 +218,12 @@
                             Submitted
                           </th>
                           <th class="text-left py-3 px-4 text-blue-200 font-semibold text-sm">
+                            Device Status
+                          </th>
+                          <th class="text-left py-3 px-4 text-blue-200 font-semibold text-sm">
+                            Return Status
+                          </th>
+                          <th class="text-left py-3 px-4 text-blue-200 font-semibold text-sm">
                             Actions
                           </th>
                         </tr>
@@ -224,7 +278,10 @@
                               {{ getCurrentStepText(request.current_step) }}
                             </div>
                             <div class="text-blue-300 text-xs">
-                              Step {{ request.current_step }} of 7
+                              <span v-if="request.current_step === 0"
+                                >Waiting from another user</span
+                              >
+                              <span v-else>Step {{ request.current_step }} of 7</span>
                             </div>
                           </td>
                           <td class="py-4 px-4">
@@ -234,6 +291,79 @@
                             <div class="text-blue-300 text-xs">
                               {{ formatTime(request.created_at) }}
                             </div>
+                          </td>
+                          <td class="py-4 px-4">
+                            <div
+                              v-if="
+                                request.type === 'booking_service' && request.device_availability
+                              "
+                            >
+                              <div
+                                v-if="request.device_availability.is_available"
+                                class="flex items-center space-x-2"
+                              >
+                                <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                                <span class="text-green-300 text-xs font-medium">Available</span>
+                              </div>
+                              <div
+                                v-else-if="request.device_availability.status === 'out_of_stock'"
+                                class="space-y-1"
+                              >
+                                <div class="flex items-center space-x-2">
+                                  <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
+                                  <span class="text-yellow-300 text-xs font-medium">In Use</span>
+                                </div>
+                                <div
+                                  v-if="
+                                    request.device_availability.current_users &&
+                                    request.device_availability.current_users.length > 0
+                                  "
+                                  class="text-xs text-blue-200"
+                                >
+                                  By:
+                                  {{
+                                    request.device_availability.current_users
+                                      .map((u) => u.user_name)
+                                      .join(', ')
+                                  }}
+                                </div>
+                                <div
+                                  v-if="request.device_availability.nearest_return"
+                                  class="text-xs text-orange-300"
+                                >
+                                  Available:
+                                  {{ request.device_availability.nearest_return.relative_time }}
+                                </div>
+                                <div
+                                  v-if="request.device_availability.nearest_return"
+                                  class="text-xs text-blue-300"
+                                >
+                                  {{ request.device_availability.nearest_return.date_time }}
+                                </div>
+                              </div>
+                              <div v-else class="flex items-center space-x-2">
+                                <div class="w-2 h-2 rounded-full bg-red-500"></div>
+                                <span class="text-red-300 text-xs font-medium">Unavailable</span>
+                              </div>
+                            </div>
+                            <div v-else class="text-gray-400 text-xs">N/A</div>
+                          </td>
+                          <td class="py-4 px-4">
+                            <div v-if="request.type === 'booking_service'">
+                              <div class="flex items-center space-x-2">
+                                <div
+                                  class="w-2 h-2 rounded-full"
+                                  :class="getReturnStatusColor(request.return_status)"
+                                ></div>
+                                <span
+                                  class="text-xs font-medium"
+                                  :class="getReturnStatusTextColor(request.return_status)"
+                                >
+                                  {{ getReturnStatusText(request.return_status) }}
+                                </span>
+                              </div>
+                            </div>
+                            <div v-else class="text-gray-400 text-xs">N/A</div>
                           </td>
                           <td class="py-4 px-4">
                             <button
@@ -293,13 +423,80 @@
                         <div class="text-white text-sm">
                           {{ getCurrentStepText(request.current_step) }}
                           <span class="text-blue-300 text-xs ml-2">
-                            (Step {{ request.current_step }} of 7)
+                            <span v-if="request.current_step === 0"
+                              >(Waiting from another user)</span
+                            >
+                            <span v-else>(Step {{ request.current_step }} of 7)</span>
                           </span>
                         </div>
 
                         <div class="text-blue-300 text-xs">
                           {{ formatDate(request.created_at) }} at
                           {{ formatTime(request.created_at) }}
+                        </div>
+
+                        <!-- Device Availability for mobile -->
+                        <div
+                          v-if="request.type === 'booking_service' && request.device_availability"
+                          class="mt-2"
+                        >
+                          <div
+                            v-if="request.device_availability.is_available"
+                            class="flex items-center space-x-2"
+                          >
+                            <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                            <span class="text-green-300 text-xs font-medium">Device Available</span>
+                          </div>
+                          <div
+                            v-else-if="request.device_availability.status === 'out_of_stock'"
+                            class="space-y-1"
+                          >
+                            <div class="flex items-center space-x-2">
+                              <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
+                              <span class="text-yellow-300 text-xs font-medium">Device In Use</span>
+                            </div>
+                            <div
+                              v-if="
+                                request.device_availability.current_users &&
+                                request.device_availability.current_users.length > 0
+                              "
+                              class="text-xs text-blue-200 ml-4"
+                            >
+                              By:
+                              {{
+                                request.device_availability.current_users
+                                  .map((u) => u.user_name)
+                                  .join(', ')
+                              }}
+                            </div>
+                            <div
+                              v-if="request.device_availability.nearest_return"
+                              class="text-xs text-orange-300 ml-4"
+                            >
+                              Check back:
+                              {{ request.device_availability.nearest_return.relative_time }}
+                            </div>
+                          </div>
+                          <div v-else class="flex items-center space-x-2">
+                            <div class="w-2 h-2 rounded-full bg-red-500"></div>
+                            <span class="text-red-300 text-xs font-medium">Device Unavailable</span>
+                          </div>
+                        </div>
+
+                        <!-- Return Status for mobile -->
+                        <div v-if="request.type === 'booking_service'" class="mt-2">
+                          <div class="flex items-center space-x-2">
+                            <div
+                              class="w-2 h-2 rounded-full"
+                              :class="getReturnStatusColor(request.return_status)"
+                            ></div>
+                            <span
+                              class="text-xs font-medium"
+                              :class="getReturnStatusTextColor(request.return_status)"
+                            >
+                              Return: {{ getReturnStatusText(request.return_status) }}
+                            </span>
+                          </div>
                         </div>
                       </div>
 
@@ -347,6 +544,8 @@
       // Sidebar state now managed by Pinia - no local state needed
       const loading = ref(false)
       const showSuccessMessage = ref(false)
+      const showPendingBookingMessage = ref(false)
+      const pendingBookingId = ref(null)
       const requestType = ref('')
       const latestRequestId = ref('')
 
@@ -378,6 +577,15 @@
           latestRequestId.value = route.query.id || 'REQ-2025-NEW'
 
           // Clear query parameters
+          router.replace({ query: {} })
+        }
+
+        // Check if redirected due to pending booking restriction
+        if (route.query.pendingBooking === 'true') {
+          showPendingBookingMessage.value = true
+          pendingBookingId.value = route.query.pendingId || null
+
+          // Clear query parameters but keep the notification visible
           router.replace({ query: {} })
         }
 
@@ -442,6 +650,18 @@
         router.push('/user-dashboard')
       }
 
+      const viewPendingBookingDetails = () => {
+        if (pendingBookingId.value) {
+          router.push({
+            path: '/request-details',
+            query: {
+              id: pendingBookingId.value,
+              type: 'booking_service'
+            }
+          })
+        }
+      }
+
       // Use service methods for consistent formatting
       const getRequestTypeIcon = (type) => {
         return requestStatusService.getRequestTypeIcon(type)
@@ -464,6 +684,11 @@
       }
 
       const getCurrentStepText = (step) => {
+        // Special case for step 0: Waiting from another user (per user rule)
+        if (step === 0) {
+          return 'Waiting from another user'
+        }
+
         const stepObj = approvalSteps.find((s) => s.id === step)
         return stepObj ? stepObj.label : `Step ${step}`
       }
@@ -498,6 +723,34 @@
         return requestStatusService.formatTime(dateString)
       }
 
+      // Return status methods
+      const getReturnStatusText = (returnStatus) => {
+        const statusMap = {
+          'not_yet_returned': 'Not Yet Returned',
+          'returned': 'Returned',
+          'returned_but_compromised': 'Returned but Compromised'
+        }
+        return statusMap[returnStatus] || returnStatus || 'Not Yet Returned'
+      }
+
+      const getReturnStatusColor = (returnStatus) => {
+        const colorMap = {
+          'not_yet_returned': 'bg-yellow-400',
+          'returned': 'bg-green-400',
+          'returned_but_compromised': 'bg-orange-400'
+        }
+        return colorMap[returnStatus] || 'bg-gray-400'
+      }
+
+      const getReturnStatusTextColor = (returnStatus) => {
+        const textColorMap = {
+          'not_yet_returned': 'text-yellow-400',
+          'returned': 'text-green-400',
+          'returned_but_compromised': 'text-orange-400'
+        }
+        return textColorMap[returnStatus] || 'text-gray-400'
+      }
+
       return {
         loading,
         requests,
@@ -506,6 +759,8 @@
         perPage,
         lastPage,
         showSuccessMessage,
+        showPendingBookingMessage,
+        pendingBookingId,
         requestType,
         latestRequestId,
         approvalSteps,
@@ -514,6 +769,7 @@
         viewRequestDetails,
         goToSubmitRequest,
         submitNewRequest,
+        viewPendingBookingDetails,
         getRequestTypeIcon,
         getRequestTypeName,
         getStatusColor,
@@ -523,7 +779,10 @@
         getStepStatusClass,
         getStepTextClass,
         formatDate,
-        formatTime
+        formatTime,
+        getReturnStatusText,
+        getReturnStatusColor,
+        getReturnStatusTextColor
       }
     }
   }

@@ -38,7 +38,7 @@
             <i class="fas fa-trophy text-white text-lg drop-shadow-lg relative z-10"></i>
           </div>
           <h2 class="text-xl font-bold text-white mb-1 drop-shadow-lg">Congratulations!</h2>
-          <p class="text-blue-100 text-sm font-medium drop-shadow-sm">Head of Department</p>
+          <p class="text-blue-100 text-sm font-medium drop-shadow-sm">{{ userRoleDisplay }}</p>
         </div>
       </div>
 
@@ -123,6 +123,10 @@
       userName: {
         type: String,
         required: true
+      },
+      userRoleDisplay: {
+        type: String,
+        default: 'Staff Member'
       },
       message: {
         type: String,

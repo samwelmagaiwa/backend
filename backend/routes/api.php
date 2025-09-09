@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\v1\OnboardingController;
 use App\Http\Controllers\Api\v1\AdminController;
 use App\Http\Controllers\Api\v1\UserAccessController;
 use App\Http\Controllers\Api\v1\BookingServiceController;
+use App\Http\Controllers\Api\v1\ICTApprovalController;
 use App\Http\Controllers\Api\v1\DeclarationController;
 use App\Http\Controllers\Api\v1\BothServiceFormController;
 use App\Http\Controllers\Api\v1\AdminUserController;
@@ -224,9 +225,43 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('devices/{deviceInventoryId}/availability', [BookingServiceController::class, 'checkDeviceAvailability'])->name('booking-service.device-availability');
         Route::get('devices/{deviceInventoryId}/bookings', [BookingServiceController::class, 'getDeviceBookings'])->name('booking-service.device-bookings');
         
+        // Pending request checking
+        Route::get('check-pending-requests', [BookingServiceController::class, 'checkPendingRequests'])->name('booking-service.check-pending-requests');
+        
         // Admin actions
         Route::post('bookings/{bookingService}/approve', [BookingServiceController::class, 'approve'])->name('booking-service.approve');
         Route::post('bookings/{bookingService}/reject', [BookingServiceController::class, 'reject'])->name('booking-service.reject');
+        
+        // ICT Officer actions
+        Route::get('ict-approval-requests', [BookingServiceController::class, 'getIctApprovalRequests'])
+            ->middleware('role:ict_officer,admin,ict_director')
+            ->name('booking-service.ict-approval-requests');
+        Route::post('bookings/{bookingService}/ict-approve', [BookingServiceController::class, 'ictApprove'])
+            ->middleware('role:ict_officer,admin,ict_director')
+            ->name('booking-service.ict-approve');
+        Route::post('bookings/{bookingService}/ict-reject', [BookingServiceController::class, 'ictReject'])
+            ->middleware('role:ict_officer,admin,ict_director')
+            ->name('booking-service.ict-reject');
+    });
+
+    // ICT Approval routes (ICT Officer only)
+    Route::prefix('ict-approval')->middleware('role:ict_officer,admin,ict_director')->group(function () {
+        // Debug endpoint (must be before parameterized routes)
+        Route::get('debug', [ICTApprovalController::class, 'debugICTApprovalSystem'])->name('ict-approval.debug');
+        
+        // Statistics (must be before parameterized routes)
+        Route::get('device-requests/statistics', [ICTApprovalController::class, 'getDeviceBorrowingStatistics'])->name('ict-approval.statistics');
+        
+        // Device borrowing requests management
+        Route::get('device-requests', [ICTApprovalController::class, 'getDeviceBorrowingRequests'])->name('ict-approval.device-requests');
+        Route::get('device-requests/{requestId}', [ICTApprovalController::class, 'getDeviceBorrowingRequestDetails'])->name('ict-approval.device-request-details');
+        
+        // Approval/rejection actions
+        Route::post('device-requests/{requestId}/approve', [ICTApprovalController::class, 'approveDeviceBorrowingRequest'])->name('ict-approval.approve');
+        Route::post('device-requests/{requestId}/reject', [ICTApprovalController::class, 'rejectDeviceBorrowingRequest'])->name('ict-approval.reject');
+        
+        // User details auto-capture
+        Route::post('device-requests/{bookingId}/link-user', [ICTApprovalController::class, 'linkUserDetailsToBooking'])->name('ict-approval.link-user');
     });
 
     // Both Service Form routes (HOD Dashboard)

@@ -173,7 +173,7 @@ class RequestStatusController extends Controller
                     'user_id' => $user->id
                 ]);
                 
-                $booking = BookingService::with(['user', 'departmentInfo', 'approvedBy'])
+                $booking = BookingService::with(['user', 'departmentInfo', 'approvedBy', 'ictApprovedBy'])
                     ->where('id', $requestId)
                     ->where('user_id', $user->id)
                     ->first();
@@ -250,15 +250,22 @@ class RequestStatusController extends Controller
                 'in_review' => UserAccess::where('user_id', $user->id)->where('status', 'in_review')->count(),
             ];
 
-            // Booking requests statistics
+            // Booking requests statistics (based on ICT approval status)
+            $userBookings = BookingService::where('user_id', $user->id)->get();
             $bookingStats = [
-                'total' => BookingService::where('user_id', $user->id)->count(),
-                'pending' => BookingService::where('user_id', $user->id)->where('status', 'pending')->count(),
-                'approved' => BookingService::where('user_id', $user->id)->where('status', 'approved')->count(),
-                'rejected' => BookingService::where('user_id', $user->id)->where('status', 'rejected')->count(),
-                'in_use' => BookingService::where('user_id', $user->id)->where('status', 'in_use')->count(),
-                'returned' => BookingService::where('user_id', $user->id)->where('status', 'returned')->count(),
-                'overdue' => BookingService::where('user_id', $user->id)->overdue()->count(),
+                'total' => $userBookings->count(),
+                'pending' => $userBookings->filter(function($booking) {
+                    return $this->getBookingStatusForUser($booking) === 'pending';
+                })->count(),
+                'approved' => $userBookings->filter(function($booking) {
+                    return $this->getBookingStatusForUser($booking) === 'approved';
+                })->count(),
+                'rejected' => $userBookings->filter(function($booking) {
+                    return $this->getBookingStatusForUser($booking) === 'rejected';
+                })->count(),
+                'in_use' => $userBookings->where('status', 'in_use')->count(),
+                'returned' => $userBookings->where('status', 'returned')->count(),
+                'overdue' => $userBookings->where('status', 'overdue')->count(),
             ];
 
             // Combined statistics
@@ -338,17 +345,31 @@ class RequestStatusController extends Controller
             $departmentName = $department ? $department->name : "Department ID: {$booking->department}";
         }
 
+        // Get device availability info if device is from inventory
+        $deviceAvailabilityInfo = null;
+        $isDeviceOutOfStock = false;
+        if ($booking->device_inventory_id) {
+            $deviceAvailabilityInfo = $this->getDeviceAvailabilityInfo($booking->device_inventory_id);
+            $isDeviceOutOfStock = $deviceAvailabilityInfo && !$deviceAvailabilityInfo['is_available'] && $deviceAvailabilityInfo['status'] === 'out_of_stock';
+        }
+
+        // Determine appropriate status and current step
+        $status = $this->getBookingStatusForUser($booking, $isDeviceOutOfStock);
+        $currentStep = $this->getBookingCurrentStep($status, $isDeviceOutOfStock);
+
         return [
             'id' => 'BOOK-' . str_pad($booking->id, 6, '0', STR_PAD_LEFT),
             'original_id' => $booking->id,
             'type' => 'booking_service',
             'services' => [$deviceDisplayName],
-            'status' => $booking->status,
-            'current_step' => $this->getBookingCurrentStep($booking->status),
+            'status' => $status,
+            'current_step' => $currentStep,
             'created_at' => $booking->created_at->toISOString(),
             'updated_at' => $booking->updated_at->toISOString(),
             'staff_name' => $booking->borrower_name,
             'department' => $departmentName,
+            'device_availability' => $deviceAvailabilityInfo,
+            'return_status' => $booking->return_status ?? 'not_yet_returned',
         ];
     }
 
@@ -451,7 +472,7 @@ class RequestStatusController extends Controller
                 'returnTime' => $booking->return_time,
                 'reason' => $booking->reason,
                 'submissionDate' => $booking->created_at->format('Y-m-d'),
-                'currentStatus' => $booking->status,
+                'currentStatus' => $this->getBookingStatusForUser($booking),
                 'adminNotes' => $booking->admin_notes,
                 'approvedBy' => $booking->approvedBy ? $booking->approvedBy->name : null,
                 'approvedAt' => $booking->approved_at ? $booking->approved_at->toISOString() : null,
@@ -465,22 +486,31 @@ class RequestStatusController extends Controller
                 'accessType' => 'Temporary Booking',
                 'temporaryUntil' => $booking->return_date ? $booking->return_date->format('Y-m-d') : null,
                 'comments' => $booking->reason,
+                // ICT Approval Information (determines final booking status)
+                'ict_approve' => $booking->ict_approve ?? 'pending',
+                'ict_notes' => $booking->ict_notes,
+                'ict_approved_by' => $booking->ict_approved_by,
+                'ict_approved_at' => $booking->ict_approved_at ? $booking->ict_approved_at->toISOString() : null,
+                'ict_approved_by_name' => $booking->ictApprovedBy ? $booking->ictApprovedBy->name : null,
+                
                 // For booking service, only show ICT Officer approval (remove HOD, Divisional, DICT, Head of IT)
                 'hodApprovalStatus' => null, // Hidden for booking service
                 'divisionalStatus' => null, // Hidden for booking service
                 'dictStatus' => null, // Hidden for booking service
                 'headOfItStatus' => null, // Hidden for booking service
-                'ictStatus' => $this->getBookingApprovalStatus($booking->status),
+                'ictStatus' => $booking->ict_approve ?? 'pending',
                 'hodApprovalDate' => null,
                 'divisionalApprovalDate' => null,
                 'dictApprovalDate' => null,
                 'headOfItApprovalDate' => null,
-                'ictApprovalDate' => $booking->approved_at ? $booking->approved_at->format('Y-m-d') : null,
+                'ictApprovalDate' => $booking->ict_approved_at ? $booking->ict_approved_at->format('Y-m-d') : null,
                 'signature_info' => $booking->signature_path ? [
                     'path' => $booking->signature_path,
                     'url' => $signatureUrl,
                     'exists' => true
                 ] : null,
+                // Return Status field
+                'return_status' => $booking->return_status ?? 'not_yet_returned',
             ];
         } catch (\Exception $e) {
             Log::error('Error transforming booking request for details', [
@@ -524,15 +554,21 @@ class RequestStatusController extends Controller
     /**
      * Get current step for booking requests.
      */
-    private function getBookingCurrentStep(string $status): int
+    private function getBookingCurrentStep(string $status, bool $isDeviceOutOfStock = false): int
     {
+        // If device is out of stock and status is pending, show waiting step
+        // User rule: current step should be 'waiting from another user' instead of 'HOD review'
+        if ($isDeviceOutOfStock && $status === 'pending') {
+            return 0; // Special step for waiting from another user to return the device
+        }
+        
         $stepMap = [
-            'pending' => 1, // Pending Approval
-            'approved' => 2, // Approved
-            'in_use' => 3, // Device In Use
-            'returned' => 4, // Completed
-            'rejected' => 1, // Stopped at approval
-            'overdue' => 3, // Still in use but overdue
+            'pending' => 1, // Pending ICT Approval (or waiting for device)
+            'approved' => 6, // ICT Officer Approved (step 6 to match access request workflow)
+            'in_use' => 7, // Device In Use (final step)
+            'returned' => 7, // Device Returned (completed)
+            'rejected' => 6, // Rejected by ICT Officer (step 6)
+            'overdue' => 7, // Still in use but overdue (final step)
         ];
 
         return $stepMap[$status] ?? 1;
@@ -573,6 +609,49 @@ class RequestStatusController extends Controller
                 return 'approved'; // Device was approved but is now overdue
             default:
                 return 'pending';
+        }
+    }
+
+    /**
+     * Get booking status for user display (prioritizes ICT approval status).
+     */
+    private function getBookingStatusForUser(BookingService $booking, bool $isDeviceOutOfStock = false): string
+    {
+        // For booking service, the ICT approval status determines the user-visible status
+        // Priority order: ICT approval status > general status > out-of-stock logic
+        
+        // If ICT has explicitly approved or rejected, show that
+        if ($booking->ict_approve && in_array($booking->ict_approve, ['approved', 'rejected'])) {
+            return $booking->ict_approve;
+        }
+        
+        // If device is out of stock and ICT hasn't made a decision yet, treat as 'pending' instead of 'out of stock'
+        // User rule: when selected device is not available, status should be 'pending' not 'out of stock'
+        if ($isDeviceOutOfStock && ($booking->ict_approve === 'pending' || !$booking->ict_approve)) {
+            return 'pending'; // Waiting for another user to return the device
+        }
+        
+        // If ICT approval is pending, show pending regardless of general status
+        if ($booking->ict_approve === 'pending') {
+            return 'pending';
+        }
+        
+        // Fallback to general booking status interpretation
+        switch ($booking->status) {
+            case 'pending':
+                return 'pending'; // Waiting for ICT approval
+            case 'approved':
+                return 'approved'; // Approved by ICT
+            case 'rejected':
+                return 'rejected'; // Rejected by ICT
+            case 'in_use':
+                return 'approved'; // Device is in use (was approved)
+            case 'returned':
+                return 'approved'; // Device returned (was approved)
+            case 'overdue':
+                return 'approved'; // Device overdue (was approved but not returned)
+            default:
+                return $booking->status;
         }
     }
 
@@ -694,6 +773,82 @@ class RequestStatusController extends Controller
                 'message' => 'Debug failed.',
                 'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
             ], 500);
+        }
+    }
+
+    /**
+     * Get device availability information for a booking request.
+     */
+    private function getDeviceAvailabilityInfo(int $deviceInventoryId): ?array
+    {
+        try {
+            // Get the device availability information
+            $availabilityInfo = BookingService::checkDeviceAvailability($deviceInventoryId);
+            
+            if (!$availabilityInfo['available'] && $availabilityInfo['can_request']) {
+                // Device is out of stock, get active bookings info
+                $activeBookings = BookingService::getActiveBookingsForDevice($deviceInventoryId);
+                
+                $currentUsers = [];
+                $nearestReturnInfo = null;
+                
+                foreach ($activeBookings as $activeBooking) {
+                    $currentUsers[] = [
+                        'user_name' => $activeBooking->user ? $activeBooking->user->name : $activeBooking->borrower_name,
+                        'return_date' => $activeBooking->return_date ? $activeBooking->return_date->format('M d, Y') : 'Not specified',
+                        'return_time' => $activeBooking->return_time ?? 'Not specified',
+                        'return_date_time' => $activeBooking->return_date_time ? $activeBooking->return_date_time->format('M d, Y \\a\\t g:i A') : 'Not specified'
+                    ];
+                }
+                
+                // Get the nearest return time
+                if (isset($availabilityInfo['nearest_return'])) {
+                    $nearestReturnInfo = [
+                        'date_time' => $availabilityInfo['nearest_return']->format('M d, Y \\a\\t g:i A'),
+                        'date_only' => $availabilityInfo['nearest_return']->format('M d, Y'),
+                        'time_only' => $availabilityInfo['nearest_return']->format('g:i A'),
+                        'is_today' => $availabilityInfo['nearest_return']->isToday(),
+                        'is_tomorrow' => $availabilityInfo['nearest_return']->isTomorrow(),
+                        'relative_time' => $availabilityInfo['nearest_return']->diffForHumans()
+                    ];
+                }
+                
+                return [
+                    'is_available' => false,
+                    'status' => 'out_of_stock',
+                    'message' => $availabilityInfo['message'],
+                    'current_users' => $currentUsers,
+                    'nearest_return' => $nearestReturnInfo,
+                    'can_request' => true
+                ];
+            } elseif ($availabilityInfo['available']) {
+                return [
+                    'is_available' => true,
+                    'status' => 'available',
+                    'message' => 'Device is available for borrowing',
+                    'available_quantity' => $availabilityInfo['available_quantity'] ?? 1,
+                    'can_request' => true
+                ];
+            } else {
+                return [
+                    'is_available' => false,
+                    'status' => 'unavailable',
+                    'message' => $availabilityInfo['message'] ?? 'Device is not available',
+                    'can_request' => false
+                ];
+            }
+        } catch (\Exception $e) {
+            Log::error('Error getting device availability info', [
+                'device_inventory_id' => $deviceInventoryId,
+                'error' => $e->getMessage()
+            ]);
+            
+            return [
+                'is_available' => false,
+                'status' => 'unknown',
+                'message' => 'Unable to determine device availability',
+                'can_request' => true
+            ];
         }
     }
 }

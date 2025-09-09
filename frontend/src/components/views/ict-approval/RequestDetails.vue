@@ -113,11 +113,20 @@
 
                 <div class="flex items-center space-x-4">
                   <span
-                    :class="getStatusBadgeClass(request.status)"
+                    :class="
+                      getStatusBadgeClass(
+                        request.ict_approve || request.ict_status || request.status
+                      )
+                    "
                     class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium"
                   >
-                    <i :class="getStatusIcon(request.status)" class="mr-2"></i>
-                    {{ getStatusText(request.status) }}
+                    <i
+                      :class="
+                        getStatusIcon(request.ict_approve || request.ict_status || request.status)
+                      "
+                      class="mr-2"
+                    ></i>
+                    {{ getStatusText(request.ict_approve || request.ict_status || request.status) }}
                   </span>
                 </div>
               </div>
@@ -139,6 +148,19 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <!-- Request ID -->
+                  <div class="group">
+                    <label class="block text-sm font-semibold text-blue-100 mb-2 flex items-center">
+                      <i class="fas fa-hashtag mr-2 text-teal-300 text-sm"></i>
+                      Request ID
+                    </label>
+                    <div
+                      class="px-4 py-3 bg-white/10 border border-blue-300/30 rounded-lg text-white text-sm backdrop-blur-sm font-mono"
+                    >
+                      {{ request.request_id || `REQ-${String(request.id).padStart(6, '0')}` }}
+                    </div>
+                  </div>
+
                   <!-- Borrower Name -->
                   <div class="group">
                     <label class="block text-sm font-semibold text-blue-100 mb-2 flex items-center">
@@ -148,7 +170,7 @@
                     <div
                       class="px-4 py-3 bg-white/10 border border-blue-300/30 rounded-lg text-white text-sm backdrop-blur-sm"
                     >
-                      {{ request.borrowerName }}
+                      {{ request.borrower_name || request.borrowerName || 'Unknown' }}
                     </div>
                   </div>
 
@@ -161,7 +183,7 @@
                     <div
                       class="px-4 py-3 bg-white/10 border border-blue-300/30 rounded-lg text-white text-sm backdrop-blur-sm"
                     >
-                      {{ request.department }}
+                      {{ request.department || 'Unknown Department' }}
                     </div>
                   </div>
 
@@ -174,7 +196,20 @@
                     <div
                       class="px-4 py-3 bg-white/10 border border-blue-300/30 rounded-lg text-white text-sm backdrop-blur-sm"
                     >
-                      {{ request.phoneNumber }}
+                      {{ request.borrower_phone || request.phoneNumber || 'No phone provided' }}
+                    </div>
+                  </div>
+
+                  <!-- PF Number -->
+                  <div v-if="request.pf_number" class="group">
+                    <label class="block text-sm font-semibold text-blue-100 mb-2 flex items-center">
+                      <i class="fas fa-id-badge mr-2 text-teal-300 text-sm"></i>
+                      PF Number
+                    </label>
+                    <div
+                      class="px-4 py-3 bg-white/10 border border-blue-300/30 rounded-lg text-white text-sm backdrop-blur-sm font-mono"
+                    >
+                      {{ request.pf_number }}
                     </div>
                   </div>
 
@@ -187,7 +222,13 @@
                     <div
                       class="px-4 py-3 bg-white/10 border border-blue-300/30 rounded-lg text-white text-sm backdrop-blur-sm"
                     >
-                      {{ getDeviceDisplayName(request.deviceType, request.customDevice) }}
+                      {{
+                        request.device_name ||
+                        getDeviceDisplayName(
+                          request.device_type || request.deviceType,
+                          request.custom_device || request.customDevice
+                        )
+                      }}
                     </div>
                   </div>
 
@@ -200,7 +241,7 @@
                     <div
                       class="px-4 py-3 bg-white/10 border border-blue-300/30 rounded-lg text-white text-sm backdrop-blur-sm"
                     >
-                      {{ formatDate(request.bookingDate) }}
+                      {{ formatDate(request.booking_date || request.bookingDate) }}
                     </div>
                   </div>
 
@@ -213,8 +254,8 @@
                     <div
                       class="px-4 py-3 bg-white/10 border border-blue-300/30 rounded-lg text-white text-sm backdrop-blur-sm"
                     >
-                      {{ formatDate(request.collectionDate) }} at
-                      {{ request.returnTime }}
+                      {{ formatDate(request.collection_date || request.collectionDate) }} at
+                      {{ request.return_time || request.returnTime || 'No time specified' }}
                     </div>
                   </div>
 
@@ -230,7 +271,7 @@
                       class="px-4 py-3 bg-white/10 border border-blue-300/30 rounded-lg text-white text-sm backdrop-blur-sm"
                     >
                       <div
-                        v-if="request.signature"
+                        v-if="request.has_signature || request.signature || request.signature_path"
                         class="flex items-center justify-center text-green-400"
                       >
                         <i class="fas fa-check-circle mr-2"></i>
@@ -257,12 +298,15 @@
                   <div
                     class="px-4 py-3 bg-white/10 border border-blue-300/30 rounded-lg text-white text-sm backdrop-blur-sm"
                   >
-                    {{ request.reason }}
+                    {{ request.purpose || request.reason || 'No reason provided' }}
                   </div>
                 </div>
 
                 <!-- Digital Signature -->
-                <div v-if="request.signature" class="mt-6">
+                <div
+                  v-if="request.has_signature || request.signature || request.signature_path"
+                  class="mt-6"
+                >
                   <label class="block text-sm font-semibold text-blue-100 mb-2 flex items-center">
                     <i class="fas fa-signature mr-2 text-teal-300 text-sm"></i>
                     Digital Signature
@@ -275,7 +319,7 @@
                         class="inline-block bg-white/20 p-3 rounded-lg border border-teal-300/30"
                       >
                         <img
-                          :src="request.signature"
+                          :src="request.signature_url || request.signature"
                           alt="Digital Signature"
                           class="max-h-16 max-w-48 object-contain"
                         />
@@ -292,167 +336,56 @@
                 </div>
               </div>
 
-              <!-- ICT Officer Assessment Form -->
+              <!-- ICT Officer Actions -->
               <div
-                class="booking-card bg-gradient-to-r from-blue-600/25 to-teal-600/25 border-2 border-blue-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-500 group"
+                v-if="canTakeAction"
+                class="booking-card bg-gradient-to-r from-emerald-600/25 to-green-600/25 border-2 border-emerald-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-xl hover:shadow-emerald-500/20 transition-all duration-500 group"
               >
                 <div class="flex items-center space-x-4 mb-6">
                   <div
-                    class="w-12 h-12 bg-gradient-to-br from-blue-500 to-teal-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
+                    class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-emerald-300/50"
                   >
-                    <i class="fas fa-clipboard-check text-white text-lg"></i>
+                    <i class="fas fa-gavel text-white text-lg"></i>
                   </div>
                   <h3 class="text-xl font-bold text-white flex items-center">
-                    <i class="fas fa-tools mr-2 text-blue-300"></i>
-                    ICT Officer Assessment
+                    <i class="fas fa-check-double mr-2 text-emerald-300"></i>
+                    ICT Officer Actions
                   </h3>
                 </div>
 
-                <form @submit.prevent="saveAssessment" class="space-y-6">
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Device Condition Assessment -->
-                    <div class="group">
-                      <label
-                        class="block text-sm font-semibold text-indigo-100 mb-2 flex items-center"
-                      >
-                        <i class="fas fa-search mr-2 text-indigo-300 text-sm"></i>
-                        Device Condition Assessment
-                        <span class="text-red-400 ml-1">*</span>
-                      </label>
-                      <div class="relative">
-                        <select
-                          v-model="assessment.deviceCondition"
-                          class="w-full px-3 py-3 border border-indigo-300/30 rounded-lg focus:border-indigo-400 focus:outline-none text-white bg-indigo-100/20 focus:bg-indigo-100/30 transition-all backdrop-blur-sm group-hover:border-indigo-400/50 appearance-none cursor-pointer text-sm"
-                          required
-                        >
-                          <option value="" class="bg-indigo-800 text-indigo-300">
-                            Select Condition
-                          </option>
-                          <option value="good" class="bg-indigo-800 text-white">Good</option>
-                          <option value="minor_issues" class="bg-indigo-800 text-white">
-                            Minor Issues
-                          </option>
-                          <option value="needs_repair" class="bg-indigo-800 text-white">
-                            Needs Repair
-                          </option>
-                        </select>
-                        <div
-                          class="absolute right-3 top-1/2 transform -translate-y-1/2 text-indigo-300/50 pointer-events-none"
-                        >
-                          <i class="fas fa-chevron-down text-sm"></i>
-                        </div>
-                      </div>
-                      <div
-                        v-if="errors.deviceCondition"
-                        class="text-red-400 text-xs mt-1 flex items-center"
-                      >
-                        <i class="fas fa-exclamation-circle mr-1"></i>
-                        {{ errors.deviceCondition }}
-                      </div>
-                    </div>
+                <!-- Comments Input -->
+                <div class="mb-6">
+                  <label class="block text-sm font-semibold text-emerald-100 mb-3">
+                    <i class="fas fa-comment mr-2"></i>Add Comments (Optional)
+                  </label>
+                  <textarea
+                    v-model="approvalComments"
+                    rows="4"
+                    class="w-full px-4 py-3 bg-white/15 border border-emerald-300/30 rounded-xl focus:border-emerald-400 focus:outline-none text-white placeholder-emerald-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 resize-y"
+                    placeholder="Enter your comments or reasons for approval/rejection..."
+                  ></textarea>
+                </div>
 
-                    <!-- Status -->
-                    <div class="group">
-                      <label
-                        class="block text-sm font-semibold text-indigo-100 mb-2 flex items-center"
-                      >
-                        <i class="fas fa-flag mr-2 text-indigo-300 text-sm"></i>
-                        Status <span class="text-red-400 ml-1">*</span>
-                      </label>
-                      <div class="relative">
-                        <select
-                          v-model="assessment.status"
-                          class="w-full px-3 py-3 border border-indigo-300/30 rounded-lg focus:border-indigo-400 focus:outline-none text-white bg-indigo-100/20 focus:bg-indigo-100/30 transition-all backdrop-blur-sm group-hover:border-indigo-400/50 appearance-none cursor-pointer text-sm"
-                          required
-                        >
-                          <option value="" class="bg-indigo-800 text-indigo-300">
-                            Select Status
-                          </option>
-                          <option value="pending" class="bg-indigo-800 text-white">Pending</option>
-                          <option value="returned" class="bg-indigo-800 text-white">
-                            Returned
-                          </option>
-                          <option value="compromised" class="bg-indigo-800 text-white">
-                            Compromised
-                          </option>
-                        </select>
-                        <div
-                          class="absolute right-3 top-1/2 transform -translate-y-1/2 text-indigo-300/50 pointer-events-none"
-                        >
-                          <i class="fas fa-chevron-down text-sm"></i>
-                        </div>
-                      </div>
-                      <div v-if="errors.status" class="text-red-400 text-xs mt-1 flex items-center">
-                        <i class="fas fa-exclamation-circle mr-1"></i>
-                        {{ errors.status }}
-                      </div>
-                    </div>
-                  </div>
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                  <button
+                    @click="approveRequest"
+                    :disabled="isProcessing"
+                    class="px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-300 font-bold flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <i class="fas fa-check mr-3"></i>
+                    {{ isProcessing ? 'Processing...' : 'Approve Request' }}
+                  </button>
 
-                  <!-- Condition Before Issues -->
-                  <div class="group">
-                    <label
-                      class="block text-sm font-semibold text-indigo-100 mb-2 flex items-center"
-                    >
-                      <i class="fas fa-comment-dots mr-2 text-indigo-300 text-sm"></i>
-                      Condition Before Issues / Notes
-                    </label>
-                    <div class="relative">
-                      <textarea
-                        v-model="assessment.conditionNotes"
-                        class="w-full px-3 py-3 bg-white/15 border border-indigo-300/30 rounded-lg focus:border-indigo-400 focus:outline-none text-white placeholder-indigo-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-indigo-500/20 group-hover:border-indigo-400/50 resize-none text-sm"
-                        rows="4"
-                        placeholder="Describe any issues noticed with the device or additional notes..."
-                      ></textarea>
-                      <div
-                        class="absolute inset-0 rounded-lg bg-gradient-to-r from-indigo-500/10 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                      ></div>
-                    </div>
-                  </div>
-
-                  <!-- Assessment Date -->
-                  <div class="group">
-                    <label
-                      class="block text-sm font-semibold text-indigo-100 mb-2 flex items-center"
-                    >
-                      <i class="fas fa-calendar-check mr-2 text-indigo-300 text-sm"></i>
-                      Assessment Date
-                    </label>
-                    <div class="relative">
-                      <input
-                        v-model="assessment.assessmentDate"
-                        type="date"
-                        class="w-full px-3 py-3 bg-white/15 border border-indigo-300/30 rounded-lg focus:border-indigo-400 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-indigo-500/20 group-hover:border-indigo-400/50 text-sm"
-                        required
-                      />
-                      <div
-                        class="absolute inset-0 rounded-lg bg-gradient-to-r from-indigo-500/10 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                      ></div>
-                    </div>
-                  </div>
-
-                  <!-- Action Buttons -->
-                  <div class="flex justify-between items-center pt-6 border-t border-blue-300/20">
-                    <button
-                      type="button"
-                      @click="goBack"
-                      class="px-6 py-3 bg-gray-600/80 text-white rounded-lg hover:bg-gray-700/80 transition-all duration-300 font-semibold flex items-center shadow-lg hover:shadow-xl transform hover:scale-105 backdrop-blur-sm border border-gray-500/50 text-sm"
-                    >
-                      <i class="fas fa-times mr-2"></i>
-                      Cancel
-                    </button>
-
-                    <button
-                      type="submit"
-                      :disabled="isSubmitting"
-                      class="px-6 py-3 bg-gradient-to-r from-teal-600 to-blue-600 text-white rounded-lg hover:from-teal-700 hover:to-blue-700 transition-all duration-300 font-semibold flex items-center shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none border border-teal-400/50 text-sm"
-                    >
-                      <i v-if="!isSubmitting" class="fas fa-save mr-2"></i>
-                      <i v-else class="fas fa-spinner fa-spin mr-2"></i>
-                      {{ isSubmitting ? 'Saving Assessment...' : 'Save Assessment' }}
-                    </button>
-                  </div>
-                </form>
+                  <button
+                    @click="rejectRequest"
+                    :disabled="isProcessing"
+                    class="px-8 py-4 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-xl hover:from-red-700 hover:to-pink-700 transition-all duration-300 font-bold flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <i class="fas fa-times mr-3"></i>
+                    {{ isProcessing ? 'Processing...' : 'Reject Request' }}
+                  </button>
+                </div>
               </div>
 
               <!-- Footer -->
@@ -477,9 +410,9 @@
           >
             <i class="fas fa-check text-green-600 text-3xl"></i>
           </div>
-          <h3 class="text-2xl font-bold text-gray-800 mb-3">Assessment Saved Successfully!</h3>
+          <h3 class="text-2xl font-bold text-gray-800 mb-3">Action Completed Successfully!</h3>
           <p class="text-gray-600 mb-6">
-            The device request assessment has been updated and saved to the system.
+            The device borrowing request has been processed successfully.
           </p>
           <button
             @click="closeSuccessModal"
@@ -508,11 +441,10 @@
 </template>
 
 <script>
-  // import { ref } from 'vue' // Removed unused import
   import Header from '@/components/header.vue'
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppFooter from '@/components/footer.vue'
-  import axios from 'axios'
+  import deviceBorrowingService from '@/services/deviceBorrowingService'
 
   export default {
     name: 'RequestDetails',
@@ -531,16 +463,16 @@
     data() {
       return {
         request: {},
-        assessment: {
-          deviceCondition: '',
-          status: '',
-          conditionNotes: '',
-          assessmentDate: new Date().toISOString().split('T')[0]
-        },
-        errors: {},
+        approvalComments: '',
         isLoading: false,
-        isSubmitting: false,
+        isProcessing: false,
         showSuccessModal: false
+      }
+    },
+    computed: {
+      canTakeAction() {
+        // Check if request is in pending ICT approval status
+        return this.request.ict_approve === 'pending' || this.request.ict_status === 'pending'
       }
     },
     async mounted() {
@@ -551,111 +483,111 @@
         this.isLoading = true
         try {
           const requestId = this.$route.params.id
-          // Fetch real data from API
-          const response = await axios.get(`/api/device-requests/${requestId}`)
-          this.request = response.data
+          console.log('Fetching request details for ID:', requestId)
 
-          // Pre-fill assessment if it exists
-          if (this.request.assessment) {
-            this.assessment = { ...this.request.assessment }
+          // Validate request ID
+          if (!requestId || requestId === ':id') {
+            console.error('Invalid request ID:', requestId)
+            throw new Error('Invalid request ID: ' + requestId)
+          }
+
+          // Fetch real data from device borrowing service
+          const response = await deviceBorrowingService.getRequestDetails(requestId)
+
+          if (response.success) {
+            this.request = response.data
+            console.log('✅ Request details loaded:', this.request)
+          } else {
+            console.error('❌ Failed to load request details:', {
+              message: response.message,
+              status: response.status,
+              details: response.details,
+              error: response.error
+            })
+            throw new Error(response.message || response.error || 'Failed to load request details')
           }
         } catch (error) {
           console.error('Error fetching request details:', error)
-          // Mock data for development
-          const requestId = parseInt(this.$route.params.id)
-          const mockRequests = [
-            {
-              id: 1,
-              borrowerName: 'John Doe',
-              department: 'ICT Department',
-              phoneNumber: '0712345678',
-              deviceType: 'projector',
-              customDevice: '',
-              bookingDate: '2024-01-15',
-              collectionDate: '2024-01-20',
-              returnTime: '14:00',
-              reason: 'Presentation for board meeting',
-              status: 'pending',
-              signature: null
-            },
-            {
-              id: 2,
-              borrowerName: 'Jane Smith',
-              department: 'Finance',
-              phoneNumber: '0723456789',
-              deviceType: 'laptop',
-              customDevice: '',
-              bookingDate: '2024-01-14',
-              collectionDate: '2024-01-18',
-              returnTime: '16:00',
-              reason: 'Financial analysis work',
-              status: 'returned',
-              signature: null
-            },
-            {
-              id: 3,
-              borrowerName: 'Mike Johnson',
-              department: 'Human Resources',
-              phoneNumber: '0734567890',
-              deviceType: 'others',
-              customDevice: 'Wireless Microphone',
-              bookingDate: '2024-01-13',
-              collectionDate: '2024-01-17',
-              returnTime: '12:00',
-              reason: 'Staff training session',
-              status: 'compromised',
-              signature: null
-            }
-          ]
-
-          this.request = mockRequests.find((r) => r.id === requestId) || {}
-          // Pre-fill assessment with current status
-          this.assessment.status = this.request.status || ''
+          alert('Failed to load request details: ' + (error.message || 'Unknown error'))
+          // Redirect to requests list if data loading fails
+          this.$router.push('/ict-approval/requests')
         } finally {
           this.isLoading = false
         }
       },
 
-      async saveAssessment() {
-        if (!this.validateAssessment()) {
+      async approveRequest() {
+        if (!confirm('Are you sure you want to approve this request?')) {
           return
         }
 
-        this.isSubmitting = true
+        this.isProcessing = true
         try {
           const requestId = this.$route.params.id
-          const assessmentData = {
-            ...this.assessment,
-            requestId: requestId,
-            assessedBy: 'ICT Officer', // You can get this from user session
-            assessedAt: new Date().toISOString()
+          const response = await deviceBorrowingService.approveRequest(
+            requestId,
+            this.approvalComments
+          )
+
+          if (response.success) {
+            alert('Device borrowing request approved successfully!')
+
+            // Update local request status
+            this.request.ict_approve = 'approved'
+
+            // Redirect after a short delay
+            setTimeout(() => {
+              this.$router.push('/ict-approval/requests')
+            }, 1500)
+          } else {
+            throw new Error(response.message || 'Failed to approve request')
           }
-
-          // Replace with your actual API endpoint
-          await axios.put(`/api/device-requests/${requestId}/assessment`, assessmentData)
-
-          console.log('Assessment saved:', assessmentData)
-          this.showSuccessModal = true
         } catch (error) {
-          console.error('Error saving assessment:', error)
-          alert('Error saving assessment. Please try again.')
+          console.error('Error approving request:', error)
+          alert(
+            'Error approving request: ' +
+              (error.message || 'Failed to approve the request. Please try again.')
+          )
         } finally {
-          this.isSubmitting = false
+          this.isProcessing = false
         }
       },
 
-      validateAssessment() {
-        this.errors = {}
-
-        if (!this.assessment.deviceCondition) {
-          this.errors.deviceCondition = 'Device condition assessment is required'
+      async rejectRequest() {
+        if (!confirm('Are you sure you want to reject this request?')) {
+          return
         }
 
-        if (!this.assessment.status) {
-          this.errors.status = 'Status is required'
-        }
+        this.isProcessing = true
+        try {
+          const requestId = this.$route.params.id
+          const response = await deviceBorrowingService.rejectRequest(
+            requestId,
+            this.approvalComments || 'No reason provided'
+          )
 
-        return Object.keys(this.errors).length === 0
+          if (response.success) {
+            alert('Device borrowing request rejected successfully!')
+
+            // Update local request status
+            this.request.ict_approve = 'rejected'
+
+            // Redirect after a short delay
+            setTimeout(() => {
+              this.$router.push('/ict-approval/requests')
+            }, 1500)
+          } else {
+            throw new Error(response.message || 'Failed to reject request')
+          }
+        } catch (error) {
+          console.error('Error rejecting request:', error)
+          alert(
+            'Error rejecting request: ' +
+              (error.message || 'Failed to reject the request. Please try again.')
+          )
+        } finally {
+          this.isProcessing = false
+        }
       },
 
       closeSuccessModal() {
@@ -668,59 +600,23 @@
       },
 
       getDeviceDisplayName(deviceType, customDevice) {
-        if (deviceType === 'others') {
-          return customDevice || 'Other Device'
-        }
-
-        const deviceNames = {
-          projector: 'Projector',
-          tv_remote: 'TV Remote',
-          hdmi_cable: 'HDMI Cable',
-          monitor: 'Monitor',
-          cpu: 'CPU',
-          keyboard: 'Keyboard',
-          pc: 'PC',
-          laptop: 'Laptop'
-        }
-
-        return deviceNames[deviceType] || deviceType
+        return deviceBorrowingService.getDeviceDisplayName(deviceType, customDevice)
       },
 
       formatDate(dateString) {
-        if (!dateString) return ''
-        const date = new Date(dateString)
-        return date.toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        })
+        return deviceBorrowingService.formatDate(dateString)
       },
 
       getStatusBadgeClass(status) {
-        const classes = {
-          pending: 'bg-yellow-100 text-yellow-800 border border-yellow-200',
-          returned: 'bg-green-100 text-green-800 border border-green-200',
-          compromised: 'bg-red-100 text-red-800 border border-red-200'
-        }
-        return classes[status] || 'bg-gray-100 text-gray-800 border border-gray-200'
+        return deviceBorrowingService.getStatusBadgeClass(status)
       },
 
       getStatusIcon(status) {
-        const icons = {
-          pending: 'fas fa-clock',
-          returned: 'fas fa-check-circle',
-          compromised: 'fas fa-exclamation-triangle'
-        }
-        return icons[status] || 'fas fa-question-circle'
+        return deviceBorrowingService.getStatusIcon(status)
       },
 
       getStatusText(status) {
-        const texts = {
-          pending: 'Pending',
-          returned: 'Returned',
-          compromised: 'Compromised'
-        }
-        return texts[status] || 'Unknown'
+        return deviceBorrowingService.getStatusText(status)
       }
     }
   }

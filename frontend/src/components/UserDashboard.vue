@@ -95,7 +95,8 @@
                 <!-- View My Requests Button - Blue -->
                 <button
                   @click="viewMyRequests"
-                  class="medical-button bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-6 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/30 transform hover:scale-105 active:scale-95 relative overflow-hidden group/btn"
+                  class="medical-button bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-6 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/30 transform hover:scale-105 active:scale-95 relative overflow-hidden group/btn cursor-pointer"
+                  style="pointer-events: auto; z-index: 1000;"
                 >
                   <!-- Multi-layer button effects -->
                   <div
@@ -118,17 +119,34 @@
                   </div>
                 </button>
 
-                <!-- Submit New Request Button - Red -->
+                <!-- Submit New Request Button - Red / Orange if pending -->
                 <button
                   @click="showFormSelector = true"
-                  class="medical-button bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-6 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-red-500/30 transform hover:scale-105 active:scale-95 relative overflow-hidden group/btn"
+                  :class="[
+                    'medical-button px-8 py-6 rounded-xl font-semibold transition-all duration-300 shadow-lg transform relative overflow-hidden group/btn',
+                    hasPendingBookingRequest && !isCheckingPendingRequests
+                      ? 'bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white hover:shadow-xl hover:shadow-orange-500/30 hover:scale-105 active:scale-95'
+                      : 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white hover:shadow-xl hover:shadow-red-500/30 hover:scale-105 active:scale-95',
+                    isCheckingPendingRequests ? 'opacity-70 cursor-wait' : ''
+                  ]"
+                  :disabled="isCheckingPendingRequests"
                 >
                   <!-- Multi-layer button effects -->
                   <div
-                    class="absolute inset-0 bg-gradient-to-r from-red-500/20 to-red-600/20 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"
+                    :class="[
+                      'absolute inset-0 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300',
+                      hasPendingBookingRequest && !isCheckingPendingRequests
+                        ? 'bg-gradient-to-r from-orange-500/20 to-orange-600/20'
+                        : 'bg-gradient-to-r from-red-500/20 to-red-600/20'
+                    ]"
                   ></div>
                   <div
-                    class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-red-300/60 to-transparent group-hover/btn:animate-pulse"
+                    :class="[
+                      'absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent to-transparent group-hover/btn:animate-pulse',
+                      hasPendingBookingRequest && !isCheckingPendingRequests
+                        ? 'via-orange-300/60'
+                        : 'via-red-300/60'
+                    ]"
                   ></div>
                   <div
                     class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700"
@@ -136,11 +154,28 @@
 
                   <div class="relative z-10 flex items-center justify-center">
                     <div
-                      class="w-8 h-8 bg-red-400/40 rounded-lg flex items-center justify-center mr-3 group-hover/btn:scale-110 transition-transform duration-300"
+                      :class="[
+                        'w-8 h-8 rounded-lg flex items-center justify-center mr-3 group-hover/btn:scale-110 transition-transform duration-300',
+                        hasPendingBookingRequest && !isCheckingPendingRequests
+                          ? 'bg-orange-400/40'
+                          : 'bg-red-400/40'
+                      ]"
                     >
-                      <i class="fas fa-plus text-white text-lg drop-shadow-sm" />
+                      <i
+                        v-if="isCheckingPendingRequests"
+                        class="fas fa-spinner fa-spin text-white text-lg drop-shadow-sm"
+                      />
+                      <i
+                        v-else-if="hasPendingBookingRequest"
+                        class="fas fa-eye text-white text-lg drop-shadow-sm"
+                      />
+                      <i v-else class="fas fa-plus text-white text-lg drop-shadow-sm" />
                     </div>
-                    <span class="text-lg drop-shadow-sm">Create New Application</span>
+                    <span class="text-lg drop-shadow-sm">
+                      <template v-if="isCheckingPendingRequests">Checking...</template>
+                      <template v-else-if="hasPendingBookingRequest">View Pending Request</template>
+                      <template v-else>Create New Application</template>
+                    </span>
                   </div>
                 </button>
               </div>
@@ -629,6 +664,8 @@
   import ModernSidebar from './ModernSidebar.vue'
   import Header from './header.vue'
   import { useAuth } from '@/composables/useAuth'
+  import { useNotificationStore } from '@/stores/notification'
+  import bookingService from '@/services/bookingService'
 
   export default {
     name: 'UserDashboard',
@@ -639,20 +676,55 @@
     setup() {
       const router = useRouter()
       const { requireRole, ROLES } = useAuth()
+      const notificationStore = useNotificationStore()
 
       // Local state
       const showFormSelector = ref(false)
+      const hasPendingBookingRequest = ref(false)
+      const pendingBookingInfo = ref(null)
+      const isCheckingPendingRequests = ref(true)
       // Note: Sidebar state is now managed by Vuex, no local state needed
 
+      // Check for pending booking requests on mount
+      const checkPendingBookingRequest = async () => {
+        try {
+          isCheckingPendingRequests.value = true
+          const result = await bookingService.checkPendingRequests()
+
+          if (result.success && result.data.has_pending_request) {
+            hasPendingBookingRequest.value = true
+            pendingBookingInfo.value = result.data.pending_request
+          } else {
+            hasPendingBookingRequest.value = false
+            pendingBookingInfo.value = null
+          }
+        } catch (error) {
+          console.error('Error checking pending requests:', error)
+          // On error, assume no pending request to allow normal functionality
+          hasPendingBookingRequest.value = false
+          pendingBookingInfo.value = null
+        } finally {
+          isCheckingPendingRequests.value = false
+        }
+      }
+
       // Guard this route - only staff can access
-      onMounted(() => {
+      onMounted(async () => {
         console.log('UserDashboard mounted successfully')
         requireRole([ROLES.STAFF])
+        // Check for pending booking requests
+        await checkPendingBookingRequest()
       })
 
       // Methods
       const viewMyRequests = () => {
-        router.push('/request-status')
+        console.log('Track My Applications button clicked!')
+        try {
+          router.push('/request-status')
+          console.log('Successfully navigating to /request-status')
+        } catch (error) {
+          console.error('Error navigating to request status:', error)
+        }
       }
 
       const selectCombinedForm = () => {
@@ -662,14 +734,56 @@
 
       const selectBookingService = () => {
         showFormSelector.value = false
-        router.push('/booking-service')
+
+        console.log('selectBookingService called', {
+          hasPendingBookingRequest: hasPendingBookingRequest.value,
+          pendingBookingInfo: pendingBookingInfo.value,
+          isCheckingPendingRequests: isCheckingPendingRequests.value
+        })
+
+        if (hasPendingBookingRequest.value && pendingBookingInfo.value) {
+          // Show notification about existing pending request restriction
+          notificationStore.show({
+            type: 'warning',
+            title: 'Booking Request Restriction',
+            message: `You cannot submit a new booking request while you have a pending request (ID: ${pendingBookingInfo.value.id}). Please check your request status.`,
+            duration: 8000,
+            persistent: true,
+            actions: [
+              {
+                text: 'View Request Details',
+                action: () => {
+                  router.push(
+                    `/request-details?id=${pendingBookingInfo.value.id}&type=booking_service`
+                  )
+                }
+              }
+            ]
+          })
+
+          // Redirect to request status page with pending booking notification
+          router.push({
+            path: '/request-status',
+            query: {
+              pendingBooking: 'true',
+              pendingId: pendingBookingInfo.value.id
+            }
+          })
+        } else {
+          // No pending request, proceed to booking service
+          router.push('/booking-service')
+        }
       }
 
       return {
         showFormSelector,
+        hasPendingBookingRequest,
+        pendingBookingInfo,
+        isCheckingPendingRequests,
         viewMyRequests,
         selectCombinedForm,
-        selectBookingService
+        selectBookingService,
+        checkPendingBookingRequest
       }
     }
   }

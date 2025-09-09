@@ -334,6 +334,27 @@ const routes = [
     }
   },
 
+  // Debug route for Request Details
+  {
+    path: '/debug/request-details',
+    name: 'RequestDetailsDebug',
+    component: () => import('../components/debug/RequestDetailsDebug.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: Object.values(ROLES)
+    }
+  },
+  // Debug route for API Testing
+  {
+    path: '/debug/api-test',
+    name: 'ApiTest',
+    component: () => import('../components/debug/ApiTest.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: Object.values(ROLES)
+    }
+  },
+
   // Admin User Management routes
   {
     path: '/service-users',

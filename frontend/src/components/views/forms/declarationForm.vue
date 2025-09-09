@@ -706,13 +706,34 @@
 
       goBack() {
         this.$emit('go-back')
+      },
+
+      async loadUserData() {
+        try {
+          // Get current user data from API
+          const { authAPI } = await import('../../../utils/apiClient')
+          const result = await authAPI.getCurrentUser()
+
+          if (result.success && result.data) {
+            // Auto-populate the full name field
+            this.formData.fullName = result.data.name || ''
+            console.log('Auto-populated Full Name:', this.formData.fullName)
+          } else {
+            console.warn('Failed to load user data for auto-population')
+          }
+        } catch (error) {
+          console.error('Error loading user data:', error)
+        }
       }
     },
 
-    mounted() {
+    async mounted() {
       // Set current date as default
       const today = new Date().toISOString().split('T')[0]
       this.formData.date = today
+
+      // Auto-populate Full Name from authenticated user
+      await this.loadUserData()
     }
   }
 </script>

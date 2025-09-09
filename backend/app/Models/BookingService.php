@@ -39,6 +39,13 @@ class BookingService extends Model
         'approved_at',
         'device_collected_at',
         'device_returned_at',
+        // ICT Approval fields
+        'ict_approve',
+        'ict_approved_by',
+        'ict_approved_at',
+        'ict_notes',
+        // Return Status field
+        'return_status',
     ];
 
     /**
@@ -52,6 +59,7 @@ class BookingService extends Model
         'approved_at' => 'datetime',
         'device_collected_at' => 'datetime',
         'device_returned_at' => 'datetime',
+        'ict_approved_at' => 'datetime',
     ];
 
     /**
@@ -87,6 +95,18 @@ class BookingService extends Model
     }
 
     /**
+     * Available return status options
+     */
+    public static function getReturnStatusOptions(): array
+    {
+        return [
+            'not_yet_returned' => 'Not Yet Returned',
+            'returned' => 'Returned',
+            'returned_but_compromised' => 'Returned but Compromised'
+        ];
+    }
+
+    /**
      * Get the user that owns the booking.
      */
     public function user(): BelongsTo
@@ -100,6 +120,14 @@ class BookingService extends Model
     public function approvedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    /**
+     * Get the ICT officer who approved the booking.
+     */
+    public function ictApprovedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'ict_approved_by');
     }
 
     /**
@@ -146,6 +174,15 @@ class BookingService extends Model
     {
         $statusOptions = self::getStatusOptions();
         return $statusOptions[$this->status] ?? $this->status;
+    }
+
+    /**
+     * Get the return status display name.
+     */
+    public function getReturnStatusDisplayNameAttribute(): string
+    {
+        $returnStatusOptions = self::getReturnStatusOptions();
+        return $returnStatusOptions[$this->return_status] ?? $this->return_status;
     }
 
     /**
@@ -214,6 +251,22 @@ class BookingService extends Model
     public function scopeForUser($query, int $userId)
     {
         return $query->where('user_id', $userId);
+    }
+
+    /**
+     * Scope for filtering by ICT approval status.
+     */
+    public function scopeByIctApprovalStatus($query, string $ictApprove)
+    {
+        return $query->where('ict_approve', $ictApprove);
+    }
+
+    /**
+     * Scope for pending ICT approval.
+     */
+    public function scopePendingIctApproval($query)
+    {
+        return $query->where('ict_approve', 'pending');
     }
 
     /**

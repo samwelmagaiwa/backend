@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ICT Approval Trail - Enhanced Design Demo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    /* Custom animations */
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    
+    .animate-shimmer {
+      animation: shimmer 3s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-15px); }
+    }
+    
+    .animate-float {
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    /* Glass morphism effects */
+    .glass-card {
+      background: rgba(59, 130, 246, 0.15);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border: 2px solid rgba(96, 165, 250, 0.3);
+      box-shadow: 0 8px 32px rgba(29, 78, 216, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 min-h-screen p-8">
+  
+  <!-- Background Pattern -->
+  <div class="absolute inset-0 overflow-hidden">
+    <div class="absolute inset-0">
+      <div class="absolute text-white opacity-5 animate-float" style="left: 15%; top: 20%; animation-delay: 0s; font-size: 32px;">
+        <i class="fas fa-laptop"></i>
+      </div>
+      <div class="absolute text-white opacity-5 animate-float" style="left: 70%; top: 60%; animation-delay: 1s; font-size: 24px;">
+        <i class="fas fa-server"></i>
+      </div>
+      <div class="absolute text-white opacity-5 animate-float" style="left: 40%; top: 80%; animation-delay: 2s; font-size: 28px;">
+        <i class="fas fa-network-wired"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="relative z-10 max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold text-white mb-8 text-center">ICT Approval Trail - Enhanced UI Design</h1>
+    
+    <!-- Demo: Rejected Status with Comment -->
+    <div class="glass-card rounded-2xl p-8 mb-8">
+      <h2 class="text-xl font-bold text-white mb-6 flex items-center">
+        <i class="fas fa-route mr-3 text-blue-300"></i>
+        Approval Trail - Rejected Request
+      </h2>
+      
+      <!-- ICT Officer Only (for booking service) -->
+      <div class="flex flex-col items-center space-y-4">
+        <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-red-600 rounded-2xl flex items-center justify-center shadow-lg">
+          <i class="fas fa-times-circle text-white text-2xl"></i>
+        </div>
+        <h4 class="text-xl font-semibold text-white text-center">ICT Officer</h4>
+        <p class="text-red-400 text-lg text-center font-bold">Rejected</p>
+        <p class="text-sm text-blue-300 text-center">Sep 9, 2025</p>
+      </div>
+
+      <!-- ICT Officer Comments Section (Enhanced Blue Theme) -->
+      <div class="mt-8">
+        <div class="relative overflow-hidden rounded-2xl backdrop-blur-sm border-2 transition-all duration-500 hover:shadow-2xl transform hover:scale-[1.01] bg-gradient-to-br from-blue-600/25 to-red-600/25 border-blue-400/60 shadow-blue-500/25">
+          <!-- Animated background gradient -->
+          <div class="absolute inset-0 opacity-20">
+            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent animate-shimmer"></div>
+          </div>
+          
+          <!-- Header -->
+          <div class="relative z-10 flex items-center space-x-4 p-6 border-b border-blue-400/30">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg transform transition-transform duration-300 hover:scale-110 bg-gradient-to-br from-blue-500 to-red-600">
+              <i class="fas fa-times-circle text-white text-lg"></i>
+            </div>
+            <div class="flex-1">
+              <h4 class="text-lg font-bold text-white flex items-center">
+                <i class="fas fa-comment-dots mr-2 text-blue-200"></i>
+                ICT Officer Rejection Comments
+              </h4>
+              <p class="text-sm opacity-90 text-blue-200">
+                Reviewed by ICT Officer
+              </p>
+            </div>
+            <div class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-red-600 text-red-100 border border-blue-400/50">
+              rejected
+            </div>
+          </div>
+          
+          <!-- Comments Content -->
+          <div class="relative z-10 p-6">
+            <div class="rounded-xl p-4 border-2 border-opacity-20 bg-blue-600/15 border-blue-400/30">
+              <div class="flex items-start space-x-3">
+                <div class="flex-shrink-0 mt-1">
+                  <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-500/60">
+                    <i class="fas fa-quote-left text-white text-xs"></i>
+                  </div>
+                </div>
+                <div class="flex-1">
+                  <p class="text-white text-sm leading-relaxed font-medium">
+                    Device is currently out of stock and will not be available until next month. Please consider submitting a new request after October 15, 2024, or contact the ICT department for alternative device options. We recommend checking our device availability portal before resubmitting.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Footer with timestamp and officer info -->
+            <div class="flex justify-between items-center mt-4 pt-4 border-t border-blue-400/30">
+              <div class="flex items-center space-x-2 text-xs text-blue-200">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Sep 9, 2025 at 2:30 PM</span>
+              </div>
+              <div class="flex items-center space-x-2 text-xs text-blue-200">
+                <i class="fas fa-user-tie"></i>
+                <span>John Smith, ICT Officer</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Decorative elements -->
+          <div class="absolute top-2 right-2 w-20 h-20 opacity-10">
+            <i class="fas fa-times-circle text-white text-6xl transform rotate-12"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Demo: Approved Status with Comment -->
+    <div class="glass-card rounded-2xl p-8 mb-8">
+      <h2 class="text-xl font-bold text-white mb-6 flex items-center">
+        <i class="fas fa-route mr-3 text-green-300"></i>
+        Approval Trail - Approved Request
+      </h2>
+      
+      <!-- ICT Officer Only (for booking service) -->
+      <div class="flex flex-col items-center space-y-4">
+        <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
+          <i class="fas fa-check-circle text-white text-2xl"></i>
+        </div>
+        <h4 class="text-xl font-semibold text-white text-center">ICT Officer</h4>
+        <p class="text-green-400 text-lg text-center font-bold">Approved</p>
+        <p class="text-sm text-blue-300 text-center">Sep 9, 2025</p>
+      </div>
+
+      <!-- ICT Officer Comments Section (Enhanced Blue Theme) -->
+      <div class="mt-8">
+        <div class="relative overflow-hidden rounded-2xl backdrop-blur-sm border-2 transition-all duration-500 hover:shadow-2xl transform hover:scale-[1.01] bg-gradient-to-br from-blue-600/25 to-green-600/25 border-blue-400/60 shadow-blue-500/30">
+          <!-- Animated background gradient -->
+          <div class="absolute inset-0 opacity-20">
+            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent animate-shimmer"></div>
+          </div>
+          
+          <!-- Header -->
+          <div class="relative z-10 flex items-center space-x-4 p-6 border-b border-blue-400/30">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg transform transition-transform duration-300 hover:scale-110 bg-gradient-to-br from-blue-500 to-green-600">
+              <i class="fas fa-check-circle text-white text-lg"></i>
+            </div>
+            <div class="flex-1">
+              <h4 class="text-lg font-bold text-white flex items-center">
+                <i class="fas fa-comment-dots mr-2 text-blue-200"></i>
+                ICT Officer Approval Comments
+              </h4>
+              <p class="text-sm opacity-90 text-blue-200">
+                Reviewed by ICT Officer
+              </p>
+            </div>
+            <div class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-green-600 text-green-100 border border-blue-400/50">
+              approved
+            </div>
+          </div>
+          
+          <!-- Comments Content -->
+          <div class="relative z-10 p-6">
+            <div class="rounded-xl p-4 border-2 border-opacity-20 bg-blue-600/15 border-blue-400/30">
+              <div class="flex items-start space-x-3">
+                <div class="flex-shrink-0 mt-1">
+                  <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-500/60">
+                    <i class="fas fa-quote-left text-white text-xs"></i>
+                  </div>
+                </div>
+                <div class="flex-1">
+                  <p class="text-white text-sm leading-relaxed font-medium">
+                    Laptop approved for medical consultation purposes. Device has been allocated and is ready for collection from ICT department room 205. Please bring your ID and this approval for device pickup during office hours (8:00 AM - 5:00 PM).
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Footer with timestamp and officer info -->
+            <div class="flex justify-between items-center mt-4 pt-4 border-t border-blue-400/30">
+              <div class="flex items-center space-x-2 text-xs text-blue-200">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Sep 9, 2025 at 10:15 AM</span>
+              </div>
+              <div class="flex items-center space-x-2 text-xs text-blue-200">
+                <i class="fas fa-user-tie"></i>
+                <span>Sarah Johnson, ICT Officer</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Decorative elements -->
+          <div class="absolute top-2 right-2 w-20 h-20 opacity-10">
+            <i class="fas fa-check-circle text-white text-6xl transform rotate-12"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Demo: Pending Status without Comment -->
+    <div class="glass-card rounded-2xl p-8">
+      <h2 class="text-xl font-bold text-white mb-6 flex items-center">
+        <i class="fas fa-route mr-3 text-yellow-300"></i>
+        Approval Trail - Pending Request
+      </h2>
+      
+      <!-- ICT Officer Only (for booking service) -->
+      <div class="flex flex-col items-center space-y-4">
+        <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-yellow-600 rounded-2xl flex items-center justify-center shadow-lg">
+          <i class="fas fa-clock text-white text-2xl"></i>
+        </div>
+        <h4 class="text-xl font-semibold text-white text-center">ICT Officer</h4>
+        <p class="text-yellow-400 text-lg text-center font-bold">Pending</p>
+        <p class="text-sm text-blue-300 text-center">Awaiting review</p>
+      </div>
+      
+      <!-- No comments section for pending requests -->
+      <div class="mt-6 text-center">
+        <p class="text-blue-200 text-sm opacity-75">
+          <i class="fas fa-info-circle mr-2"></i>
+          No comments yet - awaiting ICT Officer review
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Add some interactivity
+    document.addEventListener('DOMContentLoaded', function() {
+      const cards = document.querySelectorAll('.glass-card');
+      cards.forEach((card, index) => {
+        card.style.animationDelay = (index * 0.2) + 's';
+        card.classList.add('animate__animated', 'animate__fadeInUp');
+      });
+    });
+  </script>
+</body>
+</html>
