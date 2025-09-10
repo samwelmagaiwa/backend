@@ -204,9 +204,8 @@ export const deviceInventoryService = {
     }
     return statusIcons[status] || 'fas fa-question-circle'
   },
-
   /**
-   * Fix device inventory quantity inconsistencies
+   * Fix device inventory quantity inconsistencies.
    * @returns {Promise<Object>} - API response
    */
   async fixQuantities() {
@@ -224,6 +223,56 @@ export const deviceInventoryService = {
         status: error.response?.status
       }
     }
+  },
+
+  /**
+   * Get return status color class for aggregated device return status
+   * @param {string} status - Aggregated return status
+   * @returns {string} - CSS class
+   */
+  getReturnStatusColorClass(status) {
+    const statusClasses = {
+      all_returned: 'text-green-600 bg-green-100',
+      partially_returned: 'text-yellow-600 bg-yellow-100',
+      none_returned: 'text-blue-600 bg-blue-100',
+      some_compromised: 'text-red-600 bg-red-100',
+      no_bookings: 'text-gray-600 bg-gray-100'
+    }
+    return statusClasses[status] || 'text-gray-600 bg-gray-100'
+  },
+
+  /**
+   * Get return status icon for aggregated device return status
+   * @param {string} status - Aggregated return status
+   * @returns {string} - Icon class
+   */
+  getReturnStatusIcon(status) {
+    const statusIcons = {
+      all_returned: 'fas fa-check-circle',
+      partially_returned: 'fas fa-clock',
+      none_returned: 'fas fa-hourglass-half',
+      some_compromised: 'fas fa-exclamation-triangle',
+      no_bookings: 'fas fa-minus-circle'
+    }
+    return statusIcons[status] || 'fas fa-question-circle'
+  },
+
+  /**
+   * Get return status display text for aggregated device return status
+   * @param {string} status - Aggregated return status
+   * @param {number} unreturnedCount - Number of unreturned items
+   * @param {number} compromisedCount - Number of compromised items
+   * @returns {string} - Display text
+   */
+  getReturnStatusDisplayText(status, unreturnedCount = 0, compromisedCount = 0) {
+    const statusTexts = {
+      all_returned: 'All Returned',
+      partially_returned: `${unreturnedCount} Not Returned`,
+      none_returned: `${unreturnedCount} Not Returned`,
+      some_compromised: `${compromisedCount} Compromised`,
+      no_bookings: 'No Bookings'
+    }
+    return statusTexts[status] || 'Unknown'
   }
 }
 

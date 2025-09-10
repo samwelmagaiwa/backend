@@ -583,6 +583,17 @@ class ICTApprovalController extends Controller
             'ict_approved_by' => $booking->ict_approved_by,
             'ict_approved_by_name' => $booking->ictApprovedBy?->name,
             
+            // Return status
+            'return_status' => $booking->return_status ?? 'not_yet_returned',
+            'device_returned_at' => $booking->device_returned_at?->format('Y-m-d H:i:s'),
+            
+            // Device condition assessment
+            'device_condition_issuing' => $booking->device_condition_issuing,
+            'device_condition_receiving' => $booking->device_condition_receiving,
+            'device_issued_at' => $booking->device_issued_at?->format('Y-m-d H:i:s'),
+            'assessed_by' => $booking->assessed_by,
+            'assessment_notes' => $booking->assessment_notes,
+            
             // Timestamps
             'created_at' => $booking->created_at?->format('Y-m-d H:i:s'),
             'updated_at' => $booking->updated_at?->format('Y-m-d H:i:s')
@@ -725,6 +736,208 @@ class ICTApprovalController extends Controller
         return $deviceNames[$deviceType] ?? ucwords(str_replace('_', ' ', $deviceType ?? 'Unknown Device'));
     }
     
+    /**
+     * Save issuing assessment (when device is issued to borrower)
+     * 
+     * @param Request $request
+     * @param int $requestId
+     * @return JsonResponse
+     */
+    public function saveIssuingAssessment(Request $request, int $requestId): JsonResponse
+    {
+        try {
+            // Verify ICT officer permissions
+            if (!$this->hasICTPermissions($request->user())) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized. ICT officer access required.'
+                ], 403);
+            }
+
+            $booking = BookingService::find($requestId);
+            if (!$booking) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Device borrowing request not found'
+                ], 404);
+            }
+
+            // Validate that request is approved by ICT
+            if ($booking->ict_approve !== 'approved') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Device can only be issued for ICT-approved requests'
+                ], 400);
+            }
+
+            // Validate input data
+            $validatedData = $request->validate([
+                'physical_condition' => 'required|in:excellent,good,fair,poor',
+                'functionality' => 'required|in:fully_functional,partially_functional,not_functional',
+                'accessories_complete' => 'boolean',
+                'visible_damage' => 'boolean',
+                'damage_description' => 'nullable|string|max:1000',
+                'notes' => 'nullable|string|max:1000'
+            ]);
+
+            // Prepare assessment data
+            $assessmentData = [
+                'physical_condition' => $validatedData['physical_condition'],
+                'functionality' => $validatedData['functionality'],
+                'accessories_complete' => $validatedData['accessories_complete'] ?? false,
+                'visible_damage' => $validatedData['visible_damage'] ?? false,
+                'damage_description' => $validatedData['damage_description'] ?? null,
+                'assessed_at' => now()->toISOString(),
+                'assessed_by' => $request->user()->id,
+                'assessment_type' => 'issuing'
+            ];
+
+            // Update booking with issuing assessment
+            $booking->update([
+                'device_condition_issuing' => json_encode($assessmentData),
+                'device_issued_at' => now(),
+                'assessed_by' => $request->user()->id,
+                'assessment_notes' => $validatedData['notes'] ?? null
+            ]);
+
+            Log::info('Device issuing assessment saved', [
+                'booking_id' => $booking->id,
+                'assessed_by' => $request->user()->id,
+                'assessment_data' => $assessmentData
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'data' => $this->transformBookingForICTApproval($booking, true),
+                'message' => 'Device issuing assessment saved successfully'
+            ]);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+
+        } catch (\Exception $e) {
+            Log::error('Error saving issuing assessment: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error saving issuing assessment',
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
+            ], 500);
+        }
+    }
+
+    /**
+     * Save receiving assessment (when device is received back from borrower)
+     * 
+     * @param Request $request
+     * @param int $requestId
+     * @return JsonResponse
+     */
+    public function saveReceivingAssessment(Request $request, int $requestId): JsonResponse
+    {
+        try {
+            // Verify ICT officer permissions
+            if (!$this->hasICTPermissions($request->user())) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized. ICT officer access required.'
+                ], 403);
+            }
+
+            $booking = BookingService::find($requestId);
+            if (!$booking) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Device borrowing request not found'
+                ], 404);
+            }
+
+            // Validate that device was issued (has issuing assessment)
+            if (empty($booking->device_condition_issuing)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Device must be issued first before it can be received back'
+                ], 400);
+            }
+
+            // Validate input data
+            $validatedData = $request->validate([
+                'physical_condition' => 'required|in:excellent,good,fair,poor',
+                'functionality' => 'required|in:fully_functional,partially_functional,not_functional',
+                'accessories_complete' => 'boolean',
+                'visible_damage' => 'boolean',
+                'damage_description' => 'nullable|string|max:1000',
+                'notes' => 'nullable|string|max:1000'
+            ]);
+
+            // Prepare assessment data
+            $assessmentData = [
+                'physical_condition' => $validatedData['physical_condition'],
+                'functionality' => $validatedData['functionality'],
+                'accessories_complete' => $validatedData['accessories_complete'] ?? false,
+                'visible_damage' => $validatedData['visible_damage'] ?? false,
+                'damage_description' => $validatedData['damage_description'] ?? null,
+                'assessed_at' => now()->toISOString(),
+                'assessed_by' => $request->user()->id,
+                'assessment_type' => 'receiving'
+            ];
+
+            // Update booking with receiving assessment and mark as returned
+            $booking->update([
+                'device_condition_receiving' => json_encode($assessmentData),
+                'device_received_at' => now(),
+                'return_status' => 'returned',
+                'assessed_by' => $request->user()->id,
+                'assessment_notes' => $validatedData['notes'] ?? null
+            ]);
+
+            // Return device to inventory if it was reserved
+            if ($booking->device_inventory_id) {
+                $deviceInventory = $booking->deviceInventory;
+                if ($deviceInventory) {
+                    $deviceInventory->returnDevice(1);
+                    Log::info('Device returned to inventory', [
+                        'device_id' => $deviceInventory->id,
+                        'device_name' => $deviceInventory->device_name,
+                        'booking_id' => $booking->id
+                    ]);
+                }
+            }
+
+            Log::info('Device receiving assessment saved and device returned', [
+                'booking_id' => $booking->id,
+                'assessed_by' => $request->user()->id,
+                'assessment_data' => $assessmentData
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'data' => $this->transformBookingForICTApproval($booking, true),
+                'message' => 'Device receiving assessment saved and device marked as returned successfully'
+            ]);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+
+        } catch (\Exception $e) {
+            Log::error('Error saving receiving assessment: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error saving receiving assessment',
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
+            ], 500);
+        }
+    }
+
     /**
      * Debug endpoint to check ICT approval system status
      * 

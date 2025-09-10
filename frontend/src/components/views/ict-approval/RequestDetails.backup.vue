@@ -34,6 +34,15 @@
         </div>
 
         <div class="max-w-full mx-auto px-4 relative z-10">
+          <!-- DEBUGGING: Component Status -->
+          <div class="fixed top-4 right-4 z-50 bg-red-500 text-white p-4 rounded-lg shadow-lg">
+            <h3 class="font-bold">🔧 DEBUG INFO</h3>
+            <p>Component: MOUNTED ✅</p>
+            <p>Route ID: {{ $route.params.id }}</p>
+            <p>Request Data: {{ Object.keys(request).length }} keys</p>
+            <p>Loading: {{ isLoading ? 'YES' : 'NO' }}</p>
+          </div>
+          
           <!-- Header Section -->
           <div
             class="booking-glass-card rounded-t-3xl p-4 mb-0 border-b border-blue-300/30 animate-fade-in"
@@ -98,6 +107,16 @@
           <!-- Main Content -->
           <div class="booking-glass-card rounded-b-3xl overflow-hidden animate-slide-up">
             <div class="p-4 space-y-4">
+              <!-- Component Test -->
+              <div class="bg-green-500/20 border border-green-400/40 rounded-lg p-4 mb-4">
+                <p class="text-green-200 text-sm">
+                  ✅ RequestDetails component is rendering successfully!
+                </p>
+                <p class="text-green-200 text-xs mt-2">
+                  Route ID: {{ $route.params.id }} | Request Keys: {{ Object.keys(request).length }}
+                </p>
+              </div>
+              
               <!-- Error Display -->
               <div v-if="!isLoading && (!request || Object.keys(request).length === 0)" class="bg-red-500/20 border border-red-400/40 rounded-lg p-4 mb-4">
                 <p class="text-red-200 text-sm">
@@ -342,6 +361,8 @@
                   </div>
                 </div>
               </div>
+
+
 
               <!-- Device Condition Assessment Section -->
               <div
@@ -762,7 +783,7 @@
                             class="relative cursor-pointer group"
                           >
                             <input
-                              v-model="receivingAssessment.physical_condition"
+                              v-model="issuingAssessment.physical_condition"
                               type="radio"
                               :value="condition.value"
                               class="sr-only"
@@ -770,15 +791,15 @@
                             <div
                               :class="[
                                 'p-3 rounded-xl border-2 transition-all duration-300 text-center relative overflow-hidden',
-                                receivingAssessment.physical_condition === condition.value
+                                issuingAssessment.physical_condition === condition.value
                                   ? 'bg-gradient-to-br from-blue-500 to-cyan-600 border-blue-400 text-white shadow-lg transform scale-105'
                                   : 'bg-blue-900/30 border-blue-500/30 text-blue-200 hover:border-blue-400/50 hover:bg-blue-800/40'
                               ]"
                             >
-                              <div v-if="receivingAssessment.physical_condition === condition.value" class="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-cyan-400/20 animate-pulse"></div>
+                              <div v-if="issuingAssessment.physical_condition === condition.value" class="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-cyan-400/20 animate-pulse"></div>
                               <div class="relative z-10">
                                 <div class="font-semibold text-sm mb-1">{{ condition.label }}</div>
-                                <div v-if="receivingAssessment.physical_condition === condition.value" class="text-xs opacity-80">
+                                <div v-if="issuingAssessment.physical_condition === condition.value" class="text-xs opacity-80">
                                   <i class="fas fa-check-circle"></i>
                                 </div>
                               </div>
@@ -804,7 +825,7 @@
                             class="relative cursor-pointer group"
                           >
                             <input
-                              v-model="receivingAssessment.functionality"
+                              v-model="issuingAssessment.functionality"
                               type="radio"
                               :value="func.value"
                               class="sr-only"
@@ -812,15 +833,15 @@
                             <div
                               :class="[
                                 'p-3 rounded-xl border-2 transition-all duration-300 text-center relative overflow-hidden',
-                                receivingAssessment.functionality === func.value
+                                issuingAssessment.functionality === func.value
                                   ? 'bg-gradient-to-br from-blue-500 to-cyan-600 border-blue-400 text-white shadow-lg transform scale-105'
                                   : 'bg-blue-900/30 border-blue-500/30 text-blue-200 hover:border-blue-400/50 hover:bg-blue-800/40'
                               ]"
                             >
-                              <div v-if="receivingAssessment.functionality === func.value" class="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-cyan-400/20 animate-pulse"></div>
+                              <div v-if="issuingAssessment.functionality === func.value" class="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-cyan-400/20 animate-pulse"></div>
                               <div class="relative z-10">
                                 <div class="font-semibold text-sm mb-1">{{ func.label }}</div>
-                                <div v-if="receivingAssessment.functionality === func.value" class="text-xs opacity-80">
+                                <div v-if="issuingAssessment.functionality === func.value" class="text-xs opacity-80">
                                   <i class="fas fa-check-circle"></i>
                                 </div>
                               </div>
@@ -836,20 +857,20 @@
                           <label class="flex items-center cursor-pointer group relative z-10">
                             <div class="relative">
                               <input
-                                v-model="receivingAssessment.accessories_complete"
+                                v-model="issuingAssessment.accessories_complete"
                                 type="checkbox"
                                 class="sr-only"
                               />
                               <div
                                 :class="[
                                   'w-7 h-7 rounded-xl border-2 transition-all duration-300 flex items-center justify-center relative overflow-hidden',
-                                  receivingAssessment.accessories_complete
+                                  issuingAssessment.accessories_complete
                                     ? 'bg-gradient-to-br from-blue-500 to-cyan-600 border-blue-400 shadow-lg'
                                     : 'bg-blue-900/50 border-blue-500/50 group-hover:border-blue-400/70 group-hover:bg-blue-800/60'
                                 ]"
                               >
-                                <div v-if="receivingAssessment.accessories_complete" class="absolute inset-0 bg-gradient-to-r from-blue-400/30 to-cyan-400/30 animate-pulse"></div>
-                                <i v-if="receivingAssessment.accessories_complete" class="fas fa-check text-white text-sm relative z-10"></i>
+                                <div v-if="issuingAssessment.accessories_complete" class="absolute inset-0 bg-gradient-to-r from-blue-400/30 to-cyan-400/30 animate-pulse"></div>
+                                <i v-if="issuingAssessment.accessories_complete" class="fas fa-check text-white text-sm relative z-10"></i>
                               </div>
                             </div>
                             <div class="ml-5 flex items-center">
@@ -876,20 +897,20 @@
                           <label class="flex items-center cursor-pointer group relative z-10">
                             <div class="relative">
                               <input
-                                v-model="receivingAssessment.visible_damage"
+                                v-model="issuingAssessment.visible_damage"
                                 type="checkbox"
                                 class="sr-only"
                               />
                               <div
                                 :class="[
                                   'w-7 h-7 rounded-xl border-2 transition-all duration-300 flex items-center justify-center relative overflow-hidden',
-                                  receivingAssessment.visible_damage
+                                  issuingAssessment.visible_damage
                                     ? 'bg-gradient-to-br from-red-500 to-orange-600 border-red-400 shadow-lg'
                                     : 'bg-blue-900/50 border-blue-500/50 group-hover:border-red-400/70 group-hover:bg-red-800/30'
                                 ]"
                               >
-                                <div v-if="receivingAssessment.visible_damage" class="absolute inset-0 bg-gradient-to-r from-red-400/30 to-orange-400/30 animate-pulse"></div>
-                                <i v-if="receivingAssessment.visible_damage" class="fas fa-exclamation text-white text-sm relative z-10"></i>
+                                <div v-if="issuingAssessment.visible_damage" class="absolute inset-0 bg-gradient-to-r from-red-400/30 to-orange-400/30 animate-pulse"></div>
+                                <i v-if="issuingAssessment.visible_damage" class="fas fa-exclamation text-white text-sm relative z-10"></i>
                               </div>
                             </div>
                             <div class="ml-5 flex items-center">
@@ -1167,6 +1188,23 @@
     },
     async mounted() {
       console.log('🚀 RequestDetails component mounted successfully')
+      console.log('🚀 Component data:', this.$data)
+      console.log('🚀 Route info:', this.$route)
+      console.log('🚀 API Base URL:', deviceBorrowingService)
+      
+      // Test API connectivity
+      try {
+        console.log('🔍 Testing API connectivity...')
+        const testResponse = await fetch('http://127.0.0.1:8000/api/user', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+            'Accept': 'application/json'
+          }
+        })
+        console.log('🔍 API Test Response:', testResponse.status, testResponse.statusText)
+      } catch (apiError) {
+        console.error('❌ API connectivity test failed:', apiError)
+      }
       
       try {
         await this.fetchRequestDetails()
@@ -1180,6 +1218,8 @@
         try {
           const requestId = this.$route.params.id
           console.log('🔍 RequestDetails: Fetching request details for ID:', requestId)
+          console.log('🔍 RequestDetails: Full route params:', this.$route.params)
+          console.log('🔍 RequestDetails: Full route object:', this.$route)
 
           // Validate request ID
           if (!requestId || requestId === ':id') {
@@ -1204,6 +1244,16 @@
           }
         } catch (error) {
           console.error('❌ Error fetching request details:', error)
+          console.error('❌ Error stack:', error.stack)
+          console.error('❌ Error details:', {
+            message: error.message,
+            name: error.name,
+            response: error.response
+          })
+          
+          // Don't redirect immediately, let user see the error
+          // alert('Failed to load request details: ' + (error.message || 'Unknown error'))
+          // this.$router.push('/ict-approval/requests')
         } finally {
           this.isLoading = false
         }

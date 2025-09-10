@@ -242,6 +242,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('bookings/{bookingService}/ict-reject', [BookingServiceController::class, 'ictReject'])
             ->middleware('role:ict_officer,admin,ict_director')
             ->name('booking-service.ict-reject');
+        
+        // Device condition assessment routes
+        Route::post('bookings/{bookingService}/assessment/issuing', [BookingServiceController::class, 'saveIssuingAssessment'])
+            ->middleware('role:ict_officer,admin,ict_director')
+            ->name('booking-service.assessment.issuing');
+        Route::post('bookings/{bookingService}/assessment/receiving', [BookingServiceController::class, 'saveReceivingAssessment'])
+            ->middleware('role:ict_officer,admin,ict_director')
+            ->name('booking-service.assessment.receiving');
     });
 
     // ICT Approval routes (ICT Officer only)
@@ -262,6 +270,10 @@ Route::middleware('auth:sanctum')->group(function () {
         
         // User details auto-capture
         Route::post('device-requests/{bookingId}/link-user', [ICTApprovalController::class, 'linkUserDetailsToBooking'])->name('ict-approval.link-user');
+        
+        // Device condition assessment routes
+        Route::post('device-requests/{requestId}/assessment/issuing', [ICTApprovalController::class, 'saveIssuingAssessment'])->name('ict-approval.assessment.issuing');
+        Route::post('device-requests/{requestId}/assessment/receiving', [ICTApprovalController::class, 'saveReceivingAssessment'])->name('ict-approval.assessment.receiving');
     });
 
     // Both Service Form routes (HOD Dashboard)

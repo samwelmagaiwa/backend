@@ -274,7 +274,7 @@ const routes = [
   {
     path: '/ict-approval/request/:id',
     name: 'RequestDetails',
-    component: () => import('../components/views/ict-approval/RequestDetails.vue'),
+    component: () => import('../components/views/ict-approval/RequestDetailsFixed.vue'),
     meta: {
       requiresAuth: true,
       roles: [ROLES.ICT_OFFICER]

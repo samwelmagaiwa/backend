@@ -46,6 +46,13 @@ class BookingService extends Model
         'ict_notes',
         // Return Status field
         'return_status',
+        // Device condition assessment fields
+        'device_condition_receiving',
+        'device_condition_issuing',
+        'device_received_at',
+        'device_issued_at',
+        'assessed_by',
+        'assessment_notes',
     ];
 
     /**
@@ -60,6 +67,10 @@ class BookingService extends Model
         'device_collected_at' => 'datetime',
         'device_returned_at' => 'datetime',
         'ict_approved_at' => 'datetime',
+        'device_received_at' => 'datetime',
+        'device_issued_at' => 'datetime',
+        'device_condition_receiving' => 'array',
+        'device_condition_issuing' => 'array',
     ];
 
     /**
@@ -144,6 +155,14 @@ class BookingService extends Model
     public function deviceInventory(): BelongsTo
     {
         return $this->belongsTo(DeviceInventory::class, 'device_inventory_id');
+    }
+
+    /**
+     * Get the ICT officer who performed the assessment.
+     */
+    public function assessedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'assessed_by');
     }
 
     /**

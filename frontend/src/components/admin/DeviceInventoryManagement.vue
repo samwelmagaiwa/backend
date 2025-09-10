@@ -297,6 +297,11 @@
                         <th
                           class="px-4 py-3 text-left text-xs font-medium text-blue-100 uppercase tracking-wider"
                         >
+                          Return Status
+                        </th>
+                        <th
+                          class="px-4 py-3 text-left text-xs font-medium text-blue-100 uppercase tracking-wider"
+                        >
                           Actions
                         </th>
                       </tr>
@@ -344,6 +349,24 @@
                           >
                             <i :class="getStatusIcon(device.availability_status)" class="mr-1"></i>
                             {{ getStatusText(device.availability_status) }}
+                          </span>
+                        </td>
+                        <td class="px-4 py-3">
+                          <span
+                            :class="getReturnStatusClass(device.return_status_summary)"
+                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                          >
+                            <i
+                              :class="getReturnStatusIcon(device.return_status_summary)"
+                              class="mr-1"
+                            ></i>
+                            {{
+                              getReturnStatusText(
+                                device.return_status_summary,
+                                device.unreturned_count,
+                                device.compromised_count
+                              )
+                            }}
                           </span>
                         </td>
                         <td class="px-4 py-3">
@@ -661,6 +684,21 @@
         return deviceInventoryService.getStatusIcon(status)
       }
 
+      // Return status helpers (aggregated per device)
+      const getReturnStatusClass = (status) => {
+        return deviceInventoryService.getReturnStatusColorClass(status)
+      }
+      const getReturnStatusIcon = (status) => {
+        return deviceInventoryService.getReturnStatusIcon(status)
+      }
+      const getReturnStatusText = (status, unreturnedCount = 0, compromisedCount = 0) => {
+        return deviceInventoryService.getReturnStatusDisplayText(
+          status,
+          unreturnedCount,
+          compromisedCount
+        )
+      }
+
       const fixQuantities = async () => {
         if (
           !confirm('This will fix any quantity inconsistencies in the device inventory. Continue?')
@@ -730,6 +768,9 @@
         getStatusClass,
         getStatusText,
         getStatusIcon,
+        getReturnStatusClass,
+        getReturnStatusIcon,
+        getReturnStatusText,
         fixQuantities,
         goBack
       }

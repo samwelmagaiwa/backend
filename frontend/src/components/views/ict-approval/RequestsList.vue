@@ -270,6 +270,11 @@
                           <i class="fas fa-flag mr-2"></i>Status
                         </th>
                         <th
+                          class="px-6 py-4 text-left text-sm font-semibold text-blue-100 uppercase tracking-wider"
+                        >
+                          <i class="fas fa-undo mr-2"></i>Return Status
+                        </th>
+                        <th
                           class="px-6 py-4 text-center text-sm font-semibold text-blue-100 uppercase tracking-wider"
                         >
                           <i class="fas fa-cogs mr-2"></i>Actions
@@ -373,6 +378,22 @@
                               class="mr-1"
                             ></i>
                             {{ getStatusText(request.ict_approve || 'pending') }}
+                          </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                          <span
+                            :class="
+                              getReturnStatusBadgeClass(request.return_status || 'not_yet_returned')
+                            "
+                            class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium"
+                          >
+                            <i
+                              :class="
+                                getReturnStatusIcon(request.return_status || 'not_yet_returned')
+                              "
+                              class="mr-1"
+                            ></i>
+                            {{ getReturnStatusText(request.return_status || 'not_yet_returned') }}
                           </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center">
@@ -726,6 +747,17 @@
 
       getStatusText(status) {
         return deviceBorrowingService.getStatusText(status)
+      },
+
+      // Return status helpers
+      getReturnStatusBadgeClass(status) {
+        return deviceBorrowingService.getReturnStatusBadgeClass(status)
+      },
+      getReturnStatusIcon(status) {
+        return deviceBorrowingService.getReturnStatusIcon(status)
+      },
+      getReturnStatusText(status) {
+        return deviceBorrowingService.getReturnStatusText(status)
       },
 
       // Dropdown methods

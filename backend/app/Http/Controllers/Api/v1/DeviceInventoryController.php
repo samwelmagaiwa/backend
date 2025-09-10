@@ -59,6 +59,9 @@ class DeviceInventoryController extends Controller
 
             // Transform data for response
             $transformedDevices = $devices->getCollection()->map(function ($device) {
+                // Get return status information
+                $returnStatusInfo = $this->getDeviceReturnStatusInfo($device->id);
+                
                 return [
                     'id' => $device->id,
                     'device_name' => $device->device_name,
@@ -75,6 +78,12 @@ class DeviceInventoryController extends Controller
                     'updated_by' => $device->updatedBy ? $device->updatedBy->name : null,
                     'created_at' => $device->created_at->toISOString(),
                     'updated_at' => $device->updated_at->toISOString(),
+                    // Return status aggregated information
+                    'return_status_summary' => $returnStatusInfo['summary'],
+                    'unreturned_count' => $returnStatusInfo['unreturned_count'],
+                    'compromised_count' => $returnStatusInfo['compromised_count'],
+                    'returned_count' => $returnStatusInfo['returned_count'],
+                    'total_bookings' => $returnStatusInfo['total_bookings'],
                 ];
             });
 
@@ -258,11 +267,16 @@ class DeviceInventoryController extends Controller
     public function destroy(DeviceInventory $deviceInventory): JsonResponse
     {
         try {
-            // Check if device has borrowed items
-            if ($deviceInventory->borrowed_quantity > 0) {
+            // Check if device has unreturned bookings (more accurate than borrowed_quantity)
+            $unreturnedBookings = \App\Models\BookingService::where('device_inventory_id', $deviceInventory->id)
+                ->whereIn('return_status', ['not_yet_returned'])
+                ->whereIn('ict_approve', ['approved']) // Only check approved bookings
+                ->count();
+                
+            if ($unreturnedBookings > 0) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Cannot delete device with borrowed items. Please wait for all items to be returned.',
+                    'message' => "Cannot delete device with {$unreturnedBookings} unreturned item(s). Please wait for all items to be returned.",
                 ], 422);
             }
 
@@ -438,6 +452,43 @@ class DeviceInventoryController extends Controller
         }
         
         return $deviceCode;
+    }
+
+    /**
+     * Get aggregated return status information for a device.
+     */
+    private function getDeviceReturnStatusInfo(int $deviceId): array
+    {
+        $bookings = \App\Models\BookingService::where('device_inventory_id', $deviceId)
+            ->whereIn('ict_approve', ['approved']) // Only count approved bookings
+            ->get();
+            
+        $totalBookings = $bookings->count();
+        $returnedCount = $bookings->where('return_status', 'returned')->count();
+        $compromisedCount = $bookings->where('return_status', 'returned_but_compromised')->count();
+        $unreturnedCount = $bookings->where('return_status', 'not_yet_returned')->count();
+        
+        // Determine summary status
+        $summary = 'no_bookings';
+        if ($totalBookings > 0) {
+            if ($compromisedCount > 0) {
+                $summary = 'some_compromised';
+            } elseif ($unreturnedCount === 0) {
+                $summary = 'all_returned';
+            } elseif ($returnedCount > 0) {
+                $summary = 'partially_returned';
+            } else {
+                $summary = 'none_returned';
+            }
+        }
+        
+        return [
+            'summary' => $summary,
+            'total_bookings' => $totalBookings,
+            'returned_count' => $returnedCount,
+            'compromised_count' => $compromisedCount,
+            'unreturned_count' => $unreturnedCount,
+        ];
     }
 
     /**

@@ -96,7 +96,7 @@
                 <button
                   @click="viewMyRequests"
                   class="medical-button bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-6 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/30 transform hover:scale-105 active:scale-95 relative overflow-hidden group/btn cursor-pointer"
-                  style="pointer-events: auto; z-index: 1000;"
+                  style="pointer-events: auto; z-index: 1000"
                 >
                   <!-- Multi-layer button effects -->
                   <div

@@ -1,0 +1,34 @@
+version = "1.0"
+
+[commands.lara_api_vue]
+description = "Agent for managing the Muhimbili National Hospital system built with Laravel + Vue.js"
+
+instructions = """
+You are a developer assistant for the Muhimbili National Hospital system built with Laravel and Vue.js.
+
+You can:
+- Manage Vue frontend (npm install, serve, build)
+- Manage Laravel backend (composer install, php artisan migrate/serve)
+- Work with Git for version control
+- Manage project files using filesystem tools
+- Run safe shell commands when needed
+
+Always follow Laravel and Vue best practices. Prioritize clean code, security, and maintainability.
+"""
+
+arguments = [
+  { name = "task", type = "string", required = true, description = "The task to perform, e.g. 'run migration', 'start frontend server', or 'deploy build'" }
+]
+
+mcpServers = """
+{
+  "shell": {
+    "command": "mcp-shell-server",
+    "args": [],
+    "env": { "ALLOW_COMMANDS": "npm,composer,php,artisan,git" }
+  }
+}
+"""
+
+tools = ["filesystem", "git", "shell"]
+execution_strategy = "act"

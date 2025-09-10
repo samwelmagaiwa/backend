@@ -1130,4 +1130,156 @@ class BookingServiceController extends Controller
         
         return 'others';
     }
+
+    /**
+     * ICT Officer: Save device condition assessment when issuing device.
+     */
+    public function saveIssuingAssessment(Request $request, BookingService $bookingService): JsonResponse
+    {
+        try {
+            // Check if user has ICT officer role
+            if (!$request->user()->hasAnyRole(['ict_officer', 'admin', 'ict_director'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized. ICT officer access required.'
+                ], 403);
+            }
+
+            $request->validate([
+                'device_condition' => 'required|array',
+                'device_condition.physical_condition' => 'required|string|in:excellent,good,fair,poor',
+                'device_condition.functionality' => 'required|string|in:fully_functional,partially_functional,not_functional',
+                'device_condition.accessories_complete' => 'required|boolean',
+                'device_condition.visible_damage' => 'required|boolean',
+                'device_condition.damage_description' => 'nullable|string|max:500',
+                'assessment_notes' => 'nullable|string|max:1000'
+            ]);
+
+            $bookingService->update([
+                'device_condition_issuing' => $request->device_condition,
+                'device_issued_at' => now(),
+                'assessed_by' => $request->user()->id,
+                'assessment_notes' => $request->assessment_notes,
+                'status' => 'in_use' // Update status to in_use when device is issued
+            ]);
+
+            $bookingService->load([
+                'user:id,name,email,phone,pf_number,department_id',
+                'user.department:id,name,code',
+                'departmentInfo:id,name,code',
+                'deviceInventory:id,device_name,device_code,description',
+                'assessedBy:id,name'
+            ]);
+
+            Log::info('Device issuing assessment saved', [
+                'booking_id' => $bookingService->id,
+                'assessed_by' => $request->user()->id,
+                'device_condition' => $request->device_condition
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'data' => $bookingService,
+                'message' => 'Device condition assessment saved and device marked as issued successfully'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error saving issuing assessment: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error saving device condition assessment',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * ICT Officer: Save device condition assessment when receiving device back.
+     */
+    public function saveReceivingAssessment(Request $request, BookingService $bookingService): JsonResponse
+    {
+        try {
+            // Check if user has ICT officer role
+            if (!$request->user()->hasAnyRole(['ict_officer', 'admin', 'ict_director'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized. ICT officer access required.'
+                ], 403);
+            }
+
+            $request->validate([
+                'device_condition' => 'required|array',
+                'device_condition.physical_condition' => 'required|string|in:excellent,good,fair,poor',
+                'device_condition.functionality' => 'required|string|in:fully_functional,partially_functional,not_functional',
+                'device_condition.accessories_complete' => 'required|boolean',
+                'device_condition.visible_damage' => 'required|boolean',
+                'device_condition.damage_description' => 'nullable|string|max:500',
+                'assessment_notes' => 'nullable|string|max:1000'
+            ]);
+
+            // Determine return status based on condition assessment
+            $returnStatus = 'returned';
+            $deviceCondition = $request->device_condition;
+            
+            // Mark as compromised if device has issues
+            if ($deviceCondition['physical_condition'] === 'poor' || 
+                $deviceCondition['functionality'] !== 'fully_functional' ||
+                $deviceCondition['visible_damage'] === true ||
+                !$deviceCondition['accessories_complete']) {
+                $returnStatus = 'returned_but_compromised';
+            }
+
+            $bookingService->update([
+                'device_condition_receiving' => $request->device_condition,
+                'device_received_at' => now(),
+                'assessed_by' => $request->user()->id,
+                'assessment_notes' => $request->assessment_notes,
+                'return_status' => $returnStatus,
+                'status' => 'returned', // Update main status to returned
+                'device_returned_at' => now()
+            ]);
+
+            // Return device to inventory
+            if ($bookingService->device_inventory_id) {
+                $deviceInventory = $bookingService->deviceInventory;
+                if ($deviceInventory) {
+                    $deviceInventory->returnDevice(1);
+                    Log::info('Device returned to inventory', [
+                        'device_id' => $deviceInventory->id,
+                        'device_name' => $deviceInventory->device_name,
+                        'booking_id' => $bookingService->id
+                    ]);
+                }
+            }
+
+            $bookingService->load([
+                'user:id,name,email,phone,pf_number,department_id',
+                'user.department:id,name,code',
+                'departmentInfo:id,name,code',
+                'deviceInventory:id,device_name,device_code,description',
+                'assessedBy:id,name'
+            ]);
+
+            Log::info('Device receiving assessment saved', [
+                'booking_id' => $bookingService->id,
+                'assessed_by' => $request->user()->id,
+                'return_status' => $returnStatus,
+                'device_condition' => $request->device_condition
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'data' => $bookingService,
+                'message' => 'Device received and condition assessment completed successfully'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error saving receiving assessment: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error saving device condition assessment',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

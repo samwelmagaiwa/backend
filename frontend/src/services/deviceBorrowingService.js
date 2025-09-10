@@ -283,6 +283,9 @@ export const deviceBorrowingService = {
       ict_notes: request.ict_notes,
       ict_approved_by: request.ict_approved_by,
 
+      // Return status
+      return_status: request.return_status || 'not_yet_returned',
+
       // Admin approval (separate from ICT approval)
       admin_approved_by: request.approved_by,
       admin_approved_at: request.approved_at,
@@ -405,6 +408,160 @@ export const deviceBorrowingService = {
     }
 
     return statusTexts[status] || status || 'Unknown'
+  },
+
+  /**
+   * Get CSS class for return status badge
+   * @param {string} returnStatus - Return status
+   * @returns {string} - CSS classes
+   */
+  getReturnStatusBadgeClass(returnStatus) {
+    const statusClasses = {
+      not_yet_returned: 'bg-blue-100 text-blue-800 border-blue-200',
+      returned: 'bg-green-100 text-green-800 border-green-200',
+      returned_but_compromised: 'bg-red-100 text-red-800 border-red-200',
+      out_of_stock: 'bg-yellow-100 text-yellow-800 border-yellow-200' // Treated as pending
+    }
+
+    return statusClasses[returnStatus] || statusClasses.not_yet_returned
+  },
+
+  /**
+   * Get icon for return status
+   * @param {string} returnStatus - Return status
+   * @returns {string} - Font Awesome icon class
+   */
+  getReturnStatusIcon(returnStatus) {
+    const statusIcons = {
+      not_yet_returned: 'fas fa-hourglass-half',
+      returned: 'fas fa-check-circle',
+      returned_but_compromised: 'fas fa-exclamation-triangle'
+    }
+
+    return statusIcons[returnStatus] || statusIcons.not_yet_returned
+  },
+
+  /**
+   * Get text for return status
+   * @param {string} returnStatus - Return status
+   * @returns {string} - Return status text
+   */
+  getReturnStatusText(returnStatus) {
+    const statusTexts = {
+      not_yet_returned: 'Not Returned',
+      returned: 'Returned',
+      returned_but_compromised: 'Compromised'
+    }
+
+    return statusTexts[returnStatus] || returnStatus || 'Unknown'
+  },
+
+  /**
+   * Save device condition assessment when issuing device
+   * @param {number} requestId - Request ID
+   * @param {Object} assessmentData - Assessment data
+   * @returns {Promise<Object>} - API response
+   */
+  async saveIssuingAssessment(requestId, assessmentData) {
+    try {
+      console.log('💾 Saving issuing assessment for request ID:', requestId, assessmentData)
+
+      // Try ICT approval endpoint first (recommended approach)
+      let response
+      try {
+        response = await apiClient.post(
+          `/ict-approval/device-requests/${requestId}/assessment/issuing`,
+          assessmentData
+        )
+        console.log('✅ Successfully saved via ICT approval endpoint')
+      } catch (ictError) {
+        console.log(
+          '⚠️ ICT approval endpoint failed, trying booking service endpoint:',
+          ictError.response?.status
+        )
+
+        // Fallback to booking service endpoint
+        response = await apiClient.post(
+          `/booking-service/bookings/${requestId}/assessment/issuing`,
+          assessmentData
+        )
+        console.log('✅ Successfully saved via booking service endpoint')
+      }
+
+      return {
+        success: true,
+        data: this.transformRequest(response.data.data || response.data),
+        message: response.data.message || 'Device issued and condition assessment saved successfully'
+      }
+    } catch (error) {
+      console.error('❌ Failed to save issuing assessment:', {
+        requestId,
+        error: error.message,
+        status: error.response?.status,
+        responseData: error.response?.data
+      })
+
+      return {
+        success: false,
+        message: error.response?.data?.message || error.message || 'Failed to save assessment',
+        errors: error.response?.data?.errors || {},
+        status: error.response?.status
+      }
+    }
+  },
+
+  /**
+   * Save device condition assessment when receiving device back
+   * @param {number} requestId - Request ID
+   * @param {Object} assessmentData - Assessment data
+   * @returns {Promise<Object>} - API response
+   */
+  async saveReceivingAssessment(requestId, assessmentData) {
+    try {
+      console.log('📥 Saving receiving assessment for request ID:', requestId, assessmentData)
+
+      // Try ICT approval endpoint first (recommended approach)
+      let response
+      try {
+        response = await apiClient.post(
+          `/ict-approval/device-requests/${requestId}/assessment/receiving`,
+          assessmentData
+        )
+        console.log('✅ Successfully saved via ICT approval endpoint')
+      } catch (ictError) {
+        console.log(
+          '⚠️ ICT approval endpoint failed, trying booking service endpoint:',
+          ictError.response?.status
+        )
+
+        // Fallback to booking service endpoint
+        response = await apiClient.post(
+          `/booking-service/bookings/${requestId}/assessment/receiving`,
+          assessmentData
+        )
+        console.log('✅ Successfully saved via booking service endpoint')
+      }
+
+      return {
+        success: true,
+        data: this.transformRequest(response.data.data || response.data),
+        message: response.data.message || 'Device received and assessment completed successfully'
+      }
+    } catch (error) {
+      console.error('❌ Failed to save receiving assessment:', {
+        requestId,
+        error: error.message,
+        status: error.response?.status,
+        responseData: error.response?.data
+      })
+
+      return {
+        success: false,
+        message: error.response?.data?.message || error.message || 'Failed to save assessment',
+        errors: error.response?.data?.errors || {},
+        status: error.response?.status
+      }
+    }
   }
 }
 

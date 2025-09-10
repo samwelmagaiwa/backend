@@ -726,27 +726,27 @@
       // Return status methods
       const getReturnStatusText = (returnStatus) => {
         const statusMap = {
-          'not_yet_returned': 'Not Yet Returned',
-          'returned': 'Returned',
-          'returned_but_compromised': 'Returned but Compromised'
+          not_yet_returned: 'Not Yet Returned',
+          returned: 'Returned',
+          returned_but_compromised: 'Returned but Compromised'
         }
         return statusMap[returnStatus] || returnStatus || 'Not Yet Returned'
       }
 
       const getReturnStatusColor = (returnStatus) => {
         const colorMap = {
-          'not_yet_returned': 'bg-yellow-400',
-          'returned': 'bg-green-400',
-          'returned_but_compromised': 'bg-orange-400'
+          not_yet_returned: 'bg-yellow-400',
+          returned: 'bg-green-400',
+          returned_but_compromised: 'bg-orange-400'
         }
         return colorMap[returnStatus] || 'bg-gray-400'
       }
 
       const getReturnStatusTextColor = (returnStatus) => {
         const textColorMap = {
-          'not_yet_returned': 'text-yellow-400',
-          'returned': 'text-green-400',
-          'returned_but_compromised': 'text-orange-400'
+          not_yet_returned: 'text-yellow-400',
+          returned: 'text-green-400',
+          returned_but_compromised: 'text-orange-400'
         }
         return textColorMap[returnStatus] || 'text-gray-400'
       }
