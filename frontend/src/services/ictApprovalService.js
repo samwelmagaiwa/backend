@@ -13,7 +13,8 @@ export const ictApprovalService = {
    */
   async getDeviceBorrowingRequests(params = {}) {
     try {
-      const response = await apiClient.get('/booking-service/ict-pending-approvals', {
+      // Use the dedicated ICT approval endpoint
+      const response = await apiClient.get('/ict-approval/device-requests', {
         params: {
           ...params,
           per_page: params.per_page || 50
@@ -48,7 +49,9 @@ export const ictApprovalService = {
             // Device details
             device_type: request.device_type,
             custom_device: request.custom_device,
-            device_name: this.getDeviceDisplayName(request.device_type, request.custom_device),
+            device_name: request.device_name || this.getDeviceDisplayName(request.device_type, request.custom_device),
+            device_inventory_id: request.device_inventory_id,
+            device_available: typeof request.device_available !== 'undefined' ? request.device_available : null,
 
             // Booking details
             booking_date: request.booking_date,

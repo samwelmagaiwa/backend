@@ -67,7 +67,10 @@ class ICTApprovalController extends Controller
                 'user:id,name,email,phone,pf_number,department_id',
                 'user.department:id,name,code',
                 'departmentInfo:id,name,code',
-                'deviceInventory:id,device_name,device_code,description',
+                'deviceInventory' => function($query) {
+                    $query->select(['id', 'device_name', 'device_code', 'description', 'is_active'])
+                          ->where('is_active', true);
+                },
                 'approvedBy:id,name'
             ]);
 
@@ -180,7 +183,10 @@ class ICTApprovalController extends Controller
                 'user:id,name,email,phone,pf_number,department_id',
                 'user.department:id,name,code',
                 'departmentInfo:id,name,code',
-                'deviceInventory:id,device_name,device_code,description',
+                'deviceInventory' => function($query) {
+                    $query->select(['id', 'device_name', 'device_code', 'description', 'is_active'])
+                          ->where('is_active', true);
+                },
                 'approvedBy:id,name'
             ])->find($requestIdInt);
 
@@ -558,8 +564,9 @@ class ICTApprovalController extends Controller
             // Device details
             'device_type' => $booking->device_type,
             'custom_device' => $booking->custom_device,
-            'device_name' => $this->getDeviceDisplayName($booking->device_type, $booking->custom_device),
+            'device_name' => $this->getDeviceDisplayName($booking->device_type, $booking->custom_device, $booking->deviceInventory),
             'device_inventory_id' => $booking->device_inventory_id,
+            'device_available' => $booking->deviceInventory ? $booking->deviceInventory->is_active : false,
             
             // Booking details
             'booking_date' => $booking->booking_date?->format('Y-m-d'),
@@ -703,13 +710,44 @@ class ICTApprovalController extends Controller
     }
     
     /**
-     * Get device display name based on device type and custom device
+     * Get device display name based on device type, custom device, and inventory device
+     * 
+     * @param string $deviceType
+     * @param string|null $customDevice
+     * @param DeviceInventory|null $deviceInventory
+     * @return string
+     */
+    private function getDeviceDisplayName(?string $deviceType, ?string $customDevice = null, $deviceInventory = null): string
+    {
+        // If device is from inventory and still available, use inventory name
+        if ($deviceInventory && $deviceInventory->is_active) {
+            return $deviceInventory->device_name;
+        }
+        
+        // If device inventory exists but is inactive, show as unavailable
+        if ($deviceInventory && !$deviceInventory->is_active) {
+            $inventoryName = $deviceInventory->device_name;
+            return $inventoryName . ' (Device No Longer Available)';
+        }
+        
+        // If device was linked to inventory but inventory record is deleted
+        if (!$deviceInventory && $deviceType) {
+            $fallbackName = $this->getFallbackDeviceName($deviceType, $customDevice);
+            return $fallbackName . ' (Device No Longer in Inventory)';
+        }
+        
+        // Handle custom devices or fallback to device type mapping
+        return $this->getFallbackDeviceName($deviceType, $customDevice);
+    }
+    
+    /**
+     * Get fallback device name based on device type and custom device
      * 
      * @param string $deviceType
      * @param string|null $customDevice
      * @return string
      */
-    private function getDeviceDisplayName(?string $deviceType, ?string $customDevice = null): string
+    private function getFallbackDeviceName(?string $deviceType, ?string $customDevice = null): string
     {
         if ($deviceType === 'others' && $customDevice) {
             return $customDevice;

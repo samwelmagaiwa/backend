@@ -206,6 +206,19 @@
                       <p class="text-blue-200 text-sm">ICT Status:</p>
                       <p class="font-semibold">{{ requestData?.ictStatus || 'Pending' }}</p>
                     </div>
+                    <!-- Return Status for Booking Service -->
+                    <div v-if="isBookingService">
+                      <p class="text-blue-200 text-sm">Return Status:</p>
+                      <p class="font-semibold flex items-center gap-2">
+                        <span 
+                          :class="getReturnStatusBadgeClass(requestData?.return_status || 'not_yet_returned')"
+                          class="px-2 py-1 rounded-full text-xs font-medium border"
+                        >
+                          <i :class="getReturnStatusIcon(requestData?.return_status || 'not_yet_returned')" class="mr-1"></i>
+                          {{ getReturnStatusText(requestData?.return_status || 'not_yet_returned') }}
+                        </span>
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -411,6 +424,34 @@
         return 'bg-yellow-600 text-yellow-100 border border-blue-400/50'
       }
 
+      // Return Status Helper Methods
+      const getReturnStatusBadgeClass = (returnStatus) => {
+        const statusClasses = {
+          not_yet_returned: 'bg-blue-100 text-blue-800 border-blue-200',
+          returned: 'bg-green-100 text-green-800 border-green-200',
+          returned_but_compromised: 'bg-red-100 text-red-800 border-red-200'
+        }
+        return statusClasses[returnStatus] || statusClasses.not_yet_returned
+      }
+
+      const getReturnStatusIcon = (returnStatus) => {
+        const statusIcons = {
+          not_yet_returned: 'fas fa-hourglass-half',
+          returned: 'fas fa-check-circle',
+          returned_but_compromised: 'fas fa-exclamation-triangle'
+        }
+        return statusIcons[returnStatus] || statusIcons.not_yet_returned
+      }
+
+      const getReturnStatusText = (returnStatus) => {
+        const statusTexts = {
+          not_yet_returned: 'Not Returned',
+          returned: 'Returned',
+          returned_but_compromised: 'Compromised'
+        }
+        return statusTexts[returnStatus] || returnStatus || 'Unknown'
+      }
+
       // Lifecycle
       onMounted(() => {
         loadRequestData()
@@ -433,7 +474,10 @@
         getIctCommentsIconBgClass,
         getIctCommentsIcon,
         getIctCommentsTextColor,
-        getIctCommentsStatusBadgeClass
+        getIctCommentsStatusBadgeClass,
+        getReturnStatusBadgeClass,
+        getReturnStatusIcon,
+        getReturnStatusText
       }
     }
   }

@@ -267,29 +267,55 @@ class DeviceInventoryController extends Controller
     public function destroy(DeviceInventory $deviceInventory): JsonResponse
     {
         try {
-            // Check if device has unreturned bookings (more accurate than borrowed_quantity)
-            $unreturnedBookings = \App\Models\BookingService::where('device_inventory_id', $deviceInventory->id)
-                ->whereIn('return_status', ['not_yet_returned'])
-                ->whereIn('ict_approve', ['approved']) // Only check approved bookings
-                ->count();
+            // Check if device has any active or unreturned bookings
+            $activeBookingsQuery = \App\Models\BookingService::where('device_inventory_id', $deviceInventory->id)
+                ->where(function($query) {
+                    $query->whereIn('return_status', ['not_yet_returned'])
+                          ->orWhere('ict_approve', 'pending')
+                          ->orWhere('status', 'in_use');
+                });
                 
-            if ($unreturnedBookings > 0) {
+            $activeBookings = $activeBookingsQuery->count();
+            
+            if ($activeBookings > 0) {
+                // Get detailed breakdown for better debugging
+                $unreturnedCount = \App\Models\BookingService::where('device_inventory_id', $deviceInventory->id)
+                    ->where('return_status', 'not_yet_returned')->count();
+                $pendingApprovalCount = \App\Models\BookingService::where('device_inventory_id', $deviceInventory->id)
+                    ->where('ict_approve', 'pending')->count();
+                $inUseCount = \App\Models\BookingService::where('device_inventory_id', $deviceInventory->id)
+                    ->where('status', 'in_use')->count();
+                    
+                Log::warning('Device deletion blocked due to active bookings', [
+                    'device_id' => $deviceInventory->id,
+                    'device_name' => $deviceInventory->device_name,
+                    'total_active_bookings' => $activeBookings,
+                    'unreturned_count' => $unreturnedCount,
+                    'pending_approval_count' => $pendingApprovalCount,
+                    'in_use_count' => $inUseCount
+                ]);
+                
                 return response()->json([
                     'success' => false,
-                    'message' => "Cannot delete device with {$unreturnedBookings} unreturned item(s). Please wait for all items to be returned.",
+                    'message' => "Cannot delete device with {$activeBookings} active/unreturned item(s). Please wait for all items to be returned and processed.",
+                    'details' => [
+                        'unreturned' => $unreturnedCount,
+                        'pending_approval' => $pendingApprovalCount,
+                        'in_use' => $inUseCount
+                    ]
                 ], 422);
             }
 
-            // Check if device has associated booking records
-            $hasBookings = $deviceInventory->bookingServices()->exists();
-            if ($hasBookings) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Cannot delete device with existing booking records. Consider deactivating instead.',
-                ], 422);
-            }
+            // Allow deletion if all bookings are returned/completed
+            // Historical booking records are allowed to exist for audit purposes
 
             $deviceName = $deviceInventory->device_name;
+            
+            // Get total booking count for logging
+            $totalBookings = \App\Models\BookingService::where('device_inventory_id', $deviceInventory->id)->count();
+            $returnedBookings = \App\Models\BookingService::where('device_inventory_id', $deviceInventory->id)
+                ->where('return_status', 'returned')->count();
+                
             $deviceInventory->delete();
 
             // Clear cache when device is deleted
@@ -297,7 +323,9 @@ class DeviceInventoryController extends Controller
 
             Log::info('Device deleted successfully', [
                 'device_name' => $deviceName,
-                'deleted_by' => Auth::id()
+                'deleted_by' => Auth::id(),
+                'total_historical_bookings' => $totalBookings,
+                'returned_bookings' => $returnedBookings
             ]);
 
             return response()->json([

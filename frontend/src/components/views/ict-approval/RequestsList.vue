@@ -335,13 +335,22 @@
                         <td class="px-6 py-4 whitespace-nowrap">
                           <div class="flex items-center">
                             <i class="fas fa-laptop text-teal-300 mr-2"></i>
-                            <span class="text-sm text-white font-medium">{{
-                              request.device_name ||
-                              getDeviceDisplayName(
-                                request.device_type || request.deviceType,
-                                request.custom_device || request.customDevice
-                              )
-                            }}</span>
+                            <div class="flex flex-col">
+                              <span class="text-sm text-white font-medium">{{
+                                request.device_name ||
+                                getDeviceDisplayName(
+                                  request.device_type || request.deviceType,
+                                  request.custom_device || request.customDevice
+                                )
+                              }}</span>
+                              <span 
+                                v-if="request.device_available === false && request.device_inventory_id"
+                                class="text-xs text-red-300 font-medium"
+                              >
+                                <i class="fas fa-exclamation-triangle mr-1"></i>
+                                Device No Longer Available
+                              </span>
+                            </div>
                           </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">

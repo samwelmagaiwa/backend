@@ -32,8 +32,6 @@
         </div>
 
         <div class="max-w-full mx-auto px-4 relative z-10">
-
-
           <!-- Header Section -->
           <div class="booking-glass-card rounded-t-3xl p-8 mb-0 border-b border-blue-300/30 animate-fade-in">
             <div class="flex justify-between items-center">
@@ -83,320 +81,307 @@
           </div>
 
           <!-- Main Content -->
-          <div class="bg-blue-800/30 backdrop-blur-sm rounded-xl p-6 mb-6 border border-blue-600/40">
-            <!-- Back Button -->
-            <div class="mb-4">
-              <button
-                @click="goBack"
-                class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-              >
-                <i class="fas fa-arrow-left mr-2"></i>
-                Back to Requests List
-              </button>
-            </div>
+          <div class="booking-glass-card rounded-b-3xl overflow-hidden animate-slide-up">
+            <div class="p-6 space-y-6">
 
-            <!-- Request Info -->
-            <div v-if="!isLoading && Object.keys(request).length > 0" class="space-y-4">
-              <h3 class="text-xl font-bold text-white">Request Information</h3>
-              
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-sm font-semibold text-blue-200 mb-1">Request ID</label>
-                  <div class="px-3 py-2 bg-white/10 border border-blue-300/30 rounded text-white">
-                    {{ request.request_id || `REQ-${String(request.id).padStart(6, '0')}` }}
+
+              <!-- Back Button -->
+              <div class="mb-4">
+                <button
+                  @click="goBack"
+                  class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                >
+                  <i class="fas fa-arrow-left mr-2"></i>
+                  Back to Requests List
+                </button>
+              </div>
+
+              <!-- Request Info -->
+              <div v-if="!isLoading && Object.keys(request).length > 0" class="space-y-4">
+                <h3 class="text-xl font-bold text-white">Request Information</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-semibold text-blue-200 mb-1">Request ID</label>
+                    <div class="px-3 py-2 bg-white/10 border border-blue-300/30 rounded text-white">
+                      {{ request.request_id || `REQ-${String(request.id).padStart(6, '0')}` }}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label class="block text-sm font-semibold text-blue-200 mb-1">Borrower Name</label>
+                    <div class="px-3 py-2 bg-white/10 border border-blue-300/30 rounded text-white">
+                      {{ request.borrower_name || 'Unknown' }}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label class="block text-sm font-semibold text-blue-200 mb-1">Department</label>
+                    <div class="px-3 py-2 bg-white/10 border border-blue-300/30 rounded text-white">
+                      {{ request.department || 'Unknown Department' }}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label class="block text-sm font-semibold text-blue-200 mb-1">Device Type</label>
+                    <div class="px-3 py-2 bg-white/10 border border-blue-300/30 rounded text-white">
+                      {{ request.device_name || getDeviceDisplayName(request.device_type, request.custom_device) }}
+                    </div>
                   </div>
                 </div>
-                
+
                 <div>
-                  <label class="block text-sm font-semibold text-blue-200 mb-1">Borrower Name</label>
+                  <label class="block text-sm font-semibold text-blue-200 mb-1">Reason</label>
                   <div class="px-3 py-2 bg-white/10 border border-blue-300/30 rounded text-white">
-                    {{ request.borrower_name || 'Unknown' }}
-                  </div>
-                </div>
-                
-                <div>
-                  <label class="block text-sm font-semibold text-blue-200 mb-1">Department</label>
-                  <div class="px-3 py-2 bg-white/10 border border-blue-300/30 rounded text-white">
-                    {{ request.department || 'Unknown Department' }}
-                  </div>
-                </div>
-                
-                <div>
-                  <label class="block text-sm font-semibold text-blue-200 mb-1">Device Type</label>
-                  <div class="px-3 py-2 bg-white/10 border border-blue-300/30 rounded text-white">
-                    {{ request.device_name || getDeviceDisplayName(request.device_type, request.custom_device) }}
+                    {{ request.reason || request.purpose || 'No reason provided' }}
                   </div>
                 </div>
               </div>
 
-              <div>
-                <label class="block text-sm font-semibold text-blue-200 mb-1">Reason</label>
-                <div class="px-3 py-2 bg-white/10 border border-blue-300/30 rounded text-white">
-                  {{ request.reason || request.purpose || 'No reason provided' }}
+              <!-- Device Condition Assessment Section -->
+              <div v-if="!isLoading && Object.keys(request).length > 0" class="bg-blue-800/30 backdrop-blur-sm rounded-xl p-6 border border-blue-600/40 animate-fade-in">
+                <div class="flex items-center gap-3 mb-6">
+                  <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-clipboard-check text-white text-lg"></i>
+                  </div>
+                  <h3 class="text-xl font-bold text-white">Device Condition Assessment</h3>
                 </div>
-              </div>
-            </div>
 
-            <!-- Loading State -->
-            <div v-else-if="isLoading" class="text-center py-8">
-              <div class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <p class="text-white">Loading request details...</p>
-            </div>
-
-            <!-- Error State -->
-            <div v-else class="bg-red-500/20 border border-red-400/40 rounded-lg p-4">
-              <p class="text-red-200 text-sm mb-2">⚠️ No request data loaded. Check console for errors.</p>
-              <button 
-                @click="fetchRequestDetails()" 
-                class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-              >
-                Retry Loading
-              </button>
-            </div>
-          </div>
-
-          <!-- Device Assessment Section -->
-          <div v-if="canTakeAction || true" class="bg-purple-800/30 backdrop-blur-sm rounded-xl p-6 mb-6 border border-purple-600/40">
-            <h3 class="text-lg font-bold text-white mb-4">
-              <i class="fas fa-clipboard-check mr-2"></i>
-              Device Condition Assessment
-            </h3>
-            
-            <!-- Assessment Type Tabs -->
-            <div class="mb-6">
-              <div class="bg-slate-800/50 p-3 rounded-xl border border-purple-400/20">
-                <div class="flex space-x-3">
+                <!-- Assessment Type Tabs -->
+                <div class="flex mb-6 bg-blue-900/40 rounded-xl p-1">
                   <button
                     @click="assessmentType = 'issuing'"
                     :class="[
-                      'flex-1 px-4 py-3 rounded-lg font-bold transition-all duration-300',
-                      assessmentType === 'issuing'
-                        ? 'bg-purple-600 text-white shadow-lg'
-                        : 'bg-slate-700/50 text-purple-200 hover:bg-slate-600/60'
+                      'flex-1 py-3 px-4 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2',
+                      assessmentType === 'issuing' 
+                        ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg' 
+                        : 'text-blue-200 hover:text-white hover:bg-blue-800/50'
                     ]"
                   >
-                    <i class="fas fa-hand-holding mr-2"></i>
+                    <i class="fas fa-hand-holding text-sm"></i>
                     Device Issuing
                   </button>
                   <button
                     @click="assessmentType = 'receiving'"
                     :class="[
-                      'flex-1 px-4 py-3 rounded-lg font-bold transition-all duration-300',
-                      assessmentType === 'receiving'
-                        ? 'bg-purple-600 text-white shadow-lg'
-                        : 'bg-slate-700/50 text-purple-200 hover:bg-slate-600/60'
+                      'flex-1 py-3 px-4 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2',
+                      assessmentType === 'receiving' 
+                        ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg' 
+                        : 'text-blue-200 hover:text-white hover:bg-blue-800/50'
                     ]"
                   >
-                    <i class="fas fa-undo mr-2"></i>
+                    <i class="fas fa-undo text-sm"></i>
                     Device Receiving
                   </button>
                 </div>
-              </div>
-            </div>
 
-            <!-- Assessment Form -->
-            <div class="space-y-6">
-              <!-- Physical Condition -->
-              <div>
-                <label class="block text-sm font-semibold text-purple-200 mb-3">
-                  <i class="fas fa-eye mr-2"></i>
-                  Physical Condition
-                </label>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  <label
-                    v-for="condition in physicalConditions"
-                    :key="condition.value"
-                    class="cursor-pointer"
-                  >
-                    <input
-                      v-model="assessment.physical_condition"
-                      type="radio"
-                      :value="condition.value"
-                      class="sr-only"
-                    />
-                    <div
-                      :class="[
-                        'p-3 rounded-lg border-2 transition-all text-center',
-                        assessment.physical_condition === condition.value
-                          ? 'bg-purple-600 border-purple-400 text-white'
-                          : 'bg-slate-800/50 border-slate-600 text-slate-300 hover:border-purple-400/50'
-                      ]"
-                    >
-                      <div class="font-semibold text-sm">{{ condition.label }}</div>
+                <!-- Assessment Form -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <!-- Physical Condition -->
+                  <div>
+                    <label class="block text-sm font-semibold text-blue-200 mb-3">
+                      <i class="fas fa-eye mr-2"></i>
+                      Physical Condition *
+                    </label>
+                    <div class="space-y-2">
+                      <label v-for="condition in physicalConditions" :key="condition.value" 
+                             class="flex items-center p-3 bg-blue-900/20 rounded-lg border border-blue-600/30 hover:border-blue-500/50 transition-all cursor-pointer group">
+                        <input 
+                          type="radio" 
+                          :value="condition.value" 
+                          v-model="assessment.physicalCondition"
+                          class="mr-3 text-blue-600 focus:ring-blue-500"
+                        >
+                        <div class="flex items-center gap-2">
+                          <i :class="condition.icon + ' text-' + condition.color"></i>
+                          <span class="text-white group-hover:text-blue-100 font-medium">{{ condition.label }}</span>
+                        </div>
+                      </label>
                     </div>
+                  </div>
+
+                  <!-- Device Functionality -->
+                  <div>
+                    <label class="block text-sm font-semibold text-blue-200 mb-3">
+                      <i class="fas fa-cogs mr-2"></i>
+                      Device Functionality *
+                    </label>
+                    <div class="space-y-2">
+                      <label v-for="functionality in functionalityOptions" :key="functionality.value" 
+                             class="flex items-center p-3 bg-purple-900/20 rounded-lg border border-purple-600/30 hover:border-purple-500/50 transition-all cursor-pointer group">
+                        <input 
+                          type="radio" 
+                          :value="functionality.value" 
+                          v-model="assessment.functionality"
+                          class="mr-3 text-purple-600 focus:ring-purple-500"
+                        >
+                        <div class="flex items-center gap-2">
+                          <i :class="functionality.icon + ' text-' + functionality.color"></i>
+                          <span class="text-white group-hover:text-purple-100 font-medium">{{ functionality.label }}</span>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Accessories and Damage Assessment -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <!-- Accessories Completeness -->
+                  <div>
+                    <label class="block text-sm font-semibold text-purple-200 mb-3">
+                      <i class="fas fa-puzzle-piece mr-2"></i>
+                      Accessories Status
+                    </label>
+                    <div class="bg-purple-900/20 rounded-lg border border-purple-600/30 p-4">
+                      <label class="flex items-center cursor-pointer group">
+                        <input 
+                          type="checkbox" 
+                          v-model="assessment.accessoriesComplete"
+                          class="mr-3 text-purple-600 focus:ring-purple-500 rounded"
+                        >
+                        <div class="flex items-center gap-2">
+                          <i class="fas fa-check-circle text-green-400"></i>
+                          <span class="text-white group-hover:text-purple-100 font-medium">All accessories included</span>
+                        </div>
+                      </label>
+                      <p class="text-purple-300 text-xs mt-2 ml-6">Check if all required accessories are present and functional</p>
+                    </div>
+                  </div>
+
+                  <!-- Damage Assessment -->
+                  <div>
+                    <label class="block text-sm font-semibold text-purple-200 mb-3">
+                      <i class="fas fa-exclamation-triangle mr-2"></i>
+                      Damage Assessment
+                    </label>
+                    <div class="bg-purple-900/20 rounded-lg border border-purple-600/30 p-4">
+                      <label class="flex items-center cursor-pointer group mb-3">
+                        <input 
+                          type="checkbox" 
+                          v-model="assessment.hasDamage"
+                          class="mr-3 text-red-600 focus:ring-red-500 rounded"
+                        >
+                        <div class="flex items-center gap-2">
+                          <i class="fas fa-tools text-red-400"></i>
+                          <span class="text-white group-hover:text-purple-100 font-medium">Device has damage/issues</span>
+                        </div>
+                      </label>
+                      <textarea 
+                        v-if="assessment.hasDamage"
+                        v-model="assessment.damageDescription"
+                        rows="2"
+                        class="w-full px-3 py-2 bg-purple-800/30 border border-purple-500/30 rounded focus:border-purple-400 focus:outline-none text-white placeholder-purple-300/60 text-sm"
+                        placeholder="Describe the damage or issues..."
+                      ></textarea>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Additional Notes -->
+                <div class="mb-6">
+                  <label class="block text-sm font-semibold text-purple-200 mb-3">
+                    <i class="fas fa-sticky-note mr-2"></i>
+                    Additional Notes
                   </label>
+                  <textarea
+                    v-model="assessment.notes"
+                    rows="3"
+                    class="w-full px-4 py-3 bg-purple-900/20 border border-purple-600/30 rounded-lg focus:border-purple-400 focus:outline-none text-white placeholder-purple-300/60 resize-none"
+                    placeholder="Enter any additional observations, recommendations, or notes about the device condition..."
+                  ></textarea>
+                </div>
+
+                <!-- Assessment Actions -->
+                <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-purple-600/30">
+                  <button
+                    @click="saveAssessment"
+                    :disabled="!isAssessmentValid || isSavingAssessment"
+                    class="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
+                  >
+                    <i class="fas fa-save"></i>
+                    {{ isSavingAssessment ? 'Saving Assessment...' : `Save ${assessmentType === 'issuing' ? 'Issuing' : 'Receiving'} Assessment` }}
+                  </button>
+                  
+                  <button
+                    @click="resetAssessment"
+                    :disabled="isSavingAssessment"
+                    class="px-6 py-3 bg-gray-600 text-white rounded-lg font-semibold transition-colors hover:bg-gray-700 disabled:opacity-50 flex items-center gap-2"
+                  >
+                    <i class="fas fa-undo"></i>
+                    Reset Form
+                  </button>
+                </div>
+
+                <!-- Assessment Status Messages -->
+                <div v-if="assessmentMessage" class="mt-4">
+                  <div :class="[
+                    'p-4 rounded-lg border flex items-center gap-3',
+                    assessmentMessage.type === 'success' 
+                      ? 'bg-green-500/20 border-green-400/40 text-green-200' 
+                      : 'bg-red-500/20 border-red-400/40 text-red-200'
+                  ]">
+                    <i :class="[
+                      'fas',
+                      assessmentMessage.type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'
+                    ]"></i>
+                    <span>{{ assessmentMessage.text }}</span>
+                  </div>
                 </div>
               </div>
 
-              <!-- Functionality -->
-              <div>
-                <label class="block text-sm font-semibold text-purple-200 mb-3">
-                  <i class="fas fa-cogs mr-2"></i>
-                  Device Functionality
-                </label>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <label
-                    v-for="func in functionalityOptions"
-                    :key="func.value"
-                    class="cursor-pointer"
-                  >
-                    <input
-                      v-model="assessment.functionality"
-                      type="radio"
-                      :value="func.value"
-                      class="sr-only"
-                    />
-                    <div
-                      :class="[
-                        'p-3 rounded-lg border-2 transition-all text-center',
-                        assessment.functionality === func.value
-                          ? 'bg-purple-600 border-purple-400 text-white'
-                          : 'bg-slate-800/50 border-slate-600 text-slate-300 hover:border-purple-400/50'
-                      ]"
-                    >
-                      <div class="font-semibold text-sm">{{ func.label }}</div>
-                    </div>
-                  </label>
-                </div>
+              <!-- Loading State -->
+              <div v-else-if="isLoading" class="text-center py-8">
+                <div class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <p class="text-white">Loading request details...</p>
               </div>
 
-              <!-- Accessories Complete -->
-              <div>
-                <label class="flex items-center cursor-pointer p-4 bg-slate-800/30 rounded-lg border border-purple-500/20 hover:border-purple-400/40 transition-all">
-                  <input
-                    v-model="assessment.accessories_complete"
-                    type="checkbox"
-                    class="sr-only"
-                  />
-                  <div
-                    :class="[
-                      'w-6 h-6 rounded border-2 flex items-center justify-center mr-4',
-                      assessment.accessories_complete
-                        ? 'bg-purple-600 border-purple-400'
-                        : 'bg-slate-700/50 border-slate-500/50'
-                    ]"
-                  >
-                    <i v-if="assessment.accessories_complete" class="fas fa-check text-white text-sm"></i>
-                  </div>
-                  <div>
-                    <span class="text-white font-semibold block">
-                      All accessories are complete and included
-                    </span>
-                    <span class="text-purple-200/70 text-sm">
-                      Verify all components, cables, and documentation are present
-                    </span>
-                  </div>
-                </label>
-              </div>
-
-              <!-- Damage Check -->
-              <div>
-                <label class="flex items-center cursor-pointer p-4 bg-slate-800/30 rounded-lg border border-red-500/20 hover:border-red-400/40 transition-all">
-                  <input
-                    v-model="assessment.visible_damage"
-                    type="checkbox"
-                    class="sr-only"
-                  />
-                  <div
-                    :class="[
-                      'w-6 h-6 rounded border-2 flex items-center justify-center mr-4',
-                      assessment.visible_damage
-                        ? 'bg-red-600 border-red-400'
-                        : 'bg-slate-700/50 border-slate-500/50'
-                    ]"
-                  >
-                    <i v-if="assessment.visible_damage" class="fas fa-exclamation text-white text-sm"></i>
-                  </div>
-                  <div>
-                    <span class="text-white font-semibold block">
-                      Device has visible damage or defects
-                    </span>
-                    <span class="text-red-200/70 text-sm">
-                      Check for scratches, cracks, dents, or missing parts
-                    </span>
-                  </div>
-                </label>
-              </div>
-
-              <!-- Damage Description -->
-              <div v-if="assessment.visible_damage" class="space-y-2">
-                <label class="block text-sm font-semibold text-red-200">
-                  <i class="fas fa-edit mr-2"></i>
-                  Damage Description
-                </label>
-                <textarea
-                  v-model="assessment.damage_description"
-                  rows="4"
-                  class="w-full px-3 py-2 bg-slate-800/60 border-2 border-red-500/30 rounded focus:border-red-400 focus:outline-none text-white placeholder-red-200/60"
-                  placeholder="Provide detailed description of any visible damage, scratches, or defects..."
-                ></textarea>
-              </div>
-
-              <!-- Assessment Notes -->
-              <div>
-                <label class="block text-sm font-semibold text-purple-200 mb-2">
-                  <i class="fas fa-sticky-note mr-2"></i>
-                  Additional Notes (Optional)
-                </label>
-                <textarea
-                  v-model="assessmentNotes"
-                  rows="3"
-                  class="w-full px-3 py-2 bg-white/15 border border-purple-300/30 rounded focus:border-purple-400 focus:outline-none text-white placeholder-purple-200/60"
-                  placeholder="Any additional observations or recommendations..."
-                ></textarea>
-              </div>
-
-              <!-- Save Assessment Button -->
-              <div class="text-center">
-                <button
-                  @click="saveAssessment"
-                  :disabled="!isAssessmentComplete || isProcessingAssessment"
-                  class="px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 transition-all font-bold flex items-center justify-center mx-auto disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <i class="fas fa-save mr-2"></i>
-                  {{ isProcessingAssessment ? 'Saving Assessment...' : `${assessmentType === 'issuing' ? 'Issue' : 'Receive'} Device` }}
+              <!-- Error State -->
+              <div v-else class="bg-red-500/20 border border-red-400/40 rounded-lg p-4">
+                <p class="text-red-200 text-sm mb-2">⚠️ No request data loaded. Check console for errors.</p>
+                <button @click="fetchRequestDetails()" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                  Retry Loading
                 </button>
               </div>
+
+              <!-- ICT Officer Actions -->
+              <div v-if="canTakeAction" class="bg-green-800/30 backdrop-blur-sm rounded-xl p-6 border border-green-600/40">
+                <h3 class="text-lg font-bold text-white mb-4">ICT Officer Actions</h3>
+                
+                <div class="mb-4">
+                  <label class="block text-sm font-semibold text-green-200 mb-2">Comments (Optional)</label>
+                  <textarea
+                    v-model="approvalComments"
+                    rows="3"
+                    class="w-full px-3 py-2 bg-white/15 border border-green-300/30 rounded focus:border-green-400 focus:outline-none text-white placeholder-green-200/60"
+                    placeholder="Enter your comments..."
+                  ></textarea>
+                </div>
+
+                <div class="flex gap-3">
+                  <button
+                    @click="approveRequest"
+                    :disabled="isProcessing"
+                    class="px-6 py-3 bg-green-600 text-white rounded hover:bg-green-700 transition-colors font-bold flex items-center disabled:opacity-50"
+                  >
+                    <i class="fas fa-check mr-2"></i>
+                    {{ isProcessing ? 'Processing...' : 'Approve Request' }}
+                  </button>
+
+                  <button
+                    @click="rejectRequest"
+                    :disabled="isProcessing"
+                    class="px-6 py-3 bg-red-600 text-white rounded hover:bg-red-700 transition-colors font-bold flex items-center disabled:opacity-50"
+                  >
+                    <i class="fas fa-times mr-2"></i>
+                    {{ isProcessing ? 'Processing...' : 'Reject Request' }}
+                  </button>
+                </div>
+              </div>
+
+              <!-- Footer -->
+              <AppFooter />
             </div>
           </div>
-
-          <!-- ICT Officer Actions -->
-          <div v-if="canTakeAction" class="bg-green-800/30 backdrop-blur-sm rounded-xl p-6 border border-green-600/40">
-            <h3 class="text-lg font-bold text-white mb-4">ICT Officer Actions</h3>
-            
-            <div class="mb-4">
-              <label class="block text-sm font-semibold text-green-200 mb-2">Comments (Optional)</label>
-              <textarea
-                v-model="approvalComments"
-                rows="3"
-                class="w-full px-3 py-2 bg-white/15 border border-green-300/30 rounded focus:border-green-400 focus:outline-none text-white placeholder-green-200/60"
-                placeholder="Enter your comments..."
-              ></textarea>
-            </div>
-
-            <div class="flex gap-3">
-              <button
-                @click="approveRequest"
-                :disabled="isProcessing"
-                class="px-6 py-3 bg-green-600 text-white rounded hover:bg-green-700 transition-colors font-bold flex items-center disabled:opacity-50"
-              >
-                <i class="fas fa-check mr-2"></i>
-                {{ isProcessing ? 'Processing...' : 'Approve Request' }}
-              </button>
-
-              <button
-                @click="rejectRequest"
-                :disabled="isProcessing"
-                class="px-6 py-3 bg-red-600 text-white rounded hover:bg-red-700 transition-colors font-bold flex items-center disabled:opacity-50"
-              >
-                <i class="fas fa-times mr-2"></i>
-                {{ isProcessing ? 'Processing...' : 'Reject Request' }}
-              </button>
-            </div>
-          </div>
-
-          <!-- Footer -->
-          <AppFooter />
         </div>
       </main>
     </div>
@@ -422,27 +407,31 @@ export default {
       approvalComments: '',
       isLoading: false,
       isProcessing: false,
+      
       // Assessment data
-      assessmentType: 'issuing',
-      isProcessingAssessment: false,
+      assessmentType: 'issuing', // 'issuing' or 'receiving'
       assessment: {
-        physical_condition: '',
+        physicalCondition: '',
         functionality: '',
-        accessories_complete: false,
-        visible_damage: false,
-        damage_description: ''
+        accessoriesComplete: false,
+        hasDamage: false,
+        damageDescription: '',
+        notes: ''
       },
-      assessmentNotes: '',
+      isSavingAssessment: false,
+      assessmentMessage: null,
+      
+      // Assessment options
       physicalConditions: [
-        { value: 'excellent', label: 'Excellent' },
-        { value: 'good', label: 'Good' },
-        { value: 'fair', label: 'Fair' },
-        { value: 'poor', label: 'Poor' }
+        { value: 'excellent', label: 'Excellent', icon: 'fas fa-star', color: 'green-400' },
+        { value: 'good', label: 'Good', icon: 'fas fa-thumbs-up', color: 'blue-400' },
+        { value: 'fair', label: 'Fair', icon: 'fas fa-exclamation', color: 'yellow-400' },
+        { value: 'poor', label: 'Poor', icon: 'fas fa-times', color: 'red-400' }
       ],
       functionalityOptions: [
-        { value: 'fully_functional', label: 'Fully Functional' },
-        { value: 'partially_functional', label: 'Partially Functional' },
-        { value: 'not_functional', label: 'Not Functional' }
+        { value: 'fully', label: 'Fully Functional', icon: 'fas fa-check-circle', color: 'green-400' },
+        { value: 'partially', label: 'Partially Functional', icon: 'fas fa-exclamation-circle', color: 'yellow-400' },
+        { value: 'not', label: 'Not Functional', icon: 'fas fa-times-circle', color: 'red-400' }
       ]
     }
   },
@@ -450,12 +439,12 @@ export default {
     canTakeAction() {
       return this.request.ict_approve === 'pending' || this.request.ict_status === 'pending'
     },
-    isAssessmentComplete() {
-      return (
-        this.assessment.physical_condition &&
-        this.assessment.functionality &&
-        (!this.assessment.visible_damage || this.assessment.damage_description)
-      )
+    
+    isAssessmentValid() {
+      const { physicalCondition, functionality } = this.assessment
+      const requiredFields = physicalCondition && functionality
+      const damageValid = !this.assessment.hasDamage || this.assessment.damageDescription.trim()
+      return requiredFields && damageValid
     }
   },
   async mounted() {
@@ -569,54 +558,98 @@ export default {
       event.target.style.display = 'none'
     },
 
+    // Assessment methods
     async saveAssessment() {
-      if (!this.isAssessmentComplete) {
-        alert('Please complete all required assessment fields')
+      if (!this.isAssessmentValid) {
+        this.showAssessmentMessage('Please fill in all required fields', 'error')
         return
       }
 
-      const action = this.assessmentType === 'issuing' ? 'issue this device to the borrower' : 'mark this device as received'
-      if (!confirm(`Are you sure you want to ${action}?`)) {
-        return
-      }
+      this.isSavingAssessment = true
+      this.assessmentMessage = null
 
-      this.isProcessingAssessment = true
       try {
         const requestId = this.$route.params.id
         const assessmentData = {
-          device_condition: this.assessment,
-          assessment_notes: this.assessmentNotes
+          physical_condition: this.assessment.physicalCondition,
+          functionality: this.assessment.functionality === 'fully' ? 'fully_functional' : 
+                        this.assessment.functionality === 'partially' ? 'partially_functional' : 'not_functional',
+          accessories_complete: this.assessment.accessoriesComplete,
+          visible_damage: this.assessment.hasDamage,
+          damage_description: this.assessment.hasDamage ? this.assessment.damageDescription : null,
+          notes: this.assessment.notes || null
         }
 
-        let response
-        if (this.assessmentType === 'issuing') {
-          response = await deviceBorrowingService.saveIssuingAssessment(requestId, assessmentData)
-        } else {
-          response = await deviceBorrowingService.saveReceivingAssessment(requestId, assessmentData)
-        }
+        console.log('💾 Saving assessment:', assessmentData)
+
+        // Call the appropriate service method based on assessment type
+        const response = this.assessmentType === 'issuing' 
+          ? await deviceBorrowingService.saveIssuingAssessment(requestId, assessmentData)
+          : await deviceBorrowingService.saveReceivingAssessment(requestId, assessmentData)
 
         if (response.success) {
-          const statusMessage = this.assessmentType === 'issuing' 
-            ? 'Device issued successfully! Assessment saved.'
-            : 'Device received successfully! Assessment completed.'
+          this.showAssessmentMessage('Assessment saved successfully!', 'success')
           
-          alert(statusMessage)
-          
-          // Update local request data
-          if (response.data) {
-            this.request = { ...this.request, ...response.data }
+          // Update request status based on assessment type
+          if (this.assessmentType === 'issuing') {
+            this.request.status = 'in_use'
+            this.request.device_issued_at = new Date().toISOString()
+          } else {
+            this.request.status = 'returned'
+            this.request.device_received_at = new Date().toISOString()
+            // Check if device was returned with damage
+            if (this.assessment.hasDamage) {
+              this.request.return_status = 'returned_but_compromised'
+            } else {
+              this.request.return_status = 'returned'
+            }
           }
           
-          // Refresh the request details
+          // Refresh request data
           await this.fetchRequestDetails()
+          
+          // Auto-hide success message after 3 seconds
+          setTimeout(() => {
+            this.assessmentMessage = null
+          }, 3000)
         } else {
           throw new Error(response.message || 'Failed to save assessment')
         }
       } catch (error) {
-        console.error('Error saving assessment:', error)
-        alert('Error saving assessment: ' + (error.message || 'Unknown error'))
+        console.error('❌ Error saving assessment:', error)
+        this.showAssessmentMessage(
+          'Error saving assessment: ' + (error.message || 'Please try again'), 
+          'error'
+        )
       } finally {
-        this.isProcessingAssessment = false
+        this.isSavingAssessment = false
+      }
+    },
+
+    resetAssessment() {
+      if (confirm('Are you sure you want to reset the assessment form?')) {
+        this.assessment = {
+          physicalCondition: '',
+          functionality: '',
+          accessoriesComplete: false,
+          hasDamage: false,
+          damageDescription: '',
+          notes: ''
+        }
+        this.assessmentMessage = null
+      }
+    },
+
+    showAssessmentMessage(text, type) {
+      this.assessmentMessage = { text, type }
+      
+      // Auto-hide error messages after 5 seconds
+      if (type === 'error') {
+        setTimeout(() => {
+          if (this.assessmentMessage && this.assessmentMessage.type === 'error') {
+            this.assessmentMessage = null
+          }
+        }, 5000)
       }
     }
   }

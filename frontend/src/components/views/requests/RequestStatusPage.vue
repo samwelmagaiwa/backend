@@ -366,13 +366,40 @@
                             <div v-else class="text-gray-400 text-xs">N/A</div>
                           </td>
                           <td class="py-4 px-4">
-                            <button
-                              @click="viewRequestDetails(request)"
-                              class="px-3 py-1 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-lg text-blue-300 text-sm font-medium transition-colors"
-                            >
-                              <i class="fas fa-eye mr-1"></i>
-                              View
-                            </button>
+                            <div class="relative" :class="'dropdown-' + request.id">
+                              <button
+                                @click="toggleDropdown(request.id)"
+                                class="px-3 py-1 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-lg text-blue-300 text-sm font-medium transition-colors flex items-center"
+                              >
+                                <i class="fas fa-cog mr-1"></i>
+                                Actions
+                                <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                              </button>
+                              
+                              <!-- Dropdown Menu -->
+                              <div
+                                v-if="activeDropdown === request.id"
+                                class="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-600 rounded-lg shadow-lg z-50"
+                              >
+                                <div class="py-1">
+                                  <button
+                                    @click="viewRequestDetails(request)"
+                                    class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white flex items-center"
+                                  >
+                                    <i class="fas fa-eye mr-2 text-blue-400"></i>
+                                    View Details
+                                  </button>
+                                  <button
+                                    @click="cancelRequest(request)"
+                                    class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-red-600 hover:text-white flex items-center"
+                                  >
+                                    <i class="fas fa-times mr-2 text-red-400"></i>
+                                    Cancel Request
+                                    <span class="ml-1 text-xs">({{ request.status }})</span>
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
                           </td>
                         </tr>
                       </tbody>
@@ -500,13 +527,40 @@
                         </div>
                       </div>
 
-                      <button
-                        @click="viewRequestDetails(request)"
-                        class="w-full px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-lg text-blue-300 text-sm font-medium transition-colors"
-                      >
-                        <i class="fas fa-eye mr-2"></i>
-                        View Details
-                      </button>
+                      <div class="relative" :class="'mobile-dropdown-' + request.id">
+                        <button
+                          @click="toggleDropdown('mobile-' + request.id)"
+                          class="w-full px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-lg text-blue-300 text-sm font-medium transition-colors flex items-center justify-center"
+                        >
+                          <i class="fas fa-cog mr-2"></i>
+                          Actions
+                          <i class="fas fa-chevron-down ml-2 text-xs"></i>
+                        </button>
+                        
+                        <!-- Mobile Dropdown Menu -->
+                        <div
+                          v-if="activeDropdown === 'mobile-' + request.id"
+                          class="absolute left-0 right-0 mt-2 bg-gray-800 border border-gray-600 rounded-lg shadow-lg z-50"
+                        >
+                          <div class="py-1">
+                            <button
+                              @click="viewRequestDetails(request)"
+                              class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white flex items-center"
+                            >
+                              <i class="fas fa-eye mr-2 text-blue-400"></i>
+                              View Details
+                            </button>
+                            <button
+                              @click="cancelRequest(request)"
+                              class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-red-600 hover:text-white flex items-center"
+                            >
+                              <i class="fas fa-times mr-2 text-red-400"></i>
+                              Cancel Request
+                              <span class="ml-1 text-xs">({{ request.status }})</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -522,7 +576,7 @@
 </template>
 
 <script>
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, onUnmounted } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppHeader from '@/components/AppHeader.vue'
@@ -548,6 +602,8 @@
       const pendingBookingId = ref(null)
       const requestType = ref('')
       const latestRequestId = ref('')
+      const activeDropdown = ref(null)
+      const cancelingRequest = ref(null)
 
       // Reactive data for requests
       const requests = ref([])
@@ -592,6 +648,22 @@
         loadRequests()
       })
 
+      // Add click outside listener to close dropdowns
+      const handleClickOutside = (event) => {
+        if (!event.target.closest('.relative')) {
+          closeDropdown()
+        }
+      }
+      
+      onMounted(() => {
+        document.addEventListener('click', handleClickOutside)
+      })
+
+      // Cleanup listener on unmount
+      onUnmounted(() => {
+        document.removeEventListener('click', handleClickOutside)
+      })
+
       // Methods
       const loadRequests = async (page = 1, filters = {}) => {
         loading.value = true
@@ -611,7 +683,8 @@
             console.log('✅ Requests loaded successfully:', {
               total: totalRequests.value,
               current_page: currentPage.value,
-              requests_count: requests.value.length
+              requests_count: requests.value.length,
+              sample_request: requests.value[0] // Show first request for debugging
             })
           } else {
             console.error('❌ Failed to load requests:', response.error)
@@ -659,6 +732,103 @@
               type: 'booking_service'
             }
           })
+        }
+      }
+
+      // Dropdown functionality
+      const toggleDropdown = (requestId) => {
+        console.log('🔄 toggleDropdown called:', {
+          requestId: requestId,
+          currentActiveDropdown: activeDropdown.value
+        })
+        if (activeDropdown.value === requestId) {
+          activeDropdown.value = null
+        } else {
+          activeDropdown.value = requestId
+        }
+        console.log('🔄 activeDropdown after toggle:', activeDropdown.value)
+      }
+
+      // Close dropdown when clicking outside
+      const closeDropdown = () => {
+        activeDropdown.value = null
+      }
+
+      // Check if request can be cancelled
+      const canCancelRequest = (request) => {
+        // Only allow cancellation for pending requests
+        const canCancel = request.status === 'pending' && !cancelingRequest.value
+        console.log('🔍 canCancelRequest check:', {
+          requestId: request.id,
+          status: request.status,
+          cancelingRequest: cancelingRequest.value,
+          canCancel: canCancel
+        })
+        return canCancel
+      }
+
+      // Cancel request functionality
+      const cancelRequest = async (request) => {
+        if (!canCancelRequest(request)) {
+          return
+        }
+
+        // Close dropdown first
+        closeDropdown()
+
+        // Confirm cancellation
+        const confirmed = confirm(
+          `Are you sure you want to cancel this ${request.type === 'booking_service' ? 'booking' : 'access'} request?\n\nRequest ID: #${request.id}\nType: ${getRequestTypeName(request.type)}\n\nThis action cannot be undone.`
+        )
+
+        if (!confirmed) {
+          return
+        }
+
+        cancelingRequest.value = request.id
+
+        try {
+          // Call the appropriate cancel API based on request type
+          let response
+          if (request.type === 'booking_service') {
+            // For booking service requests, call the booking service API
+            response = await fetch(`/api/booking-service/bookings/${request.original_id || request.id}`, {
+              method: 'DELETE',
+              headers: {
+                'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+              }
+            })
+          } else {
+            // For access requests, call the user access API
+            response = await fetch(`/api/v1/user-access/${request.original_id || request.id}`, {
+              method: 'DELETE',
+              headers: {
+                'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+              }
+            })
+          }
+
+          if (response.ok) {
+            const result = await response.json()
+            
+            // Show success message
+            alert(`Request #${request.id} has been cancelled successfully.`)
+            
+            // Refresh the requests list
+            await loadRequests(currentPage.value)
+          } else {
+            const errorData = await response.json()
+            throw new Error(errorData.message || 'Failed to cancel request')
+          }
+        } catch (error) {
+          console.error('❌ Error cancelling request:', error)
+          alert(`Failed to cancel request: ${error.message}\n\nPlease try again or contact support if the problem persists.`)
+        } finally {
+          cancelingRequest.value = null
         }
       }
 
@@ -763,6 +933,8 @@
         pendingBookingId,
         requestType,
         latestRequestId,
+        activeDropdown,
+        cancelingRequest,
         approvalSteps,
         loadRequests,
         refreshRequests,
@@ -770,6 +942,10 @@
         goToSubmitRequest,
         submitNewRequest,
         viewPendingBookingDetails,
+        toggleDropdown,
+        closeDropdown,
+        canCancelRequest,
+        cancelRequest,
         getRequestTypeIcon,
         getRequestTypeName,
         getStatusColor,

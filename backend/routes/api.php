@@ -16,6 +16,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return redirect('/api/documentation');
+
+    // ICT Approval: Device Assessments
+    Route::prefix('ict-approval')->group(function () {
+        Route::prefix('device-requests/{id}/assessment')->group(function () {
+            Route::post('issuing', [\App\Http\Controllers\API\ICTApproval\DeviceAssessmentController::class, 'saveIssuing']);
+            Route::post('receiving', [\App\Http\Controllers\API\ICTApproval\DeviceAssessmentController::class, 'saveReceiving']);
+        });
+    });
 });
 
 // Public routes
@@ -217,6 +225,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('departments', [BookingServiceController::class, 'getDepartments'])->name('booking-service.departments');
         Route::get('statistics', [BookingServiceController::class, 'getStatistics'])->name('booking-service.statistics');
         Route::get('debug-departments', [BookingServiceController::class, 'debugDepartments'])->name('booking-service.debug-departments');
+        Route::get('debug-assessment-schema', [BookingServiceController::class, 'debugAssessmentSchema'])->name('booking-service.debug-assessment-schema');
         Route::post('seed-departments', [BookingServiceController::class, 'seedDepartments'])->name('booking-service.seed-departments');
         
 
@@ -236,6 +245,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('ict-approval-requests', [BookingServiceController::class, 'getIctApprovalRequests'])
             ->middleware('role:ict_officer,admin,ict_director')
             ->name('booking-service.ict-approval-requests');
+        // Alias for frontend compatibility
+        Route::get('ict-pending-approvals', [BookingServiceController::class, 'getIctApprovalRequests'])
+            ->middleware('role:ict_officer,admin,ict_director')
+            ->name('booking-service.ict-pending-approvals');
         Route::post('bookings/{bookingService}/ict-approve', [BookingServiceController::class, 'ictApprove'])
             ->middleware('role:ict_officer,admin,ict_director')
             ->name('booking-service.ict-approve');

@@ -683,7 +683,10 @@ class BookingServiceController extends Controller
                 'user:id,name,email,phone,pf_number,department_id',
                 'user.department:id,name,code',
                 'departmentInfo:id,name,code',
-                'deviceInventory:id,device_name,device_code,description',
+                'deviceInventory' => function($query) {
+                    $query->select(['id', 'device_name', 'device_code', 'description', 'is_active'])
+                          ->where('is_active', true);
+                },
                 'ictApprovedBy:id,name'
             ]);
 
@@ -1070,6 +1073,79 @@ class BookingServiceController extends Controller
     }
 
     /**
+     * Debug endpoint to check database schema for assessment columns.
+     */
+    public function debugAssessmentSchema(): JsonResponse
+    {
+        try {
+            $tableColumns = \Schema::getColumnListing('booking_service');
+            $requiredColumns = [
+                'device_condition_issuing', 
+                'device_condition_receiving',
+                'device_issued_at',
+                'device_received_at', 
+                'assessed_by', 
+                'assessment_notes'
+            ];
+            
+            $existingColumns = array_intersect($requiredColumns, $tableColumns);
+            $missingColumns = array_diff($requiredColumns, $tableColumns);
+            
+            // Check if migrations have been run
+            $migrationFiles = [
+                '2025_01_27_160000_add_device_condition_assessment_to_booking_service_table.php',
+                '2025_09_10_000000_create_device_assessments_table.php'
+            ];
+            
+            $migrationStatus = [];
+            foreach ($migrationFiles as $migration) {
+                $migrationName = str_replace('.php', '', $migration);
+                $exists = \DB::table('migrations')
+                    ->where('migration', $migrationName)
+                    ->exists();
+                $migrationStatus[$migration] = $exists ? 'run' : 'not_run';
+            }
+            
+            // Sample booking for testing
+            $sampleBooking = BookingService::with(['user', 'assessedBy'])
+                ->where('ict_approve', 'approved')
+                ->first();
+            
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'table_exists' => \Schema::hasTable('booking_service'),
+                    'total_columns' => count($tableColumns),
+                    'all_columns' => $tableColumns,
+                    'required_assessment_columns' => $requiredColumns,
+                    'existing_assessment_columns' => $existingColumns,
+                    'missing_assessment_columns' => $missingColumns,
+                    'schema_complete' => empty($missingColumns),
+                    'migration_status' => $migrationStatus,
+                    'sample_booking_id' => $sampleBooking?->id,
+                    'sample_booking_status' => $sampleBooking?->ict_approve,
+                    'database_connection' => \DB::connection()->getDatabaseName(),
+                    'recommendations' => empty($missingColumns) 
+                        ? ['Schema is complete - ready for assessments']
+                        : [
+                            'Run missing migrations: php artisan migrate',
+                            'Missing columns: ' . implode(', ', $missingColumns)
+                        ]
+                ],
+                'message' => 'Database schema analysis completed'
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Error in debug assessment schema: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error analyzing database schema',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Map device inventory to valid device_type enum value.
      */
     private function mapInventoryDeviceToType(DeviceInventory $device): ?string
@@ -1145,7 +1221,14 @@ class BookingServiceController extends Controller
                 ], 403);
             }
 
-            $request->validate([
+            Log::info('Starting issuing assessment save', [
+                'booking_id' => $bookingService->id,
+                'user_id' => $request->user()->id,
+                'request_data' => $request->all()
+            ]);
+
+            // Validate request data
+            $validatedData = $request->validate([
                 'device_condition' => 'required|array',
                 'device_condition.physical_condition' => 'required|string|in:excellent,good,fair,poor',
                 'device_condition.functionality' => 'required|string|in:fully_functional,partially_functional,not_functional',
@@ -1155,14 +1238,76 @@ class BookingServiceController extends Controller
                 'assessment_notes' => 'nullable|string|max:1000'
             ]);
 
-            $bookingService->update([
-                'device_condition_issuing' => $request->device_condition,
+            Log::info('Validation passed', ['validated_data' => $validatedData]);
+
+            // Check if the booking exists and can be updated
+            if (!$bookingService->exists) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Booking service record not found'
+                ], 404);
+            }
+
+            // Check if the booking is in a valid state for issuing
+            if (!in_array($bookingService->ict_approve, ['approved'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Device can only be issued for approved requests. Current ICT status: ' . $bookingService->ict_approve
+                ], 400);
+            }
+
+            // Prepare update data
+            $updateData = [
+                'device_condition_issuing' => $validatedData['device_condition'],
                 'device_issued_at' => now(),
                 'assessed_by' => $request->user()->id,
-                'assessment_notes' => $request->assessment_notes,
+                'assessment_notes' => $validatedData['assessment_notes'] ?? null,
                 'status' => 'in_use' // Update status to in_use when device is issued
+            ];
+
+            Log::info('Attempting to update booking service', [
+                'booking_id' => $bookingService->id,
+                'update_data' => $updateData
             ]);
 
+            // Check if the database columns exist
+            $tableColumns = \Schema::getColumnListing('booking_service');
+            $requiredColumns = ['device_condition_issuing', 'device_issued_at', 'assessed_by', 'assessment_notes'];
+            $missingColumns = array_diff($requiredColumns, $tableColumns);
+            
+            if (!empty($missingColumns)) {
+                Log::error('Missing database columns', [
+                    'missing_columns' => $missingColumns,
+                    'existing_columns' => $tableColumns
+                ]);
+                
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Database schema error: Missing columns: ' . implode(', ', $missingColumns),
+                    'error' => 'Please run database migrations'
+                ], 500);
+            }
+
+            // Perform the update
+            $updated = $bookingService->update($updateData);
+            
+            if (!$updated) {
+                Log::error('Failed to update booking service record', [
+                    'booking_id' => $bookingService->id,
+                    'update_data' => $updateData
+                ]);
+                
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to update booking service record'
+                ], 500);
+            }
+
+            Log::info('Successfully updated booking service', [
+                'booking_id' => $bookingService->id
+            ]);
+
+            // Reload the model with relationships
             $bookingService->load([
                 'user:id,name,email,phone,pf_number,department_id',
                 'user.department:id,name,code',
@@ -1171,10 +1316,10 @@ class BookingServiceController extends Controller
                 'assessedBy:id,name'
             ]);
 
-            Log::info('Device issuing assessment saved', [
+            Log::info('Device issuing assessment saved successfully', [
                 'booking_id' => $bookingService->id,
                 'assessed_by' => $request->user()->id,
-                'device_condition' => $request->device_condition
+                'device_condition' => $validatedData['device_condition']
             ]);
 
             return response()->json([
@@ -1183,12 +1328,43 @@ class BookingServiceController extends Controller
                 'message' => 'Device condition assessment saved and device marked as issued successfully'
             ]);
 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Validation error in issuing assessment', [
+                'booking_id' => $bookingService->id ?? 'unknown',
+                'errors' => $e->errors(),
+                'message' => $e->getMessage()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+            
+        } catch (\Illuminate\Database\QueryException $e) {
+            Log::error('Database error in issuing assessment', [
+                'booking_id' => $bookingService->id ?? 'unknown',
+                'sql_error' => $e->getMessage(),
+                'sql_code' => $e->getCode()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Database error occurred',
+                'error' => config('app.debug') ? $e->getMessage() : 'Database operation failed'
+            ], 500);
+            
         } catch (\Exception $e) {
-            Log::error('Error saving issuing assessment: ' . $e->getMessage());
+            Log::error('Unexpected error in issuing assessment', [
+                'booking_id' => $bookingService->id ?? 'unknown',
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
             return response()->json([
                 'success' => false,
                 'message' => 'Error saving device condition assessment',
-                'error' => $e->getMessage()
+                'error' => config('app.debug') ? $e->getMessage() : 'An unexpected error occurred'
             ], 500);
         }
     }
