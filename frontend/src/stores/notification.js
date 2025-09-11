@@ -179,7 +179,7 @@ export const useNotificationStore = defineStore('notification', () => {
   }
 
   function showRequestApproved(requestType, requestId) {
-    return showApproval(
+    return showApprovalNotification(
       'Request Approved',
       `Your ${requestType} request #${requestId} has been approved by the relevant authority.`,
       {
@@ -282,21 +282,17 @@ export const useNotificationStore = defineStore('notification', () => {
   }
 
   function showEmergencyAlert(title, message) {
-    return showMedicalNotification(
-      title,
-      message,
-      {
-        persistent: true,
-        duration: 0, // Never auto-dismiss
-        actions: [
-          {
-            label: 'Acknowledge',
-            icon: 'fas fa-check',
-            callback: () => console.log('Emergency alert acknowledged')
-          }
-        ]
-      }
-    )
+    return showMedicalNotification(title, message, {
+      persistent: true,
+      duration: 0, // Never auto-dismiss
+      actions: [
+        {
+          label: 'Acknowledge',
+          icon: 'fas fa-check',
+          callback: () => console.log('Emergency alert acknowledged')
+        }
+      ]
+    })
   }
 
   // Additional Hospital Management System Notifications
@@ -317,19 +313,15 @@ export const useNotificationStore = defineStore('notification', () => {
   }
 
   function showProfileUpdated() {
-    return showInfo(
-      'Profile Updated',
-      'Your profile information has been successfully updated.',
-      {
-        actions: [
-          {
-            label: 'View Profile',
-            icon: 'fas fa-user',
-            url: '/profile'
-          }
-        ]
-      }
-    )
+    return showInfo('Profile Updated', 'Your profile information has been successfully updated.', {
+      actions: [
+        {
+          label: 'View Profile',
+          icon: 'fas fa-user',
+          url: '/profile'
+        }
+      ]
+    })
   }
 
   function showPasswordChanged() {
@@ -377,23 +369,15 @@ export const useNotificationStore = defineStore('notification', () => {
   }
 
   function showFileUploadSuccess(fileName) {
-    return showSuccess(
-      'File Uploaded',
-      `${fileName} has been successfully uploaded.`,
-      {
-        duration: 4000
-      }
-    )
+    return showSuccess('File Uploaded', `${fileName} has been successfully uploaded.`, {
+      duration: 4000
+    })
   }
 
   function showFileUploadError(fileName, reason) {
-    return showError(
-      'File Upload Failed',
-      `Failed to upload ${fileName}. ${reason}`,
-      {
-        duration: 8000
-      }
-    )
+    return showError('File Upload Failed', `Failed to upload ${fileName}. ${reason}`, {
+      duration: 8000
+    })
   }
 
   function showSignatureRequired() {
@@ -450,7 +434,7 @@ export const useNotificationStore = defineStore('notification', () => {
     )
   }
 
-  function showDeviceReturned(deviceName, requestId) {
+  function showDeviceReturned(deviceName, _requestId) {
     return showSuccess(
       'Device Returned',
       `Thank you for returning ${deviceName} on time. Your booking request is now complete.`,
@@ -506,25 +490,21 @@ export const useNotificationStore = defineStore('notification', () => {
   }
 
   function showNewFeatureAnnouncement(featureName, description) {
-    return showInfo(
-      `New Feature: ${featureName}`,
-      description,
-      {
-        duration: 10000,
-        actions: [
-          {
-            label: 'Learn More',
-            icon: 'fas fa-info-circle',
-            url: '/help'
-          },
-          {
-            label: 'Try It Now',
-            icon: 'fas fa-rocket',
-            url: '/user-dashboard'
-          }
-        ]
-      }
-    )
+    return showInfo(`New Feature: ${featureName}`, description, {
+      duration: 10000,
+      actions: [
+        {
+          label: 'Learn More',
+          icon: 'fas fa-info-circle',
+          url: '/help'
+        },
+        {
+          label: 'Try It Now',
+          icon: 'fas fa-rocket',
+          url: '/user-dashboard'
+        }
+      ]
+    })
   }
 
   function showQuotaExceeded(quotaType, currentUsage, limit) {
@@ -599,26 +579,22 @@ export const useNotificationStore = defineStore('notification', () => {
   }
 
   function showSecurityAlert(alertType, details) {
-    return showError(
-      `Security Alert: ${alertType}`,
-      details,
-      {
-        persistent: true,
-        duration: 0,
-        actions: [
-          {
-            label: 'Change Password',
-            icon: 'fas fa-shield-alt',
-            url: '/profile'
-          },
-          {
-            label: 'Review Activity',
-            icon: 'fas fa-history',
-            url: '/security-log'
-          }
-        ]
-      }
-    )
+    return showError(`Security Alert: ${alertType}`, details, {
+      persistent: true,
+      duration: 0,
+      actions: [
+        {
+          label: 'Change Password',
+          icon: 'fas fa-shield-alt',
+          url: '/profile'
+        },
+        {
+          label: 'Review Activity',
+          icon: 'fas fa-history',
+          url: '/security-log'
+        }
+      ]
+    })
   }
 
   function showWelcomeMessage(userName) {

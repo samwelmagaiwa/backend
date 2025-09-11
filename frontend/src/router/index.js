@@ -243,6 +243,15 @@ const routes = [
     }
   },
   {
+    path: '/edit-booking-request',
+    name: 'EditBookingRequest',
+    component: () => import('../components/views/booking/EditBookingRequest.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: [ROLES.STAFF]
+    }
+  },
+  {
     path: '/request-status',
     name: 'RequestStatusPage',
     component: () => import('../components/views/requests/RequestStatusPage.vue'),
@@ -272,9 +281,45 @@ const routes = [
     }
   },
   {
+    path: '/ict-approval/requests-simple',
+    name: 'RequestsListSimple',
+    component: () => import('../components/views/ict-approval/RequestsListSimple.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: [ROLES.ICT_OFFICER]
+    }
+  },
+  {
+    path: '/ict-approval/requests-original',
+    name: 'RequestsListOriginal',
+    component: () => import('../components/views/ict-approval/RequestsList.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: [ROLES.ICT_OFFICER]
+    }
+  },
+  {
+    path: '/debug/ict-requests',
+    name: 'RequestsListDebug',
+    component: () => import('../components/debug/RequestsListDebug.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: [ROLES.ICT_OFFICER]
+    }
+  },
+  {
+    path: '/debug/api-test',
+    name: 'ApiTestComponent',
+    component: () => import('../components/debug/ApiTestComponent.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: [ROLES.ICT_OFFICER]
+    }
+  },
+  {
     path: '/ict-approval/request/:id',
     name: 'RequestDetails',
-    component: () => import('../components/views/ict-approval/RequestDetailsFixed.vue'),
+    component: () => import('../components/views/ict-approval/RequestDetails.vue'),
     meta: {
       requiresAuth: true,
       roles: [ROLES.ICT_OFFICER]

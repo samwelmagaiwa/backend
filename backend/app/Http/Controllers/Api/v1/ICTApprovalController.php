@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\BookingService;
 use App\Models\User;
 use App\Models\Department;
+use App\Models\DeviceAssessment;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
@@ -263,6 +264,32 @@ class ICTApprovalController extends Controller
                 'ict_approved_at' => now(),
                 'ict_notes' => $validatedData['ict_notes'] ?? null
             ]);
+            
+            // Now borrow the device from inventory since request is approved
+            if ($booking->device_inventory_id) {
+                $deviceInventory = $booking->deviceInventory;
+                if ($deviceInventory) {
+                    if (!$deviceInventory->borrowDevice(1)) {
+                        Log::error('Unable to borrow device after approval', [
+                            'device_id' => $deviceInventory->id,
+                            'device_name' => $deviceInventory->device_name,
+                            'available_quantity' => $deviceInventory->available_quantity,
+                            'booking_id' => $booking->id
+                        ]);
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Request approved but device is no longer available. Please check device inventory.'
+                        ], 400);
+                    }
+                    
+                    Log::info('Device borrowed from inventory after approval', [
+                        'device_id' => $deviceInventory->id,
+                        'device_name' => $deviceInventory->device_name,
+                        'remaining_quantity' => $deviceInventory->available_quantity,
+                        'booking_id' => $booking->id
+                    ]);
+                }
+            }
 
             // Load relationships
             $booking->load(['user', 'approvedBy', 'departmentInfo']);
@@ -346,17 +373,8 @@ class ICTApprovalController extends Controller
                 'ict_notes' => $validatedData['ict_notes']
             ]);
 
-            // If device was reserved, return it to inventory
-            if ($booking->device_inventory_id) {
-                $deviceInventory = $booking->deviceInventory;
-                if ($deviceInventory) {
-                    $deviceInventory->returnDevice(1);
-                    Log::info('Device returned to inventory due to rejection', [
-                        'device_id' => $deviceInventory->id,
-                        'device_name' => $deviceInventory->device_name
-                    ]);
-                }
-            }
+            // No need to return device to inventory since it wasn't borrowed during creation
+            // Device is only borrowed when approved, so rejection requires no inventory action
 
             // Load relationships
             $booking->load(['user', 'approvedBy', 'departmentInfo']);
@@ -554,7 +572,7 @@ class ICTApprovalController extends Controller
             'borrower_id' => $booking->user_id,
             'borrower_name' => $user->name ?? $booking->borrower_name ?? 'Unknown User',
             'borrower_email' => $user->email ?? null,
-            'borrower_phone' => $user->phone ?? $booking->phone_number ?? null,
+            'borrower_phone' => $user->phone ?? $booking->phone_number ?? null, // Always prioritize users.phone
             'pf_number' => $user->pf_number ?? null,
             
             // Department details
@@ -830,7 +848,21 @@ class ICTApprovalController extends Controller
                 'assessment_type' => 'issuing'
             ];
 
-            // Update booking with issuing assessment
+            // Save to device_assessments table
+            DeviceAssessment::create([
+                'booking_id' => $booking->id,
+                'assessment_type' => 'issuing',
+                'physical_condition' => $validatedData['physical_condition'],
+                'functionality' => $validatedData['functionality'],
+                'accessories_complete' => $validatedData['accessories_complete'] ?? false,
+                'has_damage' => $validatedData['visible_damage'] ?? false,
+                'damage_description' => $validatedData['damage_description'] ?? null,
+                'notes' => $validatedData['notes'] ?? null,
+                'assessed_by' => $request->user()->id,
+                'assessed_at' => now()
+            ]);
+
+            // Update booking with issuing assessment (for backward compatibility)
             $booking->update([
                 'device_condition_issuing' => json_encode($assessmentData),
                 'device_issued_at' => now(),
@@ -924,7 +956,21 @@ class ICTApprovalController extends Controller
                 'assessment_type' => 'receiving'
             ];
 
-            // Update booking with receiving assessment and mark as returned
+            // Save to device_assessments table
+            DeviceAssessment::create([
+                'booking_id' => $booking->id,
+                'assessment_type' => 'receiving',
+                'physical_condition' => $validatedData['physical_condition'],
+                'functionality' => $validatedData['functionality'],
+                'accessories_complete' => $validatedData['accessories_complete'] ?? false,
+                'has_damage' => $validatedData['visible_damage'] ?? false,
+                'damage_description' => $validatedData['damage_description'] ?? null,
+                'notes' => $validatedData['notes'] ?? null,
+                'assessed_by' => $request->user()->id,
+                'assessed_at' => now()
+            ]);
+
+            // Update booking with receiving assessment and mark as returned (for backward compatibility)
             $booking->update([
                 'device_condition_receiving' => json_encode($assessmentData),
                 'device_received_at' => now(),
@@ -971,6 +1017,292 @@ class ICTApprovalController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error saving receiving assessment',
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
+            ], 500);
+        }
+    }
+
+    /**
+     * Delete a device borrowing request (ICT Officer)
+     * 
+     * @param Request $request
+     * @param int $requestId
+     * @return JsonResponse
+     */
+    public function deleteDeviceBorrowingRequest(Request $request, int $requestId): JsonResponse
+    {
+        try {
+            // Verify ICT officer permissions
+            if (!$this->hasICTPermissions($request->user())) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized. ICT officer access required.'
+                ], 403);
+            }
+
+            $booking = BookingService::find($requestId);
+
+            if (!$booking) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Device borrowing request not found'
+                ], 404);
+            }
+
+            // Check if request can be deleted
+            // Allow deletion of: pending requests, rejected requests, and approved requests that have been returned
+            $canDelete = false;
+            $reason = '';
+            
+            if ($booking->ict_approve === 'pending' || $booking->status === 'pending') {
+                $canDelete = true;
+                $reason = 'pending request';
+            } elseif ($booking->ict_approve === 'rejected') {
+                $canDelete = true;
+                $reason = 'rejected request';
+            } elseif ($booking->ict_approve === 'approved' && $booking->return_status === 'returned') {
+                $canDelete = true;
+                $reason = 'approved request that has been returned';
+            } elseif ($booking->ict_approve === 'approved' && $booking->return_status === 'returned_but_compromised') {
+                $canDelete = true;
+                $reason = 'approved request that has been returned (compromised)';
+            }
+            
+            if (!$canDelete) {
+                $currentStatus = $booking->ict_approve ?? $booking->status;
+                $returnStatus = $booking->return_status ?? 'not_yet_returned';
+                return response()->json([
+                    'success' => false,
+                    'message' => "Cannot delete this request. Current ICT status: {$currentStatus}, Return status: {$returnStatus}. Only pending, rejected, or returned requests can be deleted."
+                ], 400);
+            }
+            
+            Log::info('Request deletion allowed', [
+                'booking_id' => $booking->id,
+                'reason' => $reason,
+                'ict_approve' => $booking->ict_approve,
+                'return_status' => $booking->return_status
+            ]);
+
+            // Only return device to inventory if request was approved (device was actually borrowed)
+            if ($booking->device_inventory_id && $booking->ict_approve === 'approved') {
+                $deviceInventory = $booking->deviceInventory;
+                if ($deviceInventory) {
+                    $deviceInventory->returnDevice(1);
+                    Log::info('Device returned to inventory due to approved request deletion', [
+                        'device_id' => $deviceInventory->id,
+                        'device_name' => $deviceInventory->device_name,
+                        'booking_id' => $booking->id
+                    ]);
+                } else {
+                    Log::info('No device to return - request was not approved', [
+                        'booking_id' => $booking->id,
+                        'ict_approve' => $booking->ict_approve
+                    ]);
+                }
+            }
+
+            // Delete signature file if exists
+            if ($booking->signature_path) {
+                \Storage::disk('public')->delete($booking->signature_path);
+                Log::info('Signature file deleted', [
+                    'signature_path' => $booking->signature_path,
+                    'booking_id' => $booking->id
+                ]);
+            }
+
+            // Store booking info for logging before deletion
+            $bookingInfo = [
+                'id' => $booking->id,
+                'borrower_name' => $booking->borrower_name,
+                'device_type' => $booking->device_type,
+                'booking_date' => $booking->booking_date,
+                'department' => $booking->department
+            ];
+
+            // Delete the booking
+            $booking->delete();
+
+            Log::info('Device borrowing request deleted by ICT officer', [
+                'deleted_by' => $request->user()->id,
+                'deleted_by_name' => $request->user()->name,
+                'booking_info' => $bookingInfo
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Device borrowing request deleted successfully'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error deleting device borrowing request: ' . $e->getMessage(), [
+                'request_id' => $requestId,
+                'user_id' => $request->user()->id,
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting device borrowing request',
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
+            ], 500);
+        }
+    }
+
+    /**
+     * Bulk delete device borrowing requests (ICT Officer)
+     * 
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function bulkDeleteDeviceBorrowingRequests(Request $request): JsonResponse
+    {
+        try {
+            // Verify ICT officer permissions
+            if (!$this->hasICTPermissions($request->user())) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized. ICT officer access required.'
+                ], 403);
+            }
+
+            // Validate request data
+            $validatedData = $request->validate([
+                'request_ids' => 'required|array|min:1',
+                'request_ids.*' => 'required|integer|exists:booking_service,id'
+            ]);
+
+            $requestIds = $validatedData['request_ids'];
+            $deletedRequests = [];
+            $failedRequests = [];
+            $returnedDevices = [];
+
+            foreach ($requestIds as $requestId) {
+                try {
+                    $booking = BookingService::find($requestId);
+                    
+                    if (!$booking) {
+                        $failedRequests[] = [
+                            'id' => $requestId,
+                            'reason' => 'Request not found'
+                        ];
+                        continue;
+                    }
+
+                    // Check if request can be deleted using same logic as single delete
+                    $canDelete = false;
+                    $reason = '';
+                    
+                    if ($booking->ict_approve === 'pending' || $booking->status === 'pending') {
+                        $canDelete = true;
+                        $reason = 'pending request';
+                    } elseif ($booking->ict_approve === 'rejected') {
+                        $canDelete = true;
+                        $reason = 'rejected request';
+                    } elseif ($booking->ict_approve === 'approved' && $booking->return_status === 'returned') {
+                        $canDelete = true;
+                        $reason = 'approved request that has been returned';
+                    } elseif ($booking->ict_approve === 'approved' && $booking->return_status === 'returned_but_compromised') {
+                        $canDelete = true;
+                        $reason = 'approved request that has been returned (compromised)';
+                    }
+                    
+                    if (!$canDelete) {
+                        $currentStatus = $booking->ict_approve ?? $booking->status;
+                        $returnStatus = $booking->return_status ?? 'not_yet_returned';
+                        $failedRequests[] = [
+                            'id' => $requestId,
+                            'reason' => "Cannot delete: ICT status: {$currentStatus}, Return status: {$returnStatus}"
+                        ];
+                        continue;
+                    }
+
+                    // If device was reserved, return it to inventory
+                    if ($booking->device_inventory_id) {
+                        $deviceInventory = $booking->deviceInventory;
+                        if ($deviceInventory) {
+                            $deviceInventory->returnDevice(1);
+                            $returnedDevices[] = [
+                                'device_id' => $deviceInventory->id,
+                                'device_name' => $deviceInventory->device_name,
+                                'booking_id' => $booking->id
+                            ];
+                        }
+                    }
+
+                    // Delete signature file if exists
+                    if ($booking->signature_path) {
+                        \Storage::disk('public')->delete($booking->signature_path);
+                    }
+
+                    // Store booking info for logging before deletion
+                    $bookingInfo = [
+                        'id' => $booking->id,
+                        'borrower_name' => $booking->borrower_name,
+                        'device_type' => $booking->device_type,
+                        'booking_date' => $booking->booking_date,
+                        'department' => $booking->department,
+                        'reason' => $reason
+                    ];
+
+                    // Delete the booking
+                    $booking->delete();
+                    $deletedRequests[] = $bookingInfo;
+
+                } catch (\Exception $e) {
+                    $failedRequests[] = [
+                        'id' => $requestId,
+                        'reason' => 'Error: ' . $e->getMessage()
+                    ];
+                }
+            }
+
+            Log::info('Bulk device borrowing requests deletion completed', [
+                'deleted_by' => $request->user()->id,
+                'deleted_by_name' => $request->user()->name,
+                'total_requested' => count($requestIds),
+                'successfully_deleted' => count($deletedRequests),
+                'failed_deletions' => count($failedRequests),
+                'returned_devices' => count($returnedDevices),
+                'deleted_requests' => $deletedRequests,
+                'failed_requests' => $failedRequests
+            ]);
+
+            $message = 'Bulk deletion completed. ';
+            $message .= count($deletedRequests) . ' requests deleted successfully.';
+            if (count($failedRequests) > 0) {
+                $message .= ' ' . count($failedRequests) . ' requests could not be deleted.';
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'data' => [
+                    'deleted_count' => count($deletedRequests),
+                    'failed_count' => count($failedRequests),
+                    'deleted_requests' => $deletedRequests,
+                    'failed_requests' => $failedRequests,
+                    'returned_devices' => $returnedDevices
+                ]
+            ]);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+
+        } catch (\Exception $e) {
+            Log::error('Error in bulk device borrowing requests deletion: ' . $e->getMessage(), [
+                'user_id' => $request->user()->id,
+                'request_data' => $request->all(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error performing bulk deletion',
                 'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
             ], 500);
         }

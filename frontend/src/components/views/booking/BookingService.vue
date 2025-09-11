@@ -382,11 +382,11 @@
                       <div class="relative">
                         <input
                           v-model="formData.phoneNumber"
-                          @input="validatePhoneNumber"
                           type="tel"
-                          class="booking-input w-full px-3 py-3 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50"
-                          placeholder="Enter phone number"
-                          pattern="[0-9]{10,}"
+                          readonly
+                          class="booking-input w-full px-3 py-3 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50 cursor-not-allowed opacity-90"
+                          placeholder="Auto-populated from your account"
+                          title="This field is automatically filled with your account phone number"
                           required
                         />
                         <div
@@ -395,7 +395,7 @@
                         <div
                           class="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-300/50"
                         >
-                          <i class="fas fa-mobile-alt"></i>
+                          <i class="fas fa-lock" title="Auto-populated from your account"></i>
                         </div>
                       </div>
                       <div
@@ -407,7 +407,7 @@
                       </div>
                       <p class="text-xs text-blue-200/60 mt-1 italic flex items-center">
                         <i class="fas fa-info-circle mr-1"></i>
-                        e.g. 0712 000 000
+                        Automatically filled from your account information
                       </p>
                     </div>
 
@@ -1064,8 +1064,9 @@
         await this.loadDepartments()
         await this.loadAvailableDevices()
 
-        // Auto-populate borrower name from authenticated user
+        // Auto-populate borrower name and phone number from authenticated user
         this.populateBorrowerName()
+        this.populatePhoneNumber()
 
         // Debug: Check if time input is working
         console.log('BookingService mounted, returnTime field:', this.formData.returnTime)
@@ -1197,6 +1198,34 @@
         }
       },
 
+      populatePhoneNumber() {
+        // Auto-populate phone number from authenticated user
+        try {
+          if (this.authStore.isAuthenticated && this.authStore.user) {
+            const userPhone = this.authStore.user.phone
+            if (userPhone && !this.formData.phoneNumber) {
+              this.formData.phoneNumber = userPhone
+              console.log('✅ Auto-populated phone number:', userPhone)
+            } else if (!userPhone) {
+              console.warn('⚠️ User phone not available in auth store')
+              // Try to get from localStorage as fallback
+              const storedUserData = localStorage.getItem('user_data')
+              if (storedUserData) {
+                const userData = JSON.parse(storedUserData)
+                if (userData.phone) {
+                  this.formData.phoneNumber = userData.phone
+                  console.log('✅ Auto-populated phone number from localStorage:', userData.phone)
+                }
+              }
+            }
+          } else {
+            console.warn('⚠️ User not authenticated or user data not available')
+          }
+        } catch (error) {
+          console.error('❌ Error populating phone number:', error)
+        }
+      },
+
       validateSignature() {
         if (!this.formData.signature) {
           this.errors.signature = 'Digital signature is required'
@@ -1210,11 +1239,11 @@
         this.validateBookingDate()
         this.validateDeviceType()
         this.validateDepartment()
-        this.validatePhoneNumber()
         this.validateReturnDate()
         this.validateReturnTime()
         this.validateReason()
         this.validateSignature()
+        // Phone number validation removed since it's auto-populated
       },
 
       mapDeviceToType(device) {
@@ -1490,12 +1519,9 @@
       },
 
       validatePhoneNumber() {
-        if (!this.formData.phoneNumber.trim()) {
-          this.errors.phoneNumber = 'Phone number is required'
-        } else if (this.formData.phoneNumber.trim().length < 10) {
-          this.errors.phoneNumber = 'Phone number must be at least 10 digits'
-        } else if (!/^[\+]?[0-9\s\-\(\)]+$/.test(this.formData.phoneNumber.trim())) {
-          this.errors.phoneNumber = 'Please enter a valid phone number'
+        // Phone number is auto-populated from user account, just check if it exists
+        if (!this.formData.phoneNumber || !this.formData.phoneNumber.trim()) {
+          this.errors.phoneNumber = 'Phone number not available in your account. Please contact admin to update your profile.'
         } else {
           this.errors.phoneNumber = ''
         }
@@ -1673,11 +1699,8 @@
           this.errors.returnTime = 'Return time is required'
         }
 
-        if (!this.formData.phoneNumber.trim()) {
-          this.errors.phoneNumber = 'Phone number is required'
-        } else if (this.formData.phoneNumber.trim().length < 10) {
-          this.errors.phoneNumber = 'Phone number must be at least 10 digits'
-        }
+        // Validate phone number (auto-populated from user account)
+        this.validatePhoneNumber()
 
         // Remove condition validation as these fields are not in the current form
 

@@ -40,7 +40,10 @@
         </div>
 
         <!-- Message -->
-        <p v-if="notification.message" class="text-sm text-white/90 mt-3 leading-relaxed relative z-10">
+        <p
+          v-if="notification.message"
+          class="text-sm text-white/90 mt-3 leading-relaxed relative z-10"
+        >
           {{ notification.message }}
         </p>
 
@@ -113,46 +116,76 @@
 
       const getNotificationClasses = (type) => {
         const classes = {
-          success: 'medical-card bg-gradient-to-r from-blue-600/30 to-emerald-600/30 border-emerald-400 shadow-emerald-500/30',
-          error: 'medical-card bg-gradient-to-r from-blue-600/30 to-red-600/30 border-red-400 shadow-red-500/30',
-          warning: 'medical-card bg-gradient-to-r from-blue-600/30 to-yellow-600/30 border-yellow-400 shadow-yellow-500/30',
+          success:
+            'medical-card bg-gradient-to-r from-blue-600/30 to-emerald-600/30 border-emerald-400 shadow-emerald-500/30',
+          error:
+            'medical-card bg-gradient-to-r from-blue-600/30 to-red-600/30 border-red-400 shadow-red-500/30',
+          warning:
+            'medical-card bg-gradient-to-r from-blue-600/30 to-yellow-600/30 border-yellow-400 shadow-yellow-500/30',
           info: 'medical-card bg-gradient-to-r from-blue-600/30 to-blue-700/30 border-blue-400 shadow-blue-500/30',
-          booking: 'medical-card bg-gradient-to-r from-blue-600/30 to-cyan-600/30 border-cyan-400 shadow-cyan-500/30',
-          access: 'medical-card bg-gradient-to-r from-blue-600/30 to-indigo-600/30 border-indigo-400 shadow-indigo-500/30',
-          approval: 'medical-card bg-gradient-to-r from-blue-600/30 to-purple-600/30 border-purple-400 shadow-purple-500/30',
-          system: 'medical-card bg-gradient-to-r from-blue-600/30 to-teal-600/30 border-teal-400 shadow-teal-500/30',
-          medical: 'medical-card bg-gradient-to-r from-blue-600/30 to-blue-800/30 border-blue-400 shadow-blue-500/30',
+          booking:
+            'medical-card bg-gradient-to-r from-blue-600/30 to-cyan-600/30 border-cyan-400 shadow-cyan-500/30',
+          access:
+            'medical-card bg-gradient-to-r from-blue-600/30 to-indigo-600/30 border-indigo-400 shadow-indigo-500/30',
+          approval:
+            'medical-card bg-gradient-to-r from-blue-600/30 to-purple-600/30 border-purple-400 shadow-purple-500/30',
+          system:
+            'medical-card bg-gradient-to-r from-blue-600/30 to-teal-600/30 border-teal-400 shadow-teal-500/30',
+          medical:
+            'medical-card bg-gradient-to-r from-blue-600/30 to-blue-800/30 border-blue-400 shadow-blue-500/30',
           // Additional notification types with blue theme
-          security: 'medical-card bg-gradient-to-r from-blue-600/30 to-red-700/30 border-red-500 shadow-red-600/30',
-          maintenance: 'medical-card bg-gradient-to-r from-blue-600/30 to-orange-600/30 border-orange-400 shadow-orange-500/30',
-          feature: 'medical-card bg-gradient-to-r from-blue-600/30 to-violet-600/30 border-violet-400 shadow-violet-500/30',
-          quota: 'medical-card bg-gradient-to-r from-blue-600/30 to-amber-600/30 border-amber-400 shadow-amber-500/30',
-          session: 'medical-card bg-gradient-to-r from-blue-600/30 to-rose-600/30 border-rose-400 shadow-rose-500/30',
-          backup: 'medical-card bg-gradient-to-r from-blue-600/30 to-slate-600/30 border-slate-400 shadow-slate-500/30',
-          welcome: 'medical-card bg-gradient-to-r from-blue-600/30 to-sky-600/30 border-sky-400 shadow-sky-500/30'
+          security:
+            'medical-card bg-gradient-to-r from-blue-600/30 to-red-700/30 border-red-500 shadow-red-600/30',
+          maintenance:
+            'medical-card bg-gradient-to-r from-blue-600/30 to-orange-600/30 border-orange-400 shadow-orange-500/30',
+          feature:
+            'medical-card bg-gradient-to-r from-blue-600/30 to-violet-600/30 border-violet-400 shadow-violet-500/30',
+          quota:
+            'medical-card bg-gradient-to-r from-blue-600/30 to-amber-600/30 border-amber-400 shadow-amber-500/30',
+          session:
+            'medical-card bg-gradient-to-r from-blue-600/30 to-rose-600/30 border-rose-400 shadow-rose-500/30',
+          backup:
+            'medical-card bg-gradient-to-r from-blue-600/30 to-slate-600/30 border-slate-400 shadow-slate-500/30',
+          welcome:
+            'medical-card bg-gradient-to-r from-blue-600/30 to-sky-600/30 border-sky-400 shadow-sky-500/30'
         }
         return classes[type] || classes.info
       }
 
       const getIconClasses = (type) => {
         const classes = {
-          success: 'w-8 h-8 bg-emerald-500/20 text-emerald-300 rounded-full flex items-center justify-center border border-emerald-400/30',
-          error: 'w-8 h-8 bg-red-500/20 text-red-300 rounded-full flex items-center justify-center border border-red-400/30',
-          warning: 'w-8 h-8 bg-yellow-500/20 text-yellow-300 rounded-full flex items-center justify-center border border-yellow-400/30',
+          success:
+            'w-8 h-8 bg-emerald-500/20 text-emerald-300 rounded-full flex items-center justify-center border border-emerald-400/30',
+          error:
+            'w-8 h-8 bg-red-500/20 text-red-300 rounded-full flex items-center justify-center border border-red-400/30',
+          warning:
+            'w-8 h-8 bg-yellow-500/20 text-yellow-300 rounded-full flex items-center justify-center border border-yellow-400/30',
           info: 'w-8 h-8 bg-blue-500/20 text-blue-300 rounded-full flex items-center justify-center border border-blue-400/30',
-          booking: 'w-8 h-8 bg-cyan-500/20 text-cyan-300 rounded-full flex items-center justify-center border border-cyan-400/30',
-          access: 'w-8 h-8 bg-indigo-500/20 text-indigo-300 rounded-full flex items-center justify-center border border-indigo-400/30',
-          approval: 'w-8 h-8 bg-purple-500/20 text-purple-300 rounded-full flex items-center justify-center border border-purple-400/30',
-          system: 'w-8 h-8 bg-teal-500/20 text-teal-300 rounded-full flex items-center justify-center border border-teal-400/30',
-          medical: 'w-8 h-8 bg-blue-500/20 text-blue-300 rounded-full flex items-center justify-center border border-blue-400/30',
+          booking:
+            'w-8 h-8 bg-cyan-500/20 text-cyan-300 rounded-full flex items-center justify-center border border-cyan-400/30',
+          access:
+            'w-8 h-8 bg-indigo-500/20 text-indigo-300 rounded-full flex items-center justify-center border border-indigo-400/30',
+          approval:
+            'w-8 h-8 bg-purple-500/20 text-purple-300 rounded-full flex items-center justify-center border border-purple-400/30',
+          system:
+            'w-8 h-8 bg-teal-500/20 text-teal-300 rounded-full flex items-center justify-center border border-teal-400/30',
+          medical:
+            'w-8 h-8 bg-blue-500/20 text-blue-300 rounded-full flex items-center justify-center border border-blue-400/30',
           // Additional notification types
-          security: 'w-8 h-8 bg-red-600/20 text-red-300 rounded-full flex items-center justify-center border border-red-500/30',
-          maintenance: 'w-8 h-8 bg-orange-500/20 text-orange-300 rounded-full flex items-center justify-center border border-orange-400/30',
-          feature: 'w-8 h-8 bg-violet-500/20 text-violet-300 rounded-full flex items-center justify-center border border-violet-400/30',
-          quota: 'w-8 h-8 bg-amber-500/20 text-amber-300 rounded-full flex items-center justify-center border border-amber-400/30',
-          session: 'w-8 h-8 bg-rose-500/20 text-rose-300 rounded-full flex items-center justify-center border border-rose-400/30',
-          backup: 'w-8 h-8 bg-slate-500/20 text-slate-300 rounded-full flex items-center justify-center border border-slate-400/30',
-          welcome: 'w-8 h-8 bg-sky-500/20 text-sky-300 rounded-full flex items-center justify-center border border-sky-400/30'
+          security:
+            'w-8 h-8 bg-red-600/20 text-red-300 rounded-full flex items-center justify-center border border-red-500/30',
+          maintenance:
+            'w-8 h-8 bg-orange-500/20 text-orange-300 rounded-full flex items-center justify-center border border-orange-400/30',
+          feature:
+            'w-8 h-8 bg-violet-500/20 text-violet-300 rounded-full flex items-center justify-center border border-violet-400/30',
+          quota:
+            'w-8 h-8 bg-amber-500/20 text-amber-300 rounded-full flex items-center justify-center border border-amber-400/30',
+          session:
+            'w-8 h-8 bg-rose-500/20 text-rose-300 rounded-full flex items-center justify-center border border-rose-400/30',
+          backup:
+            'w-8 h-8 bg-slate-500/20 text-slate-300 rounded-full flex items-center justify-center border border-slate-400/30',
+          welcome:
+            'w-8 h-8 bg-sky-500/20 text-sky-300 rounded-full flex items-center justify-center border border-sky-400/30'
         }
         return classes[type] || classes.info
       }
@@ -182,19 +215,25 @@
 
       const getActionButtonClasses = (type) => {
         const classes = {
-          success: 'bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-400/30',
+          success:
+            'bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-400/30',
           error: 'bg-red-500/20 text-red-300 hover:bg-red-500/30 border border-red-400/30',
-          warning: 'bg-yellow-500/20 text-yellow-300 hover:bg-yellow-500/30 border border-yellow-400/30',
+          warning:
+            'bg-yellow-500/20 text-yellow-300 hover:bg-yellow-500/30 border border-yellow-400/30',
           info: 'bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 border border-blue-400/30',
           booking: 'bg-cyan-500/20 text-cyan-300 hover:bg-cyan-500/30 border border-cyan-400/30',
-          access: 'bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 border border-indigo-400/30',
-          approval: 'bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 border border-purple-400/30',
+          access:
+            'bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 border border-indigo-400/30',
+          approval:
+            'bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 border border-purple-400/30',
           system: 'bg-teal-500/20 text-teal-300 hover:bg-teal-500/30 border border-teal-400/30',
           medical: 'bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 border border-blue-400/30',
           // Additional notification types
           security: 'bg-red-600/20 text-red-300 hover:bg-red-600/30 border border-red-500/30',
-          maintenance: 'bg-orange-500/20 text-orange-300 hover:bg-orange-500/30 border border-orange-400/30',
-          feature: 'bg-violet-500/20 text-violet-300 hover:bg-violet-500/30 border border-violet-400/30',
+          maintenance:
+            'bg-orange-500/20 text-orange-300 hover:bg-orange-500/30 border border-orange-400/30',
+          feature:
+            'bg-violet-500/20 text-violet-300 hover:bg-violet-500/30 border border-violet-400/30',
           quota: 'bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-400/30',
           session: 'bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 border border-rose-400/30',
           backup: 'bg-slate-500/20 text-slate-300 hover:bg-slate-500/30 border border-slate-400/30',
@@ -325,7 +364,8 @@
 
   /* Pulse animation for medical pattern */
   @keyframes pulse {
-    0%, 100% {
+    0%,
+    100% {
       opacity: 0.3;
     }
     50% {
@@ -367,7 +407,11 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.05) 100%
+    );
     border-radius: inherit;
     pointer-events: none;
   }

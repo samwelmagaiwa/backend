@@ -2,10 +2,9 @@
 
 namespace App\Providers;
 
+use App\Support\Security\Health as SecurityHealth;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,28 +21,46 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Rate limiters
-        RateLimiter::for('api', function (Request $request) {
-            return Limit::perMinute(60)->by(optional($request->user())->id ?: $request->ip());
-        });
+        // Log security features activation with colorized console output
+        $this->logSecurityFeaturesEnabled();
+    }
+    
+    /**
+     * Log that security features have been enabled and their health status
+     * - Green (\e[32m) when OK
+     * - Red   (\e[31m) when Failure
+     *
+     * @return void
+     */
+    private function logSecurityFeaturesEnabled(): void
+    {
+        $checks = SecurityHealth::checks();
 
-        RateLimiter::for('login', function (Request $request) {
-            $email = (string) $request->input('email', '');
-            return [
-                Limit::perMinute(5)->by(strtolower($email) . '|' . $request->ip()),
-                Limit::perMinute(50)->by($request->ip()),
-            ];
-        });
+        // Aggregate overall status
+        $allOk = collect($checks)->every(fn ($r) => $r['ok'] === true);
 
-        RateLimiter::for('sensitive', function (Request $request) {
-            $key = $request->user()?->id ? 'uid:' . $request->user()->id : 'ip:' . $request->ip();
-            return Limit::perMinute(15)->by($key);
-        });
+        // Structured log to laravel.log (no ANSI colors)
+        Log::info('🔒 Security features enabled', [
+            'overall_ok' => $allOk,
+            'checks' => $checks,
+        ]);
 
-        RateLimiter::for('register', function (Request $request) {
-            return [
-                Limit::perMinute(3)->by($request->ip()),
-            ];
-        });
+        // Colorized console output
+        $GREEN = "\e[32m"; // green
+        $RED   = "\e[31m"; // red
+        $RESET = "\e[0m";  // reset
+
+        $prefix = $allOk ? "{$GREEN}[SECURITY]{$RESET}" : "{$RED}[SECURITY]{$RESET}";
+        error_log($prefix . ' Boot checks: ' . ($allOk ? ($GREEN . 'OK' . $RESET) : ($RED . 'FAIL' . $RESET)));
+
+        foreach ($checks as $name => $result) {
+            $color = $result['ok'] ? $GREEN : $RED;
+            $status = $result['ok'] ? 'OK' : 'FAIL';
+            error_log(sprintf('%s %s: %s - %s%s', $prefix, $name, $status, $color, $result['message'] . $RESET));
+        }
+
+        if (!$allOk) {
+            error_log($RED . '[SECURITY] One or more security checks failed. Review configuration before proceeding to production.' . $RESET);
+        }
     }
 }

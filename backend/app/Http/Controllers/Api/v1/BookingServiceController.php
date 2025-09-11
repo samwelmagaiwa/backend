@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\BookingService;
 use App\Models\Department;
 use App\Models\DeviceInventory;
+use App\Models\DeviceAssessment;
 use App\Services\SignatureService;
 use App\Http\Requests\BookingServiceRequest;
 use Illuminate\Http\Request;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class BookingServiceController extends Controller
 {
@@ -104,18 +106,31 @@ class BookingServiceController extends Controller
                 ], 422);
             }
             
-            try {
-                $validatedData = $request->validated();
-                Log::info('Validation passed successfully');
-            } catch (\Illuminate\Validation\ValidationException $e) {
-                Log::error('Validation failed', [
-                    'errors' => $e->errors(),
-                    'message' => $e->getMessage()
-                ]);
-                throw $e;
-            }
-            
-            $validatedData['user_id'] = $request->user()->id;
+            $validatedData = $request->validated();
+            Log::info('Validation passed successfully');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Validation failed', [
+                'errors' => $e->errors(),
+                'message' => $e->getMessage()
+            ]);
+            throw $e;
+        }
+        
+        $validatedData['user_id'] = $request->user()->id;
+        
+        // Auto-capture phone number from users table (override any submitted phone_number)
+        $user = $request->user();
+        if ($user->phone) {
+            $validatedData['phone_number'] = $user->phone;
+            Log::info('Auto-captured phone number from users table', [
+                'user_id' => $user->id,
+                'phone_number' => $user->phone
+            ]);
+        } else {
+            Log::warning('User does not have phone number in profile', [
+                'user_id' => $user->id
+            ]);
+        }
             
             // Combine return_date and return_time into return_date_time
             if (isset($validatedData['return_date']) && isset($validatedData['return_time'])) {
@@ -161,22 +176,13 @@ class BookingServiceController extends Controller
                     ], 400);
                 }
                 
-                // If device is available (quantity > 0), reserve it
+                // Don't reserve device on booking creation - only when ICT approves
+                // Just log the availability check result
                 if ($availabilityCheck['available']) {
-                    if (!$deviceInventory->borrowDevice(1)) {
-                        return response()->json([
-                            'success' => false,
-                            'message' => 'Unable to reserve the device. It may no longer be available.'
-                        ], 400);
-                    }
-                    
-                    // Clear cache when device quantity changes
-                    Cache::forget('available_devices');
-                    
-                    Log::info('Device reserved from inventory', [
+                    Log::info('Device available for booking request', [
                         'device_id' => $deviceInventory->id,
                         'device_name' => $deviceInventory->device_name,
-                        'remaining_quantity' => $deviceInventory->available_quantity
+                        'available_quantity' => $deviceInventory->available_quantity
                     ]);
                 } else {
                     // Device is out of stock but request is allowed
@@ -234,15 +240,8 @@ class BookingServiceController extends Controller
                 'request_data' => $request->except(['signature'])
             ]);
 
-            // If device was reserved but booking failed, return the device to inventory
-            if (isset($deviceInventory) && $deviceInventory) {
-                $deviceInventory->returnDevice(1);
-                // Clear cache when device quantity changes
-                Cache::forget('available_devices');
-                Log::info('Device returned to inventory due to booking failure', [
-                    'device_id' => $deviceInventory->id
-                ]);
-            }
+            // No need to return device since we don't reserve it during booking creation
+            // Device is only borrowed when ICT approves the request
 
             return response()->json([
                 'success' => false,
@@ -355,6 +354,139 @@ class BookingServiceController extends Controller
                 'success' => false,
                 'message' => 'Error updating booking',
                 'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Update a rejected booking request.
+     */
+    public function updateRejectedRequest(Request $request, int $bookingId): JsonResponse
+    {
+        try {
+            $booking = BookingService::find($bookingId);
+            
+            if (!$booking) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Booking request not found'
+                ], 404);
+            }
+
+            // Check if user can edit this booking (only owner)
+            if ($booking->user_id !== $request->user()->id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized to edit this booking request'
+                ], 403);
+            }
+
+            // Only allow editing rejected requests
+            if ($booking->ict_approve !== 'rejected') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Only rejected booking requests can be edited'
+                ], 400);
+            }
+
+            // Use the same validation rules as creation
+            $validatedData = $request->validate([
+                'device_type' => 'required|string|max:100',
+                'custom_device' => 'nullable|string|max:255',
+                'device_inventory_id' => 'nullable|integer|exists:device_inventory,id',
+                'borrower_name' => 'required|string|max:255',
+                'department' => 'required|string|max:255',
+                'booking_date' => 'required|date|after_or_equal:today',
+                'return_date' => 'required|date|after:booking_date',
+                'return_time' => 'required',
+                'reason' => 'required|string|max:1000',
+            ]);
+
+            // Handle signature upload if provided
+            if ($request->hasFile('signature')) {
+                // Delete old signature if exists
+                if ($booking->signature_path) {
+                    Storage::disk('public')->delete($booking->signature_path);
+                }
+
+                $signaturePath = $this->handleSignatureUpload($request->file('signature'), $validatedData['borrower_name']);
+                $validatedData['signature_path'] = $signaturePath;
+            }
+
+            // Combine return_date and return_time into return_date_time
+            if (isset($validatedData['return_date']) && isset($validatedData['return_time'])) {
+                $returnDate = $validatedData['return_date'];
+                $returnTime = $validatedData['return_time'];
+                $validatedData['return_date_time'] = $returnDate . ' ' . $returnTime;
+            }
+
+            // Handle device inventory if device_inventory_id is provided
+            if (isset($validatedData['device_inventory_id']) && $validatedData['device_inventory_id']) {
+                $deviceInventory = DeviceInventory::find($validatedData['device_inventory_id']);
+                
+                if (!$deviceInventory) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Selected device not found in inventory'
+                    ], 400);
+                }
+                
+                // Auto-determine device_type from inventory device
+                $autoDetectedDeviceType = $this->mapInventoryDeviceToType($deviceInventory);
+                if ($autoDetectedDeviceType) {
+                    $validatedData['device_type'] = $autoDetectedDeviceType;
+                }
+
+                // Check device availability
+                $availabilityCheck = BookingService::checkDeviceAvailability($validatedData['device_inventory_id']);
+                
+                if (!$availabilityCheck['can_request']) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => $availabilityCheck['message']
+                    ], 400);
+                }
+            }
+
+            // Reset ICT approval status to pending for re-evaluation
+            $validatedData['ict_approve'] = 'pending';
+            $validatedData['ict_approved_by'] = null;
+            $validatedData['ict_approved_at'] = null;
+            $validatedData['ict_notes'] = null;
+            $validatedData['status'] = 'pending';
+
+            // Update the booking
+            $booking->update($validatedData);
+            $booking->load(['user', 'departmentInfo', 'deviceInventory']);
+
+            Log::info('Rejected booking request updated and re-submitted', [
+                'booking_id' => $booking->id,
+                'user_id' => $request->user()->id,
+                'device_type' => $booking->device_type
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'data' => $booking,
+                'message' => 'Booking request updated and re-submitted successfully! Your request is now pending approval again.'
+            ]);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error('Error updating rejected booking request: ' . $e->getMessage(), [
+                'booking_id' => $bookingId,
+                'user_id' => $request->user()->id
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating booking request',
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
             ], 500);
         }
     }
@@ -1288,7 +1420,21 @@ class BookingServiceController extends Controller
                 ], 500);
             }
 
-            // Perform the update
+            // Save to device_assessments table
+            DeviceAssessment::create([
+                'booking_id' => $bookingService->id,
+                'assessment_type' => 'issuing',
+                'physical_condition' => $validatedData['device_condition']['physical_condition'],
+                'functionality' => $validatedData['device_condition']['functionality'],
+                'accessories_complete' => $validatedData['device_condition']['accessories_complete'],
+                'has_damage' => $validatedData['device_condition']['visible_damage'],
+                'damage_description' => $validatedData['device_condition']['damage_description'] ?? null,
+                'notes' => $validatedData['assessment_notes'] ?? null,
+                'assessed_by' => $request->user()->id,
+                'assessed_at' => now()
+            ]);
+
+            // Perform the update (for backward compatibility)
             $updated = $bookingService->update($updateData);
             
             if (!$updated) {
@@ -1405,6 +1551,21 @@ class BookingServiceController extends Controller
                 $returnStatus = 'returned_but_compromised';
             }
 
+            // Save to device_assessments table
+            DeviceAssessment::create([
+                'booking_id' => $bookingService->id,
+                'assessment_type' => 'receiving',
+                'physical_condition' => $deviceCondition['physical_condition'],
+                'functionality' => $deviceCondition['functionality'],
+                'accessories_complete' => $deviceCondition['accessories_complete'],
+                'has_damage' => $deviceCondition['visible_damage'],
+                'damage_description' => $deviceCondition['damage_description'] ?? null,
+                'notes' => $request->assessment_notes ?? null,
+                'assessed_by' => $request->user()->id,
+                'assessed_at' => now()
+            ]);
+
+            // Update booking (for backward compatibility)
             $bookingService->update([
                 'device_condition_receiving' => $request->device_condition,
                 'device_received_at' => now(),

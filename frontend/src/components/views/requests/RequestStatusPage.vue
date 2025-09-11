@@ -375,7 +375,7 @@
                                 Actions
                                 <i class="fas fa-chevron-down ml-1 text-xs"></i>
                               </button>
-                              
+
                               <!-- Dropdown Menu -->
                               <div
                                 v-if="activeDropdown === request.id"
@@ -388,6 +388,15 @@
                                   >
                                     <i class="fas fa-eye mr-2 text-blue-400"></i>
                                     View Details
+                                  </button>
+                                  <!-- Edit button for rejected booking requests -->
+                                  <button
+                                    v-if="request.type === 'booking_service' && request.status === 'rejected'"
+                                    @click="editRequest(request)"
+                                    class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-green-600 hover:text-white flex items-center"
+                                  >
+                                    <i class="fas fa-edit mr-2 text-green-400"></i>
+                                    Edit Request
                                   </button>
                                   <button
                                     @click="cancelRequest(request)"
@@ -536,7 +545,7 @@
                           Actions
                           <i class="fas fa-chevron-down ml-2 text-xs"></i>
                         </button>
-                        
+
                         <!-- Mobile Dropdown Menu -->
                         <div
                           v-if="activeDropdown === 'mobile-' + request.id"
@@ -549,6 +558,15 @@
                             >
                               <i class="fas fa-eye mr-2 text-blue-400"></i>
                               View Details
+                            </button>
+                            <!-- Edit button for rejected booking requests -->
+                            <button
+                              v-if="request.type === 'booking_service' && request.status === 'rejected'"
+                              @click="editRequest(request)"
+                              class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-green-600 hover:text-white flex items-center"
+                            >
+                              <i class="fas fa-edit mr-2 text-green-400"></i>
+                              Edit Request
                             </button>
                             <button
                               @click="cancelRequest(request)"
@@ -654,7 +672,7 @@
           closeDropdown()
         }
       }
-      
+
       onMounted(() => {
         document.addEventListener('click', handleClickOutside)
       })
@@ -711,6 +729,26 @@
           query: {
             id: request.original_id || request.id,
             type: request.type
+          }
+        })
+      }
+
+      const editRequest = (request) => {
+        // Close dropdown first
+        closeDropdown()
+
+        // Only allow editing rejected booking requests
+        if (request.type !== 'booking_service' || request.status !== 'rejected') {
+          alert('Only rejected booking requests can be edited.')
+          return
+        }
+
+        // Navigate to edit page with the request data
+        router.push({
+          path: '/edit-booking-request',
+          query: {
+            id: request.original_id || request.id,
+            mode: 'edit'
           }
         })
       }
@@ -792,32 +830,35 @@
           let response
           if (request.type === 'booking_service') {
             // For booking service requests, call the booking service API
-            response = await fetch(`/api/booking-service/bookings/${request.original_id || request.id}`, {
-              method: 'DELETE',
-              headers: {
-                'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
+            response = await fetch(
+              `/api/booking-service/bookings/${request.original_id || request.id}`,
+              {
+                method: 'DELETE',
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+                  'Content-Type': 'application/json',
+                  Accept: 'application/json'
+                }
               }
-            })
+            )
           } else {
             // For access requests, call the user access API
             response = await fetch(`/api/v1/user-access/${request.original_id || request.id}`, {
               method: 'DELETE',
               headers: {
-                'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+                Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
                 'Content-Type': 'application/json',
-                'Accept': 'application/json'
+                Accept: 'application/json'
               }
             })
           }
 
           if (response.ok) {
-            const result = await response.json()
-            
+            await response.json()
+
             // Show success message
             alert(`Request #${request.id} has been cancelled successfully.`)
-            
+
             // Refresh the requests list
             await loadRequests(currentPage.value)
           } else {
@@ -826,7 +867,9 @@
           }
         } catch (error) {
           console.error('❌ Error cancelling request:', error)
-          alert(`Failed to cancel request: ${error.message}\n\nPlease try again or contact support if the problem persists.`)
+          alert(
+            `Failed to cancel request: ${error.message}\n\nPlease try again or contact support if the problem persists.`
+          )
         } finally {
           cancelingRequest.value = null
         }
@@ -939,6 +982,7 @@
         loadRequests,
         refreshRequests,
         viewRequestDetails,
+        editRequest,
         goToSubmitRequest,
         submitNewRequest,
         viewPendingBookingDetails,

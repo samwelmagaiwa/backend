@@ -210,12 +210,23 @@
                     <div v-if="isBookingService">
                       <p class="text-blue-200 text-sm">Return Status:</p>
                       <p class="font-semibold flex items-center gap-2">
-                        <span 
-                          :class="getReturnStatusBadgeClass(requestData?.return_status || 'not_yet_returned')"
+                        <span
+                          :class="
+                            getReturnStatusBadgeClass(
+                              requestData?.return_status || 'not_yet_returned'
+                            )
+                          "
                           class="px-2 py-1 rounded-full text-xs font-medium border"
                         >
-                          <i :class="getReturnStatusIcon(requestData?.return_status || 'not_yet_returned')" class="mr-1"></i>
-                          {{ getReturnStatusText(requestData?.return_status || 'not_yet_returned') }}
+                          <i
+                            :class="
+                              getReturnStatusIcon(requestData?.return_status || 'not_yet_returned')
+                            "
+                            class="mr-1"
+                          ></i>
+                          {{
+                            getReturnStatusText(requestData?.return_status || 'not_yet_returned')
+                          }}
                         </span>
                       </p>
                     </div>

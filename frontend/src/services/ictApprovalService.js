@@ -49,9 +49,12 @@ export const ictApprovalService = {
             // Device details
             device_type: request.device_type,
             custom_device: request.custom_device,
-            device_name: request.device_name || this.getDeviceDisplayName(request.device_type, request.custom_device),
+            device_name:
+              request.device_name ||
+              this.getDeviceDisplayName(request.device_type, request.custom_device),
             device_inventory_id: request.device_inventory_id,
-            device_available: typeof request.device_available !== 'undefined' ? request.device_available : null,
+            device_available:
+              typeof request.device_available !== 'undefined' ? request.device_available : null,
 
             // Booking details
             booking_date: request.booking_date,

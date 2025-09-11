@@ -4,11 +4,15 @@ use App\Http\Middleware\BrowserBackArrowMiddleware;
 use App\Http\Middleware\CheckTokenAbilities;
 use App\Http\Middleware\RoleMiddleware;
 use App\Http\Middleware\BothServiceFormRoleMiddleware;
+use App\Http\Middleware\SecurityHeaders;
+use App\Http\Middleware\InputSanitization;
+use App\Http\Middleware\XSSProtection;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Middleware\HandleCors;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Routing\Middleware\ThrottleRequests;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -18,14 +22,29 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function ($middleware) {
-        $middleware->prependToGroup('api', HandleCors::class);
-        // Removed EnsureFrontendRequestsAreStateful from API group to keep API stateless and avoid CSRF on API routes
+        // Temporarily disabled all middleware for debugging
+        // // Security middlewares
+        // $middleware->use([
+        //     SecurityHeaders::class,      // Apply security headers first
+        //     InputSanitization::class,    // Sanitize inputs early
+        //     XSSProtection::class,        // XSS protection after sanitization
+        // ]);
+        
+        // // CORS and API-specific middleware
+        // $middleware->prependToGroup('api', HandleCors::class);
+        // $middleware->appendToGroup('api', 'throttle:api'); // Rate limiting for API routes
+        
+        // // Removed EnsureFrontendRequestsAreStateful from API group to keep API stateless and avoid CSRF on API routes
         $middleware->alias([
             'browserbackarrow' => BrowserBackArrowMiddleware::class,
             'abilities' => CheckTokenAbilities::class,
             'role' => RoleMiddleware::class,
             'both.service.role' => BothServiceFormRoleMiddleware::class,
             'admin' => App\Http\Middleware\AdminMiddleware::class,
+            // Additional security aliases for specific use cases
+            'auth.throttle' => 'throttle:auth',
+            'sensitive.throttle' => 'throttle:sensitive',
+            'upload.throttle' => 'throttle:uploads',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -98,6 +98,70 @@
             </div>
           </div>
 
+          <!-- Error Display -->
+          <div
+            v-if="error"
+            class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"
+          >
+            <h3 class="font-bold">Error</h3>
+            <p>{{ error }}</p>
+            <button
+              @click="fetchRequests"
+              class="mt-2 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+            >
+              Retry
+            </button>
+          </div>
+
+          <!-- Debug Information -->
+          <div
+            v-if="showDebugInfo"
+            class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4"
+          >
+            <h3 class="font-bold">Debug Information</h3>
+            <div class="text-sm mt-2">
+              <p><strong>Requests Array Length:</strong> {{ requests.length }}</p>
+              <p><strong>Filtered Requests Length:</strong> {{ filteredRequests.length }}</p>
+              <p><strong>Loading State:</strong> {{ isLoading }}</p>
+              <p><strong>Search Query:</strong> {{ searchQuery || 'None' }}</p>
+              <p><strong>ICT Status Filter:</strong> {{ ictStatusFilter || 'None' }}</p>
+              <p><strong>Last API Response:</strong></p>
+              <pre class="bg-gray-100 p-2 rounded text-xs overflow-auto mt-1">{{
+                JSON.stringify(lastApiResponse, null, 2)
+              }}</pre>
+            </div>
+            <div class="mt-3 space-x-2">
+              <button
+                @click="testDirectApiCall"
+                class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
+              >
+                Test Direct API
+              </button>
+              <button
+                @click="testBookingServiceApi"
+                class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700"
+              >
+                Test Booking API
+              </button>
+              <button
+                @click="showDebugInfo = false"
+                class="bg-yellow-600 text-white px-3 py-1 rounded text-sm hover:bg-yellow-700"
+              >
+                Hide Debug
+              </button>
+            </div>
+          </div>
+
+          <!-- Show Debug Button -->
+          <div v-if="!showDebugInfo && !isLoading" class="mb-4">
+            <button
+              @click="showDebugInfo = true"
+              class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 text-sm"
+            >
+              Show Debug Info
+            </button>
+          </div>
+
           <!-- Main Content -->
           <div class="booking-glass-card rounded-b-3xl overflow-hidden animate-slide-up">
             <div class="p-8">
@@ -219,6 +283,47 @@
                 </div>
               </div>
 
+              <!-- Bulk Actions Toolbar -->
+              <div
+                v-if="selectedRequests.length > 0"
+                class="bg-gradient-to-r from-rose-600/25 to-red-600/25 border-2 border-red-400/40 rounded-2xl backdrop-blur-sm overflow-hidden mb-4 animate-slide-up"
+              >
+                <div class="p-4 flex items-center justify-between">
+                  <div class="flex items-center">
+                    <div
+                      class="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center mr-3"
+                    >
+                      <i class="fas fa-trash text-white"></i>
+                    </div>
+                    <div>
+                      <h3 class="text-lg font-bold text-white">
+                        {{ selectedRequests.length }} Request{{
+                          selectedRequests.length > 1 ? 's' : ''
+                        }}
+                        Selected
+                      </h3>
+                      <p class="text-sm text-red-200">Ready for bulk deletion</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center space-x-3">
+                    <button
+                      @click="clearSelection"
+                      class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200 text-sm"
+                    >
+                      <i class="fas fa-times mr-2"></i>
+                      Clear Selection
+                    </button>
+                    <button
+                      @click="bulkDeleteRequests"
+                      class="px-4 py-2 bg-gradient-to-r from-red-600 to-rose-600 text-white rounded-lg hover:from-red-700 hover:to-rose-700 transition-all duration-200 text-sm font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
+                    >
+                      <i class="fas fa-trash mr-2"></i>
+                      Delete Selected ({{ selectedRequests.length }})
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               <!-- Requests Table -->
               <div
                 class="bg-gradient-to-r from-blue-600/25 to-teal-600/25 border-2 border-blue-400/40 rounded-2xl backdrop-blur-sm overflow-hidden"
@@ -227,6 +332,12 @@
                   <h3 class="text-xl font-bold text-white flex items-center">
                     <i class="fas fa-table mr-3 text-teal-300"></i>
                     Device Borrowing Requests
+                    <span
+                      v-if="selectedRequests.length > 0"
+                      class="ml-3 px-3 py-1 bg-red-500 text-white rounded-full text-sm"
+                    >
+                      {{ selectedRequests.length }} selected
+                    </span>
                   </h3>
                 </div>
 
@@ -234,6 +345,19 @@
                   <table class="w-full">
                     <thead class="bg-blue-800/50">
                       <tr>
+                        <th
+                          class="px-4 py-4 text-left text-sm font-semibold text-blue-100 uppercase tracking-wider"
+                        >
+                          <div class="flex items-center">
+                            <input
+                              type="checkbox"
+                              v-model="selectAll"
+                              @change="toggleSelectAll"
+                              class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 mr-3"
+                            />
+                            <i class="fas fa-check-square mr-2"></i>Select
+                          </div>
+                        </th>
                         <th
                           class="px-6 py-4 text-left text-sm font-semibold text-blue-100 uppercase tracking-wider"
                         >
@@ -286,7 +410,24 @@
                         v-for="request in filteredRequests"
                         :key="request.id"
                         class="hover:bg-blue-700/30 transition-colors duration-200"
+                        :class="{
+                          'bg-blue-600/20': selectedRequests.includes(request.id)
+                        }"
                       >
+                        <td class="px-4 py-4 whitespace-nowrap">
+                          <div class="flex items-center">
+                            <input
+                              type="checkbox"
+                              :value="request.id"
+                              v-model="selectedRequests"
+                              :disabled="!canDeleteRequest(request)"
+                              class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                              :class="{
+                                'opacity-50 cursor-not-allowed': !canDeleteRequest(request)
+                              }"
+                            />
+                          </div>
+                        </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                           <div class="flex items-center">
                             <div
@@ -343,8 +484,10 @@
                                   request.custom_device || request.customDevice
                                 )
                               }}</span>
-                              <span 
-                                v-if="request.device_available === false && request.device_inventory_id"
+                              <span
+                                v-if="
+                                  request.device_available === false && request.device_inventory_id
+                                "
                                 class="text-xs text-red-300 font-medium"
                               >
                                 <i class="fas fa-exclamation-triangle mr-1"></i>
@@ -407,106 +550,132 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center">
                           <div class="relative inline-block">
-                            <!-- Actions Dropdown Button -->
+                            <!-- Compact Actions Dropdown Button -->
                             <button
                               @click="toggleActionsDropdown(request.id)"
-                              class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-medium rounded-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+                              class="relative inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-xs font-medium rounded-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-1 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 group overflow-hidden"
                             >
-                              <i class="fas fa-eye mr-2"></i>
-                              Actions
-                              <i
-                                class="fas fa-chevron-down ml-2 text-xs transition-transform duration-200"
-                                :class="{
-                                  'rotate-180': openDropdown === request.id
-                                }"
-                              ></i>
+                              <!-- Animated Background Gradient -->
+                              <div
+                                class="absolute inset-0 bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                              ></div>
+
+                              <!-- Shimmer Effect -->
+                              <div
+                                class="absolute inset-0 -skew-x-12 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[200%] transition-transform duration-600"
+                              ></div>
+
+                              <!-- Button Content -->
+                              <div class="relative z-10 flex items-center">
+                                <i class="fas fa-eye text-sm mr-2 group-hover:animate-pulse"></i>
+                                <span class="font-medium">Actions</span>
+                                <i
+                                  class="fas fa-chevron-down ml-2 text-xs transition-all duration-200 group-hover:text-cyan-200"
+                                  :class="{
+                                    'rotate-180 text-cyan-300': openDropdown === request.id
+                                  }"
+                                ></i>
+                              </div>
+
+                              <!-- Pulse Ring Effect -->
+                              <div
+                                class="absolute inset-0 rounded-lg border border-blue-400/50 group-hover:border-cyan-400/70 transition-colors duration-200"
+                              ></div>
                             </button>
 
-                            <!-- Actions Dropdown Menu -->
+                            <!-- Enhanced Actions Dropdown Menu -->
                             <transition
-                              enter-active-class="transition ease-out duration-200"
-                              enter-from-class="opacity-0 scale-95 translate-y-1"
-                              enter-to-class="opacity-100 scale-100 translate-y-0"
-                              leave-active-class="transition ease-in duration-150"
-                              leave-from-class="opacity-100 scale-100 translate-y-0"
-                              leave-to-class="opacity-0 scale-95 translate-y-1"
+                              enter-active-class="transition ease-out duration-300"
+                              enter-from-class="opacity-0 scale-90 translate-y-2 rotate-3"
+                              enter-to-class="opacity-100 scale-100 translate-y-0 rotate-0"
+                              leave-active-class="transition ease-in duration-200"
+                              leave-from-class="opacity-100 scale-100 translate-y-0 rotate-0"
+                              leave-to-class="opacity-0 scale-90 translate-y-2 rotate-3"
                             >
                               <div
                                 v-if="openDropdown === request.id"
-                                class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-50 overflow-hidden"
+                                class="absolute right-0 mt-2 w-52 bg-gradient-to-br from-white via-gray-50 to-blue-50 rounded-xl shadow-xl border border-blue-200/50 z-50 overflow-hidden backdrop-blur-sm"
                                 style="
                                   box-shadow:
-                                    0 10px 25px -5px rgba(0, 0, 0, 0.1),
-                                    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+                                    0 10px 25px -5px rgba(0, 0, 0, 0.15),
+                                    0 0 0 1px rgba(59, 130, 246, 0.1),
+                                    inset 0 1px 0 rgba(255, 255, 255, 0.1);
                                 "
                               >
-                                <!-- View Action -->
+                                <!-- Compact View Action -->
                                 <router-link
                                   :to="`/ict-approval/request/${request.id}`"
                                   @click="closeDropdown"
-                                  class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors duration-200 group"
+                                  class="relative flex items-center px-2 py-1.5 text-xs bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 transition-all duration-200 group overflow-hidden border-b border-blue-400/30 rounded-sm"
                                 >
+                                  <!-- Shimmer Effect -->
                                   <div
-                                    class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-blue-200 transition-colors duration-200"
-                                  >
-                                    <i class="fas fa-eye text-blue-600 text-sm"></i>
-                                  </div>
-                                  <div class="flex-1">
-                                    <p class="font-medium">View Details</p>
-                                    <p class="text-xs text-gray-500">Review request information</p>
-                                  </div>
+                                    class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[200%] transition-transform duration-500"
+                                  ></div>
+
+                                  <!-- Icon -->
+                                  <i class="fas fa-eye text-xs mr-2 relative z-10"></i>
+
+                                  <!-- Content -->
+                                  <span class="font-medium relative z-10">View Details</span>
+
+                                  <!-- Arrow Icon -->
+                                  <i
+                                    class="fas fa-arrow-right text-xs ml-auto opacity-0 group-hover:opacity-100 transition-opacity duration-200 relative z-10"
+                                  ></i>
                                 </router-link>
 
-                                <!-- Divider -->
-                                <div class="border-t border-gray-100"></div>
-
-                                <!-- Approve Action -->
-                                <button
-                                  @click="approveRequest(request.id)"
-                                  class="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors duration-200 group"
-                                  :disabled="request.ict_approve === 'approved'"
-                                  :class="{
-                                    'opacity-50 cursor-not-allowed':
-                                      request.ict_approve === 'approved'
-                                  }"
-                                >
-                                  <div
-                                    class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-green-200 transition-colors duration-200"
-                                  >
-                                    <i class="fas fa-check text-green-600 text-sm"></i>
-                                  </div>
-                                  <div class="flex-1 text-left">
-                                    <p class="font-medium">Approve Request</p>
-                                    <p class="text-xs text-gray-500">
-                                      Grant device borrowing access
-                                    </p>
-                                  </div>
-                                </button>
-
-                                <!-- Divider -->
-                                <div class="border-t border-gray-100"></div>
-
-                                <!-- Reject Action -->
+                                <!-- Compact Reject Action -->
                                 <button
                                   @click="rejectRequest(request.id)"
-                                  class="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-700 transition-colors duration-200 group"
+                                  class="relative w-full flex items-center px-2 py-1.5 text-xs bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 transition-all duration-200 group overflow-hidden border-b border-red-400/30 rounded-sm"
                                   :disabled="request.ict_approve === 'rejected'"
                                   :class="{
                                     'opacity-50 cursor-not-allowed':
                                       request.ict_approve === 'rejected'
                                   }"
                                 >
+                                  <!-- Shimmer Effect -->
                                   <div
-                                    class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-red-200 transition-colors duration-200"
-                                  >
-                                    <i class="fas fa-times text-red-600 text-sm"></i>
-                                  </div>
-                                  <div class="flex-1 text-left">
-                                    <p class="font-medium">Reject Request</p>
-                                    <p class="text-xs text-gray-500">
-                                      Deny device borrowing access
-                                    </p>
-                                  </div>
+                                    class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[200%] transition-transform duration-500"
+                                  ></div>
+
+                                  <!-- Icon -->
+                                  <i class="fas fa-times text-xs mr-2 relative z-10"></i>
+
+                                  <!-- Content -->
+                                  <span class="font-medium relative z-10">Reject Request</span>
+
+                                  <!-- Warning Icon -->
+                                  <i
+                                    class="fas fa-ban text-xs ml-auto opacity-0 group-hover:opacity-100 transition-opacity duration-200 relative z-10"
+                                  ></i>
+                                </button>
+
+                                <!-- Compact Delete Action -->
+                                <button
+                                  @click="deleteRequest(request.id)"
+                                  class="relative w-full flex items-center px-2 py-1.5 text-xs bg-gradient-to-r from-rose-600 to-red-700 text-white hover:from-rose-700 hover:to-red-800 transition-all duration-200 group overflow-hidden rounded-sm"
+                                  :disabled="!canDeleteRequest(request)"
+                                  :class="{
+                                    'opacity-50 cursor-not-allowed': !canDeleteRequest(request)
+                                  }"
+                                >
+                                  <!-- Shimmer Effect -->
+                                  <div
+                                    class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[200%] transition-transform duration-500"
+                                  ></div>
+
+                                  <!-- Icon -->
+                                  <i class="fas fa-trash text-xs mr-2 relative z-10"></i>
+
+                                  <!-- Content -->
+                                  <span class="font-medium relative z-10">Delete Request</span>
+
+                                  <!-- Danger Icon -->
+                                  <i
+                                    class="fas fa-skull-crossbones text-xs ml-auto opacity-0 group-hover:opacity-100 transition-opacity duration-200 relative z-10"
+                                  ></i>
                                 </button>
                               </div>
                             </transition>
@@ -576,6 +745,7 @@
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppFooter from '@/components/footer.vue'
   import deviceBorrowingService from '@/services/deviceBorrowingService'
+  import apiClient from '@/utils/apiClient'
 
   export default {
     name: 'RequestsList',
@@ -612,8 +782,16 @@
         showApprovalModal: false,
         approvalNotes: '',
         selectedRequestId: null,
-        actionType: null, // 'approve' or 'reject'
-        searchDebounce: null
+        actionType: null, // 'approve', 'reject', or 'delete'
+        searchDebounce: null,
+        // Bulk selection properties
+        selectedRequests: [],
+        selectAll: false,
+        // Error handling
+        error: null,
+        // Debug information
+        showDebugInfo: false,
+        lastApiResponse: null
       }
     },
     computed: {
@@ -651,7 +829,15 @@
       }
     },
     async mounted() {
-      await this.fetchRequests()
+      try {
+        console.log('RequestsList: Component mounted, initializing...')
+        await this.fetchRequests()
+        console.log('RequestsList: Component initialized successfully')
+      } catch (error) {
+        console.error('RequestsList: Error during mount:', error)
+        this.error = 'Failed to initialize component: ' + error.message
+        this.isLoading = false
+      }
     },
     watch: {
       // Watch for filter changes and refresh data
@@ -681,7 +867,11 @@
     methods: {
       async fetchRequests() {
         this.isLoading = true
+        this.error = null
+
         try {
+          console.log('Fetching device borrowing requests...')
+
           // Fetch all device borrowing requests for ICT approval from booking_service table
           const response = await deviceBorrowingService.getAllRequests({
             search: this.searchQuery || undefined,
@@ -691,21 +881,27 @@
             per_page: 50
           })
 
+          console.log('Service response:', response)
+
+          // Store the response for debugging
+          this.lastApiResponse = response
+
           if (response.success) {
             this.requests = response.data.data || []
-            console.log('✅ Device borrowing requests loaded:', this.requests.length)
+            console.log('Device borrowing requests loaded:', this.requests.length)
+            console.log('Raw requests data:', this.requests)
 
             // Also fetch statistics
             await this.fetchStatistics()
           } else {
-            console.error('❌ Failed to fetch requests:', response.message)
+            console.error('Failed to fetch requests:', response.message)
             throw new Error(response.message || 'Failed to fetch requests')
           }
         } catch (error) {
           console.error('Error fetching requests:', error)
-          alert(
+          this.error =
+            error.message ||
             'Unable to load device borrowing requests. Please check your connection and try again.'
-          )
           this.requests = []
           this.calculateStats()
         } finally {
@@ -779,48 +975,6 @@
       },
 
       // Action methods
-      async approveRequest(requestId) {
-        try {
-          this.selectedRequestId = requestId
-          this.actionType = 'approve'
-
-          const confirmed = confirm(
-            'Are you sure you want to approve this device borrowing request?'
-          )
-          if (!confirmed) return
-
-          this.isProcessing = true
-          this.closeDropdown()
-
-          // Get optional notes from user
-          const notes = prompt('Add approval notes (optional):') || ''
-
-          const response = await deviceBorrowingService.approveRequest(requestId, notes)
-
-          if (response.success) {
-            // Update local request status
-            const requestIndex = this.requests.findIndex((req) => req.id === requestId)
-            if (requestIndex !== -1) {
-              this.requests[requestIndex].ict_approve = 'approved'
-              this.requests[requestIndex].ict_notes = notes
-              this.requests[requestIndex].ict_approved_at = new Date().toISOString()
-            }
-
-            this.calculateStats()
-            alert('Device borrowing request approved successfully!')
-            console.log('✅ Request approved:', requestId)
-          } else {
-            throw new Error(response.message || 'Failed to approve request')
-          }
-        } catch (error) {
-          console.error('❌ Error approving request:', error)
-          alert('Error approving request: ' + error.message)
-        } finally {
-          this.isProcessing = false
-          this.selectedRequestId = null
-          this.actionType = null
-        }
-      },
 
       async rejectRequest(requestId) {
         try {
@@ -855,17 +1009,185 @@
 
             this.calculateStats()
             alert('Device borrowing request rejected successfully!')
-            console.log('✅ Request rejected:', requestId)
+            console.log('Request rejected:', requestId)
           } else {
             throw new Error(response.message || 'Failed to reject request')
           }
         } catch (error) {
-          console.error('❌ Error rejecting request:', error)
+          console.error('Error rejecting request:', error)
           alert('Error rejecting request: ' + error.message)
         } finally {
           this.isProcessing = false
           this.selectedRequestId = null
           this.actionType = null
+        }
+      },
+
+      async deleteRequest(requestId) {
+        try {
+          this.selectedRequestId = requestId
+          this.actionType = 'delete'
+
+          const confirmed = confirm(
+            'Are you sure you want to permanently delete this device borrowing request? This action cannot be undone.'
+          )
+          if (!confirmed) return
+
+          this.isProcessing = true
+          this.closeDropdown()
+
+          const response = await deviceBorrowingService.deleteRequest(requestId)
+
+          if (response.success) {
+            // Remove request from local array
+            const requestIndex = this.requests.findIndex((req) => req.id === requestId)
+            if (requestIndex !== -1) {
+              this.requests.splice(requestIndex, 1)
+            }
+
+            // Remove from selected requests if it was selected
+            this.selectedRequests = this.selectedRequests.filter((id) => id !== requestId)
+
+            this.calculateStats()
+            alert('Device borrowing request deleted successfully!')
+            console.log('Request deleted:', requestId)
+          } else {
+            throw new Error(response.message || 'Failed to delete request')
+          }
+        } catch (error) {
+          console.error('Error deleting request:', error)
+          alert('Error deleting request: ' + error.message)
+        } finally {
+          this.isProcessing = false
+          this.selectedRequestId = null
+          this.actionType = null
+        }
+      },
+
+      // Bulk selection methods
+      toggleSelectAll() {
+        if (this.selectAll) {
+          // Select all deletable requests
+          this.selectedRequests = this.filteredRequests
+            .filter((request) => this.canDeleteRequest(request))
+            .map((request) => request.id)
+        } else {
+          // Deselect all
+          this.selectedRequests = []
+        }
+      },
+
+      clearSelection() {
+        this.selectedRequests = []
+        this.selectAll = false
+      },
+
+      canDeleteRequest(request) {
+        return deviceBorrowingService.canDeleteRequest(request)
+      },
+
+      async bulkDeleteRequests() {
+        try {
+          if (this.selectedRequests.length === 0) {
+            alert('No requests selected for deletion.')
+            return
+          }
+
+          const confirmed = confirm(
+            `Are you sure you want to permanently delete ${this.selectedRequests.length} selected request${this.selectedRequests.length > 1 ? 's' : ''}? This action cannot be undone.`
+          )
+          if (!confirmed) return
+
+          this.isProcessing = true
+          this.actionType = 'bulk-delete'
+
+          const response = await deviceBorrowingService.bulkDeleteRequests(this.selectedRequests)
+
+          if (response.success) {
+            const deletedCount = response.data.deleted_count || 0
+            const failedCount = response.data.failed_count || 0
+
+            // Remove successfully deleted requests from local array
+            if (response.data.deleted_requests) {
+              const deletedIds = response.data.deleted_requests.map((req) => req.id)
+              this.requests = this.requests.filter((req) => !deletedIds.includes(req.id))
+            }
+
+            // Clear selection
+            this.clearSelection()
+
+            this.calculateStats()
+
+            let message = `Bulk deletion completed. ${deletedCount} request${deletedCount > 1 ? 's' : ''} deleted successfully.`
+            if (failedCount > 0) {
+              message += ` ${failedCount} request${failedCount > 1 ? 's' : ''} could not be deleted.`
+            }
+
+            alert(message)
+            console.log('Bulk deletion completed:', response.data)
+
+            // Show details of failed deletions if any
+            if (failedCount > 0 && response.data.failed_requests) {
+              console.warn('Failed deletions:', response.data.failed_requests)
+            }
+          } else {
+            throw new Error(response.message || 'Failed to delete requests')
+          }
+        } catch (error) {
+          console.error('Error in bulk deletion:', error)
+          alert('Error deleting requests: ' + error.message)
+        } finally {
+          this.isProcessing = false
+          this.actionType = null
+        }
+      },
+
+      // Debug methods
+      async testDirectApiCall() {
+        try {
+          console.log('Testing direct ICT approval API call...')
+          const response = await apiClient.get('/ict-approval/device-requests', {
+            params: { per_page: 10 }
+          })
+          console.log('Direct ICT API response:', response)
+          this.lastApiResponse = {
+            endpoint: '/ict-approval/device-requests',
+            success: true,
+            data: response.data,
+            status: response.status
+          }
+        } catch (error) {
+          console.error('Direct ICT API error:', error)
+          this.lastApiResponse = {
+            endpoint: '/ict-approval/device-requests',
+            success: false,
+            error: error.response?.data || error.message,
+            status: error.response?.status
+          }
+        }
+      },
+
+      async testBookingServiceApi() {
+        try {
+          console.log('Testing booking service API call...')
+          const response = await apiClient.get('/booking-service/ict-approval-requests', {
+            params: { per_page: 10 }
+          })
+          console.log('Booking service API response:', response)
+          this.lastApiResponse = {
+            endpoint: '/booking-service/ict-approval-requests',
+            success: true,
+            data: response.data,
+            status: response.status
+          }
+        } catch (error) {
+          console.error('Booking service API error:', error)
+          this.lastApiResponse = {
+            endpoint: '/booking-service/ict-approval-requests',
+            success: false,
+            error: error.response?.data || error.message,
+            status: error.response?.status
+          }
         }
       }
     }
@@ -952,6 +1274,93 @@
 
   button:focus {
     box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.3);
+  }
+
+  /* Enhanced Action Button Animations */
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%) skewX(-12deg);
+    }
+    100% {
+      transform: translateX(200%) skewX(-12deg);
+    }
+  }
+
+  @keyframes float-up {
+    0% {
+      transform: translateY(0px) scale(1);
+    }
+    50% {
+      transform: translateY(-5px) scale(1.05);
+    }
+    100% {
+      transform: translateY(0px) scale(1);
+    }
+  }
+
+  @keyframes glow {
+    0%,
+    100% {
+      box-shadow: 0 0 5px rgba(147, 51, 234, 0.3);
+    }
+    50% {
+      box-shadow:
+        0 0 20px rgba(147, 51, 234, 0.6),
+        0 0 30px rgba(147, 51, 234, 0.4);
+    }
+  }
+
+  @keyframes rainbow {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  @keyframes sparkle {
+    0%,
+    100% {
+      opacity: 0;
+      transform: scale(0) rotate(0deg);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1) rotate(180deg);
+    }
+  }
+
+  /* Action Button Hover Effects */
+  .action-button-main:hover {
+    animation: float-up 0.6s ease-in-out infinite;
+  }
+
+  .action-button-main:hover .shimmer-effect {
+    animation: shimmer 1s ease-in-out infinite;
+  }
+
+  .action-button-main:focus {
+    animation: glow 1s ease-in-out infinite;
+  }
+
+  /* Dropdown Menu Enhancements */
+  .dropdown-menu {
+    backdrop-filter: blur(20px);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.9));
+  }
+
+  .action-item:hover {
+    transform: translateX(5px) scale(1.02);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* Sparkle Animation for Success Actions */
+  .success-sparkle {
+    animation: sparkle 1.5s ease-in-out infinite;
   }
 
   /* Smooth transitions */

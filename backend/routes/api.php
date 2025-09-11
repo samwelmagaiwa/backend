@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\v1\AuthController;
-
+use App\Http\Controllers\SecurityTestController;
 use App\Http\Controllers\Api\v1\OnboardingController;
 use App\Http\Controllers\Api\v1\AdminController;
 use App\Http\Controllers\Api\v1\UserAccessController;
@@ -11,19 +11,17 @@ use App\Http\Controllers\Api\v1\DeclarationController;
 use App\Http\Controllers\Api\v1\BothServiceFormController;
 use App\Http\Controllers\Api\v1\AdminUserController;
 use App\Http\Controllers\Api\v1\AdminDepartmentController;
+use App\Http\Controllers\Api\v1\DeviceInventoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return redirect('/api/documentation');
+});
 
-    // ICT Approval: Device Assessments
-    Route::prefix('ict-approval')->group(function () {
-        Route::prefix('device-requests/{id}/assessment')->group(function () {
-            Route::post('issuing', [\App\Http\Controllers\API\ICTApproval\DeviceAssessmentController::class, 'saveIssuing']);
-            Route::post('receiving', [\App\Http\Controllers\API\ICTApproval\DeviceAssessmentController::class, 'saveReceiving']);
-        });
-    });
+// Simple test route - should work if routing is functioning
+Route::get('/test-simple', function () {
+    return response()->json(['message' => 'Test route working', 'timestamp' => now()]);
 });
 
 // Public routes
@@ -65,6 +63,15 @@ Route::get('/', function () {
     // Authentication routes
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login')->name('login');
     Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:register')->name('register');
+    
+    // Security Test Routes (for testing security implementations)
+    Route::prefix('security-test')->group(function () {
+        Route::get('/test', [SecurityTestController::class, 'test'])->name('security-test.basic');
+        Route::get('/health', [SecurityTestController::class, 'healthCheck'])->name('security-test.health');
+        Route::get('/rate-limit', [SecurityTestController::class, 'rateLimitTest'])->name('security-test.rate-limit');
+        Route::post('/sanitization', [SecurityTestController::class, 'sanitizationTest'])->name('security-test.sanitization');
+        Route::post('/xss', [SecurityTestController::class, 'xssTest'])->name('security-test.xss');
+    });
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -220,6 +227,9 @@ Route::middleware('auth:sanctum')->group(function () {
         // CRUD operations
         Route::apiResource('bookings', BookingServiceController::class);
         
+        // Edit rejected booking request route
+        Route::put('bookings/{bookingId}/edit-rejected', [BookingServiceController::class, 'updateRejectedRequest'])->name('booking-service.edit-rejected');
+        
         // Utility routes
         Route::get('device-types', [BookingServiceController::class, 'getDeviceTypes'])->name('booking-service.device-types');
         Route::get('departments', [BookingServiceController::class, 'getDepartments'])->name('booking-service.departments');
@@ -280,6 +290,8 @@ Route::middleware('auth:sanctum')->group(function () {
         // Approval/rejection actions
         Route::post('device-requests/{requestId}/approve', [ICTApprovalController::class, 'approveDeviceBorrowingRequest'])->name('ict-approval.approve');
         Route::post('device-requests/{requestId}/reject', [ICTApprovalController::class, 'rejectDeviceBorrowingRequest'])->name('ict-approval.reject');
+        Route::delete('device-requests/{requestId}', [ICTApprovalController::class, 'deleteDeviceBorrowingRequest'])->name('ict-approval.delete');
+        Route::post('device-requests/bulk-delete', [ICTApprovalController::class, 'bulkDeleteDeviceBorrowingRequests'])->name('ict-approval.bulk-delete');
         
         // User details auto-capture
         Route::post('device-requests/{bookingId}/link-user', [ICTApprovalController::class, 'linkUserDetailsToBooking'])->name('ict-approval.link-user');
@@ -364,14 +376,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Device Inventory Management routes (Admin only)
     Route::prefix('device-inventory')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Api\v1\DeviceInventoryController::class, 'index'])->name('device-inventory.index');
-        Route::post('/', [\App\Http\Controllers\Api\v1\DeviceInventoryController::class, 'store'])->name('device-inventory.store');
-        Route::get('/available', [\App\Http\Controllers\Api\v1\DeviceInventoryController::class, 'getAvailableDevices'])->name('device-inventory.available');
-        Route::get('/statistics', [\App\Http\Controllers\Api\v1\DeviceInventoryController::class, 'getStatistics'])->name('device-inventory.statistics');
-        Route::post('/fix-quantities', [\App\Http\Controllers\Api\v1\DeviceInventoryController::class, 'fixQuantities'])->name('device-inventory.fix-quantities');
-        Route::get('/{deviceInventory}', [\App\Http\Controllers\Api\v1\DeviceInventoryController::class, 'show'])->name('device-inventory.show');
-        Route::put('/{deviceInventory}', [\App\Http\Controllers\Api\v1\DeviceInventoryController::class, 'update'])->name('device-inventory.update');
-        Route::delete('/{deviceInventory}', [\App\Http\Controllers\Api\v1\DeviceInventoryController::class, 'destroy'])->name('device-inventory.destroy');
+        Route::get('/', [DeviceInventoryController::class, 'index'])->name('device-inventory.index');
+        Route::post('/', [DeviceInventoryController::class, 'store'])->name('device-inventory.store');
+        Route::get('/available', [DeviceInventoryController::class, 'getAvailableDevices'])->name('device-inventory.available');
+        Route::get('/statistics', [DeviceInventoryController::class, 'getStatistics'])->name('device-inventory.statistics');
+        Route::post('/fix-quantities', [DeviceInventoryController::class, 'fixQuantities'])->name('device-inventory.fix-quantities');
+        Route::get('/{deviceInventory}', [DeviceInventoryController::class, 'show'])->name('device-inventory.show');
+        Route::put('/{deviceInventory}', [DeviceInventoryController::class, 'update'])->name('device-inventory.update');
+        Route::delete('/{deviceInventory}', [DeviceInventoryController::class, 'destroy'])->name('device-inventory.destroy');
     });
 
     // COMMENTED OUT: Individual form routes - now using Combined Access Form only
