@@ -1001,6 +1001,7 @@
   import deviceInventoryService from '@/services/deviceInventoryService'
   import ictApprovalService from '@/services/ictApprovalService'
   import { useAuthStore } from '@/stores/auth'
+  import apiClient from '@/utils/apiClient'
 
   export default {
     name: 'BookingService',
@@ -1088,29 +1089,20 @@
       async checkPendingRequests() {
         try {
           this.isCheckingPendingRequests = true
-          const response = await fetch('/api/booking-service/check-pending-requests', {
-            method: 'GET',
-            headers: {
-              Authorization: `Bearer ${this.authStore.token}`,
-              'Content-Type': 'application/json',
-              Accept: 'application/json'
-            }
-          })
+          const response = await apiClient.get('/booking-service/check-pending-requests')
 
-          const result = await response.json()
+          if (response.data.success) {
+            this.hasPendingRequest = response.data.has_pending_request
 
-          if (result.success) {
-            this.hasPendingRequest = result.has_pending_request
-
-            if (this.hasPendingRequest && result.pending_request) {
-              this.pendingRequestInfo = result.pending_request
+            if (this.hasPendingRequest && response.data.pending_request) {
+              this.pendingRequestInfo = response.data.pending_request
               this.showPendingRequestModal = true
-              console.log('🚫 User has pending request:', result.pending_request)
+              console.log('🚫 User has pending request:', response.data.pending_request)
             } else {
               console.log('✅ No pending requests found')
             }
           } else {
-            console.error('Failed to check pending requests:', result.message)
+            console.error('Failed to check pending requests:', response.data.message)
           }
         } catch (error) {
           console.error('Error checking pending requests:', error)
@@ -1141,30 +1133,25 @@
 
       async checkDeviceAvailability(deviceInventoryId) {
         try {
-          const response = await fetch(
-            `/api/booking-service/devices/${deviceInventoryId}/availability`,
-            {
-              method: 'GET',
-              headers: {
-                Authorization: `Bearer ${this.authStore.token}`,
-                'Content-Type': 'application/json',
-                Accept: 'application/json'
-              }
-            }
+          // Use apiClient instead of fetch to ensure correct base URL
+          const response = await apiClient.get(
+            `/booking-service/devices/${deviceInventoryId}/availability`
           )
 
-          const result = await response.json()
+          if (response.data.success) {
+            this.deviceAvailabilityInfo = response.data.data
+            this.showAvailabilityWarning =
+              !response.data.data.available && response.data.data.can_request
 
-          if (result.success) {
-            this.deviceAvailabilityInfo = result.data
-            this.showAvailabilityWarning = !result.data.available && result.data.can_request
-
-            console.log('Device availability checked:', result.data)
+            console.log('Device availability checked:', response.data.data)
           } else {
-            console.error('Failed to check device availability:', result.message)
+            console.error('Failed to check device availability:', response.data.message)
           }
         } catch (error) {
           console.error('Error checking device availability:', error)
+          // Don't show availability warning if there's an error
+          this.deviceAvailabilityInfo = null
+          this.showAvailabilityWarning = false
         }
       },
 
@@ -1521,7 +1508,8 @@
       validatePhoneNumber() {
         // Phone number is auto-populated from user account, just check if it exists
         if (!this.formData.phoneNumber || !this.formData.phoneNumber.trim()) {
-          this.errors.phoneNumber = 'Phone number not available in your account. Please contact admin to update your profile.'
+          this.errors.phoneNumber =
+            'Phone number not available in your account. Please contact admin to update your profile.'
         } else {
           this.errors.phoneNumber = ''
         }

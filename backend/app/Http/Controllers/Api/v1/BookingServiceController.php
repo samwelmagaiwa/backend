@@ -76,32 +76,32 @@ class BookingServiceController extends Controller
                 'request_data' => $request->except(['signature'])
             ]);
             
-            // Check if user already has a pending request
-            $existingPendingRequest = BookingService::where('user_id', $request->user()->id)
-                ->whereIn('status', ['pending'])
-                ->whereIn('ict_approve', ['pending'])
-                ->first();
+            // Check if user can submit a new request (prevent duplicates)
+            $canSubmitCheck = BookingService::canUserSubmitNewRequest($request->user()->id);
+            
+            if (!$canSubmitCheck['can_submit']) {
+                $activeRequest = $canSubmitCheck['active_request'];
                 
-            if ($existingPendingRequest) {
-                Log::info('User attempted to create booking with existing pending request', [
+                Log::info('User attempted to create booking with existing active request', [
                     'user_id' => $request->user()->id,
-                    'existing_request_id' => $existingPendingRequest->id,
-                    'existing_request_status' => $existingPendingRequest->status,
-                    'existing_ict_status' => $existingPendingRequest->ict_approve
+                    'existing_request_id' => $activeRequest->id,
+                    'existing_request_status' => $activeRequest->status,
+                    'existing_ict_status' => $activeRequest->ict_approve
                 ]);
                 
                 return response()->json([
                     'success' => false,
-                    'message' => 'You cannot submit a new booking request while you have a pending request. Please wait for your current request to be processed.',
+                    'message' => $canSubmitCheck['message'],
                     'existing_request' => [
-                        'id' => $existingPendingRequest->id,
-                        'device_type' => $existingPendingRequest->device_type,
-                        'custom_device' => $existingPendingRequest->custom_device,
-                        'booking_date' => $existingPendingRequest->booking_date,
-                        'status' => $existingPendingRequest->status,
-                        'ict_approve' => $existingPendingRequest->ict_approve,
-                        'created_at' => $existingPendingRequest->created_at,
-                        'request_url' => '/request-details?id=' . $existingPendingRequest->id . '&type=booking_service'
+                        'id' => $activeRequest->id,
+                        'device_type' => $activeRequest->device_type,
+                        'custom_device' => $activeRequest->custom_device,
+                        'booking_date' => $activeRequest->booking_date,
+                        'status' => $activeRequest->status,
+                        'ict_approve' => $activeRequest->ict_approve,
+                        'created_at' => $activeRequest->created_at,
+                        'device_issued_at' => $activeRequest->device_issued_at,
+                        'request_url' => '/request-details?id=' . $activeRequest->id . '&type=booking_service'
                     ]
                 ], 422);
             }
@@ -116,7 +116,8 @@ class BookingServiceController extends Controller
             throw $e;
         }
         
-        $validatedData['user_id'] = $request->user()->id;
+        try {
+            $validatedData['user_id'] = $request->user()->id;
         
         // Auto-capture phone number from users table (override any submitted phone_number)
         $user = $request->user();
@@ -904,16 +905,26 @@ class BookingServiceController extends Controller
                 ], 400);
             }
 
-            $bookingService->update([
+            // Prepare approval data
+            $approvalData = [
                 'ict_approve' => 'approved',
                 'ict_approved_by' => $request->user()->id,
                 'ict_approved_at' => now(),
                 'ict_notes' => $request->input('ict_notes', ''),
-                // Update main status to approved when ICT approves
-                'status' => 'approved',
                 'approved_by' => $request->user()->id,
                 'approved_at' => now()
-            ]);
+            ];
+            
+            // If device assessment already exists, mark device as issued and in_use
+            if ($bookingService->device_condition_issuing) {
+                $approvalData['device_issued_at'] = now();
+                $approvalData['status'] = 'in_use';
+            } else {
+                // If no assessment yet, just mark as approved
+                $approvalData['status'] = 'approved';
+            }
+            
+            $bookingService->update($approvalData);
 
             $bookingService->load([
                 'user:id,name,email,phone,pf_number,department_id',
@@ -1063,30 +1074,43 @@ class BookingServiceController extends Controller
     public function checkPendingRequests(Request $request): JsonResponse
     {
         try {
-            $pendingRequest = BookingService::where('user_id', $request->user()->id)
-                ->whereIn('status', ['pending'])
-                ->whereIn('ict_approve', ['pending'])
-                ->with(['deviceInventory'])
-                ->first();
+            // Check if user can submit a new request
+            $canSubmitCheck = BookingService::canUserSubmitNewRequest($request->user()->id);
+            
+            if (!$canSubmitCheck['can_submit']) {
+                $activeRequest = $canSubmitCheck['active_request'];
                 
-            if ($pendingRequest) {
+                // Load device inventory relationship
+                $activeRequest->load(['deviceInventory']);
+                
+                // Determine request type for frontend
+                $requestType = '';
+                if ($activeRequest->status === 'pending' && $activeRequest->ict_approve === 'pending') {
+                    $requestType = 'pending';
+                } else {
+                    $requestType = 'active';
+                }
+                
                 return response()->json([
                     'success' => true,
                     'has_pending_request' => true,
-                    'message' => 'You have a pending booking request. Please wait for it to be processed before submitting a new request.',
-                    'pending_request' => [
-                        'id' => $pendingRequest->id,
-                        'device_type' => $pendingRequest->device_type,
-                        'custom_device' => $pendingRequest->custom_device,
-                        'device_name' => $pendingRequest->device_type === 'others' && $pendingRequest->custom_device 
-                            ? $pendingRequest->custom_device 
-                            : (BookingService::getDeviceTypes()[$pendingRequest->device_type] ?? $pendingRequest->device_type),
-                        'booking_date' => $pendingRequest->booking_date,
-                        'return_date' => $pendingRequest->return_date,
-                        'status' => $pendingRequest->status,
-                        'ict_approve' => $pendingRequest->ict_approve,
-                        'created_at' => $pendingRequest->created_at,
-                        'request_url' => '/request-details?id=' . $pendingRequest->id . '&type=booking_service'
+                    'has_active_request' => true,
+                    'request_type' => $requestType,
+                    'message' => $canSubmitCheck['message'],
+                    'active_request' => [
+                        'id' => $activeRequest->id,
+                        'device_type' => $activeRequest->device_type,
+                        'custom_device' => $activeRequest->custom_device,
+                        'device_name' => $activeRequest->device_type === 'others' && $activeRequest->custom_device 
+                            ? $activeRequest->custom_device 
+                            : (BookingService::getDeviceTypes()[$activeRequest->device_type] ?? $activeRequest->device_type),
+                        'booking_date' => $activeRequest->booking_date,
+                        'return_date' => $activeRequest->return_date,
+                        'status' => $activeRequest->status,
+                        'ict_approve' => $activeRequest->ict_approve,
+                        'created_at' => $activeRequest->created_at,
+                        'device_issued_at' => $activeRequest->device_issued_at,
+                        'request_url' => '/request-details?id=' . $activeRequest->id . '&type=booking_service'
                     ]
                 ]);
             }
@@ -1094,14 +1118,15 @@ class BookingServiceController extends Controller
             return response()->json([
                 'success' => true,
                 'has_pending_request' => false,
-                'message' => 'No pending requests found. You can submit a new booking request.'
+                'has_active_request' => false,
+                'message' => 'No active requests found. You can submit a new booking request.'
             ]);
             
         } catch (\Exception $e) {
-            Log::error('Error checking pending requests: ' . $e->getMessage());
+            Log::error('Error checking active requests: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Error checking pending requests',
+                'message' => 'Error checking active requests',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -1380,22 +1405,27 @@ class BookingServiceController extends Controller
                 ], 404);
             }
 
-            // Check if the booking is in a valid state for issuing
-            if (!in_array($bookingService->ict_approve, ['approved'])) {
+            // Check if the booking is in a valid state for assessment
+            // Allow assessment for pending requests (before approval) and approved requests
+            if (!in_array($bookingService->ict_approve, ['pending', 'approved'])) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Device can only be issued for approved requests. Current ICT status: ' . $bookingService->ict_approve
+                    'message' => 'Device assessment can only be done for pending or approved requests. Current ICT status: ' . $bookingService->ict_approve
                 ], 400);
             }
 
             // Prepare update data
             $updateData = [
                 'device_condition_issuing' => $validatedData['device_condition'],
-                'device_issued_at' => now(),
                 'assessed_by' => $request->user()->id,
-                'assessment_notes' => $validatedData['assessment_notes'] ?? null,
-                'status' => 'in_use' // Update status to in_use when device is issued
+                'assessment_notes' => $validatedData['assessment_notes'] ?? null
             ];
+            
+            // Only mark as issued and in_use if the request is already approved
+            if ($bookingService->ict_approve === 'approved') {
+                $updateData['device_issued_at'] = now();
+                $updateData['status'] = 'in_use';
+            }
 
             Log::info('Attempting to update booking service', [
                 'booking_id' => $bookingService->id,
@@ -1420,19 +1450,47 @@ class BookingServiceController extends Controller
                 ], 500);
             }
 
-            // Save to device_assessments table
-            DeviceAssessment::create([
-                'booking_id' => $bookingService->id,
-                'assessment_type' => 'issuing',
-                'physical_condition' => $validatedData['device_condition']['physical_condition'],
-                'functionality' => $validatedData['device_condition']['functionality'],
-                'accessories_complete' => $validatedData['device_condition']['accessories_complete'],
-                'has_damage' => $validatedData['device_condition']['visible_damage'],
-                'damage_description' => $validatedData['device_condition']['damage_description'] ?? null,
-                'notes' => $validatedData['assessment_notes'] ?? null,
-                'assessed_by' => $request->user()->id,
-                'assessed_at' => now()
-            ]);
+            // Check if assessment already exists to prevent duplicates
+            $existingAssessment = DeviceAssessment::where('booking_id', $bookingService->id)
+                ->where('assessment_type', 'issuing')
+                ->first();
+            
+            if ($existingAssessment) {
+                // Update existing assessment instead of creating a new one
+                $existingAssessment->update([
+                    'physical_condition' => $validatedData['device_condition']['physical_condition'],
+                    'functionality' => $validatedData['device_condition']['functionality'],
+                    'accessories_complete' => $validatedData['device_condition']['accessories_complete'],
+                    'has_damage' => $validatedData['device_condition']['visible_damage'],
+                    'damage_description' => $validatedData['device_condition']['damage_description'] ?? null,
+                    'notes' => $validatedData['assessment_notes'] ?? null,
+                    'assessed_by' => $request->user()->id,
+                    'assessed_at' => now()
+                ]);
+                
+                Log::info('Updated existing issuing assessment', [
+                    'assessment_id' => $existingAssessment->id,
+                    'booking_id' => $bookingService->id
+                ]);
+            } else {
+                // Create new assessment
+                DeviceAssessment::create([
+                    'booking_id' => $bookingService->id,
+                    'assessment_type' => 'issuing',
+                    'physical_condition' => $validatedData['device_condition']['physical_condition'],
+                    'functionality' => $validatedData['device_condition']['functionality'],
+                    'accessories_complete' => $validatedData['device_condition']['accessories_complete'],
+                    'has_damage' => $validatedData['device_condition']['visible_damage'],
+                    'damage_description' => $validatedData['device_condition']['damage_description'] ?? null,
+                    'notes' => $validatedData['assessment_notes'] ?? null,
+                    'assessed_by' => $request->user()->id,
+                    'assessed_at' => now()
+                ]);
+                
+                Log::info('Created new issuing assessment', [
+                    'booking_id' => $bookingService->id
+                ]);
+            }
 
             // Perform the update (for backward compatibility)
             $updated = $bookingService->update($updateData);
@@ -1551,19 +1609,47 @@ class BookingServiceController extends Controller
                 $returnStatus = 'returned_but_compromised';
             }
 
-            // Save to device_assessments table
-            DeviceAssessment::create([
-                'booking_id' => $bookingService->id,
-                'assessment_type' => 'receiving',
-                'physical_condition' => $deviceCondition['physical_condition'],
-                'functionality' => $deviceCondition['functionality'],
-                'accessories_complete' => $deviceCondition['accessories_complete'],
-                'has_damage' => $deviceCondition['visible_damage'],
-                'damage_description' => $deviceCondition['damage_description'] ?? null,
-                'notes' => $request->assessment_notes ?? null,
-                'assessed_by' => $request->user()->id,
-                'assessed_at' => now()
-            ]);
+            // Check if receiving assessment already exists to prevent duplicates
+            $existingReceivingAssessment = DeviceAssessment::where('booking_id', $bookingService->id)
+                ->where('assessment_type', 'receiving')
+                ->first();
+            
+            if ($existingReceivingAssessment) {
+                // Update existing assessment instead of creating a new one
+                $existingReceivingAssessment->update([
+                    'physical_condition' => $deviceCondition['physical_condition'],
+                    'functionality' => $deviceCondition['functionality'],
+                    'accessories_complete' => $deviceCondition['accessories_complete'],
+                    'has_damage' => $deviceCondition['visible_damage'],
+                    'damage_description' => $deviceCondition['damage_description'] ?? null,
+                    'notes' => $request->assessment_notes ?? null,
+                    'assessed_by' => $request->user()->id,
+                    'assessed_at' => now()
+                ]);
+                
+                Log::info('Updated existing receiving assessment', [
+                    'assessment_id' => $existingReceivingAssessment->id,
+                    'booking_id' => $bookingService->id
+                ]);
+            } else {
+                // Create new assessment
+                DeviceAssessment::create([
+                    'booking_id' => $bookingService->id,
+                    'assessment_type' => 'receiving',
+                    'physical_condition' => $deviceCondition['physical_condition'],
+                    'functionality' => $deviceCondition['functionality'],
+                    'accessories_complete' => $deviceCondition['accessories_complete'],
+                    'has_damage' => $deviceCondition['visible_damage'],
+                    'damage_description' => $deviceCondition['damage_description'] ?? null,
+                    'notes' => $request->assessment_notes ?? null,
+                    'assessed_by' => $request->user()->id,
+                    'assessed_at' => now()
+                ]);
+                
+                Log::info('Created new receiving assessment', [
+                    'booking_id' => $bookingService->id
+                ]);
+            }
 
             // Update booking (for backward compatibility)
             $bookingService->update([

@@ -220,6 +220,7 @@ class ICTApprovalController extends Controller
 
     /**
      * Approve a device borrowing request
+     * Can be done before or after device issuing for workflow flexibility
      * 
      * @param Request $request
      * @param int $requestId
@@ -265,8 +266,11 @@ class ICTApprovalController extends Controller
                 'ict_notes' => $validatedData['ict_notes'] ?? null
             ]);
             
-            // Now borrow the device from inventory since request is approved
-            if ($booking->device_inventory_id) {
+            // Check if device was already issued (device_issued_at or device_condition_issuing exists)
+            $deviceAlreadyIssued = !empty($booking->device_issued_at) || !empty($booking->device_condition_issuing);
+            
+            // Only borrow device from inventory if it hasn't been issued yet
+            if ($booking->device_inventory_id && !$deviceAlreadyIssued) {
                 $deviceInventory = $booking->deviceInventory;
                 if ($deviceInventory) {
                     if (!$deviceInventory->borrowDevice(1)) {
@@ -289,6 +293,12 @@ class ICTApprovalController extends Controller
                         'booking_id' => $booking->id
                     ]);
                 }
+            } elseif ($deviceAlreadyIssued) {
+                Log::info('Device already issued, skipping inventory borrowing', [
+                    'booking_id' => $booking->id,
+                    'device_issued_at' => $booking->device_issued_at,
+                    'has_device_condition_issuing' => !empty($booking->device_condition_issuing)
+                ]);
             }
 
             // Load relationships
@@ -794,6 +804,7 @@ class ICTApprovalController extends Controller
     
     /**
      * Save issuing assessment (when device is issued to borrower)
+     * Can be done before or after ICT approval for flexibility
      * 
      * @param Request $request
      * @param int $requestId
@@ -818,11 +829,19 @@ class ICTApprovalController extends Controller
                 ], 404);
             }
 
-            // Validate that request is approved by ICT
-            if ($booking->ict_approve !== 'approved') {
+            // Check if device has already been issued
+            if (!empty($booking->device_condition_issuing)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Device can only be issued for ICT-approved requests'
+                    'message' => 'Device has already been issued. Cannot issue the same device twice.'
+                ], 400);
+            }
+
+            // Check if request status is suitable for issuing (not rejected)
+            if ($booking->ict_approve === 'rejected') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cannot issue device for rejected requests'
                 ], 400);
             }
 
@@ -848,6 +867,32 @@ class ICTApprovalController extends Controller
                 'assessment_type' => 'issuing'
             ];
 
+            // Borrow device from inventory if available and not already borrowed
+            if ($booking->device_inventory_id) {
+                $deviceInventory = $booking->deviceInventory;
+                if ($deviceInventory) {
+                    if (!$deviceInventory->borrowDevice(1)) {
+                        Log::error('Unable to borrow device during issuing', [
+                            'device_id' => $deviceInventory->id,
+                            'device_name' => $deviceInventory->device_name,
+                            'available_quantity' => $deviceInventory->available_quantity,
+                            'booking_id' => $booking->id
+                        ]);
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Device is no longer available. Please check device inventory.'
+                        ], 400);
+                    }
+                    
+                    Log::info('Device borrowed from inventory during issuing', [
+                        'device_id' => $deviceInventory->id,
+                        'device_name' => $deviceInventory->device_name,
+                        'remaining_quantity' => $deviceInventory->available_quantity,
+                        'booking_id' => $booking->id
+                    ]);
+                }
+            }
+
             // Save to device_assessments table
             DeviceAssessment::create([
                 'booking_id' => $booking->id,
@@ -862,15 +907,16 @@ class ICTApprovalController extends Controller
                 'assessed_at' => now()
             ]);
 
-            // Update booking with issuing assessment (for backward compatibility)
+            // Update booking with issuing assessment and set status to in_use
             $booking->update([
                 'device_condition_issuing' => json_encode($assessmentData),
                 'device_issued_at' => now(),
+                'status' => 'in_use', // Set status to in_use when device is issued
                 'assessed_by' => $request->user()->id,
                 'assessment_notes' => $validatedData['notes'] ?? null
             ]);
 
-            Log::info('Device issuing assessment saved', [
+            Log::info('Device issuing assessment saved and device borrowed from inventory', [
                 'booking_id' => $booking->id,
                 'assessed_by' => $request->user()->id,
                 'assessment_data' => $assessmentData
@@ -879,7 +925,7 @@ class ICTApprovalController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => $this->transformBookingForICTApproval($booking, true),
-                'message' => 'Device issuing assessment saved successfully'
+                'message' => 'Device issued successfully with assessment saved. Device is now in use.'
             ]);
 
         } catch (ValidationException $e) {

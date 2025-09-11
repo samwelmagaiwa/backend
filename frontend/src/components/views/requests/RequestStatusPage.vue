@@ -391,7 +391,10 @@
                                   </button>
                                   <!-- Edit button for rejected booking requests -->
                                   <button
-                                    v-if="request.type === 'booking_service' && request.status === 'rejected'"
+                                    v-if="
+                                      request.type === 'booking_service' &&
+                                      request.status === 'rejected'
+                                    "
                                     @click="editRequest(request)"
                                     class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-green-600 hover:text-white flex items-center"
                                   >
@@ -561,7 +564,9 @@
                             </button>
                             <!-- Edit button for rejected booking requests -->
                             <button
-                              v-if="request.type === 'booking_service' && request.status === 'rejected'"
+                              v-if="
+                                request.type === 'booking_service' && request.status === 'rejected'
+                              "
                               @click="editRequest(request)"
                               class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-green-600 hover:text-white flex items-center"
                             >

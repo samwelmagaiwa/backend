@@ -1,7 +1,7 @@
 <template>
   <aside
     v-if="shouldShowSidebar"
-    class="h-screen flex flex-col transition-all duration-300 ease-in-out overflow-hidden relative shadow-2xl"
+    class="min-h-full flex flex-col transition-all duration-300 ease-in-out overflow-hidden relative shadow-2xl"
     :class="[isCollapsed ? 'w-16' : 'w-72']"
     aria-label="Sidebar navigation"
     style="

@@ -369,4 +369,58 @@ class BookingService extends Model
             'available_quantity' => 0
         ];
     }
+
+    /**
+     * Check if user has any active booking requests.
+     * Returns the active request if found, null otherwise.
+     */
+    public static function getUserActiveRequest(int $userId): ?self
+    {
+        return self::where('user_id', $userId)
+            ->where(function ($query) {
+                $query->where(function ($q) {
+                    // Pending requests (not yet processed by ICT)
+                    $q->where('status', 'pending')
+                      ->where('ict_approve', 'pending');
+                })
+                ->orWhere(function ($q) {
+                    // Approved requests (approved by ICT but not yet returned)
+                    $q->whereIn('status', ['approved', 'in_use'])
+                      ->where('ict_approve', 'approved');
+                });
+            })
+            ->first();
+    }
+
+    /**
+     * Check if user can submit a new booking request.
+     * Returns array with status and message.
+     */
+    public static function canUserSubmitNewRequest(int $userId): array
+    {
+        $activeRequest = self::getUserActiveRequest($userId);
+        
+        if (!$activeRequest) {
+            return [
+                'can_submit' => true,
+                'message' => 'User can submit a new booking request.',
+                'active_request' => null
+            ];
+        }
+        
+        // Determine appropriate message based on request status
+        if ($activeRequest->status === 'pending' && $activeRequest->ict_approve === 'pending') {
+            $message = 'User has a pending booking request. Please wait for it to be processed by ICT.';
+        } elseif ($activeRequest->status === 'approved' || $activeRequest->status === 'in_use') {
+            $message = 'User has an active device booking. Please return the current device before requesting a new one.';
+        } else {
+            $message = 'User has an active request. Please complete the current request first.';
+        }
+        
+        return [
+            'can_submit' => false,
+            'message' => $message,
+            'active_request' => $activeRequest
+        ];
+    }
 }

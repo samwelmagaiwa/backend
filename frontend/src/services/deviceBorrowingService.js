@@ -111,7 +111,7 @@ export const deviceBorrowingService = {
       // Add source endpoint information for better type detection
       request._endpoint = sourceEndpoint
       request._source = sourceEndpoint.includes('booking') ? 'booking_service' : 'ict_approval'
-      
+
       console.log('📄 Raw request data:', request)
       console.log('🔍 Source endpoint:', sourceEndpoint)
       console.log('🔍 Raw reason field:', request.reason)
@@ -122,7 +122,7 @@ export const deviceBorrowingService = {
         user_phone: request.user?.phone,
         phoneNumber: request.phoneNumber
       })
-      
+
       // Check request type before transformation
       const isBooking = this.isBookingRequest(request)
       console.log('🔍 Request type analysis:', {
@@ -411,25 +411,31 @@ export const deviceBorrowingService = {
       'device_condition_issuing', // booking_service has device assessments
       'booking_date' // booking_service has booking_date field
     ]
-    
+
     // Check if request has multiple booking-specific indicators
-    const hasBookingFields = bookingIndicators.filter(field => 
-      request.hasOwnProperty(field) && request[field] !== null && request[field] !== undefined
+    const hasBookingFields = bookingIndicators.filter(
+      (field) =>
+        Object.prototype.hasOwnProperty.call(request, field) &&
+        request[field] !== null &&
+        request[field] !== undefined
     ).length
-    
+
     // Also check the endpoint or source if available
-    const isFromBookingEndpoint = request._source === 'booking_service' || 
-                                 request._endpoint?.includes('booking') ||
-                                 request._endpoint?.includes('device-requests')
-    
+    const isFromBookingEndpoint =
+      request._source === 'booking_service' ||
+      request._endpoint?.includes('booking') ||
+      request._endpoint?.includes('device-requests')
+
     console.log('🔍 Request type detection:', {
       requestId: request.id,
       hasBookingFields: hasBookingFields,
-      bookingFieldsFound: bookingIndicators.filter(field => request.hasOwnProperty(field)),
+      bookingFieldsFound: bookingIndicators.filter((field) =>
+        Object.prototype.hasOwnProperty.call(request, field)
+      ),
       isFromBookingEndpoint,
       isBookingRequest: hasBookingFields >= 3 || isFromBookingEndpoint
     })
-    
+
     // Consider it a booking request if it has 3+ booking indicators or comes from booking endpoint
     return hasBookingFields >= 3 || isFromBookingEndpoint
   },
@@ -442,16 +448,20 @@ export const deviceBorrowingService = {
   getPhoneNumber(request) {
     // Always prioritize phone number from users table for both booking and approval processes
     const phoneNumber = request.user?.phone || request.phone_number || request.borrower_phone
-    
+
     console.log('📞 Auto-captured phone number from users table:', {
       requestId: request.id,
       user_phone: request.user?.phone,
       phone_number: request.phone_number,
       borrower_phone: request.borrower_phone,
       selected: phoneNumber,
-      source: request.user?.phone ? 'users_table' : (request.phone_number ? 'booking_service_table' : 'fallback')
+      source: request.user?.phone
+        ? 'users_table'
+        : request.phone_number
+          ? 'booking_service_table'
+          : 'fallback'
     })
-    
+
     return phoneNumber
   },
 
@@ -651,7 +661,9 @@ export const deviceBorrowingService = {
       not_yet_returned: 'bg-blue-100 text-blue-800 border-blue-200',
       returned: 'bg-green-100 text-green-800 border-green-200',
       returned_but_compromised: 'bg-red-100 text-red-800 border-red-200',
-      out_of_stock: 'bg-yellow-100 text-yellow-800 border-yellow-200' // Treated as pending
+      out_of_stock: 'bg-yellow-100 text-yellow-800 border-yellow-200', // Treated as pending
+      received: 'bg-green-100 text-green-800 border-green-200', // Same as returned
+      received_compromised: 'bg-red-100 text-red-800 border-red-200' // Compromised received
     }
 
     return statusClasses[returnStatus] || statusClasses.not_yet_returned
@@ -681,7 +693,9 @@ export const deviceBorrowingService = {
     const statusTexts = {
       not_yet_returned: 'Not Returned',
       returned: 'Returned',
-      returned_but_compromised: 'Compromised'
+      returned_but_compromised: 'Compromised',
+      received: 'Received',
+      received_compromised: 'Received (Compromised)'
     }
 
     return statusTexts[returnStatus] || returnStatus || 'Unknown'

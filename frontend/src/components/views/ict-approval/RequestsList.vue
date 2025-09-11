@@ -113,55 +113,6 @@
             </button>
           </div>
 
-          <!-- Debug Information -->
-          <div
-            v-if="showDebugInfo"
-            class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4"
-          >
-            <h3 class="font-bold">Debug Information</h3>
-            <div class="text-sm mt-2">
-              <p><strong>Requests Array Length:</strong> {{ requests.length }}</p>
-              <p><strong>Filtered Requests Length:</strong> {{ filteredRequests.length }}</p>
-              <p><strong>Loading State:</strong> {{ isLoading }}</p>
-              <p><strong>Search Query:</strong> {{ searchQuery || 'None' }}</p>
-              <p><strong>ICT Status Filter:</strong> {{ ictStatusFilter || 'None' }}</p>
-              <p><strong>Last API Response:</strong></p>
-              <pre class="bg-gray-100 p-2 rounded text-xs overflow-auto mt-1">{{
-                JSON.stringify(lastApiResponse, null, 2)
-              }}</pre>
-            </div>
-            <div class="mt-3 space-x-2">
-              <button
-                @click="testDirectApiCall"
-                class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
-              >
-                Test Direct API
-              </button>
-              <button
-                @click="testBookingServiceApi"
-                class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700"
-              >
-                Test Booking API
-              </button>
-              <button
-                @click="showDebugInfo = false"
-                class="bg-yellow-600 text-white px-3 py-1 rounded text-sm hover:bg-yellow-700"
-              >
-                Hide Debug
-              </button>
-            </div>
-          </div>
-
-          <!-- Show Debug Button -->
-          <div v-if="!showDebugInfo && !isLoading" class="mb-4">
-            <button
-              @click="showDebugInfo = true"
-              class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 text-sm"
-            >
-              Show Debug Info
-            </button>
-          </div>
-
           <!-- Main Content -->
           <div class="booking-glass-card rounded-b-3xl overflow-hidden animate-slide-up">
             <div class="p-8">
@@ -628,7 +579,7 @@
                                 <!-- Compact Reject Action -->
                                 <button
                                   @click="rejectRequest(request.id)"
-                                  class="relative w-full flex items-center px-2 py-1.5 text-xs bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 transition-all duration-200 group overflow-hidden border-b border-red-400/30 rounded-sm"
+                                  class="relative w-full flex items-center px-2 py-1.5 text-xs bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 transition-all duration-200 group overflow-hidden border-b border-orange-400/30 rounded-sm"
                                   :disabled="request.ict_approve === 'rejected'"
                                   :class="{
                                     'opacity-50 cursor-not-allowed':
@@ -655,7 +606,7 @@
                                 <!-- Compact Delete Action -->
                                 <button
                                   @click="deleteRequest(request.id)"
-                                  class="relative w-full flex items-center px-2 py-1.5 text-xs bg-gradient-to-r from-rose-600 to-red-700 text-white hover:from-rose-700 hover:to-red-800 transition-all duration-200 group overflow-hidden rounded-sm"
+                                  class="relative w-full flex items-center px-2 py-1.5 text-xs bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 transition-all duration-200 group overflow-hidden rounded-sm"
                                   :disabled="!canDeleteRequest(request)"
                                   :class="{
                                     'opacity-50 cursor-not-allowed': !canDeleteRequest(request)
@@ -745,7 +696,6 @@
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppFooter from '@/components/footer.vue'
   import deviceBorrowingService from '@/services/deviceBorrowingService'
-  import apiClient from '@/utils/apiClient'
 
   export default {
     name: 'RequestsList',
@@ -788,10 +738,7 @@
         selectedRequests: [],
         selectAll: false,
         // Error handling
-        error: null,
-        // Debug information
-        showDebugInfo: false,
-        lastApiResponse: null
+        error: null
       }
     },
     computed: {
@@ -882,9 +829,6 @@
           })
 
           console.log('Service response:', response)
-
-          // Store the response for debugging
-          this.lastApiResponse = response
 
           if (response.success) {
             this.requests = response.data.data || []
@@ -1139,55 +1083,6 @@
         } finally {
           this.isProcessing = false
           this.actionType = null
-        }
-      },
-
-      // Debug methods
-      async testDirectApiCall() {
-        try {
-          console.log('Testing direct ICT approval API call...')
-          const response = await apiClient.get('/ict-approval/device-requests', {
-            params: { per_page: 10 }
-          })
-          console.log('Direct ICT API response:', response)
-          this.lastApiResponse = {
-            endpoint: '/ict-approval/device-requests',
-            success: true,
-            data: response.data,
-            status: response.status
-          }
-        } catch (error) {
-          console.error('Direct ICT API error:', error)
-          this.lastApiResponse = {
-            endpoint: '/ict-approval/device-requests',
-            success: false,
-            error: error.response?.data || error.message,
-            status: error.response?.status
-          }
-        }
-      },
-
-      async testBookingServiceApi() {
-        try {
-          console.log('Testing booking service API call...')
-          const response = await apiClient.get('/booking-service/ict-approval-requests', {
-            params: { per_page: 10 }
-          })
-          console.log('Booking service API response:', response)
-          this.lastApiResponse = {
-            endpoint: '/booking-service/ict-approval-requests',
-            success: true,
-            data: response.data,
-            status: response.status
-          }
-        } catch (error) {
-          console.error('Booking service API error:', error)
-          this.lastApiResponse = {
-            endpoint: '/booking-service/ict-approval-requests',
-            success: false,
-            error: error.response?.data || error.message,
-            status: error.response?.status
-          }
         }
       }
     }

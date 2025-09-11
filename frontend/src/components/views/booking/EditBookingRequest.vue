@@ -399,303 +399,332 @@
 </template>
 
 <script>
-import { ref, onMounted, computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import ModernSidebar from '@/components/ModernSidebar.vue'
-import AppHeader from '@/components/AppHeader.vue'
-import { useAuth } from '@/composables/useAuth'
-import bookingService from '@/services/bookingService'
+  import { ref, onMounted, computed } from 'vue'
+  import { useRouter, useRoute } from 'vue-router'
+  import ModernSidebar from '@/components/ModernSidebar.vue'
+  import AppHeader from '@/components/AppHeader.vue'
+  import { useAuth } from '@/composables/useAuth'
 
-export default {
-  name: 'EditBookingRequest',
-  components: {
-    ModernSidebar,
-    AppHeader
-  },
-  setup() {
-    const router = useRouter()
-    const route = useRoute()
-    const { requireRole, ROLES } = useAuth()
+  export default {
+    name: 'EditBookingRequest',
+    components: {
+      ModernSidebar,
+      AppHeader
+    },
+    setup() {
+      const router = useRouter()
+      const route = useRoute()
+      const { requireRole, ROLES } = useAuth()
 
-    // Reactive state
-    const loading = ref(true)
-    const submitting = ref(false)
-    const requestId = ref(route.query.id || '')
-    const originalRequest = ref(null)
-    const errors = ref({})
-    const deviceTypes = ref([])
-    const departments = ref([])
+      // Reactive state
+      const loading = ref(true)
+      const submitting = ref(false)
+      const requestId = ref(route.query.id || '')
+      const originalRequest = ref(null)
+      const errors = ref({})
+      const deviceTypes = ref([])
+      const departments = ref([])
 
-    // Form data
-    const formData = ref({
-      borrower_name: '',
-      department: '',
-      booking_date: '',
-      return_date: '',
-      return_time: '',
-      device_type: '',
-      custom_device: '',
-      reason: ''
-    })
+      // Form data
+      const formData = ref({
+        borrower_name: '',
+        department: '',
+        booking_date: '',
+        return_date: '',
+        return_time: '',
+        device_type: '',
+        custom_device: '',
+        reason: ''
+      })
 
-    // Computed properties
-    const minDate = computed(() => {
-      const today = new Date()
-      return today.toISOString().split('T')[0]
-    })
+      // Computed properties
+      const minDate = computed(() => {
+        const today = new Date()
+        return today.toISOString().split('T')[0]
+      })
 
-    const minReturnDate = computed(() => {
-      if (formData.value.booking_date) {
-        const bookingDate = new Date(formData.value.booking_date)
-        bookingDate.setDate(bookingDate.getDate() + 1)
-        return bookingDate.toISOString().split('T')[0]
-      }
-      return minDate.value
-    })
-
-    // Guard this route - only staff can access
-    onMounted(() => {
-      requireRole([ROLES.STAFF])
-      loadBookingRequest()
-      loadFormOptions()
-    })
-
-    // Methods
-    const loadBookingRequest = async () => {
-      if (!requestId.value) {
-        loading.value = false
-        return
-      }
-
-      try {
-        const response = await fetch(`/api/booking-service/bookings/${requestId.value}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
-            'Content-Type': 'application/json',
-            Accept: 'application/json'
-          }
-        })
-
-        if (response.ok) {
-          const result = await response.json()
-          if (result.success) {
-            originalRequest.value = result.data
-            
-            // Check if this request can be edited
-            if (result.data.ict_approve !== 'rejected') {
-              alert('Only rejected booking requests can be edited.')
-              goBack()
-              return
-            }
-
-            // Populate form with existing data
-            formData.value = {
-              borrower_name: result.data.borrower_name || '',
-              department: result.data.department || '',
-              booking_date: result.data.booking_date || '',
-              return_date: result.data.return_date || '',
-              return_time: result.data.return_time || '',
-              device_type: result.data.device_type || '',
-              custom_device: result.data.custom_device || '',
-              reason: result.data.reason || ''
-            }
-          } else {
-            throw new Error(result.message || 'Failed to load booking request')
-          }
-        } else {
-          const errorData = await response.json()
-          throw new Error(errorData.message || 'Failed to load booking request')
+      const minReturnDate = computed(() => {
+        if (formData.value.booking_date) {
+          const bookingDate = new Date(formData.value.booking_date)
+          bookingDate.setDate(bookingDate.getDate() + 1)
+          return bookingDate.toISOString().split('T')[0]
         }
-      } catch (error) {
-        console.error('Error loading booking request:', error)
-        alert(`Error loading request: ${error.message}`)
-      } finally {
-        loading.value = false
-      }
-    }
+        return minDate.value
+      })
 
-    const loadFormOptions = async () => {
-      try {
-        // Load device types
-        const deviceTypesResponse = await fetch('/api/booking-service/device-types', {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
-            'Content-Type': 'application/json',
-            Accept: 'application/json'
-          }
-        })
+      // Guard this route - only staff can access
+      onMounted(() => {
+        requireRole([ROLES.STAFF])
+        loadBookingRequest()
+        loadFormOptions()
+      })
 
-        if (deviceTypesResponse.ok) {
-          const result = await deviceTypesResponse.json()
-          if (result.success) {
-            deviceTypes.value = result.data
-          }
+      // Methods
+      const loadBookingRequest = async () => {
+        if (!requestId.value) {
+          loading.value = false
+          return
         }
 
-        // Load departments
-        const departmentsResponse = await fetch('/api/booking-service/departments', {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
-            'Content-Type': 'application/json',
-            Accept: 'application/json'
-          }
-        })
-
-        if (departmentsResponse.ok) {
-          const result = await departmentsResponse.json()
-          if (result.success) {
-            departments.value = result.data
-          }
-        }
-      } catch (error) {
-        console.error('Error loading form options:', error)
-      }
-    }
-
-    const onDeviceTypeChange = () => {
-      if (formData.value.device_type !== 'other') {
-        formData.value.custom_device = ''
-      }
-    }
-
-    const updateBooking = async () => {
-      if (submitting.value) return
-
-      errors.value = {}
-      submitting.value = true
-
-      try {
-        // Prepare form data
-        const requestData = {
-          ...formData.value
-        }
-
-        // If device type is not 'other', clear custom device
-        if (requestData.device_type !== 'other') {
-          requestData.custom_device = ''
-        }
-
-        const response = await fetch(`/api/booking-service/bookings/${requestId.value}/edit-rejected`, {
-          method: 'PUT',
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
-            'Content-Type': 'application/json',
-            Accept: 'application/json'
-          },
-          body: JSON.stringify(requestData)
-        })
-
-        const result = await response.json()
-
-        if (response.ok && result.success) {
-          // Show success message
-          alert('Booking request updated and resubmitted successfully!')
-          
-          // Redirect to request status page
-          router.push({
-            path: '/request-status',
-            query: {
-              success: 'true',
-              type: 'booking_service',
-              id: requestId.value
+        try {
+          const response = await fetch(`/api/booking-service/bookings/${requestId.value}`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+              'Content-Type': 'application/json',
+              Accept: 'application/json'
             }
           })
-        } else {
-          if (result.errors) {
-            errors.value = result.errors
+
+          if (response.ok) {
+            const result = await response.json()
+            if (result.success) {
+              originalRequest.value = result.data
+
+              // Check if this request can be edited
+              if (result.data.ict_approve !== 'rejected') {
+                alert('Only rejected booking requests can be edited.')
+                goBack()
+                return
+              }
+
+              // Populate form with existing data
+              formData.value = {
+                borrower_name: result.data.borrower_name || '',
+                department: result.data.department || '',
+                booking_date: result.data.booking_date || '',
+                return_date: result.data.return_date || '',
+                return_time: result.data.return_time || '',
+                device_type: result.data.device_type || '',
+                custom_device: result.data.custom_device || '',
+                reason: result.data.reason || ''
+              }
+            } else {
+              throw new Error(result.message || 'Failed to load booking request')
+            }
+          } else {
+            const errorData = await response.json()
+            throw new Error(errorData.message || 'Failed to load booking request')
           }
-          throw new Error(result.message || 'Failed to update booking request')
+        } catch (error) {
+          console.error('Error loading booking request:', error)
+          alert(`Error loading request: ${error.message}`)
+        } finally {
+          loading.value = false
         }
-      } catch (error) {
-        console.error('Error updating booking request:', error)
-        alert(`Error updating request: ${error.message}`)
-      } finally {
-        submitting.value = false
+      }
+
+      const loadFormOptions = async () => {
+        try {
+          // Load device types
+          const deviceTypesResponse = await fetch('/api/booking-service/device-types', {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+              'Content-Type': 'application/json',
+              Accept: 'application/json'
+            }
+          })
+
+          if (deviceTypesResponse.ok) {
+            const result = await deviceTypesResponse.json()
+            if (result.success) {
+              deviceTypes.value = result.data
+            }
+          }
+
+          // Load departments
+          const departmentsResponse = await fetch('/api/booking-service/departments', {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+              'Content-Type': 'application/json',
+              Accept: 'application/json'
+            }
+          })
+
+          if (departmentsResponse.ok) {
+            const result = await departmentsResponse.json()
+            if (result.success) {
+              departments.value = result.data
+            }
+          }
+        } catch (error) {
+          console.error('Error loading form options:', error)
+        }
+      }
+
+      const onDeviceTypeChange = () => {
+        if (formData.value.device_type !== 'other') {
+          formData.value.custom_device = ''
+        }
+      }
+
+      const updateBooking = async () => {
+        if (submitting.value) return
+
+        errors.value = {}
+        submitting.value = true
+
+        try {
+          // Prepare form data
+          const requestData = {
+            ...formData.value
+          }
+
+          // If device type is not 'other', clear custom device
+          if (requestData.device_type !== 'other') {
+            requestData.custom_device = ''
+          }
+
+          const response = await fetch(
+            `/api/booking-service/bookings/${requestId.value}/edit-rejected`,
+            {
+              method: 'PUT',
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+                'Content-Type': 'application/json',
+                Accept: 'application/json'
+              },
+              body: JSON.stringify(requestData)
+            }
+          )
+
+          const result = await response.json()
+
+          if (response.ok && result.success) {
+            // Show success message
+            alert('Booking request updated and resubmitted successfully!')
+
+            // Redirect to request status page
+            router.push({
+              path: '/request-status',
+              query: {
+                success: 'true',
+                type: 'booking_service',
+                id: requestId.value
+              }
+            })
+          } else {
+            if (result.errors) {
+              errors.value = result.errors
+            }
+            throw new Error(result.message || 'Failed to update booking request')
+          }
+        } catch (error) {
+          console.error('Error updating booking request:', error)
+          alert(`Error updating request: ${error.message}`)
+        } finally {
+          submitting.value = false
+        }
+      }
+
+      const goBack = () => {
+        router.go(-1)
+      }
+
+      return {
+        loading,
+        submitting,
+        requestId,
+        originalRequest,
+        formData,
+        errors,
+        deviceTypes,
+        departments,
+        minDate,
+        minReturnDate,
+        onDeviceTypeChange,
+        updateBooking,
+        goBack
       }
     }
-
-    const goBack = () => {
-      router.go(-1)
-    }
-
-    return {
-      loading,
-      submitting,
-      requestId,
-      originalRequest,
-      formData,
-      errors,
-      deviceTypes,
-      departments,
-      minDate,
-      minReturnDate,
-      onDeviceTypeChange,
-      updateBooking,
-      goBack
-    }
   }
-}
 </script>
 
 <style scoped>
-/* Custom styles for the edit form */
-.booking-glass-card {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-}
+  /* Custom styles for the edit form */
+  .booking-glass-card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
 
-.booking-card {
-  transition: all 0.3s ease;
-}
+  .booking-card {
+    transition: all 0.3s ease;
+  }
 
-.booking-input {
-  transition: all 0.3s ease;
-}
+  .booking-input {
+    transition: all 0.3s ease;
+  }
 
-.booking-input:focus {
-  transform: translateY(-1px);
-}
+  .booking-input:focus {
+    transform: translateY(-1px);
+  }
 
-.animate-fade-in {
-  animation: fadeIn 0.6s ease-out;
-}
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out;
+  }
 
-.animate-fade-in-delay {
-  animation: fadeIn 0.8s ease-out;
-}
+  .animate-fade-in-delay {
+    animation: fadeIn 0.8s ease-out;
+  }
 
-.animate-slide-up {
-  animation: slideUp 0.5s ease-out;
-}
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out;
+  }
 
-.animate-bounce-gentle {
-  animation: bounceGentle 2s infinite;
-}
+  .animate-bounce-gentle {
+    animation: bounceGentle 2s infinite;
+  }
 
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 
-@keyframes slideUp {
-  from { transform: translateY(30px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
+  @keyframes slideUp {
+    from {
+      transform: translateY(30px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
 
-@keyframes bounceGentle {
-  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-  40% { transform: translateY(-10px); }
-  60% { transform: translateY(-5px); }
-}
+  @keyframes bounceGentle {
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+      transform: translateY(0);
+    }
+    40% {
+      transform: translateY(-10px);
+    }
+    60% {
+      transform: translateY(-5px);
+    }
+  }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
-}
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
 </style>
