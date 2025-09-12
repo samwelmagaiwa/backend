@@ -552,7 +552,7 @@ class RequestStatusController extends Controller
     }
 
     /**
-     * Get current step for booking requests.
+     * Get current step for booking requests (3-step system).
      */
     private function getBookingCurrentStep(string $status, bool $isDeviceOutOfStock = false): int
     {
@@ -562,13 +562,17 @@ class RequestStatusController extends Controller
             return 0; // Special step for waiting from another user to return the device
         }
         
+        // Updated 3-step mapping for booking requests:
+        // Step 1: Request Submitted (user submitted booking request details)
+        // Step 2: ICT Approval (ICT approve the booking request)
+        // Step 3: Device Received (ICT receive the device for clearing in system)
         $stepMap = [
-            'pending' => 1, // Pending ICT Approval (or waiting for device)
-            'approved' => 6, // ICT Officer Approved (step 6 to match access request workflow)
-            'in_use' => 7, // Device In Use (final step)
-            'returned' => 7, // Device Returned (completed)
-            'rejected' => 6, // Rejected by ICT Officer (step 6)
-            'overdue' => 7, // Still in use but overdue (final step)
+            'pending' => 2, // Step 2: Waiting for ICT Approval
+            'approved' => 3, // Step 3: ICT Approved, ready for device receiving
+            'in_use' => 3, // Step 3: Device in use (approved and received)
+            'returned' => 3, // Step 3: Device returned (completed)
+            'rejected' => 2, // Step 2: Rejected at ICT Approval stage
+            'overdue' => 3, // Step 3: Device overdue but was approved
         ];
 
         return $stepMap[$status] ?? 1;

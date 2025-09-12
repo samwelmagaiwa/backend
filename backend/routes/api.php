@@ -246,6 +246,7 @@ Route::middleware('auth:sanctum')->group(function () {
         
         // Pending request checking
         Route::get('check-pending-requests', [BookingServiceController::class, 'checkPendingRequests'])->name('booking-service.check-pending-requests');
+        Route::get('can-submit-new-request', [BookingServiceController::class, 'canUserSubmitNewRequest'])->name('booking-service.can-submit-new-request');
         
         // Admin actions
         Route::post('bookings/{bookingService}/approve', [BookingServiceController::class, 'approve'])->name('booking-service.approve');

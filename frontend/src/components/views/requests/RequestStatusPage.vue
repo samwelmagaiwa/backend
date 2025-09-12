@@ -275,11 +275,14 @@
                           </td>
                           <td class="py-4 px-4">
                             <div class="text-white text-sm">
-                              {{ getCurrentStepText(request.current_step) }}
+                              {{ getCurrentStepText(request.current_step, request.type) }}
                             </div>
                             <div class="text-blue-300 text-xs">
                               <span v-if="request.current_step === 0"
                                 >Waiting from another user</span
+                              >
+                              <span v-else-if="request.type === 'booking_service'"
+                                >Step {{ request.current_step }} of 3</span
                               >
                               <span v-else>Step {{ request.current_step }} of 7</span>
                             </div>
@@ -460,10 +463,13 @@
                         </div>
 
                         <div class="text-white text-sm">
-                          {{ getCurrentStepText(request.current_step) }}
+                          {{ getCurrentStepText(request.current_step, request.type) }}
                           <span class="text-blue-300 text-xs ml-2">
                             <span v-if="request.current_step === 0"
                               >(Waiting from another user)</span
+                            >
+                            <span v-else-if="request.type === 'booking_service'"
+                              >(Step {{ request.current_step }} of 3)</span
                             >
                             <span v-else>(Step {{ request.current_step }} of 7)</span>
                           </span>
@@ -635,6 +641,7 @@
       const perPage = ref(15)
       const lastPage = ref(1)
 
+      // Standard approval steps (for access requests)
       const approvalSteps = [
         { id: 1, label: 'User Info', description: 'Submit your access request' },
         { id: 2, label: 'HOD Review', description: 'Head of Department review' },
@@ -643,6 +650,25 @@
         { id: 5, label: 'HOD (IT)', description: 'IT Head assessment' },
         { id: 6, label: 'ICT Officer', description: 'ICT Officer processing' },
         { id: 7, label: 'Approved', description: 'Final approval granted' }
+      ]
+
+      // Booking service specific steps (only 3 steps)
+      const bookingSteps = [
+        {
+          id: 1,
+          label: 'Request Submitted',
+          description: 'User submitted booking request details'
+        },
+        {
+          id: 2,
+          label: 'ICT Approval',
+          description: 'ICT approve the booking request'
+        },
+        {
+          id: 3,
+          label: 'Device Received',
+          description: 'ICT receive the device for clearing in system'
+        }
       ]
 
       // Guard this route - only staff can access
@@ -901,13 +927,15 @@
         return requestStatusService.getStatusDisplayName(status)
       }
 
-      const getCurrentStepText = (step) => {
+      const getCurrentStepText = (step, requestType = null) => {
         // Special case for step 0: Waiting from another user (per user rule)
         if (step === 0) {
           return 'Waiting from another user'
         }
 
-        const stepObj = approvalSteps.find((s) => s.id === step)
+        // Use different steps array based on request type
+        const stepsArray = requestType === 'booking_service' ? bookingSteps : approvalSteps
+        const stepObj = stepsArray.find((s) => s.id === step)
         return stepObj ? stepObj.label : `Step ${step}`
       }
 
@@ -984,6 +1012,7 @@
         activeDropdown,
         cancelingRequest,
         approvalSteps,
+        bookingSteps,
         loadRequests,
         refreshRequests,
         viewRequestDetails,

@@ -280,6 +280,7 @@
                   </button>
                   <button
                     @click="assessmentType = 'receiving'"
+                    data-tab="receiving"
                     :class="[
                       'flex-1 py-2 px-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-sm',
                       assessmentType === 'receiving'
@@ -456,7 +457,7 @@
                   <!-- Save Issuing Assessment Button -->
                   <button
                     v-if="showIssuingAssessmentButton"
-                    @click="saveIssuingAssessment"
+                    @click="handleIssuingAssessmentAction"
                     :disabled="!issuingAssessmentButtonState.enabled"
                     :title="issuingAssessmentButtonState.tooltip"
                     :class="[
@@ -468,52 +469,89 @@
                     {{ issuingAssessmentButtonState.text }}
                   </button>
 
-                  <!-- Approve Request Button -->
-                  <button
-                    v-if="showApprovalButton"
-                    @click="approveRequest"
-                    :disabled="!canApproveRequest || isProcessing"
-                    :class="[
-                      'flex-1 py-2 px-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-sm',
-                      requestApproved
-                        ? 'bg-blue-600 text-white shadow-lg'
-                        : canApproveRequest && !isProcessing
-                          ? 'bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg hover:from-green-700 hover:to-green-800'
-                          : 'bg-gray-600 text-gray-300 cursor-not-allowed opacity-50',
-                      requestApproved || (canApproveRequest && !isProcessing)
-                        ? 'border-2 border-green-400'
-                        : ''
-                    ]"
-                  >
-                    <i
+                  <!-- ICT Action Buttons (Approve/Reject) -->
+                  <div v-if="showApprovalButton" class="flex flex-1 gap-2">
+                    <!-- Approve Request Button -->
+                    <button
+                      @click="approveRequest"
+                      :disabled="
+                        !canTakeAction || isProcessing || requestApproved || !issuingAssessmentSaved
+                      "
                       :class="[
-                        'text-xs',
-                        isProcessing
-                          ? 'fas fa-spinner fa-spin'
-                          : requestApproved
-                            ? 'fas fa-check-double'
-                            : 'fas fa-check'
+                        'flex-1 py-2 px-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-sm',
+                        requestApproved
+                          ? 'bg-blue-600 text-white shadow-lg border-2 border-blue-400'
+                          : canTakeAction && !isProcessing && issuingAssessmentSaved
+                            ? 'bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg hover:from-green-700 hover:to-green-800 border-2 border-green-500/50 hover:border-green-400'
+                            : 'bg-gray-600 text-gray-300 cursor-not-allowed opacity-50'
                       ]"
-                    ></i>
-                    {{
-                      isProcessing
-                        ? 'Approving...'
-                        : requestApproved
-                          ? 'Request Approved'
-                          : 'Approve Request'
-                    }}
-                  </button>
+                      :title="getApproveButtonTooltip()"
+                    >
+                      <i
+                        :class="[
+                          'text-xs',
+                          isProcessing
+                            ? 'fas fa-spinner fa-spin'
+                            : requestApproved
+                              ? 'fas fa-check-double'
+                              : 'fas fa-check'
+                        ]"
+                      ></i>
+                      {{
+                        isProcessing
+                          ? 'Approving...'
+                          : requestApproved
+                            ? 'Request Approved'
+                            : !issuingAssessmentSaved
+                              ? 'Save Assessment First'
+                              : 'Approve Request'
+                      }}
+                    </button>
 
-                  <!-- Receiving Assessment Button (Purple) - Only show during receiving phase -->
+                    <!-- Reject Request Button -->
+                    <button
+                      @click="rejectRequest"
+                      :disabled="!canTakeAction || isProcessing || requestRejected"
+                      :class="[
+                        'flex-1 py-2 px-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-sm',
+                        requestRejected
+                          ? 'bg-gray-600 text-white shadow-lg border-2 border-gray-400'
+                          : canTakeAction && !isProcessing
+                            ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg hover:from-red-700 hover:to-red-800 border-2 border-red-500/50 hover:border-red-400'
+                            : 'bg-gray-600 text-gray-300 cursor-not-allowed opacity-50'
+                      ]"
+                      title="Reject this device borrowing request"
+                    >
+                      <i
+                        :class="[
+                          'text-xs',
+                          isProcessing
+                            ? 'fas fa-spinner fa-spin'
+                            : requestRejected
+                              ? 'fas fa-times-circle'
+                              : 'fas fa-times'
+                        ]"
+                      ></i>
+                      {{
+                        isProcessing
+                          ? 'Rejecting...'
+                          : requestRejected
+                            ? 'Request Rejected'
+                            : 'Reject Request'
+                      }}
+                    </button>
+                  </div>
+
+                  <!-- Receiving Assessment Button (Green) - Only show during receiving phase -->
                   <button
                     v-if="showReceivingButton"
                     @click="receiveDeviceNow"
                     :disabled="!canReceiveDevice"
-                    class="w-full group relative overflow-hidden px-4 py-2 bg-gradient-to-r from-purple-600 via-purple-700 to-purple-800 text-white rounded-lg font-semibold text-sm transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="w-full group relative overflow-hidden px-4 py-2 bg-gradient-to-r from-green-600 via-green-700 to-green-800 text-white rounded-lg font-semibold text-sm transition-all duration-300 hover:shadow-lg hover:shadow-green-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <!-- Background Animation -->
                     <div
-                      class="absolute inset-0 bg-gradient-to-r from-purple-700 via-purple-800 to-purple-900 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                      class="absolute inset-0 bg-gradient-to-r from-green-700 via-green-800 to-green-900 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                     ></div>
 
                     <!-- Button Content -->
@@ -565,6 +603,8 @@
                   </div>
                 </div>
               </div>
+
+
 
               <!-- Loading State -->
               <div v-else-if="isLoading" class="text-center py-6">
@@ -732,6 +772,11 @@
         return isPending
       },
 
+      requestRejected() {
+        // Check if request has been rejected
+        return this.request.ict_approve === 'rejected' || this.request.ict_status === 'rejected'
+      },
+
       currentAssessment() {
         return this.assessmentType === 'issuing' ? this.issuingAssessment : this.receivingAssessment
       },
@@ -770,13 +815,18 @@
         // 1. Request is pending (can take action)
         // 2. Assessment is saved (device condition assessed)
         // 3. Request is not already approved
+        // 4. Not currently processing
         const canApprove =
-          this.canTakeAction && this.issuingAssessmentSaved && !this.requestApproved
+          this.canTakeAction &&
+          this.issuingAssessmentSaved &&
+          !this.requestApproved &&
+          !this.isProcessing
 
         console.log('🔍 canApproveRequest check:', {
           canTakeAction: this.canTakeAction,
           issuingAssessmentSaved: this.issuingAssessmentSaved,
           requestApproved: this.requestApproved,
+          isProcessing: this.isProcessing,
           canApprove
         })
 
@@ -822,12 +872,21 @@
         // 2. Device has been issued (approved)
         // 3. Not already received
         // 4. Not currently processing
-        return (
+        const canReceive =
           this.isReceivingAssessmentComplete &&
           this.requestApproved &&
           !this.deviceReceived &&
           !this.isProcessingAssessment
-        )
+
+        console.log('🔍 canReceiveDevice check:', {
+          isReceivingAssessmentComplete: this.isReceivingAssessmentComplete,
+          requestApproved: this.requestApproved,
+          deviceReceived: this.deviceReceived,
+          isProcessingAssessment: this.isProcessingAssessment,
+          canReceive
+        })
+
+        return canReceive
       },
 
       showIssuingAssessmentButton() {
@@ -838,10 +897,36 @@
       },
 
       showApprovalButton() {
-        // Show approval button only if:
-        // 1. Assessment type is 'issuing'
-        // 2. Device hasn't been received yet
-        return this.assessmentType === 'issuing' && !this.deviceReceived
+        // Show approval buttons (approve/reject) in two scenarios:
+        // 1. ISSUING TAB: Initial approval phase (before device is issued)
+        // 2. RECEIVING TAB: Final approval phase (after device is issued but request still pending)
+        const showOnIssuingTab =
+          this.canTakeAction &&
+          !this.requestApproved &&
+          !this.requestRejected &&
+          this.assessmentType === 'issuing'
+
+        const showOnReceivingTab =
+          this.canTakeAction &&
+          !this.requestApproved &&
+          !this.requestRejected &&
+          this.assessmentType === 'receiving' &&
+          this.issuingAssessmentSaved // Device has been issued but needs final approval
+
+        const showButtons = showOnIssuingTab || showOnReceivingTab
+
+        console.log('🔍 showApprovalButton check:', {
+          canTakeAction: this.canTakeAction,
+          requestApproved: this.requestApproved,
+          requestRejected: this.requestRejected,
+          assessmentType: this.assessmentType,
+          issuingAssessmentSaved: this.issuingAssessmentSaved,
+          showOnIssuingTab,
+          showOnReceivingTab,
+          showButtons
+        })
+
+        return showButtons
       },
 
       showReceivingButton() {
@@ -860,12 +945,24 @@
           (!this.request.ict_approve && !this.request.ict_status)
 
         if (this.issuingAssessmentSaved) {
-          return {
-            enabled: false,
-            text: 'Assessment Saved',
-            icon: 'fas fa-check-circle',
-            classes: 'bg-green-600 text-white shadow-lg',
-            tooltip: 'Device assessment has been saved successfully'
+          // After assessment is saved, show approve button if not yet approved
+          if (!this.requestApproved) {
+            return {
+              enabled: true,
+              text: 'Approve Request',
+              icon: 'fas fa-check',
+              classes:
+                'bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg hover:from-green-700 hover:to-green-800',
+              tooltip: 'Approve this device borrowing request'
+            }
+          } else {
+            return {
+              enabled: false,
+              text: 'Request Approved',
+              icon: 'fas fa-check-double',
+              classes: 'bg-blue-600 text-white shadow-lg',
+              tooltip: 'This request has been approved'
+            }
           }
         }
 
@@ -1038,8 +1135,26 @@
               deviceIssued: this.deviceIssued
             })
 
-            // Automatically redirect to requests list immediately
-            this.$router.push('/ict-approval/requests')
+            // Switch to receiving tab for next phase of workflow
+            this.assessmentType = 'receiving'
+
+            // Show success message but don't redirect yet
+            setTimeout(() => {
+              alert(
+                'Request approved! Now switched to Device Receiving tab. Complete the receiving assessment to finish the workflow.'
+              )
+            }, 500)
+
+            // Highlight the receiving tab briefly
+            setTimeout(() => {
+              const receivingTab = document.querySelector('[data-tab="receiving"]')
+              if (receivingTab) {
+                receivingTab.classList.add('animate-pulse')
+                setTimeout(() => {
+                  receivingTab.classList.remove('animate-pulse')
+                }, 2000)
+              }
+            }, 1000)
           } else {
             throw new Error(response.message || 'Failed to approve request')
           }
@@ -1052,7 +1167,20 @@
       },
 
       async rejectRequest() {
-        if (!confirm('Are you sure you want to reject this request?')) {
+        // Get rejection reason from user
+        const rejectionReason = prompt(
+          'Please provide a reason for rejecting this request:',
+          'Request does not meet ICT approval criteria'
+        )
+
+        if (!rejectionReason || rejectionReason.trim() === '') {
+          alert('Rejection reason is required.')
+          return
+        }
+
+        if (
+          !confirm('Are you sure you want to reject this request?\n\nReason: ' + rejectionReason)
+        ) {
           return
         }
 
@@ -1061,13 +1189,24 @@
           const requestId = this.$route.params.id
           const response = await deviceBorrowingService.rejectRequest(
             requestId,
-            'Request rejected by ICT Officer' // Default rejection reason
+            rejectionReason.trim()
           )
 
           if (response.success) {
             alert('Device borrowing request rejected successfully!')
             this.request.ict_approve = 'rejected'
-            // Automatically redirect to requests list immediately
+
+            // Update the request data with rejection details
+            if (response.data) {
+              this.request = { ...this.request, ...response.data }
+            }
+
+            console.log('✅ Request rejected successfully:', {
+              requestId: this.request.id,
+              rejectionReason: rejectionReason
+            })
+
+            // Automatically redirect to requests list
             this.$router.push('/ict-approval/requests')
           } else {
             throw new Error(response.message || 'Failed to reject request')
@@ -1124,12 +1263,37 @@
         }
       },
 
+      getApproveButtonTooltip() {
+        if (this.requestApproved) {
+          return 'This request has already been approved'
+        }
+        if (!this.canTakeAction) {
+          return 'This request cannot be approved - check request status'
+        }
+        if (this.isProcessing) {
+          return 'Processing request...'
+        }
+        if (!this.issuingAssessmentSaved) {
+          return 'Please save the device issuing assessment first before approving'
+        }
+        return 'Approve this device borrowing request'
+      },
+
       handleImageError(event) {
         console.warn('Image failed to load:', event.target.src)
         event.target.style.display = 'none'
       },
 
       // Assessment methods
+      handleIssuingAssessmentAction() {
+        // Check if we should save assessment or approve request
+        if (!this.issuingAssessmentSaved) {
+          this.saveIssuingAssessment()
+        } else if (!this.requestApproved) {
+          this.approveRequest()
+        }
+      },
+
       async saveIssuingAssessment() {
         // Prevent multiple clicks
         if (this.isProcessingAssessment || this.issuingAssessmentSaved) {

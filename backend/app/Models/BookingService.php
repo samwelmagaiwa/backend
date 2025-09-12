@@ -78,16 +78,56 @@ class BookingService extends Model
      */
     public static function getDeviceTypes(): array
     {
-        return [
-            'projector' => 'Projector',
-            'tv_remote' => 'TV Remote',
-            'hdmi_cable' => 'HDMI Cable',
-            'monitor' => 'Monitor',
-            'cpu' => 'CPU',
-            'keyboard' => 'Keyboard',
-            'pc' => 'PC',
-            'others' => 'Others'
-        ];
+        // Get device types from actual inventory and map to enum-compatible keys
+        try {
+            $inventoryDevices = [];
+            $devices = \App\Models\DeviceInventory::distinct()->pluck('device_name');
+            
+            foreach ($devices as $deviceName) {
+                $normalizedName = strtoupper($deviceName);
+                
+                // Map inventory device names to enum values
+                switch ($normalizedName) {
+                    case 'PROJECTOR':
+                        $inventoryDevices['projector'] = 'Projector';
+                        break;
+                    case 'HDMI':
+                        $inventoryDevices['hdmi_cable'] = 'HDMI Cable';
+                        break;
+                    case 'TV':
+                    case 'TV REMOTE':
+                        $inventoryDevices['tv_remote'] = 'TV Remote';
+                        break;
+                    case 'MONITOR':
+                        $inventoryDevices['monitor'] = 'Monitor';
+                        break;
+                    case 'CPU':
+                        $inventoryDevices['cpu'] = 'CPU';
+                        break;
+                    case 'KEYBOARD':
+                        $inventoryDevices['keyboard'] = 'Keyboard';
+                        break;
+                    case 'PC':
+                        $inventoryDevices['pc'] = 'PC';
+                        break;
+                    default:
+                        // For unknown devices, use 'others' and let user specify
+                        break;
+                }
+            }
+            
+            // Always include 'others' option for custom devices
+            $inventoryDevices['others'] = 'Others (Specify Below)';
+            
+            return $inventoryDevices;
+        } catch (\Exception $e) {
+            // Fallback to enum-compatible static list
+            return [
+                'projector' => 'Projector',
+                'hdmi_cable' => 'HDMI Cable',
+                'others' => 'Others (Specify Below)'
+            ];
+        }
     }
 
     /**
@@ -178,12 +218,31 @@ class BookingService extends Model
      */
     public function getDeviceDisplayNameAttribute(): string
     {
-        if ($this->device_type === 'others' && $this->custom_device) {
+        // Handle custom devices (both old 'other' and new 'others')
+        if (in_array($this->device_type, ['others', 'other']) && $this->custom_device) {
             return $this->custom_device;
         }
         
+        // Get current device types
         $deviceTypes = self::getDeviceTypes();
-        return $deviceTypes[$this->device_type] ?? $this->device_type;
+        
+        // Check current device types first
+        if (isset($deviceTypes[$this->device_type])) {
+            return $deviceTypes[$this->device_type];
+        }
+        
+        // Backward compatibility for old device types
+        $legacyDeviceTypes = [
+            'tv_remote' => 'TV Remote',
+            'hdmi_cable' => 'HDMI Cable',
+            'monitor' => 'Monitor',
+            'cpu' => 'CPU',
+            'keyboard' => 'Keyboard',
+            'pc' => 'PC',
+            'other' => 'Other Device' // Legacy support
+        ];
+        
+        return $legacyDeviceTypes[$this->device_type] ?? ucwords(str_replace('_', ' ', $this->device_type));
     }
 
     /**
@@ -387,6 +446,11 @@ class BookingService extends Model
                     // Approved requests (approved by ICT but not yet returned)
                     $q->whereIn('status', ['approved', 'in_use'])
                       ->where('ict_approve', 'approved');
+                })
+                ->orWhere(function ($q) {
+                    // Returned status but device not yet returned (status should be 'returned' but return_status is 'not_yet_returned')
+                    $q->where('ict_approve', 'approved')
+                      ->where('return_status', 'not_yet_returned');
                 });
             })
             ->first();
@@ -408,19 +472,28 @@ class BookingService extends Model
             ];
         }
         
-        // Determine appropriate message based on request status
+        // Determine appropriate message based on request status and return status
+        $message = '';
+        
         if ($activeRequest->status === 'pending' && $activeRequest->ict_approve === 'pending') {
-            $message = 'User has a pending booking request. Please wait for it to be processed by ICT.';
+            $message = 'You have a pending booking request. Please wait for it to be processed by ICT before submitting a new request.';
+        } elseif ($activeRequest->return_status === 'not_yet_returned' && $activeRequest->ict_approve === 'approved') {
+            // User has an approved device that hasn't been returned yet
+            $deviceName = $activeRequest->getDeviceDisplayNameAttribute();
+            $requestId = $activeRequest->id;
+            $message = "You still have a device ({$deviceName}) that has not been returned (Request ID: #{$requestId}). Please return the device before submitting a new request. Contact ICT office for device return process.";
         } elseif ($activeRequest->status === 'approved' || $activeRequest->status === 'in_use') {
-            $message = 'User has an active device booking. Please return the current device before requesting a new one.';
+            $message = 'You have an active device booking. Please return the current device before requesting a new one.';
         } else {
-            $message = 'User has an active request. Please complete the current request first.';
+            $message = 'You have an active request. Please complete the current request first.';
         }
         
         return [
             'can_submit' => false,
             'message' => $message,
-            'active_request' => $activeRequest
+            'active_request' => $activeRequest,
+            'return_status' => $activeRequest->return_status,
+            'request_id' => $activeRequest->id
         ];
     }
 }

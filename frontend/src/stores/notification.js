@@ -619,6 +619,117 @@ export const useNotificationStore = defineStore('notification', () => {
     )
   }
 
+  // Device condition assessment notifications
+  function showDeviceConditionSaved(deviceName, requestId) {
+    return showBookingNotification(
+      'Device Condition Assessment Saved',
+      `Device condition assessment saved successfully! You can now approve the request to issue the ${deviceName}.`,
+      {
+        duration: 6000,
+        actions: [
+          {
+            label: 'Approve Request',
+            icon: 'fas fa-check-circle',
+            url: `/ict-approval/request/${requestId}?action=approve`
+          },
+          {
+            label: 'View Details',
+            icon: 'fas fa-eye',
+            url: `/ict-approval/request/${requestId}`
+          }
+        ]
+      }
+    )
+  }
+
+  function showDeviceConditionUpdated(deviceName, requestId) {
+    return showBookingNotification(
+      'Device Condition Updated',
+      `${deviceName} condition assessment has been updated successfully. The request is ready for final approval.`,
+      {
+        duration: 5000,
+        actions: [
+          {
+            label: 'Review & Approve',
+            icon: 'fas fa-clipboard-check',
+            url: `/ict-approval/request/${requestId}`
+          }
+        ]
+      }
+    )
+  }
+
+  function showDeviceReadyForIssue(deviceName, requestId) {
+    return showBookingNotification(
+      'Device Ready for Issue',
+      `${deviceName} has passed condition assessment and is ready to be issued to the borrower.`,
+      {
+        duration: 7000,
+        actions: [
+          {
+            label: 'Issue Device',
+            icon: 'fas fa-hand-holding',
+            url: `/ict-approval/request/${requestId}?action=issue`
+          },
+          {
+            label: 'View Assessment',
+            icon: 'fas fa-clipboard-list',
+            url: `/ict-approval/request/${requestId}?tab=assessment`
+          }
+        ]
+      }
+    )
+  }
+
+  function showDeviceIssued(deviceName, borrowerName, requestId) {
+    return showSuccess(
+      'Device Successfully Issued',
+      `${deviceName} has been successfully issued to ${borrowerName}. Return tracking is now active.`,
+      {
+        duration: 6000,
+        actions: [
+          {
+            label: 'Track Return',
+            icon: 'fas fa-calendar-check',
+            url: `/ict-approval/request/${requestId}?tab=tracking`
+          },
+          {
+            label: 'Print Receipt',
+            icon: 'fas fa-print',
+            callback: () => window.print()
+          }
+        ]
+      }
+    )
+  }
+
+  function showDeviceReturnAssessment(deviceName, requestId, condition) {
+    const isGoodCondition = condition === 'good' || condition === 'excellent'
+    return showBookingNotification(
+      'Device Return Assessment',
+      `${deviceName} has been returned and assessed as '${condition}'. ${isGoodCondition ? 'No issues found.' : 'Please review the condition report.'}`,
+      {
+        duration: 6000,
+        actions: [
+          {
+            label: 'View Report',
+            icon: 'fas fa-file-alt',
+            url: `/ict-approval/request/${requestId}?tab=return-assessment`
+          },
+          ...(isGoodCondition
+            ? []
+            : [
+                {
+                  label: 'Report Issue',
+                  icon: 'fas fa-exclamation-triangle',
+                  url: `/ict-approval/request/${requestId}?tab=issue-report`
+                }
+              ])
+        ]
+      }
+    )
+  }
+
   return {
     // State
     notifications,
@@ -676,7 +787,14 @@ export const useNotificationStore = defineStore('notification', () => {
     // Booking-specific
     setPendingBookingInfo,
     clearPendingBookingInfo,
-    showBookingLockNotification
+    showBookingLockNotification,
+
+    // Device condition assessment notifications
+    showDeviceConditionSaved,
+    showDeviceConditionUpdated,
+    showDeviceReadyForIssue,
+    showDeviceIssued,
+    showDeviceReturnAssessment
   }
 })
 

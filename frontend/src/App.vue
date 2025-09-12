@@ -19,8 +19,9 @@
       <router-view />
     </main>
 
-    <!-- Notification System -->
+    <!-- Notification Systems -->
     <NotificationSystem />
+    <CompactNotificationSystem />
 
     <!-- Global error notification -->
     <div
@@ -49,13 +50,15 @@
   import { computed, onMounted, ref } from 'vue'
   import AuthLoadingScreen from './components/AuthLoadingScreen.vue'
   import NotificationSystem from './components/NotificationSystem.vue'
+  import CompactNotificationSystem from './components/CompactNotificationSystem.vue'
   import { useAuthStore } from './stores/auth'
 
   export default {
     name: 'App',
     components: {
       AuthLoadingScreen,
-      NotificationSystem
+      NotificationSystem,
+      CompactNotificationSystem
     },
 
     setup() {

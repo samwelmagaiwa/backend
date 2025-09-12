@@ -245,7 +245,20 @@ const routes = [
   {
     path: '/edit-booking-request',
     name: 'EditBookingRequest',
-    component: () => import('../components/views/booking/EditBookingRequest.vue'),
+    component: () =>
+      import('../components/views/booking/EditBookingRequest.vue').catch((error) => {
+        console.error('Failed to load EditBookingRequest component:', error)
+        // Return a fallback component
+        return {
+          template: `
+          <div class="p-8 text-center">
+            <h1 class="text-2xl font-bold text-red-600 mb-4">Component Loading Error</h1>
+            <p class="text-gray-600 mb-4">Failed to load EditBookingRequest component.</p>
+            <button @click="$router.go(-1)" class="bg-blue-500 text-white px-4 py-2 rounded">Go Back</button>
+          </div>
+        `
+        }
+      }),
     meta: {
       requiresAuth: true,
       roles: [ROLES.STAFF]

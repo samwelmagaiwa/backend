@@ -327,6 +327,34 @@ export const bookingService = {
         has_pending_request: false
       }
     }
+  },
+
+  /**
+   * Check if user can submit a new booking request
+   * Validates against unreturned devices and active requests
+   * @returns {Promise<Object>} - API response with eligibility status
+   */
+  async canSubmitNewRequest() {
+    try {
+      const response = await apiClient.get('/booking-service/can-submit-new-request')
+      return {
+        success: true,
+        data: response.data.data || response.data,
+        can_submit: response.data.can_submit,
+        message: response.data.message,
+        active_request: response.data.active_request || null,
+        return_status_info: response.data.return_status_info || null
+      }
+    } catch (error) {
+      console.error('Failed to check new request eligibility:', error)
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to check request eligibility',
+        status: error.response?.status,
+        can_submit: false,
+        active_request: null
+      }
+    }
   }
 }
 

@@ -112,7 +112,10 @@
                   <i class="fas fa-spinner fa-spin text-white text-2xl"></i>
                 </div>
                 <h3 class="text-xl font-bold text-white">Checking Your Requests...</h3>
-                <p class="text-blue-200 text-sm">Please wait while we verify your booking status</p>
+                <p class="text-blue-200 text-sm">
+                  Verifying if you have any pending booking requests
+                </p>
+                <p class="text-blue-300/70 text-xs mt-2 italic">This may take a few seconds...</p>
               </div>
             </div>
           </div>
@@ -482,150 +485,153 @@
                     </div>
                   </div>
 
-                  <!-- Reason for Borrowing -->
-                  <div class="group">
-                    <label class="block text-sm font-bold text-blue-100 mb-1 flex items-center">
-                      <i class="fas fa-comment-alt mr-2 text-blue-300"></i>
-                      Reason for Borrowing
-                      <span class="text-red-400 ml-1">*</span>
-                    </label>
-                    <div class="relative">
-                      <textarea
-                        v-model="formData.reason"
-                        @input="handleReasonInput"
-                        class="booking-input w-full px-3 py-2 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50 resize-none"
-                        rows="3"
-                        placeholder="Please explain the reason for borrowing this device... (minimum 10 characters)"
-                        maxlength="1000"
-                        required
-                      ></textarea>
-                      <div
-                        class="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/10 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                      ></div>
-                    </div>
-                    <div v-if="errors.reason" class="text-red-400 text-xs mt-1 flex items-center">
-                      <i class="fas fa-exclamation-circle mr-1"></i>
-                      {{ errors.reason }}
-                    </div>
-                    <div class="flex justify-between items-center mt-1">
-                      <p class="text-xs text-blue-200/60 italic flex items-center">
-                        <i class="fas fa-info-circle mr-1"></i>
-                        Minimum 10 characters required
-                      </p>
-                      <p
-                        class="text-xs"
-                        :class="formData.reason.length >= 10 ? 'text-green-400' : 'text-yellow-400'"
-                      >
-                        {{ formData.reason.length }}/1000 characters
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Signature Section -->
-              <div
-                class="booking-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-3 rounded-xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
-              >
-                <div class="flex items-center space-x-3 mb-2">
-                  <div
-                    class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
-                  >
-                    <i class="fas fa-signature text-white text-sm"></i>
-                  </div>
-                  <h3 class="text-base font-bold text-white">Digital Signature</h3>
-                </div>
-
-                <div class="group">
-                  <label class="block text-sm font-bold text-blue-100 mb-1 flex items-center">
-                    <i class="fas fa-signature mr-2 text-blue-300"></i>
-                    Signature <span class="text-red-400 ml-1">*</span>
-                    <span class="ml-2 text-xs text-blue-300/70 font-normal">(PNG, JPG, JPEG)</span>
-                  </label>
-
-                  <div class="flex flex-col md:flex-row gap-2 items-start">
-                    <!-- Signature Display Box -->
-                    <div
-                      class="relative w-full md:w-60 h-16 border-2 border-blue-300/30 rounded-lg bg-blue-100/20 focus-within:bg-blue-100/30 focus-within:border-blue-400 overflow-hidden backdrop-blur-sm group-hover:border-blue-400/50 transition-all duration-300"
-                    >
-                      <!-- Signature Image Display -->
-                      <div
-                        v-if="signaturePreview"
-                        class="w-full h-full flex items-center justify-center p-1"
-                      >
-                        <img
-                          :src="signaturePreview"
-                          alt="Digital Signature"
-                          class="max-w-full max-h-full object-contain"
-                        />
+                  <!-- Combined Row: Digital Signature & Reason for Borrowing -->
+                  <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                    <!-- Digital Signature Section (Left) -->
+                    <div class="group">
+                      <div class="flex items-center space-x-2 mb-1">
+                        <div
+                          class="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
+                        >
+                          <i class="fas fa-signature text-white text-xs"></i>
+                        </div>
+                        <h3 class="text-sm font-bold text-white">Digital Signature</h3>
                       </div>
 
-                      <!-- Placeholder Text -->
-                      <div v-else class="w-full h-full flex items-center justify-center">
-                        <div class="text-center">
-                          <i class="fas fa-signature text-blue-400/50 text-lg mb-1"></i>
-                          <p class="text-xs text-blue-400 italic">Signature here</p>
+                      <label class="block text-sm font-bold text-blue-100 mb-1 flex items-center">
+                        <i class="fas fa-signature mr-2 text-blue-300"></i>
+                        Signature <span class="text-red-400 ml-1">*</span>
+                        <span class="ml-2 text-xs text-blue-300/70 font-normal"
+                          >(PNG, JPG, JPEG)</span
+                        >
+                      </label>
+
+                      <div class="flex flex-col gap-1 items-start">
+                        <!-- Signature Display Box -->
+                        <div
+                          class="relative w-full h-12 border-2 border-blue-300/30 rounded-lg bg-blue-100/20 focus-within:bg-blue-100/30 focus-within:border-blue-400 overflow-hidden backdrop-blur-sm group-hover:border-blue-400/50 transition-all duration-300"
+                        >
+                          <!-- Signature Image Display -->
+                          <div
+                            v-if="signaturePreview"
+                            class="w-full h-full flex items-center justify-center p-1"
+                          >
+                            <img
+                              :src="signaturePreview"
+                              alt="Digital Signature"
+                              class="max-w-full max-h-full object-contain"
+                            />
+                          </div>
+
+                          <!-- Placeholder Text -->
+                          <div v-else class="w-full h-full flex items-center justify-center">
+                            <div class="flex items-center">
+                              <i class="fas fa-signature text-blue-400/50 text-sm mr-1"></i>
+                              <p class="text-xs text-blue-400 italic">Signature</p>
+                            </div>
+                          </div>
+
+                          <!-- Remove Button (when signature exists) -->
+                          <button
+                            v-if="signaturePreview"
+                            type="button"
+                            @click="removeSignature"
+                            class="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition duration-200 text-xs shadow-lg"
+                            title="Remove signature"
+                          >
+                            <i class="fas fa-times text-xs"></i>
+                          </button>
+                        </div>
+
+                        <!-- Upload Button and Max Size -->
+                        <div class="flex items-center gap-2 w-full">
+                          <input
+                            ref="signatureInput"
+                            type="file"
+                            accept=".png,.jpg,.jpeg"
+                            @change="handleSignatureUpload"
+                            class="hidden"
+                          />
+
+                          <button
+                            type="button"
+                            @click="$refs.signatureInput.click()"
+                            :disabled="uploadProgress > 0 && uploadProgress < 100"
+                            class="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-medium rounded-lg hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/30"
+                          >
+                            <span v-if="uploadProgress === 0" class="flex items-center">
+                              <i class="fas fa-upload mr-1"></i>
+                              Upload
+                            </span>
+                            <span
+                              v-else-if="uploadProgress > 0 && uploadProgress < 100"
+                              class="flex items-center"
+                            >
+                              <i class="fas fa-spinner fa-spin mr-1"></i>
+                              {{ uploadProgress }}%
+                            </span>
+                            <span v-else class="flex items-center">
+                              <i class="fas fa-check mr-1"></i>
+                              Change
+                            </span>
+                          </button>
+
+                          <p class="text-xs text-blue-200/70 italic">Max: 2MB</p>
                         </div>
                       </div>
 
-                      <!-- Remove Button (when signature exists) -->
-                      <button
-                        v-if="signaturePreview"
-                        type="button"
-                        @click="removeSignature"
-                        class="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition duration-200 text-xs shadow-lg"
-                        title="Remove signature"
+                      <div
+                        v-if="errors.signature"
+                        class="text-red-500 text-xs mt-1 flex items-center"
                       >
-                        <i class="fas fa-times text-xs"></i>
-                      </button>
+                        <i class="fas fa-exclamation-circle mr-1"></i>
+                        {{ errors.signature }}
+                      </div>
                     </div>
 
-                    <!-- Upload Button -->
-                    <div class="flex flex-col gap-1">
-                      <input
-                        ref="signatureInput"
-                        type="file"
-                        accept=".png,.jpg,.jpeg"
-                        @change="handleSignatureUpload"
-                        class="hidden"
-                      />
-
-                      <button
-                        type="button"
-                        @click="$refs.signatureInput.click()"
-                        :disabled="uploadProgress > 0 && uploadProgress < 100"
-                        class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-medium rounded-lg hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/30"
-                      >
-                        <span v-if="uploadProgress === 0" class="flex items-center">
-                          <i class="fas fa-upload mr-1"></i>
-                          Upload
-                        </span>
-                        <span
-                          v-else-if="uploadProgress > 0 && uploadProgress < 100"
-                          class="flex items-center"
+                    <!-- Reason for Borrowing Section (Right) -->
+                    <div class="group">
+                      <label class="block text-sm font-bold text-blue-100 mb-1 flex items-center">
+                        <i class="fas fa-comment-alt mr-2 text-blue-300"></i>
+                        Reason for Borrowing
+                        <span class="text-red-400 ml-1">*</span>
+                      </label>
+                      <div class="relative">
+                        <textarea
+                          v-model="formData.reason"
+                          @input="handleReasonInput"
+                          class="booking-input w-full px-3 py-2 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50 resize-none"
+                          rows="2"
+                          placeholder="Explain reason for borrowing... (min 10 chars)"
+                          maxlength="1000"
+                          required
+                        ></textarea>
+                        <div
+                          class="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/10 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                        ></div>
+                      </div>
+                      <div v-if="errors.reason" class="text-red-400 text-xs mt-1 flex items-center">
+                        <i class="fas fa-exclamation-circle mr-1"></i>
+                        {{ errors.reason }}
+                      </div>
+                      <div class="flex justify-between items-center mt-0.5">
+                        <p class="text-xs text-blue-200/60 italic">Min 10 chars</p>
+                        <p
+                          class="text-xs"
+                          :class="
+                            formData.reason.length >= 10 ? 'text-green-400' : 'text-yellow-400'
+                          "
                         >
-                          <i class="fas fa-spinner fa-spin mr-1"></i>
-                          {{ uploadProgress }}%
-                        </span>
-                        <span v-else class="flex items-center">
-                          <i class="fas fa-check mr-1"></i>
-                          Change
-                        </span>
-                      </button>
-
-                      <p class="text-xs text-blue-200/70 italic">Max: 2MB</p>
+                          {{ formData.reason.length }}/1000
+                        </p>
+                      </div>
                     </div>
-                  </div>
-
-                  <div v-if="errors.signature" class="text-red-500 text-xs mt-2 flex items-center">
-                    <i class="fas fa-exclamation-circle mr-1"></i>
-                    {{ errors.signature }}
                   </div>
                 </div>
               </div>
 
               <!-- Submit Section -->
-              <div class="border-t border-blue-300/20 pt-4">
+              <div class="border-t border-blue-300/20 pt-3">
                 <div class="flex justify-between items-center">
                   <button
                     type="button"
@@ -1028,7 +1034,7 @@
           customDevice: '',
           reason: '',
           department: '',
-          returnDate: '',
+          collectionDate: '', // Fixed: matches form template field name
           returnTime: '',
           phoneNumber: '',
           conditionBefore: '',
@@ -1056,40 +1062,81 @@
       }
     },
     async mounted() {
-      // Check if user has pending requests first
-      await this.checkPendingRequests()
+      try {
+        // Set up automatic fallback timeout (10 seconds)
+        const fallbackTimeout = setTimeout(async () => {
+          if (this.isCheckingPendingRequests) {
+            console.warn('⚠️ Pending requests check taking too long, showing form')
+            this.isCheckingPendingRequests = false
+            this.hasPendingRequest = false
+            await this.initializeForm()
+          }
+        }, 10000)
 
-      // Only proceed if no pending request found
-      if (!this.hasPendingRequest) {
-        // Load departments and available devices when component is mounted
-        await this.loadDepartments()
-        await this.loadAvailableDevices()
+        // Check if user has pending requests first
+        await this.checkPendingRequests()
 
-        // Auto-populate borrower name and phone number from authenticated user
-        this.populateBorrowerName()
-        this.populatePhoneNumber()
+        // Clear the fallback timeout since check completed
+        clearTimeout(fallbackTimeout)
 
-        // Debug: Check if time input is working
-        console.log('BookingService mounted, returnTime field:', this.formData.returnTime)
-
-        // Set a default time if none is set (optional)
-        if (!this.formData.returnTime) {
-          // Set default return time to 5 PM
-          this.formData.returnTime = '17:00'
+        // Only proceed if no pending request found
+        if (!this.hasPendingRequest) {
+          await this.initializeForm()
         }
-
-        // Initialize real-time validation
-        this.initializeValidation()
+      } catch (error) {
+        console.error('Error during component initialization:', error)
+        // If pending check fails, still initialize the form
+        this.isCheckingPendingRequests = false
+        this.hasPendingRequest = false
+        await this.initializeForm()
       }
     },
     methods: {
+      /**
+       * Initialize form data and load required dependencies
+       */
+      async initializeForm() {
+        try {
+          // Load departments and available devices when component is mounted
+          await this.loadDepartments()
+          await this.loadAvailableDevices()
+
+          // Auto-populate borrower name and phone number from authenticated user
+          this.populateBorrowerName()
+          this.populatePhoneNumber()
+
+          // Debug: Check if time input is working
+          console.log('BookingService mounted, returnTime field:', this.formData.returnTime)
+
+          // Set a default time if none is set (optional)
+          if (!this.formData.returnTime) {
+            // Set default return time to 5 PM
+            this.formData.returnTime = '17:00'
+          }
+
+          // Initialize real-time validation
+          this.initializeValidation()
+        } catch (error) {
+          console.error('Error initializing form:', error)
+        }
+      },
+
       /**
        * Check if user has any pending booking requests
        */
       async checkPendingRequests() {
         try {
           this.isCheckingPendingRequests = true
-          const response = await apiClient.get('/booking-service/check-pending-requests')
+
+          // Add timeout and retry logic
+          const controller = new AbortController()
+          const timeoutId = setTimeout(() => controller.abort(), 8000) // 8 second timeout
+
+          const response = await apiClient.get('/booking-service/check-pending-requests', {
+            signal: controller.signal
+          })
+
+          clearTimeout(timeoutId)
 
           if (response.data.success) {
             this.hasPendingRequest = response.data.has_pending_request
@@ -1103,9 +1150,28 @@
             }
           } else {
             console.error('Failed to check pending requests:', response.data.message)
+            // Allow form to continue even if check fails
+            this.hasPendingRequest = false
           }
         } catch (error) {
           console.error('Error checking pending requests:', error)
+
+          // Handle different types of errors
+          if (error.name === 'AbortError' || error.code === 'ECONNABORTED') {
+            console.warn('⚠️ Pending requests check timed out - allowing form submission')
+            // Don't show error to user, just proceed
+          } else if (error.response?.status === 401) {
+            console.warn('⚠️ Authentication error during pending requests check')
+            // Let auth interceptor handle this
+            return
+          } else {
+            console.warn(
+              '⚠️ Network error during pending requests check - allowing form submission'
+            )
+          }
+
+          // Always allow form to continue if check fails
+          this.hasPendingRequest = false
         } finally {
           this.isCheckingPendingRequests = false
         }
@@ -1189,24 +1255,20 @@
         // Auto-populate phone number from authenticated user
         try {
           if (this.authStore.isAuthenticated && this.authStore.user) {
-            const userPhone = this.authStore.user.phone
+            const userPhone = this.authStore.user.phone || this.authStore.user.phone_number
             if (userPhone && !this.formData.phoneNumber) {
               this.formData.phoneNumber = userPhone
-              console.log('✅ Auto-populated phone number:', userPhone)
             } else if (!userPhone) {
-              console.warn('⚠️ User phone not available in auth store')
               // Try to get from localStorage as fallback
               const storedUserData = localStorage.getItem('user_data')
               if (storedUserData) {
                 const userData = JSON.parse(storedUserData)
-                if (userData.phone) {
-                  this.formData.phoneNumber = userData.phone
-                  console.log('✅ Auto-populated phone number from localStorage:', userData.phone)
+                const phoneFromStorage = userData.phone || userData.phone_number
+                if (phoneFromStorage) {
+                  this.formData.phoneNumber = phoneFromStorage
                 }
               }
             }
-          } else {
-            console.warn('⚠️ User not authenticated or user data not available')
           }
         } catch (error) {
           console.error('❌ Error populating phone number:', error)
@@ -1696,26 +1758,57 @@
           this.errors.signature = 'Digital signature is required'
         }
 
-        return Object.keys(this.errors).length === 0
+        // Filter out empty error messages for more accurate validation
+        const actualErrors = Object.keys(this.errors).filter(
+          (key) => this.errors[key] && this.errors[key].trim()
+        )
+        return actualErrors.length === 0
       },
 
       async submitBooking() {
-        if (!this.validateForm()) {
-          return
-        }
-
-        // Double-check for pending requests before submitting
-        await this.checkPendingRequests()
-        if (this.hasPendingRequest) {
-          alert(
-            'You have a pending booking request. Please wait for it to be processed before submitting a new request.'
-          )
-          return
-        }
-
+        // Set submitting state to true to show loading
         this.isSubmitting = true
 
         try {
+          // Validate form first
+          if (!this.validateForm()) {
+            // Log validation errors safely
+            const errorFields = Object.keys(this.errors)
+            console.log('Form validation failed - Error count:', errorFields.length)
+            console.log('Error fields:', errorFields)
+
+            // Reset submitting state immediately
+            this.isSubmitting = false
+
+            // Scroll to the first error field for better UX
+            this.scrollToFirstError()
+
+            // Show a brief alert to notify about validation issues
+            const errorCount = errorFields.length
+            alert(
+              `Please fill in all required fields. ${errorCount} ${errorCount === 1 ? 'field' : 'fields'} need(s) attention.`
+            )
+            return
+          }
+
+          // Double-check for pending requests before submitting
+          try {
+            await this.checkPendingRequests()
+            if (this.hasPendingRequest) {
+              alert(
+                'You have a pending booking request. Please wait for it to be processed before submitting a new request.'
+              )
+              this.isSubmitting = false // Reset submitting state when pending request found
+              return
+            }
+          } catch (error) {
+            console.warn(
+              '⚠️ Could not verify pending requests, proceeding with submission:',
+              error.message
+            )
+            // Continue with submission if pending check fails
+          }
+
           // Prepare form data for API submission
           const formData = new FormData()
 
@@ -1805,8 +1898,8 @@
             }
           }
         } catch (error) {
-          console.error('Error submitting booking:', error)
-          alert('Network error. Please check your connection and try again.')
+          console.error('Error in submitBooking:', error)
+          alert('An unexpected error occurred. Please try again.')
         } finally {
           this.isSubmitting = false
         }
@@ -1821,7 +1914,7 @@
           customDevice: '',
           reason: '',
           department: '',
-          returnDate: '',
+          collectionDate: '', // Fixed: matches form template field name
           returnTime: '',
           phoneNumber: '',
           conditionBefore: '',
@@ -1970,6 +2063,41 @@
         } catch (error) {
           console.error('❌ Error linking user details to ICT approval system:', error)
           // Don't show error to user as this is a background process
+        }
+      },
+
+      /**
+       * Scroll to the first field that has a validation error
+       */
+      scrollToFirstError() {
+        const firstErrorField = Object.keys(this.errors)[0]
+        if (firstErrorField) {
+          // Create a map of error fields to form field names
+          const fieldMap = {
+            bookingDate: 'bookingDate',
+            borrowerName: 'borrowerName',
+            deviceType: 'deviceInventoryId',
+            customDevice: 'customDevice',
+            reason: 'reason',
+            department: 'department',
+            collectionDate: 'collectionDate',
+            returnTime: 'returnTime',
+            phoneNumber: 'phoneNumber',
+            signature: 'signatureInput'
+          }
+
+          const fieldName = fieldMap[firstErrorField] || firstErrorField
+          const element = document.querySelector(
+            `[name="${fieldName}"], #${fieldName}, [v-model*="${fieldName}"]`
+          )
+
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            // Add a slight delay before focusing to ensure scroll completes
+            setTimeout(() => {
+              element.focus()
+            }, 500)
+          }
         }
       }
     }

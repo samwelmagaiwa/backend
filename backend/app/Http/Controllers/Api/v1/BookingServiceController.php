@@ -96,13 +96,19 @@ class BookingServiceController extends Controller
                         'id' => $activeRequest->id,
                         'device_type' => $activeRequest->device_type,
                         'custom_device' => $activeRequest->custom_device,
+                        'device_display_name' => $activeRequest->getDeviceDisplayNameAttribute(),
                         'booking_date' => $activeRequest->booking_date,
+                        'return_date' => $activeRequest->return_date,
                         'status' => $activeRequest->status,
                         'ict_approve' => $activeRequest->ict_approve,
+                        'return_status' => $activeRequest->return_status,
                         'created_at' => $activeRequest->created_at,
                         'device_issued_at' => $activeRequest->device_issued_at,
+                        'device_returned_at' => $activeRequest->device_returned_at,
                         'request_url' => '/request-details?id=' . $activeRequest->id . '&type=booking_service'
-                    ]
+                    ],
+                    'return_status_info' => $canSubmitCheck['return_status'] ?? null,
+                    'error_code' => 'ACTIVE_REQUEST_EXISTS'
                 ], 422);
             }
             
@@ -255,38 +261,67 @@ class BookingServiceController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Request $request, BookingService $bookingService): JsonResponse
+    public function show(Request $request, BookingService $booking): JsonResponse
     {
         try {
             // Check if user can view this booking
             $user = $request->user();
             $canView = false;
             
+            // Debug logging
+            Log::info('BookingService show method - Authorization check', [
+                'booking_id' => $booking->id,
+                'booking_user_id' => $booking->user_id,
+                'current_user_id' => $user->id,
+                'current_user_email' => $user->email,
+                'current_user_direct_role' => $user->role ? $user->role->name : 'no_direct_role',
+                'current_user_primary_role' => $user->getPrimaryRoleName(),
+                'current_user_all_roles' => $user->roles->pluck('name')->toArray(),
+                'booking_status' => $booking->status,
+                'booking_ict_approve' => $booking->ict_approve,
+                'user_has_admin_role' => $user->hasAnyRole(['admin']),
+                'user_has_ict_role' => $user->hasAnyRole(['ict_officer', 'ict_director']),
+                'user_has_staff_role' => $user->hasAnyRole(['staff']),
+                'is_booking_owner' => $booking->user_id === $user->id
+            ]);
+            
             // Admin can view any booking
             if ($user->hasAnyRole(['admin'])) {
                 $canView = true;
+                Log::info('Access granted: User has admin role');
             }
             // ICT officers can view any booking for approval purposes
             elseif ($user->hasAnyRole(['ict_officer', 'ict_director'])) {
                 $canView = true;
+                Log::info('Access granted: User has ICT role');
             }
             // Users can view their own bookings
-            elseif ($bookingService->user_id === $user->id) {
+            elseif ($booking->user_id === $user->id) {
                 $canView = true;
+                Log::info('Access granted: User owns this booking');
+            }
+            else {
+                Log::warning('Access denied - None of the authorization conditions met');
             }
             
             if (!$canView) {
+                Log::warning('BookingService show - Access denied', [
+                    'booking_id' => $booking->id,
+                    'current_user_id' => $user->id,
+                    'booking_owner_id' => $booking->user_id,
+                    'reason' => 'User does not have permission to view this booking'
+                ]);
                 return response()->json([
                     'success' => false,
                     'message' => 'Unauthorized to view this booking'
                 ], 403);
             }
 
-            $bookingService->load(['user', 'approvedBy', 'departmentInfo', 'ictApprovedBy']);
+            $booking->load(['user', 'approvedBy', 'departmentInfo', 'ictApprovedBy']);
 
             return response()->json([
                 'success' => true,
-                'data' => $bookingService,
+                'data' => $booking,
                 'message' => 'Booking retrieved successfully'
             ]);
 
@@ -303,11 +338,11 @@ class BookingServiceController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(BookingServiceRequest $request, BookingService $bookingService): JsonResponse
+    public function update(BookingServiceRequest $request, BookingService $booking): JsonResponse
     {
         try {
             // Check if user can update this booking
-            if ((!$request->user()->role || $request->user()->role->name !== 'admin') && $bookingService->user_id !== $request->user()->id) {
+            if ((!$request->user()->role || $request->user()->role->name !== 'admin') && $booking->user_id !== $request->user()->id) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Unauthorized to update this booking'
@@ -315,7 +350,7 @@ class BookingServiceController extends Controller
             }
 
             // Only allow updates if booking is still pending
-            if ($bookingService->status !== 'pending') {
+            if ($booking->status !== 'pending') {
                 return response()->json([
                     'success' => false,
                     'message' => 'Cannot update booking that is no longer pending'
@@ -327,25 +362,25 @@ class BookingServiceController extends Controller
             // Handle signature upload if provided
             if ($request->hasFile('signature')) {
                 // Delete old signature if exists
-                if ($bookingService->signature_path) {
-                    Storage::disk('public')->delete($bookingService->signature_path);
+                if ($booking->signature_path) {
+                    Storage::disk('public')->delete($booking->signature_path);
                 }
 
                 $signaturePath = $this->handleSignatureUpload($request->file('signature'), $validatedData['borrower_name']);
                 $validatedData['signature_path'] = $signaturePath;
             }
 
-            $bookingService->update($validatedData);
-            $bookingService->load(['user', 'departmentInfo']);
+            $booking->update($validatedData);
+            $booking->load(['user', 'departmentInfo']);
 
             Log::info('Booking service updated successfully', [
-                'booking_id' => $bookingService->id,
+                'booking_id' => $booking->id,
                 'user_id' => $request->user()->id
             ]);
 
             return response()->json([
                 'success' => true,
-                'data' => $bookingService,
+                'data' => $booking,
                 'message' => 'Booking updated successfully'
             ]);
 
@@ -365,6 +400,14 @@ class BookingServiceController extends Controller
     public function updateRejectedRequest(Request $request, int $bookingId): JsonResponse
     {
         try {
+            // Debug logging
+            Log::info('updateRejectedRequest - Raw request data:', [
+                'booking_id' => $bookingId,
+                'user_id' => $request->user()->id,
+                'raw_input' => $request->all(),
+                'device_type_received' => $request->input('device_type')
+            ]);
+
             $booking = BookingService::find($bookingId);
             
             if (!$booking) {
@@ -402,6 +445,29 @@ class BookingServiceController extends Controller
                 'return_time' => 'required',
                 'reason' => 'required|string|max:1000',
             ]);
+
+            // Fix device type mapping - map incorrect frontend values to correct enum values
+            $deviceTypeMapping = [
+                'hdmi' => 'hdmi_cable',
+                'tv' => 'tv_remote',
+                'tv_remote' => 'tv_remote',
+                'monitor' => 'monitor',
+                'cpu' => 'cpu',
+                'keyboard' => 'keyboard',
+                'pc' => 'pc',
+                'projector' => 'projector',
+                'others' => 'others'
+            ];
+            
+            if (isset($validatedData['device_type']) && isset($deviceTypeMapping[$validatedData['device_type']])) {
+                $originalDeviceType = $validatedData['device_type'];
+                $validatedData['device_type'] = $deviceTypeMapping[$validatedData['device_type']];
+                
+                Log::info('Device type mapping applied:', [
+                    'original' => $originalDeviceType,
+                    'mapped_to' => $validatedData['device_type']
+                ]);
+            }
 
             // Handle signature upload if provided
             if ($request->hasFile('signature')) {
@@ -495,11 +561,11 @@ class BookingServiceController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request, BookingService $bookingService): JsonResponse
+    public function destroy(Request $request, BookingService $booking): JsonResponse
     {
         try {
             // Check if user can delete this booking
-            if ((!$request->user()->role || $request->user()->role->name !== 'admin') && $bookingService->user_id !== $request->user()->id) {
+            if ((!$request->user()->role || $request->user()->role->name !== 'admin') && $booking->user_id !== $request->user()->id) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Unauthorized to delete this booking'
@@ -507,7 +573,7 @@ class BookingServiceController extends Controller
             }
 
             // Only allow deletion if booking is still pending
-            if ($bookingService->status !== 'pending') {
+            if ($booking->status !== 'pending') {
                 return response()->json([
                     'success' => false,
                     'message' => 'Cannot delete booking that is no longer pending'
@@ -515,14 +581,14 @@ class BookingServiceController extends Controller
             }
 
             // Delete signature file if exists
-            if ($bookingService->signature_path) {
-                Storage::disk('public')->delete($bookingService->signature_path);
+            if ($booking->signature_path) {
+                Storage::disk('public')->delete($booking->signature_path);
             }
 
-            $bookingService->delete();
+            $booking->delete();
 
             Log::info('Booking service deleted successfully', [
-                'booking_id' => $bookingService->id,
+                'booking_id' => $booking->id,
                 'user_id' => $request->user()->id
             ]);
 
@@ -536,6 +602,47 @@ class BookingServiceController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error deleting booking',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Check if user can submit a new booking request.
+     */
+    public function canUserSubmitNewRequest(Request $request): JsonResponse
+    {
+        try {
+            $canSubmitCheck = BookingService::canUserSubmitNewRequest($request->user()->id);
+            
+            $response = [
+                'success' => true,
+                'can_submit' => $canSubmitCheck['can_submit'],
+                'message' => $canSubmitCheck['message']
+            ];
+            
+            if (!$canSubmitCheck['can_submit'] && $canSubmitCheck['active_request']) {
+                $activeRequest = $canSubmitCheck['active_request'];
+                $response['active_request'] = [
+                    'id' => $activeRequest->id,
+                    'device_display_name' => $activeRequest->getDeviceDisplayNameAttribute(),
+                    'booking_date' => $activeRequest->booking_date,
+                    'return_date' => $activeRequest->return_date,
+                    'status' => $activeRequest->status,
+                    'ict_approve' => $activeRequest->ict_approve,
+                    'return_status' => $activeRequest->return_status,
+                    'created_at' => $activeRequest->created_at
+                ];
+                $response['return_status_info'] = $canSubmitCheck['return_status'] ?? null;
+            }
+            
+            return response()->json($response);
+            
+        } catch (\Exception $e) {
+            Log::error('Error checking if user can submit new request: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error checking request eligibility',
                 'error' => $e->getMessage()
             ], 500);
         }

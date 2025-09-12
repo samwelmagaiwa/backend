@@ -1,8 +1,8 @@
 <template>
   <aside
     v-if="shouldShowSidebar"
-    class="min-h-full flex flex-col transition-all duration-300 ease-in-out overflow-hidden relative shadow-2xl"
-    :class="[isCollapsed ? 'w-16' : 'w-56']"
+    class="min-h-full flex flex-col transition-all duration-300 ease-in-out overflow-hidden relative shadow-2xl sidebar-responsive"
+    :class="[isCollapsed ? 'w-16 sidebar-collapsed' : 'w-56 sidebar-expanded']"
     aria-label="Sidebar navigation"
     style="
       background: linear-gradient(
@@ -92,7 +92,7 @@
               >
                 <i class="fas fa-hospital text-white text-sm"></i>
               </div>
-              <span class="text-white font-bold text-lg tracking-wide">MNH</span>
+              <span class="text-white font-bold responsive-brand-text tracking-wide">MNH</span>
             </div>
           </div>
         </div>
@@ -133,12 +133,12 @@
               <!-- User Info -->
               <div class="flex-1 min-w-0">
                 <h3
-                  class="text-white font-bold text-sm truncate group-hover:text-orange-100 transition-colors duration-300"
+                  class="text-white font-bold responsive-profile-name truncate group-hover:text-orange-100 transition-colors duration-300"
                 >
                   {{ userName || 'JOHN DOE' }}
                 </h3>
                 <p
-                  class="text-blue-100 text-xs truncate opacity-80 group-hover:opacity-100 transition-opacity duration-300"
+                  class="text-blue-100 responsive-profile-role truncate opacity-80 group-hover:opacity-100 transition-opacity duration-300"
                 >
                   {{ getRoleDisplayName(userRole) }}
                 </p>
@@ -171,9 +171,10 @@
               >
                 <!-- Avatar background layers -->
                 <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
-                <span class="text-white font-bold text-sm relative z-10 drop-shadow-lg">{{
-                  userInitials
-                }}</span>
+                <span
+                  class="text-white font-bold responsive-profile-name relative z-10 drop-shadow-lg"
+                  >{{ userInitials }}</span
+                >
                 <!-- Online indicator -->
                 <div
                   class="absolute bottom-0 right-0 w-2 h-2 bg-green-400 rounded-full border border-white shadow-sm animate-pulse"
@@ -194,7 +195,7 @@
         <div v-if="filteredDashboardItems.length > 0" class="mb-2">
           <div
             v-if="!isCollapsed"
-            class="flex items-center justify-between px-4 py-2 text-xs font-bold text-blue-200 uppercase tracking-wider cursor-pointer hover:text-white transition-colors duration-200 section-header"
+            class="flex items-center justify-between px-4 py-2 responsive-section-header font-bold text-blue-200 uppercase tracking-wider cursor-pointer hover:text-white transition-colors duration-200 section-header"
             @click="toggleSectionLocal('dashboard')"
           >
             <span>Dashboard</span>
@@ -229,7 +230,7 @@
               v-for="item in filteredDashboardItems"
               :key="item.path"
               :to="item.path"
-              class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 relative ml-2 shadow-sm nav-item"
+              class="group flex items-center px-4 py-3 responsive-nav-item font-medium rounded-lg transition-all duration-200 relative ml-2 shadow-sm nav-item"
               :class="[
                 route.path === item.path
                   ? 'bg-white text-blue-600 shadow-lg transform scale-105'
@@ -239,7 +240,7 @@
               v-tooltip="isCollapsed ? item.displayName : ''"
             >
               <div
-                class="flex items-center justify-center w-5 h-5 transition-colors duration-200"
+                class="flex items-center justify-center responsive-icon-small transition-colors duration-200"
                 :class="isCollapsed ? '' : 'mr-3'"
               >
                 <i :class="[item.icon, 'text-current']"></i>
@@ -260,7 +261,7 @@
         <div v-if="filteredUserManagementItems.length > 0" class="mb-2">
           <div
             v-if="!isCollapsed"
-            class="flex items-center justify-between px-4 py-2 text-xs font-bold text-blue-200 uppercase tracking-wider cursor-pointer hover:text-white transition-colors duration-200 section-header"
+            class="flex items-center justify-between px-4 py-2 responsive-section-header font-bold text-blue-200 uppercase tracking-wider cursor-pointer hover:text-white transition-colors duration-200 section-header"
             @click="toggleSectionLocal('userManagement')"
           >
             <span>User Management</span>
@@ -295,7 +296,7 @@
               v-for="item in filteredUserManagementItems"
               :key="item.path"
               :to="item.path"
-              class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 relative ml-2 shadow-sm nav-item"
+              class="group flex items-center px-4 py-3 responsive-nav-item font-medium rounded-lg transition-all duration-200 relative ml-2 shadow-sm nav-item"
               :class="[
                 route.path === item.path
                   ? 'bg-white text-blue-600 shadow-lg transform scale-105'
@@ -305,7 +306,7 @@
               v-tooltip="isCollapsed ? item.displayName : ''"
             >
               <div
-                class="flex items-center justify-center w-5 h-5 transition-colors duration-200"
+                class="flex items-center justify-center responsive-icon-small transition-colors duration-200"
                 :class="isCollapsed ? '' : 'mr-3'"
               >
                 <i :class="[item.icon, 'text-current']"></i>
@@ -326,7 +327,7 @@
         <div v-if="filteredRequestsManagementItems.length > 0" class="mb-2">
           <div
             v-if="!isCollapsed"
-            class="flex items-center justify-between px-4 py-2 text-xs font-bold text-blue-200 uppercase tracking-wider cursor-pointer hover:text-white transition-colors duration-200 section-header"
+            class="flex items-center justify-between px-4 py-2 responsive-section-header font-bold text-blue-200 uppercase tracking-wider cursor-pointer hover:text-white transition-colors duration-200 section-header"
             @click="toggleSectionLocal('requestsManagement')"
           >
             <span>Requests</span>
@@ -361,7 +362,7 @@
               v-for="item in filteredRequestsManagementItems"
               :key="item.path"
               :to="item.path"
-              class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 relative ml-2 shadow-sm nav-item"
+              class="group flex items-center px-4 py-3 responsive-nav-item font-medium rounded-lg transition-all duration-200 relative ml-2 shadow-sm nav-item"
               :class="[
                 route.path === item.path
                   ? 'bg-white text-blue-600 shadow-lg transform scale-105'
@@ -371,7 +372,7 @@
               v-tooltip="isCollapsed ? item.displayName : ''"
             >
               <div
-                class="flex items-center justify-center w-5 h-5 transition-colors duration-200"
+                class="flex items-center justify-center responsive-icon-small transition-colors duration-200"
                 :class="isCollapsed ? '' : 'mr-3'"
               >
                 <i :class="[item.icon, 'text-current']"></i>
@@ -392,7 +393,7 @@
         <div v-if="filteredDeviceManagementItems.length > 0" class="mb-2">
           <div
             v-if="!isCollapsed"
-            class="flex items-center justify-between px-4 py-2 text-xs font-bold text-blue-200 uppercase tracking-wider cursor-pointer hover:text-white transition-colors duration-200 section-header"
+            class="flex items-center justify-between px-4 py-2 responsive-section-header font-bold text-blue-200 uppercase tracking-wider cursor-pointer hover:text-white transition-colors duration-200 section-header"
             @click="toggleSectionLocal('deviceManagement')"
           >
             <span>Device Management</span>
@@ -427,7 +428,7 @@
               v-for="item in filteredDeviceManagementItems"
               :key="item.path"
               :to="item.path"
-              class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 relative ml-2 shadow-sm nav-item"
+              class="group flex items-center px-4 py-3 responsive-nav-item font-medium rounded-lg transition-all duration-200 relative ml-2 shadow-sm nav-item"
               :class="[
                 route.path === item.path
                   ? 'bg-white text-blue-600 shadow-lg transform scale-105'
@@ -437,7 +438,7 @@
               v-tooltip="isCollapsed ? item.displayName : ''"
             >
               <div
-                class="flex items-center justify-center w-5 h-5 transition-colors duration-200"
+                class="flex items-center justify-center responsive-icon-small transition-colors duration-200"
                 :class="isCollapsed ? '' : 'mr-3'"
               >
                 <i :class="[item.icon, 'text-current']"></i>
@@ -460,15 +461,20 @@
         <!-- Help Center -->
         <button
           @click="showHelp"
-          class="w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 text-white hover:bg-blue-600/60"
+          class="w-full flex items-center px-4 py-3 responsive-bottom-section font-medium rounded-lg transition-all duration-200 text-white hover:bg-blue-600/60"
           :class="isCollapsed ? 'justify-center' : ''"
           v-tooltip="isCollapsed ? 'Help Center' : ''"
         >
           <div
-            class="flex items-center justify-center w-5 h-5 transition-colors duration-200"
+            class="flex items-center justify-center responsive-icon-small transition-colors duration-200"
             :class="isCollapsed ? '' : 'mr-3'"
           >
-            <svg class="w-5 h-5 text-current" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="responsive-icon-small text-current"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -477,21 +483,30 @@
               />
             </svg>
           </div>
-          <span v-if="!isCollapsed" class="truncate uppercase tracking-wide">HELP CENTER</span>
+          <span
+            v-if="!isCollapsed"
+            class="truncate uppercase tracking-wide responsive-bottom-section"
+            >HELP CENTER</span
+          >
         </button>
 
         <!-- Logout -->
         <button
           @click="handleLogout"
-          class="w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 text-white hover:bg-blue-600/60"
+          class="w-full flex items-center px-4 py-3 responsive-bottom-section font-medium rounded-lg transition-all duration-200 text-white hover:bg-blue-600/60"
           :class="isCollapsed ? 'justify-center' : ''"
           v-tooltip="isCollapsed ? 'Log Out' : ''"
         >
           <div
-            class="flex items-center justify-center w-5 h-5 transition-colors duration-200"
+            class="flex items-center justify-center responsive-icon-small transition-colors duration-200"
             :class="isCollapsed ? '' : 'mr-3'"
           >
-            <svg class="w-5 h-5 text-current" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="responsive-icon-small text-current"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -500,7 +515,11 @@
               />
             </svg>
           </div>
-          <span v-if="!isCollapsed" class="truncate uppercase tracking-wide">LOG OUT</span>
+          <span
+            v-if="!isCollapsed"
+            class="truncate uppercase tracking-wide responsive-bottom-section"
+            >LOG OUT</span
+          >
         </button>
       </div>
     </div>
@@ -1128,6 +1147,94 @@
 </script>
 
 <style scoped>
+  /* Responsive Font Size Variables */
+  .sidebar-responsive {
+    --brand-font-size: 0.875rem; /* 14px */
+    --profile-name-size: 0.875rem; /* 14px */
+    --profile-role-size: 0.75rem; /* 12px */
+    --section-header-size: 0.75rem; /* 12px */
+    --nav-item-size: 0.875rem; /* 14px */
+    --bottom-section-size: 0.875rem; /* 14px */
+
+    /* Icon sizes */
+    --icon-size-small: 1rem; /* 16px */
+    --icon-size-medium: 1.25rem; /* 20px */
+
+    /* Transition for font sizes */
+    transition: all 0.3s ease-in-out;
+  }
+
+  .sidebar-expanded {
+    --brand-font-size: 1.125rem; /* 18px */
+    --profile-name-size: 0.875rem; /* 14px */
+    --profile-role-size: 0.75rem; /* 12px */
+    --section-header-size: 0.75rem; /* 12px */
+    --nav-item-size: 0.875rem; /* 14px */
+    --bottom-section-size: 0.875rem; /* 14px */
+
+    --icon-size-small: 1.25rem; /* 20px */
+    --icon-size-medium: 1.5rem; /* 24px */
+  }
+
+  .sidebar-collapsed {
+    --brand-font-size: 0.75rem; /* 12px - hidden anyway */
+    --profile-name-size: 0.75rem; /* 12px - hidden anyway */
+    --profile-role-size: 0.625rem; /* 10px - hidden anyway */
+    --section-header-size: 0.625rem; /* 10px - hidden anyway */
+    --nav-item-size: 0.75rem; /* 12px - hidden anyway */
+    --bottom-section-size: 0.75rem; /* 12px - hidden anyway */
+
+    --icon-size-small: 1rem; /* 16px */
+    --icon-size-medium: 1.25rem; /* 20px */
+  }
+
+  /* Responsive text classes */
+  .responsive-brand-text {
+    font-size: var(--brand-font-size);
+    transition: font-size 0.3s ease-in-out;
+  }
+
+  .responsive-profile-name {
+    font-size: var(--profile-name-size);
+    transition: font-size 0.3s ease-in-out;
+  }
+
+  .responsive-profile-role {
+    font-size: var(--profile-role-size);
+    transition: font-size 0.3s ease-in-out;
+  }
+
+  .responsive-section-header {
+    font-size: var(--section-header-size);
+    transition: font-size 0.3s ease-in-out;
+  }
+
+  .responsive-nav-item {
+    font-size: var(--nav-item-size);
+    transition: font-size 0.3s ease-in-out;
+  }
+
+  .responsive-bottom-section {
+    font-size: var(--bottom-section-size);
+    transition: font-size 0.3s ease-in-out;
+  }
+
+  .responsive-icon-small {
+    width: var(--icon-size-small);
+    height: var(--icon-size-small);
+    transition:
+      width 0.3s ease-in-out,
+      height 0.3s ease-in-out;
+  }
+
+  .responsive-icon-medium {
+    width: var(--icon-size-medium);
+    height: var(--icon-size-medium);
+    transition:
+      width 0.3s ease-in-out,
+      height 0.3s ease-in-out;
+  }
+
   /* Custom scrollbar */
   .custom-scrollbar::-webkit-scrollbar {
     width: 4px;
@@ -1398,6 +1505,26 @@
   /* Enhanced Sidebar Transitions */
   .h-screen {
     transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Global transitions for all responsive elements */
+  .sidebar-responsive * {
+    transition:
+      font-size 0.3s ease-in-out,
+      width 0.3s ease-in-out,
+      height 0.3s ease-in-out;
+  }
+
+  /* Ensure text doesn't wrap during transitions */
+  .responsive-brand-text,
+  .responsive-profile-name,
+  .responsive-profile-role,
+  .responsive-section-header,
+  .responsive-nav-item,
+  .responsive-bottom-section {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   /* Profile hover effects */
