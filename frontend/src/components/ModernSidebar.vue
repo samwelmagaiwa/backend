@@ -2,7 +2,7 @@
   <aside
     v-if="shouldShowSidebar"
     class="min-h-full flex flex-col transition-all duration-300 ease-in-out overflow-hidden relative shadow-2xl"
-    :class="[isCollapsed ? 'w-16' : 'w-72']"
+    :class="[isCollapsed ? 'w-16' : 'w-56']"
     aria-label="Sidebar navigation"
     style="
       background: linear-gradient(

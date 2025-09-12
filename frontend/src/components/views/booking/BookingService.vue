@@ -11,7 +11,7 @@
           <!-- Floating geometric shapes -->
           <div class="absolute inset-0">
             <div
-              v-for="i in 20"
+              v-for="i in 10"
               :key="i"
               class="absolute text-white opacity-5 animate-float"
               :style="{
@@ -37,12 +37,12 @@
         <div class="max-w-12xl mx-auto relative z-10">
           <!-- Header Section -->
           <div
-            class="booking-glass-card rounded-t-3xl p-6 mb-0 border-b border-blue-300/30 animate-fade-in"
+            class="booking-glass-card rounded-t-3xl p-4 mb-0 border-b border-blue-300/30 animate-fade-in"
           >
             <div class="flex justify-between items-center">
               <!-- Left Logo -->
               <div
-                class="w-24 h-24 mr-6 transform hover:scale-110 transition-transform duration-300"
+                class="w-16 h-16 mr-4 transform hover:scale-110 transition-transform duration-300"
               >
                 <div
                   class="w-full h-full bg-gradient-to-br from-blue-500/20 to-teal-500/20 rounded-2xl backdrop-blur-sm border-2 border-blue-300/40 flex items-center justify-center shadow-2xl hover:shadow-blue-500/25"
@@ -50,7 +50,7 @@
                   <img
                     src="/assets/images/ngao2.png"
                     alt="National Shield"
-                    class="max-w-16 max-h-16 object-contain"
+                    class="max-w-12 max-h-12 object-contain"
                   />
                 </div>
               </div>
@@ -58,13 +58,13 @@
               <!-- Center Content -->
               <div class="text-center flex-1">
                 <h1
-                  class="text-3xl font-bold text-white mb-4 tracking-wide drop-shadow-lg animate-fade-in"
+                  class="text-2xl font-bold text-white mb-2 tracking-wide drop-shadow-lg animate-fade-in"
                 >
                   MUHIMBILI NATIONAL HOSPITAL
                 </h1>
-                <div class="relative inline-block mb-4">
+                <div class="relative inline-block mb-2">
                   <div
-                    class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-3 rounded-full text-lg font-bold shadow-2xl transform hover:scale-105 transition-all duration-300 border-2 border-blue-400/60"
+                    class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2 rounded-full text-base font-bold shadow-2xl transform hover:scale-105 transition-all duration-300 border-2 border-blue-400/60"
                   >
                     <span class="relative z-10 flex items-center gap-2">
                       <i class="fas fa-calendar-check"></i>
@@ -76,7 +76,7 @@
                   </div>
                 </div>
                 <h2
-                  class="text-xl font-bold text-blue-100 tracking-wide drop-shadow-md animate-fade-in-delay"
+                  class="text-lg font-bold text-blue-100 tracking-wide drop-shadow-md animate-fade-in-delay"
                 >
                   ICT EQUIPMENT RESERVATION SYSTEM
                 </h2>
@@ -84,7 +84,7 @@
 
               <!-- Right Logo -->
               <div
-                class="w-24 h-24 ml-6 transform hover:scale-110 transition-transform duration-300"
+                class="w-16 h-16 ml-4 transform hover:scale-110 transition-transform duration-300"
               >
                 <div
                   class="w-full h-full bg-gradient-to-br from-teal-500/20 to-blue-500/20 rounded-2xl backdrop-blur-sm border-2 border-teal-300/40 flex items-center justify-center shadow-2xl hover:shadow-teal-500/25"
@@ -92,7 +92,7 @@
                   <img
                     src="/assets/images/logo2.png"
                     alt="Muhimbili Logo"
-                    class="max-w-16 max-h-16 object-contain"
+                    class="max-w-12 max-h-12 object-contain"
                   />
                 </div>
               </div>
@@ -122,12 +122,12 @@
             v-else-if="!hasPendingRequest"
             class="booking-glass-card rounded-b-3xl overflow-hidden animate-slide-up"
           >
-            <form @submit.prevent="submitBooking" class="p-6 space-y-6">
+            <form @submit.prevent="submitBooking" class="p-4 space-y-4">
               <!-- Booking Information Section -->
               <div
-                class="booking-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
+                class="booking-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-4 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
               >
-                <div class="flex items-center space-x-4 mb-4">
+                <div class="flex items-center space-x-3 mb-3">
                   <div
                     class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
                   >
@@ -139,12 +139,12 @@
                   </h3>
                 </div>
 
-                <div class="space-y-4">
+                <div class="space-y-3">
                   <!-- Row 1: Name of Borrower & Booking Date -->
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <!-- Name of Borrower -->
                     <div class="group">
-                      <label class="block text-sm font-bold text-blue-100 mb-2 flex items-center">
+                      <label class="block text-sm font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-user mr-2 text-blue-300"></i>
                         Name of Borrower
                         <span class="text-red-400 ml-1">*</span>
@@ -154,7 +154,7 @@
                           v-model="formData.borrowerName"
                           type="text"
                           readonly
-                          class="booking-input w-full px-3 py-3 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50 cursor-not-allowed opacity-90"
+                          class="booking-input w-full px-3 py-2 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50 cursor-not-allowed opacity-90"
                           placeholder="Auto-populated from your account"
                           title="This field is automatically filled with your account name"
                           required
@@ -183,7 +183,7 @@
 
                     <!-- Booking Date -->
                     <div class="group">
-                      <label class="block text-sm font-bold text-blue-100 mb-2 flex items-center">
+                      <label class="block text-sm font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-calendar mr-2 text-blue-300"></i>
                         Booking Date <span class="text-red-400 ml-1">*</span>
                       </label>
@@ -193,7 +193,7 @@
                           @input="validateBookingDate"
                           @change="validateBookingDate"
                           type="date"
-                          class="booking-input w-full px-3 py-3 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50"
+                          class="booking-input w-full px-3 py-2 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50"
                           required
                         />
                         <div
@@ -214,7 +214,7 @@
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <!-- Type of Device -->
                     <div class="group">
-                      <label class="block text-sm font-bold text-blue-100 mb-2 flex items-center">
+                      <label class="block text-sm font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-laptop mr-2 text-blue-300"></i>
                         Type of Device Borrowed
                         <span class="text-red-400 ml-1">*</span>
@@ -224,7 +224,7 @@
                           v-model="formData.deviceInventoryId"
                           @change="handleDeviceTypeChange"
                           :disabled="isLoadingDevices"
-                          class="w-full px-3 py-3 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white bg-blue-600/80 focus:bg-blue-600/90 transition-all backdrop-blur-sm group-hover:border-blue-400/50 appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                          class="w-full px-3 py-2 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white bg-blue-600/80 focus:bg-blue-600/90 transition-all backdrop-blur-sm group-hover:border-blue-400/50 appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                           required
                         >
                           <option value="" class="bg-blue-800 text-blue-300">
@@ -273,7 +273,7 @@
 
                     <!-- Department -->
                     <div class="group">
-                      <label class="block text-sm font-bold text-blue-100 mb-2 flex items-center">
+                      <label class="block text-sm font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-building mr-2 text-blue-300"></i>
                         Department <span class="text-red-400 ml-1">*</span>
                       </label>
@@ -281,7 +281,7 @@
                         <select
                           v-model="formData.department"
                           @change="validateDepartment"
-                          class="w-full px-3 py-3 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white bg-blue-600/80 focus:bg-blue-600/90 transition-all backdrop-blur-sm group-hover:border-blue-400/50 appearance-none cursor-pointer"
+                          class="w-full px-3 py-2 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white bg-blue-600/80 focus:bg-blue-600/90 transition-all backdrop-blur-sm group-hover:border-blue-400/50 appearance-none cursor-pointer"
                           required
                         >
                           <option value="" class="bg-blue-800 text-blue-300">
@@ -345,7 +345,7 @@
                     v-if="formData.deviceInventoryId === 'others'"
                     class="group animate-slide-down"
                   >
-                    <label class="block text-sm font-bold text-blue-100 mb-2 flex items-center">
+                    <label class="block text-sm font-bold text-blue-100 mb-1 flex items-center">
                       <i class="fas fa-edit mr-2 text-blue-300"></i>
                       Specify Device <span class="text-red-400 ml-1">*</span>
                     </label>
@@ -354,7 +354,7 @@
                         v-model="formData.customDevice"
                         @input="validateCustomDevice"
                         type="text"
-                        class="booking-input w-full px-3 py-3 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50"
+                        class="booking-input w-full px-3 py-2 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50"
                         placeholder="Please specify the device you want to borrow"
                         :required="formData.deviceInventoryId === 'others'"
                       />
@@ -375,7 +375,7 @@
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <!-- Phone Number -->
                     <div class="group">
-                      <label class="block text-sm font-bold text-blue-100 mb-2 flex items-center">
+                      <label class="block text-sm font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-phone mr-2 text-blue-300"></i>
                         Phone Number <span class="text-red-400 ml-1">*</span>
                       </label>
@@ -384,7 +384,7 @@
                           v-model="formData.phoneNumber"
                           type="tel"
                           readonly
-                          class="booking-input w-full px-3 py-3 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50 cursor-not-allowed opacity-90"
+                          class="booking-input w-full px-3 py-2 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50 cursor-not-allowed opacity-90"
                           placeholder="Auto-populated from your account"
                           title="This field is automatically filled with your account phone number"
                           required
@@ -413,7 +413,7 @@
 
                     <!-- Date of Collection -->
                     <div class="group">
-                      <label class="block text-sm font-bold text-blue-100 mb-2 flex items-center">
+                      <label class="block text-sm font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-calendar-plus mr-2 text-blue-300"></i>
                         Date of returning
                         <span class="text-red-400 ml-1">*</span>
@@ -424,7 +424,7 @@
                           @input="validateReturnDate"
                           @change="validateReturnDate"
                           type="date"
-                          class="booking-input w-full px-3 py-3 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50"
+                          class="booking-input w-full px-3 py-2 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50"
                           required
                         />
                         <div
@@ -444,7 +444,7 @@
                   <!-- Return Time -->
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div class="group">
-                      <label class="block text-sm font-bold text-blue-100 mb-2 flex items-center">
+                      <label class="block text-sm font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-clock mr-2 text-blue-300"></i>
                         Return Time <span class="text-red-400 ml-1">*</span>
                       </label>
@@ -455,7 +455,7 @@
                           @change="handleReturnTimeChange"
                           @input="validateReturnTime"
                           @click="handleReturnTimeClick"
-                          class="booking-input w-full px-3 py-3 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50 relative z-10"
+                          class="booking-input w-full px-3 py-2 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50 relative z-10"
                           style="color-scheme: dark"
                           required
                         />
@@ -484,7 +484,7 @@
 
                   <!-- Reason for Borrowing -->
                   <div class="group">
-                    <label class="block text-sm font-bold text-blue-100 mb-2 flex items-center">
+                    <label class="block text-sm font-bold text-blue-100 mb-1 flex items-center">
                       <i class="fas fa-comment-alt mr-2 text-blue-300"></i>
                       Reason for Borrowing
                       <span class="text-red-400 ml-1">*</span>
@@ -493,7 +493,7 @@
                       <textarea
                         v-model="formData.reason"
                         @input="handleReasonInput"
-                        class="booking-input w-full px-3 py-3 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50 resize-none"
+                        class="booking-input w-full px-3 py-2 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50 resize-none"
                         rows="3"
                         placeholder="Please explain the reason for borrowing this device... (minimum 10 characters)"
                         maxlength="1000"
@@ -525,9 +525,9 @@
 
               <!-- Signature Section -->
               <div
-                class="booking-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-4 rounded-xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
+                class="booking-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-3 rounded-xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
               >
-                <div class="flex items-center space-x-3 mb-3">
+                <div class="flex items-center space-x-3 mb-2">
                   <div
                     class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
                   >
@@ -537,7 +537,7 @@
                 </div>
 
                 <div class="group">
-                  <label class="block text-sm font-bold text-blue-100 mb-2 flex items-center">
+                  <label class="block text-sm font-bold text-blue-100 mb-1 flex items-center">
                     <i class="fas fa-signature mr-2 text-blue-300"></i>
                     Signature <span class="text-red-400 ml-1">*</span>
                     <span class="ml-2 text-xs text-blue-300/70 font-normal">(PNG, JPG, JPEG)</span>
@@ -625,12 +625,12 @@
               </div>
 
               <!-- Submit Section -->
-              <div class="border-t border-blue-300/20 pt-6">
+              <div class="border-t border-blue-300/20 pt-4">
                 <div class="flex justify-between items-center">
                   <button
                     type="button"
                     @click="goBack"
-                    class="px-6 py-3 bg-gray-600/80 text-white rounded-xl hover:bg-gray-700/80 transition-all duration-300 font-semibold flex items-center shadow-lg hover:shadow-xl transform hover:scale-105 backdrop-blur-sm border border-gray-500/50"
+                    class="px-4 py-2 bg-gray-600/80 text-white rounded-xl hover:bg-gray-700/80 transition-all duration-300 font-semibold flex items-center shadow-lg hover:shadow-xl transform hover:scale-105 backdrop-blur-sm border border-gray-500/50"
                   >
                     <i class="fas fa-arrow-left mr-2"></i>
                     Back to Dashboard
@@ -639,7 +639,7 @@
                   <button
                     type="submit"
                     :disabled="isSubmitting"
-                    class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-semibold flex items-center shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none border border-blue-400/50"
+                    class="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-semibold flex items-center shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none border border-blue-400/50"
                   >
                     <i v-if="!isSubmitting" class="fas fa-paper-plane mr-2"></i>
                     <i v-else class="fas fa-spinner fa-spin mr-2"></i>

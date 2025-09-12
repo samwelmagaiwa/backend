@@ -4,7 +4,7 @@
     <div class="flex flex-1 overflow-hidden">
       <ModernSidebar />
       <main
-        class="flex-1 p-8 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative"
+        class="flex-1 p-4 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative"
       >
         <!-- Background Pattern -->
         <div class="absolute inset-0 overflow-hidden">
@@ -33,10 +33,10 @@
           </div>
         </div>
 
-        <div class="max-w-full mx-auto px-4 relative z-10">
+        <div class="max-w-full mx-auto px-2 relative z-10">
           <!-- Header Section -->
           <div
-            class="booking-glass-card rounded-t-3xl p-8 mb-0 border-b border-blue-300/30 animate-fade-in"
+            class="booking-glass-card rounded-t-3xl p-6 mb-0 border-b border-blue-300/30 animate-fade-in"
           >
             <div class="flex justify-between items-center">
               <!-- Left Logo -->
@@ -115,7 +115,7 @@
 
           <!-- Main Content -->
           <div class="booking-glass-card rounded-b-3xl overflow-hidden animate-slide-up">
-            <div class="p-8">
+            <div class="p-6">
               <!-- Stats Cards -->
               <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                 <div
