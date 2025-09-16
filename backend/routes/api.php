@@ -395,7 +395,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/recent-activity', [\App\Http\Controllers\Api\v1\UserDashboardController::class, 'getRecentActivity'])->name('user.recent-activity');
     });
 
-    // HOD Combined Access Request routes (HOD only)
+    // HOD Combined Access Request routes (HOD only) - LEGACY
     Route::prefix('hod')->middleware('role:head_of_department,divisional_director,ict_director,admin')->group(function () {
         Route::get('combined-access-requests', [HodCombinedAccessController::class, 'index'])
             ->name('hod.combined-access-requests.index');
@@ -407,6 +407,50 @@ Route::middleware('auth:sanctum')->group(function () {
             ->name('hod.combined-access-requests.approve');
         Route::post('combined-access-requests/{id}/cancel', [HodCombinedAccessController::class, 'cancel'])
             ->name('hod.combined-access-requests.cancel');
+    });
+
+    // ========================================
+    // NEW COMPLETE USER ACCESS WORKFLOW ROUTES
+    // ========================================
+    
+    // User Access Workflow routes - Complete system for all stakeholders
+    Route::prefix('user-access-workflow')->group(function () {
+        // Basic CRUD operations
+        Route::get('/', [\App\Http\Controllers\Api\UserAccessWorkflowController::class, 'index'])
+            ->name('user-access-workflow.index');
+        Route::post('/', [\App\Http\Controllers\Api\UserAccessWorkflowController::class, 'store'])
+            ->name('user-access-workflow.store');
+        Route::get('/{userAccess}', [\App\Http\Controllers\Api\UserAccessWorkflowController::class, 'show'])
+            ->name('user-access-workflow.show');
+        Route::put('/{userAccess}', [\App\Http\Controllers\Api\UserAccessWorkflowController::class, 'update'])
+            ->name('user-access-workflow.update');
+        
+        // Utility routes
+        Route::get('/options/form-data', [\App\Http\Controllers\Api\UserAccessWorkflowController::class, 'getFormOptions'])
+            ->name('user-access-workflow.form-options');
+        Route::get('/statistics/dashboard', [\App\Http\Controllers\Api\UserAccessWorkflowController::class, 'getStatistics'])
+            ->name('user-access-workflow.statistics');
+        Route::post('/export/requests', [\App\Http\Controllers\Api\UserAccessWorkflowController::class, 'export'])
+            ->name('user-access-workflow.export');
+        Route::post('/{userAccess}/cancel', [\App\Http\Controllers\Api\UserAccessWorkflowController::class, 'cancel'])
+            ->name('user-access-workflow.cancel');
+        
+        // Approval workflow routes - Role-based access control
+        Route::post('/{userAccess}/approve/hod', [\App\Http\Controllers\Api\UserAccessWorkflowController::class, 'processHodApproval'])
+            ->middleware('role:head_of_department')
+            ->name('user-access-workflow.approve.hod');
+        Route::post('/{userAccess}/approve/divisional', [\App\Http\Controllers\Api\UserAccessWorkflowController::class, 'processDivisionalApproval'])
+            ->middleware('role:divisional_director')
+            ->name('user-access-workflow.approve.divisional');
+        Route::post('/{userAccess}/approve/ict-director', [\App\Http\Controllers\Api\UserAccessWorkflowController::class, 'processIctDirectorApproval'])
+            ->middleware('role:ict_director')
+            ->name('user-access-workflow.approve.ict-director');
+        Route::post('/{userAccess}/approve/head-it', [\App\Http\Controllers\Api\UserAccessWorkflowController::class, 'processHeadItApproval'])
+            ->middleware('role:head_it')
+            ->name('user-access-workflow.approve.head-it');
+        Route::post('/{userAccess}/implement/ict-officer', [\App\Http\Controllers\Api\UserAccessWorkflowController::class, 'processIctOfficerImplementation'])
+            ->middleware('role:ict_officer')
+            ->name('user-access-workflow.implement.ict-officer');
     });
 
     // User Profile routes (for form auto-population)

@@ -27,10 +27,32 @@ class UserAccess extends Model
         'signature_path',
         'purpose',
         'request_type',
+        'wellsoft_modules',
+        'jeeva_modules',
+        'internet_purposes',
+        'access_type',
+        'temporary_until',
         'status',
         'hod_comments',
         'hod_name',
         'hod_approved_at',
+        'divisional_director_name',
+        'divisional_director_signature_path',
+        'divisional_director_comments',
+        'divisional_approved_at',
+        'ict_director_name',
+        'ict_director_signature_path',
+        'ict_director_comments',
+        'ict_director_approved_at',
+        'head_it_name',
+        'head_it_signature_path',
+        'head_it_comments',
+        'head_it_approved_at',
+        'ict_officer_name',
+        'ict_officer_signature_path',
+        'ict_officer_comments',
+        'ict_officer_implemented_at',
+        'implementation_comments',
         'cancellation_reason',
         'cancelled_by',
         'cancelled_at',
@@ -44,7 +66,15 @@ class UserAccess extends Model
         'updated_at' => 'datetime',
         'request_type' => 'array',
         'purpose' => 'array',
+        'wellsoft_modules' => 'array',
+        'jeeva_modules' => 'array',
+        'internet_purposes' => 'array',
+        'temporary_until' => 'date',
         'hod_approved_at' => 'datetime',
+        'divisional_approved_at' => 'datetime',
+        'ict_director_approved_at' => 'datetime',
+        'head_it_approved_at' => 'datetime',
+        'ict_officer_implemented_at' => 'datetime',
         'cancelled_at' => 'datetime',
     ];
 
@@ -67,6 +97,17 @@ class UserAccess extends Model
         'pending_hod' => 'Pending HOD Approval',
         'hod_approved' => 'HOD Approved',
         'hod_rejected' => 'HOD Rejected',
+        'pending_divisional' => 'Pending Divisional Director',
+        'divisional_approved' => 'Divisional Director Approved',
+        'divisional_rejected' => 'Divisional Director Rejected',
+        'pending_ict_director' => 'Pending ICT Director',
+        'ict_director_approved' => 'ICT Director Approved',
+        'ict_director_rejected' => 'ICT Director Rejected',
+        'pending_head_it' => 'Pending Head IT',
+        'head_it_approved' => 'Head IT Approved',
+        'head_it_rejected' => 'Head IT Rejected',
+        'pending_ict_officer' => 'Pending ICT Officer',
+        'implemented' => 'Implemented',
         'approved' => 'Approved',
         'rejected' => 'Rejected',
         'in_review' => 'In Review',
@@ -184,5 +225,107 @@ class UserAccess extends Model
             return $this->request_type;
         }
         return [$this->request_type];
+    }
+
+    /**
+     * Access type constants
+     */
+    const ACCESS_TYPES = [
+        'permanent' => 'Permanent (until retirement)',
+        'temporary' => 'Temporary'
+    ];
+
+    /**
+     * Get next approval stage based on current status
+     */
+    public function getNextApprovalStage(): ?string
+    {
+        return match($this->status) {
+            'pending', 'pending_hod' => 'hod',
+            'hod_approved', 'pending_divisional' => 'divisional_director',
+            'divisional_approved', 'pending_ict_director' => 'ict_director',
+            'ict_director_approved', 'pending_head_it' => 'head_it',
+            'head_it_approved', 'pending_ict_officer' => 'ict_officer',
+            default => null
+        };
+    }
+
+    /**
+     * Check if request is at a specific approval stage
+     */
+    public function isAtStage(string $stage): bool
+    {
+        return match($stage) {
+            'hod' => in_array($this->status, ['pending', 'pending_hod']),
+            'divisional_director' => in_array($this->status, ['hod_approved', 'pending_divisional']),
+            'ict_director' => in_array($this->status, ['divisional_approved', 'pending_ict_director']),
+            'head_it' => in_array($this->status, ['ict_director_approved', 'pending_head_it']),
+            'ict_officer' => in_array($this->status, ['head_it_approved', 'pending_ict_officer']),
+            default => false
+        };
+    }
+
+    /**
+     * Check if request has specific modules
+     */
+    public function hasWellsoftModules(): bool
+    {
+        return !empty($this->wellsoft_modules);
+    }
+
+    public function hasJeevaModules(): bool
+    {
+        return !empty($this->jeeva_modules);
+    }
+
+    public function hasInternetPurposes(): bool
+    {
+        return !empty($this->internet_purposes);
+    }
+
+    /**
+     * Get formatted access type
+     */
+    public function getAccessTypeNameAttribute(): string
+    {
+        return self::ACCESS_TYPES[$this->access_type] ?? $this->access_type;
+    }
+
+    /**
+     * Check if access is temporary
+     */
+    public function isTemporary(): bool
+    {
+        return $this->access_type === 'temporary';
+    }
+
+    /**
+     * Check if access is permanent
+     */
+    public function isPermanent(): bool
+    {
+        return $this->access_type === 'permanent';
+    }
+
+    /**
+     * Get all modules as a combined array
+     */
+    public function getAllModulesAttribute(): array
+    {
+        $modules = [];
+        
+        if ($this->wellsoft_modules) {
+            foreach ($this->wellsoft_modules as $module) {
+                $modules[] = ['type' => 'Wellsoft', 'name' => $module];
+            }
+        }
+        
+        if ($this->jeeva_modules) {
+            foreach ($this->jeeva_modules as $module) {
+                $modules[] = ['type' => 'Jeeva', 'name' => $module];
+            }
+        }
+        
+        return $modules;
     }
 }
