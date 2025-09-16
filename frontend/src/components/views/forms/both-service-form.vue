@@ -141,6 +141,7 @@
                           <input
                             v-model.trim="form.shared.pfNumber"
                             type="text"
+                            :readonly="isReviewMode"
                             class="medical-input w-full px-2 py-1 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 text-sm"
                             placeholder="PF Number"
                             required
@@ -162,6 +163,7 @@
                           <input
                             v-model.trim="form.shared.staffName"
                             type="text"
+                            :readonly="isReviewMode"
                             class="medical-input w-full px-2 py-1 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 text-sm"
                             placeholder="Full name"
                             required
@@ -183,6 +185,7 @@
                           <input
                             v-model.trim="form.shared.department"
                             type="text"
+                            :readonly="isReviewMode"
                             class="medical-input w-full px-2 py-1 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 text-sm"
                             placeholder="Department"
                             required
@@ -201,6 +204,7 @@
                           <input
                             v-model.trim="form.shared.phone"
                             type="tel"
+                            :readonly="isReviewMode"
                             class="medical-input w-full px-2 py-1 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 text-sm"
                             placeholder="e.g. 0712 000 000"
                             required
@@ -215,8 +219,38 @@
                           Signature <span class="text-red-400">*</span>
                         </label>
                         <div class="relative max-w-sm mx-auto">
+                          <!-- Review mode: Show signature status from database -->
                           <div
-                            v-if="!signaturePreview"
+                            v-if="isReviewMode"
+                            class="w-full px-2 py-2 border-2 border-blue-300/40 rounded-lg bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 min-h-[60px] flex items-center justify-center"
+                          >
+                            <!-- Loading state -->
+                            <div v-if="loading" class="text-center">
+                              <i class="fas fa-spinner fa-spin text-blue-300 text-lg mb-1"></i>
+                              <p class="text-blue-100 text-xs">Loading signature...</p>
+                            </div>
+                            <!-- Loaded state -->
+                            <div v-else class="text-center">
+                              <div v-if="hasSignature" class="mb-1">
+                                <i class="fas fa-check-circle text-green-400 text-lg mb-1"></i>
+                                <p class="text-green-300 text-xs font-semibold flex items-center justify-center gap-1">
+                                  <i class="fas fa-check text-xs"></i>
+                                  Signed
+                                </p>
+                                <p v-if="requestData?.signature_path" class="text-blue-200 text-xs mt-1">
+                                  File: {{ getSignatureFileName(requestData.signature_path) }}
+                                </p>
+                              </div>
+                              <div v-else class="mb-1">
+                                <i class="fas fa-signature text-blue-300 text-lg mb-1"></i>
+                                <p class="text-blue-100 text-xs">No signature uploaded</p>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Edit mode: Show signature upload interface -->
+                          <div
+                            v-else-if="!signaturePreview"
                             class="w-full px-2 py-2 border-2 border-dashed border-blue-300/40 rounded-lg focus-within:border-blue-400 bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 min-h-[60px] flex items-center justify-center hover:bg-white/20"
                           >
                             <div class="text-center">
@@ -235,8 +269,9 @@
                             </div>
                           </div>
 
+                          <!-- Edit mode: Show uploaded signature preview -->
                           <div
-                            v-else
+                            v-else-if="!isReviewMode"
                             class="w-full px-2 py-2 border-2 border-blue-300/40 rounded-lg bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 min-h-[60px] flex items-center justify-center relative"
                           >
                             <div v-if="isImage(signaturePreview)" class="text-center">
@@ -281,6 +316,7 @@
                           </div>
 
                           <input
+                            v-if="!isReviewMode"
                             ref="signatureInput"
                             type="file"
                             accept="image/png,image/jpeg,application/pdf"
@@ -1552,10 +1588,13 @@
               </div>
             </form>
           </div>
+          
+          <!-- Footer moved to bottom of main content -->
+          <div class="mt-6">
+            <AppFooter />
+          </div>
         </div>
       </main>
-      <!-- Footer -->
-      <AppFooter />
     </div>
 
     <!-- Close Tab Confirmation Modal -->
@@ -2180,6 +2219,23 @@
           }
         })
         return list
+      },
+
+      // Check if signature exists in the database
+      hasSignature() {
+        const hasData = !!this.requestData
+        const hasPath = this.requestData && !!this.requestData.signature_path
+        const pathNotEmpty = hasPath && this.requestData.signature_path.trim() !== ''
+        
+        console.log('hasSignature debug:', {
+          hasData,
+          hasPath, 
+          signaturePath: this.requestData?.signature_path,
+          pathNotEmpty,
+          result: hasData && hasPath && pathNotEmpty
+        })
+        
+        return hasData && hasPath && pathNotEmpty
       }
     },
     async mounted() {
@@ -2416,24 +2472,62 @@
         try {
           this.loading = true
           this.error = null
+          
+          console.log('Loading request data for ID:', this.requestId)
           const response = await combinedAccessService.getRequestById(this.requestId)
-          this.requestData = response.data
+          
+          if (response.success && response.data) {
+            this.requestData = response.data
+            console.log('Loaded request data:', this.requestData)
+            console.log('Signature path from API:', this.requestData.signature_path)
+            console.log('Type of signature_path:', typeof this.requestData.signature_path)
 
-          // Populate form with request data
-          if (this.requestData) {
+            // Populate form with request data
             this.form.shared = {
               pfNumber: this.requestData.pf_number || '',
-              staffName: this.requestData.staff_name || '',
-              department: this.requestData.department || '',
-              phone: this.requestData.phone || ''
+              staffName: this.requestData.staff_name || this.requestData.full_name || '',
+              department: this.requestData.department || this.requestData.department_name || '',
+              phone: this.requestData.phone || this.requestData.phone_number || ''
             }
 
-            // Set other form fields based on request data structure
-            // This should be adjusted based on your actual data structure
+            // Handle signature data
+            if (this.requestData.signature_path) {
+              console.log('Signature found:', this.requestData.signature_path)
+              // In review mode, we don't load the actual file, just show the status
+              this.signatureFileName = this.getSignatureFileName(this.requestData.signature_path)
+            }
+
+            // Populate module selections based on request_types
+            if (this.requestData.request_types || this.requestData.request_type) {
+              const types = this.requestData.request_types || this.requestData.request_type || []
+              
+              // Handle Wellsoft
+              if (types.includes('wellsoft')) {
+                this.selectedWellsoft = ['Registrar'] // Default or parse from data
+              }
+              
+              // Handle Jeeva
+              if (types.includes('jeeva_access') || types.includes('jeeva')) {
+                this.selectedJeeva = ['FINANCIAL ACCOUNTING'] // Default or parse from data  
+              }
+              
+              // Handle Internet
+              if (types.includes('internet_access_request') || types.includes('internet')) {
+                // Set internet purposes if available
+                if (this.requestData.purpose) {
+                  const purposes = Array.isArray(this.requestData.purpose) ? this.requestData.purpose : [this.requestData.purpose]
+                  this.internetPurposes = [...purposes, '', '', ''].slice(0, 4)
+                }
+              }
+            }
+
+            console.log('Form populated successfully')
+          } else {
+            throw new Error(response.error || 'Failed to load request data')
           }
         } catch (error) {
           console.error('Error loading request data:', error)
-          this.error = 'Failed to load request data'
+          this.error = `Failed to load request data: ${error.message}`
           this.toast = {
             show: true,
             message: 'Error loading request data'
@@ -2461,6 +2555,12 @@
           default:
             return 'pending'
         }
+      },
+
+      // Extract filename from signature path
+      getSignatureFileName(signaturePath) {
+        if (!signaturePath) return ''
+        return signaturePath.split('/').pop() || signaturePath
       },
 
       canApproveAtStage() {

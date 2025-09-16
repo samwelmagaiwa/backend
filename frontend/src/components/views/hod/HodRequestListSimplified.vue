@@ -58,7 +58,9 @@
                 class="px-3 py-2 bg-white/20 border border-blue-300/30 rounded text-white"
               >
                 <option value="">All Statuses</option>
+                <option value="pending">Pending</option>
                 <option value="pending_hod">Pending HOD</option>
+                <option value="approved">Approved</option>
                 <option value="hod_approved">HOD Approved</option>
                 <option value="hod_rejected">HOD Rejected</option>
               </select>
@@ -137,9 +139,16 @@
 
                   <!-- Current Status -->
                   <td class="px-4 py-3">
-                    <span :class="getStatusBadgeClass(request.hod_status || request.status || 'pending_hod')" class="px-2 py-1 rounded text-xs font-medium">
-                      {{ getStatusText(request.hod_status || request.status || 'pending_hod') }}
-                    </span>
+                    <div class="flex flex-col">
+                      <!-- Display the exact database status -->
+                      <span :class="getStatusBadgeClass(request.status)" class="px-2 py-1 rounded text-xs font-medium mb-1">
+                        {{ getStatusText(request.status) }}
+                      </span>
+                      <!-- Show raw status for debugging -->
+                      <div class="text-xs text-gray-400">
+                        Raw: {{ request.status }}
+                      </div>
+                    </div>
                   </td>
 
                   <!-- Actions -->
@@ -252,10 +261,10 @@ export default {
         )
       }
 
-      // Filter by status
+      // Filter by status - use exact database status
       if (this.statusFilter) {
         filtered = filtered.filter(
-          (request) => (request.hod_status || request.status || 'pending_hod') === this.statusFilter
+          (request) => request.status === this.statusFilter
         )
       }
 
@@ -337,9 +346,10 @@ export default {
       const requests = Array.isArray(this.requests) ? this.requests : []
       
       this.stats = {
-        pendingHod: requests.filter((r) => (r.hod_status || r.status) === 'pending_hod').length,
-        hodApproved: requests.filter((r) => (r.hod_status || r.status) === 'hod_approved').length,
-        hodRejected: requests.filter((r) => (r.hod_status || r.status) === 'hod_rejected').length,
+        // Count based on exact database status values
+        pendingHod: requests.filter((r) => r.status === 'pending_hod').length,
+        hodApproved: requests.filter((r) => r.status === 'hod_approved' || r.status === 'approved').length,
+        hodRejected: requests.filter((r) => r.status === 'hod_rejected').length,
         total: requests.length
       }
     },
@@ -402,14 +412,13 @@ export default {
     },
 
     canEdit(request) {
-      // HOD can edit requests that are pending
-      return (request.hod_status || request.status) === 'pending_hod'
+      // HOD can edit requests that are pending HOD approval
+      return request.status === 'pending_hod'
     },
 
     canCancel(request) {
-      // HOD can cancel requests that are not already rejected or cancelled
-      const status = request.hod_status || request.status
-      return status !== 'hod_rejected' && status !== 'cancelled'
+      // HOD can cancel requests that are not already rejected, cancelled, or approved
+      return request.status !== 'hod_rejected' && request.status !== 'cancelled' && request.status !== 'approved'
     },
 
     formatDate(dateString) {
@@ -433,7 +442,11 @@ export default {
 
     getStatusBadgeClass(status) {
       const classes = {
-        'pending_hod': 'bg-yellow-100 text-yellow-800',
+        // Actual database status values from user_access table
+        'pending': 'bg-blue-100 text-blue-800',
+        'pending_hod': 'bg-yellow-100 text-yellow-800', 
+        'approved': 'bg-green-100 text-green-800',
+        // Additional workflow statuses
         'hod_approved': 'bg-green-100 text-green-800',
         'hod_rejected': 'bg-red-100 text-red-800',
         'cancelled': 'bg-gray-100 text-gray-800'
@@ -453,12 +466,16 @@ export default {
 
     getStatusText(status) {
       const texts = {
+        // Actual database status values from user_access table
+        'pending': 'Pending',
         'pending_hod': 'Pending HOD Approval',
+        'approved': 'Approved',
+        // Additional workflow statuses
         'hod_approved': 'HOD Approved',
-        'hod_rejected': 'HOD Rejected',
+        'hod_rejected': 'HOD Rejected', 
         'cancelled': 'Cancelled'
       }
-      return texts[status] || 'Unknown Status'
+      return texts[status] || `Unknown Status (${status})`
     }
   }
 }
