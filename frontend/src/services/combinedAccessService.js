@@ -15,7 +15,7 @@ class CombinedAccessService {
       console.log('🔄 Fetching combined access requests for HOD approval...', filters)
 
       const params = new URLSearchParams()
-      
+
       if (filters.search) params.append('search', filters.search)
       if (filters.status) params.append('status', filters.status)
       if (filters.department) params.append('department', filters.department)
@@ -25,7 +25,11 @@ class CombinedAccessService {
       const response = await apiClient.get(`/hod/combined-access-requests?${params.toString()}`)
 
       if (response.data && response.data.success) {
-        console.log('✅ HOD requests retrieved successfully:', response.data.data?.length || 0, 'requests')
+        console.log(
+          '✅ HOD requests retrieved successfully:',
+          response.data.data?.length || 0,
+          'requests'
+        )
         return {
           success: true,
           data: response.data
@@ -84,7 +88,7 @@ class CombinedAccessService {
       console.log('🔄 Updating HOD approval for request:', requestId, approvalData)
 
       const formData = new FormData()
-      
+
       // Add approval data
       formData.append('hod_status', approvalData.status) // 'approved' or 'rejected'
       formData.append('hod_comments', approvalData.comments || '')
@@ -106,7 +110,10 @@ class CombinedAccessService {
         formData.append('access_rights', JSON.stringify(approvalData.accessRights))
       }
 
-      const response = await apiClient.post(`/hod/combined-access-requests/${requestId}/approve`, formData)
+      const response = await apiClient.post(
+        `/hod/combined-access-requests/${requestId}/approve`,
+        formData
+      )
 
       if (response.data && response.data.success) {
         console.log('✅ HOD approval updated successfully:', requestId)
@@ -207,24 +214,29 @@ class CombinedAccessService {
       console.log('🔄 Exporting HOD requests...', { filters, format })
 
       const params = new URLSearchParams()
-      
+
       if (filters.search) params.append('search', filters.search)
       if (filters.status) params.append('status', filters.status)
       if (filters.department) params.append('department', filters.department)
       if (filters.date_from) params.append('date_from', filters.date_from)
       if (filters.date_to) params.append('date_to', filters.date_to)
-      
+
       params.append('format', format)
 
-      const response = await apiClient.get(`/hod/combined-access-requests/export?${params.toString()}`, {
-        responseType: 'blob'
-      })
+      const response = await apiClient.get(
+        `/hod/combined-access-requests/export?${params.toString()}`,
+        {
+          responseType: 'blob'
+        }
+      )
 
       console.log('✅ Export completed successfully')
       return {
         success: true,
         data: response.data,
-        filename: this.getFilenameFromHeaders(response.headers) || `hod_requests_${Date.now()}.${format === 'excel' ? 'xlsx' : 'csv'}`
+        filename:
+          this.getFilenameFromHeaders(response.headers) ||
+          `hod_requests_${Date.now()}.${format === 'excel' ? 'xlsx' : 'csv'}`
       }
     } catch (error) {
       console.error('❌ Error exporting HOD requests:', error)
@@ -326,7 +338,8 @@ class CombinedAccessService {
       console.error('❌ Error fetching request history:', error)
       return {
         success: false,
-        error: error.response?.data?.message || error.message || 'Failed to retrieve request history',
+        error:
+          error.response?.data?.message || error.message || 'Failed to retrieve request history',
         data: []
       }
     }
@@ -439,11 +452,11 @@ class CombinedAccessService {
    */
   getStatusText(status) {
     const statusMap = {
-      'pending_hod': 'Pending HOD Approval',
-      'hod_approved': 'HOD Approved',
-      'hod_rejected': 'HOD Rejected',
-      'cancelled': 'Cancelled',
-      'completed': 'Completed'
+      pending_hod: 'Pending HOD Approval',
+      hod_approved: 'HOD Approved',
+      hod_rejected: 'HOD Rejected',
+      cancelled: 'Cancelled',
+      completed: 'Completed'
     }
     return statusMap[status] || 'Unknown Status'
   }
@@ -455,16 +468,16 @@ class CombinedAccessService {
    */
   getServicesText(services) {
     if (!services || services.length === 0) return 'No services'
-    
+
     const serviceMap = {
-      'jeeva': 'Jeeva',
-      'jeeva_access': 'Jeeva',
-      'wellsoft': 'Wellsoft',
-      'internet': 'Internet',
-      'internet_access_request': 'Internet'
+      jeeva: 'Jeeva',
+      jeeva_access: 'Jeeva',
+      wellsoft: 'Wellsoft',
+      internet: 'Internet',
+      internet_access_request: 'Internet'
     }
-    
-    return services.map(service => serviceMap[service] || service).join(', ')
+
+    return services.map((service) => serviceMap[service] || service).join(', ')
   }
 }
 

@@ -61,7 +61,6 @@
           <!-- Main Content -->
           <div class="medical-glass-card rounded-b-3xl overflow-hidden">
             <div class="p-6">
-
               <!-- Quick Actions Section -->
               <div>
                 <h3 class="text-xl font-bold text-white mb-4 flex items-center">
@@ -82,7 +81,7 @@
                       <span class="text-white font-medium text-sm">View Requests</span>
                     </div>
                   </router-link>
-                  
+
                   <router-link
                     to="/hod-dashboard/combined-requests"
                     class="medical-card bg-gradient-to-r from-purple-600/25 to-pink-600/25 border-2 border-purple-400/40 p-4 rounded-xl backdrop-blur-sm hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 group text-center"
@@ -170,7 +169,6 @@
 
       // Local state
       // Sidebar state now managed by Pinia - no local state needed
-
 
       const recentRequests = ref([])
       const quickActions = ref([

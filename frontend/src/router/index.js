@@ -224,7 +224,7 @@ const routes = [
   },
   {
     path: '/both-service-form/:id',
-    name: 'BothServiceFormReview', 
+    name: 'BothServiceFormReview',
     component: () => import('../components/views/forms/both-service-form.vue'),
     meta: {
       requiresAuth: true,
@@ -362,7 +362,8 @@ const routes = [
   {
     path: '/hod-dashboard/combined-requests',
     name: 'HODCombinedRequestList',
-    component: () => import('../components/views/hod/HodRequestList.vue'),
+    component: () =>
+      import(/* webpackChunkName: "hod" */ '../components/views/hod/HodRequestListSimplified.vue'),
     meta: {
       requiresAuth: true,
       roles: [

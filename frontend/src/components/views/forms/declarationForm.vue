@@ -176,7 +176,9 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <!-- Full Name -->
               <div class="md:col-span-2">
-                <label class="block text-sm font-bold text-blue-100 mb-2 flex items-center justify-between">
+                <label
+                  class="block text-sm font-bold text-blue-100 mb-2 flex items-center justify-between"
+                >
                   <span>Full Name <span class="text-red-400">*</span></span>
                   <span
                     v-if="autoPopulated && formData.fullName && !isLoadingProfile"
@@ -192,10 +194,18 @@
                     type="text"
                     class="medical-input w-full px-2 py-1.5 border-2 rounded-lg focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 text-sm"
                     :class="{
-                      'bg-blue-500/30 border-blue-400/60 focus:border-blue-500 hover:bg-blue-500/40 focus:bg-blue-500/50 focus:shadow-lg focus:shadow-blue-500/30': !autoPopulated || isLoadingProfile,
-                      'bg-green-500/20 border-green-400/60 cursor-not-allowed': autoPopulated && formData.fullName && !isLoadingProfile
+                      'bg-blue-500/30 border-blue-400/60 focus:border-blue-500 hover:bg-blue-500/40 focus:bg-blue-500/50 focus:shadow-lg focus:shadow-blue-500/30':
+                        !autoPopulated || isLoadingProfile,
+                      'bg-green-500/20 border-green-400/60 cursor-not-allowed':
+                        autoPopulated && formData.fullName && !isLoadingProfile
                     }"
-                    :placeholder="isLoadingProfile ? 'Loading your name...' : (autoPopulated && formData.fullName ? 'Auto-populated from your profile' : 'Enter your full name')"
+                    :placeholder="
+                      isLoadingProfile
+                        ? 'Loading your name...'
+                        : autoPopulated && formData.fullName
+                          ? 'Auto-populated from your profile'
+                          : 'Enter your full name'
+                    "
                     :disabled="isLoadingProfile || (autoPopulated && formData.fullName)"
                     :readonly="autoPopulated && formData.fullName && !isLoadingProfile"
                     required
@@ -204,11 +214,12 @@
                     class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/10 to-blue-600/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
                   ></div>
                   <!-- Loading/Success indicator -->
-                  <div
-                    class="absolute right-2 top-1/2 transform -translate-y-1/2 text-blue-300/70"
-                  >
+                  <div class="absolute right-2 top-1/2 transform -translate-y-1/2 text-blue-300/70">
                     <i v-if="isLoadingProfile" class="fas fa-spinner fa-spin text-xs"></i>
-                    <i v-else-if="autoPopulated && formData.fullName" class="fas fa-check text-green-400 text-xs"></i>
+                    <i
+                      v-else-if="autoPopulated && formData.fullName"
+                      class="fas fa-check text-green-400 text-xs"
+                    ></i>
                   </div>
                 </div>
                 <!-- Help text for protected field -->
@@ -223,7 +234,9 @@
 
               <!-- PF Number -->
               <div>
-                <label class="block text-sm font-bold text-blue-100 mb-2 flex items-center justify-between">
+                <label
+                  class="block text-sm font-bold text-blue-100 mb-2 flex items-center justify-between"
+                >
                   <span>PF Number <span class="text-red-400">*</span></span>
                   <span
                     v-if="autoPopulated && formData.pfNumber && !isLoadingProfile"
@@ -239,10 +252,18 @@
                     type="text"
                     class="medical-input w-full px-2 py-1.5 border-2 rounded-lg focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 text-sm"
                     :class="{
-                      'bg-blue-500/30 border-blue-400/60 focus:border-blue-500 hover:bg-blue-500/40 focus:bg-blue-500/50 focus:shadow-lg focus:shadow-blue-500/30': !autoPopulated || isLoadingProfile,
-                      'bg-green-500/20 border-green-400/60 cursor-not-allowed': autoPopulated && formData.pfNumber && !isLoadingProfile
+                      'bg-blue-500/30 border-blue-400/60 focus:border-blue-500 hover:bg-blue-500/40 focus:bg-blue-500/50 focus:shadow-lg focus:shadow-blue-500/30':
+                        !autoPopulated || isLoadingProfile,
+                      'bg-green-500/20 border-green-400/60 cursor-not-allowed':
+                        autoPopulated && formData.pfNumber && !isLoadingProfile
                     }"
-                    :placeholder="isLoadingProfile ? 'Loading your PF Number...' : (autoPopulated && formData.pfNumber ? 'Auto-populated from your profile' : 'Enter PF Number')"
+                    :placeholder="
+                      isLoadingProfile
+                        ? 'Loading your PF Number...'
+                        : autoPopulated && formData.pfNumber
+                          ? 'Auto-populated from your profile'
+                          : 'Enter PF Number'
+                    "
                     :disabled="isLoadingProfile || (autoPopulated && formData.pfNumber)"
                     :readonly="autoPopulated && formData.pfNumber && !isLoadingProfile"
                     required
@@ -251,11 +272,12 @@
                     class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/10 to-blue-600/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
                   ></div>
                   <!-- Loading/Success indicator -->
-                  <div
-                    class="absolute right-2 top-1/2 transform -translate-y-1/2 text-blue-300/70"
-                  >
+                  <div class="absolute right-2 top-1/2 transform -translate-y-1/2 text-blue-300/70">
                     <i v-if="isLoadingProfile" class="fas fa-spinner fa-spin text-xs"></i>
-                    <i v-else-if="autoPopulated && formData.pfNumber" class="fas fa-check text-green-400 text-xs"></i>
+                    <i
+                      v-else-if="autoPopulated && formData.pfNumber"
+                      class="fas fa-check text-green-400 text-xs"
+                    ></i>
                   </div>
                 </div>
                 <!-- Help text for protected field -->
@@ -616,7 +638,6 @@
       }
     },
 
-
     methods: {
       /**
        * Auto-populate user data from the authenticated user's profile
@@ -625,41 +646,46 @@
         console.log('🔄 Starting declaration form auto-population...')
         this.isLoadingProfile = true
         this.profileLoadError = null
-        
+
         try {
           const result = await userProfileService.getFormAutoPopulationData()
-          
+
           if (result.success && result.data) {
             console.log('✅ User profile retrieved for declaration:', result.data)
-            
+
             // Auto-populate form fields
             this.formData.fullName = result.data.staffName || result.data.fullName || ''
             this.formData.pfNumber = result.data.pfNumber || ''
-            
+
             this.autoPopulated = true
-            
+
             console.log('✅ Declaration form auto-populated:', {
               fullName: this.formData.fullName,
               pfNumber: this.formData.pfNumber
             })
-            
+
             // Show success notification
             this.showNotification('Your name and PF number have been auto-populated', 'info')
-            
           } else {
             console.warn('⚠️ Failed to auto-populate declaration form:', result.error)
             this.profileLoadError = result.error || 'Failed to load profile data'
-            this.showNotification('Could not auto-populate your details. Please fill them manually.', 'warning')
+            this.showNotification(
+              'Could not auto-populate your details. Please fill them manually.',
+              'warning'
+            )
           }
         } catch (error) {
           console.error('❌ Error during declaration auto-population:', error)
           this.profileLoadError = error.message || 'Network error while loading profile'
-          this.showNotification('Error loading your profile. Please fill in your details manually.', 'error')
+          this.showNotification(
+            'Error loading your profile. Please fill in your details manually.',
+            'error'
+          )
         } finally {
           this.isLoadingProfile = false
         }
       },
-      
+
       loadSignature() {
         this.$refs.signatureInput.click()
       },
@@ -837,13 +863,12 @@
 
       goBack() {
         this.$emit('go-back')
-      },
-
+      }
     },
 
     async mounted() {
       console.log('🔄 Declaration form mounted, starting initialization...')
-      
+
       // Set current date as default
       const today = new Date().toISOString().split('T')[0]
       this.formData.date = today

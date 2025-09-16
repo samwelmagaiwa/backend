@@ -2127,12 +2127,12 @@
       isReviewMode() {
         return this.$route.params.id != null || this.$route.query.id != null
       },
-      
+
       // Request ID from route or query parameters
       requestId() {
         return this.$route.params.id || this.$route.query.id || null
       },
-      
+
       currentTab() {
         return this.tabs.find((t) => t.key === this.activeTab) || null
       },
@@ -2418,16 +2418,16 @@
           this.error = null
           const response = await combinedAccessService.getRequestById(this.requestId)
           this.requestData = response.data
-          
+
           // Populate form with request data
           if (this.requestData) {
             this.form.shared = {
               pfNumber: this.requestData.pf_number || '',
-              staffName: this.requestData.staff_name || '', 
+              staffName: this.requestData.staff_name || '',
               department: this.requestData.department || '',
               phone: this.requestData.phone || ''
             }
-            
+
             // Set other form fields based on request data structure
             // This should be adjusted based on your actual data structure
           }
@@ -2443,10 +2443,10 @@
           this.loading = false
         }
       },
-      
+
       getApprovalStatus(role) {
         if (!this.requestData) return 'pending'
-        
+
         switch (role) {
           case 'hod':
             return this.requestData.hod_approval_status || 'pending'
@@ -2462,13 +2462,13 @@
             return 'pending'
         }
       },
-      
+
       canApproveAtStage() {
         // This should check if the current user can approve at the current stage
         // Based on the user's role and current approval status
         return true // Simplified for now
       },
-      
+
       async approveRequest() {
         try {
           this.loading = true
@@ -2476,7 +2476,7 @@
             status: 'approved',
             comments: this.form.comments || 'Approved'
           })
-          
+
           this.toast = {
             show: true,
             message: 'Request approved successfully'
@@ -2496,18 +2496,18 @@
           this.loading = false
         }
       },
-      
+
       async rejectRequest() {
         const reason = prompt('Please provide a reason for rejection:')
         if (!reason) return
-        
+
         try {
           this.loading = true
           await combinedAccessService.updateHodApproval(this.requestId, {
             status: 'rejected',
             comments: reason
           })
-          
+
           this.toast = {
             show: true,
             message: 'Request rejected'
@@ -2527,7 +2527,7 @@
           this.loading = false
         }
       },
-      
+
       goBackToRequests() {
         this.$router.push({ name: 'HODCombinedRequestList' })
       },
