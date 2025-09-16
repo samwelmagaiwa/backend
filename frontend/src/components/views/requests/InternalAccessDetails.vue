@@ -10,6 +10,19 @@
           <!-- Header Section -->
           <div class="medical-glass-card rounded-t-3xl p-8 mb-0 border-b border-blue-300/30">
             <div class="flex justify-between items-center">
+              <!-- Refresh Button - Left -->
+              <div class="flex items-center">
+                <button
+                  @click="refreshData"
+                  :disabled="isLoading"
+                  class="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-semibold flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  title="Refresh request data"
+                >
+                  <i :class="isLoading ? 'fas fa-spinner fa-spin' : 'fas fa-sync-alt'" class="text-sm"></i>
+                  {{ isLoading ? 'Refreshing...' : 'Refresh' }}
+                </button>
+              </div>
+              
               <!-- Center Content -->
               <div class="text-center flex-1">
                 <h1 class="text-2xl font-bold text-white mb-4 tracking-wide drop-shadow-lg">
@@ -27,6 +40,9 @@
                   Internal Access Management
                 </h2>
               </div>
+              
+              <!-- Spacer for balance -->
+              <div class="w-24"></div>
             </div>
           </div>
 
@@ -39,7 +55,7 @@
                   class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"
                 ></div>
                 <h2 class="text-white text-xl">Loading request details...</h2>
-                <p class="text-blue-300">ID: {{ requestId }}, Type: {{ requestType }}</p>
+                <p class="text-blue-300">ID: {{ formattedRequestId }}, Type: {{ formattedRequestType }}</p>
               </div>
 
               <!-- Request Data -->
@@ -181,7 +197,7 @@
                     <!-- Request Status Overview -->
                     <div class="mb-6 p-4 bg-white/10 rounded-xl border border-emerald-300/30">
                       <h4 class="text-sm font-bold text-blue-100 mb-3">
-                        Combined Access Request - {{ requestType }} Status
+                        {{ formattedRequestType }} - Status Overview
                       </h4>
                       <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
                         <div class="text-center">
@@ -422,15 +438,15 @@
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-white">
                     <div>
                       <p class="text-blue-200 text-sm">Request ID:</p>
-                      <p class="font-semibold">{{ requestId }}</p>
+                      <p class="font-semibold">{{ formattedRequestId }}</p>
                     </div>
                     <div>
                       <p class="text-blue-200 text-sm">Request Type:</p>
-                      <p class="font-semibold">{{ requestType }}</p>
+                      <p class="font-semibold">{{ formattedRequestType }}</p>
                     </div>
                     <div>
                       <p class="text-blue-200 text-sm">Status:</p>
-                      <p class="font-semibold">{{ requestData?.currentStatus || 'Pending' }}</p>
+                      <p class="font-semibold">{{ formattedCurrentStatus }}</p>
                     </div>
                     <div>
                       <p class="text-blue-200 text-sm">ICT Status:</p>
@@ -472,7 +488,7 @@
                   <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
                 </div>
                 <h2 class="text-white text-xl">Failed to Load Request</h2>
-                <p class="text-red-300">Could not load request details for ID: {{ requestId }}</p>
+                <p class="text-red-300">Could not load request details for ID: {{ formattedRequestId }}</p>
                 <button
                   @click="loadRequestData"
                   class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -537,6 +553,89 @@
         )
       })
 
+      // Format request ID with padding like #REQ-000004
+      const formattedRequestId = computed(() => {
+        if (!requestId.value || requestId.value === 'N/A') return 'N/A'
+        // Extract numeric part from request ID and pad with zeros
+        const numericMatch = requestId.value.toString().match(/\d+/)
+        if (numericMatch) {
+          const number = parseInt(numericMatch[0])
+          return `#REQ-${number.toString().padStart(6, '0')}`
+        }
+        // If no numeric part found, just add # prefix
+        return `#${requestId.value}`
+      })
+
+      // Format request type to show services for combined access
+      const formattedRequestType = computed(() => {
+        if (requestType.value === 'combined_access' && requestData.value) {
+          const services = []
+          
+          // Check for different types of services in the request data
+          if (requestData.value.jeeva_modules?.length > 0 || 
+              requestData.value.request_types?.includes('jeeva_access') ||
+              requestData.value.request_types?.includes('jeeva')) {
+            services.push('Jeeva')
+          }
+          
+          if (requestData.value.wellsoft_modules?.length > 0 || 
+              requestData.value.request_types?.includes('wellsoft')) {
+            services.push('Wellsoft')
+          }
+          
+          if (requestData.value.internet_purposes?.length > 0 || 
+              requestData.value.request_types?.includes('internet_access_request') ||
+              requestData.value.request_types?.includes('internet')) {
+            services.push('Internet')
+          }
+          
+          if (services.length > 0) {
+            return `Combined Access - ${services.join(', ')}`
+          }
+          
+          return 'Combined Access'
+        }
+        
+        // For other request types, just capitalize and format nicely
+        if (requestType.value === 'booking_service') {
+          return 'Device Booking'
+        }
+        
+        return requestType.value?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'N/A'
+      })
+
+      // Get current status with proper formatting
+      const formattedCurrentStatus = computed(() => {
+        if (!requestData.value) return 'Loading...'
+        
+        const status = requestData.value.status || requestData.value.currentStatus || 'pending'
+        
+        // Map status values to user-friendly text
+        const statusMap = {
+          'pending': 'Pending Review',
+          'pending_hod': 'Pending HOD Approval', 
+          'hod_approved': 'HOD Approved',
+          'hod_rejected': 'HOD Rejected',
+          'pending_divisional': 'Pending Divisional Director',
+          'divisional_approved': 'Divisional Director Approved',
+          'divisional_rejected': 'Divisional Director Rejected',
+          'pending_ict_director': 'Pending ICT Director',
+          'ict_director_approved': 'ICT Director Approved', 
+          'ict_director_rejected': 'ICT Director Rejected',
+          'pending_head_it': 'Pending Head of IT',
+          'head_it_approved': 'Head of IT Approved',
+          'head_it_rejected': 'Head of IT Rejected',
+          'pending_ict_officer': 'Pending ICT Officer',
+          'ict_officer_approved': 'ICT Officer Approved',
+          'ict_officer_rejected': 'ICT Officer Rejected',
+          'implemented': 'Implemented',
+          'approved': 'Fully Approved',
+          'cancelled': 'Cancelled'
+        }
+        
+        return statusMap[status] || status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+      })
+
       // Methods
       const loadRequestData = async () => {
         isLoading.value = true
@@ -555,6 +654,16 @@
             if (response.success) {
               requestData.value = response.data
               console.log('✅ Request data loaded:', requestData.value)
+              console.log('🔍 Request data keys:', Object.keys(requestData.value))
+              console.log('🔍 Status field value:', requestData.value.status)
+              console.log('🔍 Current status field value:', requestData.value.currentStatus)
+              console.log('🔍 All status-related fields:', {
+                status: requestData.value.status,
+                currentStatus: requestData.value.currentStatus,
+                request_status: requestData.value.request_status,
+                hod_approval_status: requestData.value.hod_approval_status,
+                hodApproval: requestData.value.hodApproval
+              })
             } else {
               console.error('❌ Failed to load request:', {
                 error: response.error,
@@ -667,11 +776,32 @@
 
       // HOD Approval Methods
       const getHODApprovalStatus = () => {
-        return (
-          requestData.value?.hodApproval?.status ||
-          requestData.value?.hod_approval_status ||
-          'pending'
-        )
+        // Use the same logic as formattedCurrentStatus to get the overall status
+        const overallStatus = requestData.value?.status || requestData.value?.currentStatus
+        const hodSpecificStatus = requestData.value?.hodApproval?.status || requestData.value?.hod_approval_status
+        
+        console.log('🔍 HOD Status Debug:', {
+          overallStatus,
+          hodSpecificStatus,
+          statusField: requestData.value?.status,
+          currentStatusField: requestData.value?.currentStatus,
+          fullRequestData: requestData.value
+        })
+        
+        // First check if the overall request status indicates HOD rejection or approval
+        if (overallStatus === 'hod_rejected') {
+          console.log('✅ HOD status determined from overall status: rejected')
+          return 'rejected'
+        }
+        if (['hod_approved', 'divisional_approved', 'ict_director_approved', 'head_it_approved', 'implemented', 'approved'].includes(overallStatus)) {
+          console.log('✅ HOD status determined from overall status: approved')
+          return 'approved'
+        }
+        
+        // Fall back to the specific HOD approval status if available
+        const finalStatus = hodSpecificStatus || 'pending'
+        console.log('✅ HOD status from specific field:', finalStatus)
+        return finalStatus
       }
 
       const getHODComment = () => {
@@ -747,7 +877,7 @@
       const getCombinedApprovalStatus = (stage) => {
         if (!requestData.value) return 'pending'
 
-        const status = requestData.value.status || 'pending'
+        const status = requestData.value.status || requestData.value.currentStatus || 'pending'
 
         switch (stage) {
           case 'hod':
@@ -861,9 +991,41 @@
         return statusTexts[returnStatus] || returnStatus || 'Unknown'
       }
 
+      // Auto-refresh functionality
+      const setupAutoRefresh = () => {
+        // Refresh data when window regains focus (useful when user comes back from approval page)
+        const handleVisibilityChange = () => {
+          if (!document.hidden) {
+            console.log('🔄 Window regained focus, refreshing request data...')
+            loadRequestData()
+          }
+        }
+        
+        const handleFocus = () => {
+          console.log('🔄 Window focused, refreshing request data...')
+          loadRequestData()
+        }
+        
+        document.addEventListener('visibilitychange', handleVisibilityChange)
+        window.addEventListener('focus', handleFocus)
+        
+        // Clean up listeners when component unmounts
+        return () => {
+          document.removeEventListener('visibilitychange', handleVisibilityChange)
+          window.removeEventListener('focus', handleFocus)
+        }
+      }
+      
+      // Manual refresh method
+      const refreshData = () => {
+        console.log('🔄 Manual refresh triggered')
+        loadRequestData()
+      }
+
       // Lifecycle
       onMounted(() => {
         loadRequestData()
+        setupAutoRefresh()
       })
 
       return {
@@ -871,8 +1033,12 @@
         isLoading,
         requestId,
         requestType,
+        formattedRequestId,
+        formattedRequestType,
+        formattedCurrentStatus,
         isBookingService,
         loadRequestData,
+        refreshData,
         formatDate,
         formatDateTime,
         getApprovalStepClass,

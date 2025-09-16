@@ -1531,66 +1531,30 @@
                     </div>
                   </div>
 
-                  <!-- Review Mode Actions -->
-                  <div
-                    v-if="isReviewMode"
-                    class="medical-card bg-gradient-to-r from-emerald-600/25 to-green-600/25 border-2 border-emerald-400/40 p-8 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-500 group"
-                  >
-                    <div class="flex items-center space-x-4 mb-6">
-                      <div
-                        class="w-14 h-14 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-emerald-300/50"
-                      >
-                        <i class="fas fa-gavel text-white text-xl"></i>
-                      </div>
-                      <h3 class="text-xl font-bold text-white flex items-center">
-                        <i class="fas fa-check-double mr-2 text-emerald-300"></i>
-                        Review Actions
-                      </h3>
-                    </div>
+                  <!-- Action Buttons (Review Mode Only) -->
+                  <div v-if="isReviewMode && canApproveAtStage()" class="flex justify-between gap-4 mt-6">
+                    <!-- Approve Button - Left Side -->
+                    <button
+                      type="button"
+                      @click="approveRequest"
+                      :disabled="loading"
+                      class="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-300 font-semibold flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    >
+                      <i v-if="loading" class="fas fa-spinner fa-spin mr-2"></i>
+                      <i v-else class="fas fa-check mr-2"></i>
+                      {{ loading ? 'Processing...' : 'Approve Request' }}
+                    </button>
 
-                    <!-- Action Buttons -->
-                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                      <button
-                        type="button"
-                        @click="goToRequestDetails"
-                        class="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 font-semibold flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105"
-                      >
-                        <i class="fas fa-eye mr-2"></i>
-                        View Request Details
-                      </button>
-
-                      <button
-                        type="button"
-                        @click="goBackToRequests"
-                        class="px-6 py-3 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-lg hover:from-gray-700 hover:to-gray-800 transition-all duration-300 font-semibold flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105"
-                      >
-                        <i class="fas fa-arrow-left mr-2"></i>
-                        Back to Requests
-                      </button>
-
-                      <button
-                        v-if="canApproveAtStage()"
-                        type="button"
-                        @click="approveRequest"
-                        :disabled="loading"
-                        class="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-300 font-semibold flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                      >
-                        <i v-if="loading" class="fas fa-spinner fa-spin mr-2"></i>
-                        <i v-else class="fas fa-check mr-2"></i>
-                        {{ loading ? 'Processing...' : 'Approve Request' }}
-                      </button>
-
-                      <button
-                        v-if="canApproveAtStage()"
-                        type="button"
-                        @click="rejectRequest"
-                        :disabled="loading"
-                        class="px-6 py-3 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-lg hover:from-red-700 hover:to-pink-700 transition-all duration-300 font-semibold flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                      >
-                        <i class="fas fa-times mr-2"></i>
-                        Reject Request
-                      </button>
-                    </div>
+                    <!-- Reject Button - Right Side -->
+                    <button
+                      type="button"
+                      @click="rejectRequest"
+                      :disabled="loading"
+                      class="flex-1 px-6 py-3 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-lg hover:from-red-700 hover:to-pink-700 transition-all duration-300 font-semibold flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    >
+                      <i class="fas fa-times mr-2"></i>
+                      Reject Request
+                    </button>
                   </div>
 
                   <!-- Footer & Submit (Normal Mode) -->
@@ -3434,10 +3398,9 @@
           this.$refs.ictOfficerSignatureInput.value = ''
         }
       },
-
       // Manual debug method to trigger auto-population (for testing)
       debugAutoPopulation() {
-        console.log('=== DEBUG AUTO-POPULATION ====')
+        console.log('=== DEBUG AUTO-POPULATION =====')
         console.log('Current user:', this.currentUser)
         console.log('Is review mode:', this.isReviewMode)
         console.log('Current approval stage:', this.currentApprovalStage)
@@ -3451,22 +3414,6 @@
         if (this.currentUser?.name) {
           console.log('User role from database:', this.currentUser.role || this.currentUser.user_role)
           this.populateBasedOnUserRole(this.currentUser)
-          
-          console.log('\n=== MANUAL POPULATION TEST (All Fields) ===')
-          console.log('Testing HOD population...')
-          this.populateApproverName('hod')
-
-          console.log('Testing Divisional Director population...')
-          this.populateApproverName('divisional')
-
-          console.log('Testing ICT Director population...')
-          this.populateApproverName('ict_director')
-
-          console.log('Testing Head IT population...')
-          this.populateApproverName('head_it')
-
-          console.log('Testing ICT Officer population...')
-          this.populateApproverName('ict_officer')
         } else {
           console.error('No current user data available!')
         }
@@ -3481,30 +3428,41 @@
           const response = await authService.getCurrentUser()
           console.log('📨 Raw API response:', response)
           
-          if (response.success) {
+          if (response && response.success) {
             console.log('✅ API call successful, response.data:', response.data)
             
-            // Check if response.data has a 'user' property or if the user data is directly in response.data
-            if (response.data && response.data.user) {
-              this.currentUser = response.data.user
-              console.log('👤 Current user loaded from response.data.user:', this.currentUser)
+            // Handle different possible response structures
+            let userData = null
+            
+            if (response.data && response.data.data && response.data.data.name) {
+              // Case: {success: true, data: {data: {name: 'John', ...}}}
+              userData = response.data.data
+              console.log('👤 Current user loaded from response.data.data:', userData)
+            } else if (response.data && response.data.user && response.data.user.name) {
+              // Case: {success: true, data: {user: {name: 'John', ...}}}
+              userData = response.data.user
+              console.log('👤 Current user loaded from response.data.user:', userData)
             } else if (response.data && response.data.name) {
-              this.currentUser = response.data
-              console.log('👤 Current user loaded from response.data directly:', this.currentUser)
+              // Case: {success: true, data: {name: 'John', ...}}
+              userData = response.data
+              console.log('👤 Current user loaded from response.data directly:', userData)
             } else {
-              console.error('❌ User data structure not recognized:', response.data)
+              console.error('❌ User data structure not recognized. Full response:', JSON.stringify(response, null, 2))
+              console.error('❌ response.data content:', response.data)
             }
             
-            if (this.currentUser && this.currentUser.name) {
-              console.log('📋 User name from database:', this.currentUser.name)
-              console.log('📋 User ID:', this.currentUser.id)
-              console.log('📋 User email:', this.currentUser.email)
+            if (userData && userData.name) {
+              this.currentUser = userData
+              console.log('📋 User name from database:', userData.name)
+              console.log('📋 User ID:', userData.id)
+              console.log('📋 User email:', userData.email)
+              console.log('📋 User role:', userData.role || userData.user_role)
             } else {
-              console.error('❌ No name property found in currentUser:', this.currentUser)
+              console.error('❌ No valid user data found:', userData)
             }
           } else {
-            console.warn('❌ Failed to get current user:', response.message)
-            console.log('❌ Response status:', response.status)
+            console.warn('❌ Failed to get current user:', response?.message || 'Unknown error')
+            console.log('❌ Response status:', response?.status)
           }
         } catch (error) {
           console.error('💥 Error fetching current user:', error)
@@ -3580,6 +3538,15 @@
         const userName = user.name
         
         console.log(`🎯 Role-based population for role: "${userRole}" with name: "${userName}"`)
+        
+        // First, clear ALL approval name fields to ensure clean state
+        console.log('🧺 Clearing all approval name fields before role-based population')
+        this.form.approvals.hod.name = ''
+        this.form.approvals.divisionalDirector.name = ''
+        this.form.approvals.directorICT.name = ''
+        this.form.implementation.headIT.name = ''
+        this.form.implementation.ictOfficer.name = ''
+        console.log('✅ All fields cleared')
 
         // Map roles to approval stages
         const roleToStageMap = {
@@ -3601,8 +3568,26 @@
         const mappedStage = roleToStageMap[normalizedRole]
 
         if (mappedStage) {
-          console.log(`✅ Found role mapping: "${userRole}" → "${mappedStage}"`)
-          this.populateApproverName(mappedStage)
+          console.log(`\u2705 Found role mapping: "${userRole}" \u2192 "${mappedStage}"`)
+          
+          // Check if the mapped stage is currently editable (active)
+          const isStageEditable = this.isApprovalStageEditable(mappedStage)
+          console.log(`\ud83d\udd0d Is ${mappedStage} stage editable?`, isStageEditable)
+          
+          if (isStageEditable) {
+            console.log(`\ud83d\udd04 About to populate ONLY the ${mappedStage} field with: ${userName}`)
+            this.populateApproverName(mappedStage)
+          } else {
+            console.log(`\u26a0\ufe0f Skipping ${mappedStage} field - not currently active/editable`)
+          }
+          
+          // Verify the population worked correctly
+          console.log('\ud83d\udd0d Post-population verification:')
+          console.log('HOD name:', this.form.approvals.hod.name)
+          console.log('Divisional Director name:', this.form.approvals.divisionalDirector.name)
+          console.log('ICT Director name:', this.form.approvals.directorICT.name)
+          console.log('Head IT name:', this.form.implementation.headIT.name)
+          console.log('ICT Officer name:', this.form.implementation.ictOfficer.name)
         } else {
           console.log(`⚠️ No role mapping found for: "${userRole}". Available mappings:`, Object.keys(roleToStageMap))
           
@@ -3626,6 +3611,19 @@
             }
           }
         }
+      },
+
+      // Helper method to check if a specific approval stage is currently editable
+      isApprovalStageEditable(stage) {
+        const editableMap = {
+          'hod': this.isHodApprovalEditable,
+          'divisional': this.isDivisionalApprovalEditable,
+          'ict_director': this.isIctDirectorApprovalEditable,
+          'head_it': this.isHeadItApprovalEditable,
+          'ict_officer': this.isIctOfficerApprovalEditable
+        }
+        
+        return editableMap[stage] || false
       },
 
       // Auto-populate approver name based on current user and approval stage
