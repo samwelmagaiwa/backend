@@ -1,0 +1,367 @@
+<?php
+
+namespace App\Http\Controllers\Api\v1;
+
+use App\Http\Controllers\Controller;
+use App\Models\UserAccess;
+use App\Models\Department;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+
+class HodCombinedAccessController extends Controller
+{
+    /**
+     * Get all combined access requests for HOD approval
+     */
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            Log::info('HOD Combined Access: Fetching requests', [
+                'user_id' => auth()->id(),
+                'filters' => $request->all()
+            ]);
+
+            $query = UserAccess::with(['user', 'department'])
+                ->whereNotNull('request_type')
+                ->where(function ($q) {
+                    // Get requests that need HOD approval or are pending HOD
+                    $q->where('status', 'pending')
+                        ->orWhere('status', 'pending_hod')
+                        ->orWhere('status', 'hod_approved')
+                        ->orWhere('status', 'hod_rejected');
+                });
+
+            // Apply filters
+            if ($request->filled('search')) {
+                $searchTerm = $request->search;
+                $query->where(function ($q) use ($searchTerm) {
+                    $q->where('staff_name', 'like', "%{$searchTerm}%")
+                        ->orWhere('pf_number', 'like', "%{$searchTerm}%")
+                        ->orWhereHas('department', function ($dq) use ($searchTerm) {
+                            $dq->where('name', 'like', "%{$searchTerm}%");
+                        })
+                        ->orWhere('id', 'like', "%{$searchTerm}%");
+                });
+            }
+
+            if ($request->filled('status')) {
+                $query->where('status', $request->status);
+            }
+
+            if ($request->filled('department')) {
+                $query->where('department_id', $request->department);
+            }
+
+            // Order by created_at (FIFO - oldest first)
+            $query->orderBy('created_at', 'asc');
+
+            $perPage = $request->get('per_page', 50);
+            $requests = $query->paginate($perPage);
+
+            // Transform the data for frontend
+            $transformedData = $requests->through(function ($request) {
+                return $this->transformRequestData($request);
+            });
+
+            Log::info('HOD Combined Access: Requests retrieved successfully', [
+                'count' => $requests->total()
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Combined access requests retrieved successfully',
+                'data' => $transformedData
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('HOD Combined Access: Error fetching requests', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve combined access requests',
+                'error' => app()->environment('local') ? $e->getMessage() : 'Internal server error'
+            ], 500);
+        }
+    }
+
+    /**
+     * Get a specific combined access request by ID
+     */
+    public function show($id): JsonResponse
+    {
+        try {
+            Log::info('HOD Combined Access: Fetching specific request', [
+                'request_id' => $id,
+                'user_id' => auth()->id()
+            ]);
+
+            $request = UserAccess::with(['user', 'department'])
+                ->findOrFail($id);
+
+            $transformedData = $this->transformRequestData($request);
+
+            Log::info('HOD Combined Access: Request retrieved successfully', [
+                'request_id' => $id
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Request retrieved successfully',
+                'data' => $transformedData
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('HOD Combined Access: Error fetching request', [
+                'request_id' => $id,
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Request not found',
+                'error' => app()->environment('local') ? $e->getMessage() : 'Request not found'
+            ], 404);
+        }
+    }
+
+    /**
+     * Update HOD approval status
+     */
+    public function updateApproval(Request $request, $id): JsonResponse
+    {
+        try {
+            Log::info('HOD Combined Access: Updating approval', [
+                'request_id' => $id,
+                'user_id' => auth()->id(),
+                'approval_data' => $request->all()
+            ]);
+
+            $userAccessRequest = UserAccess::findOrFail($id);
+
+            // Validate the approval data
+            $validatedData = $request->validate([
+                'hod_status' => 'required|in:approved,rejected',
+                'hod_comments' => 'nullable|string|max:1000',
+                'hod_name' => 'nullable|string|max:255',
+                'hod_approved_at' => 'nullable|string',
+            ]);
+
+            DB::beginTransaction();
+
+            // Update the request
+            $updateData = [
+                'status' => $validatedData['hod_status'] === 'approved' ? 'hod_approved' : 'hod_rejected',
+                'hod_comments' => $validatedData['hod_comments'] ?? '',
+                'hod_name' => $validatedData['hod_name'] ?? auth()->user()->name,
+                'hod_approved_at' => now(),
+                'updated_at' => now()
+            ];
+
+            $userAccessRequest->update($updateData);
+
+            DB::commit();
+
+            Log::info('HOD Combined Access: Approval updated successfully', [
+                'request_id' => $id,
+                'status' => $validatedData['hod_status']
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Request approval updated successfully',
+                'data' => $this->transformRequestData($userAccessRequest->fresh())
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            Log::error('HOD Combined Access: Error updating approval', [
+                'request_id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update request approval',
+                'error' => app()->environment('local') ? $e->getMessage() : 'Internal server error'
+            ], 500);
+        }
+    }
+
+    /**
+     * Cancel a combined access request
+     */
+    public function cancel(Request $request, $id): JsonResponse
+    {
+        try {
+            Log::info('HOD Combined Access: Cancelling request', [
+                'request_id' => $id,
+                'user_id' => auth()->id()
+            ]);
+
+            $userAccessRequest = UserAccess::findOrFail($id);
+
+            $validatedData = $request->validate([
+                'reason' => 'required|string|max:1000'
+            ]);
+
+            DB::beginTransaction();
+
+            $userAccessRequest->update([
+                'status' => 'cancelled',
+                'cancellation_reason' => $validatedData['reason'],
+                'cancelled_by' => auth()->id(),
+                'cancelled_at' => now(),
+                'updated_at' => now()
+            ]);
+
+            DB::commit();
+
+            Log::info('HOD Combined Access: Request cancelled successfully', [
+                'request_id' => $id
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Request cancelled successfully',
+                'data' => $this->transformRequestData($userAccessRequest->fresh())
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            Log::error('HOD Combined Access: Error cancelling request', [
+                'request_id' => $id,
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to cancel request',
+                'error' => app()->environment('local') ? $e->getMessage() : 'Internal server error'
+            ], 500);
+        }
+    }
+
+    /**
+     * Get statistics for HOD dashboard
+     */
+    public function statistics(): JsonResponse
+    {
+        try {
+            Log::info('HOD Combined Access: Fetching statistics', [
+                'user_id' => auth()->id()
+            ]);
+
+            $stats = [
+                'pendingHod' => UserAccess::whereIn('status', ['pending', 'pending_hod'])->count(),
+                'hodApproved' => UserAccess::where('status', 'hod_approved')->count(),
+                'hodRejected' => UserAccess::where('status', 'hod_rejected')->count(),
+                'total' => UserAccess::count(),
+                'thisMonth' => UserAccess::whereMonth('created_at', Carbon::now()->month)
+                    ->whereYear('created_at', Carbon::now()->year)
+                    ->count(),
+                'lastMonth' => UserAccess::whereMonth('created_at', Carbon::now()->subMonth()->month)
+                    ->whereYear('created_at', Carbon::now()->subMonth()->year)
+                    ->count()
+            ];
+
+            Log::info('HOD Combined Access: Statistics retrieved successfully', $stats);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Statistics retrieved successfully',
+                'data' => $stats
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('HOD Combined Access: Error fetching statistics', [
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve statistics',
+                'data' => [
+                    'pendingHod' => 0,
+                    'hodApproved' => 0,
+                    'hodRejected' => 0,
+                    'total' => 0,
+                    'thisMonth' => 0,
+                    'lastMonth' => 0
+                ]
+            ]);
+        }
+    }
+
+    /**
+     * Transform request data for frontend consumption
+     */
+    private function transformRequestData($request): array
+    {
+        return [
+            'id' => $request->id,
+            'request_id' => 'REQ-' . str_pad($request->id, 6, '0', STR_PAD_LEFT),
+            'pf_number' => $request->pf_number,
+            'staff_name' => $request->staff_name,
+            'full_name' => $request->staff_name, // Alias for compatibility
+            'phone' => $request->phone_number,
+            'phone_number' => $request->phone_number,
+            'department' => $request->department?->name ?? 'N/A',
+            'department_id' => $request->department_id,
+            'department_name' => $request->department?->name ?? 'N/A',
+            'request_type' => $request->getRequestTypesArray(),
+            'request_type_display' => $request->request_type_name,
+            'request_types' => $request->getRequestTypesArray(), // Array format
+            'purpose' => $request->purpose,
+            'status' => $request->status,
+            'hod_status' => $request->status,  // Alias for frontend
+            'status_display' => $request->status_name,
+            'signature_path' => $request->signature_path,
+            'created_at' => $request->created_at,
+            'updated_at' => $request->updated_at,
+            'submission_date' => $request->created_at,
+            'hod_comments' => $request->hod_comments ?? '',
+            'hod_name' => $request->hod_name ?? '',
+            'hod_approved_at' => $request->hod_approved_at,
+            // Approval workflow status
+            'hod_approval_status' => $this->getApprovalStatus($request, 'hod'),
+            'divisional_approval_status' => $this->getApprovalStatus($request, 'divisional'),
+            'dict_approval_status' => $this->getApprovalStatus($request, 'dict'),
+            'head_it_approval_status' => $this->getApprovalStatus($request, 'head_it'),
+            'ict_approval_status' => $this->getApprovalStatus($request, 'ict'),
+        ];
+    }
+
+    /**
+     * Get approval status for a specific role
+     */
+    private function getApprovalStatus($request, $role): string
+    {
+        switch ($role) {
+            case 'hod':
+                if ($request->status === 'hod_approved') return 'approved';
+                if ($request->status === 'hod_rejected') return 'rejected';
+                return 'pending';
+            case 'divisional':
+                // Add logic based on your workflow
+                return 'pending';
+            case 'dict':
+                return 'pending';
+            case 'head_it':
+                return 'pending';
+            case 'ict':
+                return 'pending';
+            default:
+                return 'pending';
+        }
+    }
+}

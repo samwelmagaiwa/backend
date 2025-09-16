@@ -2,7 +2,7 @@
   <aside
     v-if="shouldShowSidebar"
     class="min-h-full flex flex-col transition-all duration-300 ease-in-out overflow-hidden relative shadow-2xl sidebar-responsive"
-    :class="[isCollapsed ? 'w-16 sidebar-collapsed' : 'w-56 sidebar-expanded']"
+    :class="[isCollapsed ? 'w-16 sidebar-collapsed' : 'w-72 sidebar-expanded']"
     aria-label="Sidebar navigation"
     style="
       background: linear-gradient(
@@ -884,13 +884,6 @@
             category: 'device-management',
             description: 'Manage device borrowing requests'
           },
-          '/ict-approval/request/:id': {
-            name: 'RequestDetails',
-            displayName: 'Request Details',
-            icon: 'fas fa-clipboard-check',
-            category: 'device-management',
-            description: 'View and assess device requests'
-          },
 
           // Requests Management (for approvers)
           '/hod-dashboard/request-list': {
@@ -899,13 +892,6 @@
             icon: 'fas fa-clipboard-check',
             category: 'requests-management',
             description: 'Review access requests'
-          },
-          '/internal-access/details': {
-            name: 'InternalAccessDetails',
-            displayName: 'Request Details',
-            icon: 'fas fa-file-signature',
-            category: 'requests-management',
-            description: 'Review and approve requests'
           }
         }
 

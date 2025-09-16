@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\v1\BothServiceFormController;
 use App\Http\Controllers\Api\v1\AdminUserController;
 use App\Http\Controllers\Api\v1\AdminDepartmentController;
 use App\Http\Controllers\Api\v1\DeviceInventoryController;
+use App\Http\Controllers\Api\v1\HodCombinedAccessController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -385,6 +386,36 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{deviceInventory}', [DeviceInventoryController::class, 'show'])->name('device-inventory.show');
         Route::put('/{deviceInventory}', [DeviceInventoryController::class, 'update'])->name('device-inventory.update');
         Route::delete('/{deviceInventory}', [DeviceInventoryController::class, 'destroy'])->name('device-inventory.destroy');
+    });
+
+    // User Dashboard routes (Staff only)
+    Route::prefix('user')->group(function () {
+        Route::get('/dashboard-stats', [\App\Http\Controllers\Api\v1\UserDashboardController::class, 'getDashboardStats'])->name('user.dashboard-stats');
+        Route::get('/request-status-breakdown', [\App\Http\Controllers\Api\v1\UserDashboardController::class, 'getRequestStatusBreakdown'])->name('user.request-status-breakdown');
+        Route::get('/recent-activity', [\App\Http\Controllers\Api\v1\UserDashboardController::class, 'getRecentActivity'])->name('user.recent-activity');
+    });
+
+    // HOD Combined Access Request routes (HOD only)
+    Route::prefix('hod')->middleware('role:head_of_department,divisional_director,ict_director,admin')->group(function () {
+        Route::get('combined-access-requests', [HodCombinedAccessController::class, 'index'])
+            ->name('hod.combined-access-requests.index');
+        Route::get('combined-access-requests/statistics', [HodCombinedAccessController::class, 'statistics'])
+            ->name('hod.combined-access-requests.statistics');
+        Route::get('combined-access-requests/{id}', [HodCombinedAccessController::class, 'show'])
+            ->name('hod.combined-access-requests.show');
+        Route::post('combined-access-requests/{id}/approve', [HodCombinedAccessController::class, 'updateApproval'])
+            ->name('hod.combined-access-requests.approve');
+        Route::post('combined-access-requests/{id}/cancel', [HodCombinedAccessController::class, 'cancel'])
+            ->name('hod.combined-access-requests.cancel');
+    });
+
+    // User Profile routes (for form auto-population)
+    Route::prefix('profile')->group(function () {
+        Route::get('/current', [\App\Http\Controllers\Api\v1\UserProfileController::class, 'getCurrentUserProfile'])->name('profile.current');
+        Route::put('/current', [\App\Http\Controllers\Api\v1\UserProfileController::class, 'updateCurrentUserProfile'])->name('profile.update');
+        Route::post('/lookup-pf', [\App\Http\Controllers\Api\v1\UserProfileController::class, 'getUserByPfNumber'])->name('profile.lookup-pf');
+        Route::post('/check-pf', [\App\Http\Controllers\Api\v1\UserProfileController::class, 'checkPfNumberExists'])->name('profile.check-pf');
+        Route::get('/departments', [\App\Http\Controllers\Api\v1\UserProfileController::class, 'getDepartments'])->name('profile.departments');
     });
 
     // COMMENTED OUT: Individual form routes - now using Combined Access Form only

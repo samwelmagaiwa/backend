@@ -28,6 +28,12 @@ class UserAccess extends Model
         'purpose',
         'request_type',
         'status',
+        'hod_comments',
+        'hod_name',
+        'hod_approved_at',
+        'cancellation_reason',
+        'cancelled_by',
+        'cancelled_at',
     ];
 
     /**
@@ -38,6 +44,8 @@ class UserAccess extends Model
         'updated_at' => 'datetime',
         'request_type' => 'array',
         'purpose' => 'array',
+        'hod_approved_at' => 'datetime',
+        'cancelled_at' => 'datetime',
     ];
 
     // Removed custom accessors and mutators since we're using Laravel's built-in array casting
@@ -56,9 +64,13 @@ class UserAccess extends Model
      */
     const STATUSES = [
         'pending' => 'Pending',
+        'pending_hod' => 'Pending HOD Approval',
+        'hod_approved' => 'HOD Approved',
+        'hod_rejected' => 'HOD Rejected',
         'approved' => 'Approved',
         'rejected' => 'Rejected',
         'in_review' => 'In Review',
+        'cancelled' => 'Cancelled',
     ];
 
     /**

@@ -135,55 +135,137 @@
           <div
             class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-5 rounded-xl backdrop-blur-sm hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-300 group"
           >
-            <div class="flex items-center space-x-3 mb-4">
-              <div
-                class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
-              >
-                <i class="fas fa-user-md text-white text-lg"></i>
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center space-x-3">
+                <div
+                  class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
+                >
+                  <i class="fas fa-user-md text-white text-lg"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white flex items-center">
+                  <i class="fas fa-id-card mr-2 text-blue-300"></i>
+                  Personal Information
+                </h3>
               </div>
-              <h3 class="text-lg font-bold text-white flex items-center">
-                <i class="fas fa-id-card mr-2 text-blue-300"></i>
-                Personal Information
-              </h3>
+              <!-- Auto-population status -->
+              <div class="flex items-center space-x-2">
+                <span
+                  v-if="isLoadingProfile"
+                  class="text-xs text-blue-300 font-medium bg-blue-500/20 px-2 py-1 rounded-full border border-blue-400/30 animate-pulse"
+                >
+                  <i class="fas fa-spinner fa-spin mr-1 text-xs"></i>
+                  Loading...
+                </span>
+                <span
+                  v-else-if="autoPopulated"
+                  class="text-xs text-green-300 font-medium bg-green-500/20 px-2 py-1 rounded-full border border-green-400/30"
+                >
+                  <i class="fas fa-check mr-1 text-xs"></i>
+                  Auto-populated
+                </span>
+                <span
+                  v-else-if="profileLoadError"
+                  class="text-xs text-yellow-300 font-medium bg-yellow-500/20 px-2 py-1 rounded-full border border-yellow-400/30"
+                >
+                  <i class="fas fa-exclamation-triangle mr-1 text-xs"></i>
+                  Manual entry
+                </span>
+              </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <!-- Full Name -->
               <div class="md:col-span-2">
-                <label class="block text-sm font-bold text-blue-100 mb-2">
-                  Full Name <span class="text-red-400">*</span>
+                <label class="block text-sm font-bold text-blue-100 mb-2 flex items-center justify-between">
+                  <span>Full Name <span class="text-red-400">*</span></span>
+                  <span
+                    v-if="autoPopulated && formData.fullName && !isLoadingProfile"
+                    class="text-xs text-green-300 font-medium bg-green-500/20 px-2 py-1 rounded-full border border-green-400/30 flex items-center gap-1"
+                  >
+                    <i class="fas fa-lock text-xs"></i>
+                    Protected
+                  </span>
                 </label>
                 <div class="relative">
                   <input
                     v-model="formData.fullName"
                     type="text"
-                    class="medical-input w-full px-2 py-1.5 bg-blue-500/30 border-2 border-blue-400/60 rounded-lg focus:border-blue-500 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-blue-500/40 focus:bg-blue-500/50 focus:shadow-lg focus:shadow-blue-500/30 text-sm"
-                    placeholder="Enter your full name"
+                    class="medical-input w-full px-2 py-1.5 border-2 rounded-lg focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 text-sm"
+                    :class="{
+                      'bg-blue-500/30 border-blue-400/60 focus:border-blue-500 hover:bg-blue-500/40 focus:bg-blue-500/50 focus:shadow-lg focus:shadow-blue-500/30': !autoPopulated || isLoadingProfile,
+                      'bg-green-500/20 border-green-400/60 cursor-not-allowed': autoPopulated && formData.fullName && !isLoadingProfile
+                    }"
+                    :placeholder="isLoadingProfile ? 'Loading your name...' : (autoPopulated && formData.fullName ? 'Auto-populated from your profile' : 'Enter your full name')"
+                    :disabled="isLoadingProfile || (autoPopulated && formData.fullName)"
+                    :readonly="autoPopulated && formData.fullName && !isLoadingProfile"
                     required
                   />
                   <div
                     class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/10 to-blue-600/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
                   ></div>
+                  <!-- Loading/Success indicator -->
+                  <div
+                    class="absolute right-2 top-1/2 transform -translate-y-1/2 text-blue-300/70"
+                  >
+                    <i v-if="isLoadingProfile" class="fas fa-spinner fa-spin text-xs"></i>
+                    <i v-else-if="autoPopulated && formData.fullName" class="fas fa-check text-green-400 text-xs"></i>
+                  </div>
                 </div>
+                <!-- Help text for protected field -->
+                <p
+                  v-if="autoPopulated && formData.fullName && !isLoadingProfile"
+                  class="text-xs text-green-200/70 mt-1 italic flex items-center"
+                >
+                  <i class="fas fa-info-circle mr-1"></i>
+                  This field is auto-populated from your profile and cannot be edited
+                </p>
               </div>
 
               <!-- PF Number -->
               <div>
-                <label class="block text-sm font-bold text-blue-100 mb-2">
-                  PF Number <span class="text-red-400">*</span>
+                <label class="block text-sm font-bold text-blue-100 mb-2 flex items-center justify-between">
+                  <span>PF Number <span class="text-red-400">*</span></span>
+                  <span
+                    v-if="autoPopulated && formData.pfNumber && !isLoadingProfile"
+                    class="text-xs text-green-300 font-medium bg-green-500/20 px-2 py-1 rounded-full border border-green-400/30 flex items-center gap-1"
+                  >
+                    <i class="fas fa-lock text-xs"></i>
+                    Protected
+                  </span>
                 </label>
                 <div class="relative">
                   <input
                     v-model="formData.pfNumber"
                     type="text"
-                    class="medical-input w-full px-2 py-1.5 bg-blue-500/30 border-2 border-blue-400/60 rounded-lg focus:border-blue-500 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-blue-500/40 focus:bg-blue-500/50 focus:shadow-lg focus:shadow-blue-500/30 text-sm"
-                    placeholder="Enter PF Number"
+                    class="medical-input w-full px-2 py-1.5 border-2 rounded-lg focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 text-sm"
+                    :class="{
+                      'bg-blue-500/30 border-blue-400/60 focus:border-blue-500 hover:bg-blue-500/40 focus:bg-blue-500/50 focus:shadow-lg focus:shadow-blue-500/30': !autoPopulated || isLoadingProfile,
+                      'bg-green-500/20 border-green-400/60 cursor-not-allowed': autoPopulated && formData.pfNumber && !isLoadingProfile
+                    }"
+                    :placeholder="isLoadingProfile ? 'Loading your PF Number...' : (autoPopulated && formData.pfNumber ? 'Auto-populated from your profile' : 'Enter PF Number')"
+                    :disabled="isLoadingProfile || (autoPopulated && formData.pfNumber)"
+                    :readonly="autoPopulated && formData.pfNumber && !isLoadingProfile"
                     required
                   />
                   <div
                     class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/10 to-blue-600/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
                   ></div>
+                  <!-- Loading/Success indicator -->
+                  <div
+                    class="absolute right-2 top-1/2 transform -translate-y-1/2 text-blue-300/70"
+                  >
+                    <i v-if="isLoadingProfile" class="fas fa-spinner fa-spin text-xs"></i>
+                    <i v-else-if="autoPopulated && formData.pfNumber" class="fas fa-check text-green-400 text-xs"></i>
+                  </div>
                 </div>
+                <!-- Help text for protected field -->
+                <p
+                  v-if="autoPopulated && formData.pfNumber && !isLoadingProfile"
+                  class="text-xs text-green-200/70 mt-1 italic flex items-center"
+                >
+                  <i class="fas fa-info-circle mr-1"></i>
+                  This field is auto-populated from your profile and cannot be edited
+                </p>
               </div>
 
               <!-- Department/Unit -->
@@ -464,6 +546,8 @@
 </template>
 
 <script>
+  import userProfileService from '../../../services/userProfileService'
+
   export default {
     name: 'DeclarationForm',
     emits: ['form-submitted', 'go-back'],
@@ -472,6 +556,10 @@
         isSubmitting: false,
         signaturePreview: '',
         signatureFileName: '',
+        // Auto-population states
+        isLoadingProfile: true,
+        profileLoadError: null,
+        autoPopulated: false,
         departments: [
           'Administration',
           'Anesthesiology',
@@ -528,7 +616,50 @@
       }
     },
 
+
     methods: {
+      /**
+       * Auto-populate user data from the authenticated user's profile
+       */
+      async autoPopulateUserData() {
+        console.log('🔄 Starting declaration form auto-population...')
+        this.isLoadingProfile = true
+        this.profileLoadError = null
+        
+        try {
+          const result = await userProfileService.getFormAutoPopulationData()
+          
+          if (result.success && result.data) {
+            console.log('✅ User profile retrieved for declaration:', result.data)
+            
+            // Auto-populate form fields
+            this.formData.fullName = result.data.staffName || result.data.fullName || ''
+            this.formData.pfNumber = result.data.pfNumber || ''
+            
+            this.autoPopulated = true
+            
+            console.log('✅ Declaration form auto-populated:', {
+              fullName: this.formData.fullName,
+              pfNumber: this.formData.pfNumber
+            })
+            
+            // Show success notification
+            this.showNotification('Your name and PF number have been auto-populated', 'info')
+            
+          } else {
+            console.warn('⚠️ Failed to auto-populate declaration form:', result.error)
+            this.profileLoadError = result.error || 'Failed to load profile data'
+            this.showNotification('Could not auto-populate your details. Please fill them manually.', 'warning')
+          }
+        } catch (error) {
+          console.error('❌ Error during declaration auto-population:', error)
+          this.profileLoadError = error.message || 'Network error while loading profile'
+          this.showNotification('Error loading your profile. Please fill in your details manually.', 'error')
+        } finally {
+          this.isLoadingProfile = false
+        }
+      },
+      
       loadSignature() {
         this.$refs.signatureInput.click()
       },
@@ -708,32 +839,17 @@
         this.$emit('go-back')
       },
 
-      async loadUserData() {
-        try {
-          // Get current user data from API
-          const { authAPI } = await import('../../../utils/apiClient')
-          const result = await authAPI.getCurrentUser()
-
-          if (result.success && result.data) {
-            // Auto-populate the full name field
-            this.formData.fullName = result.data.name || ''
-            console.log('Auto-populated Full Name:', this.formData.fullName)
-          } else {
-            console.warn('Failed to load user data for auto-population')
-          }
-        } catch (error) {
-          console.error('Error loading user data:', error)
-        }
-      }
     },
 
     async mounted() {
+      console.log('🔄 Declaration form mounted, starting initialization...')
+      
       // Set current date as default
       const today = new Date().toISOString().split('T')[0]
       this.formData.date = today
 
-      // Auto-populate Full Name from authenticated user
-      await this.loadUserData()
+      // Auto-populate user data using the profile service
+      await this.autoPopulateUserData()
     }
   }
 </script>
@@ -998,6 +1114,24 @@
   .border-dashed:hover {
     border-color: #10b981;
     background-color: #f0fdf4;
+  }
+
+  /* Protected field styles */
+  .medical-input[readonly] {
+    background: rgba(34, 197, 94, 0.15) !important;
+    border-color: rgba(34, 197, 94, 0.4) !important;
+    cursor: not-allowed;
+    user-select: none;
+  }
+
+  .medical-input[readonly]:hover {
+    background: rgba(34, 197, 94, 0.2) !important;
+    transform: none !important;
+  }
+
+  .medical-input[readonly]:focus {
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2) !important;
+    border-color: rgba(34, 197, 94, 0.6) !important;
   }
 
   /* Custom scrollbar */

@@ -604,8 +604,6 @@
                 </div>
               </div>
 
-
-
               <!-- Loading State -->
               <div v-else-if="isLoading" class="text-center py-6">
                 <div

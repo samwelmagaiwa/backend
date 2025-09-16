@@ -1958,6 +1958,7 @@
   import Header from '@/components/header.vue'
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppFooter from '@/components/footer.vue'
+  import combinedAccessService from '@/services/combinedAccessService.js'
 
   export default {
     name: 'BothServiveForm',
@@ -2114,10 +2115,24 @@
 
         confirm: { key: '', label: '' },
         toast: { show: false, message: '' },
-        errors: { pfNumber: '', staffName: '' }
+        errors: { pfNumber: '', staffName: '' },
+        // Review mode data
+        requestData: null,
+        loading: false,
+        error: null
       }
     },
     computed: {
+      // Review mode check
+      isReviewMode() {
+        return this.$route.params.id != null || this.$route.query.id != null
+      },
+      
+      // Request ID from route or query parameters
+      requestId() {
+        return this.$route.params.id || this.$route.query.id || null
+      },
+      
       currentTab() {
         return this.tabs.find((t) => t.key === this.activeTab) || null
       },
@@ -2165,6 +2180,11 @@
           }
         })
         return list
+      }
+    },
+    async mounted() {
+      if (this.isReviewMode && this.requestId) {
+        await this.loadRequestData()
       }
     },
     watch: {
@@ -2389,6 +2409,127 @@
         this.headITSignatureFileName = ''
         this.ictOfficerSignaturePreview = ''
         this.ictOfficerSignatureFileName = ''
+      },
+
+      // Review mode methods
+      async loadRequestData() {
+        try {
+          this.loading = true
+          this.error = null
+          const response = await combinedAccessService.getRequestById(this.requestId)
+          this.requestData = response.data
+          
+          // Populate form with request data
+          if (this.requestData) {
+            this.form.shared = {
+              pfNumber: this.requestData.pf_number || '',
+              staffName: this.requestData.staff_name || '', 
+              department: this.requestData.department || '',
+              phone: this.requestData.phone || ''
+            }
+            
+            // Set other form fields based on request data structure
+            // This should be adjusted based on your actual data structure
+          }
+        } catch (error) {
+          console.error('Error loading request data:', error)
+          this.error = 'Failed to load request data'
+          this.toast = {
+            show: true,
+            message: 'Error loading request data'
+          }
+          setTimeout(() => (this.toast.show = false), 3000)
+        } finally {
+          this.loading = false
+        }
+      },
+      
+      getApprovalStatus(role) {
+        if (!this.requestData) return 'pending'
+        
+        switch (role) {
+          case 'hod':
+            return this.requestData.hod_approval_status || 'pending'
+          case 'divisional':
+            return this.requestData.divisional_approval_status || 'pending'
+          case 'dict':
+            return this.requestData.dict_approval_status || 'pending'
+          case 'headOfIt':
+            return this.requestData.head_it_approval_status || 'pending'
+          case 'ict':
+            return this.requestData.ict_approval_status || 'pending'
+          default:
+            return 'pending'
+        }
+      },
+      
+      canApproveAtStage() {
+        // This should check if the current user can approve at the current stage
+        // Based on the user's role and current approval status
+        return true // Simplified for now
+      },
+      
+      async approveRequest() {
+        try {
+          this.loading = true
+          await combinedAccessService.updateHodApproval(this.requestId, {
+            status: 'approved',
+            comments: this.form.comments || 'Approved'
+          })
+          
+          this.toast = {
+            show: true,
+            message: 'Request approved successfully'
+          }
+          setTimeout(() => {
+            this.toast.show = false
+            this.goBackToRequests()
+          }, 2000)
+        } catch (error) {
+          console.error('Error approving request:', error)
+          this.toast = {
+            show: true,
+            message: 'Error approving request'
+          }
+          setTimeout(() => (this.toast.show = false), 3000)
+        } finally {
+          this.loading = false
+        }
+      },
+      
+      async rejectRequest() {
+        const reason = prompt('Please provide a reason for rejection:')
+        if (!reason) return
+        
+        try {
+          this.loading = true
+          await combinedAccessService.updateHodApproval(this.requestId, {
+            status: 'rejected',
+            comments: reason
+          })
+          
+          this.toast = {
+            show: true,
+            message: 'Request rejected'
+          }
+          setTimeout(() => {
+            this.toast.show = false
+            this.goBackToRequests()
+          }, 2000)
+        } catch (error) {
+          console.error('Error rejecting request:', error)
+          this.toast = {
+            show: true,
+            message: 'Error rejecting request'
+          }
+          setTimeout(() => (this.toast.show = false), 3000)
+        } finally {
+          this.loading = false
+        }
+      },
+      
+      goBackToRequests() {
+        this.$router.push({ name: 'HODCombinedRequestList' })
       },
 
       // Signature handling methods

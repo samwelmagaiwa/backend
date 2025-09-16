@@ -222,6 +222,20 @@ const routes = [
     },
     alias: ['/both-service-from']
   },
+  {
+    path: '/both-service-form/:id',
+    name: 'BothServiceFormReview', 
+    component: () => import('../components/views/forms/both-service-form.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: [
+        ROLES.DIVISIONAL_DIRECTOR,
+        ROLES.HEAD_OF_DEPARTMENT,
+        ROLES.ICT_DIRECTOR,
+        ROLES.ICT_OFFICER
+      ]
+    }
+  },
 
   // User submission forms
   {
@@ -338,12 +352,17 @@ const routes = [
       roles: [ROLES.ICT_OFFICER]
     }
   },
-
-  // Internal Access Requests Dashboard (for approvers)
+  // Internal Access Requests Dashboard (for approvers) - Redirect to new combined requests
   {
     path: '/hod-dashboard/request-list',
     name: 'HODDashboardRequestList',
-    component: () => import('../components/views/requests/InternalAccessList.vue'),
+    redirect: '/hod-dashboard/combined-requests'
+  },
+  // HOD Combined Access Requests List
+  {
+    path: '/hod-dashboard/combined-requests',
+    name: 'HODCombinedRequestList',
+    component: () => import('../components/views/hod/HodRequestList.vue'),
     meta: {
       requiresAuth: true,
       roles: [
@@ -359,21 +378,6 @@ const routes = [
   {
     path: '/internal-access/list',
     redirect: '/hod-dashboard/request-list'
-  },
-
-  {
-    path: '/internal-access/details',
-    name: 'InternalAccessDetails',
-    component: () => import('../components/views/requests/InternalAccessDetails.vue'),
-    meta: {
-      requiresAuth: true,
-      roles: [
-        ROLES.DIVISIONAL_DIRECTOR,
-        ROLES.HEAD_OF_DEPARTMENT,
-        ROLES.ICT_DIRECTOR,
-        ROLES.ICT_OFFICER
-      ]
-    }
   },
 
   // Debug route for HOD Dashboard

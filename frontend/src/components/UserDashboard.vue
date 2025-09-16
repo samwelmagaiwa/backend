@@ -280,7 +280,8 @@
                   <div
                     class="text-6xl font-bold text-orange-400 drop-shadow-lg relative group-hover:scale-105 transition-transform duration-300"
                   >
-                    12
+                    <span v-if="isLoadingStats" class="animate-pulse">--</span>
+                    <span v-else>{{ dashboardStats.underReview }}</span>
                     <!-- Number glow layers -->
                     <div
                       class="absolute -inset-4 bg-orange-400/15 blur-xl opacity-50 group-hover:opacity-100 transition-opacity duration-300 rounded-full"
@@ -307,7 +308,7 @@
                   >
                     <div
                       class="h-full bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 rounded-full relative overflow-hidden group-hover:shadow-lg transition-shadow duration-300"
-                      style="width: 65%"
+                      :style="`width: ${dashboardStats.processingPercentage}%`"
                     >
                       <!-- Progress shine effect -->
                       <div
@@ -426,7 +427,8 @@
                   <div
                     class="text-6xl font-bold text-green-400 drop-shadow-lg relative group-hover:scale-105 transition-transform duration-300"
                   >
-                    47
+                    <span v-if="isLoadingStats" class="animate-pulse">--</span>
+                    <span v-else>{{ dashboardStats.grantedAccess }}</span>
                     <!-- Number glow layers -->
                     <div
                       class="absolute -inset-4 bg-green-400/15 blur-xl opacity-50 group-hover:opacity-100 transition-opacity duration-300 rounded-full"
@@ -453,7 +455,7 @@
                   >
                     <div
                       class="h-full bg-gradient-to-r from-green-400 via-green-500 to-green-600 rounded-full relative overflow-hidden group-hover:shadow-lg transition-shadow duration-300"
-                      style="width: 89%"
+                      :style="`width: ${dashboardStats.completedPercentage}%`"
                     >
                       <!-- Progress shine effect -->
                       <div
@@ -570,7 +572,8 @@
                   <div
                     class="text-6xl font-bold text-purple-400 drop-shadow-lg relative group-hover:scale-105 transition-transform duration-300"
                   >
-                    3
+                    <span v-if="isLoadingStats" class="animate-pulse">--</span>
+                    <span v-else>{{ dashboardStats.needsRevision }}</span>
                     <!-- Number glow layers -->
                     <div
                       class="absolute -inset-4 bg-purple-400/15 blur-xl opacity-50 group-hover:opacity-100 transition-opacity duration-300 rounded-full"
@@ -597,7 +600,7 @@
                   >
                     <div
                       class="h-full bg-gradient-to-r from-purple-400 via-purple-500 to-purple-600 rounded-full relative overflow-hidden group-hover:shadow-lg transition-shadow duration-300"
-                      style="width: 25%"
+                      :style="`width: ${dashboardStats.revisionPercentage}%`"
                     >
                       <!-- Progress shine effect -->
                       <div
@@ -666,6 +669,7 @@
   import { useAuth } from '@/composables/useAuth'
   import { useNotificationStore } from '@/stores/notification'
   import bookingService from '@/services/bookingService'
+  import dashboardService from '@/services/dashboardService'
 
   export default {
     name: 'UserDashboard',
@@ -683,7 +687,70 @@
       const hasPendingBookingRequest = ref(false)
       const pendingBookingInfo = ref(null)
       const isCheckingPendingRequests = ref(true)
+
+      // Dashboard statistics state
+      const dashboardStats = ref({
+        processing: 0,
+        underReview: 0,
+        completed: 0,
+        grantedAccess: 0,
+        revision: 0,
+        needsRevision: 0,
+        total: 0,
+        processingPercentage: 0,
+        completedPercentage: 0,
+        revisionPercentage: 0
+      })
+      const isLoadingStats = ref(true)
+      const statsError = ref(null)
+
       // Note: Sidebar state is now managed by Vuex, no local state needed
+
+      // Fetch dashboard statistics from backend
+      const fetchDashboardStats = async () => {
+        try {
+          isLoadingStats.value = true
+          statsError.value = null
+
+          console.log('📊 UserDashboard: Fetching dashboard statistics...')
+          const result = await dashboardService.getUserDashboardStats()
+
+          if (result.success && result.data) {
+            // Update dashboard stats with backend data
+            dashboardStats.value = {
+              processing: result.data.processing || 0,
+              underReview: result.data.underReview || result.data.processing || 0,
+              completed: result.data.completed || 0,
+              grantedAccess: result.data.grantedAccess || result.data.completed || 0,
+              revision: result.data.revision || result.data.needsRevision || 0,
+              needsRevision: result.data.needsRevision || result.data.revision || 0,
+              total: result.data.total || 0,
+              processingPercentage: result.data.processingPercentage || 0,
+              completedPercentage: result.data.completedPercentage || 0,
+              revisionPercentage: result.data.revisionPercentage || 0
+            }
+
+            console.log('✅ UserDashboard: Dashboard stats updated:', dashboardStats.value)
+          } else {
+            // Use fallback data if backend fails
+            console.warn('⚠️ Using fallback dashboard statistics')
+            if (result.data) {
+              dashboardStats.value = result.data
+            }
+            if (result.error) {
+              statsError.value = result.error
+            }
+          }
+        } catch (error) {
+          console.error('❌ UserDashboard: Error fetching dashboard stats:', error)
+          statsError.value = error.message || 'Failed to load dashboard statistics'
+
+          // Use mock data as fallback
+          dashboardStats.value = dashboardService.getMockStats()
+        } finally {
+          isLoadingStats.value = false
+        }
+      }
 
       // Check for pending booking requests on mount
       const checkPendingBookingRequest = async () => {
@@ -712,8 +779,9 @@
       onMounted(async () => {
         console.log('UserDashboard mounted successfully')
         requireRole([ROLES.STAFF])
-        // Check for pending booking requests
-        await checkPendingBookingRequest()
+
+        // Fetch dashboard statistics and check for pending requests in parallel
+        await Promise.allSettled([fetchDashboardStats(), checkPendingBookingRequest()])
       })
 
       // Methods
@@ -776,14 +844,25 @@
       }
 
       return {
+        // Form selector
         showFormSelector,
+
+        // Booking requests
         hasPendingBookingRequest,
         pendingBookingInfo,
         isCheckingPendingRequests,
+
+        // Dashboard statistics
+        dashboardStats,
+        isLoadingStats,
+        statsError,
+
+        // Methods
         viewMyRequests,
         selectCombinedForm,
         selectBookingService,
-        checkPendingBookingRequest
+        checkPendingBookingRequest,
+        fetchDashboardStats
       }
     }
   }

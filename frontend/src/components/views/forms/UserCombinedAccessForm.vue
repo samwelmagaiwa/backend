@@ -141,7 +141,7 @@
                         class="absolute top-1 right-1 w-1 h-1 bg-white/60 rounded-full animate-ping"
                       ></div>
                     </div>
-                    <div>
+                    <div class="flex-1">
                       <h3 class="text-lg font-bold text-white flex items-center">
                         <i class="fas fa-id-card mr-2 text-blue-300"></i>
                         Applicant Details
@@ -152,6 +152,28 @@
                         >
                           <i class="fas fa-asterisk mr-1 text-xs"></i>
                           Required Information
+                        </span>
+                        <!-- Auto-population status indicator -->
+                        <span
+                          v-if="isLoadingProfile"
+                          class="text-xs text-blue-300 font-medium bg-blue-500/20 px-2 py-1 rounded-full border border-blue-400/30 animate-pulse"
+                        >
+                          <i class="fas fa-spinner fa-spin mr-1 text-xs"></i>
+                          Loading your details...
+                        </span>
+                        <span
+                          v-else-if="autoPopulated"
+                          class="text-xs text-green-300 font-medium bg-green-500/20 px-2 py-1 rounded-full border border-green-400/30"
+                        >
+                          <i class="fas fa-check mr-1 text-xs"></i>
+                          Auto-populated
+                        </span>
+                        <span
+                          v-else-if="profileLoadError"
+                          class="text-xs text-yellow-300 font-medium bg-yellow-500/20 px-2 py-1 rounded-full border border-yellow-400/30"
+                        >
+                          <i class="fas fa-exclamation-triangle mr-1 text-xs"></i>
+                          Manual entry required
                         </span>
                       </div>
                     </div>
@@ -172,7 +194,10 @@
                             v-model="formData.pfNumber"
                             type="text"
                             class="medical-input w-full px-3 py-2 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50"
-                            placeholder="Enter PF Number"
+                            :placeholder="
+                              isLoadingProfile ? 'Loading your PF Number...' : 'Enter PF Number'
+                            "
+                            :disabled="isLoadingProfile"
                             required
                           />
                           <div
@@ -181,7 +206,12 @@
                           <div
                             class="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-300/50"
                           >
-                            <i class="fas fa-hashtag"></i>
+                            <i v-if="isLoadingProfile" class="fas fa-spinner fa-spin"></i>
+                            <i
+                              v-else-if="autoPopulated && formData.pfNumber"
+                              class="fas fa-check text-green-400"
+                            ></i>
+                            <i v-else class="fas fa-hashtag"></i>
                           </div>
                         </div>
                         <p class="text-xs text-blue-200/60 mt-1 italic flex items-center">
@@ -201,7 +231,10 @@
                             v-model="formData.staffName"
                             type="text"
                             class="medical-input w-full px-4 py-2 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50"
-                            placeholder="Enter full name"
+                            :placeholder="
+                              isLoadingProfile ? 'Loading your name...' : 'Enter full name'
+                            "
+                            :disabled="isLoadingProfile"
                             required
                           />
                           <div
@@ -210,7 +243,12 @@
                           <div
                             class="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-300/50"
                           >
-                            <i class="fas fa-user-circle"></i>
+                            <i v-if="isLoadingProfile" class="fas fa-spinner fa-spin"></i>
+                            <i
+                              v-else-if="autoPopulated && formData.staffName"
+                              class="fas fa-check text-green-400"
+                            ></i>
+                            <i v-else class="fas fa-user-circle"></i>
                           </div>
                         </div>
                         <p class="text-xs text-blue-200/60 mt-1 italic flex items-center">
@@ -233,7 +271,10 @@
                             v-model="formData.phoneNumber"
                             type="tel"
                             class="medical-input w-full px-4 py-2 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50"
-                            placeholder="Enter phone number"
+                            :placeholder="
+                              isLoadingProfile ? 'Loading your phone...' : 'Enter phone number'
+                            "
+                            :disabled="isLoadingProfile"
                             required
                           />
                           <div
@@ -242,7 +283,12 @@
                           <div
                             class="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-300/50"
                           >
-                            <i class="fas fa-mobile-alt"></i>
+                            <i v-if="isLoadingProfile" class="fas fa-spinner fa-spin"></i>
+                            <i
+                              v-else-if="autoPopulated && formData.phoneNumber"
+                              class="fas fa-check text-green-400"
+                            ></i>
+                            <i v-else class="fas fa-mobile-alt"></i>
                           </div>
                         </div>
                         <p class="text-xs text-blue-200/60 mt-1 italic flex items-center">
@@ -854,6 +900,7 @@
   import AppFooter from '@/components/footer.vue'
   import AppHeader from '@/components/AppHeader.vue'
   import userCombinedAccessService from '@/services/userCombinedAccessService'
+  import userProfileService from '@/services/userProfileService'
 
   export default {
     name: 'UserCombinedAccessForm',
@@ -876,6 +923,10 @@
         signaturePreview: '',
         signatureFileName: '',
         departments: [],
+        // Auto-population states
+        isLoadingProfile: true,
+        profileLoadError: null,
+        autoPopulated: false,
         formData: {
           // Applicant Details
           pfNumber: '',
@@ -912,8 +963,12 @@
     },
 
     async mounted() {
-      // Load departments when component is mounted
-      await this.loadDepartments()
+      console.log('🔄 UserCombinedAccessForm: Component mounted, starting initialization...')
+
+      // Load both profile data and departments concurrently
+      await Promise.all([this.autoPopulateUserData(), this.loadDepartments()])
+
+      console.log('✅ UserCombinedAccessForm: Initialization completed')
     },
 
     methods: {
@@ -952,6 +1007,58 @@
           ]
         }
       },
+
+      /**
+       * Auto-populate user data from the authenticated user's profile
+       */
+      async autoPopulateUserData() {
+        console.log('🔄 Starting user data auto-population...')
+        this.isLoadingProfile = true
+        this.profileLoadError = null
+
+        try {
+          const result = await userProfileService.getFormAutoPopulationData()
+
+          if (result.success && result.data) {
+            console.log('✅ User profile retrieved successfully:', result.data)
+
+            // Auto-populate form fields
+            this.formData.pfNumber = result.data.pfNumber || ''
+            this.formData.staffName = result.data.staffName || ''
+            this.formData.phoneNumber = result.data.phoneNumber || ''
+            this.formData.department = result.data.departmentId || ''
+
+            this.autoPopulated = true
+
+            console.log('✅ Form auto-populated with user data:', {
+              pfNumber: this.formData.pfNumber,
+              staffName: this.formData.staffName,
+              phoneNumber: this.formData.phoneNumber,
+              department: this.formData.department
+            })
+
+            // Show success notification
+            this.showNotification('Your details have been auto-populated from your profile', 'info')
+          } else {
+            console.warn('⚠️ Failed to auto-populate user data:', result.error)
+            this.profileLoadError = result.error || 'Failed to load profile data'
+            this.showNotification(
+              'Could not auto-populate your details. Please fill them manually.',
+              'warning'
+            )
+          }
+        } catch (error) {
+          console.error('❌ Error during auto-population:', error)
+          this.profileLoadError = error.message || 'Network error while loading profile'
+          this.showNotification(
+            'Error loading your profile. Please fill in your details manually.',
+            'error'
+          )
+        } finally {
+          this.isLoadingProfile = false
+        }
+      },
+
       async submitForm() {
         // Validate required fields
         if (

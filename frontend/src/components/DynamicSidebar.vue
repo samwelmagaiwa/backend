@@ -529,36 +529,6 @@
                     ></div>
                   </router-link>
                 </li>
-
-                <!-- Request Details Node (Dynamic) -->
-                <li v-if="$route.params.id" class="tree-leaf">
-                  <div
-                    class="relative flex items-center rounded-lg px-3 py-2 text-sm transition-all duration-300 backdrop-blur-sm bg-gradient-to-r from-cyan-500/40 via-emerald-500/40 to-teal-500/40 text-white shadow-xl border border-cyan-400/50"
-                  >
-                    <!-- Tree Connector -->
-                    <div class="absolute -left-4 top-1/2 w-3 h-px bg-slate-600/30"></div>
-                    <div
-                      class="absolute -left-4 top-1/2 w-1 h-1 bg-slate-600/50 rounded-full transform -translate-y-0.5"
-                    ></div>
-
-                    <div
-                      class="relative flex items-center justify-center w-5 h-5 rounded bg-gradient-to-br from-cyan-500/50 via-emerald-500/50 to-teal-500/50 transition-all duration-300 shadow border border-white/20 mr-3"
-                    >
-                      <i class="fas fa-clipboard-check text-xs drop-shadow-lg"></i>
-                    </div>
-                    <div class="relative flex-1">
-                      <span class="font-medium tracking-wide drop-shadow-lg block"
-                        >Request Details</span
-                      >
-                      <span class="text-xs opacity-80">ID: {{ $route.params.id }}</span>
-                    </div>
-
-                    <!-- Active Indicator -->
-                    <div
-                      class="absolute right-2 w-1.5 h-1.5 bg-cyan-300 rounded-full animate-pulse shadow-lg"
-                    ></div>
-                  </div>
-                </li>
               </ul>
             </transition>
           </li>
@@ -699,7 +669,7 @@
         set: (value) => emit('update:collapsed', value)
       })
 
-      const containerWidthClass = computed(() => (isCollapsed.value ? 'w-16' : 'w-64'))
+      const containerWidthClass = computed(() => (isCollapsed.value ? 'w-16' : 'w-72'))
 
       // Get menu items based on stable user role
       const menuItems = computed(() => {
@@ -903,13 +873,6 @@
             category: 'device-management',
             description: 'Manage device borrowing requests'
           },
-          '/ict-approval/request/:id': {
-            name: 'RequestDetails',
-            displayName: 'Request Details',
-            icon: 'fas fa-clipboard-check',
-            category: 'device-management',
-            description: 'View and assess device requests'
-          },
 
           // Requests Management (for approvers)
           '/hod-dashboard/request-list': {
@@ -925,13 +888,6 @@
             icon: 'fas fa-clipboard-check',
             category: 'requests-management',
             description: 'Review access requests'
-          },
-          '/internal-access/details': {
-            name: 'InternalAccessDetails',
-            displayName: 'Request Details',
-            icon: 'fas fa-file-signature',
-            category: 'requests-management',
-            description: 'Review and approve requests'
           }
         }
 
