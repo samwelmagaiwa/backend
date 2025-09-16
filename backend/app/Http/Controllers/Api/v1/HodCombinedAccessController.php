@@ -322,6 +322,14 @@ class HodCombinedAccessController extends Controller
             'request_type_display' => $request->request_type_name,
             'request_types' => $request->getRequestTypesArray(), // Array format
             'purpose' => $request->purpose,
+            
+            // NEW: Include module data for conditional display
+            'wellsoft_modules' => $request->wellsoft_modules,
+            'jeeva_modules' => $request->jeeva_modules,
+            'internet_purposes' => $request->internet_purposes,
+            'access_type' => $request->access_type,
+            'temporary_until' => $request->temporary_until?->format('Y-m-d'),
+            
             'status' => $request->status,
             'hod_status' => $request->status,  // Alias for frontend
             'status_display' => $request->status_name,

@@ -345,23 +345,29 @@
                     </div>
 
                     <!-- Module Requested for - Compact -->
-                    <div class="flex justify-center mb-3">
+                    <div class="flex justify-center mb-3" :class="{ 'opacity-50': isReviewMode && !hasWellsoftRequest && !hasJeevaRequest }">
                       <div
                         class="bg-white/10 rounded-lg p-2 border border-blue-300/30 backdrop-blur-sm"
                       >
-                        <label class="block text-sm font-bold text-blue-100 mb-2 text-center">
+                        <label class="block text-sm font-bold text-blue-100 mb-2 text-center flex items-center justify-center gap-2">
                           <i class="fas fa-toggle-on mr-1 text-blue-300 text-xs"></i>
                           Module Requested for
                           <span class="text-red-400">*</span>
+                          <span v-if="isReviewMode && !hasWellsoftRequest && !hasJeevaRequest" class="text-xs px-2 py-1 bg-gray-500/30 rounded-full text-gray-300">
+                            <i class="fas fa-lock text-xs mr-1"></i>
+                            Not Applicable
+                          </span>
                         </label>
                         <div class="flex items-center gap-4 justify-center">
                           <label
                             class="flex items-center cursor-pointer hover:bg-blue-500/20 p-2 rounded transition-all"
+                            :class="{ 'pointer-events-none': isReviewMode && !hasWellsoftRequest && !hasJeevaRequest }"
                           >
                             <input
                               v-model="wellsoftRequestType"
                               type="radio"
                               value="use"
+                              :disabled="isReviewMode && !hasWellsoftRequest && !hasJeevaRequest"
                               class="w-4 h-4 text-blue-600 border-blue-300 focus:ring-blue-500 mr-2"
                             />
                             <span class="text-sm font-medium text-blue-100 flex items-center">
@@ -371,11 +377,13 @@
                           </label>
                           <label
                             class="flex items-center cursor-pointer hover:bg-red-500/20 p-2 rounded transition-all"
+                            :class="{ 'pointer-events-none': isReviewMode && !hasWellsoftRequest && !hasJeevaRequest }"
                           >
                             <input
                               v-model="wellsoftRequestType"
                               type="radio"
                               value="revoke"
+                              :disabled="isReviewMode && !hasWellsoftRequest && !hasJeevaRequest"
                               class="w-4 h-4 text-blue-600 border-blue-300 focus:ring-blue-500 mr-2"
                             />
                             <span class="text-sm font-medium text-blue-100 flex items-center">
@@ -388,15 +396,19 @@
                     </div>
 
                     <!-- Wellsoft selector -->
-                    <div class="mb-6">
-                      <label class="block text-sm font-bold text-blue-100 mb-3">
+                    <div class="mb-6" :class="{ 'opacity-50': isWellsoftReadonly }">
+                      <label class="block text-sm font-bold text-blue-100 mb-3 flex items-center gap-2">
                         Wellsoft Modules <span class="text-red-400">*</span>
+                        <span v-if="isWellsoftReadonly" class="text-xs px-2 py-1 bg-gray-500/30 rounded-full text-gray-300">
+                          <i class="fas fa-lock text-xs mr-1"></i>
+                          Not Requested
+                        </span>
                       </label>
                       <div class="flex items-center justify-between mb-3">
                         <span class="text-sm text-blue-200"
                           >{{ selectedWellsoft.length }} modules selected</span
                         >
-                        <div class="flex items-center gap-2 text-sm">
+                        <div v-if="!isWellsoftReadonly" class="flex items-center gap-2 text-sm">
                           <button
                             type="button"
                             class="px-3 py-1 bg-blue-500/20 text-blue-200 rounded-lg hover:bg-blue-500/30 transition-colors backdrop-blur-sm border border-blue-400/30"
@@ -413,7 +425,7 @@
                           </button>
                         </div>
                       </div>
-                      <div class="relative mb-2">
+                      <div v-if="!isWellsoftReadonly" class="relative mb-2">
                         <input
                           v-model.trim="wellsoftQuery"
                           class="medical-input w-full px-3 py-2 pl-8 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm text-sm"
@@ -433,6 +445,7 @@
                         >
                           <i class="fas fa-check text-blue-300"></i> {{ m }}
                           <button
+                            v-if="!isWellsoftReadonly"
                             type="button"
                             @click="toggleWellsoft(m)"
                             class="ml-1 hover:text-blue-200 transition-colors"
@@ -442,8 +455,16 @@
                         </span>
                       </div>
 
+                      <!-- No modules message for readonly state -->
+                      <div v-if="isWellsoftReadonly && selectedWellsoft.length === 0" 
+                           class="bg-gray-500/10 rounded-lg p-4 border border-gray-400/30 text-center">
+                        <i class="fas fa-info-circle text-gray-400 mb-2 text-lg"></i>
+                        <p class="text-gray-300 text-sm">No Wellsoft modules requested</p>
+                      </div>
+
                       <!-- Options grid -->
                       <div
+                        v-if="!isWellsoftReadonly"
                         class="bg-white/10 rounded-lg p-3 max-h-40 border border-blue-300/30 overflow-y-auto backdrop-blur-sm"
                       >
                         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
@@ -465,15 +486,19 @@
                     </div>
 
                     <!-- Jeeva selector -->
-                    <div class="mb-6">
-                      <label class="block text-sm font-bold text-blue-100 mb-3">
+                    <div class="mb-6" :class="{ 'opacity-50': isJeevaReadonly }">
+                      <label class="block text-sm font-bold text-blue-100 mb-3 flex items-center gap-2">
                         Jeeva Modules <span class="text-red-400">*</span>
+                        <span v-if="isJeevaReadonly" class="text-xs px-2 py-1 bg-gray-500/30 rounded-full text-gray-300">
+                          <i class="fas fa-lock text-xs mr-1"></i>
+                          Not Requested
+                        </span>
                       </label>
                       <div class="flex items-center justify-between mb-3">
                         <span class="text-sm text-blue-200"
                           >{{ selectedJeeva.length }} modules selected</span
                         >
-                        <div class="flex items-center gap-2 text-sm">
+                        <div v-if="!isJeevaReadonly" class="flex items-center gap-2 text-sm">
                           <button
                             type="button"
                             class="px-3 py-1 bg-cyan-500/20 text-cyan-200 rounded-lg hover:bg-cyan-500/30 transition-colors backdrop-blur-sm border border-cyan-400/30"
@@ -490,7 +515,7 @@
                           </button>
                         </div>
                       </div>
-                      <div class="relative mb-2">
+                      <div v-if="!isJeevaReadonly" class="relative mb-2">
                         <input
                           v-model.trim="jeevaQuery"
                           class="medical-input w-full px-3 py-2 pl-8 bg-white/15 border border-blue-300/30 rounded-lg focus:border-cyan-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm text-sm"
@@ -509,6 +534,7 @@
                         >
                           <i class="fas fa-check text-cyan-300"></i> {{ m }}
                           <button
+                            v-if="!isJeevaReadonly"
                             type="button"
                             @click="toggleJeeva(m)"
                             class="ml-1 hover:text-cyan-200 transition-colors"
@@ -518,7 +544,15 @@
                         </span>
                       </div>
 
+                      <!-- No modules message for readonly state -->
+                      <div v-if="isJeevaReadonly && selectedJeeva.length === 0" 
+                           class="bg-gray-500/10 rounded-lg p-4 border border-gray-400/30 text-center">
+                        <i class="fas fa-info-circle text-gray-400 mb-2 text-lg"></i>
+                        <p class="text-gray-300 text-sm">No Jeeva modules requested</p>
+                      </div>
+
                       <div
+                        v-if="!isJeevaReadonly"
                         class="bg-white/10 rounded-lg p-3 max-h-40 border border-blue-300/30 overflow-y-auto backdrop-blur-sm"
                       >
                         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
@@ -540,11 +574,24 @@
                     </div>
 
                     <!-- Internet selector -->
-                    <div class="mb-6">
-                      <label class="block text-sm font-bold text-blue-100 mb-3">
+                    <div class="mb-6" :class="{ 'opacity-50': isInternetReadonly }">
+                      <label class="block text-sm font-bold text-blue-100 mb-3 flex items-center gap-2">
                         Internet Purpose <span class="text-red-400">*</span>
+                        <span v-if="isInternetReadonly" class="text-xs px-2 py-1 bg-gray-500/30 rounded-full text-gray-300">
+                          <i class="fas fa-lock text-xs mr-1"></i>
+                          Not Requested
+                        </span>
                       </label>
-                      <div class="space-y-2">
+                      
+                      <!-- No purposes message for readonly state -->
+                      <div v-if="isInternetReadonly && !internetPurposes.some(p => p.trim())" 
+                           class="bg-gray-500/10 rounded-lg p-4 border border-gray-400/30 text-center">
+                        <i class="fas fa-info-circle text-gray-400 mb-2 text-lg"></i>
+                        <p class="text-gray-300 text-sm">No internet access purposes requested</p>
+                      </div>
+                      
+                      <!-- Purpose inputs -->
+                      <div v-if="!isInternetReadonly || internetPurposes.some(p => p.trim())" class="space-y-2">
                         <div
                           v-for="(purpose, index) in internetPurposes"
                           :key="index"
@@ -558,11 +605,14 @@
                             <input
                               v-model="internetPurposes[index]"
                               type="text"
+                              :readonly="isInternetReadonly"
                               class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 module-request-editable text-sm"
-                              :placeholder="`Purpose ${index + 1}`"
-                              :required="index === 0"
+                              :class="{ 'cursor-not-allowed': isInternetReadonly }"
+                              :placeholder="isInternetReadonly ? '' : `Purpose ${index + 1}`"
+                              :required="index === 0 && !isInternetReadonly"
                             />
                             <div
+                              v-if="!isInternetReadonly"
                               class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/10 to-cyan-500/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
                             ></div>
                           </div>
@@ -2236,6 +2286,46 @@
         })
         
         return hasData && hasPath && pathNotEmpty
+      },
+
+      // Get request types from loaded data
+      requestTypes() {
+        if (!this.requestData) return []
+        
+        // Handle both array and object formats
+        let types = this.requestData.request_types || this.requestData.request_type || []
+        if (!Array.isArray(types)) {
+          types = [types]
+        }
+        
+        console.log('Request types:', types)
+        return types
+      },
+
+      // Check if specific request type is included
+      hasWellsoftRequest() {
+        return this.requestTypes.includes('wellsoft')
+      },
+
+      hasJeevaRequest() {
+        return this.requestTypes.includes('jeeva_access') || this.requestTypes.includes('jeeva')
+      },
+
+      hasInternetRequest() {
+        return this.requestTypes.includes('internet_access_request') || this.requestTypes.includes('internet')
+      },
+
+      // Determine if sections should be readonly based on review mode and request type
+      isWellsoftReadonly() {
+        return this.isReviewMode && !this.hasWellsoftRequest
+      },
+
+      isJeevaReadonly() {
+        return this.isReviewMode && !this.hasJeevaRequest
+      },
+
+      isInternetReadonly() {
+        return this.isReviewMode && !this.hasInternetRequest
       }
     },
     async mounted() {
@@ -2497,28 +2587,43 @@
               this.signatureFileName = this.getSignatureFileName(this.requestData.signature_path)
             }
 
-            // Populate module selections based on request_types
+            // Populate module selections based on actual database data
             if (this.requestData.request_types || this.requestData.request_type) {
               const types = this.requestData.request_types || this.requestData.request_type || []
               
-              // Handle Wellsoft
+              // Handle Wellsoft modules
               if (types.includes('wellsoft')) {
-                this.selectedWellsoft = ['Registrar'] // Default or parse from data
+                const wellsoftModules = this.requestData.wellsoft_modules || []
+                this.selectedWellsoft = Array.isArray(wellsoftModules) ? wellsoftModules : []
+                console.log('Loaded Wellsoft modules:', this.selectedWellsoft)
+              } else {
+                this.selectedWellsoft = []
               }
               
-              // Handle Jeeva
+              // Handle Jeeva modules
               if (types.includes('jeeva_access') || types.includes('jeeva')) {
-                this.selectedJeeva = ['FINANCIAL ACCOUNTING'] // Default or parse from data  
+                const jeevaModules = this.requestData.jeeva_modules || []
+                this.selectedJeeva = Array.isArray(jeevaModules) ? jeevaModules : []
+                console.log('Loaded Jeeva modules:', this.selectedJeeva)
+              } else {
+                this.selectedJeeva = []
               }
               
-              // Handle Internet
+              // Handle Internet purposes
               if (types.includes('internet_access_request') || types.includes('internet')) {
-                // Set internet purposes if available
-                if (this.requestData.purpose) {
-                  const purposes = Array.isArray(this.requestData.purpose) ? this.requestData.purpose : [this.requestData.purpose]
-                  this.internetPurposes = [...purposes, '', '', ''].slice(0, 4)
-                }
+                const internetPurposes = this.requestData.internet_purposes || this.requestData.purpose || []
+                const purposes = Array.isArray(internetPurposes) ? internetPurposes : [internetPurposes]
+                // Ensure we have exactly 4 purpose slots
+                this.internetPurposes = [...purposes, '', '', '', ''].slice(0, 4)
+                console.log('Loaded Internet purposes:', this.internetPurposes)
+              } else {
+                this.internetPurposes = ['', '', '', '']
               }
+            } else {
+              // Reset all selections if no request types
+              this.selectedWellsoft = []
+              this.selectedJeeva = []
+              this.internetPurposes = ['', '', '', '']
             }
 
             console.log('Form populated successfully')
