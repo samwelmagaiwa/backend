@@ -176,10 +176,240 @@
                     </div>
                   </div>
 
-                  <!-- For Access Requests: Full approval chain -->
-                  <div v-else class="grid grid-cols-2 md:grid-cols-5 gap-3">
-                    <div class="text-center text-white text-sm">
-                      Access Request Approval Chain (Not Booking Service)
+                  <!-- For Combined Access Requests: Full approval chain -->
+                  <div v-else class="space-y-6">
+                    <!-- Request Status Overview -->
+                    <div class="mb-6 p-4 bg-white/10 rounded-xl border border-emerald-300/30">
+                      <h4 class="text-sm font-bold text-blue-100 mb-3">
+                        Combined Access Request - {{ requestType }} Status
+                      </h4>
+                      <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
+                        <div class="text-center">
+                          <div
+                            :class="
+                              getCombinedApprovalStatus('hod') === 'approved'
+                                ? 'bg-green-500'
+                                : getCombinedApprovalStatus('hod') === 'rejected'
+                                  ? 'bg-red-500'
+                                  : 'bg-yellow-500'
+                            "
+                            class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1"
+                          >
+                            <i
+                              :class="
+                                getCombinedApprovalStatus('hod') === 'approved'
+                                  ? 'fas fa-check'
+                                  : getCombinedApprovalStatus('hod') === 'rejected'
+                                    ? 'fas fa-times'
+                                    : 'fas fa-clock'
+                              "
+                              class="text-white text-sm"
+                            ></i>
+                          </div>
+                          <p class="text-xs text-white">HOD</p>
+                        </div>
+                        <div class="text-center">
+                          <div
+                            :class="
+                              getCombinedApprovalStatus('divisional') === 'approved'
+                                ? 'bg-green-500'
+                                : getCombinedApprovalStatus('divisional') === 'rejected'
+                                  ? 'bg-red-500'
+                                  : 'bg-yellow-500'
+                            "
+                            class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1"
+                          >
+                            <i
+                              :class="
+                                getCombinedApprovalStatus('divisional') === 'approved'
+                                  ? 'fas fa-check'
+                                  : getCombinedApprovalStatus('divisional') === 'rejected'
+                                    ? 'fas fa-times'
+                                    : 'fas fa-clock'
+                              "
+                              class="text-white text-sm"
+                            ></i>
+                          </div>
+                          <p class="text-xs text-white">Divisional</p>
+                        </div>
+                        <div class="text-center">
+                          <div
+                            :class="
+                              getCombinedApprovalStatus('ict_director') === 'approved'
+                                ? 'bg-green-500'
+                                : getCombinedApprovalStatus('ict_director') === 'rejected'
+                                  ? 'bg-red-500'
+                                  : 'bg-yellow-500'
+                            "
+                            class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1"
+                          >
+                            <i
+                              :class="
+                                getCombinedApprovalStatus('ict_director') === 'approved'
+                                  ? 'fas fa-check'
+                                  : getCombinedApprovalStatus('ict_director') === 'rejected'
+                                    ? 'fas fa-times'
+                                    : 'fas fa-clock'
+                              "
+                              class="text-white text-sm"
+                            ></i>
+                          </div>
+                          <p class="text-xs text-white">DICT</p>
+                        </div>
+                        <div class="text-center">
+                          <div
+                            :class="
+                              getCombinedApprovalStatus('head_it') === 'approved'
+                                ? 'bg-green-500'
+                                : getCombinedApprovalStatus('head_it') === 'rejected'
+                                  ? 'bg-red-500'
+                                  : 'bg-yellow-500'
+                            "
+                            class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1"
+                          >
+                            <i
+                              :class="
+                                getCombinedApprovalStatus('head_it') === 'approved'
+                                  ? 'fas fa-check'
+                                  : getCombinedApprovalStatus('head_it') === 'rejected'
+                                    ? 'fas fa-times'
+                                    : 'fas fa-clock'
+                              "
+                              class="text-white text-sm"
+                            ></i>
+                          </div>
+                          <p class="text-xs text-white">Head IT</p>
+                        </div>
+                        <div class="text-center">
+                          <div
+                            :class="
+                              getCombinedApprovalStatus('ict_officer') === 'approved'
+                                ? 'bg-green-500'
+                                : getCombinedApprovalStatus('ict_officer') === 'rejected'
+                                  ? 'bg-red-500'
+                                  : 'bg-yellow-500'
+                            "
+                            class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1"
+                          >
+                            <i
+                              :class="
+                                getCombinedApprovalStatus('ict_officer') === 'approved'
+                                  ? 'fas fa-check'
+                                  : getCombinedApprovalStatus('ict_officer') === 'rejected'
+                                    ? 'fas fa-times'
+                                    : 'fas fa-clock'
+                              "
+                              class="text-white text-sm"
+                            ></i>
+                          </div>
+                          <p class="text-xs text-white">ICT Officer</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- HOD Approval Card -->
+                    <div
+                      class="bg-gradient-to-r from-blue-600/20 to-blue-700/20 border border-blue-400/40 rounded-lg p-4 backdrop-blur-sm hover:shadow-lg transition-all duration-300"
+                    >
+                      <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                          <div
+                            :class="getHODApprovalStepClass()"
+                            class="w-10 h-10 rounded-lg flex items-center justify-center shadow-md"
+                          >
+                            <i :class="getHODApprovalStepIcon()" class="text-white text-sm"></i>
+                          </div>
+                          <div>
+                            <h4 class="text-white font-semibold text-sm">Head of Department</h4>
+                            <p :class="getHODApprovalStatusTextClass()" class="text-xs font-medium">
+                              {{ getHODApprovalStatusText() }}
+                            </p>
+                          </div>
+                        </div>
+                        <div class="text-right">
+                          <p class="text-xs text-blue-300">
+                            {{
+                              requestData?.hodApproval?.approved_at || requestData?.hod_approved_at
+                                ? formatDate(
+                                    requestData?.hodApproval?.approved_at ||
+                                      requestData?.hod_approved_at
+                                  )
+                                : 'Pending'
+                            }}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- HOD Comments Card -->
+                    <div v-if="getHODComment()" class="mt-3">
+                      <div
+                        :class="getHODCommentsCardClass()"
+                        class="rounded-lg p-4 backdrop-blur-sm border transition-all duration-300 hover:shadow-lg"
+                      >
+                        <!-- Header -->
+                        <div class="flex items-center justify-between mb-3">
+                          <div class="flex items-center space-x-2">
+                            <div
+                              :class="getHODCommentsIconBgClass()"
+                              class="w-8 h-8 rounded-lg flex items-center justify-center shadow-sm"
+                            >
+                              <i :class="getHODCommentsIcon()" class="text-white text-sm"></i>
+                            </div>
+                            <div>
+                              <h5 class="text-white font-semibold text-sm">HOD Comments</h5>
+                              <p class="text-xs opacity-75" :class="getHODCommentsTextColor()">
+                                {{
+                                  getHODApprovalStatus() === 'rejected'
+                                    ? 'Rejection Reason'
+                                    : getHODApprovalStatus() === 'approved'
+                                      ? 'Approval Note'
+                                      : 'Review Comment'
+                                }}
+                              </p>
+                            </div>
+                          </div>
+                          <div
+                            :class="getHODCommentsStatusBadgeClass()"
+                            class="px-2 py-1 rounded text-xs font-semibold uppercase"
+                          >
+                            {{ getHODApprovalStatus() }}
+                          </div>
+                        </div>
+
+                        <!-- Comment Content -->
+                        <div class="mb-3">
+                          <p class="text-white text-sm leading-relaxed">
+                            {{ getHODComment() }}
+                          </p>
+                        </div>
+
+                        <!-- Footer -->
+                        <div
+                          class="flex justify-between items-center text-xs"
+                          :class="getHODCommentsTextColor()"
+                        >
+                          <div class="flex items-center space-x-1">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>{{
+                              requestData?.hodApproval?.approved_at || requestData?.hod_approved_at
+                                ? formatDateTime(
+                                    requestData?.hodApproval?.approved_at ||
+                                      requestData?.hod_approved_at
+                                  )
+                                : 'Pending'
+                            }}</span>
+                          </div>
+                          <div class="flex items-center space-x-1">
+                            <i class="fas fa-user"></i>
+                            <span>{{
+                              requestData?.hodApproval?.approved_by_name ||
+                              requestData?.hod_approved_by_name ||
+                              'HOD'
+                            }}</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -435,6 +665,174 @@
         return 'bg-yellow-600 text-yellow-100 border border-blue-400/50'
       }
 
+      // HOD Approval Methods
+      const getHODApprovalStatus = () => {
+        return (
+          requestData.value?.hodApproval?.status ||
+          requestData.value?.hod_approval_status ||
+          'pending'
+        )
+      }
+
+      const getHODComment = () => {
+        return (
+          requestData.value?.hodApproval?.comment ||
+          requestData.value?.hodApproval?.rejection_reason ||
+          requestData.value?.hod_approval_comment ||
+          requestData.value?.hod_rejection_reason
+        )
+      }
+
+      const getHODApprovalStepClass = () => {
+        const status = getHODApprovalStatus()
+        if (status === 'approved') return 'bg-gradient-to-br from-blue-500 to-green-600'
+        if (status === 'rejected') return 'bg-gradient-to-br from-blue-500 to-red-600'
+        return 'bg-gradient-to-br from-blue-500 to-yellow-600'
+      }
+
+      const getHODApprovalStepIcon = () => {
+        const status = getHODApprovalStatus()
+        if (status === 'approved') return 'fas fa-check'
+        if (status === 'rejected') return 'fas fa-times'
+        return 'fas fa-clock'
+      }
+
+      const getHODApprovalStatusText = () => {
+        const status = getHODApprovalStatus()
+        return status.charAt(0).toUpperCase() + status.slice(1)
+      }
+
+      const getHODApprovalStatusTextClass = () => {
+        const status = getHODApprovalStatus()
+        if (status === 'approved') return 'text-green-400'
+        if (status === 'rejected') return 'text-red-400'
+        return 'text-yellow-400'
+      }
+
+      const getHODCommentsCardClass = () => {
+        const status = getHODApprovalStatus()
+        if (status === 'approved')
+          return 'bg-gradient-to-br from-blue-600/25 to-green-600/25 border-blue-400/60 shadow-blue-500/30'
+        if (status === 'rejected')
+          return 'bg-gradient-to-br from-blue-600/25 to-red-600/25 border-blue-400/60 shadow-blue-500/25'
+        return 'bg-gradient-to-br from-blue-600/25 to-yellow-600/25 border-blue-400/60 shadow-blue-500/25'
+      }
+
+      const getHODCommentsIconBgClass = () => {
+        const status = getHODApprovalStatus()
+        if (status === 'approved') return 'bg-gradient-to-br from-blue-500 to-green-600'
+        if (status === 'rejected') return 'bg-gradient-to-br from-blue-500 to-red-600'
+        return 'bg-gradient-to-br from-blue-500 to-yellow-600'
+      }
+
+      const getHODCommentsIcon = () => {
+        const status = getHODApprovalStatus()
+        if (status === 'approved') return 'fas fa-check-circle'
+        if (status === 'rejected') return 'fas fa-times-circle'
+        return 'fas fa-clock'
+      }
+
+      const getHODCommentsTextColor = () => {
+        return 'text-blue-200'
+      }
+
+      const getHODCommentsStatusBadgeClass = () => {
+        const status = getHODApprovalStatus()
+        if (status === 'approved') return 'bg-green-600 text-green-100 border border-blue-400/50'
+        if (status === 'rejected') return 'bg-red-600 text-red-100 border border-blue-400/50'
+        return 'bg-yellow-600 text-yellow-100 border border-blue-400/50'
+      }
+
+      // Combined Access Request Status Helper
+      const getCombinedApprovalStatus = (stage) => {
+        if (!requestData.value) return 'pending'
+
+        const status = requestData.value.status || 'pending'
+
+        switch (stage) {
+          case 'hod':
+            if (
+              [
+                'hod_approved',
+                'divisional_approved',
+                'ict_director_approved',
+                'head_it_approved',
+                'implemented',
+                'approved'
+              ].includes(status)
+            ) {
+              return 'approved'
+            }
+            if (status === 'hod_rejected') {
+              return 'rejected'
+            }
+            return 'pending'
+
+          case 'divisional':
+            if (
+              [
+                'divisional_approved',
+                'ict_director_approved',
+                'head_it_approved',
+                'implemented',
+                'approved'
+              ].includes(status)
+            ) {
+              return 'approved'
+            }
+            if (status === 'divisional_rejected') {
+              return 'rejected'
+            }
+            if (['hod_approved', 'pending_divisional'].includes(status)) {
+              return 'pending'
+            }
+            return 'not_reached'
+
+          case 'ict_director':
+            if (
+              ['ict_director_approved', 'head_it_approved', 'implemented', 'approved'].includes(
+                status
+              )
+            ) {
+              return 'approved'
+            }
+            if (status === 'ict_director_rejected') {
+              return 'rejected'
+            }
+            if (['divisional_approved', 'pending_ict_director'].includes(status)) {
+              return 'pending'
+            }
+            return 'not_reached'
+
+          case 'head_it':
+            if (['head_it_approved', 'implemented', 'approved'].includes(status)) {
+              return 'approved'
+            }
+            if (status === 'head_it_rejected') {
+              return 'rejected'
+            }
+            if (['ict_director_approved', 'pending_head_it'].includes(status)) {
+              return 'pending'
+            }
+            return 'not_reached'
+
+          case 'ict_officer':
+            if (['implemented', 'approved'].includes(status)) {
+              return 'approved'
+            }
+            if (status === 'ict_officer_rejected') {
+              return 'rejected'
+            }
+            if (['head_it_approved', 'pending_ict_officer'].includes(status)) {
+              return 'pending'
+            }
+            return 'not_reached'
+
+          default:
+            return 'pending'
+        }
+      }
+
       // Return Status Helper Methods
       const getReturnStatusBadgeClass = (returnStatus) => {
         const statusClasses = {
@@ -486,6 +884,21 @@
         getIctCommentsIcon,
         getIctCommentsTextColor,
         getIctCommentsStatusBadgeClass,
+        // HOD Methods
+        getHODApprovalStatus,
+        getHODComment,
+        getHODApprovalStepClass,
+        getHODApprovalStepIcon,
+        getHODApprovalStatusText,
+        getHODApprovalStatusTextClass,
+        getHODCommentsCardClass,
+        getHODCommentsIconBgClass,
+        getHODCommentsIcon,
+        getHODCommentsTextColor,
+        getHODCommentsStatusBadgeClass,
+        // Combined Access Request Status
+        getCombinedApprovalStatus,
+        // Return status methods
         getReturnStatusBadgeClass,
         getReturnStatusIcon,
         getReturnStatusText

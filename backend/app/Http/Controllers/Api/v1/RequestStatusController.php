@@ -245,8 +245,8 @@ class RequestStatusController extends Controller
             $accessStats = [
                 'total' => UserAccess::where('user_id', $user->id)->count(),
                 'pending' => UserAccess::where('user_id', $user->id)->where('status', 'pending')->count(),
-                'approved' => UserAccess::where('user_id', $user->id)->where('status', 'approved')->count(),
-                'rejected' => UserAccess::where('user_id', $user->id)->where('status', 'rejected')->count(),
+                'approved' => UserAccess::where('user_id', $user->id)->whereIn('status', ['approved', 'hod_approved'])->count(),
+                'rejected' => UserAccess::where('user_id', $user->id)->whereIn('status', ['rejected', 'hod_rejected'])->count(),
                 'in_review' => UserAccess::where('user_id', $user->id)->where('status', 'in_review')->count(),
             ];
 
@@ -413,6 +413,42 @@ class RequestStatusController extends Controller
             'ictApprovalDate' => null,
             'signature_url' => $this->signatureService->getSignatureUrl($accessRequest->signature_path),
             'signature_info' => $this->signatureService->getSignatureInfo($accessRequest->signature_path),
+            
+            // HOD Approval workflow data
+            'hod_approval_status' => $accessRequest->hod_approval_status,
+            'hod_approved_at' => $accessRequest->hod_approved_at,
+            'hod_approved_by' => $accessRequest->hod_approved_by,
+            'hod_approved_by_name' => $accessRequest->hod_approved_by_name,
+            'hod_approval_comment' => $accessRequest->hod_approval_comment,
+            'hod_rejection_reason' => $accessRequest->hod_rejection_reason,
+            
+            // Divisional Director approval
+            'divisional_director_approval_status' => $accessRequest->divisional_director_approval_status,
+            'divisional_director_approved_at' => $accessRequest->divisional_director_approved_at,
+            'divisional_director_approved_by' => $accessRequest->divisional_director_approved_by,
+            'divisional_director_approved_by_name' => $accessRequest->divisional_director_approved_by_name,
+            'divisional_director_approval_comment' => $accessRequest->divisional_director_approval_comment,
+            
+            // ICT Director approval
+            'ict_director_approval_status' => $accessRequest->ict_director_approval_status,
+            'ict_director_approved_at' => $accessRequest->ict_director_approved_at,
+            'ict_director_approved_by' => $accessRequest->ict_director_approved_by,
+            'ict_director_approved_by_name' => $accessRequest->ict_director_approved_by_name,
+            'ict_director_approval_comment' => $accessRequest->ict_director_approval_comment,
+            
+            // Head of IT approval
+            'head_of_it_approval_status' => $accessRequest->head_of_it_approval_status,
+            'head_of_it_approved_at' => $accessRequest->head_of_it_approved_at,
+            'head_of_it_approved_by' => $accessRequest->head_of_it_approved_by,
+            'head_of_it_approved_by_name' => $accessRequest->head_of_it_approved_by_name,
+            'head_of_it_approval_comment' => $accessRequest->head_of_it_approval_comment,
+            
+            // ICT Officer approval
+            'ict_officer_approval_status' => $accessRequest->ict_officer_approval_status,
+            'ict_officer_approved_at' => $accessRequest->ict_officer_approved_at,
+            'ict_officer_approved_by' => $accessRequest->ict_officer_approved_by,
+            'ict_officer_approved_by_name' => $accessRequest->ict_officer_approved_by_name,
+            'ict_officer_approval_comment' => $accessRequest->ict_officer_approval_comment,
         ];
     }
 
@@ -543,6 +579,8 @@ class RequestStatusController extends Controller
     {
         $stepMap = [
             'pending' => 2, // HOD Review
+            'hod_approved' => 3, // Divisional Director Review
+            'hod_rejected' => 2, // Stopped at HOD Review
             'in_review' => 3, // Divisional Director
             'approved' => 7, // Completed
             'rejected' => 2, // Stopped at current step
@@ -583,13 +621,21 @@ class RequestStatusController extends Controller
      */
     private function getApprovalStatus(string $currentStatus, string $step): string
     {
-        // For now, return pending for all steps since we don't have detailed approval tracking
-        // This can be enhanced when approval workflow is implemented
-        if ($currentStatus === 'approved') {
+        // Handle HOD-specific statuses
+        if ($currentStatus === 'hod_approved') {
+            // HOD has approved, so HOD step is approved, others are pending
+            return $step === 'hod' ? 'approved' : 'pending';
+        } elseif ($currentStatus === 'hod_rejected') {
+            // HOD has rejected, so HOD step is rejected, others remain pending
+            return $step === 'hod' ? 'rejected' : 'pending';
+        } elseif ($currentStatus === 'approved') {
+            // Final approval - all steps are approved
             return 'approved';
         } elseif ($currentStatus === 'rejected') {
+            // Final rejection - exact step depends on where it was rejected
             return 'rejected';
         } else {
+            // Default pending status
             return 'pending';
         }
     }

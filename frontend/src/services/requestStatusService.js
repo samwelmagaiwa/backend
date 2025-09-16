@@ -79,9 +79,43 @@ const requestStatusService = {
 
       console.log('✅ Request details response:', response.data)
 
+      // Ensure approval workflow data is properly structured
+      let requestData = response.data.data
+      if (requestData && type === 'combined_access') {
+        // Structure HOD approval data for better access
+        if (requestData.hod_approved_at || requestData.hod_approval_comment) {
+          requestData.hodApproval = {
+            status: requestData.hod_approval_status || 'pending',
+            approved_at: requestData.hod_approved_at,
+            approved_by: requestData.hod_approved_by,
+            approved_by_name: requestData.hod_approved_by_name,
+            comment: requestData.hod_approval_comment,
+            rejection_reason: requestData.hod_rejection_reason || requestData.hod_approval_comment
+          }
+        }
+
+        // Structure other approval steps similarly
+        ;['divisional_director', 'ict_director', 'head_of_it', 'ict_officer'].forEach((role) => {
+          const statusField = `${role}_approval_status`
+          const dateField = `${role}_approved_at`
+          const byField = `${role}_approved_by`
+          const commentField = `${role}_approval_comment`
+
+          if (requestData[statusField] || requestData[dateField] || requestData[commentField]) {
+            requestData[`${role.replace('_', '')}Approval`] = {
+              status: requestData[statusField] || 'pending',
+              approved_at: requestData[dateField],
+              approved_by: requestData[byField],
+              comment: requestData[commentField],
+              rejection_reason: requestData[commentField]
+            }
+          }
+        })
+      }
+
       return {
         success: true,
-        data: response.data.data,
+        data: requestData,
         message: response.data.message
       }
     } catch (error) {
@@ -98,18 +132,6 @@ const requestStatusService = {
         },
         params: { id, type }
       })
-
-      // Additional detailed logging for debugging
-      console.log('Full error object:', error)
-      if (error.response) {
-        console.log('Response data:', error.response.data)
-        console.log('Response status:', error.response.status)
-        console.log('Response headers:', error.response.headers)
-      } else if (error.request) {
-        console.log('Request was made but no response:', error.request)
-      } else {
-        console.log('Error setting up request:', error.message)
-      }
 
       return {
         success: false,

@@ -235,7 +235,12 @@
                           class="border-b border-blue-400/20 hover:bg-blue-500/10 transition-colors"
                         >
                           <td class="py-4 px-4">
-                            <div class="font-medium text-white">#{{ request.id }}</div>
+                            <div class="font-medium text-white">
+                              {{ formatRequestId(request.id) }}
+                            </div>
+                            <div class="text-blue-300 text-xs mt-1">
+                              {{ getRequestTypeLabel(request) }}
+                            </div>
                           </td>
                           <td class="py-4 px-4">
                             <div class="flex items-center space-x-2">
@@ -429,7 +434,8 @@
                       class="bg-blue-500/10 border border-blue-400/30 rounded-xl p-4 hover:bg-blue-500/15 transition-colors"
                     >
                       <div class="flex items-center justify-between mb-3">
-                        <div class="font-medium text-white">#{{ request.id }}</div>
+                        <div class="font-medium text-white">{{ formatRequestId(request.id) }}</div>
+                        <div class="text-blue-300 text-xs">{{ getRequestTypeLabel(request) }}</div>
                         <div class="flex items-center space-x-2">
                           <div
                             class="w-2 h-2 rounded-full"
@@ -997,6 +1003,28 @@
         return textColorMap[returnStatus] || 'text-gray-400'
       }
 
+      // Format request ID with REQ prefix and padding
+      const formatRequestId = (id) => {
+        if (!id) return 'N/A'
+        const numericId = String(id).padStart(6, '0')
+        return `#REQ-${numericId}`
+      }
+
+      // Get request type label with services information
+      const getRequestTypeLabel = (request) => {
+        if (!request) return 'Unknown'
+
+        const baseType = getRequestTypeName(request.type)
+
+        // For combined access requests, include the services
+        if (request.type === 'combined_access' && request.services && request.services.length > 0) {
+          const serviceNames = request.services.join(', ')
+          return `${baseType} - ${serviceNames}`
+        }
+
+        return baseType
+      }
+
       return {
         loading,
         requests,
@@ -1036,7 +1064,9 @@
         formatTime,
         getReturnStatusText,
         getReturnStatusColor,
-        getReturnStatusTextColor
+        getReturnStatusTextColor,
+        formatRequestId,
+        getRequestTypeLabel
       }
     }
   }

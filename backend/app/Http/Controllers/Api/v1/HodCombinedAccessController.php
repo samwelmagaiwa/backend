@@ -22,6 +22,8 @@ class HodCombinedAccessController extends Controller
         try {
             Log::info('HOD Combined Access: Fetching requests', [
                 'user_id' => auth()->id(),
+                'user_name' => auth()->user()->name ?? 'Unknown',
+                'user_email' => auth()->user()->email ?? 'Unknown',
                 'filters' => $request->all()
             ]);
 
@@ -34,6 +36,38 @@ class HodCombinedAccessController extends Controller
                         ->orWhere('status', 'hod_approved')
                         ->orWhere('status', 'hod_rejected');
                 });
+
+            // DEPARTMENT FILTERING: HOD only sees requests from their department(s)
+            $currentUser = auth()->user();
+            $hodDepartmentIds = $currentUser->departmentsAsHOD()->pluck('id')->toArray();
+            
+            if (!empty($hodDepartmentIds)) {
+                $query->whereIn('department_id', $hodDepartmentIds);
+                Log::info('HOD Department Filter Applied', [
+                    'user_id' => $currentUser->id,
+                    'user_name' => $currentUser->name,
+                    'user_email' => $currentUser->email,
+                    'hod_department_ids' => $hodDepartmentIds,
+                    'requests_before_dept_filter' => UserAccess::with(['user', 'department'])
+                        ->whereNotNull('request_type')
+                        ->where(function ($q) {
+                            $q->where('status', 'pending')
+                                ->orWhere('status', 'pending_hod')
+                                ->orWhere('status', 'hod_approved')
+                                ->orWhere('status', 'hod_rejected');
+                        })->count(),
+                    'requests_after_dept_filter' => (clone $query)->count()
+                ]);
+            } else {
+                // If user is not HOD of any department, show no requests
+                Log::warning('HOD Access Attempt: User is not HOD of any department', [
+                    'user_id' => $currentUser->id,
+                    'user_name' => $currentUser->name,
+                    'user_email' => $currentUser->email,
+                    'user_roles' => $currentUser->roles()->pluck('name')->toArray() ?? 'No roles loaded'
+                ]);
+                $query->whereRaw('1 = 0'); // This will return no results
+            }
 
             // Apply filters
             if ($request->filled('search')) {
@@ -105,6 +139,24 @@ class HodCombinedAccessController extends Controller
             $request = UserAccess::with(['user', 'department'])
                 ->findOrFail($id);
 
+            // DEPARTMENT AUTHORIZATION: Ensure HOD can only access requests from their department(s)
+            $currentUser = auth()->user();
+            $hodDepartmentIds = $currentUser->departmentsAsHOD()->pluck('id')->toArray();
+            
+            if (!empty($hodDepartmentIds) && !in_array($request->department_id, $hodDepartmentIds)) {
+                Log::warning('HOD Access Denied: Request not from HOD department', [
+                    'user_id' => $currentUser->id,
+                    'request_department_id' => $request->department_id,
+                    'hod_department_ids' => $hodDepartmentIds
+                ]);
+                
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Access denied. You can only view requests from your department.',
+                    'error' => 'Unauthorized access'
+                ], 403);
+            }
+
             $transformedData = $this->transformRequestData($request);
 
             Log::info('HOD Combined Access: Request retrieved successfully', [
@@ -145,6 +197,25 @@ class HodCombinedAccessController extends Controller
 
             $userAccessRequest = UserAccess::findOrFail($id);
 
+            // DEPARTMENT AUTHORIZATION: Ensure HOD can only approve requests from their department(s)
+            $currentUser = auth()->user();
+            $hodDepartmentIds = $currentUser->departmentsAsHOD()->pluck('id')->toArray();
+            
+            if (!empty($hodDepartmentIds) && !in_array($userAccessRequest->department_id, $hodDepartmentIds)) {
+                Log::warning('HOD Approval Denied: Request not from HOD department', [
+                    'user_id' => $currentUser->id,
+                    'request_id' => $id,
+                    'request_department_id' => $userAccessRequest->department_id,
+                    'hod_department_ids' => $hodDepartmentIds
+                ]);
+                
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Access denied. You can only approve requests from your department.',
+                    'error' => 'Unauthorized access'
+                ], 403);
+            }
+
             // Validate the approval data
             $validatedData = $request->validate([
                 'hod_status' => 'required|in:approved,rejected',
@@ -155,11 +226,14 @@ class HodCombinedAccessController extends Controller
 
             DB::beginTransaction();
 
-            // Update the request
+            // Update the request - automatically capture authenticated user's name
+            $currentUser = auth()->user();
             $updateData = [
                 'status' => $validatedData['hod_status'] === 'approved' ? 'hod_approved' : 'hod_rejected',
                 'hod_comments' => $validatedData['hod_comments'] ?? '',
-                'hod_name' => $validatedData['hod_name'] ?? auth()->user()->name,
+                'hod_name' => $currentUser->name, // Always use authenticated user's name
+                'hod_approved_by' => $currentUser->id,
+                'hod_approved_by_name' => $currentUser->name,
                 'hod_approved_at' => now(),
                 'updated_at' => now()
             ];
@@ -261,17 +335,30 @@ class HodCombinedAccessController extends Controller
                 'user_id' => auth()->id()
             ]);
 
+            // DEPARTMENT FILTERING: HOD statistics only for their department(s)
+            $currentUser = auth()->user();
+            $hodDepartmentIds = $currentUser->departmentsAsHOD()->pluck('id')->toArray();
+            
+            $baseQuery = UserAccess::query();
+            if (!empty($hodDepartmentIds)) {
+                $baseQuery->whereIn('department_id', $hodDepartmentIds);
+            } else {
+                // If not HOD of any department, return zero stats
+                $baseQuery->whereRaw('1 = 0');
+            }
+            
             $stats = [
-                'pendingHod' => UserAccess::whereIn('status', ['pending', 'pending_hod'])->count(),
-                'hodApproved' => UserAccess::where('status', 'hod_approved')->count(),
-                'hodRejected' => UserAccess::where('status', 'hod_rejected')->count(),
-                'total' => UserAccess::count(),
-                'thisMonth' => UserAccess::whereMonth('created_at', Carbon::now()->month)
+                'pendingHod' => (clone $baseQuery)->whereIn('status', ['pending', 'pending_hod'])->count(),
+                'hodApproved' => (clone $baseQuery)->where('status', 'hod_approved')->count(),
+                'hodRejected' => (clone $baseQuery)->where('status', 'hod_rejected')->count(),
+                'total' => (clone $baseQuery)->count(),
+                'thisMonth' => (clone $baseQuery)->whereMonth('created_at', Carbon::now()->month)
                     ->whereYear('created_at', Carbon::now()->year)
                     ->count(),
-                'lastMonth' => UserAccess::whereMonth('created_at', Carbon::now()->subMonth()->month)
+                'lastMonth' => (clone $baseQuery)->whereMonth('created_at', Carbon::now()->subMonth()->month)
                     ->whereYear('created_at', Carbon::now()->subMonth()->year)
-                    ->count()
+                    ->count(),
+                'departments' => !empty($hodDepartmentIds) ? Department::whereIn('id', $hodDepartmentIds)->pluck('name')->toArray() : []
             ];
 
             Log::info('HOD Combined Access: Statistics retrieved successfully', $stats);

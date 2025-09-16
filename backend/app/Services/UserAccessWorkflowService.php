@@ -244,6 +244,17 @@ class UserAccessWorkflowService
         if ($status) {
             $query->whereIn('status', $status);
         }
+        
+        // DEPARTMENT FILTERING: HODs only see requests from their department(s)
+        if ($user->hasRole('head_of_department')) {
+            $hodDepartmentIds = $user->departmentsAsHOD()->pluck('id')->toArray();
+            if (!empty($hodDepartmentIds)) {
+                $query->whereIn('department_id', $hodDepartmentIds);
+            } else {
+                // If user has HOD role but no departments assigned, show no requests
+                $query->whereRaw('1 = 0');
+            }
+        }
 
         // Apply additional filters
         if (isset($filters['search']) && $filters['search']) {
@@ -276,6 +287,17 @@ class UserAccessWorkflowService
         $allowedStatuses = $this->getStatusForUserRole($user);
         if ($allowedStatuses) {
             $baseQuery->whereIn('status', $allowedStatuses);
+        }
+        
+        // DEPARTMENT FILTERING: HODs only see statistics from their department(s)
+        if ($user->hasRole('head_of_department')) {
+            $hodDepartmentIds = $user->departmentsAsHOD()->pluck('id')->toArray();
+            if (!empty($hodDepartmentIds)) {
+                $baseQuery->whereIn('department_id', $hodDepartmentIds);
+            } else {
+                // If user has HOD role but no departments assigned, show zero stats
+                $baseQuery->whereRaw('1 = 0');
+            }
         }
 
         return [

@@ -233,11 +233,16 @@
                             <div v-else class="text-center">
                               <div v-if="hasSignature" class="mb-1">
                                 <i class="fas fa-check-circle text-green-400 text-lg mb-1"></i>
-                                <p class="text-green-300 text-xs font-semibold flex items-center justify-center gap-1">
+                                <p
+                                  class="text-green-300 text-xs font-semibold flex items-center justify-center gap-1"
+                                >
                                   <i class="fas fa-check text-xs"></i>
                                   Signed
                                 </p>
-                                <p v-if="requestData?.signature_path" class="text-blue-200 text-xs mt-1">
+                                <p
+                                  v-if="requestData?.signature_path"
+                                  class="text-blue-200 text-xs mt-1"
+                                >
                                   File: {{ getSignatureFileName(requestData.signature_path) }}
                                 </p>
                               </div>
@@ -345,15 +350,25 @@
                     </div>
 
                     <!-- Module Requested for - Compact -->
-                    <div class="flex justify-center mb-3" :class="{ 'opacity-50': isReviewMode && !hasWellsoftRequest && !hasJeevaRequest }">
+                    <div
+                      class="flex justify-center mb-3"
+                      :class="{
+                        'opacity-50': isReviewMode && !hasWellsoftRequest && !hasJeevaRequest
+                      }"
+                    >
                       <div
                         class="bg-white/10 rounded-lg p-2 border border-blue-300/30 backdrop-blur-sm"
                       >
-                        <label class="block text-sm font-bold text-blue-100 mb-2 text-center flex items-center justify-center gap-2">
+                        <label
+                          class="block text-sm font-bold text-blue-100 mb-2 text-center flex items-center justify-center gap-2"
+                        >
                           <i class="fas fa-toggle-on mr-1 text-blue-300 text-xs"></i>
                           Module Requested for
                           <span class="text-red-400">*</span>
-                          <span v-if="isReviewMode && !hasWellsoftRequest && !hasJeevaRequest" class="text-xs px-2 py-1 bg-gray-500/30 rounded-full text-gray-300">
+                          <span
+                            v-if="isReviewMode && !hasWellsoftRequest && !hasJeevaRequest"
+                            class="text-xs px-2 py-1 bg-gray-500/30 rounded-full text-gray-300"
+                          >
                             <i class="fas fa-lock text-xs mr-1"></i>
                             Not Applicable
                           </span>
@@ -361,7 +376,10 @@
                         <div class="flex items-center gap-4 justify-center">
                           <label
                             class="flex items-center cursor-pointer hover:bg-blue-500/20 p-2 rounded transition-all"
-                            :class="{ 'pointer-events-none': isReviewMode && !hasWellsoftRequest && !hasJeevaRequest }"
+                            :class="{
+                              'pointer-events-none':
+                                isReviewMode && !hasWellsoftRequest && !hasJeevaRequest
+                            }"
                           >
                             <input
                               v-model="wellsoftRequestType"
@@ -377,7 +395,10 @@
                           </label>
                           <label
                             class="flex items-center cursor-pointer hover:bg-red-500/20 p-2 rounded transition-all"
-                            :class="{ 'pointer-events-none': isReviewMode && !hasWellsoftRequest && !hasJeevaRequest }"
+                            :class="{
+                              'pointer-events-none':
+                                isReviewMode && !hasWellsoftRequest && !hasJeevaRequest
+                            }"
                           >
                             <input
                               v-model="wellsoftRequestType"
@@ -397,9 +418,14 @@
 
                     <!-- Wellsoft selector -->
                     <div class="mb-6" :class="{ 'opacity-50': isWellsoftReadonly }">
-                      <label class="block text-sm font-bold text-blue-100 mb-3 flex items-center gap-2">
+                      <label
+                        class="block text-sm font-bold text-blue-100 mb-3 flex items-center gap-2"
+                      >
                         Wellsoft Modules <span class="text-red-400">*</span>
-                        <span v-if="isWellsoftReadonly" class="text-xs px-2 py-1 bg-gray-500/30 rounded-full text-gray-300">
+                        <span
+                          v-if="isWellsoftReadonly"
+                          class="text-xs px-2 py-1 bg-gray-500/30 rounded-full text-gray-300"
+                        >
                           <i class="fas fa-lock text-xs mr-1"></i>
                           Not Requested
                         </span>
@@ -456,8 +482,10 @@
                       </div>
 
                       <!-- No modules message for readonly state -->
-                      <div v-if="isWellsoftReadonly && selectedWellsoft.length === 0" 
-                           class="bg-gray-500/10 rounded-lg p-4 border border-gray-400/30 text-center">
+                      <div
+                        v-if="isWellsoftReadonly && selectedWellsoft.length === 0"
+                        class="bg-gray-500/10 rounded-lg p-4 border border-gray-400/30 text-center"
+                      >
                         <i class="fas fa-info-circle text-gray-400 mb-2 text-lg"></i>
                         <p class="text-gray-300 text-sm">No Wellsoft modules requested</p>
                       </div>
@@ -487,9 +515,14 @@
 
                     <!-- Jeeva selector -->
                     <div class="mb-6" :class="{ 'opacity-50': isJeevaReadonly }">
-                      <label class="block text-sm font-bold text-blue-100 mb-3 flex items-center gap-2">
+                      <label
+                        class="block text-sm font-bold text-blue-100 mb-3 flex items-center gap-2"
+                      >
                         Jeeva Modules <span class="text-red-400">*</span>
-                        <span v-if="isJeevaReadonly" class="text-xs px-2 py-1 bg-gray-500/30 rounded-full text-gray-300">
+                        <span
+                          v-if="isJeevaReadonly"
+                          class="text-xs px-2 py-1 bg-gray-500/30 rounded-full text-gray-300"
+                        >
                           <i class="fas fa-lock text-xs mr-1"></i>
                           Not Requested
                         </span>
@@ -545,8 +578,10 @@
                       </div>
 
                       <!-- No modules message for readonly state -->
-                      <div v-if="isJeevaReadonly && selectedJeeva.length === 0" 
-                           class="bg-gray-500/10 rounded-lg p-4 border border-gray-400/30 text-center">
+                      <div
+                        v-if="isJeevaReadonly && selectedJeeva.length === 0"
+                        class="bg-gray-500/10 rounded-lg p-4 border border-gray-400/30 text-center"
+                      >
                         <i class="fas fa-info-circle text-gray-400 mb-2 text-lg"></i>
                         <p class="text-gray-300 text-sm">No Jeeva modules requested</p>
                       </div>
@@ -575,23 +610,33 @@
 
                     <!-- Internet selector -->
                     <div class="mb-6" :class="{ 'opacity-50': isInternetReadonly }">
-                      <label class="block text-sm font-bold text-blue-100 mb-3 flex items-center gap-2">
+                      <label
+                        class="block text-sm font-bold text-blue-100 mb-3 flex items-center gap-2"
+                      >
                         Internet Purpose <span class="text-red-400">*</span>
-                        <span v-if="isInternetReadonly" class="text-xs px-2 py-1 bg-gray-500/30 rounded-full text-gray-300">
+                        <span
+                          v-if="isInternetReadonly"
+                          class="text-xs px-2 py-1 bg-gray-500/30 rounded-full text-gray-300"
+                        >
                           <i class="fas fa-lock text-xs mr-1"></i>
                           Not Requested
                         </span>
                       </label>
-                      
+
                       <!-- No purposes message for readonly state -->
-                      <div v-if="isInternetReadonly && !internetPurposes.some(p => p.trim())" 
-                           class="bg-gray-500/10 rounded-lg p-4 border border-gray-400/30 text-center">
+                      <div
+                        v-if="isInternetReadonly && !internetPurposes.some((p) => p.trim())"
+                        class="bg-gray-500/10 rounded-lg p-4 border border-gray-400/30 text-center"
+                      >
                         <i class="fas fa-info-circle text-gray-400 mb-2 text-lg"></i>
                         <p class="text-gray-300 text-sm">No internet access purposes requested</p>
                       </div>
-                      
+
                       <!-- Purpose inputs -->
-                      <div v-if="!isInternetReadonly || internetPurposes.some(p => p.trim())" class="space-y-2">
+                      <div
+                        v-if="!isInternetReadonly || internetPurposes.some((p) => p.trim())"
+                        class="space-y-2"
+                      >
                         <div
                           v-for="(purpose, index) in internetPurposes"
                           :key="index"
@@ -719,12 +764,27 @@
                       <!-- HoD/BM -->
                       <div
                         class="bg-white/15 rounded-lg p-4 border border-blue-300/30 backdrop-blur-sm"
+                        :class="{ 'opacity-50': !isHodApprovalEditable }"
                       >
                         <h5
-                          class="font-bold text-white mb-4 text-center text-sm flex items-center justify-center"
+                          class="font-bold text-white mb-4 text-center text-sm flex items-center justify-center gap-2"
                         >
                           <i class="fas fa-user-tie mr-2 text-blue-300"></i>
                           HoD/BM
+                          <span
+                            v-if="isStageCompleted('hod')"
+                            class="text-xs px-2 py-1 bg-green-500/30 rounded-full text-green-300"
+                          >
+                            <i class="fas fa-check text-xs mr-1"></i>
+                            Completed
+                          </span>
+                          <span
+                            v-else-if="!isHodApprovalEditable && isReviewMode"
+                            class="text-xs px-2 py-1 bg-gray-500/30 rounded-full text-gray-300"
+                          >
+                            <i class="fas fa-clock text-xs mr-1"></i>
+                            Pending
+                          </span>
                         </h5>
                         <div class="space-y-3">
                           <div>
@@ -735,9 +795,14 @@
                               <input
                                 v-model="form.approvals.hod.name"
                                 type="text"
-                                placeholder="Enter name"
-                                class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm hod-approval-editable"
+                                readonly
+                                :placeholder="currentUser?.name || 'Loading user...' "
+                                class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm cursor-not-allowed"
+                                :title="'Auto-filled with: ' + (currentUser?.name || 'Loading...')"
                               />
+                              <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
+                                <i class="fas fa-lock text-blue-300 text-xs" title="This field is auto-populated from your account"></i>
+                              </div>
                             </div>
                           </div>
                           <div>
@@ -755,6 +820,7 @@
                                     <p class="text-blue-100 text-xs">No signature uploaded</p>
                                   </div>
                                   <button
+                                    v-if="isHodApprovalEditable"
                                     type="button"
                                     @click="triggerHodSignatureUpload"
                                     class="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/50"
@@ -790,7 +856,10 @@
                                   </p>
                                 </div>
 
-                                <div class="absolute top-2 right-2 flex gap-1">
+                                <div
+                                  v-if="isHodApprovalEditable"
+                                  class="absolute top-2 right-2 flex gap-1"
+                                >
                                   <button
                                     type="button"
                                     @click="triggerHodSignatureUpload"
@@ -827,7 +896,9 @@
                               <input
                                 v-model="form.approvals.hod.date"
                                 type="date"
+                                :readonly="!isHodApprovalEditable"
                                 class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm hod-approval-editable"
+                                :class="{ 'cursor-not-allowed': !isHodApprovalEditable }"
                               />
                             </div>
                           </div>
@@ -837,12 +908,27 @@
                       <!-- Divisional Director -->
                       <div
                         class="bg-white/15 rounded-lg p-4 border border-blue-300/30 backdrop-blur-sm"
+                        :class="{ 'opacity-50': !isDivisionalApprovalEditable }"
                       >
                         <h5
-                          class="font-bold text-white mb-4 text-center text-sm flex items-center justify-center"
+                          class="font-bold text-white mb-4 text-center text-sm flex items-center justify-center gap-2"
                         >
                           <i class="fas fa-user-circle mr-2 text-blue-300"></i>
                           Divisional Director
+                          <span
+                            v-if="isStageCompleted('divisional')"
+                            class="text-xs px-2 py-1 bg-green-500/30 rounded-full text-green-300"
+                          >
+                            <i class="fas fa-check text-xs mr-1"></i>
+                            Completed
+                          </span>
+                          <span
+                            v-else-if="!isDivisionalApprovalEditable && isReviewMode"
+                            class="text-xs px-2 py-1 bg-gray-500/30 rounded-full text-gray-300"
+                          >
+                            <i class="fas fa-clock text-xs mr-1"></i>
+                            Pending
+                          </span>
                         </h5>
                         <div class="space-y-3">
                           <div>
@@ -853,9 +939,14 @@
                               <input
                                 v-model="form.approvals.divisionalDirector.name"
                                 type="text"
-                                placeholder="Enter name"
-                                class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm"
+                                readonly
+                                :placeholder="currentUser?.name || 'Loading user...' "
+                                class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm cursor-not-allowed"
+                                :title="'Auto-filled with: ' + (currentUser?.name || 'Loading...')"
                               />
+                              <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
+                                <i class="fas fa-lock text-blue-300 text-xs" title="This field is auto-populated from your account"></i>
+                              </div>
                             </div>
                           </div>
                           <div>
@@ -873,6 +964,7 @@
                                     <p class="text-blue-100 text-xs">No signature uploaded</p>
                                   </div>
                                   <button
+                                    v-if="isDivisionalApprovalEditable"
                                     type="button"
                                     @click="triggerDivDirectorSignatureUpload"
                                     class="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/50"
@@ -911,7 +1003,10 @@
                                   </p>
                                 </div>
 
-                                <div class="absolute top-2 right-2 flex gap-1">
+                                <div
+                                  v-if="isDivisionalApprovalEditable"
+                                  class="absolute top-2 right-2 flex gap-1"
+                                >
                                   <button
                                     type="button"
                                     @click="triggerDivDirectorSignatureUpload"
@@ -948,7 +1043,9 @@
                               <input
                                 v-model="form.approvals.divisionalDirector.date"
                                 type="date"
+                                :readonly="!isDivisionalApprovalEditable"
                                 class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm"
+                                :class="{ 'cursor-not-allowed': !isDivisionalApprovalEditable }"
                               />
                             </div>
                           </div>
@@ -958,12 +1055,27 @@
                       <!-- Director of ICT -->
                       <div
                         class="bg-white/15 rounded-lg p-4 border border-blue-300/30 backdrop-blur-sm"
+                        :class="{ 'opacity-50': !isIctDirectorApprovalEditable }"
                       >
                         <h5
-                          class="font-bold text-white mb-4 text-center text-sm flex items-center justify-center"
+                          class="font-bold text-white mb-4 text-center text-sm flex items-center justify-center gap-2"
                         >
                           <i class="fas fa-laptop-code mr-2 text-blue-300"></i>
                           Director of ICT
+                          <span
+                            v-if="isStageCompleted('ict_director')"
+                            class="text-xs px-2 py-1 bg-green-500/30 rounded-full text-green-300"
+                          >
+                            <i class="fas fa-check text-xs mr-1"></i>
+                            Completed
+                          </span>
+                          <span
+                            v-else-if="!isIctDirectorApprovalEditable && isReviewMode"
+                            class="text-xs px-2 py-1 bg-gray-500/30 rounded-full text-gray-300"
+                          >
+                            <i class="fas fa-clock text-xs mr-1"></i>
+                            Pending
+                          </span>
                         </h5>
                         <div class="space-y-3">
                           <div>
@@ -974,9 +1086,14 @@
                               <input
                                 v-model="form.approvals.directorICT.name"
                                 type="text"
-                                placeholder="Enter name"
-                                class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm"
+                                readonly
+                                :placeholder="currentUser?.name || 'Loading user...' "
+                                class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm cursor-not-allowed"
+                                :title="'Auto-filled with: ' + (currentUser?.name || 'Loading...')"
                               />
+                              <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
+                                <i class="fas fa-lock text-blue-300 text-xs" title="This field is auto-populated from your account"></i>
+                              </div>
                             </div>
                           </div>
                           <div>
@@ -994,6 +1111,7 @@
                                     <p class="text-blue-100 text-xs">No signature uploaded</p>
                                   </div>
                                   <button
+                                    v-if="isIctDirectorApprovalEditable"
                                     type="button"
                                     @click="triggerDirectorICTSignatureUpload"
                                     class="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/50"
@@ -1032,7 +1150,10 @@
                                   </p>
                                 </div>
 
-                                <div class="absolute top-2 right-2 flex gap-1">
+                                <div
+                                  v-if="isIctDirectorApprovalEditable"
+                                  class="absolute top-2 right-2 flex gap-1"
+                                >
                                   <button
                                     type="button"
                                     @click="triggerDirectorICTSignatureUpload"
@@ -1069,7 +1190,9 @@
                               <input
                                 v-model="form.approvals.directorICT.date"
                                 type="date"
+                                :readonly="!isIctDirectorApprovalEditable"
                                 class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm"
+                                :class="{ 'cursor-not-allowed': !isIctDirectorApprovalEditable }"
                               />
                             </div>
                           </div>
@@ -1126,12 +1249,27 @@
                       <!-- Head of IT -->
                       <div
                         class="bg-white/15 rounded-lg p-4 border border-blue-300/30 backdrop-blur-sm"
+                        :class="{ 'opacity-50': !isHeadItApprovalEditable }"
                       >
                         <h5
-                          class="font-bold text-white mb-3 text-center text-sm flex items-center justify-center"
+                          class="font-bold text-white mb-3 text-center text-sm flex items-center justify-center gap-2"
                         >
                           <i class="fas fa-user-cog mr-2"></i>
                           Head of IT
+                          <span
+                            v-if="isStageCompleted('head_it')"
+                            class="text-xs px-2 py-1 bg-green-500/30 rounded-full text-green-300"
+                          >
+                            <i class="fas fa-check text-xs mr-1"></i>
+                            Completed
+                          </span>
+                          <span
+                            v-else-if="!isHeadItApprovalEditable && isReviewMode"
+                            class="text-xs px-2 py-1 bg-gray-500/30 rounded-full text-gray-300"
+                          >
+                            <i class="fas fa-clock text-xs mr-1"></i>
+                            Pending
+                          </span>
                         </h5>
                         <div class="space-y-3">
                           <div>
@@ -1142,9 +1280,14 @@
                               <input
                                 v-model="form.implementation.headIT.name"
                                 type="text"
-                                placeholder="Enter name"
-                                class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm"
+                                readonly
+                                :placeholder="currentUser?.name || 'Loading user...' "
+                                class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm cursor-not-allowed"
+                                :title="'Auto-filled with: ' + (currentUser?.name || 'Loading...')"
                               />
+                              <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
+                                <i class="fas fa-lock text-blue-300 text-xs" title="This field is auto-populated from your account"></i>
+                              </div>
                             </div>
                           </div>
                           <div>
@@ -1162,6 +1305,7 @@
                                     <p class="text-blue-100 text-xs">No signature</p>
                                   </div>
                                   <button
+                                    v-if="isHeadItApprovalEditable"
                                     type="button"
                                     @click="triggerHeadITSignatureUpload"
                                     class="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors duration-200 flex items-center gap-1 mx-auto"
@@ -1197,7 +1341,10 @@
                                   </p>
                                 </div>
 
-                                <div class="absolute top-1 right-1 flex gap-1">
+                                <div
+                                  v-if="isHeadItApprovalEditable"
+                                  class="absolute top-1 right-1 flex gap-1"
+                                >
                                   <button
                                     type="button"
                                     @click="triggerHeadITSignatureUpload"
@@ -1234,7 +1381,9 @@
                               <input
                                 v-model="form.implementation.headIT.date"
                                 type="date"
+                                :readonly="!isHeadItApprovalEditable"
                                 class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm"
+                                :class="{ 'cursor-not-allowed': !isHeadItApprovalEditable }"
                               />
                             </div>
                           </div>
@@ -1244,12 +1393,27 @@
                       <!-- ICT Officer granting access -->
                       <div
                         class="bg-white/15 rounded-lg p-4 border border-blue-300/30 backdrop-blur-sm"
+                        :class="{ 'opacity-50': !isIctOfficerApprovalEditable }"
                       >
                         <h5
-                          class="font-bold text-white mb-3 text-center text-sm flex items-center justify-center"
+                          class="font-bold text-white mb-3 text-center text-sm flex items-center justify-center gap-2"
                         >
                           <i class="fas fa-user-shield mr-2"></i>
                           ICT Officer granting access
+                          <span
+                            v-if="isStageCompleted('ict_officer')"
+                            class="text-xs px-2 py-1 bg-green-500/30 rounded-full text-green-300"
+                          >
+                            <i class="fas fa-check text-xs mr-1"></i>
+                            Completed
+                          </span>
+                          <span
+                            v-else-if="!isIctOfficerApprovalEditable && isReviewMode"
+                            class="text-xs px-2 py-1 bg-gray-500/30 rounded-full text-gray-300"
+                          >
+                            <i class="fas fa-clock text-xs mr-1"></i>
+                            Pending
+                          </span>
                         </h5>
                         <div class="space-y-3">
                           <div>
@@ -1260,9 +1424,14 @@
                               <input
                                 v-model="form.implementation.ictOfficer.name"
                                 type="text"
-                                placeholder="Enter name"
-                                class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm"
+                                readonly
+                                :placeholder="currentUser?.name || 'Loading user...' "
+                                class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm cursor-not-allowed"
+                                :title="'Auto-filled with: ' + (currentUser?.name || 'Loading...')"
                               />
+                              <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
+                                <i class="fas fa-lock text-blue-300 text-xs" title="This field is auto-populated from your account"></i>
+                              </div>
                             </div>
                           </div>
                           <div>
@@ -1280,6 +1449,7 @@
                                     <p class="text-blue-100 text-xs">No signature uploaded</p>
                                   </div>
                                   <button
+                                    v-if="isIctOfficerApprovalEditable"
                                     type="button"
                                     @click="triggerIctOfficerSignatureUpload"
                                     class="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/50"
@@ -1378,135 +1548,17 @@
                       </h3>
                     </div>
 
-                    <!-- Request Status -->
-                    <div class="mb-6 p-4 bg-white/10 rounded-xl border border-emerald-300/30">
-                      <h4 class="text-sm font-bold text-blue-100 mb-3">Request Status</h4>
-                      <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
-                        <div class="text-center">
-                          <div
-                            :class="
-                              getApprovalStatus('hod') === 'approved'
-                                ? 'bg-green-500'
-                                : getApprovalStatus('hod') === 'rejected'
-                                  ? 'bg-red-500'
-                                  : 'bg-yellow-500'
-                            "
-                            class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1"
-                          >
-                            <i
-                              :class="
-                                getApprovalStatus('hod') === 'approved'
-                                  ? 'fas fa-check'
-                                  : getApprovalStatus('hod') === 'rejected'
-                                    ? 'fas fa-times'
-                                    : 'fas fa-clock'
-                              "
-                              class="text-white text-sm"
-                            ></i>
-                          </div>
-                          <p class="text-xs text-white">HOD</p>
-                        </div>
-                        <div class="text-center">
-                          <div
-                            :class="
-                              getApprovalStatus('divisional') === 'approved'
-                                ? 'bg-green-500'
-                                : getApprovalStatus('divisional') === 'rejected'
-                                  ? 'bg-red-500'
-                                  : 'bg-yellow-500'
-                            "
-                            class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1"
-                          >
-                            <i
-                              :class="
-                                getApprovalStatus('divisional') === 'approved'
-                                  ? 'fas fa-check'
-                                  : getApprovalStatus('divisional') === 'rejected'
-                                    ? 'fas fa-times'
-                                    : 'fas fa-clock'
-                              "
-                              class="text-white text-sm"
-                            ></i>
-                          </div>
-                          <p class="text-xs text-white">Divisional</p>
-                        </div>
-                        <div class="text-center">
-                          <div
-                            :class="
-                              getApprovalStatus('dict') === 'approved'
-                                ? 'bg-green-500'
-                                : getApprovalStatus('dict') === 'rejected'
-                                  ? 'bg-red-500'
-                                  : 'bg-yellow-500'
-                            "
-                            class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1"
-                          >
-                            <i
-                              :class="
-                                getApprovalStatus('dict') === 'approved'
-                                  ? 'fas fa-check'
-                                  : getApprovalStatus('dict') === 'rejected'
-                                    ? 'fas fa-times'
-                                    : 'fas fa-clock'
-                              "
-                              class="text-white text-sm"
-                            ></i>
-                          </div>
-                          <p class="text-xs text-white">DICT</p>
-                        </div>
-                        <div class="text-center">
-                          <div
-                            :class="
-                              getApprovalStatus('headOfIt') === 'approved'
-                                ? 'bg-green-500'
-                                : getApprovalStatus('headOfIt') === 'rejected'
-                                  ? 'bg-red-500'
-                                  : 'bg-yellow-500'
-                            "
-                            class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1"
-                          >
-                            <i
-                              :class="
-                                getApprovalStatus('headOfIt') === 'approved'
-                                  ? 'fas fa-check'
-                                  : getApprovalStatus('headOfIt') === 'rejected'
-                                    ? 'fas fa-times'
-                                    : 'fas fa-clock'
-                              "
-                              class="text-white text-sm"
-                            ></i>
-                          </div>
-                          <p class="text-xs text-white">Head IT</p>
-                        </div>
-                        <div class="text-center">
-                          <div
-                            :class="
-                              getApprovalStatus('ict') === 'approved'
-                                ? 'bg-green-500'
-                                : getApprovalStatus('ict') === 'rejected'
-                                  ? 'bg-red-500'
-                                  : 'bg-yellow-500'
-                            "
-                            class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1"
-                          >
-                            <i
-                              :class="
-                                getApprovalStatus('ict') === 'approved'
-                                  ? 'fas fa-check'
-                                  : getApprovalStatus('ict') === 'rejected'
-                                    ? 'fas fa-times'
-                                    : 'fas fa-clock'
-                              "
-                              class="text-white text-sm"
-                            ></i>
-                          </div>
-                          <p class="text-xs text-white">ICT Officer</p>
-                        </div>
-                      </div>
-                    </div>
-
                     <!-- Action Buttons -->
                     <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                      <button
+                        type="button"
+                        @click="goToRequestDetails"
+                        class="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 font-semibold flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105"
+                      >
+                        <i class="fas fa-eye mr-2"></i>
+                        View Request Details
+                      </button>
+
                       <button
                         type="button"
                         @click="goBackToRequests"
@@ -1520,17 +1572,20 @@
                         v-if="canApproveAtStage()"
                         type="button"
                         @click="approveRequest"
-                        class="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-300 font-semibold flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105"
+                        :disabled="loading"
+                        class="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-300 font-semibold flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                       >
-                        <i class="fas fa-check mr-2"></i>
-                        Approve Request
+                        <i v-if="loading" class="fas fa-spinner fa-spin mr-2"></i>
+                        <i v-else class="fas fa-check mr-2"></i>
+                        {{ loading ? 'Processing...' : 'Approve Request' }}
                       </button>
 
                       <button
                         v-if="canApproveAtStage()"
                         type="button"
                         @click="rejectRequest"
-                        class="px-6 py-3 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-lg hover:from-red-700 hover:to-pink-700 transition-all duration-300 font-semibold flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105"
+                        :disabled="loading"
+                        class="px-6 py-3 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-lg hover:from-red-700 hover:to-pink-700 transition-all duration-300 font-semibold flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                       >
                         <i class="fas fa-times mr-2"></i>
                         Reject Request
@@ -1638,7 +1693,7 @@
               </div>
             </form>
           </div>
-          
+
           <!-- Footer moved to bottom of main content -->
           <div class="mt-6">
             <AppFooter />
@@ -1661,6 +1716,56 @@
           <div class="mt-4 flex justify-end gap-2">
             <button class="btn-secondary" @click="confirm = { key: '', label: '' }">Cancel</button>
             <button class="btn-danger" @click="closeTab(confirm.key)">Remove</button>
+          </div>
+        </div>
+      </div>
+    </transition>
+
+    <!-- Rejection Reason Modal -->
+    <transition name="fade">
+      <div
+        v-if="showRejectionModal"
+        class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      >
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
+          <div class="flex items-center space-x-3 mb-4">
+            <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+              <i class="fas fa-times text-red-600"></i>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-gray-800">Reject Request</h3>
+              <p class="text-sm text-gray-600">
+                Please provide a reason for rejecting this request
+              </p>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Rejection Reason *</label>
+            <textarea
+              v-model="rejectionReason"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm"
+              rows="4"
+              placeholder="Enter the reason for rejecting this request..."
+              required
+            ></textarea>
+          </div>
+
+          <div class="flex justify-end space-x-3">
+            <button
+              @click="cancelRejectRequest"
+              class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              @click="confirmRejectRequest"
+              :disabled="!rejectionReason?.trim()"
+              class="px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-red-300 text-white rounded-lg font-medium transition-colors flex items-center"
+            >
+              <i class="fas fa-times mr-2"></i>
+              Reject Request
+            </button>
           </div>
         </div>
       </div>
@@ -2048,6 +2153,7 @@
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppFooter from '@/components/footer.vue'
   import combinedAccessService from '@/services/combinedAccessService.js'
+  import authService from '@/services/authService.js'
 
   export default {
     name: 'BothServiveForm',
@@ -2208,7 +2314,12 @@
         // Review mode data
         requestData: null,
         loading: false,
-        error: null
+        error: null,
+        // Rejection modal data
+        showRejectionModal: false,
+        rejectionReason: '',
+        // Current authenticated user data
+        currentUser: null
       }
     },
     computed: {
@@ -2276,28 +2387,28 @@
         const hasData = !!this.requestData
         const hasPath = this.requestData && !!this.requestData.signature_path
         const pathNotEmpty = hasPath && this.requestData.signature_path.trim() !== ''
-        
+
         console.log('hasSignature debug:', {
           hasData,
-          hasPath, 
+          hasPath,
           signaturePath: this.requestData?.signature_path,
           pathNotEmpty,
           result: hasData && hasPath && pathNotEmpty
         })
-        
+
         return hasData && hasPath && pathNotEmpty
       },
 
       // Get request types from loaded data
       requestTypes() {
         if (!this.requestData) return []
-        
+
         // Handle both array and object formats
         let types = this.requestData.request_types || this.requestData.request_type || []
         if (!Array.isArray(types)) {
           types = [types]
         }
-        
+
         console.log('Request types:', types)
         return types
       },
@@ -2312,7 +2423,10 @@
       },
 
       hasInternetRequest() {
-        return this.requestTypes.includes('internet_access_request') || this.requestTypes.includes('internet')
+        return (
+          this.requestTypes.includes('internet_access_request') ||
+          this.requestTypes.includes('internet')
+        )
       },
 
       // Determine if sections should be readonly based on review mode and request type
@@ -2326,9 +2440,127 @@
 
       isInternetReadonly() {
         return this.isReviewMode && !this.hasInternetRequest
+      },
+
+      // Get current approval stage from request status
+      currentApprovalStage() {
+        if (!this.requestData) return 'pending'
+
+        const status = this.requestData.status || 'pending'
+        const stageMap = {
+          pending: 'hod',
+          pending_hod: 'hod',
+          hod_approved: 'divisional',
+          pending_divisional: 'divisional',
+          divisional_approved: 'ict_director',
+          pending_ict_director: 'ict_director',
+          ict_director_approved: 'head_it',
+          pending_head_it: 'head_it',
+          head_it_approved: 'ict_officer',
+          pending_ict_officer: 'ict_officer',
+          implemented: 'completed',
+          approved: 'completed',
+          hod_rejected: 'completed',
+          divisional_rejected: 'completed',
+          ict_director_rejected: 'completed',
+          head_it_rejected: 'completed',
+          cancelled: 'completed'
+        }
+
+        return stageMap[status] || 'hod'
+      },
+
+      // Determine if approval sections should be readonly based on current stage
+      isHodApprovalEditable() {
+        return !this.isReviewMode || this.currentApprovalStage === 'hod'
+      },
+
+      isDivisionalApprovalEditable() {
+        return !this.isReviewMode || this.currentApprovalStage === 'divisional'
+      },
+
+      isIctDirectorApprovalEditable() {
+        return !this.isReviewMode || this.currentApprovalStage === 'ict_director'
+      },
+
+      isHeadItApprovalEditable() {
+        return !this.isReviewMode || this.currentApprovalStage === 'head_it'
+      },
+
+      isIctOfficerApprovalEditable() {
+        return !this.isReviewMode || this.currentApprovalStage === 'ict_officer'
+      },
+
+      // Check if a stage has been completed
+      isStageCompleted() {
+        return (stage) => {
+          if (!this.requestData) return false
+
+          const status = this.requestData.status || 'pending'
+          const completedStages = {
+            hod: [
+              'hod_approved',
+              'divisional_approved',
+              'pending_divisional',
+              'ict_director_approved',
+              'pending_ict_director',
+              'head_it_approved',
+              'pending_head_it',
+              'ict_officer_approved',
+              'pending_ict_officer',
+              'implemented',
+              'approved'
+            ],
+            divisional: [
+              'divisional_approved',
+              'ict_director_approved',
+              'pending_ict_director',
+              'head_it_approved',
+              'pending_head_it',
+              'ict_officer_approved',
+              'pending_ict_officer',
+              'implemented',
+              'approved'
+            ],
+            ict_director: [
+              'ict_director_approved',
+              'head_it_approved',
+              'pending_head_it',
+              'ict_officer_approved',
+              'pending_ict_officer',
+              'implemented',
+              'approved'
+            ],
+            head_it: [
+              'head_it_approved',
+              'ict_officer_approved',
+              'pending_ict_officer',
+              'implemented',
+              'approved'
+            ],
+            ict_officer: ['implemented', 'approved']
+          }
+
+          return completedStages[stage]?.includes(status) || false
+        }
       }
     },
     async mounted() {
+      // Try to get current user from multiple sources
+      await this.getCurrentUser()
+      
+      // Fallback to localStorage or Vuex if API fails
+      if (!this.currentUser || !this.currentUser.name) {
+        console.log('🔄 API failed, trying localStorage fallback...')
+        this.tryGetUserFromLocalStorage()
+      }
+      
+      // Fallback to Vuex store
+      if (!this.currentUser || !this.currentUser.name) {
+        console.log('🔄 localStorage failed, trying Vuex store fallback...')
+        this.tryGetUserFromStore()
+      }
+
       if (this.isReviewMode && this.requestId) {
         await this.loadRequestData()
       }
@@ -2345,6 +2577,90 @@
           this.syncTabs('jeeva', v)
         },
         deep: true
+      },
+      // Watch for when approval sections become editable (now just for logging)
+      isHodApprovalEditable: {
+        handler(isEditable) {
+          console.log('HOD approval editable changed:', {
+            isEditable,
+            currentHodName: this.form.approvals.hod.name,
+            hasCurrentUser: !!this.currentUser,
+            isReviewMode: this.isReviewMode,
+            currentApprovalStage: this.currentApprovalStage
+          })
+          // Role-based population is now handled by currentUser watcher
+        },
+        immediate: true
+      },
+      isDivisionalApprovalEditable: {
+        handler(isEditable) {
+          console.log('Divisional approval editable changed:', {
+            isEditable,
+            currentDivisionalName: this.form.approvals.divisionalDirector.name,
+            hasCurrentUser: !!this.currentUser,
+            isReviewMode: this.isReviewMode,
+            currentApprovalStage: this.currentApprovalStage
+          })
+          // Role-based population is now handled by currentUser watcher
+        },
+        immediate: true
+      },
+      isIctDirectorApprovalEditable: {
+        handler(isEditable) {
+          console.log('ICT Director approval editable changed:', {
+            isEditable,
+            currentIctDirectorName: this.form.approvals.directorICT.name,
+            hasCurrentUser: !!this.currentUser,
+            isReviewMode: this.isReviewMode,
+            currentApprovalStage: this.currentApprovalStage
+          })
+          // Role-based population is now handled by currentUser watcher
+        },
+        immediate: true
+      },
+      isHeadItApprovalEditable: {
+        handler(isEditable) {
+          console.log('Head IT approval editable changed:', {
+            isEditable,
+            currentHeadItName: this.form.implementation.headIT.name,
+            hasCurrentUser: !!this.currentUser,
+            isReviewMode: this.isReviewMode,
+            currentApprovalStage: this.currentApprovalStage
+          })
+          // Role-based population is now handled by currentUser watcher
+        },
+        immediate: true
+      },
+      isIctOfficerApprovalEditable: {
+        handler(isEditable) {
+          console.log('ICT Officer approval editable changed:', {
+            isEditable,
+            currentIctOfficerName: this.form.implementation.ictOfficer.name,
+            hasCurrentUser: !!this.currentUser,
+            isReviewMode: this.isReviewMode,
+            currentApprovalStage: this.currentApprovalStage
+          })
+          // Role-based population is now handled by currentUser watcher
+        },
+        immediate: true
+      },
+      // Watch for when currentUser data is loaded to trigger auto-population
+      currentUser: {
+        handler(newUser) {
+          if (newUser && newUser.name) {
+            console.log('Current user data loaded, role-based auto-population:', {
+              userName: newUser.name,
+              userId: newUser.id,
+              userRole: newUser.role,
+              isReviewMode: this.isReviewMode,
+              currentApprovalStage: this.currentApprovalStage
+            })
+
+            // Role-based population - only populate the field that matches user's role
+            this.populateBasedOnUserRole(newUser)
+          }
+        },
+        immediate: true
       }
     },
     methods: {
@@ -2562,10 +2878,10 @@
         try {
           this.loading = true
           this.error = null
-          
+
           console.log('Loading request data for ID:', this.requestId)
           const response = await combinedAccessService.getRequestById(this.requestId)
-          
+
           if (response.success && response.data) {
             this.requestData = response.data
             console.log('Loaded request data:', this.requestData)
@@ -2590,7 +2906,7 @@
             // Populate module selections based on actual database data
             if (this.requestData.request_types || this.requestData.request_type) {
               const types = this.requestData.request_types || this.requestData.request_type || []
-              
+
               // Handle Wellsoft modules
               if (types.includes('wellsoft')) {
                 const wellsoftModules = this.requestData.wellsoft_modules || []
@@ -2599,7 +2915,7 @@
               } else {
                 this.selectedWellsoft = []
               }
-              
+
               // Handle Jeeva modules
               if (types.includes('jeeva_access') || types.includes('jeeva')) {
                 const jeevaModules = this.requestData.jeeva_modules || []
@@ -2608,11 +2924,14 @@
               } else {
                 this.selectedJeeva = []
               }
-              
+
               // Handle Internet purposes
               if (types.includes('internet_access_request') || types.includes('internet')) {
-                const internetPurposes = this.requestData.internet_purposes || this.requestData.purpose || []
-                const purposes = Array.isArray(internetPurposes) ? internetPurposes : [internetPurposes]
+                const internetPurposes =
+                  this.requestData.internet_purposes || this.requestData.purpose || []
+                const purposes = Array.isArray(internetPurposes)
+                  ? internetPurposes
+                  : [internetPurposes]
                 // Ensure we have exactly 4 purpose slots
                 this.internetPurposes = [...purposes, '', '', '', ''].slice(0, 4)
                 console.log('Loaded Internet purposes:', this.internetPurposes)
@@ -2669,32 +2988,48 @@
       },
 
       canApproveAtStage() {
-        // This should check if the current user can approve at the current stage
-        // Based on the user's role and current approval status
-        return true // Simplified for now
+        // Only show buttons in review mode
+        if (!this.isReviewMode) return false
+
+        // Only show buttons if request data is loaded
+        if (!this.requestData) return false
+
+        // Get current HOD approval status
+        const hodStatus = this.requestData.hod_approval_status || 'pending'
+
+        // Only show buttons if HOD approval is still pending
+        // Once approved or rejected, HOD should not be able to change it
+        return hodStatus === 'pending'
       },
 
       async approveRequest() {
         try {
           this.loading = true
-          await combinedAccessService.updateHodApproval(this.requestId, {
+
+          console.log('Approving request:', this.requestId)
+
+          const result = await combinedAccessService.updateHodApproval(this.requestId, {
             status: 'approved',
-            comments: this.form.comments || 'Approved'
+            comments: this.form.comments || 'Approved by HOD'
           })
 
-          this.toast = {
-            show: true,
-            message: 'Request approved successfully'
+          if (result.success) {
+            this.toast = {
+              show: true,
+              message: 'Request approved successfully'
+            }
+            setTimeout(() => {
+              this.toast.show = false
+              this.goBackToRequests()
+            }, 2000)
+          } else {
+            throw new Error(result.error || 'Failed to approve request')
           }
-          setTimeout(() => {
-            this.toast.show = false
-            this.goBackToRequests()
-          }, 2000)
         } catch (error) {
           console.error('Error approving request:', error)
           this.toast = {
             show: true,
-            message: 'Error approving request'
+            message: `Error approving request: ${error.message}`
           }
           setTimeout(() => (this.toast.show = false), 3000)
         } finally {
@@ -2703,38 +3038,90 @@
       },
 
       async rejectRequest() {
-        const reason = prompt('Please provide a reason for rejection:')
-        if (!reason) return
+        // Show rejection reason modal
+        this.showRejectionModal = true
+      },
+
+      async confirmRejectRequest() {
+        if (!this.rejectionReason?.trim()) {
+          this.toast = {
+            show: true,
+            message: 'Please provide a reason for rejection'
+          }
+          setTimeout(() => (this.toast.show = false), 3000)
+          return
+        }
 
         try {
           this.loading = true
-          await combinedAccessService.updateHodApproval(this.requestId, {
+          this.showRejectionModal = false
+
+          console.log('Rejecting request:', this.requestId, 'with reason:', this.rejectionReason)
+
+          const result = await combinedAccessService.updateHodApproval(this.requestId, {
             status: 'rejected',
-            comments: reason
+            comments: this.rejectionReason
           })
 
-          this.toast = {
-            show: true,
-            message: 'Request rejected'
+          if (result.success) {
+            this.toast = {
+              show: true,
+              message: 'Request rejected successfully'
+            }
+            setTimeout(() => {
+              this.toast.show = false
+              this.goBackToRequests()
+            }, 2000)
+          } else {
+            throw new Error(result.error || 'Failed to reject request')
           }
-          setTimeout(() => {
-            this.toast.show = false
-            this.goBackToRequests()
-          }, 2000)
         } catch (error) {
           console.error('Error rejecting request:', error)
           this.toast = {
             show: true,
-            message: 'Error rejecting request'
+            message: `Error rejecting request: ${error.message}`
           }
           setTimeout(() => (this.toast.show = false), 3000)
         } finally {
           this.loading = false
+          this.rejectionReason = ''
         }
       },
 
+      cancelRejectRequest() {
+        this.showRejectionModal = false
+        this.rejectionReason = ''
+      },
+
       goBackToRequests() {
-        this.$router.push({ name: 'HODCombinedRequestList' })
+        try {
+          console.log('Navigating back to HOD combined requests list')
+          this.$router.push({
+            name: 'HODCombinedRequestList',
+            path: '/hod-dashboard/combined-requests'
+          })
+        } catch (error) {
+          console.error('Error navigating back to requests:', error)
+          // Fallback navigation using path
+          this.$router.push('/hod-dashboard/combined-requests')
+        }
+      },
+
+      goToRequestDetails() {
+        try {
+          console.log('Navigating to request details for ID:', this.requestId)
+          this.$router.push({
+            path: '/request-details',
+            query: {
+              id: this.requestId,
+              type: 'combined_access'
+            }
+          })
+        } catch (error) {
+          console.error('Error navigating to request details:', error)
+          // Fallback navigation
+          this.$router.push(`/request-details?id=${this.requestId}&type=combined_access`)
+        }
       },
 
       // Signature handling methods
@@ -3045,6 +3432,246 @@
         this.ictOfficerSignatureFileName = ''
         if (this.$refs.ictOfficerSignatureInput) {
           this.$refs.ictOfficerSignatureInput.value = ''
+        }
+      },
+
+      // Manual debug method to trigger auto-population (for testing)
+      debugAutoPopulation() {
+        console.log('=== DEBUG AUTO-POPULATION ====')
+        console.log('Current user:', this.currentUser)
+        console.log('Is review mode:', this.isReviewMode)
+        console.log('Current approval stage:', this.currentApprovalStage)
+        console.log('HOD editable:', this.isHodApprovalEditable)
+        console.log('HOD current name:', this.form.approvals.hod.name)
+        console.log('Request data status:', this.requestData?.status)
+
+        console.log('\n=== TRIGGERING ROLE-BASED AUTO-POPULATION ===')
+
+        // Use role-based population for debugging
+        if (this.currentUser?.name) {
+          console.log('User role from database:', this.currentUser.role || this.currentUser.user_role)
+          this.populateBasedOnUserRole(this.currentUser)
+          
+          console.log('\n=== MANUAL POPULATION TEST (All Fields) ===')
+          console.log('Testing HOD population...')
+          this.populateApproverName('hod')
+
+          console.log('Testing Divisional Director population...')
+          this.populateApproverName('divisional')
+
+          console.log('Testing ICT Director population...')
+          this.populateApproverName('ict_director')
+
+          console.log('Testing Head IT population...')
+          this.populateApproverName('head_it')
+
+          console.log('Testing ICT Officer population...')
+          this.populateApproverName('ict_officer')
+        } else {
+          console.error('No current user data available!')
+        }
+
+        console.log('=== DEBUG COMPLETE ===')
+      },
+
+      // Get current authenticated user
+      async getCurrentUser() {
+        try {
+          console.log('🔍 Attempting to fetch current user...')
+          const response = await authService.getCurrentUser()
+          console.log('📨 Raw API response:', response)
+          
+          if (response.success) {
+            console.log('✅ API call successful, response.data:', response.data)
+            
+            // Check if response.data has a 'user' property or if the user data is directly in response.data
+            if (response.data && response.data.user) {
+              this.currentUser = response.data.user
+              console.log('👤 Current user loaded from response.data.user:', this.currentUser)
+            } else if (response.data && response.data.name) {
+              this.currentUser = response.data
+              console.log('👤 Current user loaded from response.data directly:', this.currentUser)
+            } else {
+              console.error('❌ User data structure not recognized:', response.data)
+            }
+            
+            if (this.currentUser && this.currentUser.name) {
+              console.log('📋 User name from database:', this.currentUser.name)
+              console.log('📋 User ID:', this.currentUser.id)
+              console.log('📋 User email:', this.currentUser.email)
+            } else {
+              console.error('❌ No name property found in currentUser:', this.currentUser)
+            }
+          } else {
+            console.warn('❌ Failed to get current user:', response.message)
+            console.log('❌ Response status:', response.status)
+          }
+        } catch (error) {
+          console.error('💥 Error fetching current user:', error)
+          console.error('💥 Error details:', {
+            message: error.message,
+            response: error.response,
+            status: error.response?.status,
+            data: error.response?.data
+          })
+        }
+      },
+
+      // Fallback method to get user from localStorage
+      tryGetUserFromLocalStorage() {
+        try {
+          const storedUser = localStorage.getItem('user_data')
+          if (storedUser) {
+            const userData = JSON.parse(storedUser)
+            console.log('💾 Found user in localStorage:', userData)
+            
+            if (userData && userData.name) {
+              this.currentUser = userData
+              console.log('✅ Using localStorage user data:', this.currentUser.name)
+            } else if (userData && userData.user && userData.user.name) {
+              this.currentUser = userData.user
+              console.log('✅ Using localStorage user.user data:', this.currentUser.name)
+            }
+          } else {
+            console.log('❌ No user_data found in localStorage')
+          }
+        } catch (error) {
+          console.error('❌ Error parsing localStorage user_data:', error)
+        }
+      },
+
+      // Fallback method to get user from Vuex store
+      tryGetUserFromStore() {
+        try {
+          // Try to get from Vuex store (if using Vuex)
+          if (this.$store && this.$store.state && this.$store.state.auth) {
+            const storeUser = this.$store.state.auth.user || this.$store.state.auth.currentUser
+            if (storeUser && storeUser.name) {
+              this.currentUser = storeUser
+              console.log('✅ Using Vuex store user data:', this.currentUser.name)
+            }
+          }
+          
+          // Try alternative Vuex structure
+          if (!this.currentUser && this.$store && this.$store.getters) {
+            const getterUser = this.$store.getters.currentUser || this.$store.getters['auth/user']
+            if (getterUser && getterUser.name) {
+              this.currentUser = getterUser
+              console.log('✅ Using Vuex getter user data:', this.currentUser.name)
+            }
+          }
+          
+          if (!this.currentUser) {
+            console.log('❌ No user found in Vuex store')
+          }
+        } catch (error) {
+          console.error('❌ Error accessing Vuex store:', error)
+        }
+      },
+
+      // Role-based auto-population - only populate field matching user's role
+      populateBasedOnUserRole(user) {
+        if (!user || !user.name) {
+          console.log('❌ No valid user data for role-based population')
+          return
+        }
+
+        const userRole = user.role || user.user_role || ''
+        const userName = user.name
+        
+        console.log(`🎯 Role-based population for role: "${userRole}" with name: "${userName}"`)
+
+        // Map roles to approval stages
+        const roleToStageMap = {
+          'head_of_department': 'hod',
+          'hod': 'hod',
+          'head_department': 'hod',
+          'divisional_director': 'divisional', 
+          'director_divisional': 'divisional',
+          'ict_director': 'ict_director',
+          'director_ict': 'ict_director',
+          'head_it': 'head_it',
+          'head_of_it': 'head_it',
+          'ict_officer': 'ict_officer',
+          'officer_ict': 'ict_officer'
+        }
+
+        // Normalize role string for matching
+        const normalizedRole = userRole.toLowerCase().replace(/[\s_-]+/g, '_')
+        const mappedStage = roleToStageMap[normalizedRole]
+
+        if (mappedStage) {
+          console.log(`✅ Found role mapping: "${userRole}" → "${mappedStage}"`)
+          this.populateApproverName(mappedStage)
+        } else {
+          console.log(`⚠️ No role mapping found for: "${userRole}". Available mappings:`, Object.keys(roleToStageMap))
+          
+          // Fallback: if user is in review mode and has edit permissions for a specific stage
+          if (this.isReviewMode) {
+            if (this.isHodApprovalEditable) {
+              console.log('📋 Fallback: Using HOD field based on edit permissions')
+              this.populateApproverName('hod')
+            } else if (this.isDivisionalApprovalEditable) {
+              console.log('📋 Fallback: Using Divisional field based on edit permissions')
+              this.populateApproverName('divisional')
+            } else if (this.isIctDirectorApprovalEditable) {
+              console.log('📋 Fallback: Using ICT Director field based on edit permissions')
+              this.populateApproverName('ict_director')
+            } else if (this.isHeadItApprovalEditable) {
+              console.log('📋 Fallback: Using Head IT field based on edit permissions')
+              this.populateApproverName('head_it')
+            } else if (this.isIctOfficerApprovalEditable) {
+              console.log('📋 Fallback: Using ICT Officer field based on edit permissions')
+              this.populateApproverName('ict_officer')
+            }
+          }
+        }
+      },
+
+      // Auto-populate approver name based on current user and approval stage
+      populateApproverName(stage) {
+        if (!this.currentUser || !this.currentUser.name) {
+          console.log('No current user data available for auto-population', {
+            hasCurrentUser: !!this.currentUser,
+            currentUser: this.currentUser,
+            userName: this.currentUser?.name
+          })
+          return
+        }
+
+        const userName = this.currentUser.name
+        console.log(`Auto-populating ${stage} approver name with user from database:`, {
+          stage,
+          userName,
+          userId: this.currentUser.id,
+          userEmail: this.currentUser.email,
+          userPfNumber: this.currentUser.pf_number
+        })
+
+        // Always populate the appropriate name field with authenticated user's name
+        switch (stage) {
+          case 'hod':
+            this.form.approvals.hod.name = userName
+            console.log(`✅ HOD name populated: ${userName}`)
+            break
+          case 'divisional':
+            this.form.approvals.divisionalDirector.name = userName
+            console.log(`✅ Divisional Director name populated: ${userName}`)
+            break
+          case 'ict_director':
+            this.form.approvals.directorICT.name = userName
+            console.log(`✅ ICT Director name populated: ${userName}`)
+            break
+          case 'head_it':
+            this.form.implementation.headIT.name = userName
+            console.log(`✅ Head of IT name populated: ${userName}`)
+            break
+          case 'ict_officer':
+            this.form.implementation.ictOfficer.name = userName
+            console.log(`✅ ICT Officer name populated: ${userName}`)
+            break
+          default:
+            console.warn(`Unknown approval stage: ${stage}`)
         }
       }
     }

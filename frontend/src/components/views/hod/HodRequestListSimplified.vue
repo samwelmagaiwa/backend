@@ -7,19 +7,24 @@
         <div class="max-w-full mx-auto">
           <!-- Header -->
           <div class="bg-white/10 rounded-lg p-6 mb-4">
-            <h1 class="text-2xl font-bold text-white mb-2">
-              ACCESS REQUESTS - HOD APPROVAL STAGE
-            </h1>
+            <h1 class="text-2xl font-bold text-white mb-2">ACCESS REQUESTS - HOD APPROVAL STAGE</h1>
             <p class="text-blue-200">
-              Staff requests displayed in FIFO order. Click "View & Process" to capture: Module Requested for, Module Request, Access Rights, and Comments.
+              Staff requests displayed in FIFO order. Click "View & Process" to capture: Module
+              Requested for, Module Request, Access Rights, and Comments.
             </p>
           </div>
 
           <!-- Error Display -->
-          <div v-if="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          <div
+            v-if="error"
+            class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"
+          >
             <h3 class="font-bold">Error</h3>
             <p>{{ error }}</p>
-            <button @click="fetchRequests" class="mt-2 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+            <button
+              @click="fetchRequests"
+              class="mt-2 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+            >
               Retry
             </button>
           </div>
@@ -87,7 +92,11 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="request in filteredRequests" :key="request.id" class="border-t border-blue-300/20 hover:bg-blue-700/30">
+                <tr
+                  v-for="request in filteredRequests"
+                  :key="request.id"
+                  class="border-t border-blue-300/20 hover:bg-blue-700/30"
+                >
                   <!-- Request ID -->
                   <td class="px-4 py-3">
                     <div class="text-white font-medium">
@@ -99,13 +108,22 @@
                   <!-- Request Type -->
                   <td class="px-4 py-3">
                     <div class="flex flex-wrap gap-1">
-                      <span v-if="hasService(request, 'jeeva')" class="px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">
+                      <span
+                        v-if="hasService(request, 'jeeva')"
+                        class="px-2 py-1 rounded text-xs bg-blue-100 text-blue-800"
+                      >
                         Jeeva
                       </span>
-                      <span v-if="hasService(request, 'wellsoft')" class="px-2 py-1 rounded text-xs bg-green-100 text-green-800">
+                      <span
+                        v-if="hasService(request, 'wellsoft')"
+                        class="px-2 py-1 rounded text-xs bg-green-100 text-green-800"
+                      >
                         Wellsoft
                       </span>
-                      <span v-if="hasService(request, 'internet')" class="px-2 py-1 rounded text-xs bg-cyan-100 text-cyan-800">
+                      <span
+                        v-if="hasService(request, 'internet')"
+                        class="px-2 py-1 rounded text-xs bg-cyan-100 text-cyan-800"
+                      >
                         Internet
                       </span>
                     </div>
@@ -141,13 +159,14 @@
                   <td class="px-4 py-3">
                     <div class="flex flex-col">
                       <!-- Display the exact database status -->
-                      <span :class="getStatusBadgeClass(request.status)" class="px-2 py-1 rounded text-xs font-medium mb-1">
+                      <span
+                        :class="getStatusBadgeClass(request.status)"
+                        class="px-2 py-1 rounded text-xs font-medium mb-1"
+                      >
                         {{ getStatusText(request.status) }}
                       </span>
                       <!-- Show raw status for debugging -->
-                      <div class="text-xs text-gray-400">
-                        Raw: {{ request.status }}
-                      </div>
+                      <div class="text-xs text-gray-400">Raw: {{ request.status }}</div>
                     </div>
                   </td>
 
@@ -184,7 +203,11 @@
             <div v-if="filteredRequests.length === 0" class="text-center py-12">
               <h3 class="text-white text-lg font-medium mb-2">No requests found</h3>
               <p class="text-blue-300">
-                {{ searchQuery || statusFilter ? 'No requests are pending your approval.' : 'Try adjusting your filters' }}
+                {{
+                  searchQuery || statusFilter
+                    ? 'No requests are pending your approval.'
+                    : 'Try adjusting your filters'
+                }}
               </p>
             </div>
 
@@ -202,9 +225,14 @@
     </div>
 
     <!-- Loading Modal -->
-    <div v-if="isLoading" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div
+      v-if="isLoading"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    >
       <div class="bg-white rounded-lg shadow-xl p-8 text-center">
-        <div class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <div
+          class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"
+        ></div>
         <p class="text-gray-600">Loading requests...</p>
       </div>
     </div>
@@ -212,271 +240,285 @@
 </template>
 
 <script>
-import Header from '@/components/header.vue'
-import ModernSidebar from '@/components/ModernSidebar.vue'
-import AppFooter from '@/components/footer.vue'
-import combinedAccessService from '@/services/combinedAccessService'
+  import Header from '@/components/header.vue'
+  import ModernSidebar from '@/components/ModernSidebar.vue'
+  import AppFooter from '@/components/footer.vue'
+  import combinedAccessService from '@/services/combinedAccessService'
 
-export default {
-  name: 'HodRequestListSimplified',
-  components: {
-    Header,
-    ModernSidebar,
-    AppFooter
-  },
-  data() {
-    return {
-      requests: [],
-      searchQuery: '',
-      statusFilter: '',
-      isLoading: false,
-      stats: {
-        pendingHod: 0,
-        hodApproved: 0,
-        hodRejected: 0,
-        total: 0
-      },
-      error: null
-    }
-  },
-  computed: {
-    filteredRequests() {
-      // Ensure requests is always an array
-      if (!Array.isArray(this.requests)) {
-        console.warn('HodRequestList: requests is not an array:', this.requests)
-        return []
+  export default {
+    name: 'HodRequestListSimplified',
+    components: {
+      Header,
+      ModernSidebar,
+      AppFooter
+    },
+    data() {
+      return {
+        requests: [],
+        searchQuery: '',
+        statusFilter: '',
+        isLoading: false,
+        stats: {
+          pendingHod: 0,
+          hodApproved: 0,
+          hodRejected: 0,
+          total: 0
+        },
+        error: null
       }
-      
-      let filtered = this.requests
-
-      // Filter by search query
-      if (this.searchQuery) {
-        const query = this.searchQuery.toLowerCase()
-        filtered = filtered.filter(
-          (request) =>
-            (request.staff_name || request.full_name || '').toLowerCase().includes(query) ||
-            (request.pf_number || '').toLowerCase().includes(query) ||
-            (request.department || '').toLowerCase().includes(query) ||
-            (request.request_id || '').toLowerCase().includes(query)
-        )
-      }
-
-      // Filter by status - use exact database status
-      if (this.statusFilter) {
-        filtered = filtered.filter(
-          (request) => request.status === this.statusFilter
-        )
-      }
-
-      // Sort by FIFO order (oldest first)
-      return filtered.sort((a, b) => {
-        const dateA = new Date(a.created_at || a.submission_date || 0)
-        const dateB = new Date(b.created_at || b.submission_date || 0)
-        return dateA - dateB
-      })
-    }
-  },
-  async mounted() {
-    try {
-      console.log('HodRequestListSimplified: Component mounted, initializing...')
-      await this.fetchRequests()
-      console.log('HodRequestListSimplified: Component initialized successfully')
-    } catch (error) {
-      console.error('HodRequestListSimplified: Error during mount:', error)
-      this.error = 'Failed to initialize component: ' + error.message
-      this.isLoading = false
-    }
-  },
-  methods: {
-    async fetchRequests() {
-      this.isLoading = true
-      this.error = null
-
-      try {
-        console.log('Fetching combined access requests for HOD approval...')
-
-        const response = await combinedAccessService.getHodRequests({
-          search: this.searchQuery || undefined,
-          status: this.statusFilter || undefined,
-          per_page: 50
-        })
-
-        if (response.success) {
-          // Handle the nested response structure: response.data.data.data
-          const responseData = response.data?.data || response.data || {}
-          this.requests = Array.isArray(responseData.data) ? responseData.data : (Array.isArray(responseData) ? responseData : [])
-          console.log('Combined access requests loaded:', this.requests.length)
-          console.log('Raw response data:', response.data)
-          
-          // Also fetch statistics
-          await this.fetchStatistics()
-        } else {
-          throw new Error(response.error || 'Failed to fetch requests')
+    },
+    computed: {
+      filteredRequests() {
+        // Ensure requests is always an array
+        if (!Array.isArray(this.requests)) {
+          console.warn('HodRequestList: requests is not an array:', this.requests)
+          return []
         }
 
+        let filtered = this.requests
+
+        // Filter by search query
+        if (this.searchQuery) {
+          const query = this.searchQuery.toLowerCase()
+          filtered = filtered.filter(
+            (request) =>
+              (request.staff_name || request.full_name || '').toLowerCase().includes(query) ||
+              (request.pf_number || '').toLowerCase().includes(query) ||
+              (request.department || '').toLowerCase().includes(query) ||
+              (request.request_id || '').toLowerCase().includes(query)
+          )
+        }
+
+        // Filter by status - use exact database status
+        if (this.statusFilter) {
+          filtered = filtered.filter((request) => request.status === this.statusFilter)
+        }
+
+        // Sort by FIFO order (oldest first)
+        return filtered.sort((a, b) => {
+          const dateA = new Date(a.created_at || a.submission_date || 0)
+          const dateB = new Date(b.created_at || b.submission_date || 0)
+          return dateA - dateB
+        })
+      }
+    },
+    async mounted() {
+      try {
+        console.log('HodRequestListSimplified: Component mounted, initializing...')
+        await this.fetchRequests()
+        console.log('HodRequestListSimplified: Component initialized successfully')
       } catch (error) {
-        console.error('Error fetching requests:', error)
-        this.error = 'Unable to load combined access requests. Please check your connection and try again.'
-        this.requests = []
-        this.calculateStats()
-      } finally {
+        console.error('HodRequestListSimplified: Error during mount:', error)
+        this.error = 'Failed to initialize component: ' + error.message
         this.isLoading = false
       }
     },
+    methods: {
+      async fetchRequests() {
+        this.isLoading = true
+        this.error = null
 
-    async fetchStatistics() {
-      try {
-        const response = await combinedAccessService.getHodStatistics()
-        
-        if (response.success) {
-          this.stats = response.data
-        } else {
+        try {
+          console.log('Fetching combined access requests for HOD approval...')
+
+          const response = await combinedAccessService.getHodRequests({
+            search: this.searchQuery || undefined,
+            status: this.statusFilter || undefined,
+            per_page: 50
+          })
+
+          if (response.success) {
+            // Handle the nested response structure: response.data.data.data
+            const responseData = response.data?.data || response.data || {}
+            this.requests = Array.isArray(responseData.data)
+              ? responseData.data
+              : Array.isArray(responseData)
+                ? responseData
+                : []
+            console.log('Combined access requests loaded:', this.requests.length)
+            console.log('Raw response data:', response.data)
+
+            // Also fetch statistics
+            await this.fetchStatistics()
+          } else {
+            throw new Error(response.error || 'Failed to fetch requests')
+          }
+        } catch (error) {
+          console.error('Error fetching requests:', error)
+          this.error =
+            'Unable to load combined access requests. Please check your connection and try again.'
+          this.requests = []
+          this.calculateStats()
+        } finally {
+          this.isLoading = false
+        }
+      },
+
+      async fetchStatistics() {
+        try {
+          const response = await combinedAccessService.getHodStatistics()
+
+          if (response.success) {
+            this.stats = response.data
+          } else {
+            // Fall back to calculating stats from loaded requests
+            this.calculateStats()
+          }
+        } catch (error) {
+          console.error('Error fetching statistics:', error)
           // Fall back to calculating stats from loaded requests
           this.calculateStats()
         }
-      } catch (error) {
-        console.error('Error fetching statistics:', error)
-        // Fall back to calculating stats from loaded requests
-        this.calculateStats()
-      }
-    },
+      },
 
-    calculateStats() {
-      // Ensure requests is an array before calculating stats
-      const requests = Array.isArray(this.requests) ? this.requests : []
-      
-      this.stats = {
-        // Count based on exact database status values
-        pendingHod: requests.filter((r) => r.status === 'pending_hod').length,
-        hodApproved: requests.filter((r) => r.status === 'hod_approved' || r.status === 'approved').length,
-        hodRejected: requests.filter((r) => r.status === 'hod_rejected').length,
-        total: requests.length
-      }
-    },
+      calculateStats() {
+        // Ensure requests is an array before calculating stats
+        const requests = Array.isArray(this.requests) ? this.requests : []
 
-    async refreshRequests() {
-      await this.fetchRequests()
-    },
-
-    viewAndProcessRequest(requestId) {
-      // Navigate to both-service-form.vue with populated data
-      this.$router.push(`/both-service-form/${requestId}`)
-    },
-
-    editRequest(requestId) {
-      // Navigate to edit mode
-      this.$router.push(`/both-service-form/${requestId}/edit`)
-    },
-
-    async cancelRequest(requestId) {
-      try {
-        const confirmed = confirm('Are you sure you want to cancel this request? This action cannot be undone.')
-        if (!confirmed) return
-
-        const reason = prompt('Please provide a reason for cancellation:')
-        if (!reason || reason.trim() === '') {
-          alert('Cancellation reason is required')
-          return
+        this.stats = {
+          // Count based on exact database status values
+          pendingHod: requests.filter((r) => r.status === 'pending_hod').length,
+          hodApproved: requests.filter(
+            (r) => r.status === 'hod_approved' || r.status === 'approved'
+          ).length,
+          hodRejected: requests.filter((r) => r.status === 'hod_rejected').length,
+          total: requests.length
         }
+      },
 
-        console.log('Cancelling request:', requestId)
-        
-        const response = await combinedAccessService.cancelRequest(requestId, reason)
-        
-        if (response.success) {
-          // Update local state
-          const requestIndex = this.requests.findIndex(r => r.id === requestId)
-          if (requestIndex !== -1) {
-            this.requests[requestIndex].hod_status = 'cancelled'
-            this.requests[requestIndex].status = 'cancelled'
+      async refreshRequests() {
+        await this.fetchRequests()
+      },
+
+      viewAndProcessRequest(requestId) {
+        // Navigate to both-service-form.vue with populated data
+        this.$router.push(`/both-service-form/${requestId}`)
+      },
+
+      editRequest(requestId) {
+        // Navigate to edit mode
+        this.$router.push(`/both-service-form/${requestId}/edit`)
+      },
+
+      async cancelRequest(requestId) {
+        try {
+          const confirmed = confirm(
+            'Are you sure you want to cancel this request? This action cannot be undone.'
+          )
+          if (!confirmed) return
+
+          const reason = prompt('Please provide a reason for cancellation:')
+          if (!reason || reason.trim() === '') {
+            alert('Cancellation reason is required')
+            return
           }
 
-          this.calculateStats()
-          alert('Request cancelled successfully!')
-        } else {
-          throw new Error(response.error || 'Failed to cancel request')
+          console.log('Cancelling request:', requestId)
+
+          const response = await combinedAccessService.cancelRequest(requestId, reason)
+
+          if (response.success) {
+            // Update local state
+            const requestIndex = this.requests.findIndex((r) => r.id === requestId)
+            if (requestIndex !== -1) {
+              this.requests[requestIndex].hod_status = 'cancelled'
+              this.requests[requestIndex].status = 'cancelled'
+            }
+
+            this.calculateStats()
+            alert('Request cancelled successfully!')
+          } else {
+            throw new Error(response.error || 'Failed to cancel request')
+          }
+        } catch (error) {
+          console.error('Error cancelling request:', error)
+          alert('Error cancelling request: ' + error.message)
         }
-      } catch (error) {
-        console.error('Error cancelling request:', error)
-        alert('Error cancelling request: ' + error.message)
+      },
+
+      hasService(request, serviceType) {
+        return (
+          (request.services && request.services.includes(serviceType)) ||
+          (request.request_types &&
+            request.request_types.some(
+              (type) =>
+                (serviceType === 'jeeva' && type === 'jeeva_access') ||
+                (serviceType === 'wellsoft' && type === 'wellsoft') ||
+                (serviceType === 'internet' && type === 'internet_access_request')
+            ))
+        )
+      },
+
+      canEdit(request) {
+        // HOD can edit requests that are pending HOD approval
+        return request.status === 'pending_hod'
+      },
+
+      canCancel(request) {
+        // HOD can cancel requests that are not already rejected, cancelled, or approved
+        return (
+          request.status !== 'hod_rejected' &&
+          request.status !== 'cancelled' &&
+          request.status !== 'approved'
+        )
+      },
+
+      formatDate(dateString) {
+        if (!dateString) return 'N/A'
+        const date = new Date(dateString)
+        return date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        })
+      },
+
+      formatTime(dateString) {
+        if (!dateString) return 'N/A'
+        const date = new Date(dateString)
+        return date.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit'
+        })
+      },
+
+      getStatusBadgeClass(status) {
+        const classes = {
+          // Actual database status values from user_access table
+          pending: 'bg-blue-100 text-blue-800',
+          pending_hod: 'bg-yellow-100 text-yellow-800',
+          approved: 'bg-green-100 text-green-800',
+          // Additional workflow statuses
+          hod_approved: 'bg-green-100 text-green-800',
+          hod_rejected: 'bg-red-100 text-red-800',
+          cancelled: 'bg-gray-100 text-gray-800'
+        }
+        return classes[status] || 'bg-gray-100 text-gray-800'
+      },
+
+      getStatusIcon(status) {
+        const icons = {
+          pending_hod: 'fas fa-clock',
+          hod_approved: 'fas fa-check',
+          hod_rejected: 'fas fa-times',
+          cancelled: 'fas fa-ban'
+        }
+        return icons[status] || 'fas fa-question'
+      },
+
+      getStatusText(status) {
+        const texts = {
+          // Actual database status values from user_access table
+          pending: 'Pending',
+          pending_hod: 'Pending HOD Approval',
+          approved: 'Approved',
+          // Additional workflow statuses
+          hod_approved: 'HOD Approved',
+          hod_rejected: 'HOD Rejected',
+          cancelled: 'Cancelled'
+        }
+        return texts[status] || `Unknown Status (${status})`
       }
-    },
-
-    hasService(request, serviceType) {
-      return request.services && request.services.includes(serviceType) ||
-             request.request_types && request.request_types.some(type => 
-               (serviceType === 'jeeva' && type === 'jeeva_access') ||
-               (serviceType === 'wellsoft' && type === 'wellsoft') ||
-               (serviceType === 'internet' && type === 'internet_access_request')
-             )
-    },
-
-    canEdit(request) {
-      // HOD can edit requests that are pending HOD approval
-      return request.status === 'pending_hod'
-    },
-
-    canCancel(request) {
-      // HOD can cancel requests that are not already rejected, cancelled, or approved
-      return request.status !== 'hod_rejected' && request.status !== 'cancelled' && request.status !== 'approved'
-    },
-
-    formatDate(dateString) {
-      if (!dateString) return 'N/A'
-      const date = new Date(dateString)
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-      })
-    },
-
-    formatTime(dateString) {
-      if (!dateString) return 'N/A'
-      const date = new Date(dateString)
-      return date.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit'
-      })
-    },
-
-    getStatusBadgeClass(status) {
-      const classes = {
-        // Actual database status values from user_access table
-        'pending': 'bg-blue-100 text-blue-800',
-        'pending_hod': 'bg-yellow-100 text-yellow-800', 
-        'approved': 'bg-green-100 text-green-800',
-        // Additional workflow statuses
-        'hod_approved': 'bg-green-100 text-green-800',
-        'hod_rejected': 'bg-red-100 text-red-800',
-        'cancelled': 'bg-gray-100 text-gray-800'
-      }
-      return classes[status] || 'bg-gray-100 text-gray-800'
-    },
-
-    getStatusIcon(status) {
-      const icons = {
-        'pending_hod': 'fas fa-clock',
-        'hod_approved': 'fas fa-check',
-        'hod_rejected': 'fas fa-times',
-        'cancelled': 'fas fa-ban'
-      }
-      return icons[status] || 'fas fa-question'
-    },
-
-    getStatusText(status) {
-      const texts = {
-        // Actual database status values from user_access table
-        'pending': 'Pending',
-        'pending_hod': 'Pending HOD Approval',
-        'approved': 'Approved',
-        // Additional workflow statuses
-        'hod_approved': 'HOD Approved',
-        'hod_rejected': 'HOD Rejected', 
-        'cancelled': 'Cancelled'
-      }
-      return texts[status] || `Unknown Status (${status})`
     }
   }
-}
 </script>
