@@ -9,40 +9,21 @@
         <div class="max-w-5xl mx-auto">
           <!-- Header Section -->
           <div class="medical-glass-card rounded-t-3xl p-8 mb-0 border-b border-blue-300/30">
-            <div class="flex justify-between items-center">
-              <!-- Refresh Button - Left -->
-              <div class="flex items-center">
-                <button
-                  @click="refreshData"
-                  :disabled="isLoading"
-                  class="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-semibold flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                  title="Refresh request data"
-                >
-                  <i :class="isLoading ? 'fas fa-spinner fa-spin' : 'fas fa-sync-alt'" class="text-sm"></i>
-                  {{ isLoading ? 'Refreshing...' : 'Refresh' }}
-                </button>
+            <div class="text-center">
+              <h1 class="text-2xl font-bold text-white mb-4 tracking-wide drop-shadow-lg">
+                MUHIMBILI NATIONAL HOSPITAL
+              </h1>
+              <div
+                class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2 rounded-full text-base font-bold shadow-2xl"
+              >
+                <span class="relative z-10 flex items-center gap-3">
+                  <i class="fas fa-clipboard-list text-base"></i>
+                  REQUEST DETAILS
+                </span>
               </div>
-              
-              <!-- Center Content -->
-              <div class="text-center flex-1">
-                <h1 class="text-2xl font-bold text-white mb-4 tracking-wide drop-shadow-lg">
-                  MUHIMBILI NATIONAL HOSPITAL
-                </h1>
-                <div
-                  class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2 rounded-full text-base font-bold shadow-2xl"
-                >
-                  <span class="relative z-10 flex items-center gap-3">
-                    <i class="fas fa-clipboard-list text-base"></i>
-                    REQUEST DETAILS
-                  </span>
-                </div>
-                <h2 class="text-lg font-bold text-blue-100 tracking-wide drop-shadow-md mt-4">
-                  Internal Access Management
-                </h2>
-              </div>
-              
-              <!-- Spacer for balance -->
-              <div class="w-24"></div>
+              <h2 class="text-lg font-bold text-blue-100 tracking-wide drop-shadow-md mt-4">
+                Internal Access Management
+              </h2>
             </div>
           </div>
 
@@ -345,12 +326,13 @@
                         <div class="text-right">
                           <p class="text-xs text-blue-300">
                             {{
-                              requestData?.hodApproval?.approved_at || requestData?.hod_approved_at
+                              requestData?.hodApproval?.approved_at || requestData?.hod_approved_at || requestData?.hod_rejected_at
                                 ? formatDate(
                                     requestData?.hodApproval?.approved_at ||
-                                      requestData?.hod_approved_at
+                                      requestData?.hod_approved_at ||
+                                      requestData?.hod_rejected_at
                                   )
-                                : 'Pending'
+                                : getHODApprovalStatus() === 'rejected' ? 'Recently' : 'Pending'
                             }}
                           </p>
                         </div>
@@ -358,7 +340,7 @@
                     </div>
 
                     <!-- HOD Comments Card -->
-                    <div v-if="getHODComment()" class="mt-3">
+                    <div v-if="getHODComment() || getHODApprovalStatus() === 'rejected'" class="mt-3">
                       <div
                         :class="getHODCommentsCardClass()"
                         class="rounded-lg p-4 backdrop-blur-sm border transition-all duration-300 hover:shadow-lg"
@@ -396,7 +378,7 @@
                         <!-- Comment Content -->
                         <div class="mb-3">
                           <p class="text-white text-sm leading-relaxed">
-                            {{ getHODComment() }}
+                            {{ getHODComment() || (getHODApprovalStatus() === 'rejected' ? 'No rejection reason provided.' : 'No comment available.') }}
                           </p>
                         </div>
 
@@ -408,12 +390,13 @@
                           <div class="flex items-center space-x-1">
                             <i class="fas fa-calendar-alt"></i>
                             <span>{{
-                              requestData?.hodApproval?.approved_at || requestData?.hod_approved_at
+                              requestData?.hodApproval?.approved_at || requestData?.hod_approved_at || requestData?.hod_rejected_at
                                 ? formatDateTime(
                                     requestData?.hodApproval?.approved_at ||
-                                      requestData?.hod_approved_at
+                                      requestData?.hod_approved_at ||
+                                      requestData?.hod_rejected_at
                                   )
-                                : 'Pending'
+                                : getHODApprovalStatus() === 'rejected' ? 'Recently' : 'Pending'
                             }}</span>
                           </div>
                           <div class="flex items-center space-x-1">
@@ -446,7 +429,7 @@
                     </div>
                     <div>
                       <p class="text-blue-200 text-sm">Status:</p>
-                      <p class="font-semibold">{{ formattedCurrentStatus }}</p>
+                      <p class="font-semibold" :class="getCurrentStatusTextClass()">{{ formattedCurrentStatus }}</p>
                     </div>
                     <div>
                       <p class="text-blue-200 text-sm">ICT Status:</p>
@@ -505,18 +488,6 @@
       </main>
     </div>
 
-    <!-- Loading Modal -->
-    <div
-      v-if="isLoading"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-    >
-      <div class="bg-white rounded-xl shadow-2xl p-8 text-center">
-        <div
-          class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"
-        ></div>
-        <p class="text-gray-600">Loading request details...</p>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -805,12 +776,36 @@
       }
 
       const getHODComment = () => {
-        return (
+        const comment = (
           requestData.value?.hodApproval?.comment ||
           requestData.value?.hodApproval?.rejection_reason ||
           requestData.value?.hod_approval_comment ||
-          requestData.value?.hod_rejection_reason
+          requestData.value?.hod_rejection_reason ||
+          requestData.value?.hod_comment ||
+          requestData.value?.rejection_comment ||
+          requestData.value?.rejection_reason
         )
+        
+        console.log('🔍 HOD Comment Debug:', {
+          comment,
+          hodApproval: requestData.value?.hodApproval,
+          hod_approval_comment: requestData.value?.hod_approval_comment,
+          hod_rejection_reason: requestData.value?.hod_rejection_reason,
+          hod_comment: requestData.value?.hod_comment,
+          rejection_comment: requestData.value?.rejection_comment,
+          rejection_reason: requestData.value?.rejection_reason,
+          allCommentFields: {
+            'hodApproval?.comment': requestData.value?.hodApproval?.comment,
+            'hodApproval?.rejection_reason': requestData.value?.hodApproval?.rejection_reason,
+            'hod_approval_comment': requestData.value?.hod_approval_comment,
+            'hod_rejection_reason': requestData.value?.hod_rejection_reason,
+            'hod_comment': requestData.value?.hod_comment,
+            'rejection_comment': requestData.value?.rejection_comment,
+            'rejection_reason': requestData.value?.rejection_reason
+          }
+        })
+        
+        return comment
       }
 
       const getHODApprovalStepClass = () => {
@@ -840,12 +835,8 @@
       }
 
       const getHODCommentsCardClass = () => {
-        const status = getHODApprovalStatus()
-        if (status === 'approved')
-          return 'bg-gradient-to-br from-blue-600/25 to-green-600/25 border-blue-400/60 shadow-blue-500/30'
-        if (status === 'rejected')
-          return 'bg-gradient-to-br from-blue-600/25 to-red-600/25 border-blue-400/60 shadow-blue-500/25'
-        return 'bg-gradient-to-br from-blue-600/25 to-yellow-600/25 border-blue-400/60 shadow-blue-500/25'
+        // Always return blue background regardless of status
+        return 'bg-gradient-to-br from-blue-600/30 to-blue-700/30 border-blue-400/60 shadow-blue-500/25'
       }
 
       const getHODCommentsIconBgClass = () => {
@@ -1016,12 +1007,36 @@
         }
       }
       
-      // Manual refresh method
-      const refreshData = () => {
-        console.log('🔄 Manual refresh triggered')
-        loadRequestData()
+      // Get current status text color class
+      const getCurrentStatusTextClass = () => {
+        if (!requestData.value) return 'text-white'
+        
+        const status = requestData.value.status || requestData.value.currentStatus || 'pending'
+        
+        // Check if status indicates rejection
+        if (status.includes('rejected') || status === 'rejected') {
+          return 'text-red-400'
+        }
+        
+        // Check if status indicates approval/success
+        if (status.includes('approved') || status === 'approved' || status === 'implemented') {
+          return 'text-green-400'
+        }
+        
+        // Check if status indicates pending
+        if (status.includes('pending') || status === 'pending') {
+          return 'text-yellow-400'
+        }
+        
+        // Check if status indicates cancellation
+        if (status === 'cancelled') {
+          return 'text-gray-400'
+        }
+        
+        // Default to white text
+        return 'text-white'
       }
-
+      
       // Lifecycle
       onMounted(() => {
         loadRequestData()
@@ -1036,9 +1051,9 @@
         formattedRequestId,
         formattedRequestType,
         formattedCurrentStatus,
+        getCurrentStatusTextClass,
         isBookingService,
         loadRequestData,
-        refreshData,
         formatDate,
         formatDateTime,
         getApprovalStepClass,

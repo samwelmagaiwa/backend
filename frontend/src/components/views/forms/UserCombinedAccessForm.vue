@@ -76,8 +76,8 @@
                     class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2 rounded-full text-base font-bold shadow-2xl transform hover:scale-105 transition-all duration-300 border-2 border-blue-400/60"
                   >
                     <span class="relative z-10 flex items-center gap-2">
-                      <i class="fas fa-layer-group"></i>
-                      COMBINED ACCESS REQUEST
+                      <i :class="isEditMode ? 'fas fa-edit' : 'fas fa-layer-group'"></i>
+                      {{ isEditMode ? 'EDIT COMBINED ACCESS REQUEST' : 'COMBINED ACCESS REQUEST' }}
                     </span>
                     <div
                       class="absolute inset-0 bg-gradient-to-r from-blue-700 to-blue-800 rounded-full opacity-0 hover:opacity-100 transition-opacity duration-300"
@@ -87,7 +87,7 @@
                 <h2
                   class="text-base font-bold text-blue-100 tracking-wide drop-shadow-md animate-fade-in-delay"
                 >
-                  COMPREHENSIVE SYSTEM ACCESS
+                  {{ isEditMode ? 'MODIFY AND RESUBMIT REQUEST' : 'COMPREHENSIVE SYSTEM ACCESS' }}
                 </h2>
               </div>
 
@@ -804,8 +804,8 @@
                       class="px-5 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-semibold flex items-center shadow-lg hover:shadow-xl text-sm transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                     >
                       <i v-if="isSubmitting" class="fas fa-spinner fa-spin mr-2"></i>
-                      <i v-else class="fas fa-paper-plane mr-2"></i>
-                      {{ isSubmitting ? 'Submitting...' : 'Submit Request' }}
+                      <i v-else :class="isEditMode ? 'fas fa-save' : 'fas fa-paper-plane'" class="mr-2"></i>
+                      {{ isSubmitting ? (isEditMode ? 'Updating...' : 'Submitting...') : (isEditMode ? 'Update & Resubmit' : 'Submit Request') }}
                     </button>
                   </div>
                 </div>
@@ -927,6 +927,10 @@
         isLoadingProfile: true,
         profileLoadError: null,
         autoPopulated: false,
+        // Edit mode properties
+        isEditMode: false,
+        editRequestId: null,
+        originalRequestData: null,
         formData: {
           // Applicant Details
           pfNumber: '',
@@ -964,14 +968,178 @@
 
     async mounted() {
       console.log('🔄 UserCombinedAccessForm: Component mounted, starting initialization...')
-
+      
+      // Check if in edit mode
+      this.checkEditMode()
+      
       // Load both profile data and departments concurrently
-      await Promise.all([this.autoPopulateUserData(), this.loadDepartments()])
+      if (this.isEditMode) {
+        await Promise.all([this.loadExistingRequest(), this.loadDepartments()])
+      } else {
+        await Promise.all([this.autoPopulateUserData(), this.loadDepartments()])
+      }
 
       console.log('✅ UserCombinedAccessForm: Initialization completed')
     },
 
     methods: {
+      /**
+       * Check if the component is in edit mode by examining route query parameters
+       */
+      checkEditMode() {
+        const { id, mode, status } = this.$route.query
+        
+        if (id && mode === 'edit') {
+          this.isEditMode = true
+          this.editRequestId = id
+          
+          console.log('🔄 Edit mode detected:', {
+            requestId: this.editRequestId,
+            mode: mode,
+            status: status
+          })
+        } else {
+          this.isEditMode = false
+          this.editRequestId = null
+          
+          console.log('📝 New form mode detected')
+        }
+      },
+      
+      /**
+       * Load existing request data for editing
+       */
+      async loadExistingRequest() {
+        if (!this.editRequestId) {
+          console.error('❌ No request ID provided for edit mode')
+          this.showNotification('Invalid request ID for editing', 'error')
+          this.$router.push('/request-status')
+          return
+        }
+        
+        console.log('🔄 Loading existing request data for ID:', this.editRequestId)
+        this.isLoadingProfile = true
+        
+        try {
+          const response = await userCombinedAccessService.getRequestById(this.editRequestId)
+          
+          if (response.success && response.data) {
+            this.originalRequestData = response.data
+            this.populateFormWithExistingData(response.data)
+            
+            console.log('✅ Existing request data loaded successfully')
+            this.showNotification('Request data loaded for editing', 'info')
+          } else {
+            console.error('❌ Failed to load request data:', response)
+            this.showNotification(response.message || 'Failed to load request data', 'error')
+            this.$router.push('/request-status')
+          }
+        } catch (error) {
+          console.error('❌ Error loading existing request:', error)
+          this.showNotification('Error loading request data', 'error')
+          this.$router.push('/request-status')
+        } finally {
+          this.isLoadingProfile = false
+        }
+      },
+      
+      /**
+       * Populate form fields with existing request data
+       */
+      populateFormWithExistingData(requestData) {
+        console.log('🔄 Populating form with existing data:', requestData)
+        console.log('🔍 Available fields in requestData:', Object.keys(requestData))
+        
+        // Handle nested data if the response is wrapped
+        const data = requestData.data || requestData
+        
+        // Basic information - try different possible field names
+        this.formData.pfNumber = data.pf_number || data.pfNumber || data.PF_NUMBER || ''
+        this.formData.staffName = data.staff_name || data.staffName || data.name || data.full_name || ''
+        this.formData.phoneNumber = data.phone_number || data.phoneNumber || data.phone || ''
+        this.formData.department = data.department_id || data.departmentId || data.department || ''
+        
+        console.log('🔍 Form field assignments:', {
+          pfNumber: {
+            value: this.formData.pfNumber,
+            sources: [data.pf_number, data.pfNumber, data.PF_NUMBER]
+          },
+          staffName: {
+            value: this.formData.staffName,
+            sources: [data.staff_name, data.staffName, data.name, data.full_name]
+          },
+          phoneNumber: {
+            value: this.formData.phoneNumber,
+            sources: [data.phone_number, data.phoneNumber, data.phone]
+          },
+          department: {
+            value: this.formData.department,
+            sources: [data.department_id, data.departmentId, data.department]
+          }
+        })
+        
+        // Services - parse from request_types array or individual fields
+        if (data.request_types && Array.isArray(data.request_types)) {
+          console.log('🔍 Request types found:', data.request_types)
+          this.formData.services.jeeva = data.request_types.includes('jeeva_access') || data.request_types.includes('jeeva')
+          this.formData.services.wellsoft = data.request_types.includes('wellsoft')
+          this.formData.services.internet = data.request_types.includes('internet_access_request') || data.request_types.includes('internet')
+        } else if (typeof data.request_types === 'string') {
+          // Handle comma-separated string
+          console.log('🔍 Request types as string:', data.request_types)
+          const types = data.request_types.split(',')
+          this.formData.services.jeeva = types.some(type => type.trim().includes('jeeva'))
+          this.formData.services.wellsoft = types.some(type => type.trim().includes('wellsoft'))
+          this.formData.services.internet = types.some(type => type.trim().includes('internet'))
+        } else {
+          // Try individual boolean fields
+          this.formData.services.jeeva = data.jeeva_access || data.jeeva || false
+          this.formData.services.wellsoft = data.wellsoft_access || data.wellsoft || false
+          this.formData.services.internet = data.internet_access || data.internet || false
+        }
+        
+        // Internet purposes
+        if (data.internet_purposes && Array.isArray(data.internet_purposes)) {
+          console.log('🔍 Internet purposes found:', data.internet_purposes)
+          this.formData.internetPurposes = [...data.internet_purposes]
+          // Fill remaining slots with empty strings
+          while (this.formData.internetPurposes.length < 4) {
+            this.formData.internetPurposes.push('')
+          }
+        } else if (data.internet_purposes && typeof data.internet_purposes === 'string') {
+          // Handle comma-separated string
+          console.log('🔍 Internet purposes as string:', data.internet_purposes)
+          const purposes = data.internet_purposes.split(',').map(p => p.trim()).filter(p => p)
+          this.formData.internetPurposes = [...purposes]
+          while (this.formData.internetPurposes.length < 4) {
+            this.formData.internetPurposes.push('')
+          }
+        }
+        
+        // Note: Signature will need to be re-uploaded in edit mode as we don't store the file
+        this.autoPopulated = true
+        
+        console.log('✅ Form populated with existing data:', {
+          pfNumber: this.formData.pfNumber,
+          staffName: this.formData.staffName,
+          phoneNumber: this.formData.phoneNumber,
+          department: this.formData.department,
+          services: this.formData.services,
+          internetPurposes: this.formData.internetPurposes
+        })
+        
+        // Validate that essential fields are populated
+        const missingFields = []
+        if (!this.formData.pfNumber) missingFields.push('PF Number')
+        if (!this.formData.staffName) missingFields.push('Staff Name')
+        if (!this.formData.phoneNumber) missingFields.push('Phone Number')
+        
+        if (missingFields.length > 0) {
+          console.warn('⚠️ Missing essential fields after population:', missingFields)
+          this.showNotification(`Missing fields: ${missingFields.join(', ')}. Please fill them manually.`, 'warning')
+        }
+      },
+      
       async loadDepartments() {
         try {
           const response = await userCombinedAccessService.getDepartments()
@@ -1121,21 +1289,29 @@
             })
           }
 
-          console.log('Submitting combined access request:', {
+          console.log(`${this.isEditMode ? 'Updating' : 'Submitting'} combined access request:`, {
+            isEditMode: this.isEditMode,
+            requestId: this.editRequestId,
             pfNumber: this.formData.pfNumber,
             staffName: this.formData.staffName,
             requestTypes,
             hasSignature: !!this.formData.signature
           })
 
-          // Submit to API
-          const response = await userCombinedAccessService.submitCombinedRequest(formData)
+          // Submit to API (update or create)
+          const response = this.isEditMode 
+            ? await userCombinedAccessService.updateRequest(this.editRequestId, formData)
+            : await userCombinedAccessService.submitCombinedRequest(formData)
 
           if (response.success) {
-            console.log('Combined access request submitted successfully:', response.data)
+            const actionText = this.isEditMode ? 'updated and resubmitted' : 'submitted'
+            console.log(`Combined access request ${actionText} successfully:`, response.data)
+            
             this.showSuccessModal = true
-            this.resetForm()
-            this.showNotification('Combined access request submitted successfully!', 'success')
+            if (!this.isEditMode) {
+              this.resetForm()
+            }
+            this.showNotification(`Combined access request ${actionText} successfully!`, 'success')
           } else {
             console.error('API Error:', response)
 
@@ -1144,11 +1320,11 @@
               const errorMessages = Object.values(response.errors).flat()
               this.showNotification(errorMessages[0] || 'Validation failed', 'error')
             } else {
-              this.showNotification(response.message || 'Failed to submit request', 'error')
+              this.showNotification(response.message || `Failed to ${this.isEditMode ? 'update' : 'submit'} request`, 'error')
             }
           }
         } catch (error) {
-          console.error('Error submitting combined access request:', error)
+          console.error(`Error ${this.isEditMode ? 'updating' : 'submitting'} combined access request:`, error)
           this.showNotification(
             'Network error. Please check your connection and try again.',
             'error'

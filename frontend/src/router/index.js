@@ -217,7 +217,8 @@ const routes = [
         ROLES.DIVISIONAL_DIRECTOR,
         ROLES.HEAD_OF_DEPARTMENT,
         ROLES.ICT_DIRECTOR,
-        ROLES.ICT_OFFICER
+        ROLES.ICT_OFFICER,
+        ROLES.STAFF // Allow staff to edit their own rejected requests
       ]
     },
     alias: ['/both-service-from']
@@ -232,7 +233,8 @@ const routes = [
         ROLES.DIVISIONAL_DIRECTOR,
         ROLES.HEAD_OF_DEPARTMENT,
         ROLES.ICT_DIRECTOR,
-        ROLES.ICT_OFFICER
+        ROLES.ICT_OFFICER,
+        ROLES.STAFF // Allow staff to edit their own rejected requests
       ]
     }
   },

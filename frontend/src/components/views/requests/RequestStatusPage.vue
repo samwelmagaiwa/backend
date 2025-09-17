@@ -397,17 +397,22 @@
                                     <i class="fas fa-eye mr-2 text-blue-400"></i>
                                     View Details
                                   </button>
-                                  <!-- Edit button for rejected booking requests -->
+                                  <!-- Edit button for rejected requests -->
                                   <button
                                     v-if="
-                                      request.type === 'booking_service' &&
-                                      request.status === 'rejected'
+                                      (request.status === 'rejected' || 
+                                       request.status === 'hod_rejected' ||
+                                       request.status === 'divisional_rejected' ||
+                                       request.status === 'ict_director_rejected' ||
+                                       request.status === 'head_it_rejected' ||
+                                       request.status === 'ict_officer_rejected') &&
+                                      canEditRequest(request)
                                     "
                                     @click="editRequest(request)"
                                     class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-green-600 hover:text-white flex items-center"
                                   >
                                     <i class="fas fa-edit mr-2 text-green-400"></i>
-                                    Edit Request
+                                    Edit & Resubmit
                                   </button>
                                   <button
                                     @click="cancelRequest(request)"
@@ -574,16 +579,22 @@
                               <i class="fas fa-eye mr-2 text-blue-400"></i>
                               View Details
                             </button>
-                            <!-- Edit button for rejected booking requests -->
+                            <!-- Edit button for rejected requests -->
                             <button
                               v-if="
-                                request.type === 'booking_service' && request.status === 'rejected'
+                                (request.status === 'rejected' || 
+                                 request.status === 'hod_rejected' ||
+                                 request.status === 'divisional_rejected' ||
+                                 request.status === 'ict_director_rejected' ||
+                                 request.status === 'head_it_rejected' ||
+                                 request.status === 'ict_officer_rejected') &&
+                                canEditRequest(request)
                               "
                               @click="editRequest(request)"
                               class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-green-600 hover:text-white flex items-center"
                             >
                               <i class="fas fa-edit mr-2 text-green-400"></i>
-                              Edit Request
+                              Edit & Resubmit
                             </button>
                             <button
                               @click="cancelRequest(request)"
@@ -616,6 +627,7 @@
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppHeader from '@/components/AppHeader.vue'
   import { useAuth } from '@/composables/useAuth'
+  import { useAuthStore } from '@/stores/auth'
   import requestStatusService from '@/services/requestStatusService'
 
   export default {
@@ -770,24 +782,170 @@
         })
       }
 
-      const editRequest = (request) => {
+      const editRequest = async (request) => {
+        console.log('🚀 EditRequest: Starting edit request flow', {
+          requestId: request.id,
+          originalId: request.original_id,
+          requestType: request.type,
+          status: request.status,
+          canEdit: canEditRequest(request)
+        })
+        
         // Close dropdown first
         closeDropdown()
 
-        // Only allow editing rejected booking requests
-        if (request.type !== 'booking_service' || request.status !== 'rejected') {
-          alert('Only rejected booking requests can be edited.')
+        // Check current user authentication and role
+        const piniaAuthStore = useAuthStore()
+        console.log('🔍 EditRequest: Current auth state:', {
+          isAuthenticated: piniaAuthStore.isAuthenticated,
+          userRole: piniaAuthStore.userRole,
+          userName: piniaAuthStore.user?.name,
+          userId: piniaAuthStore.user?.id
+        })
+
+        // Check if request can be edited
+        if (!canEditRequest(request)) {
+          alert(`This ${getRequestTypeName(request.type)} request cannot be edited in its current status: ${getStatusText(request.status)}`)
+          return
+        }
+
+        // Show confirmation dialog
+        const confirmed = confirm(
+          `Edit and resubmit this ${getRequestTypeName(request.type)} request?\n\n` +
+          `Request ID: ${formatRequestId(request.id)}\n` +
+          `Current Status: ${getStatusText(request.status)}\n\n` +
+          `This will allow you to modify the request details and resubmit it for approval.`
+        )
+        
+        if (!confirmed) {
+          console.log('❌ EditRequest: User cancelled confirmation dialog')
+          return
+        }
+        
+        console.log('✅ EditRequest: User confirmed, proceeding with navigation')
+
+        // Navigate to appropriate edit page based on request type
+        let editPath = ''
+        let hasEditSupport = true
+        
+        switch(request.type) {
+          case 'booking_service':
+            editPath = '/edit-booking-request'
+            break
+          case 'combined_access':
+            editPath = '/user-combined-form'
+            break
+          case 'jeeva_access':
+          case 'jeeva':
+            // Individual forms don't have :id routes yet, show helpful message
+            alert(
+              `Edit functionality for ${getRequestTypeName(request.type)} requests is currently in development.\n\n` +
+              `For now, you can:\n` +
+              `1. Submit a new ${getRequestTypeName(request.type)} request\n` +
+              `2. Contact support for assistance with modifying this request\n\n` +
+              `Combined access requests already support editing.`
+            )
+            hasEditSupport = false
+            break
+          case 'wellsoft':
+            alert(
+              `Edit functionality for ${getRequestTypeName(request.type)} requests is currently in development.\n\n` +
+              `For now, you can:\n` +
+              `1. Submit a new ${getRequestTypeName(request.type)} request\n` +
+              `2. Contact support for assistance with modifying this request\n\n` +
+              `Combined access requests already support editing.`
+            )
+            hasEditSupport = false
+            break
+          case 'internet_access_request':
+          case 'internet':
+            alert(
+              `Edit functionality for ${getRequestTypeName(request.type)} requests is currently in development.\n\n` +
+              `For now, you can:\n` +
+              `1. Submit a new ${getRequestTypeName(request.type)} request\n` +
+              `2. Contact support for assistance with modifying this request\n\n` +
+              `Combined access requests already support editing.`
+            )
+            hasEditSupport = false
+            break
+          default:
+            alert(`Edit functionality not yet implemented for ${getRequestTypeName(request.type)} requests.`)
+            hasEditSupport = false
+            break
+        }
+        
+        if (!hasEditSupport) {
           return
         }
 
         // Navigate to edit page with the request data
-        router.push({
-          path: '/edit-booking-request',
-          query: {
-            id: request.original_id || request.id,
-            mode: 'edit'
+        const navigationData = {
+          requestId: request.id,
+          originalId: request.original_id,
+          requestType: request.type,
+          editPath: editPath,
+          finalId: request.original_id || request.id,
+          currentRoute: route.fullPath,
+          currentPath: route.path
+        }
+        
+        console.log('📝 EditRequest: Preparing navigation with data:', navigationData)
+        
+        try {
+          const navigationTarget = {
+            path: editPath,
+            query: {
+              id: request.original_id || request.id,
+              mode: 'edit',
+              status: 'rejected'
+            }
           }
-        })
+          
+          console.log('📝 EditRequest: Navigation target prepared:', navigationTarget)
+          console.log('📝 EditRequest: Current router state:', {
+            currentRoute: router.currentRoute.value,
+            hasRouter: !!router,
+            routerOptions: router.options
+          })
+          
+          // Use await to catch any navigation errors
+          console.log('🚀 EditRequest: Attempting navigation...')
+          const navigationResult = await router.push(navigationTarget)
+          console.log('✅ EditRequest: Navigation completed successfully:', navigationResult)
+          
+        } catch (error) {
+          console.error('❌ EditRequest: Navigation failed with error:', {
+            error: error,
+            message: error.message,
+            stack: error.stack,
+            type: error.type,
+            to: error.to,
+            from: error.from
+          })
+          
+          // Check if this is a navigation guard rejection
+          if (error.type === 2 || error.message?.includes('navigation guard')) {
+            console.error('❌ EditRequest: Navigation blocked by route guard')
+            alert(`Navigation blocked by route guard. This might be due to:\n\n` +
+                  `1. Missing authentication token\n` +
+                  `2. Insufficient user permissions\n` +
+                  `3. Route configuration issue\n\n` +
+                  `Please try logging out and back in, or contact support.`)
+            return
+          }
+          
+          // Fallback navigation attempt
+          console.log('🔄 EditRequest: Attempting fallback navigation...')
+          try {
+            const fallbackUrl = `${editPath}?id=${request.original_id || request.id}&mode=edit&status=rejected`
+            console.log('🔄 EditRequest: Fallback URL:', fallbackUrl)
+            await router.push(fallbackUrl)
+            console.log('✅ EditRequest: Fallback navigation successful')
+          } catch (fallbackError) {
+            console.error('❌ EditRequest: Fallback navigation also failed:', fallbackError)
+            alert(`Navigation error: Unable to navigate to edit page.\n\nPlease try refreshing the page or contact support.\n\nError: ${error.message}\nFallback Error: ${fallbackError.message}`)
+          }
+        }
       }
 
       const goToSubmitRequest = () => {
@@ -840,6 +998,30 @@
           canCancel: canCancel
         })
         return canCancel
+      }
+      
+      // Check if request can be edited
+      const canEditRequest = (request) => {
+        // Allow editing rejected requests for all types
+        const rejectedStatuses = [
+          'rejected',
+          'hod_rejected',
+          'divisional_rejected', 
+          'ict_director_rejected',
+          'head_it_rejected',
+          'ict_officer_rejected'
+        ]
+        
+        const canEdit = rejectedStatuses.includes(request.status) && !cancelingRequest.value
+        
+        console.log('🔍 canEditRequest check:', {
+          requestId: request.id,
+          requestType: request.type,
+          status: request.status,
+          canEdit: canEdit
+        })
+        
+        return canEdit
       }
 
       // Cancel request functionality
@@ -1051,6 +1233,7 @@
         toggleDropdown,
         closeDropdown,
         canCancelRequest,
+        canEditRequest,
         cancelRequest,
         getRequestTypeIcon,
         getRequestTypeName,
