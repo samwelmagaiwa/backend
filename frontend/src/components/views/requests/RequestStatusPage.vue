@@ -39,6 +39,61 @@
           <!-- Main Content -->
           <div class="medical-glass-card rounded-b-3xl overflow-hidden">
             <div class="p-6 space-y-6">
+              <!-- Pending Combined Access Request Restriction Message -->
+              <div
+                v-if="showPendingAccessMessage"
+                class="medical-card bg-gradient-to-r from-red-600/25 to-pink-700/25 border-2 border-red-400/40 p-6 rounded-2xl mb-6"
+              >
+                <div class="flex items-center space-x-4">
+                  <div
+                    class="w-16 h-16 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl flex items-center justify-center shadow-lg"
+                  >
+                    <i class="fas fa-ban text-white text-2xl"></i>
+                  </div>
+                  <div class="flex-1">
+                    <h3 class="text-xl font-bold text-white mb-2">
+                      <i class="fas fa-layer-group mr-2 text-red-300"></i>
+                      Access Request Blocked
+                    </h3>
+                    <p class="text-red-100/90 text-sm mb-3">
+                      {{ blockMessage || 'You cannot submit a new Combined Access request while you have a pending request that needs to be processed.' }}
+                    </p>
+                    <div class="flex items-center space-x-4">
+                      <div
+                        v-if="pendingAccessRequestId"
+                        class="bg-red-500/20 px-3 py-1 rounded-full border border-red-400/30"
+                      >
+                        <span class="text-red-300 text-sm font-medium">
+                          Pending Request: {{ pendingAccessRequestId }}
+                        </span>
+                      </div>
+                      <div
+                        class="bg-red-500/20 px-3 py-1 rounded-full border border-red-400/30"
+                      >
+                        <span class="text-red-300 text-sm font-medium">
+                          Policy: One pending access request at a time
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex flex-col space-y-2">
+                    <button
+                      @click="refreshRequests"
+                      class="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 rounded-lg text-red-300 text-sm font-medium transition-colors"
+                    >
+                      <i class="fas fa-sync-alt mr-1"></i>
+                      Refresh Status
+                    </button>
+                    <button
+                      @click="showPendingAccessMessage = false"
+                      class="w-8 h-8 bg-red-500/20 hover:bg-red-500/30 rounded-lg flex items-center justify-center transition-colors"
+                    >
+                      <i class="fas fa-times text-red-300"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               <!-- Pending Booking Restriction Message -->
               <div
                 v-if="showPendingBookingMessage"
@@ -618,6 +673,16 @@
         </div>
       </main>
     </div>
+    
+    <!-- Edit Request Modal -->
+    <EditRequestModal
+      :isVisible="showEditModal"
+      :requestId="selectedRequest?.id || ''"
+      :requestType="selectedRequest?.type || ''"
+      :requestStatus="selectedRequest?.status || ''"
+      @confirm="handleEditConfirm"
+      @close="closeEditModal"
+    />
   </div>
 </template>
 
@@ -626,6 +691,7 @@
   import { useRouter, useRoute } from 'vue-router'
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppHeader from '@/components/AppHeader.vue'
+  import EditRequestModal from '@/components/modals/EditRequestModal.vue'
   import { useAuth } from '@/composables/useAuth'
   import { useAuthStore } from '@/stores/auth'
   import requestStatusService from '@/services/requestStatusService'
@@ -634,7 +700,8 @@
     name: 'RequestStatusPage',
     components: {
       ModernSidebar,
-      AppHeader
+      AppHeader,
+      EditRequestModal
     },
     setup() {
       const router = useRouter()
@@ -647,10 +714,17 @@
       const showSuccessMessage = ref(false)
       const showPendingBookingMessage = ref(false)
       const pendingBookingId = ref(null)
+      const showPendingAccessMessage = ref(false)
+      const pendingAccessRequestId = ref(null)
+      const blockMessage = ref('')
       const requestType = ref('')
       const latestRequestId = ref('')
       const activeDropdown = ref(null)
       const cancelingRequest = ref(null)
+      
+      // Modal state
+      const showEditModal = ref(false)
+      const selectedRequest = ref(null)
 
       // Reactive data for requests
       const requests = ref([])
@@ -707,6 +781,16 @@
         if (route.query.pendingBooking === 'true') {
           showPendingBookingMessage.value = true
           pendingBookingId.value = route.query.pendingId || null
+
+          // Clear query parameters but keep the notification visible
+          router.replace({ query: {} })
+        }
+
+        // Check if redirected due to pending combined access request restriction
+        if (route.query.blocked === 'true') {
+          showPendingAccessMessage.value = true
+          pendingAccessRequestId.value = route.query.pending_request_id || null
+          blockMessage.value = route.query.message || 'You cannot submit a new Combined Access request while you have a pending request.'
 
           // Clear query parameters but keep the notification visible
           router.replace({ query: {} })
@@ -809,20 +893,19 @@
           return
         }
 
-        // Show confirmation dialog
-        const confirmed = confirm(
-          `Edit and resubmit this ${getRequestTypeName(request.type)} request?\n\n` +
-          `Request ID: ${formatRequestId(request.id)}\n` +
-          `Current Status: ${getStatusText(request.status)}\n\n` +
-          `This will allow you to modify the request details and resubmit it for approval.`
-        )
+        // Show custom modal instead of browser confirm
+        selectedRequest.value = request
+        showEditModal.value = true
         
-        if (!confirmed) {
-          console.log('❌ EditRequest: User cancelled confirmation dialog')
-          return
-        }
+        // The rest of the logic is now in handleEditConfirm method
+        return
+      }
+      
+      const handleEditConfirm = async () => {
+        const request = selectedRequest.value
+        if (!request) return
         
-        console.log('✅ EditRequest: User confirmed, proceeding with navigation')
+        console.log('✅ EditRequest: User confirmed via modal, proceeding with navigation')
 
         // Navigate to appropriate edit page based on request type
         let editPath = ''
@@ -946,6 +1029,11 @@
             alert(`Navigation error: Unable to navigate to edit page.\n\nPlease try refreshing the page or contact support.\n\nError: ${error.message}\nFallback Error: ${fallbackError.message}`)
           }
         }
+      }
+      
+      const closeEditModal = () => {
+        showEditModal.value = false
+        selectedRequest.value = null
       }
 
       const goToSubmitRequest = () => {
@@ -1217,16 +1305,23 @@
         showSuccessMessage,
         showPendingBookingMessage,
         pendingBookingId,
+        showPendingAccessMessage,
+        pendingAccessRequestId,
+        blockMessage,
         requestType,
         latestRequestId,
         activeDropdown,
         cancelingRequest,
+        showEditModal,
+        selectedRequest,
         approvalSteps,
         bookingSteps,
         loadRequests,
         refreshRequests,
         viewRequestDetails,
         editRequest,
+        handleEditConfirm,
+        closeEditModal,
         goToSubmitRequest,
         submitNewRequest,
         viewPendingBookingDetails,

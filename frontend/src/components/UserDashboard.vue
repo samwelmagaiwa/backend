@@ -670,6 +670,7 @@
   import { useNotificationStore } from '@/stores/notification'
   import bookingService from '@/services/bookingService'
   import dashboardService from '@/services/dashboardService'
+  import userCombinedAccessService from '@/services/userCombinedAccessService'
 
   export default {
     name: 'UserDashboard',
@@ -795,9 +796,49 @@
         }
       }
 
-      const selectCombinedForm = () => {
+      const selectCombinedForm = async () => {
         showFormSelector.value = false
-        router.push('/user-combined-form')
+
+        try {
+          // Check for pending combined access requests
+          const result = await userCombinedAccessService.checkPendingRequests()
+
+          if (result.success && result.data.has_pending_request) {
+            // User has pending request, show notification and redirect to request status
+            notificationStore.show({
+              type: 'warning',
+              title: 'Access Request Restriction',
+              message: `You cannot submit a new request while you have a pending request (${result.data.pending_request?.request_id || 'N/A'}). Please wait for your current request to be processed.`,
+              duration: 8000,
+              persistent: true,
+              actions: [
+                {
+                  text: 'View Request Status',
+                  action: () => {
+                    router.push('/request-status')
+                  }
+                }
+              ]
+            })
+
+            // Redirect to request status with message
+            router.push({
+              path: '/request-status',
+              query: {
+                blocked: 'true',
+                message: 'You cannot submit a new request while you have a pending request.',
+                pending_request_id: result.data.pending_request?.request_id || 'N/A'
+              }
+            })
+          } else {
+            // No pending requests, proceed to combined form
+            router.push('/user-combined-form')
+          }
+        } catch (error) {
+          console.error('Error checking pending requests:', error)
+          // On error, still allow navigation (fail-safe)
+          router.push('/user-combined-form')
+        }
       }
 
       const selectBookingService = () => {

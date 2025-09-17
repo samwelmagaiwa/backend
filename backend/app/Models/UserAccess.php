@@ -308,6 +308,24 @@ class UserAccess extends Model
     }
 
     /**
+     * Check if the request can be updated/resubmitted.
+     * Only pending or rejected requests can be updated.
+     */
+    public function canBeUpdated(): bool
+    {
+        $updatableStatuses = [
+            'pending',
+            'hod_rejected',
+            'divisional_rejected',
+            'ict_director_rejected',
+            'head_it_rejected',
+            'rejected'
+        ];
+        
+        return in_array($this->status, $updatableStatuses);
+    }
+
+    /**
      * Get all modules as a combined array
      */
     public function getAllModulesAttribute(): array

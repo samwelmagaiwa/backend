@@ -421,6 +421,7 @@ class RequestStatusController extends Controller
             'hod_approved_by_name' => $accessRequest->hod_approved_by_name,
             'hod_approval_comment' => $accessRequest->hod_approval_comment,
             'hod_rejection_reason' => $accessRequest->hod_rejection_reason,
+            'hod_comments' => $accessRequest->hod_comments,
             
             // Divisional Director approval
             'divisional_director_approval_status' => $accessRequest->divisional_director_approval_status,

@@ -796,12 +796,15 @@
                                 v-model="form.approvals.hod.name"
                                 type="text"
                                 readonly
-                                :placeholder="currentUser?.name || 'Loading user...' "
+                                :placeholder="currentUser?.name || 'Loading user...'"
                                 class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm cursor-not-allowed"
                                 :title="'Auto-filled with: ' + (currentUser?.name || 'Loading...')"
                               />
                               <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
-                                <i class="fas fa-lock text-blue-300 text-xs" title="This field is auto-populated from your account"></i>
+                                <i
+                                  class="fas fa-lock text-blue-300 text-xs"
+                                  title="This field is auto-populated from your account"
+                                ></i>
                               </div>
                             </div>
                           </div>
@@ -940,12 +943,15 @@
                                 v-model="form.approvals.divisionalDirector.name"
                                 type="text"
                                 readonly
-                                :placeholder="currentUser?.name || 'Loading user...' "
+                                :placeholder="currentUser?.name || 'Loading user...'"
                                 class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm cursor-not-allowed"
                                 :title="'Auto-filled with: ' + (currentUser?.name || 'Loading...')"
                               />
                               <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
-                                <i class="fas fa-lock text-blue-300 text-xs" title="This field is auto-populated from your account"></i>
+                                <i
+                                  class="fas fa-lock text-blue-300 text-xs"
+                                  title="This field is auto-populated from your account"
+                                ></i>
                               </div>
                             </div>
                           </div>
@@ -1087,12 +1093,15 @@
                                 v-model="form.approvals.directorICT.name"
                                 type="text"
                                 readonly
-                                :placeholder="currentUser?.name || 'Loading user...' "
+                                :placeholder="currentUser?.name || 'Loading user...'"
                                 class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm cursor-not-allowed"
                                 :title="'Auto-filled with: ' + (currentUser?.name || 'Loading...')"
                               />
                               <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
-                                <i class="fas fa-lock text-blue-300 text-xs" title="This field is auto-populated from your account"></i>
+                                <i
+                                  class="fas fa-lock text-blue-300 text-xs"
+                                  title="This field is auto-populated from your account"
+                                ></i>
                               </div>
                             </div>
                           </div>
@@ -1281,12 +1290,15 @@
                                 v-model="form.implementation.headIT.name"
                                 type="text"
                                 readonly
-                                :placeholder="currentUser?.name || 'Loading user...' "
+                                :placeholder="currentUser?.name || 'Loading user...'"
                                 class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm cursor-not-allowed"
                                 :title="'Auto-filled with: ' + (currentUser?.name || 'Loading...')"
                               />
                               <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
-                                <i class="fas fa-lock text-blue-300 text-xs" title="This field is auto-populated from your account"></i>
+                                <i
+                                  class="fas fa-lock text-blue-300 text-xs"
+                                  title="This field is auto-populated from your account"
+                                ></i>
                               </div>
                             </div>
                           </div>
@@ -1425,12 +1437,15 @@
                                 v-model="form.implementation.ictOfficer.name"
                                 type="text"
                                 readonly
-                                :placeholder="currentUser?.name || 'Loading user...' "
+                                :placeholder="currentUser?.name || 'Loading user...'"
                                 class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm cursor-not-allowed"
                                 :title="'Auto-filled with: ' + (currentUser?.name || 'Loading...')"
                               />
                               <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
-                                <i class="fas fa-lock text-blue-300 text-xs" title="This field is auto-populated from your account"></i>
+                                <i
+                                  class="fas fa-lock text-blue-300 text-xs"
+                                  title="This field is auto-populated from your account"
+                                ></i>
                               </div>
                             </div>
                           </div>
@@ -1532,7 +1547,10 @@
                   </div>
 
                   <!-- Action Buttons (Review Mode Only) -->
-                  <div v-if="isReviewMode && canApproveAtStage()" class="flex justify-between gap-4 mt-6">
+                  <div
+                    v-if="isReviewMode && canApproveAtStage()"
+                    class="flex justify-between gap-4 mt-6"
+                  >
                     <!-- Approve Button - Left Side -->
                     <button
                       type="button"
@@ -2512,13 +2530,13 @@
     async mounted() {
       // Try to get current user from multiple sources
       await this.getCurrentUser()
-      
+
       // Fallback to localStorage or Vuex if API fails
       if (!this.currentUser || !this.currentUser.name) {
         console.log('🔄 API failed, trying localStorage fallback...')
         this.tryGetUserFromLocalStorage()
       }
-      
+
       // Fallback to Vuex store
       if (!this.currentUser || !this.currentUser.name) {
         console.log('🔄 localStorage failed, trying Vuex store fallback...')
@@ -3412,7 +3430,10 @@
 
         // Use role-based population for debugging
         if (this.currentUser?.name) {
-          console.log('User role from database:', this.currentUser.role || this.currentUser.user_role)
+          console.log(
+            'User role from database:',
+            this.currentUser.role || this.currentUser.user_role
+          )
           this.populateBasedOnUserRole(this.currentUser)
         } else {
           console.error('No current user data available!')
@@ -3427,13 +3448,13 @@
           console.log('🔍 Attempting to fetch current user...')
           const response = await authService.getCurrentUser()
           console.log('📨 Raw API response:', response)
-          
+
           if (response && response.success) {
             console.log('✅ API call successful, response.data:', response.data)
-            
+
             // Handle different possible response structures
             let userData = null
-            
+
             if (response.data && response.data.data && response.data.data.name) {
               // Case: {success: true, data: {data: {name: 'John', ...}}}
               userData = response.data.data
@@ -3447,10 +3468,13 @@
               userData = response.data
               console.log('👤 Current user loaded from response.data directly:', userData)
             } else {
-              console.error('❌ User data structure not recognized. Full response:', JSON.stringify(response, null, 2))
+              console.error(
+                '❌ User data structure not recognized. Full response:',
+                JSON.stringify(response, null, 2)
+              )
               console.error('❌ response.data content:', response.data)
             }
-            
+
             if (userData && userData.name) {
               this.currentUser = userData
               console.log('📋 User name from database:', userData.name)
@@ -3482,7 +3506,7 @@
           if (storedUser) {
             const userData = JSON.parse(storedUser)
             console.log('💾 Found user in localStorage:', userData)
-            
+
             if (userData && userData.name) {
               this.currentUser = userData
               console.log('✅ Using localStorage user data:', this.currentUser.name)
@@ -3509,7 +3533,7 @@
               console.log('✅ Using Vuex store user data:', this.currentUser.name)
             }
           }
-          
+
           // Try alternative Vuex structure
           if (!this.currentUser && this.$store && this.$store.getters) {
             const getterUser = this.$store.getters.currentUser || this.$store.getters['auth/user']
@@ -3518,7 +3542,7 @@
               console.log('✅ Using Vuex getter user data:', this.currentUser.name)
             }
           }
-          
+
           if (!this.currentUser) {
             console.log('❌ No user found in Vuex store')
           }
@@ -3536,9 +3560,9 @@
 
         const userRole = user.role || user.user_role || ''
         const userName = user.name
-        
+
         console.log(`🎯 Role-based population for role: "${userRole}" with name: "${userName}"`)
-        
+
         // First, clear ALL approval name fields to ensure clean state
         console.log('🧺 Clearing all approval name fields before role-based population')
         this.form.approvals.hod.name = ''
@@ -3550,17 +3574,17 @@
 
         // Map roles to approval stages
         const roleToStageMap = {
-          'head_of_department': 'hod',
-          'hod': 'hod',
-          'head_department': 'hod',
-          'divisional_director': 'divisional', 
-          'director_divisional': 'divisional',
-          'ict_director': 'ict_director',
-          'director_ict': 'ict_director',
-          'head_it': 'head_it',
-          'head_of_it': 'head_it',
-          'ict_officer': 'ict_officer',
-          'officer_ict': 'ict_officer'
+          head_of_department: 'hod',
+          hod: 'hod',
+          head_department: 'hod',
+          divisional_director: 'divisional',
+          director_divisional: 'divisional',
+          ict_director: 'ict_director',
+          director_ict: 'ict_director',
+          head_it: 'head_it',
+          head_of_it: 'head_it',
+          ict_officer: 'ict_officer',
+          officer_ict: 'ict_officer'
         }
 
         // Normalize role string for matching
@@ -3569,18 +3593,22 @@
 
         if (mappedStage) {
           console.log(`\u2705 Found role mapping: "${userRole}" \u2192 "${mappedStage}"`)
-          
+
           // Check if the mapped stage is currently editable (active)
           const isStageEditable = this.isApprovalStageEditable(mappedStage)
           console.log(`\ud83d\udd0d Is ${mappedStage} stage editable?`, isStageEditable)
-          
+
           if (isStageEditable) {
-            console.log(`\ud83d\udd04 About to populate ONLY the ${mappedStage} field with: ${userName}`)
+            console.log(
+              `\ud83d\udd04 About to populate ONLY the ${mappedStage} field with: ${userName}`
+            )
             this.populateApproverName(mappedStage)
           } else {
-            console.log(`\u26a0\ufe0f Skipping ${mappedStage} field - not currently active/editable`)
+            console.log(
+              `\u26a0\ufe0f Skipping ${mappedStage} field - not currently active/editable`
+            )
           }
-          
+
           // Verify the population worked correctly
           console.log('\ud83d\udd0d Post-population verification:')
           console.log('HOD name:', this.form.approvals.hod.name)
@@ -3589,8 +3617,11 @@
           console.log('Head IT name:', this.form.implementation.headIT.name)
           console.log('ICT Officer name:', this.form.implementation.ictOfficer.name)
         } else {
-          console.log(`⚠️ No role mapping found for: "${userRole}". Available mappings:`, Object.keys(roleToStageMap))
-          
+          console.log(
+            `⚠️ No role mapping found for: "${userRole}". Available mappings:`,
+            Object.keys(roleToStageMap)
+          )
+
           // Fallback: if user is in review mode and has edit permissions for a specific stage
           if (this.isReviewMode) {
             if (this.isHodApprovalEditable) {
@@ -3616,13 +3647,13 @@
       // Helper method to check if a specific approval stage is currently editable
       isApprovalStageEditable(stage) {
         const editableMap = {
-          'hod': this.isHodApprovalEditable,
-          'divisional': this.isDivisionalApprovalEditable,
-          'ict_director': this.isIctDirectorApprovalEditable,
-          'head_it': this.isHeadItApprovalEditable,
-          'ict_officer': this.isIctOfficerApprovalEditable
+          hod: this.isHodApprovalEditable,
+          divisional: this.isDivisionalApprovalEditable,
+          ict_director: this.isIctDirectorApprovalEditable,
+          head_it: this.isHeadItApprovalEditable,
+          ict_officer: this.isIctOfficerApprovalEditable
         }
-        
+
         return editableMap[stage] || false
       },
 

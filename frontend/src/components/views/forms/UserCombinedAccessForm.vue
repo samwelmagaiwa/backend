@@ -804,8 +804,20 @@
                       class="px-5 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-semibold flex items-center shadow-lg hover:shadow-xl text-sm transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                     >
                       <i v-if="isSubmitting" class="fas fa-spinner fa-spin mr-2"></i>
-                      <i v-else :class="isEditMode ? 'fas fa-save' : 'fas fa-paper-plane'" class="mr-2"></i>
-                      {{ isSubmitting ? (isEditMode ? 'Updating...' : 'Submitting...') : (isEditMode ? 'Update & Resubmit' : 'Submit Request') }}
+                      <i
+                        v-else
+                        :class="isEditMode ? 'fas fa-save' : 'fas fa-paper-plane'"
+                        class="mr-2"
+                      ></i>
+                      {{
+                        isSubmitting
+                          ? isEditMode
+                            ? 'Updating...'
+                            : 'Submitting...'
+                          : isEditMode
+                            ? 'Update & Resubmit'
+                            : 'Submit Request'
+                      }}
                     </button>
                   </div>
                 </div>
@@ -822,73 +834,160 @@
     <!-- Success Modal -->
     <div
       v-if="showSuccessModal"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+      class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in"
     >
       <div
-        class="bg-white rounded-xl shadow-2xl max-w-md w-full transform transition-all duration-300 scale-100"
+        class="bg-gradient-to-br from-white via-blue-50/50 to-green-50/50 rounded-2xl shadow-2xl max-w-md w-full transform transition-all duration-500 scale-100 animate-scale-up border border-green-200/50 backdrop-blur-sm relative overflow-hidden"
       >
-        <div class="p-6 text-center">
-          <div
-            class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4"
-          >
-            <i class="fas fa-check text-green-600 text-2xl"></i>
+        <!-- Animated Background Pattern -->
+        <div class="absolute inset-0 overflow-hidden rounded-2xl">
+          <!-- Medical Plus Pattern -->
+          <div class="absolute inset-0 opacity-5">
+            <div class="grid grid-cols-6 gap-4 h-full transform rotate-12">
+              <div
+                v-for="i in 24"
+                :key="i"
+                class="bg-green-500 rounded-full w-2 h-2 animate-pulse"
+                :style="{ animationDelay: i * 0.1 + 's' }"
+              ></div>
+            </div>
           </div>
-          <h3 class="text-xl font-bold text-gray-800 mb-2">Request Submitted!</h3>
-          <p class="text-gray-600 mb-4">
-            Your Combined Access Request has been submitted successfully.
+          <!-- Floating Success Icons -->
+          <div class="absolute top-4 right-4 text-green-400/20 animate-float">
+            <i class="fas fa-user-check text-2xl"></i>
+          </div>
+          <div
+            class="absolute bottom-4 left-4 text-blue-400/20 animate-float"
+            style="animation-delay: 1s"
+          >
+            <i class="fas fa-shield-alt text-xl"></i>
+          </div>
+          <div
+            class="absolute top-1/2 left-4 text-teal-400/20 animate-float"
+            style="animation-delay: 2s"
+          >
+            <i class="fas fa-heartbeat text-lg"></i>
+          </div>
+        </div>
+
+        <div class="relative z-10 p-6 text-center">
+          <!-- Success Icon with Animation -->
+          <div class="relative mx-auto mb-6">
+            <div
+              class="w-20 h-20 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto shadow-lg animate-bounce-gentle relative overflow-hidden"
+            >
+              <div
+                class="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent rounded-full"
+              ></div>
+              <i class="fas fa-check text-white text-3xl relative z-10 drop-shadow-lg"></i>
+              <!-- Ripple Effect -->
+              <div
+                class="absolute inset-0 rounded-full border-4 border-green-400 animate-ping opacity-30"
+              ></div>
+            </div>
+            <!-- Medical Cross Decoration -->
+            <div
+              class="absolute -top-2 -right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center shadow-lg"
+            >
+              <i class="fas fa-plus text-white text-xs"></i>
+            </div>
+          </div>
+
+          <!-- Title with Medical Accent -->
+          <div class="mb-4">
+            <h3
+              class="text-2xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-2 flex items-center justify-center gap-2"
+            >
+              <i class="fas fa-file-medical-alt text-green-600"></i>
+              Request Submitted!
+            </h3>
+            <div
+              class="w-16 h-0.5 bg-gradient-to-r from-green-400 to-blue-400 mx-auto rounded-full"
+            ></div>
+          </div>
+
+          <p class="text-gray-700 mb-6 leading-relaxed">
+            Your <span class="font-semibold text-blue-600">Combined Access Request</span> has been
+            submitted successfully and is now in the approval queue.
           </p>
-          <div class="bg-blue-50 rounded-lg p-3 mb-6">
-            <p class="text-sm text-blue-800 font-medium">Selected Services:</p>
-            <div class="flex flex-wrap gap-2 mt-2">
+
+          <!-- Enhanced Services Display -->
+          <div
+            class="bg-gradient-to-r from-blue-50/80 to-green-50/80 rounded-xl p-4 mb-6 backdrop-blur-sm border border-blue-200/30 shadow-inner"
+          >
+            <div class="flex items-center justify-center gap-2 mb-3">
+              <i class="fas fa-list-check text-blue-600"></i>
+              <p class="text-sm font-semibold text-blue-800">Selected Services</p>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-2 mb-3">
               <span
                 v-if="formData.services.jeeva"
-                class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium"
+                class="px-3 py-2 bg-gradient-to-r from-green-100 to-green-200 text-green-800 rounded-full text-sm font-medium shadow-sm border border-green-300/50 flex items-center gap-1 transform hover:scale-105 transition-transform"
               >
-                <i class="fas fa-file-medical mr-1"></i>Jeeva
+                <i class="fas fa-file-medical text-green-600"></i>
+                Jeeva
               </span>
               <span
                 v-if="formData.services.wellsoft"
-                class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium"
+                class="px-3 py-2 bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 rounded-full text-sm font-medium shadow-sm border border-blue-300/50 flex items-center gap-1 transform hover:scale-105 transition-transform"
               >
-                <i class="fas fa-laptop-medical mr-1"></i>Wellsoft
+                <i class="fas fa-laptop-medical text-blue-600"></i>
+                Wellsoft
               </span>
               <span
                 v-if="formData.services.internet"
-                class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium"
+                class="px-3 py-2 bg-gradient-to-r from-teal-100 to-teal-200 text-teal-800 rounded-full text-sm font-medium shadow-sm border border-teal-300/50 flex items-center gap-1 transform hover:scale-105 transition-transform"
               >
-                <i class="fas fa-wifi mr-1"></i>Internet
+                <i class="fas fa-wifi text-teal-600"></i>
+                Internet
               </span>
             </div>
 
-            <!-- Show Internet Purposes if Internet service is selected -->
+            <!-- Enhanced Internet Purposes Display -->
             <div
               v-if="formData.services.internet && hasInternetPurposes"
-              class="mt-3 pt-3 border-t border-blue-200"
+              class="mt-4 pt-4 border-t border-blue-200/50"
             >
-              <p class="text-sm text-blue-800 font-medium mb-2">Internet Purposes:</p>
-              <div class="space-y-1">
+              <div class="flex items-center justify-center gap-2 mb-2">
+                <i class="fas fa-globe text-teal-600"></i>
+                <p class="text-sm font-semibold text-teal-800">Internet Purposes</p>
+              </div>
+              <div class="space-y-2">
                 <div
                   v-for="(purpose, index) in filledInternetPurposes"
                   :key="index"
-                  class="flex items-center text-xs text-blue-700"
+                  class="flex items-center justify-center text-sm text-teal-700 bg-teal-50/50 rounded-lg p-2"
                 >
                   <span
-                    class="w-4 h-4 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center mr-2 font-bold text-xs"
+                    class="w-5 h-5 bg-gradient-to-br from-teal-400 to-teal-600 text-white rounded-full flex items-center justify-center mr-3 font-bold text-xs shadow-sm"
                   >
                     {{ index + 1 }}
                   </span>
-                  {{ purpose }}
+                  <span class="flex-1 text-center font-medium">{{ purpose }}</span>
                 </div>
               </div>
             </div>
           </div>
+
+          <!-- Enhanced Action Button -->
           <button
             @click="closeSuccessModal"
-            class="w-full bg-green-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-200"
+            class="w-full bg-gradient-to-r from-green-600 to-blue-600 text-white py-4 px-6 rounded-xl font-semibold hover:from-green-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-2 relative overflow-hidden group"
           >
-            <i class="fas fa-home mr-2"></i>
-            Return to Dashboard
+            <div
+              class="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            ></div>
+            <i class="fas fa-home relative z-10"></i>
+            <span class="relative z-10">Return to Dashboard</span>
+            <div class="absolute top-1 right-2 w-2 h-2 bg-white/40 rounded-full animate-ping"></div>
           </button>
+
+          <!-- Status Indicator -->
+          <div class="mt-4 flex items-center justify-center gap-2 text-xs text-gray-600">
+            <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+            <span>Request ID will be generated shortly</span>
+          </div>
         </div>
       </div>
     </div>
@@ -908,6 +1007,40 @@
       ModernSidebar,
       AppFooter,
       AppHeader
+    },
+
+    // Route guard to check for pending requests before entering the form
+    beforeRouteEnter(to, from, next) {
+      // Skip check if in edit mode (user is editing an existing request)
+      if (to.query.mode === 'edit' && to.query.id) {
+        next()
+        return
+      }
+
+      // Check for pending requests
+      userCombinedAccessService
+        .checkPendingRequests()
+        .then((response) => {
+          if (response.success && response.data.has_pending_request) {
+            // User has pending request, redirect to request status with message
+            next({
+              path: '/request-status',
+              query: {
+                blocked: 'true',
+                message: 'You cannot submit a new request while you have a pending request.',
+                pending_request_id: response.data.pending_request?.request_id || 'N/A'
+              }
+            })
+          } else {
+            // No pending requests, allow access to form
+            next()
+          }
+        })
+        .catch((error) => {
+          console.error('Error checking pending requests:', error)
+          // On error, still allow access (fail-safe)
+          next()
+        })
     },
     setup() {
       // Sidebar state now managed by Pinia - no local state needed
@@ -968,10 +1101,10 @@
 
     async mounted() {
       console.log('🔄 UserCombinedAccessForm: Component mounted, starting initialization...')
-      
+
       // Check if in edit mode
       this.checkEditMode()
-      
+
       // Load both profile data and departments concurrently
       if (this.isEditMode) {
         await Promise.all([this.loadExistingRequest(), this.loadDepartments()])
@@ -988,11 +1121,11 @@
        */
       checkEditMode() {
         const { id, mode, status } = this.$route.query
-        
+
         if (id && mode === 'edit') {
           this.isEditMode = true
           this.editRequestId = id
-          
+
           console.log('🔄 Edit mode detected:', {
             requestId: this.editRequestId,
             mode: mode,
@@ -1001,11 +1134,11 @@
         } else {
           this.isEditMode = false
           this.editRequestId = null
-          
+
           console.log('📝 New form mode detected')
         }
       },
-      
+
       /**
        * Load existing request data for editing
        */
@@ -1016,17 +1149,17 @@
           this.$router.push('/request-status')
           return
         }
-        
+
         console.log('🔄 Loading existing request data for ID:', this.editRequestId)
         this.isLoadingProfile = true
-        
+
         try {
           const response = await userCombinedAccessService.getRequestById(this.editRequestId)
-          
+
           if (response.success && response.data) {
             this.originalRequestData = response.data
             this.populateFormWithExistingData(response.data)
-            
+
             console.log('✅ Existing request data loaded successfully')
             this.showNotification('Request data loaded for editing', 'info')
           } else {
@@ -1042,62 +1175,96 @@
           this.isLoadingProfile = false
         }
       },
-      
+
       /**
        * Populate form fields with existing request data
        */
       populateFormWithExistingData(requestData) {
         console.log('🔄 Populating form with existing data:', requestData)
         console.log('🔍 Available fields in requestData:', Object.keys(requestData))
-        
+        console.log('🔍 Full requestData structure:', JSON.stringify(requestData, null, 2))
+
         // Handle nested data if the response is wrapped
         const data = requestData.data || requestData
-        
+        console.log('🔍 Using data object:', data)
+        console.log('🔍 Available fields in data:', Object.keys(data))
+
         // Basic information - try different possible field names
-        this.formData.pfNumber = data.pf_number || data.pfNumber || data.PF_NUMBER || ''
-        this.formData.staffName = data.staff_name || data.staffName || data.name || data.full_name || ''
-        this.formData.phoneNumber = data.phone_number || data.phoneNumber || data.phone || ''
-        this.formData.department = data.department_id || data.departmentId || data.department || ''
-        
+        this.formData.pfNumber =
+          data.pf_number || data.pfNumber || data.PF_NUMBER || data.pf || data.employee_id || ''
+        this.formData.staffName =
+          data.staff_name ||
+          data.staffName ||
+          data.name ||
+          data.full_name ||
+          data.employee_name ||
+          data.applicant_name ||
+          ''
+        this.formData.phoneNumber =
+          data.phone_number || data.phoneNumber || data.phone || data.mobile || data.contact || ''
+        this.formData.department =
+          data.department_id ||
+          data.departmentId ||
+          data.department ||
+          data.dept ||
+          data.department_name ||
+          ''
+
         console.log('🔍 Form field assignments:', {
           pfNumber: {
             value: this.formData.pfNumber,
-            sources: [data.pf_number, data.pfNumber, data.PF_NUMBER]
+            sources: [data.pf_number, data.pfNumber, data.PF_NUMBER, data.pf, data.employee_id]
           },
           staffName: {
             value: this.formData.staffName,
-            sources: [data.staff_name, data.staffName, data.name, data.full_name]
+            sources: [
+              data.staff_name,
+              data.staffName,
+              data.name,
+              data.full_name,
+              data.employee_name,
+              data.applicant_name
+            ]
           },
           phoneNumber: {
             value: this.formData.phoneNumber,
-            sources: [data.phone_number, data.phoneNumber, data.phone]
+            sources: [data.phone_number, data.phoneNumber, data.phone, data.mobile, data.contact]
           },
           department: {
             value: this.formData.department,
-            sources: [data.department_id, data.departmentId, data.department]
+            sources: [
+              data.department_id,
+              data.departmentId,
+              data.department,
+              data.dept,
+              data.department_name
+            ]
           }
         })
-        
+
         // Services - parse from request_types array or individual fields
         if (data.request_types && Array.isArray(data.request_types)) {
           console.log('🔍 Request types found:', data.request_types)
-          this.formData.services.jeeva = data.request_types.includes('jeeva_access') || data.request_types.includes('jeeva')
+          this.formData.services.jeeva =
+            data.request_types.includes('jeeva_access') || data.request_types.includes('jeeva')
           this.formData.services.wellsoft = data.request_types.includes('wellsoft')
-          this.formData.services.internet = data.request_types.includes('internet_access_request') || data.request_types.includes('internet')
+          this.formData.services.internet =
+            data.request_types.includes('internet_access_request') ||
+            data.request_types.includes('internet')
         } else if (typeof data.request_types === 'string') {
           // Handle comma-separated string
           console.log('🔍 Request types as string:', data.request_types)
           const types = data.request_types.split(',')
-          this.formData.services.jeeva = types.some(type => type.trim().includes('jeeva'))
-          this.formData.services.wellsoft = types.some(type => type.trim().includes('wellsoft'))
-          this.formData.services.internet = types.some(type => type.trim().includes('internet'))
+          this.formData.services.jeeva = types.some((type) => type.trim().includes('jeeva'))
+          this.formData.services.wellsoft = types.some((type) => type.trim().includes('wellsoft'))
+          this.formData.services.internet = types.some((type) => type.trim().includes('internet'))
         } else {
           // Try individual boolean fields
           this.formData.services.jeeva = data.jeeva_access || data.jeeva || false
           this.formData.services.wellsoft = data.wellsoft_access || data.wellsoft || false
           this.formData.services.internet = data.internet_access || data.internet || false
         }
-        
+
         // Internet purposes
         if (data.internet_purposes && Array.isArray(data.internet_purposes)) {
           console.log('🔍 Internet purposes found:', data.internet_purposes)
@@ -1109,16 +1276,19 @@
         } else if (data.internet_purposes && typeof data.internet_purposes === 'string') {
           // Handle comma-separated string
           console.log('🔍 Internet purposes as string:', data.internet_purposes)
-          const purposes = data.internet_purposes.split(',').map(p => p.trim()).filter(p => p)
+          const purposes = data.internet_purposes
+            .split(',')
+            .map((p) => p.trim())
+            .filter((p) => p)
           this.formData.internetPurposes = [...purposes]
           while (this.formData.internetPurposes.length < 4) {
             this.formData.internetPurposes.push('')
           }
         }
-        
+
         // Note: Signature will need to be re-uploaded in edit mode as we don't store the file
         this.autoPopulated = true
-        
+
         console.log('✅ Form populated with existing data:', {
           pfNumber: this.formData.pfNumber,
           staffName: this.formData.staffName,
@@ -1127,19 +1297,21 @@
           services: this.formData.services,
           internetPurposes: this.formData.internetPurposes
         })
-        
+
         // Validate that essential fields are populated
         const missingFields = []
         if (!this.formData.pfNumber) missingFields.push('PF Number')
         if (!this.formData.staffName) missingFields.push('Staff Name')
         if (!this.formData.phoneNumber) missingFields.push('Phone Number')
-        
+
         if (missingFields.length > 0) {
           console.warn('⚠️ Missing essential fields after population:', missingFields)
-          this.showNotification(`Missing fields: ${missingFields.join(', ')}. Please fill them manually.`, 'warning')
+          console.log('🔄 Attempting to load user profile as fallback...')
+          // Try to load user profile data to fill missing fields
+          this.autoPopulateUserDataFallback(missingFields)
         }
       },
-      
+
       async loadDepartments() {
         try {
           const response = await userCombinedAccessService.getDepartments()
@@ -1227,6 +1399,69 @@
         }
       },
 
+      /**
+       * Fallback method to auto-populate user data when request data is incomplete
+       */
+      async autoPopulateUserDataFallback(missingFields) {
+        console.log('🔄 Starting fallback user data auto-population for fields:', missingFields)
+
+        try {
+          const result = await userProfileService.getFormAutoPopulationData()
+
+          if (result.success && result.data) {
+            console.log('✅ User profile retrieved for fallback:', result.data)
+
+            // Only populate missing fields
+            if (missingFields.includes('PF Number') && !this.formData.pfNumber) {
+              this.formData.pfNumber = result.data.pfNumber || ''
+            }
+            if (missingFields.includes('Staff Name') && !this.formData.staffName) {
+              this.formData.staffName = result.data.staffName || ''
+            }
+            if (missingFields.includes('Phone Number') && !this.formData.phoneNumber) {
+              this.formData.phoneNumber = result.data.phoneNumber || ''
+            }
+            if (!this.formData.department) {
+              this.formData.department = result.data.departmentId || ''
+            }
+
+            // Check which fields were successfully populated
+            const populatedFields = []
+            if (this.formData.pfNumber) populatedFields.push('PF Number')
+            if (this.formData.staffName) populatedFields.push('Staff Name')
+            if (this.formData.phoneNumber) populatedFields.push('Phone Number')
+
+            if (populatedFields.length > 0) {
+              this.showNotification(`Auto-populated: ${populatedFields.join(', ')}`, 'success')
+            }
+
+            // Show warning for still missing fields
+            const stillMissing = missingFields.filter(
+              (field) =>
+                (field === 'PF Number' && !this.formData.pfNumber) ||
+                (field === 'Staff Name' && !this.formData.staffName) ||
+                (field === 'Phone Number' && !this.formData.phoneNumber)
+            )
+
+            if (stillMissing.length > 0) {
+              this.showNotification(`Please manually fill: ${stillMissing.join(', ')}`, 'warning')
+            }
+          } else {
+            console.warn('⚠️ Failed to load user profile for fallback')
+            this.showNotification(
+              `Missing fields: ${missingFields.join(', ')}. Please fill them manually.`,
+              'warning'
+            )
+          }
+        } catch (error) {
+          console.error('❌ Error during fallback auto-population:', error)
+          this.showNotification(
+            `Missing fields: ${missingFields.join(', ')}. Please fill them manually.`,
+            'warning'
+          )
+        }
+      },
+
       async submitForm() {
         // Validate required fields
         if (
@@ -1258,6 +1493,29 @@
         this.isSubmitting = true
 
         try {
+          // Debug: Log current form data before submission
+          console.log('🔍 DEBUG: Current formData object before submission:', {
+            pfNumber: this.formData.pfNumber,
+            staffName: this.formData.staffName,
+            phoneNumber: this.formData.phoneNumber,
+            department: this.formData.department,
+            hasSignature: !!this.formData.signature,
+            isEditMode: this.isEditMode
+          })
+
+          // Validate required fields before creating FormData
+          if (!this.formData.pfNumber || this.formData.pfNumber.trim() === '') {
+            console.error('❌ PF Number is empty or undefined:', this.formData.pfNumber)
+            this.showNotification('PF Number is required but appears to be empty', 'error')
+            return
+          }
+
+          if (!this.formData.staffName || this.formData.staffName.trim() === '') {
+            console.error('❌ Staff Name is empty or undefined:', this.formData.staffName)
+            this.showNotification('Staff Name is required but appears to be empty', 'error')
+            return
+          }
+
           // Prepare form data for API submission
           const formData = new FormData()
 
@@ -1267,6 +1525,18 @@
           formData.append('phone_number', this.formData.phoneNumber)
           formData.append('department_id', this.formData.department)
           formData.append('signature', this.formData.signature)
+
+          // Debug: Log what's being appended to FormData
+          console.log('🔍 DEBUG: FormData entries being sent to API:')
+          for (let [key, value] of formData.entries()) {
+            if (key === 'signature') {
+              console.log(
+                `  ${key}: ${value ? `File(${value.name}, ${value.size} bytes)` : 'null'}`
+              )
+            } else {
+              console.log(`  ${key}: "${value}"`)
+            }
+          }
 
           // Prepare request types array
           const requestTypes = []
@@ -1299,14 +1569,14 @@
           })
 
           // Submit to API (update or create)
-          const response = this.isEditMode 
+          const response = this.isEditMode
             ? await userCombinedAccessService.updateRequest(this.editRequestId, formData)
             : await userCombinedAccessService.submitCombinedRequest(formData)
 
           if (response.success) {
             const actionText = this.isEditMode ? 'updated and resubmitted' : 'submitted'
             console.log(`Combined access request ${actionText} successfully:`, response.data)
-            
+
             this.showSuccessModal = true
             if (!this.isEditMode) {
               this.resetForm()
@@ -1320,11 +1590,17 @@
               const errorMessages = Object.values(response.errors).flat()
               this.showNotification(errorMessages[0] || 'Validation failed', 'error')
             } else {
-              this.showNotification(response.message || `Failed to ${this.isEditMode ? 'update' : 'submit'} request`, 'error')
+              this.showNotification(
+                response.message || `Failed to ${this.isEditMode ? 'update' : 'submit'} request`,
+                'error'
+              )
             }
           }
         } catch (error) {
-          console.error(`Error ${this.isEditMode ? 'updating' : 'submitting'} combined access request:`, error)
+          console.error(
+            `Error ${this.isEditMode ? 'updating' : 'submitting'} combined access request:`,
+            error
+          )
           this.showNotification(
             'Network error. Please check your connection and try again.',
             'error'
@@ -1626,6 +1902,56 @@
       opacity: 1;
       transform: scale(1) translateY(0);
     }
+  }
+
+  @keyframes scale-up {
+    from {
+      opacity: 0;
+      transform: scale(0.8) translateY(30px) rotate(3deg);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0) rotate(0deg);
+    }
+  }
+
+  @keyframes bounce-gentle {
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+      transform: translateY(0);
+    }
+    40% {
+      transform: translateY(-8px);
+    }
+    60% {
+      transform: translateY(-4px);
+    }
+  }
+
+  @keyframes pulse-ring {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(2.5);
+      opacity: 0;
+    }
+  }
+
+  .animate-scale-up {
+    animation: scale-up 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .animate-bounce-gentle {
+    animation: bounce-gentle 2s ease-in-out infinite;
+  }
+
+  .animate-pulse-ring {
+    animation: pulse-ring 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
   }
 
   .fixed.inset-0 {

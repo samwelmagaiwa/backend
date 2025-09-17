@@ -84,6 +84,9 @@ export const userCombinedAccessService = {
    */
   async updateRequest(requestId, formData) {
     try {
+      // Use POST with method override for multipart/form-data compatibility
+      formData.append('_method', 'PUT')
+
       const response = await apiClient.post(`/v1/user-access/${requestId}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
@@ -166,6 +169,27 @@ export const userCombinedAccessService = {
       return {
         success: false,
         message: error.response?.data?.message || 'Failed to check signature',
+        status: error.response?.status
+      }
+    }
+  },
+
+  /**
+   * Check if user has any pending requests
+   * @returns {Promise<Object>} - API response with pending request status
+   */
+  async checkPendingRequests() {
+    try {
+      const response = await apiClient.get('/v1/user-access/pending-status')
+      return {
+        success: true,
+        data: response.data
+      }
+    } catch (error) {
+      console.error('Failed to check pending requests:', error)
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to check pending requests',
         status: error.response?.status
       }
     }

@@ -201,8 +201,15 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // User Access Request routes (v1)
     Route::prefix('v1')->group(function () {
+        // Specific utility routes MUST come before apiResource to avoid parameter capture
+        Route::get('user-access/pending-status', [UserAccessController::class, 'checkPendingRequests']);
+        
         // User Access Request CRUD operations
         Route::apiResource('user-access', UserAccessController::class);
+        
+        // POST route with method spoofing for updates (to handle multipart/form-data)
+        Route::post('user-access/{userAccess}', [UserAccessController::class, 'update'])
+            ->name('user-access.update-multipart');
         
         // Combined Access Request route
         Route::post('combined-access', [UserAccessController::class, 'store'])->name('combined-access.store');
@@ -210,7 +217,6 @@ Route::middleware('auth:sanctum')->group(function () {
         // Additional utility routes
         Route::get('departments', [UserAccessController::class, 'getDepartments']);
         Route::post('check-signature', [UserAccessController::class, 'checkSignature']);
-        Route::get('user-access/pending-status', [UserAccessController::class, 'checkPendingRequests']);
     });
 
     // Request Status routes (for staff users to view their requests)

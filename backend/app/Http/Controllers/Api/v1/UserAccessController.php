@@ -240,6 +240,8 @@ class UserAccessController extends Controller
      */
     public function update(UserAccessRequest $request, UserAccess $userAccess): JsonResponse
     {
+        DB::beginTransaction();
+        
         try {
             // Check if user owns this request
             if ($userAccess->user_id !== Auth::id()) {
@@ -249,38 +251,81 @@ class UserAccessController extends Controller
                 ], 403);
             }
 
-            // Check if request can be updated (only pending requests)
-            if (!$userAccess->isPending()) {
+            // Check if request can be updated (only pending or rejected requests)
+            if (!$userAccess->canBeUpdated()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Only pending requests can be updated.'
+                    'message' => 'Only pending or rejected requests can be updated.'
                 ], 422);
             }
+
+            // Log the incoming request for debugging
+            Log::info('Updating user access request - Full debug', [
+                'request_id' => $userAccess->id,
+                'request_method' => $request->method(),
+                'has_method_override' => $request->has('_method'),
+                'method_override_value' => $request->input('_method'),
+                'all_input' => $request->except(['signature']),
+                'all_keys' => array_keys($request->all()),
+                'has_signature_file' => $request->hasFile('signature'),
+                'content_type' => $request->header('content-type'),
+                'request_data_debug' => [
+                    'pf_number' => $request->input('pf_number'),
+                    'staff_name' => $request->input('staff_name'),
+                    'phone_number' => $request->input('phone_number'),
+                    'department_id' => $request->input('department_id'),
+                    'request_type' => $request->input('request_type'),
+                    'internetPurposes' => $request->input('internetPurposes')
+                ]
+            ]);
 
             $validatedData = $request->validated();
             
             // Handle signature update if new file uploaded
-            if ($request->hasFile('digital_signature')) {
+            $signaturePath = $userAccess->signature_path; // Keep existing signature by default
+            
+            if ($request->hasFile('signature')) {
                 // Delete old signature if it exists and is not shared
                 if ($userAccess->signature_path) {
                     $this->signatureService->deleteSignature($userAccess->signature_path);
                 }
                 
-                // Store new signature
-                $signaturePath = $this->signatureService->storeUploadedSignature(
-                    $request->file('digital_signature'),
+                // Store new signature using the same method as create
+                $signaturePath = $this->storeSignature(
+                    $request->file('signature'),
                     $validatedData['pf_number']
                 );
-                $validatedData['signature_path'] = $signaturePath;
             }
 
-            // Update the request
+            // Get selected services from validated data
+            $selectedServices = $validatedData['request_type'];
+            
+            // Process internet purposes if internet access is selected
+            $purposes = null;
+            if (in_array('internet_access_request', $selectedServices) && isset($validatedData['internetPurposes'])) {
+                $purposes = array_filter($validatedData['internetPurposes'], function($purpose) {
+                    return !empty(trim($purpose));
+                });
+                $purposes = array_values($purposes); // Re-index array
+            }
+            
+            Log::info('Updating combined access request', [
+                'request_id' => $userAccess->id,
+                'selected_services' => $selectedServices,
+                'purposes' => $purposes,
+                'signature_updated' => $request->hasFile('signature')
+            ]);
+
+            // Update the request with all fields including services
             $userAccess->update([
                 'pf_number' => $validatedData['pf_number'],
                 'staff_name' => $validatedData['staff_name'],
                 'phone_number' => $validatedData['phone_number'],
                 'department_id' => $validatedData['department_id'],
-                'signature_path' => $validatedData['signature_path'] ?? $userAccess->signature_path,
+                'signature_path' => $signaturePath,
+                'request_type' => $selectedServices, // Update services
+                'purpose' => $purposes, // Update internet purposes
+                'status' => 'pending', // Reset status to pending for resubmission
             ]);
 
             $userAccess->load(['user', 'department']);
@@ -289,19 +334,38 @@ class UserAccessController extends Controller
             $userAccess->signature_url = $this->signatureService->getSignatureUrl($userAccess->signature_path);
             $userAccess->signature_info = $this->signatureService->getSignatureInfo($userAccess->signature_path);
 
-            Log::info("User access request updated", [
+            // Forward to appropriate queues for each service type (reprocess workflow)
+            foreach ($selectedServices as $serviceType) {
+                $this->forwardToHodQueue($userAccess, $serviceType);
+            }
+
+            Log::info("User access request updated and resubmitted", [
                 'user_id' => Auth::id(),
-                'request_id' => $userAccess->id
+                'request_id' => $userAccess->id,
+                'pf_number' => $validatedData['pf_number'],
+                'request_types' => $selectedServices,
+                'service_count' => count($selectedServices)
             ]);
+
+            DB::commit();
 
             return response()->json([
                 'success' => true,
                 'data' => $userAccess,
-                'message' => 'User access request updated successfully.'
+                'message' => 'User access request updated and resubmitted successfully with ' . count($selectedServices) . ' service type(s).',
+                'signature_info' => $this->signatureService->getSignatureInfo($signaturePath),
+                'services_requested' => $selectedServices
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Error updating user access request: ' . $e->getMessage());
+            DB::rollBack();
+            
+            Log::error('Error updating user access request: ' . $e->getMessage(), [
+                'request_id' => $userAccess->id,
+                'user_id' => Auth::id(),
+                'request_data' => $request->except(['signature']),
+                'error_trace' => $e->getTraceAsString()
+            ]);
             
             return response()->json([
                 'success' => false,
@@ -510,5 +574,78 @@ class UserAccessController extends Controller
         ];
 
         return $queueMap[$requestType] ?? 'hod_default_queue';
+    }
+
+    /**
+     * Check if user has any pending requests.
+     */
+    public function checkPendingRequests(): JsonResponse
+    {
+        try {
+            $user = Auth::user();
+            
+            // Define pending statuses
+            $pendingStatuses = [
+                'pending',
+                'pending_hod',
+                'hod_approved',
+                'pending_divisional',
+                'divisional_approved',
+                'pending_ict_director',
+                'ict_director_approved',
+                'pending_head_it',
+                'head_it_approved',
+                'pending_ict_officer',
+                'in_review'
+            ];
+            
+            // Check for any pending requests by the current user
+            $pendingRequest = UserAccess::where('user_id', $user->id)
+                ->whereIn('status', $pendingStatuses)
+                ->first();
+                
+            $hasPendingRequest = !is_null($pendingRequest);
+            
+            $response = [
+                'success' => true,
+                'has_pending_request' => $hasPendingRequest,
+                'message' => $hasPendingRequest 
+                    ? 'You have a pending request that needs to be processed before submitting a new one.' 
+                    : 'No pending requests found. You can submit a new request.'
+            ];
+            
+            // Include pending request details if found
+            if ($hasPendingRequest) {
+                $response['pending_request'] = [
+                    'id' => $pendingRequest->id,
+                    'request_id' => 'REQ-' . str_pad($pendingRequest->id, 6, '0', STR_PAD_LEFT),
+                    'status' => $pendingRequest->status,
+                    'status_name' => $pendingRequest->getStatusNameAttribute(),
+                    'request_types' => $pendingRequest->request_type,
+                    'created_at' => $pendingRequest->created_at,
+                    'updated_at' => $pendingRequest->updated_at
+                ];
+            }
+            
+            Log::info('Pending request check completed', [
+                'user_id' => $user->id,
+                'has_pending_request' => $hasPendingRequest,
+                'pending_request_id' => $pendingRequest?->id
+            ]);
+            
+            return response()->json($response);
+            
+        } catch (\Exception $e) {
+            Log::error('Error checking pending requests: ' . $e->getMessage(), [
+                'user_id' => Auth::id(),
+                'error_trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to check pending requests.',
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
+            ], 500);
+        }
     }
 }

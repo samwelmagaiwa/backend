@@ -4,24 +4,24 @@
     <div class="flex flex-1 overflow-hidden">
       <ModernSidebar />
       <main
-        class="flex-1 p-6 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative"
+        class="flex-1 p-4 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative"
       >
-        <div class="max-w-5xl mx-auto">
+        <div class="max-w-6xl mx-auto">
           <!-- Header Section -->
-          <div class="medical-glass-card rounded-t-3xl p-8 mb-0 border-b border-blue-300/30">
+          <div class="medical-glass-card rounded-t-3xl p-4 mb-0 border-b border-blue-300/30">
             <div class="text-center">
-              <h1 class="text-2xl font-bold text-white mb-4 tracking-wide drop-shadow-lg">
+              <h1 class="text-xl font-bold text-white mb-2 tracking-wide drop-shadow-lg">
                 MUHIMBILI NATIONAL HOSPITAL
               </h1>
-              <div
-                class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2 rounded-full text-base font-bold shadow-2xl"
-              >
-                <span class="relative z-10 flex items-center gap-3">
-                  <i class="fas fa-clipboard-list text-base"></i>
+              <div class="flex justify-center mb-2">
+                <div
+                  class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-lg inline-flex items-center gap-2"
+                >
+                  <i class="fas fa-clipboard-list text-sm"></i>
                   REQUEST DETAILS
-                </span>
+                </div>
               </div>
-              <h2 class="text-lg font-bold text-blue-100 tracking-wide drop-shadow-md mt-4">
+              <h2 class="text-sm font-bold text-blue-100 tracking-wide drop-shadow-md mt-2">
                 Internal Access Management
               </h2>
             </div>
@@ -29,14 +29,16 @@
 
           <!-- Main Content -->
           <div class="medical-glass-card rounded-b-3xl overflow-hidden">
-            <div class="p-6 space-y-8">
+            <div class="p-6 space-y-6">
               <!-- Loading Message -->
               <div v-if="isLoading" class="text-center py-8">
                 <div
                   class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"
                 ></div>
                 <h2 class="text-white text-xl">Loading request details...</h2>
-                <p class="text-blue-300">ID: {{ formattedRequestId }}, Type: {{ formattedRequestType }}</p>
+                <p class="text-blue-300">
+                  ID: {{ formattedRequestId }}, Type: {{ formattedRequestType }}
+                </p>
               </div>
 
               <!-- Request Data -->
@@ -326,13 +328,17 @@
                         <div class="text-right">
                           <p class="text-xs text-blue-300">
                             {{
-                              requestData?.hodApproval?.approved_at || requestData?.hod_approved_at || requestData?.hod_rejected_at
+                              requestData?.hodApproval?.approved_at ||
+                              requestData?.hod_approved_at ||
+                              requestData?.hod_rejected_at
                                 ? formatDate(
                                     requestData?.hodApproval?.approved_at ||
                                       requestData?.hod_approved_at ||
                                       requestData?.hod_rejected_at
                                   )
-                                : getHODApprovalStatus() === 'rejected' ? 'Recently' : 'Pending'
+                                : getHODApprovalStatus() === 'rejected'
+                                  ? 'Recently'
+                                  : 'Pending'
                             }}
                           </p>
                         </div>
@@ -340,7 +346,10 @@
                     </div>
 
                     <!-- HOD Comments Card -->
-                    <div v-if="getHODComment() || getHODApprovalStatus() === 'rejected'" class="mt-3">
+                    <div
+                      v-if="getHODComment() || getHODApprovalStatus() === 'rejected'"
+                      class="mt-3"
+                    >
                       <div
                         :class="getHODCommentsCardClass()"
                         class="rounded-lg p-4 backdrop-blur-sm border transition-all duration-300 hover:shadow-lg"
@@ -378,7 +387,12 @@
                         <!-- Comment Content -->
                         <div class="mb-3">
                           <p class="text-white text-sm leading-relaxed">
-                            {{ getHODComment() || (getHODApprovalStatus() === 'rejected' ? 'No rejection reason provided.' : 'No comment available.') }}
+                            {{
+                              getHODComment() ||
+                              (getHODApprovalStatus() === 'rejected'
+                                ? 'No rejection reason provided.'
+                                : 'No comment available.')
+                            }}
                           </p>
                         </div>
 
@@ -390,13 +404,17 @@
                           <div class="flex items-center space-x-1">
                             <i class="fas fa-calendar-alt"></i>
                             <span>{{
-                              requestData?.hodApproval?.approved_at || requestData?.hod_approved_at || requestData?.hod_rejected_at
+                              requestData?.hodApproval?.approved_at ||
+                              requestData?.hod_approved_at ||
+                              requestData?.hod_rejected_at
                                 ? formatDateTime(
                                     requestData?.hodApproval?.approved_at ||
                                       requestData?.hod_approved_at ||
                                       requestData?.hod_rejected_at
                                   )
-                                : getHODApprovalStatus() === 'rejected' ? 'Recently' : 'Pending'
+                                : getHODApprovalStatus() === 'rejected'
+                                  ? 'Recently'
+                                  : 'Pending'
                             }}</span>
                           </div>
                           <div class="flex items-center space-x-1">
@@ -418,7 +436,7 @@
                   class="bg-gradient-to-r from-teal-600/25 to-blue-600/25 border-2 border-teal-400/40 p-6 rounded-2xl backdrop-blur-sm"
                 >
                   <h3 class="text-xl font-bold text-white mb-4">Request Information</h3>
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-white">
+                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-white">
                     <div>
                       <p class="text-blue-200 text-sm">Request ID:</p>
                       <p class="font-semibold">{{ formattedRequestId }}</p>
@@ -429,7 +447,9 @@
                     </div>
                     <div>
                       <p class="text-blue-200 text-sm">Status:</p>
-                      <p class="font-semibold" :class="getCurrentStatusTextClass()">{{ formattedCurrentStatus }}</p>
+                      <p class="font-semibold" :class="getCurrentStatusTextClass()">
+                        {{ formattedCurrentStatus }}
+                      </p>
                     </div>
                     <div>
                       <p class="text-blue-200 text-sm">ICT Status:</p>
@@ -471,7 +491,9 @@
                   <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
                 </div>
                 <h2 class="text-white text-xl">Failed to Load Request</h2>
-                <p class="text-red-300">Could not load request details for ID: {{ formattedRequestId }}</p>
+                <p class="text-red-300">
+                  Could not load request details for ID: {{ formattedRequestId }}
+                </p>
                 <button
                   @click="loadRequestData"
                   class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -487,7 +509,6 @@
         <AppFooter />
       </main>
     </div>
-
   </div>
 </template>
 
@@ -541,70 +562,80 @@
       const formattedRequestType = computed(() => {
         if (requestType.value === 'combined_access' && requestData.value) {
           const services = []
-          
+
           // Check for different types of services in the request data
-          if (requestData.value.jeeva_modules?.length > 0 || 
-              requestData.value.request_types?.includes('jeeva_access') ||
-              requestData.value.request_types?.includes('jeeva')) {
+          if (
+            requestData.value.jeeva_modules?.length > 0 ||
+            requestData.value.request_types?.includes('jeeva_access') ||
+            requestData.value.request_types?.includes('jeeva')
+          ) {
             services.push('Jeeva')
           }
-          
-          if (requestData.value.wellsoft_modules?.length > 0 || 
-              requestData.value.request_types?.includes('wellsoft')) {
+
+          if (
+            requestData.value.wellsoft_modules?.length > 0 ||
+            requestData.value.request_types?.includes('wellsoft')
+          ) {
             services.push('Wellsoft')
           }
-          
-          if (requestData.value.internet_purposes?.length > 0 || 
-              requestData.value.request_types?.includes('internet_access_request') ||
-              requestData.value.request_types?.includes('internet')) {
+
+          if (
+            requestData.value.internet_purposes?.length > 0 ||
+            requestData.value.request_types?.includes('internet_access_request') ||
+            requestData.value.request_types?.includes('internet')
+          ) {
             services.push('Internet')
           }
-          
+
           if (services.length > 0) {
             return `Combined Access - ${services.join(', ')}`
           }
-          
+
           return 'Combined Access'
         }
-        
+
         // For other request types, just capitalize and format nicely
         if (requestType.value === 'booking_service') {
           return 'Device Booking'
         }
-        
-        return requestType.value?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'N/A'
+
+        return (
+          requestType.value?.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'N/A'
+        )
       })
 
       // Get current status with proper formatting
       const formattedCurrentStatus = computed(() => {
         if (!requestData.value) return 'Loading...'
-        
+
         const status = requestData.value.status || requestData.value.currentStatus || 'pending'
-        
+
         // Map status values to user-friendly text
         const statusMap = {
-          'pending': 'Pending Review',
-          'pending_hod': 'Pending HOD Approval', 
-          'hod_approved': 'HOD Approved',
-          'hod_rejected': 'HOD Rejected',
-          'pending_divisional': 'Pending Divisional Director',
-          'divisional_approved': 'Divisional Director Approved',
-          'divisional_rejected': 'Divisional Director Rejected',
-          'pending_ict_director': 'Pending ICT Director',
-          'ict_director_approved': 'ICT Director Approved', 
-          'ict_director_rejected': 'ICT Director Rejected',
-          'pending_head_it': 'Pending Head of IT',
-          'head_it_approved': 'Head of IT Approved',
-          'head_it_rejected': 'Head of IT Rejected',
-          'pending_ict_officer': 'Pending ICT Officer',
-          'ict_officer_approved': 'ICT Officer Approved',
-          'ict_officer_rejected': 'ICT Officer Rejected',
-          'implemented': 'Implemented',
-          'approved': 'Fully Approved',
-          'cancelled': 'Cancelled'
+          pending: 'Pending Review',
+          pending_hod: 'Pending HOD Approval',
+          hod_approved: 'HOD Approved',
+          hod_rejected: 'HOD Rejected',
+          pending_divisional: 'Pending Divisional Director',
+          divisional_approved: 'Divisional Director Approved',
+          divisional_rejected: 'Divisional Director Rejected',
+          pending_ict_director: 'Pending ICT Director',
+          ict_director_approved: 'ICT Director Approved',
+          ict_director_rejected: 'ICT Director Rejected',
+          pending_head_it: 'Pending Head of IT',
+          head_it_approved: 'Head of IT Approved',
+          head_it_rejected: 'Head of IT Rejected',
+          pending_ict_officer: 'Pending ICT Officer',
+          ict_officer_approved: 'ICT Officer Approved',
+          ict_officer_rejected: 'ICT Officer Rejected',
+          implemented: 'Implemented',
+          approved: 'Fully Approved',
+          cancelled: 'Cancelled'
         }
-        
-        return statusMap[status] || status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+
+        return (
+          statusMap[status] || status.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())
+        )
       })
 
       // Methods
@@ -749,8 +780,9 @@
       const getHODApprovalStatus = () => {
         // Use the same logic as formattedCurrentStatus to get the overall status
         const overallStatus = requestData.value?.status || requestData.value?.currentStatus
-        const hodSpecificStatus = requestData.value?.hodApproval?.status || requestData.value?.hod_approval_status
-        
+        const hodSpecificStatus =
+          requestData.value?.hodApproval?.status || requestData.value?.hod_approval_status
+
         console.log('🔍 HOD Status Debug:', {
           overallStatus,
           hodSpecificStatus,
@@ -758,17 +790,26 @@
           currentStatusField: requestData.value?.currentStatus,
           fullRequestData: requestData.value
         })
-        
+
         // First check if the overall request status indicates HOD rejection or approval
         if (overallStatus === 'hod_rejected') {
           console.log('✅ HOD status determined from overall status: rejected')
           return 'rejected'
         }
-        if (['hod_approved', 'divisional_approved', 'ict_director_approved', 'head_it_approved', 'implemented', 'approved'].includes(overallStatus)) {
+        if (
+          [
+            'hod_approved',
+            'divisional_approved',
+            'ict_director_approved',
+            'head_it_approved',
+            'implemented',
+            'approved'
+          ].includes(overallStatus)
+        ) {
           console.log('✅ HOD status determined from overall status: approved')
           return 'approved'
         }
-        
+
         // Fall back to the specific HOD approval status if available
         const finalStatus = hodSpecificStatus || 'pending'
         console.log('✅ HOD status from specific field:', finalStatus)
@@ -776,7 +817,8 @@
       }
 
       const getHODComment = () => {
-        const comment = (
+        const comment =
+          requestData.value?.hod_comments ||
           requestData.value?.hodApproval?.comment ||
           requestData.value?.hodApproval?.rejection_reason ||
           requestData.value?.hod_approval_comment ||
@@ -784,27 +826,28 @@
           requestData.value?.hod_comment ||
           requestData.value?.rejection_comment ||
           requestData.value?.rejection_reason
-        )
-        
+
         console.log('🔍 HOD Comment Debug:', {
           comment,
           hodApproval: requestData.value?.hodApproval,
+          hod_comments: requestData.value?.hod_comments,
           hod_approval_comment: requestData.value?.hod_approval_comment,
           hod_rejection_reason: requestData.value?.hod_rejection_reason,
           hod_comment: requestData.value?.hod_comment,
           rejection_comment: requestData.value?.rejection_comment,
           rejection_reason: requestData.value?.rejection_reason,
           allCommentFields: {
+            hod_comments: requestData.value?.hod_comments,
             'hodApproval?.comment': requestData.value?.hodApproval?.comment,
             'hodApproval?.rejection_reason': requestData.value?.hodApproval?.rejection_reason,
-            'hod_approval_comment': requestData.value?.hod_approval_comment,
-            'hod_rejection_reason': requestData.value?.hod_rejection_reason,
-            'hod_comment': requestData.value?.hod_comment,
-            'rejection_comment': requestData.value?.rejection_comment,
-            'rejection_reason': requestData.value?.rejection_reason
+            hod_approval_comment: requestData.value?.hod_approval_comment,
+            hod_rejection_reason: requestData.value?.hod_rejection_reason,
+            hod_comment: requestData.value?.hod_comment,
+            rejection_comment: requestData.value?.rejection_comment,
+            rejection_reason: requestData.value?.rejection_reason
           }
         })
-        
+
         return comment
       }
 
@@ -991,52 +1034,52 @@
             loadRequestData()
           }
         }
-        
+
         const handleFocus = () => {
           console.log('🔄 Window focused, refreshing request data...')
           loadRequestData()
         }
-        
+
         document.addEventListener('visibilitychange', handleVisibilityChange)
         window.addEventListener('focus', handleFocus)
-        
+
         // Clean up listeners when component unmounts
         return () => {
           document.removeEventListener('visibilitychange', handleVisibilityChange)
           window.removeEventListener('focus', handleFocus)
         }
       }
-      
+
       // Get current status text color class
       const getCurrentStatusTextClass = () => {
         if (!requestData.value) return 'text-white'
-        
+
         const status = requestData.value.status || requestData.value.currentStatus || 'pending'
-        
+
         // Check if status indicates rejection
         if (status.includes('rejected') || status === 'rejected') {
           return 'text-red-400'
         }
-        
+
         // Check if status indicates approval/success
         if (status.includes('approved') || status === 'approved' || status === 'implemented') {
           return 'text-green-400'
         }
-        
+
         // Check if status indicates pending
         if (status.includes('pending') || status === 'pending') {
           return 'text-yellow-400'
         }
-        
+
         // Check if status indicates cancellation
         if (status === 'cancelled') {
           return 'text-gray-400'
         }
-        
+
         // Default to white text
         return 'text-white'
       }
-      
+
       // Lifecycle
       onMounted(() => {
         loadRequestData()
