@@ -56,7 +56,10 @@
                       Access Request Blocked
                     </h3>
                     <p class="text-red-100/90 text-sm mb-3">
-                      {{ blockMessage || 'You cannot submit a new Combined Access request while you have a pending request that needs to be processed.' }}
+                      {{
+                        blockMessage ||
+                        'You cannot submit a new Combined Access request while you have a pending request that needs to be processed.'
+                      }}
                     </p>
                     <div class="flex items-center space-x-4">
                       <div
@@ -67,9 +70,7 @@
                           Pending Request: {{ pendingAccessRequestId }}
                         </span>
                       </div>
-                      <div
-                        class="bg-red-500/20 px-3 py-1 rounded-full border border-red-400/30"
-                      >
+                      <div class="bg-red-500/20 px-3 py-1 rounded-full border border-red-400/30">
                         <span class="text-red-300 text-sm font-medium">
                           Policy: One pending access request at a time
                         </span>
@@ -455,12 +456,12 @@
                                   <!-- Edit button for rejected requests -->
                                   <button
                                     v-if="
-                                      (request.status === 'rejected' || 
-                                       request.status === 'hod_rejected' ||
-                                       request.status === 'divisional_rejected' ||
-                                       request.status === 'ict_director_rejected' ||
-                                       request.status === 'head_it_rejected' ||
-                                       request.status === 'ict_officer_rejected') &&
+                                      (request.status === 'rejected' ||
+                                        request.status === 'hod_rejected' ||
+                                        request.status === 'divisional_rejected' ||
+                                        request.status === 'ict_director_rejected' ||
+                                        request.status === 'head_it_rejected' ||
+                                        request.status === 'ict_officer_rejected') &&
                                       canEditRequest(request)
                                     "
                                     @click="editRequest(request)"
@@ -637,12 +638,12 @@
                             <!-- Edit button for rejected requests -->
                             <button
                               v-if="
-                                (request.status === 'rejected' || 
-                                 request.status === 'hod_rejected' ||
-                                 request.status === 'divisional_rejected' ||
-                                 request.status === 'ict_director_rejected' ||
-                                 request.status === 'head_it_rejected' ||
-                                 request.status === 'ict_officer_rejected') &&
+                                (request.status === 'rejected' ||
+                                  request.status === 'hod_rejected' ||
+                                  request.status === 'divisional_rejected' ||
+                                  request.status === 'ict_director_rejected' ||
+                                  request.status === 'head_it_rejected' ||
+                                  request.status === 'ict_officer_rejected') &&
                                 canEditRequest(request)
                               "
                               @click="editRequest(request)"
@@ -673,7 +674,7 @@
         </div>
       </main>
     </div>
-    
+
     <!-- Edit Request Modal -->
     <EditRequestModal
       :isVisible="showEditModal"
@@ -721,7 +722,7 @@
       const latestRequestId = ref('')
       const activeDropdown = ref(null)
       const cancelingRequest = ref(null)
-      
+
       // Modal state
       const showEditModal = ref(false)
       const selectedRequest = ref(null)
@@ -790,7 +791,9 @@
         if (route.query.blocked === 'true') {
           showPendingAccessMessage.value = true
           pendingAccessRequestId.value = route.query.pending_request_id || null
-          blockMessage.value = route.query.message || 'You cannot submit a new Combined Access request while you have a pending request.'
+          blockMessage.value =
+            route.query.message ||
+            'You cannot submit a new Combined Access request while you have a pending request.'
 
           // Clear query parameters but keep the notification visible
           router.replace({ query: {} })
@@ -874,7 +877,7 @@
           status: request.status,
           canEdit: canEditRequest(request)
         })
-        
+
         // Close dropdown first
         closeDropdown()
 
@@ -889,29 +892,31 @@
 
         // Check if request can be edited
         if (!canEditRequest(request)) {
-          alert(`This ${getRequestTypeName(request.type)} request cannot be edited in its current status: ${getStatusText(request.status)}`)
+          alert(
+            `This ${getRequestTypeName(request.type)} request cannot be edited in its current status: ${getStatusText(request.status)}`
+          )
           return
         }
 
         // Show custom modal instead of browser confirm
         selectedRequest.value = request
         showEditModal.value = true
-        
+
         // The rest of the logic is now in handleEditConfirm method
         return
       }
-      
+
       const handleEditConfirm = async () => {
         const request = selectedRequest.value
         if (!request) return
-        
+
         console.log('✅ EditRequest: User confirmed via modal, proceeding with navigation')
 
         // Navigate to appropriate edit page based on request type
         let editPath = ''
         let hasEditSupport = true
-        
-        switch(request.type) {
+
+        switch (request.type) {
           case 'booking_service':
             editPath = '/edit-booking-request'
             break
@@ -923,20 +928,20 @@
             // Individual forms don't have :id routes yet, show helpful message
             alert(
               `Edit functionality for ${getRequestTypeName(request.type)} requests is currently in development.\n\n` +
-              `For now, you can:\n` +
-              `1. Submit a new ${getRequestTypeName(request.type)} request\n` +
-              `2. Contact support for assistance with modifying this request\n\n` +
-              `Combined access requests already support editing.`
+                `For now, you can:\n` +
+                `1. Submit a new ${getRequestTypeName(request.type)} request\n` +
+                `2. Contact support for assistance with modifying this request\n\n` +
+                `Combined access requests already support editing.`
             )
             hasEditSupport = false
             break
           case 'wellsoft':
             alert(
               `Edit functionality for ${getRequestTypeName(request.type)} requests is currently in development.\n\n` +
-              `For now, you can:\n` +
-              `1. Submit a new ${getRequestTypeName(request.type)} request\n` +
-              `2. Contact support for assistance with modifying this request\n\n` +
-              `Combined access requests already support editing.`
+                `For now, you can:\n` +
+                `1. Submit a new ${getRequestTypeName(request.type)} request\n` +
+                `2. Contact support for assistance with modifying this request\n\n` +
+                `Combined access requests already support editing.`
             )
             hasEditSupport = false
             break
@@ -944,19 +949,21 @@
           case 'internet':
             alert(
               `Edit functionality for ${getRequestTypeName(request.type)} requests is currently in development.\n\n` +
-              `For now, you can:\n` +
-              `1. Submit a new ${getRequestTypeName(request.type)} request\n` +
-              `2. Contact support for assistance with modifying this request\n\n` +
-              `Combined access requests already support editing.`
+                `For now, you can:\n` +
+                `1. Submit a new ${getRequestTypeName(request.type)} request\n` +
+                `2. Contact support for assistance with modifying this request\n\n` +
+                `Combined access requests already support editing.`
             )
             hasEditSupport = false
             break
           default:
-            alert(`Edit functionality not yet implemented for ${getRequestTypeName(request.type)} requests.`)
+            alert(
+              `Edit functionality not yet implemented for ${getRequestTypeName(request.type)} requests.`
+            )
             hasEditSupport = false
             break
         }
-        
+
         if (!hasEditSupport) {
           return
         }
@@ -971,9 +978,9 @@
           currentRoute: route.fullPath,
           currentPath: route.path
         }
-        
+
         console.log('📝 EditRequest: Preparing navigation with data:', navigationData)
-        
+
         try {
           const navigationTarget = {
             path: editPath,
@@ -983,19 +990,18 @@
               status: 'rejected'
             }
           }
-          
+
           console.log('📝 EditRequest: Navigation target prepared:', navigationTarget)
           console.log('📝 EditRequest: Current router state:', {
             currentRoute: router.currentRoute.value,
             hasRouter: !!router,
             routerOptions: router.options
           })
-          
+
           // Use await to catch any navigation errors
           console.log('🚀 EditRequest: Attempting navigation...')
           const navigationResult = await router.push(navigationTarget)
           console.log('✅ EditRequest: Navigation completed successfully:', navigationResult)
-          
         } catch (error) {
           console.error('❌ EditRequest: Navigation failed with error:', {
             error: error,
@@ -1005,18 +1011,20 @@
             to: error.to,
             from: error.from
           })
-          
+
           // Check if this is a navigation guard rejection
           if (error.type === 2 || error.message?.includes('navigation guard')) {
             console.error('❌ EditRequest: Navigation blocked by route guard')
-            alert(`Navigation blocked by route guard. This might be due to:\n\n` +
-                  `1. Missing authentication token\n` +
-                  `2. Insufficient user permissions\n` +
-                  `3. Route configuration issue\n\n` +
-                  `Please try logging out and back in, or contact support.`)
+            alert(
+              `Navigation blocked by route guard. This might be due to:\n\n` +
+                `1. Missing authentication token\n` +
+                `2. Insufficient user permissions\n` +
+                `3. Route configuration issue\n\n` +
+                `Please try logging out and back in, or contact support.`
+            )
             return
           }
-          
+
           // Fallback navigation attempt
           console.log('🔄 EditRequest: Attempting fallback navigation...')
           try {
@@ -1026,11 +1034,13 @@
             console.log('✅ EditRequest: Fallback navigation successful')
           } catch (fallbackError) {
             console.error('❌ EditRequest: Fallback navigation also failed:', fallbackError)
-            alert(`Navigation error: Unable to navigate to edit page.\n\nPlease try refreshing the page or contact support.\n\nError: ${error.message}\nFallback Error: ${fallbackError.message}`)
+            alert(
+              `Navigation error: Unable to navigate to edit page.\n\nPlease try refreshing the page or contact support.\n\nError: ${error.message}\nFallback Error: ${fallbackError.message}`
+            )
           }
         }
       }
-      
+
       const closeEditModal = () => {
         showEditModal.value = false
         selectedRequest.value = null
@@ -1087,28 +1097,28 @@
         })
         return canCancel
       }
-      
+
       // Check if request can be edited
       const canEditRequest = (request) => {
         // Allow editing rejected requests for all types
         const rejectedStatuses = [
           'rejected',
           'hod_rejected',
-          'divisional_rejected', 
+          'divisional_rejected',
           'ict_director_rejected',
           'head_it_rejected',
           'ict_officer_rejected'
         ]
-        
+
         const canEdit = rejectedStatuses.includes(request.status) && !cancelingRequest.value
-        
+
         console.log('🔍 canEditRequest check:', {
           requestId: request.id,
           requestType: request.type,
           status: request.status,
           canEdit: canEdit
         })
-        
+
         return canEdit
       }
 

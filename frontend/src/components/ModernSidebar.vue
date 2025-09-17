@@ -892,6 +892,13 @@
             icon: 'fas fa-clipboard-check',
             category: 'requests-management',
             description: 'Review access requests'
+          },
+          '/divisional-dashboard/combined-request': {
+            name: 'DivisionalCombinedRequestList',
+            displayName: 'Combined Requests',
+            icon: 'fas fa-clipboard-list',
+            category: 'requests-management',
+            description: 'Review HOD-approved requests'
           }
         }
 

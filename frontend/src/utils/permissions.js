@@ -37,7 +37,7 @@ export const ROLE_PERMISSIONS = {
   [ROLES.DIVISIONAL_DIRECTOR]: {
     routes: [
       '/divisional-dashboard',
-      '/hod-dashboard/request-list',
+      '/divisional-dashboard/combined-request',
       '/jeeva-access',
       '/wellsoft-access',
       '/internet-access',

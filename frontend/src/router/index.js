@@ -377,6 +377,22 @@ const routes = [
     }
   },
 
+  // Divisional Director Combined Access Requests List
+  {
+    path: '/divisional-dashboard/combined-request',
+    name: 'DivisionalCombinedRequestList',
+    component: () =>
+      import(/* webpackChunkName: "divisional" */ '../components/views/divisional/DivisionalRequestList.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: [
+        ROLES.DIVISIONAL_DIRECTOR,
+        ROLES.ICT_DIRECTOR,
+        ROLES.ICT_OFFICER
+      ]
+    }
+  },
+
   // Redirect old route to new route for backward compatibility
   {
     path: '/internal-access/list',

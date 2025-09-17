@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\v1\AdminUserController;
 use App\Http\Controllers\Api\v1\AdminDepartmentController;
 use App\Http\Controllers\Api\v1\DeviceInventoryController;
 use App\Http\Controllers\Api\v1\HodCombinedAccessController;
+use App\Http\Controllers\Api\v1\DivisionalCombinedAccessController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -413,6 +414,20 @@ Route::middleware('auth:sanctum')->group(function () {
             ->name('hod.combined-access-requests.approve');
         Route::post('combined-access-requests/{id}/cancel', [HodCombinedAccessController::class, 'cancel'])
             ->name('hod.combined-access-requests.cancel');
+    });
+
+    // Divisional Director Combined Access Request routes (Divisional Director only)
+    Route::prefix('divisional')->middleware('role:divisional_director,ict_director,admin')->group(function () {
+        Route::get('combined-access-requests', [DivisionalCombinedAccessController::class, 'index'])
+            ->name('divisional.combined-access-requests.index');
+        Route::get('combined-access-requests/statistics', [DivisionalCombinedAccessController::class, 'statistics'])
+            ->name('divisional.combined-access-requests.statistics');
+        Route::get('combined-access-requests/{id}', [DivisionalCombinedAccessController::class, 'show'])
+            ->name('divisional.combined-access-requests.show');
+        Route::post('combined-access-requests/{id}/approve', [DivisionalCombinedAccessController::class, 'updateApproval'])
+            ->name('divisional.combined-access-requests.approve');
+        Route::post('combined-access-requests/{id}/cancel', [DivisionalCombinedAccessController::class, 'cancel'])
+            ->name('divisional.combined-access-requests.cancel');
     });
 
     // ========================================

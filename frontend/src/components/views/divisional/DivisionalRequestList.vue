@@ -2,7 +2,9 @@
   <div class="flex flex-col h-screen">
     <Header />
     <div class="flex flex-1 overflow-hidden">
-      <ModernSidebar />
+      <div class="sidebar-narrow">
+        <ModernSidebar />
+      </div>
       <main class="flex-1 p-4 bg-blue-900 overflow-y-auto">
         <div class="max-w-full mx-auto">
 
@@ -24,16 +26,16 @@
           <!-- Stats -->
           <div class="grid grid-cols-4 gap-4 mb-6">
             <div class="bg-yellow-600/25 border border-yellow-400/40 p-4 rounded-lg">
-              <h3 class="text-yellow-200 text-sm">Pending HOD Approval</h3>
-              <p class="text-white text-2xl font-bold">{{ stats.pendingHod }}</p>
+              <h3 class="text-yellow-200 text-sm">Pending Divisional Approval</h3>
+              <p class="text-white text-2xl font-bold">{{ stats.pendingDivisional }}</p>
             </div>
             <div class="bg-green-600/25 border border-green-400/40 p-4 rounded-lg">
-              <h3 class="text-green-200 text-sm">HOD Approved</h3>
-              <p class="text-white text-2xl font-bold">{{ stats.hodApproved }}</p>
+              <h3 class="text-green-200 text-sm">Divisional Approved</h3>
+              <p class="text-white text-2xl font-bold">{{ stats.divisionalApproved }}</p>
             </div>
             <div class="bg-red-600/25 border border-red-400/40 p-4 rounded-lg">
-              <h3 class="text-red-200 text-sm">HOD Rejected</h3>
-              <p class="text-white text-2xl font-bold">{{ stats.hodRejected }}</p>
+              <h3 class="text-red-200 text-sm">Divisional Rejected</h3>
+              <p class="text-white text-2xl font-bold">{{ stats.divisionalRejected }}</p>
             </div>
             <div class="bg-blue-600/25 border border-blue-400/40 p-4 rounded-lg">
               <h3 class="text-blue-200 text-sm">Total Requests</h3>
@@ -55,11 +57,9 @@
                 class="px-3 py-2 bg-white/20 border border-blue-300/30 rounded text-white"
               >
                 <option value="">All Statuses</option>
-                <option value="pending">Pending</option>
-                <option value="pending_hod">Pending HOD</option>
-                <option value="approved">Approved</option>
                 <option value="hod_approved">HOD Approved</option>
-                <option value="hod_rejected">HOD Rejected</option>
+                <option value="divisional_approved">Divisional Approved</option>
+                <option value="divisional_rejected">Divisional Rejected</option>
               </select>
               <button
                 @click="refreshRequests"
@@ -78,7 +78,7 @@
                   <th class="px-4 py-3 text-left text-blue-100">Request ID</th>
                   <th class="px-4 py-3 text-left text-blue-100">Request Type</th>
                   <th class="px-4 py-3 text-left text-blue-100">Personal Information</th>
-                  <th class="px-4 py-3 text-left text-blue-100">Submission Date (FIFO)</th>
+                  <th class="px-4 py-3 text-left text-blue-100">HOD Approval Date</th>
                   <th class="px-4 py-3 text-left text-blue-100">Current Status</th>
                   <th class="px-4 py-3 text-center text-blue-100">Actions</th>
                 </tr>
@@ -137,13 +137,13 @@
                     </div>
                   </td>
 
-                  <!-- Submission Date -->
+                  <!-- HOD Approval Date -->
                   <td class="px-4 py-3">
                     <div class="text-white font-medium">
-                      {{ formatDate(request.created_at || request.submission_date) }}
+                      {{ formatDate(request.hod_approved_at || request.hod_approval_date) }}
                     </div>
                     <div class="text-blue-300 text-xs">
-                      {{ formatTime(request.created_at || request.submission_date) }}
+                      {{ formatTime(request.hod_approved_at || request.hod_approval_date) }}
                     </div>
                   </td>
 
@@ -197,7 +197,7 @@
               <p class="text-blue-300">
                 {{
                   searchQuery || statusFilter
-                    ? 'No requests are pending your approval.'
+                    ? 'No HOD-approved requests from your department are pending your approval.'
                     : 'Try adjusting your filters'
                 }}
               </p>
@@ -235,10 +235,10 @@
   import Header from '@/components/header.vue'
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppFooter from '@/components/footer.vue'
-  import combinedAccessService from '@/services/combinedAccessService'
+  import divisionalAccessService from '@/services/divisionalAccessService'
 
   export default {
-    name: 'HodRequestListSimplified',
+    name: 'DivisionalRequestList',
     components: {
       Header,
       ModernSidebar,
@@ -251,9 +251,9 @@
         statusFilter: '',
         isLoading: false,
         stats: {
-          pendingHod: 0,
-          hodApproved: 0,
-          hodRejected: 0,
+          pendingDivisional: 0,
+          divisionalApproved: 0,
+          divisionalRejected: 0,
           total: 0
         },
         error: null
@@ -263,7 +263,7 @@
       filteredRequests() {
         // Ensure requests is always an array
         if (!Array.isArray(this.requests)) {
-          console.warn('HodRequestList: requests is not an array:', this.requests)
+          console.warn('DivisionalRequestList: requests is not an array:', this.requests)
           return []
         }
 
@@ -286,21 +286,21 @@
           filtered = filtered.filter((request) => request.status === this.statusFilter)
         }
 
-        // Sort by FIFO order (oldest first)
+        // Sort by HOD approval date (FIFO order - oldest HOD approval first)
         return filtered.sort((a, b) => {
-          const dateA = new Date(a.created_at || a.submission_date || 0)
-          const dateB = new Date(b.created_at || b.submission_date || 0)
+          const dateA = new Date(a.hod_approved_at || a.hod_approval_date || 0)
+          const dateB = new Date(b.hod_approved_at || b.hod_approval_date || 0)
           return dateA - dateB
         })
       }
     },
     async mounted() {
       try {
-        console.log('HodRequestListSimplified: Component mounted, initializing...')
+        console.log('DivisionalRequestList: Component mounted, initializing...')
         await this.fetchRequests()
-        console.log('HodRequestListSimplified: Component initialized successfully')
+        console.log('DivisionalRequestList: Component initialized successfully')
       } catch (error) {
-        console.error('HodRequestListSimplified: Error during mount:', error)
+        console.error('DivisionalRequestList: Error during mount:', error)
         this.error = 'Failed to initialize component: ' + error.message
         this.isLoading = false
       }
@@ -311,9 +311,9 @@
         this.error = null
 
         try {
-          console.log('Fetching combined access requests for HOD approval...')
+          console.log('Fetching combined access requests for Divisional Director approval...')
 
-          const response = await combinedAccessService.getHodRequests({
+          const response = await divisionalAccessService.getDivisionalRequests({
             search: this.searchQuery || undefined,
             status: this.statusFilter || undefined,
             per_page: 50
@@ -348,7 +348,7 @@
 
       async fetchStatistics() {
         try {
-          const response = await combinedAccessService.getHodStatistics()
+          const response = await divisionalAccessService.getDivisionalStatistics()
 
           if (response.success) {
             this.stats = response.data
@@ -368,12 +368,10 @@
         const requests = Array.isArray(this.requests) ? this.requests : []
 
         this.stats = {
-          // Count based on exact database status values
-          pendingHod: requests.filter((r) => r.status === 'pending_hod').length,
-          hodApproved: requests.filter(
-            (r) => r.status === 'hod_approved' || r.status === 'approved'
-          ).length,
-          hodRejected: requests.filter((r) => r.status === 'hod_rejected').length,
+          // Count based on exact database status values for divisional director
+          pendingDivisional: requests.filter((r) => r.status === 'hod_approved').length,
+          divisionalApproved: requests.filter((r) => r.status === 'divisional_approved').length,
+          divisionalRejected: requests.filter((r) => r.status === 'divisional_rejected').length,
           total: requests.length
         }
       },
@@ -407,13 +405,13 @@
 
           console.log('Cancelling request:', requestId)
 
-          const response = await combinedAccessService.cancelRequest(requestId, reason)
+          const response = await divisionalAccessService.cancelRequest(requestId, reason)
 
           if (response.success) {
             // Update local state
             const requestIndex = this.requests.findIndex((r) => r.id === requestId)
             if (requestIndex !== -1) {
-              this.requests[requestIndex].hod_status = 'cancelled'
+              this.requests[requestIndex].divisional_status = 'cancelled'
               this.requests[requestIndex].status = 'cancelled'
             }
 
@@ -442,16 +440,17 @@
       },
 
       canEdit(request) {
-        // HOD can edit requests that are pending HOD approval
-        return request.status === 'pending_hod'
+        // Divisional Director can edit requests that are HOD approved and pending divisional approval
+        return request.status === 'hod_approved'
       },
 
       canCancel(request) {
-        // HOD can cancel requests that are not already rejected, cancelled, or approved
+        // Divisional Director can cancel requests that are not already rejected, cancelled, or fully approved
         return (
-          request.status !== 'hod_rejected' &&
+          request.status !== 'divisional_rejected' &&
           request.status !== 'cancelled' &&
-          request.status !== 'approved'
+          request.status !== 'approved' &&
+          request.status !== 'dict_approved'
         )
       },
 
@@ -476,13 +475,11 @@
 
       getStatusBadgeClass(status) {
         const classes = {
-          // Actual database status values from user_access table
-          pending: 'bg-blue-100 text-blue-800',
-          pending_hod: 'bg-yellow-100 text-yellow-800',
-          approved: 'bg-green-100 text-green-800',
-          // Additional workflow statuses
-          hod_approved: 'bg-green-100 text-green-800',
-          hod_rejected: 'bg-red-100 text-red-800',
+          // HOD-approved requests ready for divisional approval
+          hod_approved: 'bg-yellow-100 text-yellow-800',
+          // Divisional Director decisions
+          divisional_approved: 'bg-green-100 text-green-800',
+          divisional_rejected: 'bg-red-100 text-red-800',
           cancelled: 'bg-gray-100 text-gray-800'
         }
         return classes[status] || 'bg-gray-100 text-gray-800'
@@ -490,9 +487,9 @@
 
       getStatusIcon(status) {
         const icons = {
-          pending_hod: 'fas fa-clock',
-          hod_approved: 'fas fa-check',
-          hod_rejected: 'fas fa-times',
+          hod_approved: 'fas fa-clock',
+          divisional_approved: 'fas fa-check',
+          divisional_rejected: 'fas fa-times',
           cancelled: 'fas fa-ban'
         }
         return icons[status] || 'fas fa-question'
@@ -500,13 +497,11 @@
 
       getStatusText(status) {
         const texts = {
-          // Actual database status values from user_access table
-          pending: 'Pending',
-          pending_hod: 'Pending HOD Approval',
-          approved: 'Approved',
-          // Additional workflow statuses
-          hod_approved: 'HOD Approved',
-          hod_rejected: 'HOD Rejected',
+          // HOD-approved requests ready for divisional approval
+          hod_approved: 'Pending Divisional Approval',
+          // Divisional Director decisions
+          divisional_approved: 'Divisional Approved',
+          divisional_rejected: 'Divisional Rejected',
           cancelled: 'Cancelled'
         }
         return texts[status] || `Unknown Status (${status})`
@@ -514,3 +509,19 @@
     }
   }
 </script>
+
+<style scoped>
+.sidebar-narrow {
+  /* Force the sidebar to be narrower */
+  max-width: 200px;
+}
+
+/* Override the sidebar width classes for this component */
+.sidebar-narrow :deep(.sidebar-expanded) {
+  width: 200px !important;
+}
+
+.sidebar-narrow :deep(.sidebar-collapsed) {
+  width: 64px !important;
+}
+</style>
