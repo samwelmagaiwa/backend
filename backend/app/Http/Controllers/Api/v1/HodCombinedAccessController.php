@@ -184,7 +184,7 @@ class HodCombinedAccessController extends Controller
     }
 
     /**
-     * Update HOD approval status
+     * Update HOD approval status with module form data handling
      */
     public function updateApproval(Request $request, $id): JsonResponse
     {
@@ -192,7 +192,7 @@ class HodCombinedAccessController extends Controller
             Log::info('HOD Combined Access: Updating approval', [
                 'request_id' => $id,
                 'user_id' => auth()->id(),
-                'approval_data' => $request->all()
+                'approval_data' => $request->except(['wellsoft_modules', 'jeeva_modules']) // Don't log large arrays
             ]);
 
             $userAccessRequest = UserAccess::findOrFail($id);
@@ -216,12 +216,22 @@ class HodCombinedAccessController extends Controller
                 ], 403);
             }
 
-            // Validate the approval data
+            // Validate the approval data including module selections
             $validatedData = $request->validate([
                 'hod_status' => 'required|in:approved,rejected',
                 'hod_comments' => 'nullable|string|max:1000',
                 'hod_name' => 'nullable|string|max:255',
                 'hod_approved_at' => 'nullable|string',
+                // Module form data
+                'module_requested_for' => 'nullable|in:use,revoke',
+                'wellsoft_modules' => 'nullable|array',
+                'wellsoft_modules.*' => 'string',
+                'jeeva_modules' => 'nullable|array', 
+                'jeeva_modules.*' => 'string',
+                'internet_purposes' => 'nullable|array',
+                'internet_purposes.*' => 'string',
+                'access_type' => 'nullable|in:permanent,temporary',
+                'temporary_until' => 'nullable|date|after:today',
             ]);
 
             DB::beginTransaction();
@@ -237,19 +247,43 @@ class HodCombinedAccessController extends Controller
                 'hod_approved_at' => now(),
                 'updated_at' => now()
             ];
+            
+            // Add module form data if provided
+            if (isset($validatedData['module_requested_for'])) {
+                $updateData['module_requested_for'] = $validatedData['module_requested_for'];
+            }
+            if (isset($validatedData['wellsoft_modules'])) {
+                $updateData['wellsoft_modules_selected'] = array_values(array_filter($validatedData['wellsoft_modules']));
+            }
+            if (isset($validatedData['jeeva_modules'])) {
+                $updateData['jeeva_modules_selected'] = array_values(array_filter($validatedData['jeeva_modules']));
+            }
+            if (isset($validatedData['internet_purposes'])) {
+                $updateData['internet_purposes'] = array_values(array_filter($validatedData['internet_purposes']));
+            }
+            if (isset($validatedData['access_type'])) {
+                $updateData['access_type'] = $validatedData['access_type'];
+            }
+            if (isset($validatedData['temporary_until'])) {
+                $updateData['temporary_until'] = $validatedData['temporary_until'];
+            }
 
             $userAccessRequest->update($updateData);
 
             DB::commit();
 
-            Log::info('HOD Combined Access: Approval updated successfully', [
+            Log::info('HOD Combined Access: Approval updated successfully with module data', [
                 'request_id' => $id,
-                'status' => $validatedData['hod_status']
+                'status' => $validatedData['hod_status'],
+                'wellsoft_modules_count' => count($validatedData['wellsoft_modules'] ?? []),
+                'jeeva_modules_count' => count($validatedData['jeeva_modules'] ?? []),
+                'internet_purposes_count' => count($validatedData['internet_purposes'] ?? []),
+                'module_requested_for' => $validatedData['module_requested_for'] ?? 'not_specified'
             ]);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Request approval updated successfully',
+                'message' => 'Request approval updated successfully with module selections',
                 'data' => $this->transformRequestData($userAccessRequest->fresh())
             ]);
 
@@ -413,7 +447,10 @@ class HodCombinedAccessController extends Controller
             // NEW: Include module data for conditional display
             'wellsoft_modules' => $request->wellsoft_modules,
             'jeeva_modules' => $request->jeeva_modules,
+            'wellsoft_modules_selected' => $request->wellsoft_modules_selected ?? [],
+            'jeeva_modules_selected' => $request->jeeva_modules_selected ?? [],
             'internet_purposes' => $request->internet_purposes,
+            'module_requested_for' => $request->module_requested_for ?? 'use',
             'access_type' => $request->access_type,
             'temporary_until' => $request->temporary_until?->format('Y-m-d'),
             

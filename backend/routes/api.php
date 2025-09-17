@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\v1\AdminDepartmentController;
 use App\Http\Controllers\Api\v1\DeviceInventoryController;
 use App\Http\Controllers\Api\v1\HodCombinedAccessController;
 use App\Http\Controllers\Api\v1\DivisionalCombinedAccessController;
+use App\Http\Controllers\Api\v1\ModuleAccessApprovalController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -512,4 +513,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('check-signature', [UserInternetAccessFormController::class, 'checkSignature'])->name('user-internet-access.check-signature');
     });
     */
+    
+    // Module Access Approval routes - Universal approval handling
+    Route::prefix('module-access-approval')->group(function () {
+        Route::get('/{id}', [ModuleAccessApprovalController::class, 'getRequestForApproval'])
+            ->name('module-access-approval.get');
+        Route::post('/{id}/process', [ModuleAccessApprovalController::class, 'processApproval'])
+            ->name('module-access-approval.process');
+    });
 });

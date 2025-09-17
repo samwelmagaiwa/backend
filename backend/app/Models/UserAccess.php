@@ -30,12 +30,17 @@ class UserAccess extends Model
         'wellsoft_modules',
         'jeeva_modules',
         'internet_purposes',
+        'module_requested_for',
+        'wellsoft_modules_selected',
+        'jeeva_modules_selected',
         'access_type',
         'temporary_until',
         'status',
         'hod_comments',
         'hod_name',
         'hod_approved_at',
+        'hod_approved_by',
+        'hod_approved_by_name',
         'divisional_director_name',
         'divisional_director_signature_path',
         'divisional_director_comments',
@@ -68,6 +73,8 @@ class UserAccess extends Model
         'purpose' => 'array',
         'wellsoft_modules' => 'array',
         'jeeva_modules' => 'array',
+        'wellsoft_modules_selected' => 'array',
+        'jeeva_modules_selected' => 'array',
         'internet_purposes' => 'array',
         'temporary_until' => 'date',
         'hod_approved_at' => 'datetime',
@@ -332,18 +339,74 @@ class UserAccess extends Model
     {
         $modules = [];
         
-        if ($this->wellsoft_modules) {
-            foreach ($this->wellsoft_modules as $module) {
+        if ($this->wellsoft_modules_selected) {
+            foreach ($this->wellsoft_modules_selected as $module) {
                 $modules[] = ['type' => 'Wellsoft', 'name' => $module];
             }
         }
         
-        if ($this->jeeva_modules) {
-            foreach ($this->jeeva_modules as $module) {
+        if ($this->jeeva_modules_selected) {
+            foreach ($this->jeeva_modules_selected as $module) {
                 $modules[] = ['type' => 'Jeeva', 'name' => $module];
             }
         }
         
         return $modules;
+    }
+    
+    /**
+     * Get selected Wellsoft modules
+     */
+    public function getSelectedWellsoftModules(): array
+    {
+        return $this->wellsoft_modules_selected ?? [];
+    }
+    
+    /**
+     * Get selected Jeeva modules
+     */
+    public function getSelectedJeevaModules(): array
+    {
+        return $this->jeeva_modules_selected ?? [];
+    }
+    
+    /**
+     * Check if request has selected Wellsoft modules
+     */
+    public function hasSelectedWellsoftModules(): bool
+    {
+        return !empty($this->wellsoft_modules_selected);
+    }
+    
+    /**
+     * Check if request has selected Jeeva modules
+     */
+    public function hasSelectedJeevaModules(): bool
+    {
+        return !empty($this->jeeva_modules_selected);
+    }
+    
+    /**
+     * Get module requested for (use/revoke)
+     */
+    public function getModuleRequestedForAttribute(): string
+    {
+        return $this->attributes['module_requested_for'] ?? 'use';
+    }
+    
+    /**
+     * Check if modules are requested for use
+     */
+    public function isModuleRequestForUse(): bool
+    {
+        return $this->module_requested_for === 'use';
+    }
+    
+    /**
+     * Check if modules are requested for revocation
+     */
+    public function isModuleRequestForRevoke(): bool
+    {
+        return $this->module_requested_for === 'revoke';
     }
 }
