@@ -5,7 +5,6 @@
       <ModernSidebar />
       <main class="flex-1 p-4 bg-blue-900 overflow-y-auto">
         <div class="max-w-full mx-auto">
-
           <!-- Error Display -->
           <div
             v-if="error"
@@ -71,125 +70,136 @@
           </div>
 
           <!-- Requests Table -->
-          <div class="bg-white/10 rounded-lg overflow-hidden">
-            <table class="w-full">
-              <thead class="bg-blue-800/50">
-                <tr>
-                  <th class="px-4 py-3 text-left text-blue-100">Request ID</th>
-                  <th class="px-4 py-3 text-left text-blue-100">Request Type</th>
-                  <th class="px-4 py-3 text-left text-blue-100">Personal Information</th>
-                  <th class="px-4 py-3 text-left text-blue-100">Submission Date (FIFO)</th>
-                  <th class="px-4 py-3 text-left text-blue-100">Current Status</th>
-                  <th class="px-4 py-3 text-center text-blue-100">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="request in filteredRequests"
-                  :key="request.id"
-                  class="border-t border-blue-300/20 hover:bg-blue-700/30"
-                >
-                  <!-- Request ID -->
-                  <td class="px-4 py-3">
-                    <div class="text-white font-medium">
-                      {{ request.request_id || `REQ-${request.id.toString().padStart(6, '0')}` }}
-                    </div>
-                    <div class="text-purple-300 text-xs">ID: {{ request.id }}</div>
-                  </td>
+          <div class="table-container bg-white/10 rounded-lg" style="overflow: visible">
+            <div class="overflow-x-auto" style="overflow-y: visible">
+              <table class="w-full">
+                <thead class="bg-blue-800/50">
+                  <tr>
+                    <th class="px-4 py-3 text-left text-blue-100">Request ID</th>
+                    <th class="px-4 py-3 text-left text-blue-100">Request Type</th>
+                    <th class="px-4 py-3 text-left text-blue-100">Personal Information</th>
+                    <th class="px-4 py-3 text-left text-blue-100">Submission Date (FIFO)</th>
+                    <th class="px-4 py-3 text-left text-blue-100">Current Status</th>
+                    <th
+                      class="px-4 py-3 text-center text-sm font-semibold text-blue-100 uppercase tracking-wider"
+                    >
+                      <div class="flex items-center justify-center">
+                        <span
+                          class="bg-blue-100/10 px-3 py-1.5 rounded-lg border border-blue-300/20 flex items-center"
+                        >
+                          Actions
+                          <div class="ml-2 flex flex-col space-y-0.5">
+                            <div class="w-1 h-1 bg-blue-100 rounded-full"></div>
+                            <div class="w-1 h-1 bg-blue-100 rounded-full"></div>
+                            <div class="w-1 h-1 bg-blue-100 rounded-full"></div>
+                          </div>
+                        </span>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="request in filteredRequests"
+                    :key="request.id"
+                    class="border-t border-blue-300/20 hover:bg-blue-700/30"
+                  >
+                    <!-- Request ID -->
+                    <td class="px-4 py-3">
+                      <div class="text-white font-medium">
+                        {{ request.request_id || `REQ-${request.id.toString().padStart(6, '0')}` }}
+                      </div>
+                      <div class="text-purple-300 text-xs">ID: {{ request.id }}</div>
+                    </td>
 
-                  <!-- Request Type -->
-                  <td class="px-4 py-3">
-                    <div class="flex flex-wrap gap-1">
-                      <span
-                        v-if="hasService(request, 'jeeva')"
-                        class="px-2 py-1 rounded text-xs bg-blue-100 text-blue-800"
-                      >
-                        Jeeva
-                      </span>
-                      <span
-                        v-if="hasService(request, 'wellsoft')"
-                        class="px-2 py-1 rounded text-xs bg-green-100 text-green-800"
-                      >
-                        Wellsoft
-                      </span>
-                      <span
-                        v-if="hasService(request, 'internet')"
-                        class="px-2 py-1 rounded text-xs bg-cyan-100 text-cyan-800"
-                      >
-                        Internet
-                      </span>
-                    </div>
-                  </td>
+                    <!-- Request Type -->
+                    <td class="px-4 py-3">
+                      <div class="flex flex-wrap gap-1">
+                        <span
+                          v-if="hasService(request, 'jeeva')"
+                          class="px-2 py-1 rounded text-xs bg-blue-100 text-blue-800"
+                        >
+                          Jeeva
+                        </span>
+                        <span
+                          v-if="hasService(request, 'wellsoft')"
+                          class="px-2 py-1 rounded text-xs bg-green-100 text-green-800"
+                        >
+                          Wellsoft
+                        </span>
+                        <span
+                          v-if="hasService(request, 'internet')"
+                          class="px-2 py-1 rounded text-xs bg-cyan-100 text-cyan-800"
+                        >
+                          Internet
+                        </span>
+                      </div>
+                    </td>
 
-                  <!-- Personal Information -->
-                  <td class="px-4 py-3">
-                    <div class="text-white font-medium">
-                      {{ request.staff_name || request.full_name || 'Unknown User' }}
-                    </div>
-                    <div class="text-blue-300 text-sm">
-                      {{ request.phone || request.phone_number || 'No phone' }}
-                    </div>
-                    <div v-if="request.pf_number" class="text-teal-300 text-xs">
-                      PF: {{ request.pf_number }}
-                    </div>
-                    <div class="text-blue-200 text-xs">
-                      Dept: {{ request.department || 'Unknown' }}
-                    </div>
-                  </td>
+                    <!-- Personal Information -->
+                    <td class="px-4 py-3">
+                      <div class="text-white font-medium">
+                        {{ request.staff_name || request.full_name || 'Unknown User' }}
+                      </div>
+                      <div class="text-blue-300 text-sm">
+                        {{ request.phone || request.phone_number || 'No phone' }}
+                      </div>
+                      <div v-if="request.pf_number" class="text-teal-300 text-xs">
+                        PF: {{ request.pf_number }}
+                      </div>
+                      <div class="text-blue-200 text-xs">
+                        Dept: {{ request.department || 'Unknown' }}
+                      </div>
+                    </td>
 
-                  <!-- Submission Date -->
-                  <td class="px-4 py-3">
-                    <div class="text-white font-medium">
-                      {{ formatDate(request.created_at || request.submission_date) }}
-                    </div>
-                    <div class="text-blue-300 text-xs">
-                      {{ formatTime(request.created_at || request.submission_date) }}
-                    </div>
-                  </td>
+                    <!-- Submission Date -->
+                    <td class="px-4 py-3">
+                      <div class="text-white font-medium">
+                        {{ formatDate(request.created_at || request.submission_date) }}
+                      </div>
+                      <div class="text-blue-300 text-xs">
+                        {{ formatTime(request.created_at || request.submission_date) }}
+                      </div>
+                    </td>
 
-                  <!-- Current Status -->
-                  <td class="px-4 py-3">
-                    <div class="flex flex-col">
-                      <!-- Display the exact database status -->
-                      <span
-                        :class="getStatusBadgeClass(request.status)"
-                        class="px-2 py-1 rounded text-xs font-medium mb-1"
-                      >
-                        {{ getStatusText(request.status) }}
-                      </span>
-                      <!-- Show raw status for debugging -->
-                      <div class="text-xs text-gray-400">Raw: {{ request.status }}</div>
-                    </div>
-                  </td>
+                    <!-- Current Status -->
+                    <td class="px-4 py-3">
+                      <div class="flex flex-col">
+                        <!-- Display the exact database status -->
+                        <span
+                          :class="getStatusBadgeClass(request.status)"
+                          class="px-2 py-1 rounded text-xs font-medium mb-1"
+                        >
+                          {{ getStatusText(request.status) }}
+                        </span>
+                        <!-- Show raw status for debugging -->
+                        <div class="text-xs text-gray-400">Raw: {{ request.status }}</div>
+                      </div>
+                    </td>
 
-                  <!-- Actions -->
-                  <td class="px-4 py-3 text-center">
-                    <div class="flex flex-col items-center space-y-1">
-                      <button
-                        @click="viewAndProcessRequest(request.id)"
-                        class="w-full px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700"
-                      >
-                        View & Process
-                      </button>
-                      <button
-                        v-if="canEdit(request)"
-                        @click="editRequest(request.id)"
-                        class="w-full px-2 py-1 bg-amber-600 text-white text-xs rounded hover:bg-amber-700"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        v-if="canCancel(request)"
-                        @click="cancelRequest(request.id)"
-                        class="w-full px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                    <!-- Actions -->
+                    <td class="px-4 py-3 text-center relative">
+                      <div class="relative inline-block text-left">
+                        <!-- Three dots button -->
+                        <button
+                          @click.stop="toggleDropdown(request.id)"
+                          :data-request-id="request.id"
+                          class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-600/20 hover:bg-blue-600/40 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                        >
+                          <div class="flex flex-col space-y-0.5">
+                            <div class="w-1 h-1 bg-blue-100 rounded-full"></div>
+                            <div class="w-1 h-1 bg-blue-100 rounded-full"></div>
+                            <div class="w-1 h-1 bg-blue-100 rounded-full"></div>
+                          </div>
+                        </button>
+
+                        <!-- Dropdown menu removed - using global portal instead -->
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
 
             <!-- Empty State -->
             <div v-if="filteredRequests.length === 0" class="text-center py-12">
@@ -216,6 +226,48 @@
       </main>
     </div>
 
+    <!-- Global Dropdown Portal -->
+    <div v-if="activeDropdown" class="dropdown-portal">
+      <div
+        class="fixed w-48 origin-top-right bg-white rounded-lg shadow-2xl border border-gray-200 focus:outline-none"
+        :style="getGlobalDropdownStyle()"
+        @click.stop
+      >
+        <div class="py-1">
+          <button
+            @click="viewAndProcessRequest(activeDropdown)"
+            class="group flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-150"
+          >
+            <i class="fas fa-eye mr-3 text-blue-500 group-hover:text-blue-600"></i>
+            View & Process
+          </button>
+
+          <button
+            v-if="getActiveRequest() && canEdit(getActiveRequest())"
+            @click="editRequest(activeDropdown)"
+            class="group flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-600 transition-colors duration-150"
+          >
+            <i class="fas fa-edit mr-3 text-amber-500 group-hover:text-amber-600"></i>
+            Edit
+          </button>
+
+          <div
+            v-if="getActiveRequest() && canCancel(getActiveRequest())"
+            class="border-t border-gray-100 my-1"
+          ></div>
+
+          <button
+            v-if="getActiveRequest() && canCancel(getActiveRequest())"
+            @click="cancelRequest(activeDropdown)"
+            class="group flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+          >
+            <i class="fas fa-ban mr-3 text-red-500 group-hover:text-red-600"></i>
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Loading Modal -->
     <div
       v-if="isLoading"
@@ -230,6 +282,38 @@
     </div>
   </div>
 </template>
+
+<style scoped>
+  /* Force dropdown to be visible above all content */
+  .relative {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Ensure dropdown menus are always on top */
+  .dropdown-menu {
+    position: absolute !important;
+    z-index: 99999 !important;
+    box-shadow:
+      0 20px 25px -5px rgba(0, 0, 0, 0.1),
+      0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+  }
+
+  /* Prevent overflow clipping in containers */
+  .table-container {
+    overflow: visible !important;
+  }
+
+  /* Dropdown portal - ensure it's above everything */
+  .dropdown-portal {
+    z-index: 999999;
+  }
+
+  .dropdown-portal > div {
+    z-index: 999999 !important;
+    position: fixed !important;
+  }
+</style>
 
 <script>
   import Header from '@/components/header.vue'
@@ -256,7 +340,8 @@
           hodRejected: 0,
           total: 0
         },
-        error: null
+        error: null,
+        activeDropdown: null
       }
     },
     computed: {
@@ -299,13 +384,130 @@
         console.log('HodRequestListSimplified: Component mounted, initializing...')
         await this.fetchRequests()
         console.log('HodRequestListSimplified: Component initialized successfully')
+
+        // Add click listener to close dropdowns when clicking outside
+        document.addEventListener('click', this.closeDropdowns)
       } catch (error) {
         console.error('HodRequestListSimplified: Error during mount:', error)
         this.error = 'Failed to initialize component: ' + error.message
         this.isLoading = false
       }
     },
+
+    beforeUnmount() {
+      // Clean up the click listener
+      document.removeEventListener('click', this.closeDropdowns)
+    },
     methods: {
+      toggleDropdown(requestId) {
+        console.log('Toggle dropdown for request:', requestId)
+        console.log('Current activeDropdown:', this.activeDropdown)
+
+        if (this.activeDropdown === requestId) {
+          this.activeDropdown = null
+          console.log('Closing dropdown')
+        } else {
+          this.activeDropdown = requestId
+          console.log('Opening dropdown for:', requestId)
+
+          // Wait for DOM update before calculating position
+          this.$nextTick(() => {
+            // Force recalculation of dropdown position
+            this.$forceUpdate()
+          })
+        }
+      },
+
+      getDropdownStyle(requestId) {
+        if (this.activeDropdown !== requestId) {
+          return { display: 'none' }
+        }
+
+        // Find the button element
+        const buttonElement = document.querySelector(`[data-request-id="${requestId}"]`)
+        if (!buttonElement) {
+          return {
+            position: 'fixed',
+            top: '50px',
+            right: '10px',
+            zIndex: 99999
+          }
+        }
+
+        const rect = buttonElement.getBoundingClientRect()
+        const viewportHeight = window.innerHeight
+        const dropdownHeight = 150 // Approximate height of dropdown
+
+        let top = rect.bottom + 8
+        let right = window.innerWidth - rect.right
+
+        // If dropdown would go below viewport, position it above the button
+        if (top + dropdownHeight > viewportHeight) {
+          top = rect.top - dropdownHeight - 8
+        }
+
+        // Ensure dropdown doesn't go off-screen to the left
+        if (right < 0) {
+          right = 10
+        }
+
+        return {
+          position: 'fixed',
+          top: top + 'px',
+          right: right + 'px',
+          zIndex: 99999
+        }
+      },
+
+      closeDropdowns(event) {
+        // Only close if clicking outside the dropdown area
+        if (!event || !event.target.closest('.relative')) {
+          this.activeDropdown = null
+        }
+      },
+
+      getActiveRequest() {
+        if (!this.activeDropdown) return null
+        return this.filteredRequests.find((r) => r.id === this.activeDropdown)
+      },
+
+      getGlobalDropdownStyle() {
+        if (!this.activeDropdown) return { display: 'none' }
+
+        const buttonElement = document.querySelector(`[data-request-id="${this.activeDropdown}"]`)
+        if (!buttonElement) {
+          return {
+            position: 'fixed',
+            top: '50px',
+            right: '10px',
+            zIndex: 99999
+          }
+        }
+
+        const rect = buttonElement.getBoundingClientRect()
+        const viewportHeight = window.innerHeight
+        const dropdownHeight = 150
+
+        let top = rect.bottom + 8
+        let right = window.innerWidth - rect.right
+
+        // If dropdown would go below viewport, position it above
+        if (top + dropdownHeight > viewportHeight) {
+          top = rect.top - dropdownHeight - 8
+        }
+
+        // Ensure it doesn't go off-screen
+        if (right < 0) right = 10
+        if (top < 0) top = 10
+
+        return {
+          position: 'fixed',
+          top: top + 'px',
+          right: right + 'px',
+          zIndex: 99999
+        }
+      },
+
       async fetchRequests() {
         this.isLoading = true
         this.error = null
@@ -383,16 +585,19 @@
       },
 
       viewAndProcessRequest(requestId) {
+        this.closeDropdowns()
         // Navigate to both-service-form.vue with populated data
         this.$router.push(`/both-service-form/${requestId}`)
       },
 
       editRequest(requestId) {
+        this.closeDropdowns()
         // Navigate to edit mode
         this.$router.push(`/both-service-form/${requestId}/edit`)
       },
 
       async cancelRequest(requestId) {
+        this.closeDropdowns()
         try {
           const confirmed = confirm(
             'Are you sure you want to cancel this request? This action cannot be undone.'

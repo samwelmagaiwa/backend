@@ -12,15 +12,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Clean up duplicate device assessments before adding unique constraint
-        // Keep the latest assessment for each booking_id + assessment_type combination
-        
-        $duplicates = DB::select("
-            SELECT booking_id, assessment_type, COUNT(*) as count
-            FROM device_assessments 
-            GROUP BY booking_id, assessment_type 
-            HAVING COUNT(*) > 1
-        ");
+        if (Schema::hasTable('device_assessments')) {
+            // Clean up duplicate device assessments before adding unique constraint
+            // Keep the latest assessment for each booking_id + assessment_type combination
+            
+            $duplicates = DB::select("
+                SELECT booking_id, assessment_type, COUNT(*) as count
+                FROM device_assessments 
+                GROUP BY booking_id, assessment_type 
+                HAVING COUNT(*) > 1
+            ");
         
         foreach ($duplicates as $duplicate) {
             // Get all assessments for this booking_id + assessment_type
@@ -50,9 +51,12 @@ return new class extends Migration
             }
         }
         
-        \Log::info('Duplicate assessment cleanup completed', [
-            'total_duplicates_found' => count($duplicates)
-        ]);
+            \Log::info('Duplicate assessment cleanup completed', [
+                'total_duplicates_found' => count($duplicates)
+            ]);
+        } else {
+            echo "⚠️ Table device_assessments does not exist yet. Migration will be skipped and handled later.\n";
+        }
     }
 
     /**

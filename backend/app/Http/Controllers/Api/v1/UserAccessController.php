@@ -100,7 +100,17 @@ class UserAccessController extends Controller
             $user = Auth::user();
             
             // Debug: Log incoming request data
-            Log::info('Incoming request data:', [
+            Log::info('\ud83d\udd0d USER ACCESS CONTROLLER DEBUG:', [
+                'request_method' => $request->method(),
+                'request_url' => $request->url(),
+                'content_type' => $request->header('Content-Type'),
+                'all_data' => $request->except(['signature']),
+                'selectedWellsoft' => $request->input('selectedWellsoft', 'NOT_PROVIDED'),
+                'selectedJeeva' => $request->input('selectedJeeva', 'NOT_PROVIDED'),
+                'wellsoftRequestType' => $request->input('wellsoftRequestType', 'NOT_PROVIDED'),
+                'accessType' => $request->input('accessType', 'NOT_PROVIDED'),
+                'temporaryUntil' => $request->input('temporaryUntil', 'NOT_PROVIDED'),
+                'request_types' => $request->input('request_types', 'NOT_PROVIDED'),
                 'request_type' => $request->input('request_type'),
                 'services' => $request->input('services'),
                 'internetPurposes' => $request->input('internetPurposes')
@@ -126,9 +136,35 @@ class UserAccessController extends Controller
                 $purposes = array_values($purposes); // Re-index array
             }
             
+            // Process module selections with comprehensive fallback strategies (same as BothServiceFormController)
+            $selectedWellsoft = $this->processModuleArray($request, 'selectedWellsoft');
+            $selectedJeeva = $this->processModuleArray($request, 'selectedJeeva');
+            
+            Log::info('📊 Processed module selections in UserAccessController', [
+                'selectedWellsoft' => $selectedWellsoft,
+                'selectedJeeva' => $selectedJeeva,
+                'selectedWellsoft_count' => count($selectedWellsoft),
+                'selectedJeeva_count' => count($selectedJeeva),
+                'wellsoftRequestType' => $request->input('wellsoftRequestType', 'use')
+            ]);
+            
+            // Note: Module selection is done by HOD during approval process at /both-service-form/:id
+            // User submission only includes service selections (Jeeva, Wellsoft, Internet Access)
+            // Modules will be populated by HOD during approval workflow
+            
+            Log::info('User submitted service request - modules will be selected by HOD during approval', [
+                'user_id' => $user->id,
+                'selected_services' => $selectedServices,
+                'wellsoft_modules_from_request' => $selectedWellsoft,
+                'jeeva_modules_from_request' => $selectedJeeva,
+                'note' => 'Empty module arrays are expected - HOD selects modules during approval'
+            ]);
+            
             Log::info('Creating combined user access request', [
                 'selected_services' => $selectedServices,
-                'purposes' => $purposes
+                'purposes' => $purposes,
+                'wellsoft_modules_count' => count($selectedWellsoft),
+                'jeeva_modules_count' => count($selectedJeeva)
             ]);
             
             // Create the combined access request - store multiple services in one row
@@ -142,6 +178,66 @@ class UserAccessController extends Controller
                 'purpose' => $purposes,
                 'request_type' => $selectedServices, // Array stored as JSON
                 'status' => 'pending',
+                
+                // Module selections will be populated by HOD during approval process
+                'wellsoft_modules' => [],
+                'wellsoft_modules_selected' => [],
+                'jeeva_modules' => [],
+                'jeeva_modules_selected' => [],
+                'module_requested_for' => $request->input('wellsoftRequestType', 'use'),
+                'internet_purposes' => array_filter($request->input('internetPurposes', []), function($purpose) {
+                    return !empty(trim($purpose));
+                }),
+                
+                // \u2705 ADD ACCESS TYPE AND TEMPORARY DATE
+                'access_type' => $request->input('accessType', 'permanent'),
+                'temporary_until' => $request->input('temporaryUntil'),
+                
+                // \u2705 ADD APPROVAL DATA
+                'hod_name' => $request->input('hodName'),
+                'hod_signature_path' => $this->handleSignatureUpload($request, 'hodSignature', $validatedData['pf_number'], 'hod'),
+                'hod_approved_at' => $request->input('hodDate') ? $request->input('hodDate') : null,
+                'hod_comments' => $request->input('hodComments'),
+                
+                'divisional_director_name' => $request->input('divisionalDirectorName'),
+                'divisional_director_signature_path' => $this->handleSignatureUpload($request, 'divisionalDirectorSignature', $validatedData['pf_number'], 'divisional_director'),
+                'divisional_approved_at' => $request->input('divisionalDirectorDate') ? $request->input('divisionalDirectorDate') : null,
+                'divisional_director_comments' => $request->input('divisionalDirectorComments'),
+                
+                'ict_director_name' => $request->input('ictDirectorName'),
+                'ict_director_signature_path' => $this->handleSignatureUpload($request, 'ictDirectorSignature', $validatedData['pf_number'], 'ict_director'),
+                'ict_director_approved_at' => $request->input('ictDirectorDate') ? $request->input('ictDirectorDate') : null,
+                'ict_director_comments' => $request->input('ictDirectorComments'),
+                
+                // \u2705 ADD IMPLEMENTATION DATA
+                'head_it_name' => $request->input('headITName'),
+                'head_it_signature_path' => $this->handleSignatureUpload($request, 'headITSignature', $validatedData['pf_number'], 'head_it'),
+                'head_it_approved_at' => $request->input('headITDate') ? $request->input('headITDate') : null,
+                'head_it_comments' => $request->input('headITComments'),
+                
+                'ict_officer_name' => $request->input('ictOfficerName'),
+                'ict_officer_signature_path' => $this->handleSignatureUpload($request, 'ictOfficerSignature', $validatedData['pf_number'], 'ict_officer'),
+                'ict_officer_implemented_at' => $request->input('ictOfficerDate') ? $request->input('ictOfficerDate') : null,
+                'ict_officer_comments' => $request->input('ictOfficerComments'),
+                'implementation_comments' => $request->input('implementationComments')
+            ]);
+            
+            // Refresh the model to get actual stored values
+            $userAccess->refresh();
+            
+            Log::info('\u2705 ACTUAL DATA STORED IN DATABASE (UserAccessController):', [
+                'record_id' => $userAccess->id,
+                'wellsoft_modules' => $userAccess->wellsoft_modules,
+                'wellsoft_modules_selected' => $userAccess->wellsoft_modules_selected,
+                'jeeva_modules' => $userAccess->jeeva_modules,
+                'jeeva_modules_selected' => $userAccess->jeeva_modules_selected,
+                'module_requested_for' => $userAccess->module_requested_for,
+                'internet_purposes' => $userAccess->internet_purposes,
+                'access_type' => $userAccess->access_type,
+                'temporary_until' => $userAccess->temporary_until,
+                'request_type' => $userAccess->request_type,
+                'hod_name' => $userAccess->hod_name,
+                'hod_signature_path' => $userAccess->hod_signature_path
             ]);
             
             Log::info('Successfully created combined request', [
@@ -300,6 +396,10 @@ class UserAccessController extends Controller
             // Get selected services from validated data
             $selectedServices = $validatedData['request_type'];
             
+            // Process module selections with comprehensive fallback strategies (same as store method)
+            $selectedWellsoft = $this->processModuleArray($request, 'selectedWellsoft');
+            $selectedJeeva = $this->processModuleArray($request, 'selectedJeeva');
+            
             // Process internet purposes if internet access is selected
             $purposes = null;
             if (in_array('internet_access_request', $selectedServices) && isset($validatedData['internetPurposes'])) {
@@ -313,10 +413,12 @@ class UserAccessController extends Controller
                 'request_id' => $userAccess->id,
                 'selected_services' => $selectedServices,
                 'purposes' => $purposes,
-                'signature_updated' => $request->hasFile('signature')
+                'signature_updated' => $request->hasFile('signature'),
+                'wellsoft_modules_count' => count($selectedWellsoft),
+                'jeeva_modules_count' => count($selectedJeeva)
             ]);
 
-            // Update the request with all fields including services
+            // Update the request with all fields including services and modules
             $userAccess->update([
                 'pf_number' => $validatedData['pf_number'],
                 'staff_name' => $validatedData['staff_name'],
@@ -326,6 +428,13 @@ class UserAccessController extends Controller
                 'request_type' => $selectedServices, // Update services
                 'purpose' => $purposes, // Update internet purposes
                 'status' => 'pending', // Reset status to pending for resubmission
+                
+                // Update module selections
+                'wellsoft_modules' => $selectedWellsoft,
+                'wellsoft_modules_selected' => $selectedWellsoft,
+                'jeeva_modules' => $selectedJeeva,
+                'jeeva_modules_selected' => $selectedJeeva,
+                'module_requested_for' => $request->input('wellsoftRequestType', 'use'),
             ]);
 
             $userAccess->load(['user', 'department']);
@@ -484,6 +593,38 @@ class UserAccessController extends Controller
         }
     }
 
+    /**
+     * Handle signature upload for approval/implementation signatures
+     */
+    private function handleSignatureUpload(Request $request, string $fieldName, string $pfNumber, string $role): ?string
+    {
+        if (!$request->hasFile($fieldName)) {
+            return null;
+        }
+        
+        try {
+            $signatureFile = $request->file($fieldName);
+            $directory = 'signatures/' . $role;
+            $filename = $role . '_signature_' . $pfNumber . '_' . time() . '.' . $signatureFile->getClientOriginalExtension();
+            $path = $signatureFile->storeAs($directory, $filename, 'public');
+            
+            Log::info("$role signature uploaded successfully", [
+                'pf_number' => $pfNumber,
+                'role' => $role,
+                'filename' => $filename,
+                'path' => $path
+            ]);
+            
+            return $path;
+        } catch (\Exception $e) {
+            Log::error("Error storing $role signature: " . $e->getMessage(), [
+                'pf_number' => $pfNumber,
+                'role' => $role
+            ]);
+            return null;
+        }
+    }
+    
     /**
      * Store uploaded signature file.
      */
@@ -647,5 +788,62 @@ class UserAccessController extends Controller
                 'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
             ], 500);
         }
+    }
+    
+    /**
+     * Helper method to process module arrays with proper filtering (same as BothServiceFormController)
+     */
+    private function processModuleArray(Request $request, string $fieldName): array
+    {
+        // Strategy 1: Direct input method
+        $input = $request->input($fieldName);
+        $result = [];
+        
+        // Strategy 2: Process input if not empty
+        if (!empty($input)) {
+            if (is_array($input)) {
+                $result = array_filter($input, function($item) {
+                    return !empty($item) && $item !== null && $item !== '';
+                });
+            } elseif (is_string($input)) {
+                try {
+                    $decoded = json_decode($input, true);
+                    if (is_array($decoded)) {
+                        $result = array_filter($decoded, function($item) {
+                            return !empty($item) && $item !== null && $item !== '';
+                        });
+                    } else {
+                        $result = [$input];
+                    }
+                } catch (\Exception $e) {
+                    $result = [$input];
+                }
+            }
+        }
+        
+        // Strategy 3: Alternative FormData parsing (array notation)
+        if (empty($result)) {
+            $formKeys = array_keys($request->all());
+            $moduleKeys = array_filter($formKeys, function($key) use ($fieldName) {
+                return preg_match('/^' . preg_quote($fieldName, '/') . '\[\d+\]$/', $key);
+            });
+            
+            foreach ($moduleKeys as $key) {
+                $value = $request->input($key);
+                if (!empty($value) && $value !== null && $value !== '') {
+                    $result[] = $value;
+                }
+            }
+            
+            if (!empty($moduleKeys)) {
+                Log::info('🔄 FormData parsing for ' . $fieldName . ' in UserAccessController', [
+                    'found_keys' => $moduleKeys,
+                    'extracted_values' => $result
+                ]);
+            }
+        }
+        
+        // Ensure arrays are properly indexed and cleaned
+        return array_values(array_filter($result));
     }
 }

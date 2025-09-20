@@ -7,6 +7,7 @@ use App\Http\Middleware\BothServiceFormRoleMiddleware;
 use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\InputSanitization;
 use App\Http\Middleware\XSSProtection;
+use App\Http\Middleware\CustomCorsMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Middleware\HandleCors;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
@@ -22,19 +23,21 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function ($middleware) {
-        // Temporarily disabled all middleware for debugging
-        // // Security middlewares
-        // $middleware->use([
-        //     SecurityHeaders::class,      // Apply security headers first
-        //     InputSanitization::class,    // Sanitize inputs early
-        //     XSSProtection::class,        // XSS protection after sanitization
-        // ]);
+        // Security middlewares
+        // Include CORS globally to ensure OPTIONS preflight gets headers even if route group middleware is bypassed
+        $middleware->use([
+            CustomCorsMiddleware::class, // CORS must be first so all responses include CORS headers
+            SecurityHeaders::class,      // Apply security headers first
+            InputSanitization::class,    // Sanitize inputs early
+            XSSProtection::class,        // XSS protection after sanitization
+        ]);
         
-        // // CORS and API-specific middleware
-        // $middleware->prependToGroup('api', HandleCors::class);
-        // $middleware->appendToGroup('api', 'throttle:api'); // Rate limiting for API routes
+        // CORS and API-specific middleware - CRITICAL FOR FRONTEND-BACKEND COMMUNICATION
+        // Keep CORS in API group as well for explicit ordering within the group
+        $middleware->prependToGroup('api', CustomCorsMiddleware::class);
+        $middleware->appendToGroup('api', 'throttle:api'); // Rate limiting for API routes
         
-        // // Removed EnsureFrontendRequestsAreStateful from API group to keep API stateless and avoid CSRF on API routes
+        // Removed EnsureFrontendRequestsAreStateful from API group to keep API stateless and avoid CSRF on API routes
         $middleware->alias([
             'browserbackarrow' => BrowserBackArrowMiddleware::class,
             'abilities' => CheckTokenAbilities::class,

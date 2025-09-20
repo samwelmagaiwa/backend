@@ -52,10 +52,14 @@ return new class extends Migration
                 $table->index('staff_name');
                 $table->index('department_id');
                 
-                // Foreign key constraints
-                $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-                $table->foreign('department_id')->references('id')->on('departments')->onDelete('set null');
-                $table->foreign('cancelled_by')->references('id')->on('users')->onDelete('set null');
+                // Foreign key constraints - only add if referenced tables exist
+                if (Schema::hasTable('users')) {
+                    $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+                    $table->foreign('cancelled_by')->references('id')->on('users')->onDelete('set null');
+                }
+                if (Schema::hasTable('departments')) {
+                    $table->foreign('department_id')->references('id')->on('departments')->onDelete('set null');
+                }
             });
             
             echo "✅ Created user_access table with HOD approval columns\n";

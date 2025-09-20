@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class UserAccess extends Model
 {
@@ -25,10 +26,7 @@ class UserAccess extends Model
         'phone_number',
         'department_id',
         'signature_path',
-        'purpose',
         'request_type',
-        'wellsoft_modules',
-        'jeeva_modules',
         'internet_purposes',
         'module_requested_for',
         'wellsoft_modules_selected',
@@ -37,7 +35,11 @@ class UserAccess extends Model
         'temporary_until',
         'status',
         'hod_comments',
+        'hod_resubmission_notes',
+        'resubmitted_at',
+        'resubmitted_by',
         'hod_name',
+        'hod_signature_path',
         'hod_approved_at',
         'hod_approved_by',
         'hod_approved_by_name',
@@ -70,14 +72,12 @@ class UserAccess extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'request_type' => 'array',
-        'purpose' => 'array',
-        'wellsoft_modules' => 'array',
-        'jeeva_modules' => 'array',
         'wellsoft_modules_selected' => 'array',
         'jeeva_modules_selected' => 'array',
         'internet_purposes' => 'array',
         'temporary_until' => 'date',
         'hod_approved_at' => 'datetime',
+        'resubmitted_at' => 'datetime',
         'divisional_approved_at' => 'datetime',
         'ict_director_approved_at' => 'datetime',
         'head_it_approved_at' => 'datetime',
@@ -135,6 +135,202 @@ class UserAccess extends Model
     public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class);
+    }
+
+    /**
+     * Get the selected Wellsoft modules for this request.
+     */
+    public function selectedWellsoftModules(): BelongsToMany
+    {
+        return $this->belongsToMany(WellsoftModule::class, 'wellsoft_modules_selected', 'user_access_id', 'module_id')
+                    ->withTimestamps();
+    }
+
+    /**
+     * Get the selected Jeeva modules for this request.
+     */
+    public function selectedJeevaModules(): BelongsToMany
+    {
+        return $this->belongsToMany(JeevaModule::class, 'jeeva_modules_selected', 'user_access_id', 'module_id')
+                    ->withTimestamps();
+    }
+
+    /**
+     * Check if the access is permanent.
+     */
+    public function isPermanent(): bool
+    {
+        return $this->access_type === 'permanent';
+    }
+
+    /**
+     * Check if the access is temporary.
+     */
+    public function isTemporary(): bool
+    {
+        return $this->access_type === 'temporary';
+    }
+
+    /**
+     * Check if the temporary access has expired.
+     */
+    public function isExpired(): bool
+    {
+        if (!$this->isTemporary() || !$this->temporary_until) {
+            return false;
+        }
+        
+        return now()->isAfter($this->temporary_until);
+    }
+
+    /**
+     * Check if HOD has approved this request.
+     */
+    public function isHodApproved(): bool
+    {
+        return !empty($this->hod_name) && !empty($this->hod_approved_at);
+    }
+
+    /**
+     * Check if Divisional Director has approved this request.
+     */
+    public function isDivisionalDirectorApproved(): bool
+    {
+        return !empty($this->divisional_director_name) && !empty($this->divisional_approved_at);
+    }
+
+    /**
+     * Check if ICT Director has approved this request.
+     */
+    public function isIctDirectorApproved(): bool
+    {
+        return !empty($this->ict_director_name) && !empty($this->ict_director_approved_at);
+    }
+
+    /**
+     * Get the approval progress percentage.
+     */
+    public function getApprovalProgress(): int
+    {
+        $totalSteps = 3; // HOD, Divisional Director, ICT Director
+        $completedSteps = 0;
+        
+        if ($this->isHodApproved()) $completedSteps++;
+        if ($this->isDivisionalDirectorApproved()) $completedSteps++;
+        if ($this->isIctDirectorApproved()) $completedSteps++;
+        
+        return (int) (($completedSteps / $totalSteps) * 100);
+    }
+
+    /**
+     * Get the next approval step.
+     */
+    public function getNextApprovalStep(): ?string
+    {
+        if (!$this->isHodApproved()) {
+            return 'HOD/BM Approval';
+        }
+        
+        if (!$this->isDivisionalDirectorApproved()) {
+            return 'Divisional Director Approval';
+        }
+        
+        if (!$this->isIctDirectorApproved()) {
+            return 'ICT Director Approval';
+        }
+        
+        if (!$this->isHeadItApproved()) {
+            return 'Head of IT Approval';
+        }
+        
+        if (!$this->isIctOfficerImplemented()) {
+            return 'ICT Officer Implementation';
+        }
+        
+        return null; // All steps completed
+    }
+
+    /**
+     * Check if Head of IT has approved this request.
+     */
+    public function isHeadItApproved(): bool
+    {
+        return !empty($this->head_it_name) && !empty($this->head_it_approved_at);
+    }
+
+    /**
+     * Check if ICT Officer has implemented this request.
+     */
+    public function isIctOfficerImplemented(): bool
+    {
+        return !empty($this->ict_officer_name) && !empty($this->ict_officer_implemented_at);
+    }
+
+    /**
+     * Check if the implementation workflow is complete.
+     */
+    public function isImplementationComplete(): bool
+    {
+        return $this->isHeadItApproved() && $this->isIctOfficerImplemented();
+    }
+
+    /**
+     * Get the implementation progress percentage.
+     */
+    public function getImplementationProgress(): int
+    {
+        $totalSteps = 2; // Head of IT, ICT Officer
+        $completedSteps = 0;
+        
+        if ($this->isHeadItApproved()) $completedSteps++;
+        if ($this->isIctOfficerImplemented()) $completedSteps++;
+        
+        return (int) (($completedSteps / $totalSteps) * 100);
+    }
+
+    /**
+     * Get the complete workflow progress percentage (approval + implementation).
+     */
+    public function getCompleteWorkflowProgress(): int
+    {
+        $totalSteps = 5; // HOD, Divisional Director, ICT Director, Head of IT, ICT Officer
+        $completedSteps = 0;
+        
+        if ($this->isHodApproved()) $completedSteps++;
+        if ($this->isDivisionalDirectorApproved()) $completedSteps++;
+        if ($this->isIctDirectorApproved()) $completedSteps++;
+        if ($this->isHeadItApproved()) $completedSteps++;
+        if ($this->isIctOfficerImplemented()) $completedSteps++;
+        
+        return (int) (($completedSteps / $totalSteps) * 100);
+    }
+
+    /**
+     * Get the current workflow stage.
+     */
+    public function getCurrentWorkflowStage(): string
+    {
+        if (!$this->isHodApproved()) {
+            return 'Pending HOD Approval';
+        }
+        
+        if (!$this->isDivisionalDirectorApproved()) {
+            return 'Pending Divisional Director Approval';
+        }
+        
+        if (!$this->isIctDirectorApproved()) {
+            return 'Pending ICT Director Approval';
+        }
+        
+        if (!$this->isHeadItApproved()) {
+            return 'Pending Head of IT Approval';
+        }
+        
+        if (!$this->isIctOfficerImplemented()) {
+            return 'Pending ICT Officer Implementation';
+        }
+        
+        return 'Implementation Complete';
     }
 
     /**
@@ -202,6 +398,85 @@ class UserAccess extends Model
     public function isRejected(): bool
     {
         return $this->status === 'rejected';
+    }
+
+    /**
+     * Get the next approval needed in the workflow
+     */
+    public function getNextApprovalNeeded(): string
+    {
+        // If no HOD approval yet
+        if (empty($this->hod_approved_at)) {
+            return 'HOD/BM Approval';
+        }
+        
+        // If no divisional director approval yet
+        if (empty($this->divisional_approved_at)) {
+            return 'Divisional Director Approval';
+        }
+        
+        // If no ICT director approval yet
+        if (empty($this->ict_director_approved_at)) {
+            return 'ICT Director Approval';
+        }
+        
+        // If no Head IT approval yet
+        if (empty($this->head_it_approved_at)) {
+            return 'Head IT Approval';
+        }
+        
+        // If no ICT Officer implementation yet
+        if (empty($this->ict_officer_implemented_at)) {
+            return 'ICT Officer Implementation';
+        }
+        
+        return 'Complete';
+    }
+
+    /**
+     * Get the current approval stage
+     */
+    public function getCurrentApprovalStage(): array
+    {
+        $stages = [
+            'hod' => [
+                'name' => 'HOD/BM',
+                'completed' => !empty($this->hod_approved_at),
+                'has_signature' => !empty($this->hod_signature_path),
+                'approved_by' => $this->hod_name,
+                'approved_at' => $this->hod_approved_at
+            ],
+            'divisional' => [
+                'name' => 'Divisional Director',
+                'completed' => !empty($this->divisional_approved_at),
+                'has_signature' => !empty($this->divisional_director_signature_path),
+                'approved_by' => $this->divisional_director_name,
+                'approved_at' => $this->divisional_approved_at
+            ],
+            'ict_director' => [
+                'name' => 'ICT Director',
+                'completed' => !empty($this->ict_director_approved_at),
+                'has_signature' => !empty($this->ict_director_signature_path),
+                'approved_by' => $this->ict_director_name,
+                'approved_at' => $this->ict_director_approved_at
+            ],
+            'head_it' => [
+                'name' => 'Head IT',
+                'completed' => !empty($this->head_it_approved_at),
+                'has_signature' => !empty($this->head_it_signature_path),
+                'approved_by' => $this->head_it_name,
+                'approved_at' => $this->head_it_approved_at
+            ],
+            'ict_officer' => [
+                'name' => 'ICT Officer',
+                'completed' => !empty($this->ict_officer_implemented_at),
+                'has_signature' => !empty($this->ict_officer_signature_path),
+                'implemented_by' => $this->ict_officer_name,
+                'implemented_at' => $this->ict_officer_implemented_at
+            ]
+        ];
+        
+        return $stages;
     }
 
     /**
@@ -277,12 +552,12 @@ class UserAccess extends Model
      */
     public function hasWellsoftModules(): bool
     {
-        return !empty($this->wellsoft_modules);
+        return !empty($this->wellsoft_modules_selected);
     }
 
     public function hasJeevaModules(): bool
     {
-        return !empty($this->jeeva_modules);
+        return !empty($this->jeeva_modules_selected);
     }
 
     public function hasInternetPurposes(): bool
@@ -296,22 +571,6 @@ class UserAccess extends Model
     public function getAccessTypeNameAttribute(): string
     {
         return self::ACCESS_TYPES[$this->access_type] ?? $this->access_type;
-    }
-
-    /**
-     * Check if access is temporary
-     */
-    public function isTemporary(): bool
-    {
-        return $this->access_type === 'temporary';
-    }
-
-    /**
-     * Check if access is permanent
-     */
-    public function isPermanent(): bool
-    {
-        return $this->access_type === 'permanent';
     }
 
     /**

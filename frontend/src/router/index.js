@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { h } from 'vue'
 import { ROLES } from '../utils/permissions'
 import { preloadRouteBasedImages } from '../utils/imagePreloader'
 import { enhancedNavigationGuard } from '../utils/routeGuards'
@@ -264,15 +265,32 @@ const routes = [
     component: () =>
       import('../components/views/booking/EditBookingRequest.vue').catch((error) => {
         console.error('Failed to load EditBookingRequest component:', error)
-        // Return a fallback component
+        // Return a fallback component using render function instead of template
         return {
-          template: `
-          <div class="p-8 text-center">
-            <h1 class="text-2xl font-bold text-red-600 mb-4">Component Loading Error</h1>
-            <p class="text-gray-600 mb-4">Failed to load EditBookingRequest component.</p>
-            <button @click="$router.go(-1)" class="bg-blue-500 text-white px-4 py-2 rounded">Go Back</button>
-          </div>
-        `
+          name: 'EditBookingRequestFallback',
+          setup() {
+            return () =>
+              h('div', { class: 'p-8 text-center' }, [
+                h(
+                  'h1',
+                  { class: 'text-2xl font-bold text-red-600 mb-4' },
+                  'Component Loading Error'
+                ),
+                h(
+                  'p',
+                  { class: 'text-gray-600 mb-4' },
+                  'Failed to load EditBookingRequest component.'
+                ),
+                h(
+                  'button',
+                  {
+                    class: 'bg-blue-500 text-white px-4 py-2 rounded',
+                    onClick: () => window.history.back()
+                  },
+                  'Go Back'
+                )
+              ])
+          }
         }
       }),
     meta: {
@@ -377,19 +395,41 @@ const routes = [
     }
   },
 
+  // HOD Divisional Recommendations
+  {
+    path: '/hod-dashboard/divisional-recommendations',
+    name: 'HODDivisionalRecommendations',
+    component: () =>
+      import(/* webpackChunkName: "hod" */ '../components/views/hod/DivisionalRecommendations.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: [ROLES.HEAD_OF_DEPARTMENT]
+    }
+  },
+
+  // HOD Request Resubmission
+  {
+    path: '/hod-dashboard/resubmit-request/:id',
+    name: 'HODRequestResubmission',
+    component: () =>
+      import(/* webpackChunkName: "hod" */ '../components/views/hod/RequestResubmission.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: [ROLES.HEAD_OF_DEPARTMENT]
+    }
+  },
+
   // Divisional Director Combined Access Requests List
   {
     path: '/divisional-dashboard/combined-request',
     name: 'DivisionalCombinedRequestList',
     component: () =>
-      import(/* webpackChunkName: "divisional" */ '../components/views/divisional/DivisionalRequestList.vue'),
+      import(
+        /* webpackChunkName: "divisional" */ '../components/views/divisional/DivisionalRequestList.vue'
+      ),
     meta: {
       requiresAuth: true,
-      roles: [
-        ROLES.DIVISIONAL_DIRECTOR,
-        ROLES.ICT_DIRECTOR,
-        ROLES.ICT_OFFICER
-      ]
+      roles: [ROLES.DIVISIONAL_DIRECTOR, ROLES.ICT_DIRECTOR, ROLES.ICT_OFFICER]
     }
   },
 
@@ -430,6 +470,56 @@ const routes = [
     path: '/debug/api-test',
     name: 'ApiTest',
     component: () => import('../components/debug/ApiTest.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: Object.values(ROLES)
+    }
+  },
+  // Debug route for Dropdown Testing
+  {
+    path: '/debug/dropdown-test',
+    name: 'DropdownTest',
+    component: () => import('../components/debug/DropdownTest.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: Object.values(ROLES)
+    }
+  },
+  // Module Request Test Page
+  {
+    path: '/module-request-test',
+    name: 'ModuleRequestTest',
+    component: () => import('../components/views/ModuleRequestTestPage.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: Object.values(ROLES)
+    }
+  },
+  // Module Requests Test Page (Both Wellsoft and Jeeva)
+  {
+    path: '/module-requests-test',
+    name: 'ModuleRequestsTest',
+    component: () => import('../components/views/ModuleRequestsTestPage.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: Object.values(ROLES)
+    }
+  },
+  // Access Rights and Approval Workflow Test Page
+  {
+    path: '/access-rights-approval-test',
+    name: 'AccessRightsApprovalTest',
+    component: () => import('../components/views/AccessRightsApprovalTestPage.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: Object.values(ROLES)
+    }
+  },
+  // Implementation Workflow Test Page
+  {
+    path: '/implementation-workflow-test',
+    name: 'ImplementationWorkflowTest',
+    component: () => import('../components/views/ImplementationWorkflowTestPage.vue'),
     meta: {
       requiresAuth: true,
       roles: Object.values(ROLES)
@@ -508,10 +598,16 @@ const routes = [
     name: 'NotFound',
     component: () =>
       import('../components/NotFound.vue').catch(() => {
-        // Fallback if NotFound component doesn't exist
+        // Fallback if NotFound component doesn't exist - using render function instead of template
         return {
-          template:
-            '<div class="text-center p-8"><h1 class="text-2xl font-bold text-red-600">Page Not Found</h1><p class="mt-4">The requested page could not be found.</p></div>'
+          name: 'NotFoundFallback',
+          setup() {
+            return () =>
+              h('div', { class: 'text-center p-8' }, [
+                h('h1', { class: 'text-2xl font-bold text-red-600' }, 'Page Not Found'),
+                h('p', { class: 'mt-4' }, 'The requested page could not be found.')
+              ])
+          }
         }
       })
   }

@@ -19,7 +19,10 @@ module.exports = {
       },
       maxWidth: {
         '8xl': '88rem',
-        '9xl': '96rem'
+        '9xl': '96rem',
+        '10xl': '120rem',  // 1920px
+        '11xl': '132rem',  // 2112px
+        '12xl': '144rem'   // 2304px
       }
     }
   },
@@ -53,6 +56,10 @@ module.exports = {
     'scale-105',
     'translate-x-0',
     'translate-x-full',
-    '-translate-x-full'
+    '-translate-x-full',
+    // Custom max-width classes
+    'max-w-10xl',
+    'max-w-11xl',
+    'max-w-12xl'
   ]
 }

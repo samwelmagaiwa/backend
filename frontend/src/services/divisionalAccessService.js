@@ -13,7 +13,10 @@ class DivisionalAccessService {
    */
   async getDivisionalRequests(filters = {}) {
     try {
-      console.log('🔄 Fetching HOD-approved combined access requests for Divisional Director approval...', filters)
+      console.log(
+        '🔄 Fetching HOD-approved combined access requests for Divisional Director approval...',
+        filters
+      )
 
       const params = new URLSearchParams()
 
@@ -23,7 +26,9 @@ class DivisionalAccessService {
       if (filters.per_page) params.append('per_page', filters.per_page)
       if (filters.page) params.append('page', filters.page)
 
-      const response = await apiClient.get(`/divisional/combined-access-requests?${params.toString()}`)
+      const response = await apiClient.get(
+        `/divisional/combined-access-requests?${params.toString()}`
+      )
 
       if (response.data && response.data.success) {
         console.log(
@@ -42,7 +47,10 @@ class DivisionalAccessService {
       console.error('❌ Error fetching Divisional requests:', error)
       return {
         success: false,
-        error: error.response?.data?.message || error.message || 'Failed to retrieve Divisional requests',
+        error:
+          error.response?.data?.message ||
+          error.message ||
+          'Failed to retrieve Divisional requests',
         data: null
       }
     }
@@ -146,10 +154,13 @@ class DivisionalAccessService {
     try {
       console.log('🔄 Cancelling combined access request (Divisional Director):', requestId)
 
-      const response = await apiClient.post(`/divisional/combined-access-requests/${requestId}/cancel`, {
-        reason: reason || 'Cancelled by Divisional Director',
-        cancelled_at: new Date().toISOString()
-      })
+      const response = await apiClient.post(
+        `/divisional/combined-access-requests/${requestId}/cancel`,
+        {
+          reason: reason || 'Cancelled by Divisional Director',
+          cancelled_at: new Date().toISOString()
+        }
+      )
 
       if (response.data && response.data.success) {
         console.log('✅ Request cancelled successfully:', requestId)
@@ -324,7 +335,9 @@ class DivisionalAccessService {
     try {
       console.log('🔄 Fetching request history (Divisional Director):', requestId)
 
-      const response = await apiClient.get(`/divisional/combined-access-requests/${requestId}/history`)
+      const response = await apiClient.get(
+        `/divisional/combined-access-requests/${requestId}/history`
+      )
 
       if (response.data && response.data.success) {
         console.log('✅ Request history retrieved successfully')
@@ -409,8 +422,12 @@ class DivisionalAccessService {
   formatRequestForDisplay(request) {
     return {
       ...request,
-      formattedHodApprovalDate: this.formatDate(request.hod_approved_at || request.hod_approval_date),
-      formattedHodApprovalTime: this.formatTime(request.hod_approved_at || request.hod_approval_date),
+      formattedHodApprovalDate: this.formatDate(
+        request.hod_approved_at || request.hod_approval_date
+      ),
+      formattedHodApprovalTime: this.formatTime(
+        request.hod_approved_at || request.hod_approval_date
+      ),
       statusText: this.getStatusText(request.divisional_status || request.status),
       servicesText: this.getServicesText(request.services || request.request_types),
       requestIdDisplay: request.request_id || `REQ-${request.id.toString().padStart(6, '0')}`

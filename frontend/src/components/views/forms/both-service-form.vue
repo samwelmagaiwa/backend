@@ -45,7 +45,7 @@
           </div>
         </div>
 
-        <div class="max-w-12xl mx-auto relative z-10">
+        <div class="max-w-7xl mx-auto relative z-10">
           <!-- Header Section -->
           <div class="medical-glass-card rounded-t-3xl p-4 mb-0 border-b border-blue-300/30">
             <div class="flex justify-between items-center">
@@ -114,7 +114,7 @@
               @submit.prevent="onSubmit"
               :class="['p-4 space-y-4', { 'review-mode': isReviewMode }]"
             >
-              <div class="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-2 min-h-0">
+              <div class="flex-1 grid grid-cols-1 gap-6 min-h-0">
                 <!-- Left: shared + selectors -->
                 <section aria-labelledby="applicant-details" class="xl:col-span-4 space-y-2">
                   <!-- Personal Information Section -->
@@ -132,7 +132,7 @@
                         Personal Information
                       </h3>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                       <div>
                         <label class="block text-xs font-bold text-blue-100 mb-1">
                           PF Number <span class="text-red-400">*</span>
@@ -141,8 +141,9 @@
                           <input
                             v-model.trim="form.shared.pfNumber"
                             type="text"
-                            :readonly="isReviewMode"
-                            class="medical-input w-full px-2 py-1 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 text-sm"
+                            :readonly="isReviewMode || isDivisionalDirectorReadOnly"
+                            class="medical-input personal-info-input w-full px-2 py-1 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 text-sm"
+                            :class="{ 'font-bold': form.shared.pfNumber }"
                             placeholder="PF Number"
                             required
                           />
@@ -163,8 +164,9 @@
                           <input
                             v-model.trim="form.shared.staffName"
                             type="text"
-                            :readonly="isReviewMode"
-                            class="medical-input w-full px-2 py-1 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 text-sm"
+                            :readonly="isReviewMode || isDivisionalDirectorReadOnly"
+                            class="medical-input personal-info-input w-full px-2 py-1 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 text-sm"
+                            :class="{ 'font-bold': form.shared.staffName }"
                             placeholder="Full name"
                             required
                           />
@@ -185,8 +187,9 @@
                           <input
                             v-model.trim="form.shared.department"
                             type="text"
-                            :readonly="isReviewMode"
-                            class="medical-input w-full px-2 py-1 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 text-sm"
+                            :readonly="isReviewMode || isDivisionalDirectorReadOnly"
+                            class="medical-input personal-info-input w-full px-2 py-1 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 text-sm"
+                            :class="{ 'font-bold': form.shared.department }"
                             placeholder="Department"
                             required
                           />
@@ -204,8 +207,9 @@
                           <input
                             v-model.trim="form.shared.phone"
                             type="tel"
-                            :readonly="isReviewMode"
-                            class="medical-input w-full px-2 py-1 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 text-sm"
+                            :readonly="isReviewMode || isDivisionalDirectorReadOnly"
+                            class="medical-input personal-info-input w-full px-2 py-1 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 text-sm"
+                            :class="{ 'font-bold': form.shared.phone }"
                             placeholder="e.g. 0712 000 000"
                             required
                           />
@@ -214,11 +218,11 @@
                           ></div>
                         </div>
                       </div>
-                      <div class="md:col-span-3">
+                      <div class="md:col-span-2 lg:col-span-4">
                         <label class="block text-xs font-bold text-blue-100 mb-2 text-center">
                           Signature <span class="text-red-400">*</span>
                         </label>
-                        <div class="relative max-w-sm mx-auto">
+                        <div class="relative max-w-md mx-auto">
                           <!-- Review mode: Show signature status from database -->
                           <div
                             v-if="isReviewMode"
@@ -375,40 +379,74 @@
                         </label>
                         <div class="flex items-center gap-4 justify-center">
                           <label
-                            class="flex items-center cursor-pointer hover:bg-blue-500/20 p-2 rounded transition-all"
+                            class="flex items-center cursor-pointer p-2 rounded transition-all border"
                             :class="{
-                              'pointer-events-none':
-                                isReviewMode && !hasWellsoftRequest && !hasJeevaRequest
+                              'hover:bg-blue-500/20': !isDivisionalDirectorReadOnly,
+                              'bg-amber-500/20 border-amber-400/40 text-amber-200 shadow-md ring-1 ring-amber-400/30': isDivisionalDirectorReadOnly && wellsoftRequestType==='use',
+                              'bg-white/5 border-white/10 text-blue-200/80': isDivisionalDirectorReadOnly && wellsoftRequestType!=='use',
+                              'pointer-events-none': isReviewMode && !hasWellsoftRequest && !hasJeevaRequest
                             }"
                           >
                             <input
                               v-model="wellsoftRequestType"
                               type="radio"
                               value="use"
-                              :disabled="isReviewMode && !hasWellsoftRequest && !hasJeevaRequest"
-                              class="w-4 h-4 text-blue-600 border-blue-300 focus:ring-blue-500 mr-2"
+                              :disabled="(isReviewMode && !hasWellsoftRequest && !hasJeevaRequest) || isDivisionalDirectorReadOnly"
+                              :class="[
+                                'w-4 h-4 border-blue-300 focus:ring-blue-500 mr-2',
+                                isDivisionalDirectorReadOnly
+                                  ? (wellsoftRequestType==='use' ? 'text-amber-500 accent-amber-500' : 'text-blue-400 accent-blue-400')
+                                  : 'text-blue-600'
+                              ]"
                             />
-                            <span class="text-sm font-medium text-blue-100 flex items-center">
-                              <i class="fas fa-plus-circle mr-1 text-green-400 text-xs"></i>
+                            <span class="text-sm font-medium flex items-center"
+                              :class="{
+                                'text-amber-200': isDivisionalDirectorReadOnly && wellsoftRequestType==='use',
+                                'text-blue-100': !isDivisionalDirectorReadOnly || wellsoftRequestType!=='use'
+                              }"
+                            >
+                              <i class="fas fa-plus-circle mr-1 text-xs"
+                                :class="{
+                                  'text-amber-400': isDivisionalDirectorReadOnly && wellsoftRequestType==='use',
+                                  'text-green-400': !isDivisionalDirectorReadOnly || wellsoftRequestType!=='use'
+                                }"
+                              ></i>
                               Use
                             </span>
                           </label>
                           <label
-                            class="flex items-center cursor-pointer hover:bg-red-500/20 p-2 rounded transition-all"
+                            class="flex items-center cursor-pointer p-2 rounded transition-all border"
                             :class="{
-                              'pointer-events-none':
-                                isReviewMode && !hasWellsoftRequest && !hasJeevaRequest
+                              'hover:bg-red-500/20': !isDivisionalDirectorReadOnly,
+                              'bg-amber-500/20 border-amber-400/40 text-amber-200 shadow-md ring-1 ring-amber-400/30': isDivisionalDirectorReadOnly && wellsoftRequestType==='revoke',
+                              'bg-white/5 border-white/10 text-blue-200/80': isDivisionalDirectorReadOnly && wellsoftRequestType!=='revoke',
+                              'pointer-events-none': isReviewMode && !hasWellsoftRequest && !hasJeevaRequest
                             }"
                           >
                             <input
                               v-model="wellsoftRequestType"
                               type="radio"
                               value="revoke"
-                              :disabled="isReviewMode && !hasWellsoftRequest && !hasJeevaRequest"
-                              class="w-4 h-4 text-blue-600 border-blue-300 focus:ring-blue-500 mr-2"
+                              :disabled="(isReviewMode && !hasWellsoftRequest && !hasJeevaRequest) || isDivisionalDirectorReadOnly"
+                              :class="[
+                                'w-4 h-4 border-blue-300 focus:ring-blue-500 mr-2',
+                                isDivisionalDirectorReadOnly
+                                  ? (wellsoftRequestType==='revoke' ? 'text-amber-500 accent-amber-500' : 'text-blue-400 accent-blue-400')
+                                  : 'text-blue-600'
+                              ]"
                             />
-                            <span class="text-sm font-medium text-blue-100 flex items-center">
-                              <i class="fas fa-minus-circle mr-1 text-red-400 text-xs"></i>
+                            <span class="text-sm font-medium flex items-center"
+                              :class="{
+                                'text-amber-200': isDivisionalDirectorReadOnly && wellsoftRequestType==='revoke',
+                                'text-blue-100': !isDivisionalDirectorReadOnly || wellsoftRequestType!=='revoke'
+                              }"
+                            >
+                              <i class="fas fa-minus-circle mr-1 text-xs"
+                                :class="{
+                                  'text-amber-400': isDivisionalDirectorReadOnly && wellsoftRequestType==='revoke',
+                                  'text-red-400': !isDivisionalDirectorReadOnly || wellsoftRequestType!=='revoke'
+                                }"
+                              ></i>
                               Revoke
                             </span>
                           </label>
@@ -431,9 +469,13 @@
                         </span>
                       </label>
                       <div class="flex items-center justify-between mb-3">
-                        <span class="text-sm text-blue-200"
-                          >{{ selectedWellsoft.length }} modules selected</span
-                        >
+                        <span class="text-sm transition-all duration-300" :class="{ 
+                          'font-bold text-amber-300 bg-amber-500/20 px-3 py-1.5 rounded-full border border-amber-400/30 backdrop-blur-sm shadow-lg': selectedWellsoft.length && isDivisionalDirectorReadOnly,
+                          'text-blue-200': !isDivisionalDirectorReadOnly
+                        }">
+                          <i v-if="selectedWellsoft.length && isDivisionalDirectorReadOnly" class="fas fa-star text-amber-400 mr-1 text-xs"></i>
+                          {{ selectedWellsoft.length }} modules selected
+                        </span>
                         <div v-if="!isWellsoftReadonly" class="flex items-center gap-2 text-sm">
                           <button
                             type="button"
@@ -467,9 +509,20 @@
                         <span
                           v-for="m in selectedWellsoft"
                           :key="'selW-' + m"
-                          class="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-blue-500/20 text-blue-100 text-sm backdrop-blur-sm border border-blue-400/30"
+                          class="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-sm backdrop-blur-sm border transition-all duration-300 transform"
+                          :class="{ 
+                            'font-bold text-amber-200 bg-gradient-to-r from-amber-500/25 to-amber-600/25 border-amber-400/40 shadow-lg hover:shadow-xl hover:scale-105 hover:from-amber-500/30 hover:to-amber-600/30': isDivisionalDirectorReadOnly,
+                            'text-blue-100 bg-blue-500/20 border-blue-400/30': !isDivisionalDirectorReadOnly
+                          }"
                         >
-                          <i class="fas fa-check text-blue-300"></i> {{ m }}
+                          <i class="fas fa-check transition-colors duration-300" :class="{
+                            'text-amber-400': isDivisionalDirectorReadOnly,
+                            'text-blue-300': !isDivisionalDirectorReadOnly
+                          }"></i> 
+                          <span class="relative">
+                            {{ m }}
+                            <div v-if="isDivisionalDirectorReadOnly" class="absolute inset-0 rounded bg-gradient-to-r from-amber-500/10 to-amber-600/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                          </span>
                           <button
                             v-if="!isWellsoftReadonly"
                             type="button"
@@ -495,7 +548,9 @@
                         v-if="!isWellsoftReadonly"
                         class="bg-white/10 rounded-lg p-3 max-h-40 border border-blue-300/30 overflow-y-auto backdrop-blur-sm"
                       >
-                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                        <div
+                          class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-3"
+                        >
                           <label
                             v-for="m in filteredWellsoft"
                             :key="'optW-' + m"
@@ -528,9 +583,13 @@
                         </span>
                       </label>
                       <div class="flex items-center justify-between mb-3">
-                        <span class="text-sm text-blue-200"
-                          >{{ selectedJeeva.length }} modules selected</span
-                        >
+                        <span class="text-sm transition-all duration-300" :class="{ 
+                          'font-bold text-amber-300 bg-amber-500/20 px-3 py-1.5 rounded-full border border-amber-400/30 backdrop-blur-sm shadow-lg': selectedJeeva.length && isDivisionalDirectorReadOnly,
+                          'text-blue-200': !isDivisionalDirectorReadOnly
+                        }">
+                          <i v-if="selectedJeeva.length && isDivisionalDirectorReadOnly" class="fas fa-star text-amber-400 mr-1 text-xs"></i>
+                          {{ selectedJeeva.length }} modules selected
+                        </span>
                         <div v-if="!isJeevaReadonly" class="flex items-center gap-2 text-sm">
                           <button
                             type="button"
@@ -563,9 +622,20 @@
                         <span
                           v-for="m in selectedJeeva"
                           :key="'selJ-' + m"
-                          class="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-cyan-500/20 text-cyan-100 text-sm backdrop-blur-sm border border-cyan-400/30"
+                          class="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-sm backdrop-blur-sm border transition-all duration-300 transform"
+                          :class="{ 
+                            'font-bold text-amber-200 bg-gradient-to-r from-amber-500/25 to-amber-600/25 border-amber-400/40 shadow-lg hover:shadow-xl hover:scale-105 hover:from-amber-500/30 hover:to-amber-600/30': isDivisionalDirectorReadOnly,
+                            'text-cyan-100 bg-cyan-500/20 border-cyan-400/30': !isDivisionalDirectorReadOnly
+                          }"
                         >
-                          <i class="fas fa-check text-cyan-300"></i> {{ m }}
+                          <i class="fas fa-check transition-colors duration-300" :class="{
+                            'text-amber-400': isDivisionalDirectorReadOnly,
+                            'text-cyan-300': !isDivisionalDirectorReadOnly
+                          }"></i> 
+                          <span class="relative">
+                            {{ m }}
+                            <div v-if="isDivisionalDirectorReadOnly" class="absolute inset-0 rounded bg-gradient-to-r from-amber-500/10 to-amber-600/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                          </span>
                           <button
                             v-if="!isJeevaReadonly"
                             type="button"
@@ -588,9 +658,11 @@
 
                       <div
                         v-if="!isJeevaReadonly"
-                        class="bg-white/10 rounded-lg p-3 max-h-40 border border-blue-300/30 overflow-y-auto backdrop-blur-sm"
+                        class="bg-white/10 rounded-lg p-3 border border-blue-300/30 backdrop-blur-sm"
                       >
-                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                        <div
+                          class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-7 gap-3"
+                        >
                           <label
                             v-for="m in filteredJeeva"
                             :key="'optJ-' + m"
@@ -666,84 +738,6 @@
                     </div>
                   </div>
 
-                  <!-- Access Rights Section -->
-                  <div
-                    class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-3 rounded-lg backdrop-blur-sm hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 group"
-                  >
-                    <div class="flex items-center space-x-2 mb-3">
-                      <div
-                        class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
-                      >
-                        <i class="fas fa-lock text-white text-sm"></i>
-                      </div>
-                      <h3 class="text-base font-bold text-white flex items-center">
-                        <i class="fas fa-key mr-1 text-blue-300"></i>
-                        Access Rights
-                      </h3>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <!-- Permanent Option -->
-                      <div
-                        class="flex items-center p-4 border-2 border-blue-300/30 rounded-xl hover:border-blue-400 hover:bg-white/10 transition-all backdrop-blur-sm"
-                      >
-                        <input
-                          v-model="form.accessRights.type"
-                          type="radio"
-                          value="permanent"
-                          class="w-5 h-5 text-blue-600 border-blue-300 focus:ring-blue-500 mr-4 access-rights-editable"
-                        />
-                        <span class="font-medium text-white text-sm"
-                          >Permanent (until retirement)</span
-                        >
-                      </div>
-
-                      <!-- Temporary Until Option -->
-                      <div
-                        class="flex items-center justify-between p-4 border-2 border-blue-300/30 rounded-xl hover:border-blue-400 hover:bg-white/10 transition-all backdrop-blur-sm"
-                      >
-                        <div class="flex items-center">
-                          <input
-                            v-model="form.accessRights.type"
-                            type="radio"
-                            value="temporary"
-                            class="w-5 h-5 text-blue-600 border-blue-300 focus:ring-blue-500 mr-4 access-rights-editable"
-                          />
-                          <span class="font-medium text-white text-sm">Temporary Until</span>
-                        </div>
-
-                        <div
-                          class="flex items-center gap-2"
-                          v-if="form.accessRights.type === 'temporary'"
-                        >
-                          <input
-                            v-model="form.accessRights.tempDate.month"
-                            type="text"
-                            placeholder="MM"
-                            maxlength="2"
-                            class="w-12 px-2 py-1 bg-white/15 border border-blue-300/30 rounded-lg text-center text-sm text-white focus:border-blue-400 focus:outline-none backdrop-blur-sm access-rights-editable"
-                          />
-                          <span class="text-blue-200">/</span>
-                          <input
-                            v-model="form.accessRights.tempDate.day"
-                            type="text"
-                            placeholder="DD"
-                            maxlength="2"
-                            class="w-12 px-2 py-1 bg-white/15 border border-blue-300/30 rounded-lg text-center text-sm text-white focus:border-blue-400 focus:outline-none backdrop-blur-sm access-rights-editable"
-                          />
-                          <span class="text-blue-200">/</span>
-                          <input
-                            v-model="form.accessRights.tempDate.year"
-                            type="text"
-                            placeholder="YYYY"
-                            maxlength="4"
-                            class="w-20 px-2 py-1 bg-white/15 border border-blue-300/30 rounded-lg text-center text-sm text-white focus:border-blue-400 focus:outline-none backdrop-blur-sm access-rights-editable"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
                   <!-- Approval Section -->
                   <div
                     class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-3 rounded-lg backdrop-blur-sm hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 group"
@@ -760,7 +754,7 @@
                       </h3>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                       <!-- HoD/BM -->
                       <div
                         class="bg-white/15 rounded-lg p-4 border border-blue-300/30 backdrop-blur-sm"
@@ -796,9 +790,9 @@
                                 v-model="form.approvals.hod.name"
                                 type="text"
                                 readonly
-                                :placeholder="currentUser?.name || 'Loading user...'"
+                                :placeholder="getApprovalNamePlaceholder('hod')"
                                 class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm cursor-not-allowed"
-                                :title="'Auto-filled with: ' + (currentUser?.name || 'Loading...')"
+                                :title="getApprovalNameTitle('hod')"
                               />
                               <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
                                 <i
@@ -813,8 +807,31 @@
                               >Signature<span class="text-red-400">*</span></label
                             >
                             <div class="relative">
+                              <!-- Show 'Signed' indicator for divisional director when HOD has signed -->
                               <div
-                                v-if="!hodSignaturePreview"
+                                v-if="shouldShowHodSignedIndicator"
+                                class="w-full px-3 py-3 border-2 border-green-400/50 rounded-xl bg-green-500/10 backdrop-blur-sm transition-all duration-300 shadow-lg min-h-[70px] flex items-center justify-center relative"
+                              >
+                                <div class="text-center">
+                                  <div class="flex items-center justify-center space-x-2 mb-2">
+                                    <div class="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center">
+                                      <i class="fas fa-check text-green-400 text-sm"></i>
+                                    </div>
+                                    <span class="text-green-400 font-semibold text-sm">Signed</span>
+                                  </div>
+                                  <p class="text-green-300/80 text-xs">HOD approval completed</p>
+                                </div>
+                                <!-- Optional: Show signature preview icon -->
+                                <div class="absolute top-2 right-2">
+                                  <div class="w-6 h-6 bg-green-500/30 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-signature text-green-400 text-xs" title="Signature on file"></i>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              <!-- Default signature upload area (for HODs or when not signed) -->
+                              <div
+                                v-else-if="!hodSignaturePreview"
                                 class="w-full px-3 py-2 border-2 border-dashed border-blue-300/40 rounded-lg focus-within:border-blue-400 bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 min-h-[50px] flex items-center justify-center hover:bg-white/20"
                               >
                                 <div class="text-center">
@@ -943,9 +960,9 @@
                                 v-model="form.approvals.divisionalDirector.name"
                                 type="text"
                                 readonly
-                                :placeholder="currentUser?.name || 'Loading user...'"
+                                :placeholder="getApprovalNamePlaceholder('divisional_director')"
                                 class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm cursor-not-allowed"
-                                :title="'Auto-filled with: ' + (currentUser?.name || 'Loading...')"
+                                :title="getApprovalNameTitle('divisional_director')"
                               />
                               <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
                                 <i
@@ -1093,9 +1110,9 @@
                                 v-model="form.approvals.directorICT.name"
                                 type="text"
                                 readonly
-                                :placeholder="currentUser?.name || 'Loading user...'"
+                                :placeholder="getApprovalNamePlaceholder('ict_director')"
                                 class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm cursor-not-allowed"
-                                :title="'Auto-filled with: ' + (currentUser?.name || 'Loading...')"
+                                :title="getApprovalNameTitle('ict_director')"
                               />
                               <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
                                 <i
@@ -1210,26 +1227,213 @@
                     </div>
                   </div>
 
+                  <!-- Access Rights Section -->
+                  <div
+                    v-if="isHodApprovalEditable"
+                    class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-2 rounded-lg backdrop-blur-sm hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 group"
+                  >
+                    <div class="flex items-center space-x-2 mb-2">
+                      <div
+                        class="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
+                      >
+                        <i class="fas fa-key text-white text-sm"></i>
+                      </div>
+                      <h3 class="text-base font-bold text-white flex items-center">
+                        <i class="fas fa-shield-alt mr-1 text-blue-300"></i>
+                        Access Rights
+                      </h3>
+                    </div>
+
+                    <div
+                      class="bg-white/15 rounded-lg p-2 border border-blue-300/30 backdrop-blur-sm"
+                    >
+                      <!-- Radio buttons in one row -->
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
+                        <!-- Permanent Access - Left Side -->
+                        <label
+                          class="flex items-center cursor-pointer hover:bg-blue-500/20 p-2 rounded-lg transition-all border border-blue-400/30"
+                          @click="hodAccessType = 'permanent'"
+                          :class="{
+                            'bg-blue-500/10 border-blue-400/50': hodAccessType === 'permanent'
+                          }"
+                        >
+                          <input
+                            v-model="hodAccessType"
+                            type="radio"
+                            value="permanent"
+                            :disabled="!isHodApprovalEditable"
+                            @change="onAccessTypeChange('permanent')"
+                            class="w-4 h-4 text-blue-600 border-blue-300 focus:ring-blue-500 mr-3"
+                          />
+                          <span class="text-sm font-medium text-blue-100 flex items-center">
+                            <i class="fas fa-infinity mr-2 text-green-400 text-sm"></i>
+                            Permanent (until retirement)
+                          </span>
+                        </label>
+
+                        <!-- Temporary Access - Right Side -->
+                        <label
+                          class="flex items-center cursor-pointer hover:bg-blue-500/20 p-2 rounded-lg transition-all border border-blue-400/30"
+                          @click="hodAccessType = 'temporary'"
+                          :class="{
+                            'bg-blue-500/10 border-blue-400/50': hodAccessType === 'temporary'
+                          }"
+                        >
+                          <input
+                            v-model="hodAccessType"
+                            type="radio"
+                            value="temporary"
+                            :disabled="!isHodApprovalEditable"
+                            @change="onAccessTypeChange('temporary')"
+                            class="w-4 h-4 text-blue-600 border-blue-300 focus:ring-blue-500 mr-3"
+                          />
+                          <span class="text-sm font-medium text-blue-100 flex items-center">
+                            <i class="fas fa-clock mr-2 text-orange-400 text-sm"></i>
+                            Temporary Until
+                          </span>
+                        </label>
+                      </div>
+
+                      <!-- Date picker for temporary access -->
+                      <div v-if="hodAccessType === 'temporary'" class="mt-2">
+                        <div class="bg-white/10 rounded-lg p-2 border border-blue-300/20">
+                          <label class="block text-sm font-medium text-blue-100 mb-1">
+                            <i class="fas fa-calendar-alt mr-1 text-orange-400"></i>
+                            Select Expiry Date
+                          </label>
+                          <div class="relative">
+                            <input
+                              v-model="hodTemporaryUntil"
+                              type="date"
+                              :min="tomorrow"
+                              :readonly="!isHodApprovalEditable"
+                              class="medical-input w-full max-w-xs px-2 py-1 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 access-rights-editable"
+                              :class="{ 'cursor-not-allowed': !isHodApprovalEditable }"
+                            />
+                            <div
+                              class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/10 to-blue-600/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                            ></div>
+                          </div>
+                          <p class="text-xs text-blue-200 mt-1">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            Select the date when temporary access should expire
+                          </p>
+                        </div>
+                      </div>
+
+                      <!-- Error messages -->
+                      <div
+                        v-if="hodAccessType === 'temporary' && hodTemporaryUntilError"
+                        class="mt-2"
+                      >
+                        <p class="text-red-400 text-sm flex items-center">
+                          <i class="fas fa-exclamation-triangle mr-1"></i>
+                          {{ hodTemporaryUntilError }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
                   <!-- Comments Section -->
                   <div
                     class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-3 rounded-lg backdrop-blur-sm hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 group"
                   >
                     <div class="flex items-center space-x-2 mb-3">
                       <div
-                        class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
+                        class="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
                       >
                         <i class="fas fa-comments text-white text-sm"></i>
                       </div>
                       <h3 class="text-base font-bold text-white flex items-center">
                         <i class="fas fa-comment-alt mr-1 text-blue-300"></i>
-                        Comments
+                        <span v-if="isDivisionalDirectorReadOnly">Comments & Reviews</span>
+                        <span v-else>Comments</span>
                       </h3>
                     </div>
-                    <div class="relative">
+                    
+                    <!-- For Divisional Directors: Side-by-side layout -->
+                    <div v-if="isDivisionalDirectorReadOnly" class="grid grid-cols-1 lg:grid-cols-2 gap-4 relative">
+                      <!-- Left side: HOD Comments -->
+                      <div class="space-y-2">
+                        <div class="flex items-center space-x-2">
+                          <h4 class="text-sm font-bold text-white flex items-center">
+                            <i class="fas fa-user-tie mr-1 text-green-400 text-xs"></i>
+                            HOD Comments
+                          </h4>
+                          <span class="text-xs px-2 py-1 bg-green-500/30 rounded-full text-green-300 flex items-center">
+                            <i class="fas fa-user-check text-xs mr-1"></i>
+                            From HOD
+                          </span>
+                        </div>
+                        <div class="relative">
+                          <textarea
+                            :value="hodComments || 'No comments from HOD'"
+                            rows="3"
+                            readonly
+                            class="medical-input w-full px-3 py-2 border-2 rounded-lg focus:outline-none backdrop-blur-sm cursor-not-allowed resize-none transition-all duration-300"
+                            :class="[
+                              hodComments ? 
+                                'bg-gradient-to-br from-amber-900/20 to-amber-800/25 !text-amber-200 font-bold border-amber-400/60 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30' : 
+                                'bg-white/15 text-white/70 border-green-300/30 placeholder-green-200/60'
+                            ]"
+                            :style="hodComments ? 'color: #fbbf24 !important; text-shadow: 0 1px 2px rgba(245, 158, 11, 0.1);' : ''"
+                            :placeholder="hodComments ? '' : 'No comments from HOD'"
+                          ></textarea>
+                          <!-- Gold glow effect for populated comments -->
+                          <div v-if="hodComments" class="absolute inset-0 rounded-lg bg-gradient-to-r from-amber-400/5 to-amber-500/5 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                        </div>
+                        <p class="text-xs transition-colors duration-300"
+                           :class="hodComments ? 'text-amber-200/90' : 'text-green-200/80'">
+                          <i class="fas fa-info-circle mr-1 transition-colors duration-300"
+                             :class="hodComments ? 'text-amber-400' : ''"></i>
+                          <span v-if="hodComments" class="font-medium">
+                            <i class="fas fa-sparkles mr-1 text-amber-400"></i>
+                            HOD has provided valuable feedback and recommendations.
+                          </span>
+                          <span v-else>These are the comments provided by the HOD during their approval.</span>
+                        </p>
+                      </div>
+                      
+                      <!-- Center divider line (visible on large screens) -->
+                      <div class="hidden lg:block absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-blue-300/20 via-blue-300/60 to-blue-300/20 transform -translate-x-1/2">
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-blue-400/60 rounded-full shadow-sm"></div>
+                      </div>
+                      
+                      <!-- Right side: Divisional Director Review -->
+                      <div class="space-y-2">
+                        <div class="flex items-center space-x-2">
+                          <h4 class="text-sm font-bold text-white flex items-center">
+                            <i class="fas fa-user-shield mr-1 text-amber-400 text-xs"></i>
+                            Divisional Director Review
+                          </h4>
+                          <span class="text-xs px-2 py-1 bg-amber-500/30 rounded-full text-amber-300 flex items-center">
+                            <i class="fas fa-exclamation-circle text-xs mr-1"></i>
+                            Your evaluation is required
+                          </span>
+                        </div>
+                        <div class="relative">
+                          <textarea
+                            v-model="divisionalDirectorComments"
+                            rows="3"
+                            class="medical-input w-full px-3 py-2 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 resize-none"
+                            placeholder="Enter your comments, recommendations, or changes suggested for this request..."
+                            required
+                          ></textarea>
+                          <div class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/10 to-blue-600/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                        </div>
+                        <p class="text-xs text-amber-200/80">
+                          <i class="fas fa-lightbulb mr-1"></i>
+                          Your insights will guide the next approval stage.
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <!-- For other roles: Show single comments field -->
+                    <div v-else class="relative">
                       <textarea
                         v-model="form.comments"
-                        rows="4"
-                        class="medical-input w-full px-3 py-3 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 resize-y comments-editable"
+                        rows="3"
+                        class="medical-input w-full px-3 py-2 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 resize-y comments-editable"
                         placeholder="HOD: specify access Category here..."
                       ></textarea>
                       <div
@@ -1254,7 +1458,7 @@
                       </h3>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                       <!-- Head of IT -->
                       <div
                         class="bg-white/15 rounded-lg p-4 border border-blue-300/30 backdrop-blur-sm"
@@ -1290,9 +1494,9 @@
                                 v-model="form.implementation.headIT.name"
                                 type="text"
                                 readonly
-                                :placeholder="currentUser?.name || 'Loading user...'"
+                                :placeholder="getApprovalNamePlaceholder('head_it')"
                                 class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm cursor-not-allowed"
-                                :title="'Auto-filled with: ' + (currentUser?.name || 'Loading...')"
+                                :title="getApprovalNameTitle('head_it')"
                               />
                               <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
                                 <i
@@ -1437,9 +1641,9 @@
                                 v-model="form.implementation.ictOfficer.name"
                                 type="text"
                                 readonly
-                                :placeholder="currentUser?.name || 'Loading user...'"
+                                :placeholder="getApprovalNamePlaceholder('ict_officer')"
                                 class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm cursor-not-allowed"
-                                :title="'Auto-filled with: ' + (currentUser?.name || 'Loading...')"
+                                :title="getApprovalNameTitle('ict_officer')"
                               />
                               <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
                                 <i
@@ -1531,13 +1735,13 @@
                           </div>
                           <div>
                             <label class="block text-sm font-medium text-blue-100 mb-2"
-                              >Date (mm/dd/yyyy)<span class="text-red-400">*</span></label
+                              >Date<span class="text-red-400">*</span></label
                             >
                             <div class="relative">
                               <input
-                                v-model="form.implementation.ictOfficer.date"
+                                v-model="form.approvals.hod.date"
                                 type="date"
-                                class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm"
+                                class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm hod-approval-editable"
                               />
                             </div>
                           </div>
@@ -1546,33 +1750,69 @@
                     </div>
                   </div>
 
+
                   <!-- Action Buttons (Review Mode Only) -->
                   <div
                     v-if="isReviewMode && canApproveAtStage()"
-                    class="flex justify-between gap-4 mt-6"
+                    class="flex flex-col gap-4 mt-6"
                   >
-                    <!-- Approve Button - Left Side -->
-                    <button
-                      type="button"
-                      @click="approveRequest"
-                      :disabled="loading"
-                      class="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-300 font-semibold flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    <!-- Signature Required Warning -->
+                    <div
+                      v-if="isSignatureRequiredForApproval"
+                      class="bg-amber-500/20 border border-amber-400/30 rounded-lg p-3 backdrop-blur-sm"
                     >
-                      <i v-if="loading" class="fas fa-spinner fa-spin mr-2"></i>
-                      <i v-else class="fas fa-check mr-2"></i>
-                      {{ loading ? 'Processing...' : 'Approve Request' }}
-                    </button>
+                      <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-amber-500/30 rounded-lg flex items-center justify-center">
+                          <i class="fas fa-exclamation-triangle text-amber-400 text-sm"></i>
+                        </div>
+                        <div>
+                          <h4 class="text-amber-200 font-semibold text-sm">
+                            Signature Required
+                          </h4>
+                          <p class="text-amber-300/80 text-xs">
+                            Please upload your signature above before you can approve or reject this request.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
 
-                    <!-- Reject Button - Right Side -->
-                    <button
-                      type="button"
-                      @click="rejectRequest"
-                      :disabled="loading"
-                      class="flex-1 px-6 py-3 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-lg hover:from-red-700 hover:to-pink-700 transition-all duration-300 font-semibold flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                    >
-                      <i class="fas fa-times mr-2"></i>
-                      Reject Request
-                    </button>
+                    <!-- Action Buttons -->
+                    <div class="flex justify-between gap-4">
+                      <!-- Approve Button - Left Side -->
+                      <button
+                        type="button"
+                        @click="approveRequest"
+                        :disabled="areApprovalButtonsDisabled"
+                        :class="[
+                          'flex-1 px-6 py-3 rounded-lg transition-all duration-300 font-semibold flex items-center justify-center shadow-lg transform',
+                          areApprovalButtonsDisabled
+                            ? 'bg-gray-500 text-gray-300 cursor-not-allowed opacity-50'
+                            : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 hover:shadow-xl hover:scale-105'
+                        ]"
+                        :title="isSignatureRequiredForApproval ? 'Please upload your signature first' : 'Approve this request'"
+                      >
+                        <i v-if="loading || processing" class="fas fa-spinner fa-spin mr-2"></i>
+                        <i v-else class="fas fa-check mr-2"></i>
+                        {{ loading || processing ? 'Processing...' : 'Approve Request' }}
+                      </button>
+
+                      <!-- Reject Button - Right Side -->
+                      <button
+                        type="button"
+                        @click="rejectRequest"
+                        :disabled="areApprovalButtonsDisabled"
+                        :class="[
+                          'flex-1 px-6 py-3 rounded-lg transition-all duration-300 font-semibold flex items-center justify-center shadow-lg transform',
+                          areApprovalButtonsDisabled
+                            ? 'bg-gray-500 text-gray-300 cursor-not-allowed opacity-50'
+                            : 'bg-gradient-to-r from-red-600 to-pink-600 text-white hover:from-red-700 hover:to-pink-700 hover:shadow-xl hover:scale-105'
+                        ]"
+                        :title="isSignatureRequiredForApproval ? 'Please upload your signature first' : 'Reject this request'"
+                      >
+                        <i class="fas fa-times mr-2"></i>
+                        Reject Request
+                      </button>
+                    </div>
                   </div>
 
                   <!-- Footer & Submit (Normal Mode) -->
@@ -1610,7 +1850,11 @@
                 </section>
 
                 <!-- Right: tabs -->
-                <section aria-labelledby="module-tabs" class="lg:col-span-1 space-y-4">
+                <section
+                  v-if="!isReviewMode"
+                  aria-labelledby="module-tabs"
+                  class="lg:col-span-1 space-y-4"
+                >
                   <h2 id="module-tabs" class="sr-only">Module Details</h2>
 
                   <!-- Desktop tabs -->
@@ -1638,6 +1882,7 @@
                           <component
                             :is="currentTab.component"
                             v-model="moduleData[currentTab.key]"
+                            :reviewMode="isReviewMode"
                           />
                         </div>
                       </transition>
@@ -1661,7 +1906,11 @@
                       </button>
                       <transition name="fade">
                         <div v-show="openAccordions.has(t.key)" class="mt-3">
-                          <component :is="t.component" v-model="moduleData[t.key]" />
+                          <component
+                            :is="t.component"
+                            v-model="moduleData[t.key]"
+                            :reviewMode="isReviewMode"
+                          />
                           <div class="mt-3 text-right">
                             <button class="btn-secondary btn-sm" @click="tryCloseTab(t.key)">
                               <i class="fas fa-times mr-1"></i> Remove
@@ -1865,31 +2114,17 @@
 <script>
   // Wellsoft panel (key fields)
   const WellsoftPanel = {
-    props: ['modelValue'],
+    props: ['modelValue', 'reviewMode'],
     emits: ['update:modelValue'],
     template: `<div class="space-y-3">
-    <div>
+    <div v-if="!reviewMode">
       <label class="label">Action Requested<span class="text-red-500">*</span></label>
       <div class="flex gap-3">
         <label class="inline-flex items-center gap-2 text-sm"><input type="radio" value="use" :checked="modelValue?.requestType==='use'" @change="$emit('update:modelValue', { ...modelValue, requestType: 'use' })"/> Use</label>
         <label class="inline-flex items-center gap-2 text-sm"><input type="radio" value="revoke" :checked="modelValue?.requestType==='revoke'" @change="$emit('update:modelValue', { ...modelValue, requestType: 'revoke' })"/> Revoke</label>
       </div>
     </div>
-    <div>
-      <label class="label">Access Rights<span class="text-red-500">*</span></label>
-      <div class="flex flex-col sm:flex-row gap-2">
-        <label class="inline-flex items-center gap-2 text-sm"><input type="radio" value="permanent" :checked="modelValue?.accessType==='permanent'" @change="$emit('update:modelValue', { ...modelValue, accessType: 'permanent' })"/> Permanent</label>
-        <label class="inline-flex items-center gap-2 text-sm"><input type="radio" value="temporary" :checked="modelValue?.accessType==='temporary'" @change="$emit('update:modelValue', { ...modelValue, accessType: 'temporary' })"/> Temporary</label>
-        <div v-if="modelValue?.accessType==='temporary'" class="flex items-center gap-1">
-          <input placeholder="DD" maxlength="2" class="w-10 input" :value="modelValue?.tempDay||''" @input="$emit('update:modelValue', { ...modelValue, tempDay: $event.target.value })"/>
-          <span class="text-gray-400">/</span>
-          <input placeholder="MM" maxlength="2" class="w-10 input" :value="modelValue?.tempMonth||''" @input="$emit('update:modelValue', { ...modelValue, tempMonth: $event.target.value })"/>
-          <span class="text-gray-400">/</span>
-          <input placeholder="YYYY" maxlength="4" class="w-16 input" :value="modelValue?.tempYear||''" @input="$emit('update:modelValue', { ...modelValue, tempYear: $event.target.value })"/>
-        </div>
-      </div>
-    </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+    <div v-if="!reviewMode" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
       <div>
         <label class="label">HoD/BM Name<span class="text-red-500">*</span></label>
         <input class="input" :value="modelValue?.approvals?.hodName||''" @input="$emit('update:modelValue', { ...modelValue, approvals: { ...(modelValue?.approvals||{}), hodName: $event.target.value } })"/>
@@ -1903,7 +2138,7 @@
         <input type="date" class="input" :value="modelValue?.approvals?.hodDate||''" @input="$emit('update:modelValue', { ...modelValue, approvals: { ...(modelValue?.approvals||{}), hodDate: $event.target.value } })"/>
       </div>
     </div>
-    <div>
+    <div v-if="!reviewMode">
       <label class="label">Comments<span class="text-red-500">*</span></label>
 <textarea class="input" rows="3" :value="modelValue?.notes || ''" @input="$emit('update:modelValue', { ...modelValue, notes: $event.target.value })"></textarea>
     </div>
@@ -1912,7 +2147,7 @@
 
   // Jeeva panel (attractive UI mirroring Jeeva form)
   const JeevaPanel = {
-    props: ['modelValue'],
+    props: ['modelValue', 'reviewMode'],
     emits: ['update:modelValue'],
     data() {
       return {
@@ -2002,7 +2237,7 @@
     </div>
 
     <!-- Conditional sections based on selections -->
-    <div v-if="isSelected('Use') || isSelected('Revoke')">
+    <div v-if="(isSelected('Use') || isSelected('Revoke')) && !reviewMode">
       <label class="label">Action Requested<span class="text-red-500">*</span></label>
       <div class="flex gap-3 mt-1">
         <label class="inline-flex items-center gap-2 text-sm px-2 py-1 rounded-md border border-gray-200 hover:bg-indigo-50">
@@ -2014,26 +2249,8 @@
       </div>
     </div>
 
-    <div v-if="isSelected('Access Rights')">
-      <label class="label">Access Rights <span class="text-red-500">*</span></label>
-      <div class="flex flex-col sm:flex-row gap-2">
-        <label class="inline-flex items-center gap-2 text-sm px-2 py-1 rounded-md border border-gray-200 hover:bg-purple-50">
-          <input type="radio" value="permanent" :checked="modelValue?.accessType==='permanent'" @change="$emit('update:modelValue', { ...modelValue, accessType: 'permanent' })"/> Permanent
-        </label>
-        <label class="inline-flex items-center gap-2 text-sm px-2 py-1 rounded-md border border-gray-200 hover:bg-purple-50">
-          <input type="radio" value="temporary" :checked="modelValue?.accessType==='temporary'" @change="$emit('update:modelValue', { ...modelValue, accessType: 'temporary' })"/> Temporary
-        </label>
-        <div v-if="modelValue?.accessType==='temporary'" class="flex items-center gap-1">
-          <input placeholder="DD" maxlength="2" class="w-10 input" :value="modelValue?.tempDay||''" @input="$emit('update:modelValue', { ...modelValue, tempDay: $event.target.value })"/>
-          <span class="text-gray-400">/</span>
-          <input placeholder="MM" maxlength="2" class="w-10 input" :value="modelValue?.tempMonth||''" @input="$emit('update:modelValue', { ...modelValue, tempMonth: $event.target.value })"/>
-          <span class="text-gray-400">/</span>
-          <input placeholder="YYYY" maxlength="4" class="w-16 input" :value="modelValue?.tempYear||''" @input="$emit('update:modelValue', { ...modelValue, tempYear: $event.target.value })"/>
-        </div>
-      </div>
-    </div>
 
-    <div v-if="isSelected('Approval')" class="space-y-4">
+    <div v-if="isSelected('Approval') && !reviewMode" class="space-y-4">
       <label class="label">Approval</label>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         <div class="bg-indigo-50 rounded-lg p-3">
@@ -2057,7 +2274,7 @@
       </div>
     </div>
 
-    <div v-if="isSelected('Comments')">
+    <div v-if="isSelected('Comments') && !reviewMode">
       <label class="label">Comments<span class="text-red-500">*</span></label>
       <textarea rows="3" class="input" placeholder="Comments*" :value="modelValue?.comments||''" @input="$emit('update:modelValue', { ...modelValue, comments: $event.target.value })"></textarea>
     </div>
@@ -2135,7 +2352,10 @@
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppFooter from '@/components/footer.vue'
   import combinedAccessService from '@/services/combinedAccessService.js'
+  import bothServiceFormService from '@/services/bothServiceFormService.js'
   import authService from '@/services/authService.js'
+  // eslint-disable-next-line no-unused-vars
+  import { useAuthStore } from '@/stores/auth'
 
   export default {
     name: 'BothServiveForm',
@@ -2159,6 +2379,10 @@
         // Signature handling
         signaturePreview: '',
         signatureFileName: '',
+        // HOD Access Rights (decided during HOD approval)
+        hodAccessType: 'permanent',
+        hodTemporaryUntil: '',
+        hodTemporaryUntilError: '',
         // Approval signatures
         hodSignaturePreview: '',
         hodSignatureFileName: '',
@@ -2237,14 +2461,7 @@
 
         form: {
           shared: { pfNumber: '', staffName: '', department: '', phone: '' },
-          accessRights: {
-            type: '',
-            tempDate: {
-              month: '',
-              day: '',
-              year: ''
-            }
-          },
+          // accessRights removed - this will be decided by HOD during approval
           approvals: {
             hod: {
               name: '',
@@ -2301,7 +2518,11 @@
         showRejectionModal: false,
         rejectionReason: '',
         // Current authenticated user data
-        currentUser: null
+        currentUser: null,
+        // Debouncing flag for approval button
+        processing: false,
+        // Divisional Director comments
+        divisionalDirectorComments: ''
       }
     },
     computed: {
@@ -2328,6 +2549,14 @@
         const q = (this.jeevaQuery || '').toLowerCase()
         return !q ? this.jeevaModules : this.jeevaModules.filter((m) => m.toLowerCase().includes(q))
       },
+      tomorrow() {
+        const d = new Date()
+        d.setDate(d.getDate() + 1)
+        const yyyy = d.getFullYear()
+        const mm = String(d.getMonth() + 1).padStart(2, '0')
+        const dd = String(d.getDate()).padStart(2, '0')
+        return `${yyyy}-${mm}-${dd}`
+      },
 
       summaryErrors() {
         const list = []
@@ -2336,27 +2565,11 @@
         if (!shared.pfNumber) list.push('PF Number is required.')
         if (!shared.staffName) list.push('Staff Name is required.')
 
-        // Defensive guards for inline Jeeva block
-        const ji = this.jeevaInline || {}
-        if (!ji.accessType) list.push('Jeeva Access Rights: Please select Permanent or Temporary.')
-        if (ji.accessType === 'temporary') {
-          if (!ji.tempMonth || !ji.tempDay || !ji.tempYear) {
-            list.push(
-              'Jeeva Access Rights: Please provide complete Temporary Until date (MM/DD/YYYY).'
-            )
-          }
-        }
-
         // Tabs validation (guard against undefined tabs/moduleData)
         const tabs = Array.isArray(this.tabs) ? this.tabs : []
-        const data = this.moduleData || {}
         tabs.forEach((t) => {
           if (!t || !t.key) return
-          const d = data[t.key] || null
-          if (t.type === 'wellsoft' || t.type === 'jeeva') {
-            const access = d && typeof d === 'object' ? d.accessType : undefined
-            if (!access) list.push(`${t.label || 'Module'}: Access Type is required.`)
-          }
+          // accessType validation removed - will be decided by HOD during approval
           if (t.type === 'internet' && !this.internetPurposes[0].trim()) {
             list.push('Internet Purpose is required.')
           }
@@ -2413,15 +2626,15 @@
 
       // Determine if sections should be readonly based on review mode and request type
       isWellsoftReadonly() {
-        return this.isReviewMode && !this.hasWellsoftRequest
+        return (this.isReviewMode && !this.hasWellsoftRequest) || this.isDivisionalDirectorReadOnly
       },
 
       isJeevaReadonly() {
-        return this.isReviewMode && !this.hasJeevaRequest
+        return (this.isReviewMode && !this.hasJeevaRequest) || this.isDivisionalDirectorReadOnly
       },
 
       isInternetReadonly() {
-        return this.isReviewMode && !this.hasInternetRequest
+        return (this.isReviewMode && !this.hasInternetRequest) || this.isDivisionalDirectorReadOnly
       },
 
       // Get current approval stage from request status
@@ -2454,11 +2667,27 @@
 
       // Determine if approval sections should be readonly based on current stage
       isHodApprovalEditable() {
-        return !this.isReviewMode || this.currentApprovalStage === 'hod'
+        // Active only for HOD users while reviewing at the HOD stage
+        if (!this.isReviewMode || !this.requestData) return false
+        const userRole = (this.getUserRole() || '').toLowerCase()
+        const hodRoles = ['head_of_department', 'hod']
+        return this.currentApprovalStage === 'hod' && hodRoles.includes(userRole)
       },
 
       isDivisionalApprovalEditable() {
-        return !this.isReviewMode || this.currentApprovalStage === 'divisional'
+        // Active only for Divisional Director users while reviewing at the divisional stage
+        if (!this.isReviewMode || !this.requestData) return false
+        const userRole = (this.getUserRole() || '').toLowerCase()
+        const divisionalRoles = ['divisional_director']
+        return this.currentApprovalStage === 'divisional' && divisionalRoles.includes(userRole)
+      },
+
+      // Check if current user is a divisional director viewing the form (should see everything as read-only except their approval section)
+      isDivisionalDirectorReadOnly() {
+        if (!this.isReviewMode || !this.requestData) return false
+        const userRole = (this.getUserRole() || '').toLowerCase()
+        const divisionalRoles = ['divisional_director']
+        return divisionalRoles.includes(userRole)
       },
 
       isIctDirectorApprovalEditable() {
@@ -2525,6 +2754,105 @@
 
           return completedStages[stage]?.includes(status) || false
         }
+      },
+
+      // Check if required signature is uploaded for current approval stage
+      isSignatureRequiredForApproval() {
+        if (!this.isReviewMode || !this.requestData) return false
+
+        const stage = this.currentApprovalStage
+        const userRole = (this.getUserRole() || '').toLowerCase()
+        
+        // For HOD stage, check HOD signature
+        if (stage === 'hod' && ['head_of_department', 'hod'].includes(userRole)) {
+          return !this.form.approvals.hod.signature
+        }
+        
+        // For Divisional Director stage, check Divisional Director signature
+        if (stage === 'divisional' && ['divisional_director'].includes(userRole)) {
+          return !this.form.approvals.divisionalDirector.signature
+        }
+        
+        // For other stages, assume no signature required for now
+        return false
+      },
+
+      // Get HOD comments from requestData for Divisional Directors to view
+      hodComments() {
+        if (!this.requestData) return null
+        
+        // Try multiple possible sources for HOD comments - prioritize hod_comments field
+        const hodComments = this.requestData.hod_comments ||
+                           this.requestData.comments ||
+                           this.requestData.approvals?.hod?.comments ||
+                           null
+        
+        console.log('HOD Comments debug:', {
+          requestData_keys: Object.keys(this.requestData),
+          hodComments: hodComments,
+          hod_comments_field: this.requestData.hod_comments,
+          general_comments: this.requestData.comments,
+          approval_comments: this.requestData.approvals?.hod?.comments
+        })
+        
+        return hodComments?.trim() || null
+      },
+
+      // Check if approval buttons should be disabled due to missing signature
+      areApprovalButtonsDisabled() {
+        return this.loading || this.processing || this.isSignatureRequiredForApproval
+      },
+
+      // Check if HOD has already signed (for showing 'Signed' indicator to divisional director)
+      hasHodSigned() {
+        if (!this.requestData) return false
+        
+        // Check multiple possible data sources for HOD signature
+        const hodSignaturePath = this.requestData.approvals?.hod?.signature ||
+                                this.requestData.approvals?.hod?.signature_path ||
+                                this.requestData.hod_signature_path ||
+                                null
+        
+        const hodApprovedAt = this.requestData.approvals?.hod?.date ||
+                             this.requestData.approvals?.hod?.approved_at ||
+                             this.requestData.hod_approved_at ||
+                             null
+        
+        const hodName = this.requestData.approvals?.hod?.name ||
+                       this.requestData.hod_name ||
+                       null
+                       
+        // Consider HOD as signed if they have signature, approval date, and name
+        const hasSignature = !!(hodSignaturePath && hodSignaturePath.length > 0)
+        const hasApprovalDate = !!(hodApprovedAt)
+        const hasName = !!(hodName && hodName.trim().length > 0)
+        
+        console.log('🔍 HOD Signature Check:', {
+          hodSignaturePath,
+          hodApprovedAt,
+          hodName,
+          hasSignature,
+          hasApprovalDate,
+          hasName,
+          result: hasSignature && hasApprovalDate && hasName
+        })
+        
+        return hasSignature && hasApprovalDate && hasName
+      },
+
+      // Check if should show 'Signed' indicator in HOD section
+      shouldShowHodSignedIndicator() {
+        if (!this.isReviewMode || !this.requestData) return false
+        
+        const userRole = (this.getUserRole() || '').toLowerCase()
+        const isDivisionalDirector = ['divisional_director'].includes(userRole)
+        const currentStage = this.currentApprovalStage
+        
+        // Show 'Signed' indicator when:
+        // 1. Current user is Divisional Director
+        // 2. We're at divisional stage (HOD has completed their part)
+        // 3. HOD has actually signed
+        return isDivisionalDirector && currentStage === 'divisional' && this.hasHodSigned
       }
     },
     async mounted() {
@@ -2583,7 +2911,11 @@
             isReviewMode: this.isReviewMode,
             currentApprovalStage: this.currentApprovalStage
           })
-          // Role-based population is now handled by currentUser watcher
+          
+          // Auto-populate Divisional Director date when they become editable
+          if (isEditable && this.requestData) {
+            this.populateDivisionalDirectorDateFromHod()
+          }
         },
         immediate: true
       },
@@ -2717,6 +3049,102 @@
         if (type === 'jeeva') return this.selectedJeeva.includes(value)
         return false
       },
+
+      /**
+       * Get the appropriate name placeholder for approval sections based on user role
+       */
+
+      getApprovalNamePlaceholder(approvalType) {
+        const userRole = this.getUserRole()
+        const roleMapping = {
+          hod: ['head_of_department'],
+          divisional_director: ['divisional_director'],
+          ict_director: ['ict_director'],
+          head_it: ['head_it'],
+          ict_officer: ['ict_officer']
+        }
+
+        // Check if current user's role matches this approval type
+        if (roleMapping[approvalType] && roleMapping[approvalType].includes(userRole)) {
+          return this.currentUser?.name || 'Loading user...'
+        }
+
+        // For other roles, show empty or existing data
+        return this.getExistingApprovalName(approvalType) || ''
+      },
+
+      /**
+       * Get the appropriate title for approval name fields
+       */
+      getApprovalNameTitle(approvalType) {
+        const userRole = this.getUserRole()
+        const roleMapping = {
+          hod: ['head_of_department'],
+          divisional_director: ['divisional_director'],
+          ict_director: ['ict_director'],
+          head_it: ['head_it'],
+          ict_officer: ['ict_officer']
+        }
+
+        // Check if current user's role matches this approval type
+        if (roleMapping[approvalType] && roleMapping[approvalType].includes(userRole)) {
+          return 'Auto-filled with: ' + (this.currentUser?.name || 'Loading...')
+        }
+
+        return 'This field will be filled by the appropriate approver'
+      },
+
+      /**
+       * Get existing approval name from form data or request data
+       */
+      getExistingApprovalName(approvalType) {
+        switch (approvalType) {
+          case 'hod':
+            return this.form.approvals.hod.name || this.requestData?.approvals?.hod?.name
+          case 'divisional_director':
+            return (
+              this.form.approvals.divisionalDirector.name ||
+              this.requestData?.approvals?.divisionalDirector?.name
+            )
+          case 'ict_director':
+            return (
+              this.form.approvals.directorICT.name || this.requestData?.approvals?.directorICT?.name
+            )
+          case 'head_it':
+            return (
+              this.form.implementation.headIT.name || this.requestData?.implementation?.headIT?.name
+            )
+          case 'ict_officer':
+            return (
+              this.form.implementation.ictOfficer.name ||
+              this.requestData?.implementation?.ictOfficer?.name
+            )
+          default:
+            return ''
+        }
+      },
+
+      /**
+       * Get current user role from various sources
+       */
+      getUserRole() {
+        // Try multiple sources for user role from currentUser data
+        if (!this.currentUser) {
+          console.warn('No current user found for role detection')
+          return null
+        }
+
+        // Try different role properties
+        const role =
+          this.currentUser.role || this.currentUser.user_role || this.currentUser.primary_role
+
+        // Handle array of roles - use first role if available
+        if (Array.isArray(this.currentUser.roles) && this.currentUser.roles.length > 0) {
+          return this.currentUser.roles[0]
+        }
+
+        return role || ''
+      },
       toggleWellsoft(m) {
         this.selectedWellsoft = this.isSelected('wellsoft', m)
           ? this.selectedWellsoft.filter((x) => x !== m)
@@ -2762,42 +3190,243 @@
         this.activeTab = this.tabs[0]?.key || ''
       },
 
-      // Submit
-      onSubmit() {
-        this.errors = { pfNumber: '', staffName: '' }
-        if (!this.form.shared.pfNumber) this.errors.pfNumber = 'PF Number is required.'
-        if (!this.form.shared.staffName) this.errors.staffName = 'Staff Name is required.'
-        if (this.summaryErrors.length) return
+      // Access type change handler
+      onAccessTypeChange(type) {
+        console.log('Access type changed to:', type)
+        this.hodAccessType = type
 
-        const payload = {
-          shared: { ...this.form.shared },
-          jeevaInline: { ...this.jeevaInline },
-          modules: this.tabs.map((t) => ({
-            type: t.type,
-            name: t.label,
-            details: this.moduleData[t.key] || {}
-          })),
-          internetPurposes: this.internetPurposes.filter((purpose) => purpose.trim()),
-          wellsoftRequestType: this.wellsoftRequestType
+        // Clear temporary until date and error if switching to permanent
+        if (type === 'permanent') {
+          this.hodTemporaryUntil = ''
+          this.hodTemporaryUntilError = ''
         }
-        console.log('Submitting payload', payload)
-        this.toast = {
-          show: true,
-          message: 'Combined request submitted. You will receive updates.'
+
+        // Force reactivity update
+        this.$forceUpdate()
+      },
+
+      // Submit
+      async onSubmit() {
+        // Reset errors
+        this.errors = { pfNumber: '', staffName: '' }
+
+        // Basic validation
+        if (!this.form.shared.pfNumber) {
+          this.errors.pfNumber = 'PF Number is required.'
+          return
         }
-        setTimeout(() => (this.toast.show = false), 3000)
+        if (!this.form.shared.staffName) {
+          this.errors.staffName = 'Staff Name is required.'
+          return
+        }
+
+        // Enhanced validation: Check each service type based on what's expected
+        // Determine what services should be available based on request_types or inferred from selections
+        const hasWellsoftSelected = this.selectedWellsoft.length > 0
+        const hasJeevaSelected = this.selectedJeeva.length > 0
+        const hasInternetPurposes = this.internetPurposes.some((purpose) => purpose.trim())
+
+        // If in review mode, check against the request_types from the database
+        if (this.isReviewMode && this.requestData) {
+          const requestTypes = this.requestData.request_types || this.requestData.request_type || []
+
+          if (requestTypes.includes('wellsoft') && this.selectedWellsoft.length === 0) {
+            this.toast = {
+              show: true,
+              message:
+                'This request requires Wellsoft access. Please select at least 1 Wellsoft module.'
+            }
+            setTimeout(() => (this.toast.show = false), 5000)
+            return
+          }
+
+          if (
+            (requestTypes.includes('jeeva_access') || requestTypes.includes('jeeva')) &&
+            this.selectedJeeva.length === 0
+          ) {
+            this.toast = {
+              show: true,
+              message: 'This request requires Jeeva access. Please select at least 1 Jeeva module.'
+            }
+            setTimeout(() => (this.toast.show = false), 5000)
+            return
+          }
+
+          if (
+            (requestTypes.includes('internet_access_request') ||
+              requestTypes.includes('internet')) &&
+            !hasInternetPurposes
+          ) {
+            this.toast = {
+              show: true,
+              message:
+                'This request requires Internet access. Please provide at least 1 internet purpose.'
+            }
+            setTimeout(() => (this.toast.show = false), 5000)
+            return
+          }
+        } else {
+          // For new requests, ensure at least one service is selected
+          if (!hasWellsoftSelected && !hasJeevaSelected && !hasInternetPurposes) {
+            this.toast = {
+              show: true,
+              message:
+                'Please select at least one service (Wellsoft modules, Jeeva modules, or Internet access)'
+            }
+            setTimeout(() => (this.toast.show = false), 5000)
+            return
+          }
+        }
+
+        // Check if signature is provided
+        if (!this.signaturePreview) {
+          this.toast = {
+            show: true,
+            message: 'Please upload your digital signature before submitting'
+          }
+          setTimeout(() => (this.toast.show = false), 5000)
+          return
+        }
+
+        try {
+          this.loading = true
+
+          // Debug: Log form state before preparation
+          console.log('=== FORM DEBUG START ===')
+          console.log('Form state before submission:', {
+            shared: this.form.shared,
+            selectedWellsoft: this.selectedWellsoft,
+            selectedJeeva: this.selectedJeeva,
+            wellsoftRequestType: this.wellsoftRequestType,
+            internetPurposes: this.internetPurposes,
+            // accessRights removed - will be decided by HOD during approval
+            approvals: this.form.approvals,
+            implementation: this.form.implementation,
+            comments: this.form.comments,
+            signatureFile: this.form.shared.signature ? 'File object present' : 'No signature file'
+          })
+
+          // Prepare form data for submission
+          const formData = {
+            shared: {
+              pfNumber: this.form.shared.pfNumber,
+              staffName: this.form.shared.staffName,
+              department: this.form.shared.department,
+              phone: this.form.shared.phone
+            },
+            selectedWellsoft: this.selectedWellsoft,
+            selectedJeeva: this.selectedJeeva,
+            wellsoftRequestType: this.wellsoftRequestType,
+            internetPurposes: this.internetPurposes.filter((purpose) => purpose.trim()),
+            // accessRights removed - will be decided by HOD during approval process
+            signature: this.form.shared.signature, // This should be the actual file object
+            approvals: {
+              hod: {
+                name: this.form.approvals.hod.name,
+                signature: this.form.approvals.hod.signature,
+                date: this.form.approvals.hod.date
+              },
+              divisionalDirector: {
+                name: this.form.approvals.divisionalDirector.name,
+                signature: this.form.approvals.divisionalDirector.signature,
+                date: this.form.approvals.divisionalDirector.date
+              },
+              directorICT: {
+                name: this.form.approvals.directorICT.name,
+                signature: this.form.approvals.directorICT.signature,
+                date: this.form.approvals.directorICT.date
+              }
+            },
+            implementation: {
+              headIT: {
+                name: this.form.implementation.headIT.name,
+                signature: this.form.implementation.headIT.signature,
+                date: this.form.implementation.headIT.date
+              },
+              ictOfficer: {
+                name: this.form.implementation.ictOfficer.name,
+                signature: this.form.implementation.ictOfficer.signature,
+                date: this.form.implementation.ictOfficer.date
+              }
+            },
+            comments: this.form.comments
+          }
+
+          console.log('Prepared formData object:', {
+            ...formData,
+            signature: formData.signature ? 'File uploaded' : 'No signature'
+          })
+          console.log('=== FORM DEBUG END ===')
+
+          // Validate form data
+          const validation = bothServiceFormService.validateFormData(formData)
+          if (!validation.isValid) {
+            this.toast = {
+              show: true,
+              message: validation.errors.join(', ')
+            }
+            setTimeout(() => (this.toast.show = false), 5000)
+            return
+          }
+
+          // Submit the form
+          const response = await bothServiceFormService.submitCombinedRequest(formData)
+
+          if (response.success) {
+            console.log('✅ Form submitted successfully:', response.data)
+
+            this.toast = {
+              show: true,
+              message: `Combined access request submitted successfully! Request ID: ${response.data.id || 'N/A'}`
+            }
+
+            // Optionally redirect to a success page or reset form
+            setTimeout(() => {
+              this.toast.show = false
+              // Uncomment to reset form after successful submission
+              // this.onReset()
+            }, 8000)
+          } else {
+            console.error('❌ Form submission failed:', response.error)
+
+            // Handle validation errors
+            if (response.errors) {
+              let errorMessage = 'Please fix the following errors: '
+              Object.keys(response.errors).forEach((field) => {
+                if (Array.isArray(response.errors[field])) {
+                  errorMessage += response.errors[field].join(', ') + ' '
+                }
+              })
+
+              this.toast = {
+                show: true,
+                message: errorMessage
+              }
+            } else {
+              this.toast = {
+                show: true,
+                message: response.message || 'Failed to submit request. Please try again.'
+              }
+            }
+
+            setTimeout(() => (this.toast.show = false), 8000)
+          }
+        } catch (error) {
+          console.error('❌ Unexpected error during form submission:', error)
+
+          this.toast = {
+            show: true,
+            message: 'An unexpected error occurred. Please try again.'
+          }
+          setTimeout(() => (this.toast.show = false), 5000)
+        } finally {
+          this.loading = false
+        }
       },
       onReset() {
         this.form = {
           shared: { pfNumber: '', staffName: '', department: '', phone: '' },
-          accessRights: {
-            type: '',
-            tempDate: {
-              month: '',
-              day: '',
-              year: ''
-            }
-          },
+          // accessRights removed - will be decided by HOD during approval
           approvals: {
             hod: {
               name: '',
@@ -2867,16 +3496,54 @@
           if (response.success && response.data) {
             this.requestData = response.data
             console.log('Loaded request data:', this.requestData)
+            // Initialize HOD access rights from server if present
+            if (this.requestData.access_type) {
+              this.hodAccessType = this.requestData.access_type
+            }
+            if (this.requestData.temporary_until) {
+              // Expecting YYYY-MM-DD or date string; normalize to YYYY-MM-DD for input[type=date]
+              const d = new Date(this.requestData.temporary_until)
+              if (!isNaN(d.getTime())) {
+                const yyyy = d.getFullYear()
+                const mm = String(d.getMonth() + 1).padStart(2, '0')
+                const dd = String(d.getDate()).padStart(2, '0')
+                this.hodTemporaryUntil = `${yyyy}-${mm}-${dd}`
+              }
+            }
             console.log('Signature path from API:', this.requestData.signature_path)
             console.log('Type of signature_path:', typeof this.requestData.signature_path)
 
             // Populate form with request data
-            this.form.shared = {
-              pfNumber: this.requestData.pf_number || '',
-              staffName: this.requestData.staff_name || this.requestData.full_name || '',
-              department: this.requestData.department || this.requestData.department_name || '',
-              phone: this.requestData.phone || this.requestData.phone_number || ''
+            console.log('🔍 Debug: Full requestData structure:', this.requestData)
+            console.log('🔍 Debug: requestData.shared structure:', this.requestData.shared)
+            
+            // Check if data is in the 'shared' object (as returned by backend API)
+            if (this.requestData.shared) {
+              console.log('✅ Using data from requestData.shared')
+              this.form.shared = {
+                pfNumber: this.requestData.shared.pfNumber || '',
+                staffName: this.requestData.shared.staffName || '',
+                department: this.requestData.shared.department || '',
+                phone: this.requestData.shared.phone || ''
+              }
+            } else {
+              // Fallback to direct properties (legacy support)
+              console.log('⚠️ Fallback: Using direct properties from requestData')
+              this.form.shared = {
+                pfNumber: this.requestData.pf_number || '',
+                staffName: this.requestData.staff_name || this.requestData.full_name || '',
+                department: this.requestData.department || this.requestData.department_name || '',
+                phone: this.requestData.phone || this.requestData.phone_number || ''
+              }
             }
+            
+            console.log('✅ Personal Information populated:', this.form.shared)
+            
+            // Auto-populate Divisional Director date field from HOD approval date
+            this.populateDivisionalDirectorDateFromHod()
+            
+            // Force reactivity update
+            this.$forceUpdate()
 
             // Handle signature data
             if (this.requestData.signature_path) {
@@ -2889,20 +3556,58 @@
             if (this.requestData.request_types || this.requestData.request_type) {
               const types = this.requestData.request_types || this.requestData.request_type || []
 
-              // Handle Wellsoft modules
+              // Handle Wellsoft modules - use selected modules from database
               if (types.includes('wellsoft')) {
-                const wellsoftModules = this.requestData.wellsoft_modules || []
-                this.selectedWellsoft = Array.isArray(wellsoftModules) ? wellsoftModules : []
-                console.log('Loaded Wellsoft modules:', this.selectedWellsoft)
+                // Try multiple possible column names for selected Wellsoft modules
+                const wellsoftSelected =
+                  this.requestData.wellsoft_modules_selected ||
+                  this.requestData.selected_wellsoft ||
+                  this.requestData.wellsoft_modules ||
+                  []
+
+                // Parse if it's a JSON string
+                let parsedWellsoft = []
+                if (typeof wellsoftSelected === 'string') {
+                  try {
+                    parsedWellsoft = JSON.parse(wellsoftSelected)
+                  } catch (e) {
+                    console.warn('Failed to parse Wellsoft modules:', wellsoftSelected)
+                    parsedWellsoft = []
+                  }
+                } else if (Array.isArray(wellsoftSelected)) {
+                  parsedWellsoft = wellsoftSelected
+                }
+
+                this.selectedWellsoft = Array.isArray(parsedWellsoft) ? parsedWellsoft : []
+                console.log('Loaded Wellsoft selected modules:', this.selectedWellsoft)
               } else {
                 this.selectedWellsoft = []
               }
 
-              // Handle Jeeva modules
+              // Handle Jeeva modules - use selected modules from database
               if (types.includes('jeeva_access') || types.includes('jeeva')) {
-                const jeevaModules = this.requestData.jeeva_modules || []
-                this.selectedJeeva = Array.isArray(jeevaModules) ? jeevaModules : []
-                console.log('Loaded Jeeva modules:', this.selectedJeeva)
+                // Try multiple possible column names for selected Jeeva modules
+                const jeevaSelected =
+                  this.requestData.jeeva_modules_selected ||
+                  this.requestData.selected_jeeva ||
+                  this.requestData.jeeva_modules ||
+                  []
+
+                // Parse if it's a JSON string
+                let parsedJeeva = []
+                if (typeof jeevaSelected === 'string') {
+                  try {
+                    parsedJeeva = JSON.parse(jeevaSelected)
+                  } catch (e) {
+                    console.warn('Failed to parse Jeeva modules:', jeevaSelected)
+                    parsedJeeva = []
+                  }
+                } else if (Array.isArray(jeevaSelected)) {
+                  parsedJeeva = jeevaSelected
+                }
+
+                this.selectedJeeva = Array.isArray(parsedJeeva) ? parsedJeeva : []
+                console.log('Loaded Jeeva selected modules:', this.selectedJeeva)
               } else {
                 this.selectedJeeva = []
               }
@@ -2970,42 +3675,71 @@
       },
 
       canApproveAtStage() {
-        // Only show buttons in review mode
-        if (!this.isReviewMode) return false
+        // Only show in review mode with loaded data
+        if (!this.isReviewMode || !this.requestData) return false
 
-        // Only show buttons if request data is loaded
-        if (!this.requestData) return false
+        const stage = this.currentApprovalStage
+        const userRole = (this.getUserRole() || '').toLowerCase()
+        
+        // Define role mappings for each stage
+        const hodRoles = ['head_of_department', 'hod']
+        const divisionalRoles = ['divisional_director']
+        
+        // Check if user can approve at current stage
+        if (stage === 'hod' && hodRoles.includes(userRole)) {
+          // Allow if HOD approval still pending (fallback to pending)
+          const hodStatus = this.requestData.hod_approval_status || 'pending'
+          return hodStatus === 'pending'
+        }
+        
+        if (stage === 'divisional' && divisionalRoles.includes(userRole)) {
+          // Allow if request is HOD approved and divisional approval is pending
+          const status = this.requestData.status || 'pending'
+          return status === 'hod_approved'
+        }
 
-        // Get current HOD approval status
-        const hodStatus = this.requestData.hod_approval_status || 'pending'
-
-        // Only show buttons if HOD approval is still pending
-        // Once approved or rejected, HOD should not be able to change it
-        return hodStatus === 'pending'
+        return false
       },
 
       async approveRequest() {
+        // Prevent multiple rapid clicks using debouncing
+        if (this.processing || this.loading) {
+          return
+        }
+
+        // Check if signature is required but missing
+        if (this.isSignatureRequiredForApproval) {
+          const stage = this.currentApprovalStage
+          let message = 'Please upload your signature before approving this request.'
+          
+          if (stage === 'divisional') {
+            message = 'Please upload your Divisional Director signature before approving this request.'
+          } else if (stage === 'hod') {
+            message = 'Please upload your HOD signature before approving this request.'
+          }
+          
+          this.toast = {
+            show: true,
+            message
+          }
+          setTimeout(() => (this.toast.show = false), 4000)
+          return
+        }
+
         try {
+          this.processing = true
           this.loading = true
 
-          console.log('Approving request:', this.requestId)
-
-          const result = await combinedAccessService.updateHodApproval(this.requestId, {
-            status: 'approved',
-            comments: this.form.comments || 'Approved by HOD'
-          })
-
-          if (result.success) {
-            this.toast = {
-              show: true,
-              message: 'Request approved successfully'
-            }
-            setTimeout(() => {
-              this.toast.show = false
-              this.goBackToRequests()
-            }, 2000)
+          const stage = this.currentApprovalStage
+          const userRole = (this.getUserRole() || '').toLowerCase()
+          
+          // Route to appropriate approval method based on stage and role
+          if (stage === 'hod' && ['head_of_department', 'hod'].includes(userRole)) {
+            await this.approveAsHod()
+          } else if (stage === 'divisional' && ['divisional_director'].includes(userRole)) {
+            await this.approveAsDivisionalDirector()
           } else {
-            throw new Error(result.error || 'Failed to approve request')
+            throw new Error('You do not have permission to approve at this stage')
           }
         } catch (error) {
           console.error('Error approving request:', error)
@@ -3015,11 +3749,179 @@
           }
           setTimeout(() => (this.toast.show = false), 3000)
         } finally {
+          this.processing = false
           this.loading = false
         }
       },
 
+      async approveAsHod() {
+        // Validate minimal HOD fields
+        const hodName = this.form.approvals.hod.name || this.currentUser?.name || ''
+        const hodDate = this.form.approvals.hod.date || new Date().toISOString().slice(0, 10)
+        const hodSignature = this.form.approvals.hod.signature
+
+        if (!hodSignature) {
+          this.toast = {
+            show: true,
+            message: 'Please upload your HOD signature before approving'
+          }
+          setTimeout(() => (this.toast.show = false), 4000)
+          return
+        }
+
+        // Validate access rights (HOD-only)
+        this.hodTemporaryUntilError = ''
+        if (this.hodAccessType === 'temporary') {
+          if (!this.hodTemporaryUntil) {
+            this.hodTemporaryUntilError = 'Please select an end date for temporary access'
+            this.toast = { show: true, message: this.hodTemporaryUntilError }
+            setTimeout(() => (this.toast.show = false), 3000)
+            return
+          }
+          // Ensure future date
+          const today = new Date()
+          today.setHours(0, 0, 0, 0)
+          const tmp = new Date(this.hodTemporaryUntil)
+          if (isNaN(tmp.getTime()) || tmp <= today) {
+            this.hodTemporaryUntilError = 'Temporary access end date must be in the future'
+            this.toast = { show: true, message: this.hodTemporaryUntilError }
+            setTimeout(() => (this.toast.show = false), 3000)
+            return
+          }
+        }
+
+        const payload = {
+          hodName,
+          approvedDate: hodDate,
+          hodSignature,
+          comments: this.form.comments || 'Approved by HOD',
+          selectedWellsoft: this.selectedWellsoft,
+          selectedJeeva: this.selectedJeeva,
+          moduleRequestedFor: this.wellsoftRequestType || 'use',
+          accessType: this.hodAccessType,
+          temporaryUntil: this.hodAccessType === 'temporary' ? this.hodTemporaryUntil : undefined
+        }
+
+        // Add timeout to prevent hanging requests
+        const approvalPromise = bothServiceFormService.hodApproveModuleRequest(
+          this.requestId,
+          payload
+        )
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Request timed out. Please try again.')), 30000)
+        )
+
+        const result = await Promise.race([approvalPromise, timeoutPromise])
+
+        if (result.success) {
+          this.toast = {
+            show: true,
+            message: 'Request approved successfully'
+          }
+          setTimeout(() => {
+            this.toast.show = false
+            this.goBackToRequests()
+          }, 2000)
+        } else {
+          // Handle specific error types
+          let errorMessage = 'Failed to approve request'
+
+          if (result.errors && Object.keys(result.errors).length > 0) {
+            errorMessage = 'Validation errors: ' + Object.values(result.errors).flat().join(', ')
+          } else if (result.error) {
+            errorMessage = result.error
+          }
+
+          throw new Error(errorMessage)
+        }
+      },
+
+      async approveAsDivisionalDirector() {
+        // Validate Divisional Director fields
+        const divisionalDirectorName = this.form.approvals.divisionalDirector.name || this.currentUser?.name || ''
+        const divisionalDate = this.form.approvals.divisionalDirector.date || new Date().toISOString().slice(0, 10)
+        const divisionalDirectorSignature = this.form.approvals.divisionalDirector.signature
+
+        if (!divisionalDirectorSignature) {
+          this.toast = {
+            show: true,
+            message: 'Please upload your Divisional Director signature before approving'
+          }
+          setTimeout(() => (this.toast.show = false), 4000)
+          return
+        }
+
+        // Validate divisional director comments
+        if (!this.divisionalDirectorComments?.trim()) {
+          this.toast = {
+            show: true,
+            message: 'Please provide your comments/recommendations before approving'
+          }
+          setTimeout(() => (this.toast.show = false), 4000)
+          return
+        }
+
+        const payload = {
+          divisionalDirectorName,
+          approvedDate: divisionalDate,
+          divisionalDirectorSignature,
+          comments: this.divisionalDirectorComments.trim()
+        }
+
+        // Add timeout to prevent hanging requests
+        const approvalPromise = bothServiceFormService.divisionalDirectorApprove(
+          this.requestId,
+          payload
+        )
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Request timed out. Please try again.')), 30000)
+        )
+
+        const result = await Promise.race([approvalPromise, timeoutPromise])
+
+        if (result.success) {
+          this.toast = {
+            show: true,
+            message: 'Request approved successfully by Divisional Director'
+          }
+          setTimeout(() => {
+            this.toast.show = false
+            this.goBackToRequests()
+          }, 2000)
+        } else {
+          // Handle specific error types
+          let errorMessage = 'Failed to approve request'
+
+          if (result.errors && Object.keys(result.errors).length > 0) {
+            errorMessage = 'Validation errors: ' + Object.values(result.errors).flat().join(', ')
+          } else if (result.error) {
+            errorMessage = result.error
+          }
+
+          throw new Error(errorMessage)
+        }
+      },
+
       async rejectRequest() {
+        // Check if signature is required but missing
+        if (this.isSignatureRequiredForApproval) {
+          const stage = this.currentApprovalStage
+          let message = 'Please upload your signature before rejecting this request.'
+          
+          if (stage === 'divisional') {
+            message = 'Please upload your Divisional Director signature before rejecting this request.'
+          } else if (stage === 'hod') {
+            message = 'Please upload your HOD signature before rejecting this request.'
+          }
+          
+          this.toast = {
+            show: true,
+            message
+          }
+          setTimeout(() => (this.toast.show = false), 4000)
+          return
+        }
+
         // Show rejection reason modal
         this.showRejectionModal = true
       },
@@ -3038,12 +3940,29 @@
           this.loading = true
           this.showRejectionModal = false
 
+          const stage = this.currentApprovalStage
+          const userRole = (this.getUserRole() || '').toLowerCase()
+          
           console.log('Rejecting request:', this.requestId, 'with reason:', this.rejectionReason)
 
-          const result = await combinedAccessService.updateHodApproval(this.requestId, {
-            status: 'rejected',
-            comments: this.rejectionReason
-          })
+          let result
+          if (stage === 'hod' && ['head_of_department', 'hod'].includes(userRole)) {
+            // HOD rejection using the existing API
+            result = await combinedAccessService.updateHodApproval(this.requestId, {
+              status: 'rejected',
+              comments: this.rejectionReason
+            })
+          } else if (stage === 'divisional' && ['divisional_director'].includes(userRole)) {
+            // Divisional Director rejection using new API
+            const currentUserName = this.currentUser?.name || ''
+            result = await bothServiceFormService.divisionalDirectorReject(this.requestId, {
+              divisionalDirectorName: currentUserName,
+              rejectionReason: this.rejectionReason,
+              rejectionDate: new Date().toISOString().slice(0, 10)
+            })
+          } else {
+            throw new Error('You do not have permission to reject at this stage')
+          }
 
           if (result.success) {
             this.toast = {
@@ -3167,6 +4086,81 @@
         alert(message)
       },
 
+      showSignatureUploadSuccess(roleType) {
+        this.toast = {
+          show: true,
+          message: `${roleType} signature uploaded successfully! You can now approve or reject this request.`
+        }
+        setTimeout(() => (this.toast.show = false), 4000)
+      },
+
+      // Get formatted HOD approval date for display
+      getHodApprovalDateFormatted() {
+        if (!this.requestData) return 'Date unavailable'
+        
+        const hodApprovedAt = this.requestData.approvals?.hod?.date ||
+                             this.requestData.approvals?.hod?.approved_at ||
+                             this.requestData.hod_approved_at ||
+                             null
+        
+        if (!hodApprovedAt) return 'Date unavailable'
+        
+        try {
+          const date = new Date(hodApprovedAt)
+          if (isNaN(date.getTime())) return 'Date unavailable'
+          
+          return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+          })
+        } catch (error) {
+          console.warn('Error formatting HOD approval date:', error)
+          return 'Date unavailable'
+        }
+      },
+
+      // Auto-populate HOD date field for Divisional Director view using HOD approval date
+      populateDivisionalDirectorDateFromHod() {
+        if (!this.requestData) return
+        
+        // Only auto-populate when Divisional Director is reviewing
+        const userRole = (this.getUserRole() || '').toLowerCase()
+        const isDivisionalDirector = ['divisional_director'].includes(userRole)
+        
+        if (!isDivisionalDirector || !this.isReviewMode) return
+        
+        // Get HOD approval date from various possible sources
+        const hodApprovedAt = this.requestData.approvals?.hod?.date ||
+                             this.requestData.approvals?.hod?.approved_at ||
+                             this.requestData.hod_approved_at ||
+                             null
+        
+        if (!hodApprovedAt) return
+        
+        try {
+          // Convert HOD approval date to YYYY-MM-DD format for input[type="date"]
+          const date = new Date(hodApprovedAt)
+          if (isNaN(date.getTime())) return
+          
+          const yyyy = date.getFullYear()
+          const mm = String(date.getMonth() + 1).padStart(2, '0')
+          const dd = String(date.getDate()).padStart(2, '0')
+          const formattedDate = `${yyyy}-${mm}-${dd}`
+          
+          // Only populate if the HOD date field is currently empty
+          if (!this.form.approvals.hod.date) {
+            this.form.approvals.hod.date = formattedDate
+            console.log('✅ Auto-populated HOD date from HOD approval for Divisional Director view:', {
+              originalHodDate: hodApprovedAt,
+              formattedDate: formattedDate
+            })
+          }
+        } catch (error) {
+          console.warn('Error auto-populating HOD date for Divisional Director view:', error)
+        }
+      },
+
       // HOD Signature methods
       triggerHodSignatureUpload() {
         this.$refs.hodSignatureInput.click()
@@ -3201,10 +4195,12 @@
           const reader = new FileReader()
           reader.onload = () => {
             this.hodSignaturePreview = reader.result
+            this.showSignatureUploadSuccess('HOD')
           }
           reader.readAsDataURL(file)
         } else {
           this.hodSignaturePreview = 'pdf'
+          this.showSignatureUploadSuccess('HOD')
         }
       },
 
@@ -3251,10 +4247,12 @@
           const reader = new FileReader()
           reader.onload = () => {
             this.divDirectorSignaturePreview = reader.result
+            this.showSignatureUploadSuccess('Divisional Director')
           }
           reader.readAsDataURL(file)
         } else {
           this.divDirectorSignaturePreview = 'pdf'
+          this.showSignatureUploadSuccess('Divisional Director')
         }
       },
 
@@ -3522,32 +4520,23 @@
         }
       },
 
-      // Fallback method to get user from Vuex store
+      // Fallback method to get user from Pinia store
       tryGetUserFromStore() {
         try {
-          // Try to get from Vuex store (if using Vuex)
-          if (this.$store && this.$store.state && this.$store.state.auth) {
-            const storeUser = this.$store.state.auth.user || this.$store.state.auth.currentUser
-            if (storeUser && storeUser.name) {
-              this.currentUser = storeUser
-              console.log('✅ Using Vuex store user data:', this.currentUser.name)
-            }
-          }
+          // Try to get from Pinia store
+          const authStore = useAuthStore()
 
-          // Try alternative Vuex structure
-          if (!this.currentUser && this.$store && this.$store.getters) {
-            const getterUser = this.$store.getters.currentUser || this.$store.getters['auth/user']
-            if (getterUser && getterUser.name) {
-              this.currentUser = getterUser
-              console.log('✅ Using Vuex getter user data:', this.currentUser.name)
-            }
-          }
-
-          if (!this.currentUser) {
-            console.log('❌ No user found in Vuex store')
+          const storeUser = authStore.user || authStore.currentUser
+          if (storeUser && storeUser.name) {
+            this.currentUser = storeUser
+            console.log('✅ Using Pinia store user data:', this.currentUser.name)
+          } else {
+            console.log('❌ No user found in Pinia store')
           }
         } catch (error) {
-          console.error('❌ Error accessing Vuex store:', error)
+          console.error('❌ Error accessing Pinia store:', error)
+          // Fallback: no store available
+          console.log('❌ Pinia store not available, skipping store access')
         }
       },
 
@@ -3874,14 +4863,37 @@
     }
   }
 
-  /* Responsive adjustments */
-  @media (max-width: 1024px) {
-    .lg\:col-span-2 {
-      grid-column: span 1;
-    }
-    .lg\:col-span-1 {
-      grid-column: span 1;
-    }
+  /* Radio button specific styles */
+  input[type='radio'] {
+    appearance: auto;
+    -webkit-appearance: auto;
+    -moz-appearance: radio;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 10;
+    pointer-events: auto !important;
+  }
+
+  /* Ensure radio buttons are always visible and clickable */
+  input[type='radio']:checked {
+    background-color: #3b82f6 !important;
+    border-color: #3b82f6 !important;
+  }
+
+  /* Radio button labels */
+  label.cursor-pointer {
+    cursor: pointer !important;
+    user-select: none;
+  }
+
+  label.cursor-pointer:hover {
+    background-color: rgba(59, 130, 246, 0.1) !important;
+  }
+
+  /* Active state for radio button containers */
+  label.cursor-pointer.bg-blue-500\/10 {
+    background-color: rgba(59, 130, 246, 0.15) !important;
+    border-color: rgba(59, 130, 246, 0.5) !important;
   }
 
   /* Improve card spacing on smaller screens */
@@ -3898,6 +4910,30 @@
 
   .max-w-8xl {
     max-width: 88rem; /* 1408px */
+  }
+
+  /* Personal Information Input Styling */
+  .personal-info-input.font-bold {
+    font-weight: 700 !important;
+    letter-spacing: 0.025em;
+    text-shadow: 0 0 1px rgba(255, 255, 255, 0.3);
+  }
+
+  /* Enhanced bold styling for populated personal info fields */
+  .personal-info-input:not(:placeholder-shown) {
+    font-weight: 600;
+  }
+
+  .personal-info-input.font-bold:not(:placeholder-shown) {
+    font-weight: 800 !important;
+    color: #fde047 !important; /* Yellow-300 for better contrast on dark background */
+    background-color: rgba(
+      59,
+      130,
+      246,
+      0.25
+    ) !important; /* Slightly more opaque blue background */
+    border-color: rgba(251, 191, 36, 0.5) !important; /* Amber border for emphasis */
   }
 
   /* Responsive grid adjustments */

@@ -4,11 +4,13 @@ const webpack = require('webpack')
 
 module.exports = defineConfig({
   transpileDependencies: true,
+  runtimeCompiler: true,
   publicPath: process.env.NODE_ENV === 'production' ? '/' : '/',
   configureWebpack: {
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, 'src')
+        '@': path.resolve(__dirname, 'src'),
+        'vue': 'vue/dist/vue.esm-bundler.js'
       }
     },
     plugins: [

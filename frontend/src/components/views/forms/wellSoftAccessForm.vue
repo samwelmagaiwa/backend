@@ -346,79 +346,6 @@
                 </div>
               </div>
 
-              <!-- Access Rights Section -->
-              <div
-                class="medical-card bg-gradient-to-r from-cyan-600/25 to-blue-600/25 border-2 border-cyan-400/40 p-8 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-cyan-500/20 transition-all duration-500 group"
-              >
-                <div class="flex items-center space-x-4 mb-6">
-                  <div
-                    class="w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-cyan-300/50"
-                  >
-                    <i class="fas fa-lock text-white text-xl"></i>
-                  </div>
-                  <h3 class="text-xl font-bold text-white flex items-center">
-                    <i class="fas fa-key mr-2 text-cyan-300"></i>
-                    Access Rights
-                  </h3>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <!-- Permanent Option -->
-                  <div
-                    class="flex items-center p-4 border-2 border-blue-300/30 rounded-xl hover:border-cyan-400 hover:bg-white/10 transition-all backdrop-blur-sm"
-                  >
-                    <input
-                      v-model="formData.accessType"
-                      type="radio"
-                      value="permanent"
-                      class="w-4 h-4 text-cyan-600 border-blue-300 focus:ring-cyan-500 mr-3 access-rights-editable"
-                    />
-                    <span class="font-medium text-white text-sm">Permanent (until retirement)</span>
-                  </div>
-
-                  <!-- Temporary Until Option -->
-                  <div
-                    class="flex items-center justify-between p-4 border-2 border-blue-300/30 rounded-xl hover:border-cyan-400 hover:bg-white/10 transition-all backdrop-blur-sm"
-                  >
-                    <div class="flex items-center">
-                      <input
-                        v-model="formData.accessType"
-                        type="radio"
-                        value="temporary"
-                        class="w-4 h-4 text-cyan-600 border-blue-300 focus:ring-cyan-500 mr-3 access-rights-editable"
-                      />
-                      <span class="font-medium text-white text-sm">Temporary Until</span>
-                    </div>
-
-                    <div class="flex items-center gap-1" v-if="formData.accessType === 'temporary'">
-                      <input
-                        v-model="formData.tempDate.day"
-                        type="text"
-                        placeholder="DD"
-                        maxlength="2"
-                        class="w-9 px-1 py-1 border border-blue-300/30 rounded text-center text-xs focus:border-cyan-500 focus:outline-none bg-white/15 text-white access-rights-editable"
-                      />
-                      <span class="text-blue-200">/</span>
-                      <input
-                        v-model="formData.tempDate.month"
-                        type="text"
-                        placeholder="MM"
-                        maxlength="2"
-                        class="w-9 px-1 py-1 border border-blue-300/30 rounded text-center text-xs focus:border-cyan-500 focus:outline-none bg-white/15 text-white access-rights-editable"
-                      />
-                      <span class="text-blue-200">/</span>
-                      <input
-                        v-model="formData.tempDate.year"
-                        type="text"
-                        placeholder="YYYY"
-                        maxlength="4"
-                        class="w-14 px-1 py-1 border border-blue-300/30 rounded text-center text-xs focus:border-cyan-500 focus:outline-none bg-white/15 text-white access-rights-editable"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
               <!-- Approval Section -->
               <div
                 class="medical-card bg-gradient-to-r from-emerald-600/25 to-teal-600/25 border-2 border-emerald-400/40 p-8 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-500 group"
@@ -1287,23 +1214,6 @@
         if (this.formData.selectedModules.length === 0) {
           this.showNotification('Please select at least one module')
           return
-        }
-
-        if (!this.formData.accessType) {
-          this.showNotification('Please specify the access rights type')
-          return
-        }
-
-        // If temporary access, validate date
-        if (this.formData.accessType === 'temporary') {
-          if (
-            !this.formData.tempDate.day ||
-            !this.formData.tempDate.month ||
-            !this.formData.tempDate.year
-          ) {
-            this.showNotification('Please provide a complete date for temporary access')
-            return
-          }
         }
 
         // Here you would typically send the data to your backend

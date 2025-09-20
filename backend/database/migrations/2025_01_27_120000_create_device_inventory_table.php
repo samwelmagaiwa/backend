@@ -29,9 +29,11 @@ return new class extends Migration
             $table->index('device_code');
             $table->index('available_quantity');
 
-            // Add foreign key constraints
-            $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
-            $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null');
+            // Add foreign key constraints - only if users table exists
+            if (Schema::hasTable('users')) {
+                $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
+                $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null');
+            }
         });
     }
 

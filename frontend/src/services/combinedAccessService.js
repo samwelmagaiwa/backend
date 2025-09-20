@@ -56,7 +56,7 @@ class CombinedAccessService {
     try {
       console.log('🔄 Fetching combined access request:', requestId)
 
-      const response = await apiClient.get(`/hod/combined-access-requests/${requestId}`)
+      const response = await apiClient.get(`/both-service-form/${requestId}`)
 
       if (response.data && response.data.success) {
         console.log('✅ Request retrieved successfully:', requestId)

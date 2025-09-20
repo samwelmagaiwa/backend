@@ -85,7 +85,8 @@
                 <h2
                   class="text-lg font-bold text-blue-100 tracking-wide drop-shadow-md animate-fade-in-delay"
                 >
-                  Staff requests displayed in FIFO order. Click "View & Process" to capture: Module Requested for, Module Request, Access Rights, and Comments.
+                  Staff requests displayed in FIFO order. Click "View & Process" to capture: Module
+                  Requested for, Module Request, Access Rights, and Comments.
                 </h2>
               </div>
 
@@ -244,7 +245,8 @@
 
               <!-- Requests Table -->
               <div
-                class="bg-gradient-to-r from-blue-600/25 to-teal-600/25 border-2 border-blue-400/40 rounded-2xl backdrop-blur-sm overflow-hidden"
+                class="table-container bg-gradient-to-r from-blue-600/25 to-teal-600/25 border-2 border-blue-400/40 rounded-2xl backdrop-blur-sm"
+                style="overflow: visible"
               >
                 <div class="p-6 border-b border-blue-300/30">
                   <h3 class="text-xl font-bold text-white flex items-center">
@@ -253,7 +255,7 @@
                   </h3>
                 </div>
 
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto" style="overflow-y: visible">
                   <table class="w-full">
                     <thead class="bg-blue-800/50">
                       <tr>
@@ -285,7 +287,13 @@
                         <th
                           class="px-6 py-4 text-center text-sm font-semibold text-blue-100 uppercase tracking-wider"
                         >
-                          <i class="fas fa-cogs mr-2"></i>Actions
+                          <div class="flex items-center justify-center">
+                            <span
+                              class="bg-blue-100/10 px-3 py-1.5 rounded-lg border border-blue-300/20"
+                            >
+                              <i class="fas fa-cogs mr-2"></i>Actions
+                            </span>
+                          </div>
                         </th>
                       </tr>
                     </thead>
@@ -305,7 +313,10 @@
                             </div>
                             <div>
                               <div class="text-sm font-medium text-white">
-                                {{ request.request_id || `REQ-${request.id.toString().padStart(6, '0')}` }}
+                                {{
+                                  request.request_id ||
+                                  `REQ-${request.id.toString().padStart(6, '0')}`
+                                }}
                               </div>
                               <div class="text-xs text-purple-300">ID: {{ request.id }}</div>
                             </div>
@@ -334,9 +345,7 @@
                               <i class="fas fa-wifi mr-1"></i>Internet
                             </span>
                           </div>
-                          <div class="text-xs text-blue-300 mt-1">
-                            Combined Access Request
-                          </div>
+                          <div class="text-xs text-blue-300 mt-1">Combined Access Request</div>
                         </td>
 
                         <!-- Personal Information -->
@@ -377,48 +386,88 @@
                         <!-- Current Status -->
                         <td class="px-6 py-4 whitespace-nowrap">
                           <span
-                            :class="getStatusBadgeClass(request.hod_status || request.status || 'pending_hod')"
+                            :class="
+                              getStatusBadgeClass(
+                                request.hod_status || request.status || 'pending_hod'
+                              )
+                            "
                             class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium"
                           >
                             <i
-                              :class="getStatusIcon(request.hod_status || request.status || 'pending_hod')"
+                              :class="
+                                getStatusIcon(request.hod_status || request.status || 'pending_hod')
+                              "
                               class="mr-1"
                             ></i>
-                            {{ getStatusText(request.hod_status || request.status || 'pending_hod') }}
+                            {{
+                              getStatusText(request.hod_status || request.status || 'pending_hod')
+                            }}
                           </span>
                         </td>
 
                         <!-- Actions -->
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                          <div class="flex items-center justify-center space-x-2">
-                            <!-- View & Process Button -->
+                        <td class="px-6 py-4 whitespace-nowrap text-center relative">
+                          <div class="relative inline-block text-left">
+                            <!-- Three dots button -->
                             <button
-                              @click="viewAndProcessRequest(request.id)"
-                              class="inline-flex items-center px-3 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-xs font-medium rounded-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+                              @click.stop="toggleDropdown(request.id)"
+                              :data-request-id="request.id"
+                              class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-blue-600/20 hover:bg-blue-600/40 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 shadow-lg hover:shadow-xl"
                             >
-                              <i class="fas fa-eye mr-1"></i>
-                              View & Process
+                              <div class="flex flex-col space-y-0.5">
+                                <div class="w-1.5 h-1.5 bg-blue-100 rounded-full"></div>
+                                <div class="w-1.5 h-1.5 bg-blue-100 rounded-full"></div>
+                                <div class="w-1.5 h-1.5 bg-blue-100 rounded-full"></div>
+                              </div>
                             </button>
 
-                            <!-- Edit Button (if allowed) -->
-                            <button
-                              v-if="canEdit(request)"
-                              @click="editRequest(request.id)"
-                              class="inline-flex items-center px-3 py-2 bg-gradient-to-r from-amber-600 to-orange-600 text-white text-xs font-medium rounded-lg hover:from-amber-700 hover:to-orange-700 focus:outline-none focus:ring-2 focus:ring-amber-500/50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+                            <!-- Dropdown menu -->
+                            <div
+                              v-show="activeDropdown === request.id"
+                              :id="'dropdown-' + request.id"
+                              class="dropdown-menu fixed w-56 origin-top-right bg-white rounded-xl shadow-2xl border border-gray-200/50 focus:outline-none backdrop-blur-sm"
+                              :style="getDropdownStyle(request.id)"
+                              @click.stop
                             >
-                              <i class="fas fa-edit mr-1"></i>
-                              Edit
-                            </button>
+                              <div class="py-2">
+                                <button
+                                  @click="viewAndProcessRequest(request.id)"
+                                  class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 hover:text-blue-700 transition-all duration-200 font-medium"
+                                >
+                                  <i
+                                    class="fas fa-eye mr-3 text-blue-500 group-hover:text-blue-600"
+                                  ></i>
+                                  View & Process
+                                </button>
 
-                            <!-- Cancel Button (if allowed) -->
-                            <button
-                              v-if="canCancel(request)"
-                              @click="cancelRequest(request.id)"
-                              class="inline-flex items-center px-3 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white text-xs font-medium rounded-lg hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-red-500/50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
-                            >
-                              <i class="fas fa-ban mr-1"></i>
-                              Cancel
-                            </button>
+                                <button
+                                  v-if="canEdit(request)"
+                                  @click="editRequest(request.id)"
+                                  class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-amber-50 hover:to-amber-100 hover:text-amber-700 transition-all duration-200 font-medium"
+                                >
+                                  <i
+                                    class="fas fa-edit mr-3 text-amber-500 group-hover:text-amber-600"
+                                  ></i>
+                                  Edit
+                                </button>
+
+                                <div
+                                  v-if="canCancel(request)"
+                                  class="border-t border-gray-100 my-1"
+                                ></div>
+
+                                <button
+                                  v-if="canCancel(request)"
+                                  @click="cancelRequest(request.id)"
+                                  class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-red-50 hover:to-red-100 hover:text-red-700 transition-all duration-200 font-medium"
+                                >
+                                  <i
+                                    class="fas fa-ban mr-3 text-red-500 group-hover:text-red-600"
+                                  ></i>
+                                  Cancel
+                                </button>
+                              </div>
+                            </div>
                           </div>
                         </td>
                       </tr>
@@ -480,361 +529,548 @@
   </div>
 </template>
 
+<style scoped>
+  /* Force dropdown to be visible above all content */
+  .relative {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Ensure dropdown menus are always on top */
+  .dropdown-menu {
+    position: absolute !important;
+    z-index: 99999 !important;
+    box-shadow:
+      0 20px 25px -5px rgba(0, 0, 0, 0.1),
+      0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+  }
+
+  /* Prevent overflow clipping in containers */
+  .table-container {
+    overflow: visible !important;
+  }
+
+  /* Medical Glass morphism effects */
+  .medical-glass-card {
+    background: rgba(59, 130, 246, 0.15);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 2px solid rgba(96, 165, 250, 0.3);
+    box-shadow:
+      0 8px 32px rgba(29, 78, 216, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  /* Animations */
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-in-delay {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    50% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-float {
+    animation: float ease-in-out infinite;
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.6s ease-out;
+  }
+
+  .animate-fade-in-delay {
+    animation: fade-in-delay 1.2s ease-out;
+  }
+
+  .animate-slide-up {
+    animation: slide-up 0.4s ease-out;
+  }
+</style>
+
 <script>
-import Header from '@/components/header.vue'
-import ModernSidebar from '@/components/ModernSidebar.vue'
-import AppFooter from '@/components/footer.vue'
-import combinedAccessService from '@/services/combinedAccessService'
+  import Header from '@/components/header.vue'
+  import ModernSidebar from '@/components/ModernSidebar.vue'
+  import AppFooter from '@/components/footer.vue'
+  import combinedAccessService from '@/services/combinedAccessService'
 
-export default {
-  name: 'HodRequestList',
-  components: {
-    Header,
-    ModernSidebar,
-    AppFooter
-  },
-  setup() {
-    return {
-      // No local state needed for sidebar
-    }
-  },
-  data() {
-    return {
-      requests: [],
-      searchQuery: '',
-      statusFilter: '',
-      isLoading: false,
-      stats: {
-        pendingHod: 0,
-        hodApproved: 0,
-        hodRejected: 0,
-        total: 0
-      },
-      error: null
-    }
-  },
-  computed: {
-    filteredRequests() {
-      // Ensure requests is always an array
-      if (!Array.isArray(this.requests)) {
-        console.warn('HodRequestList: requests is not an array:', this.requests)
-        return []
+  export default {
+    name: 'HodRequestList',
+    components: {
+      Header,
+      ModernSidebar,
+      AppFooter
+    },
+    setup() {
+      return {
+        // No local state needed for sidebar
       }
-      
-      let filtered = this.requests
-
-      // Filter by search query
-      if (this.searchQuery) {
-        const query = this.searchQuery.toLowerCase()
-        filtered = filtered.filter(
-          (request) =>
-            (request.staff_name || request.full_name || '').toLowerCase().includes(query) ||
-            (request.pf_number || '').toLowerCase().includes(query) ||
-            (request.department || '').toLowerCase().includes(query) ||
-            (request.request_id || '').toLowerCase().includes(query)
-        )
+    },
+    data() {
+      return {
+        requests: [],
+        searchQuery: '',
+        statusFilter: '',
+        isLoading: false,
+        stats: {
+          pendingHod: 0,
+          hodApproved: 0,
+          hodRejected: 0,
+          total: 0
+        },
+        error: null,
+        activeDropdown: null
       }
-
-      // Filter by status
-      if (this.statusFilter) {
-        filtered = filtered.filter(
-          (request) => (request.hod_status || request.status || 'pending_hod') === this.statusFilter
-        )
-      }
-
-      // Sort by FIFO order (oldest first)
-      return filtered.sort((a, b) => {
-        const dateA = new Date(a.created_at || a.submission_date || 0)
-        const dateB = new Date(b.created_at || b.submission_date || 0)
-        return dateA - dateB
-      })
-    }
-  },
-  async mounted() {
-    try {
-      console.log('HodRequestList: Component mounted, initializing...')
-      await this.fetchRequests()
-      console.log('HodRequestList: Component initialized successfully')
-    } catch (error) {
-      console.error('HodRequestList: Error during mount:', error)
-      this.error = 'Failed to initialize component: ' + error.message
-      this.isLoading = false
-    }
-  },
-  methods: {
-    async fetchRequests() {
-      this.isLoading = true
-      this.error = null
-
-      try {
-        console.log('Fetching combined access requests for HOD approval...')
-
-        const response = await combinedAccessService.getHodRequests({
-          search: this.searchQuery || undefined,
-          status: this.statusFilter || undefined,
-          per_page: 50
-        })
-
-        if (response.success) {
-          // Handle the nested response structure: response.data.data.data
-          const responseData = response.data?.data || response.data || {}
-          this.requests = Array.isArray(responseData.data) ? responseData.data : (Array.isArray(responseData) ? responseData : [])
-          console.log('Combined access requests loaded:', this.requests.length)
-          console.log('Raw response data:', response.data)
-          
-          // Also fetch statistics
-          await this.fetchStatistics()
-        } else {
-          throw new Error(response.error || 'Failed to fetch requests')
+    },
+    computed: {
+      filteredRequests() {
+        // Ensure requests is always an array
+        if (!Array.isArray(this.requests)) {
+          console.warn('HodRequestList: requests is not an array:', this.requests)
+          return []
         }
 
+        let filtered = this.requests
+
+        // Filter by search query
+        if (this.searchQuery) {
+          const query = this.searchQuery.toLowerCase()
+          filtered = filtered.filter(
+            (request) =>
+              (request.staff_name || request.full_name || '').toLowerCase().includes(query) ||
+              (request.pf_number || '').toLowerCase().includes(query) ||
+              (request.department || '').toLowerCase().includes(query) ||
+              (request.request_id || '').toLowerCase().includes(query)
+          )
+        }
+
+        // Filter by status
+        if (this.statusFilter) {
+          filtered = filtered.filter(
+            (request) =>
+              (request.hod_status || request.status || 'pending_hod') === this.statusFilter
+          )
+        }
+
+        // Sort by FIFO order (oldest first)
+        return filtered.sort((a, b) => {
+          const dateA = new Date(a.created_at || a.submission_date || 0)
+          const dateB = new Date(b.created_at || b.submission_date || 0)
+          return dateA - dateB
+        })
+      }
+    },
+    async mounted() {
+      try {
+        console.log('HodRequestList: Component mounted, initializing...')
+        await this.fetchRequests()
+        console.log('HodRequestList: Component initialized successfully')
+
+        // Add click listener to close dropdowns when clicking outside
+        document.addEventListener('click', this.closeDropdowns)
       } catch (error) {
-        console.error('Error fetching requests:', error)
-        this.error = 'Unable to load combined access requests. Please check your connection and try again.'
-        this.requests = []
-        this.calculateStats()
-      } finally {
+        console.error('HodRequestList: Error during mount:', error)
+        this.error = 'Failed to initialize component: ' + error.message
         this.isLoading = false
       }
     },
 
-    async fetchStatistics() {
-      try {
-        const response = await combinedAccessService.getHodStatistics()
-        
-        if (response.success) {
-          this.stats = response.data
+    beforeUnmount() {
+      // Clean up the click listener
+      document.removeEventListener('click', this.closeDropdowns)
+    },
+
+    methods: {
+      toggleDropdown(requestId) {
+        console.log('Toggle dropdown for request:', requestId)
+        console.log('Current activeDropdown:', this.activeDropdown)
+
+        if (this.activeDropdown === requestId) {
+          this.activeDropdown = null
+          console.log('Closing dropdown')
         } else {
+          this.activeDropdown = requestId
+          console.log('Opening dropdown for:', requestId)
+
+          // Wait for DOM update before calculating position
+          this.$nextTick(() => {
+            // Force recalculation of dropdown position
+            this.$forceUpdate()
+          })
+        }
+      },
+
+      closeDropdowns(event) {
+        // Only close if clicking outside the dropdown area
+        if (!event || !event.target.closest('.relative')) {
+          this.activeDropdown = null
+        }
+      },
+
+      getDropdownStyle(requestId) {
+        if (this.activeDropdown !== requestId) {
+          return { display: 'none' }
+        }
+
+        // Find the button element
+        const buttonElement = document.querySelector(`[data-request-id="${requestId}"]`)
+        if (!buttonElement) {
+          return {
+            position: 'fixed',
+            top: '50px',
+            right: '10px',
+            zIndex: 99999
+          }
+        }
+
+        const rect = buttonElement.getBoundingClientRect()
+        const viewportHeight = window.innerHeight
+        const dropdownHeight = 200 // Approximate height of dropdown (larger for HodRequestList)
+
+        let top = rect.bottom + 8
+        let right = window.innerWidth - rect.right
+
+        // If dropdown would go below viewport, position it above the button
+        if (top + dropdownHeight > viewportHeight) {
+          top = rect.top - dropdownHeight - 8
+        }
+
+        // Ensure dropdown doesn't go off-screen to the left
+        if (right < 0) {
+          right = 10
+        }
+
+        return {
+          position: 'fixed',
+          top: top + 'px',
+          right: right + 'px',
+          zIndex: 99999
+        }
+      },
+      async fetchRequests() {
+        this.isLoading = true
+        this.error = null
+
+        try {
+          console.log('Fetching combined access requests for HOD approval...')
+
+          const response = await combinedAccessService.getHodRequests({
+            search: this.searchQuery || undefined,
+            status: this.statusFilter || undefined,
+            per_page: 50
+          })
+
+          if (response.success) {
+            // Handle the nested response structure: response.data.data.data
+            const responseData = response.data?.data || response.data || {}
+            this.requests = Array.isArray(responseData.data)
+              ? responseData.data
+              : Array.isArray(responseData)
+                ? responseData
+                : []
+            console.log('Combined access requests loaded:', this.requests.length)
+            console.log('Raw response data:', response.data)
+
+            // Also fetch statistics
+            await this.fetchStatistics()
+          } else {
+            throw new Error(response.error || 'Failed to fetch requests')
+          }
+        } catch (error) {
+          console.error('Error fetching requests:', error)
+          this.error =
+            'Unable to load combined access requests. Please check your connection and try again.'
+          this.requests = []
+          this.calculateStats()
+        } finally {
+          this.isLoading = false
+        }
+      },
+
+      async fetchStatistics() {
+        try {
+          const response = await combinedAccessService.getHodStatistics()
+
+          if (response.success) {
+            this.stats = response.data
+          } else {
+            // Fall back to calculating stats from loaded requests
+            this.calculateStats()
+          }
+        } catch (error) {
+          console.error('Error fetching statistics:', error)
           // Fall back to calculating stats from loaded requests
           this.calculateStats()
         }
-      } catch (error) {
-        console.error('Error fetching statistics:', error)
-        // Fall back to calculating stats from loaded requests
-        this.calculateStats()
-      }
-    },
+      },
 
-    calculateStats() {
-      // Ensure requests is an array before calculating stats
-      const requests = Array.isArray(this.requests) ? this.requests : []
-      
-      this.stats = {
-        pendingHod: requests.filter((r) => (r.hod_status || r.status) === 'pending_hod').length,
-        hodApproved: requests.filter((r) => (r.hod_status || r.status) === 'hod_approved').length,
-        hodRejected: requests.filter((r) => (r.hod_status || r.status) === 'hod_rejected').length,
-        total: requests.length
-      }
-    }
+      calculateStats() {
+        // Ensure requests is an array before calculating stats
+        const requests = Array.isArray(this.requests) ? this.requests : []
 
-    async refreshRequests() {
-      await this.fetchRequests()
-    },
-
-    viewAndProcessRequest(requestId) {
-      // Navigate to both-service-form.vue with populated data
-      this.$router.push(`/both-service-form/${requestId}`)
-    },
-
-    editRequest(requestId) {
-      // Navigate to edit mode
-      this.$router.push(`/both-service-form/${requestId}/edit`)
-    },
-
-    async cancelRequest(requestId) {
-      try {
-        const confirmed = confirm('Are you sure you want to cancel this request? This action cannot be undone.')
-        if (!confirmed) return
-
-        const reason = prompt('Please provide a reason for cancellation:')
-        if (!reason || reason.trim() === '') {
-          alert('Cancellation reason is required')
-          return
+        this.stats = {
+          pendingHod: requests.filter((r) => (r.hod_status || r.status) === 'pending_hod').length,
+          hodApproved: requests.filter((r) => (r.hod_status || r.status) === 'hod_approved').length,
+          hodRejected: requests.filter((r) => (r.hod_status || r.status) === 'hod_rejected').length,
+          total: requests.length
         }
+      },
 
-        console.log('Cancelling request:', requestId)
-        
-        const response = await combinedAccessService.cancelRequest(requestId, reason)
-        
-        if (response.success) {
-          // Update local state
-          const requestIndex = this.requests.findIndex(r => r.id === requestId)
-          if (requestIndex !== -1) {
-            this.requests[requestIndex].hod_status = 'cancelled'
-            this.requests[requestIndex].status = 'cancelled'
+      async refreshRequests() {
+        await this.fetchRequests()
+      },
+
+      viewAndProcessRequest(requestId) {
+        this.closeDropdowns()
+        // Navigate to both-service-form.vue with populated data
+        this.$router.push(`/both-service-form/${requestId}`)
+      },
+
+      editRequest(requestId) {
+        this.closeDropdowns()
+        // Navigate to edit mode
+        this.$router.push(`/both-service-form/${requestId}/edit`)
+      },
+
+      async cancelRequest(requestId) {
+        this.closeDropdowns()
+        try {
+          const confirmed = confirm(
+            'Are you sure you want to cancel this request? This action cannot be undone.'
+          )
+          if (!confirmed) return
+
+          const reason = prompt('Please provide a reason for cancellation:')
+          if (!reason || reason.trim() === '') {
+            alert('Cancellation reason is required')
+            return
           }
 
-          this.calculateStats()
-          alert('Request cancelled successfully!')
-        } else {
-          throw new Error(response.error || 'Failed to cancel request')
+          console.log('Cancelling request:', requestId)
+
+          const response = await combinedAccessService.cancelRequest(requestId, reason)
+
+          if (response.success) {
+            // Update local state
+            const requestIndex = this.requests.findIndex((r) => r.id === requestId)
+            if (requestIndex !== -1) {
+              this.requests[requestIndex].hod_status = 'cancelled'
+              this.requests[requestIndex].status = 'cancelled'
+            }
+
+            this.calculateStats()
+            alert('Request cancelled successfully!')
+          } else {
+            throw new Error(response.error || 'Failed to cancel request')
+          }
+        } catch (error) {
+          console.error('Error cancelling request:', error)
+          alert('Error cancelling request: ' + error.message)
         }
-      } catch (error) {
-        console.error('Error cancelling request:', error)
-        alert('Error cancelling request: ' + error.message)
+      },
+
+      hasService(request, serviceType) {
+        return (
+          (request.services && request.services.includes(serviceType)) ||
+          (request.request_types &&
+            request.request_types.some(
+              (type) =>
+                (serviceType === 'jeeva' && type === 'jeeva_access') ||
+                (serviceType === 'wellsoft' && type === 'wellsoft') ||
+                (serviceType === 'internet' && type === 'internet_access_request')
+            ))
+        )
+      },
+
+      canEdit(request) {
+        // HOD can edit requests that are pending
+        return (request.hod_status || request.status) === 'pending_hod'
+      },
+
+      canCancel(request) {
+        // HOD can cancel requests that are not already rejected or cancelled
+        const status = request.hod_status || request.status
+        return status !== 'hod_rejected' && status !== 'cancelled'
+      },
+
+      formatDate(dateString) {
+        if (!dateString) return 'N/A'
+        const date = new Date(dateString)
+        return date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        })
+      },
+
+      formatTime(dateString) {
+        if (!dateString) return 'N/A'
+        const date = new Date(dateString)
+        return date.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit'
+        })
+      },
+
+      getStatusBadgeClass(status) {
+        const classes = {
+          pending_hod: 'bg-yellow-100 text-yellow-800',
+          hod_approved: 'bg-green-100 text-green-800',
+          hod_rejected: 'bg-red-100 text-red-800',
+          cancelled: 'bg-gray-100 text-gray-800'
+        }
+        return classes[status] || 'bg-gray-100 text-gray-800'
+      },
+
+      getStatusIcon(status) {
+        const icons = {
+          pending_hod: 'fas fa-clock',
+          hod_approved: 'fas fa-check',
+          hod_rejected: 'fas fa-times',
+          cancelled: 'fas fa-ban'
+        }
+        return icons[status] || 'fas fa-question'
+      },
+
+      getStatusText(status) {
+        const texts = {
+          pending_hod: 'Pending HOD Approval',
+          hod_approved: 'HOD Approved',
+          hod_rejected: 'HOD Rejected',
+          cancelled: 'Cancelled'
+        }
+        return texts[status] || 'Unknown Status'
       }
-    },
-
-    hasService(request, serviceType) {
-      return request.services && request.services.includes(serviceType) ||
-             request.request_types && request.request_types.some(type => 
-               (serviceType === 'jeeva' && type === 'jeeva_access') ||
-               (serviceType === 'wellsoft' && type === 'wellsoft') ||
-               (serviceType === 'internet' && type === 'internet_access_request')
-             )
-    },
-
-    canEdit(request) {
-      // HOD can edit requests that are pending
-      return (request.hod_status || request.status) === 'pending_hod'
-    },
-
-    canCancel(request) {
-      // HOD can cancel requests that are not already rejected or cancelled
-      const status = request.hod_status || request.status
-      return status !== 'hod_rejected' && status !== 'cancelled'
-    },
-
-    formatDate(dateString) {
-      if (!dateString) return 'N/A'
-      const date = new Date(dateString)
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-      })
-    },
-
-    formatTime(dateString) {
-      if (!dateString) return 'N/A'
-      const date = new Date(dateString)
-      return date.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit'
-      })
-    },
-
-    getStatusBadgeClass(status) {
-      const classes = {
-        'pending_hod': 'bg-yellow-100 text-yellow-800',
-        'hod_approved': 'bg-green-100 text-green-800',
-        'hod_rejected': 'bg-red-100 text-red-800',
-        'cancelled': 'bg-gray-100 text-gray-800'
-      }
-      return classes[status] || 'bg-gray-100 text-gray-800'
-    },
-
-    getStatusIcon(status) {
-      const icons = {
-        'pending_hod': 'fas fa-clock',
-        'hod_approved': 'fas fa-check',
-        'hod_rejected': 'fas fa-times',
-        'cancelled': 'fas fa-ban'
-      }
-      return icons[status] || 'fas fa-question'
-    },
-
-    getStatusText(status) {
-      const texts = {
-        'pending_hod': 'Pending HOD Approval',
-        'hod_approved': 'HOD Approved',
-        'hod_rejected': 'HOD Rejected',
-        'cancelled': 'Cancelled'
-      }
-      return texts[status] || 'Unknown Status'
     }
   }
-}
 </script>
 
 <style scoped>
-/* Medical Glass morphism effects */
-.medical-glass-card {
-  background: rgba(59, 130, 246, 0.15);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
-  border: 2px solid rgba(96, 165, 250, 0.3);
-  box-shadow:
-    0 8px 32px rgba(29, 78, 216, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-
-/* Animations */
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
+  /* Medical Glass morphism effects */
+  .medical-glass-card {
+    background: rgba(59, 130, 246, 0.15);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 2px solid rgba(96, 165, 250, 0.3);
+    box-shadow:
+      0 8px 32px rgba(29, 78, 216, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
-  50% {
-    transform: translateY(-20px);
+
+  /* Animations */
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
   }
-}
 
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  @keyframes fade-in-delay {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
-}
 
-@keyframes fade-in-delay {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
   }
-}
 
-@keyframes slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
+  .animate-fade-in {
+    animation: fade-in 1s ease-out;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  .animate-fade-in-delay {
+    animation: fade-in-delay 1s ease-out 0.3s both;
   }
-}
 
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
+  .animate-slide-up {
+    animation: slide-up 0.6s ease-out;
+  }
 
-.animate-fade-in {
-  animation: fade-in 1s ease-out;
-}
+  /* Focus styles for accessibility */
+  input:focus,
+  select:focus {
+    box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.1);
+  }
 
-.animate-fade-in-delay {
-  animation: fade-in-delay 1s ease-out 0.3s both;
-}
+  button:focus {
+    box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.3);
+  }
 
-.animate-slide-up {
-  animation: slide-up 0.6s ease-out;
-}
-
-/* Focus styles for accessibility */
-input:focus,
-select:focus {
-  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.1);
-}
-
-button:focus {
-  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.3);
-}
-
-/* Smooth transitions */
-* {
-  transition-property:
-    color, background-color, border-color, text-decoration-color, fill, stroke, opacity,
-    box-shadow, transform, filter, backdrop-filter;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 200ms;
-}
+  /* Smooth transitions */
+  * {
+    transition-property:
+      color, background-color, border-color, text-decoration-color, fill, stroke, opacity,
+      box-shadow, transform, filter, backdrop-filter;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 200ms;
+  }
 </style>

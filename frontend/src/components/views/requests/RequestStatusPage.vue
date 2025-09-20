@@ -430,56 +430,32 @@
                             <div v-else class="text-gray-400 text-xs">N/A</div>
                           </td>
                           <td class="py-4 px-4">
-                            <div class="relative" :class="'dropdown-' + request.id">
+                            <div class="flex space-x-2">
                               <button
-                                @click="toggleDropdown(request.id)"
+                                @click="viewRequestDetails(request)"
                                 class="px-3 py-1 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-lg text-blue-300 text-sm font-medium transition-colors flex items-center"
                               >
-                                <i class="fas fa-cog mr-1"></i>
-                                Actions
-                                <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                                <i class="fas fa-eye mr-1"></i>
+                                View
                               </button>
 
-                              <!-- Dropdown Menu -->
-                              <div
-                                v-if="activeDropdown === request.id"
-                                class="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-600 rounded-lg shadow-lg z-50"
+                              <button
+                                v-if="canEditRequest(request)"
+                                @click="editRequest(request)"
+                                class="px-3 py-1 bg-green-500/20 hover:bg-green-500/30 border border-green-400/30 rounded-lg text-green-300 text-sm font-medium transition-colors flex items-center"
                               >
-                                <div class="py-1">
-                                  <button
-                                    @click="viewRequestDetails(request)"
-                                    class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white flex items-center"
-                                  >
-                                    <i class="fas fa-eye mr-2 text-blue-400"></i>
-                                    View Details
-                                  </button>
-                                  <!-- Edit button for rejected requests -->
-                                  <button
-                                    v-if="
-                                      (request.status === 'rejected' ||
-                                        request.status === 'hod_rejected' ||
-                                        request.status === 'divisional_rejected' ||
-                                        request.status === 'ict_director_rejected' ||
-                                        request.status === 'head_it_rejected' ||
-                                        request.status === 'ict_officer_rejected') &&
-                                      canEditRequest(request)
-                                    "
-                                    @click="editRequest(request)"
-                                    class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-green-600 hover:text-white flex items-center"
-                                  >
-                                    <i class="fas fa-edit mr-2 text-green-400"></i>
-                                    Edit & Resubmit
-                                  </button>
-                                  <button
-                                    @click="cancelRequest(request)"
-                                    class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-red-600 hover:text-white flex items-center"
-                                  >
-                                    <i class="fas fa-times mr-2 text-red-400"></i>
-                                    Cancel Request
-                                    <span class="ml-1 text-xs">({{ request.status }})</span>
-                                  </button>
-                                </div>
-                              </div>
+                                <i class="fas fa-edit mr-1"></i>
+                                Edit
+                              </button>
+
+                              <button
+                                v-if="canCancelRequest(request)"
+                                @click="cancelRequest(request)"
+                                class="px-3 py-1 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 rounded-lg text-red-300 text-sm font-medium transition-colors flex items-center"
+                              >
+                                <i class="fas fa-times mr-1"></i>
+                                Cancel
+                              </button>
                             </div>
                           </td>
                         </tr>
@@ -612,56 +588,32 @@
                         </div>
                       </div>
 
-                      <div class="relative" :class="'mobile-dropdown-' + request.id">
+                      <div class="flex flex-col space-y-2">
                         <button
-                          @click="toggleDropdown('mobile-' + request.id)"
+                          @click="viewRequestDetails(request)"
                           class="w-full px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-lg text-blue-300 text-sm font-medium transition-colors flex items-center justify-center"
                         >
-                          <i class="fas fa-cog mr-2"></i>
-                          Actions
-                          <i class="fas fa-chevron-down ml-2 text-xs"></i>
+                          <i class="fas fa-eye mr-2"></i>
+                          View Details
                         </button>
 
-                        <!-- Mobile Dropdown Menu -->
-                        <div
-                          v-if="activeDropdown === 'mobile-' + request.id"
-                          class="absolute left-0 right-0 mt-2 bg-gray-800 border border-gray-600 rounded-lg shadow-lg z-50"
+                        <button
+                          v-if="canEditRequest(request)"
+                          @click="editRequest(request)"
+                          class="w-full px-3 py-2 bg-green-500/20 hover:bg-green-500/30 border border-green-400/30 rounded-lg text-green-300 text-sm font-medium transition-colors flex items-center justify-center"
                         >
-                          <div class="py-1">
-                            <button
-                              @click="viewRequestDetails(request)"
-                              class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white flex items-center"
-                            >
-                              <i class="fas fa-eye mr-2 text-blue-400"></i>
-                              View Details
-                            </button>
-                            <!-- Edit button for rejected requests -->
-                            <button
-                              v-if="
-                                (request.status === 'rejected' ||
-                                  request.status === 'hod_rejected' ||
-                                  request.status === 'divisional_rejected' ||
-                                  request.status === 'ict_director_rejected' ||
-                                  request.status === 'head_it_rejected' ||
-                                  request.status === 'ict_officer_rejected') &&
-                                canEditRequest(request)
-                              "
-                              @click="editRequest(request)"
-                              class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-green-600 hover:text-white flex items-center"
-                            >
-                              <i class="fas fa-edit mr-2 text-green-400"></i>
-                              Edit & Resubmit
-                            </button>
-                            <button
-                              @click="cancelRequest(request)"
-                              class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-red-600 hover:text-white flex items-center"
-                            >
-                              <i class="fas fa-times mr-2 text-red-400"></i>
-                              Cancel Request
-                              <span class="ml-1 text-xs">({{ request.status }})</span>
-                            </button>
-                          </div>
-                        </div>
+                          <i class="fas fa-edit mr-2"></i>
+                          Edit & Resubmit
+                        </button>
+
+                        <button
+                          v-if="canCancelRequest(request)"
+                          @click="cancelRequest(request)"
+                          class="w-full px-3 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 rounded-lg text-red-300 text-sm font-medium transition-colors flex items-center justify-center"
+                        >
+                          <i class="fas fa-times mr-2"></i>
+                          Cancel Request
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -688,7 +640,7 @@
 </template>
 
 <script>
-  import { ref, onMounted, onUnmounted } from 'vue'
+  import { ref, onMounted } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppHeader from '@/components/AppHeader.vue'
@@ -720,7 +672,6 @@
       const blockMessage = ref('')
       const requestType = ref('')
       const latestRequestId = ref('')
-      const activeDropdown = ref(null)
       const cancelingRequest = ref(null)
 
       // Modal state
@@ -802,22 +753,6 @@
         loadRequests()
       })
 
-      // Add click outside listener to close dropdowns
-      const handleClickOutside = (event) => {
-        if (!event.target.closest('.relative')) {
-          closeDropdown()
-        }
-      }
-
-      onMounted(() => {
-        document.addEventListener('click', handleClickOutside)
-      })
-
-      // Cleanup listener on unmount
-      onUnmounted(() => {
-        document.removeEventListener('click', handleClickOutside)
-      })
-
       // Methods
       const loadRequests = async (page = 1, filters = {}) => {
         loading.value = true
@@ -877,9 +812,6 @@
           status: request.status,
           canEdit: canEditRequest(request)
         })
-
-        // Close dropdown first
-        closeDropdown()
 
         // Check current user authentication and role
         const piniaAuthStore = useAuthStore()
@@ -1066,25 +998,6 @@
         }
       }
 
-      // Dropdown functionality
-      const toggleDropdown = (requestId) => {
-        console.log('🔄 toggleDropdown called:', {
-          requestId: requestId,
-          currentActiveDropdown: activeDropdown.value
-        })
-        if (activeDropdown.value === requestId) {
-          activeDropdown.value = null
-        } else {
-          activeDropdown.value = requestId
-        }
-        console.log('🔄 activeDropdown after toggle:', activeDropdown.value)
-      }
-
-      // Close dropdown when clicking outside
-      const closeDropdown = () => {
-        activeDropdown.value = null
-      }
-
       // Check if request can be cancelled
       const canCancelRequest = (request) => {
         // Only allow cancellation for pending requests
@@ -1127,9 +1040,6 @@
         if (!canCancelRequest(request)) {
           return
         }
-
-        // Close dropdown first
-        closeDropdown()
 
         // Confirm cancellation
         const confirmed = confirm(
@@ -1320,7 +1230,6 @@
         blockMessage,
         requestType,
         latestRequestId,
-        activeDropdown,
         cancelingRequest,
         showEditModal,
         selectedRequest,
@@ -1335,8 +1244,6 @@
         goToSubmitRequest,
         submitNewRequest,
         viewPendingBookingDetails,
-        toggleDropdown,
-        closeDropdown,
         canCancelRequest,
         canEditRequest,
         cancelRequest,

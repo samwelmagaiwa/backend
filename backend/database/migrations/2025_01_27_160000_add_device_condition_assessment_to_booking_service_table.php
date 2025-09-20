@@ -11,7 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('booking_service', function (Blueprint $table) {
+        if (Schema::hasTable('booking_service')) {
+            Schema::table('booking_service', function (Blueprint $table) {
             // Device condition assessment fields
             $table->json('device_condition_receiving')->nullable()->after('return_status')
                   ->comment('Device condition assessment when receiving device back from borrower');
@@ -31,9 +32,14 @@ return new class extends Migration
             $table->text('assessment_notes')->nullable()->after('assessed_by')
                   ->comment('Additional notes from ICT officer during assessment');
             
-            // Add foreign key constraint
-            $table->foreign('assessed_by')->references('id')->on('users')->onDelete('set null');
-        });
+            // Add foreign key constraint - only if users table exists
+            if (Schema::hasTable('users')) {
+                $table->foreign('assessed_by')->references('id')->on('users')->onDelete('set null');
+            }
+            });
+        } else {
+            echo "⚠️ Table booking_service does not exist yet. Migration will be skipped and handled later.\n";
+        }
     }
 
     /**
@@ -41,16 +47,20 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('booking_service', function (Blueprint $table) {
-            $table->dropForeign(['assessed_by']);
-            $table->dropColumn([
-                'device_condition_receiving',
-                'device_condition_issuing', 
-                'device_received_at',
-                'device_issued_at',
-                'assessed_by',
-                'assessment_notes'
-            ]);
-        });
+        if (Schema::hasTable('booking_service')) {
+            Schema::table('booking_service', function (Blueprint $table) {
+                if (Schema::hasColumn('booking_service', 'assessed_by')) {
+                    $table->dropForeign(['assessed_by']);
+                }
+                $table->dropColumn([
+                    'device_condition_receiving',
+                    'device_condition_issuing', 
+                    'device_received_at',
+                    'device_issued_at',
+                    'assessed_by',
+                    'assessment_notes'
+                ]);
+            });
+        }
     }
 };

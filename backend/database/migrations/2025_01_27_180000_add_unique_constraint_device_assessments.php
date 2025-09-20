@@ -11,19 +11,25 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('device_assessments', function (Blueprint $table) {
-            // Add unique constraint to prevent duplicate assessments
-            // Only one assessment per booking per assessment type (issuing/receiving)
-            $table->unique(['booking_id', 'assessment_type'], 'unique_booking_assessment_type');
-        });
+        if (Schema::hasTable('device_assessments')) {
+            Schema::table('device_assessments', function (Blueprint $table) {
+                // Add unique constraint to prevent duplicate assessments
+                // Only one assessment per booking per assessment type (issuing/receiving)
+                $table->unique(['booking_id', 'assessment_type'], 'unique_booking_assessment_type');
+            });
+        } else {
+            echo "⚠️ Table device_assessments does not exist yet. Migration will be skipped and handled later.\n";
+        }
     }
 
     /**\n     * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::table('device_assessments', function (Blueprint $table) {
-            $table->dropUnique('unique_booking_assessment_type');
-        });
+        if (Schema::hasTable('device_assessments')) {
+            Schema::table('device_assessments', function (Blueprint $table) {
+                $table->dropUnique('unique_booking_assessment_type');
+            });
+        }
     }
 };

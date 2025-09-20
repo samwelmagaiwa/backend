@@ -75,6 +75,45 @@ class UserAccessRequest extends FormRequest
             'string',
             'max:255',
         ];
+        
+        // \u2705 ADD MODULE SELECTION VALIDATION RULES
+        $rules['selectedWellsoft'] = ['nullable', 'array'];
+        $rules['selectedWellsoft.*'] = ['string', 'max:255'];
+        $rules['selectedJeeva'] = ['nullable', 'array'];
+        $rules['selectedJeeva.*'] = ['string', 'max:255'];
+        $rules['wellsoftRequestType'] = ['nullable', 'string', 'in:use,revoke'];
+        
+        // \u2705 ADD ACCESS TYPE VALIDATION RULES
+        $rules['accessType'] = ['nullable', 'string', 'in:permanent,temporary'];
+        $rules['temporaryUntil'] = ['nullable', 'date', 'after:today'];
+        
+        // \u2705 ADD APPROVAL DATA VALIDATION RULES
+        $rules['hodName'] = ['nullable', 'string', 'max:255'];
+        $rules['hodSignature'] = ['nullable', 'file', 'mimes:png,jpg,jpeg', 'max:5120'];
+        $rules['hodDate'] = ['nullable', 'date'];
+        $rules['hodComments'] = ['nullable', 'string', 'max:1000'];
+        
+        $rules['divisionalDirectorName'] = ['nullable', 'string', 'max:255'];
+        $rules['divisionalDirectorSignature'] = ['nullable', 'file', 'mimes:png,jpg,jpeg', 'max:5120'];
+        $rules['divisionalDirectorDate'] = ['nullable', 'date'];
+        $rules['divisionalDirectorComments'] = ['nullable', 'string', 'max:1000'];
+        
+        $rules['ictDirectorName'] = ['nullable', 'string', 'max:255'];
+        $rules['ictDirectorSignature'] = ['nullable', 'file', 'mimes:png,jpg,jpeg', 'max:5120'];
+        $rules['ictDirectorDate'] = ['nullable', 'date'];
+        $rules['ictDirectorComments'] = ['nullable', 'string', 'max:1000'];
+        
+        // \u2705 ADD IMPLEMENTATION DATA VALIDATION RULES
+        $rules['headITName'] = ['nullable', 'string', 'max:255'];
+        $rules['headITSignature'] = ['nullable', 'file', 'mimes:png,jpg,jpeg', 'max:5120'];
+        $rules['headITDate'] = ['nullable', 'date'];
+        $rules['headITComments'] = ['nullable', 'string', 'max:1000'];
+        
+        $rules['ictOfficerName'] = ['nullable', 'string', 'max:255'];
+        $rules['ictOfficerSignature'] = ['nullable', 'file', 'mimes:png,jpg,jpeg', 'max:5120'];
+        $rules['ictOfficerDate'] = ['nullable', 'date'];
+        $rules['ictOfficerComments'] = ['nullable', 'string', 'max:1000'];
+        $rules['implementationComments'] = ['nullable', 'string', 'max:1000'];
 
         return $rules;
     }

@@ -834,160 +834,132 @@
     <!-- Success Modal -->
     <div
       v-if="showSuccessModal"
-      class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in"
+      class="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fade-in"
     >
       <div
-        class="bg-gradient-to-br from-white via-blue-50/50 to-green-50/50 rounded-2xl shadow-2xl max-w-md w-full transform transition-all duration-500 scale-100 animate-scale-up border border-green-200/50 backdrop-blur-sm relative overflow-hidden"
+        class="bg-white rounded-2xl shadow-2xl max-w-lg w-full transform transition-all duration-500 scale-100 animate-scale-up border border-gray-100 relative overflow-hidden"
       >
-        <!-- Animated Background Pattern -->
-        <div class="absolute inset-0 overflow-hidden rounded-2xl">
-          <!-- Medical Plus Pattern -->
-          <div class="absolute inset-0 opacity-5">
-            <div class="grid grid-cols-6 gap-4 h-full transform rotate-12">
+        <!-- Header Section with Icon -->
+        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 text-center relative">
+          <div class="absolute inset-0 bg-gradient-to-r from-blue-600/90 to-blue-700/90"></div>
+          <div class="relative z-10">
+            <div
+              class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg"
+            >
               <div
-                v-for="i in 24"
-                :key="i"
-                class="bg-green-500 rounded-full w-2 h-2 animate-pulse"
-                :style="{ animationDelay: i * 0.1 + 's' }"
-              ></div>
+                class="w-12 h-12 bg-gradient-to-br from-green-400 to-green-500 rounded-full flex items-center justify-center relative"
+              >
+                <i class="fas fa-check text-white text-xl"></i>
+                <div
+                  class="absolute inset-0 rounded-full border-2 border-green-300 animate-ping opacity-50"
+                ></div>
+              </div>
             </div>
-          </div>
-          <!-- Floating Success Icons -->
-          <div class="absolute top-4 right-4 text-green-400/20 animate-float">
-            <i class="fas fa-user-check text-2xl"></i>
-          </div>
-          <div
-            class="absolute bottom-4 left-4 text-blue-400/20 animate-float"
-            style="animation-delay: 1s"
-          >
-            <i class="fas fa-shield-alt text-xl"></i>
-          </div>
-          <div
-            class="absolute top-1/2 left-4 text-teal-400/20 animate-float"
-            style="animation-delay: 2s"
-          >
-            <i class="fas fa-heartbeat text-lg"></i>
+            <h3 class="text-2xl font-bold text-white mb-1">Request Submitted!</h3>
+            <p class="text-blue-100 text-sm">Your request has been processed successfully</p>
           </div>
         </div>
 
-        <div class="relative z-10 p-6 text-center">
-          <!-- Success Icon with Animation -->
-          <div class="relative mx-auto mb-6">
-            <div
-              class="w-20 h-20 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto shadow-lg animate-bounce-gentle relative overflow-hidden"
-            >
-              <div
-                class="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent rounded-full"
-              ></div>
-              <i class="fas fa-check text-white text-3xl relative z-10 drop-shadow-lg"></i>
-              <!-- Ripple Effect -->
-              <div
-                class="absolute inset-0 rounded-full border-4 border-green-400 animate-ping opacity-30"
-              ></div>
-            </div>
-            <!-- Medical Cross Decoration -->
-            <div
-              class="absolute -top-2 -right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center shadow-lg"
-            >
-              <i class="fas fa-plus text-white text-xs"></i>
-            </div>
+        <!-- Content Section -->
+        <div class="px-6 py-6">
+          <!-- Message -->
+          <div class="text-center mb-6">
+            <p class="text-gray-700 leading-relaxed">
+              Your <span class="font-semibold text-blue-600">Combined Access Request</span> has been
+              submitted successfully and is now in the approval queue.
+            </p>
           </div>
 
-          <!-- Title with Medical Accent -->
-          <div class="mb-4">
-            <h3
-              class="text-2xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-2 flex items-center justify-center gap-2"
-            >
-              <i class="fas fa-file-medical-alt text-green-600"></i>
-              Request Submitted!
-            </h3>
-            <div
-              class="w-16 h-0.5 bg-gradient-to-r from-green-400 to-blue-400 mx-auto rounded-full"
-            ></div>
-          </div>
-
-          <p class="text-gray-700 mb-6 leading-relaxed">
-            Your <span class="font-semibold text-blue-600">Combined Access Request</span> has been
-            submitted successfully and is now in the approval queue.
-          </p>
-
-          <!-- Enhanced Services Display -->
+          <!-- Services Card -->
           <div
-            class="bg-gradient-to-r from-blue-50/80 to-green-50/80 rounded-xl p-4 mb-6 backdrop-blur-sm border border-blue-200/30 shadow-inner"
+            class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 mb-6 border border-blue-100"
           >
-            <div class="flex items-center justify-center gap-2 mb-3">
-              <i class="fas fa-list-check text-blue-600"></i>
-              <p class="text-sm font-semibold text-blue-800">Selected Services</p>
+            <div class="flex items-center gap-2 mb-3">
+              <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                <i class="fas fa-list-check text-blue-600 text-sm"></i>
+              </div>
+              <h4 class="text-sm font-semibold text-blue-800">Selected Services</h4>
             </div>
 
-            <div class="flex flex-wrap justify-center gap-2 mb-3">
-              <span
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+              <div
                 v-if="formData.services.jeeva"
-                class="px-3 py-2 bg-gradient-to-r from-green-100 to-green-200 text-green-800 rounded-full text-sm font-medium shadow-sm border border-green-300/50 flex items-center gap-1 transform hover:scale-105 transition-transform"
+                class="bg-white rounded-lg p-3 shadow-sm border border-green-200 flex items-center gap-2 transition-transform hover:scale-105"
               >
-                <i class="fas fa-file-medical text-green-600"></i>
-                Jeeva
-              </span>
-              <span
+                <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                  <i class="fas fa-file-medical text-green-600 text-xs"></i>
+                </div>
+                <span class="text-sm font-medium text-green-800">Jeeva</span>
+              </div>
+
+              <div
                 v-if="formData.services.wellsoft"
-                class="px-3 py-2 bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 rounded-full text-sm font-medium shadow-sm border border-blue-300/50 flex items-center gap-1 transform hover:scale-105 transition-transform"
+                class="bg-white rounded-lg p-3 shadow-sm border border-blue-200 flex items-center gap-2 transition-transform hover:scale-105"
               >
-                <i class="fas fa-laptop-medical text-blue-600"></i>
-                Wellsoft
-              </span>
-              <span
+                <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                  <i class="fas fa-laptop-medical text-blue-600 text-xs"></i>
+                </div>
+                <span class="text-sm font-medium text-blue-800">Wellsoft</span>
+              </div>
+
+              <div
                 v-if="formData.services.internet"
-                class="px-3 py-2 bg-gradient-to-r from-teal-100 to-teal-200 text-teal-800 rounded-full text-sm font-medium shadow-sm border border-teal-300/50 flex items-center gap-1 transform hover:scale-105 transition-transform"
+                class="bg-white rounded-lg p-3 shadow-sm border border-teal-200 flex items-center gap-2 transition-transform hover:scale-105"
               >
-                <i class="fas fa-wifi text-teal-600"></i>
-                Internet
-              </span>
+                <div class="w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
+                  <i class="fas fa-wifi text-teal-600 text-xs"></i>
+                </div>
+                <span class="text-sm font-medium text-teal-800">Internet</span>
+              </div>
             </div>
 
-            <!-- Enhanced Internet Purposes Display -->
+            <!-- Internet Purposes -->
             <div
               v-if="formData.services.internet && hasInternetPurposes"
-              class="mt-4 pt-4 border-t border-blue-200/50"
+              class="mt-4 pt-4 border-t border-blue-200"
             >
-              <div class="flex items-center justify-center gap-2 mb-2">
-                <i class="fas fa-globe text-teal-600"></i>
-                <p class="text-sm font-semibold text-teal-800">Internet Purposes</p>
+              <div class="flex items-center gap-2 mb-3">
+                <div class="w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
+                  <i class="fas fa-globe text-teal-600 text-xs"></i>
+                </div>
+                <h5 class="text-sm font-medium text-teal-800">Internet Purposes</h5>
               </div>
               <div class="space-y-2">
                 <div
                   v-for="(purpose, index) in filledInternetPurposes"
                   :key="index"
-                  class="flex items-center justify-center text-sm text-teal-700 bg-teal-50/50 rounded-lg p-2"
+                  class="bg-teal-50 rounded-lg p-2 flex items-center gap-2"
                 >
-                  <span
-                    class="w-5 h-5 bg-gradient-to-br from-teal-400 to-teal-600 text-white rounded-full flex items-center justify-center mr-3 font-bold text-xs shadow-sm"
+                  <div
+                    class="w-5 h-5 bg-teal-500 text-white rounded-full flex items-center justify-center text-xs font-bold"
                   >
                     {{ index + 1 }}
-                  </span>
-                  <span class="flex-1 text-center font-medium">{{ purpose }}</span>
+                  </div>
+                  <span class="text-sm text-teal-700">{{ purpose }}</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Enhanced Action Button -->
+          <!-- Status Indicator -->
+          <div class="bg-gray-50 rounded-lg p-3 mb-6 flex items-center justify-center gap-2">
+            <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+            <span class="text-sm text-gray-600 font-medium"
+              >Request ID will be generated shortly</span
+            >
+          </div>
+
+          <!-- Action Button -->
           <button
             @click="closeSuccessModal"
-            class="w-full bg-gradient-to-r from-green-600 to-blue-600 text-white py-4 px-6 rounded-xl font-semibold hover:from-green-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-2 relative overflow-hidden group"
+            class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-200 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02] flex items-center justify-center gap-2 relative overflow-hidden group"
           >
             <div
-              class="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              class="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
             ></div>
-            <i class="fas fa-home relative z-10"></i>
+            <i class="fas fa-home text-sm relative z-10"></i>
             <span class="relative z-10">Return to Dashboard</span>
-            <div class="absolute top-1 right-2 w-2 h-2 bg-white/40 rounded-full animate-ping"></div>
           </button>
-
-          <!-- Status Indicator -->
-          <div class="mt-4 flex items-center justify-center gap-2 text-xs text-gray-600">
-            <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-            <span>Request ID will be generated shortly</span>
-          </div>
         </div>
       </div>
     </div>
@@ -1077,6 +1049,9 @@
             wellsoft: false,
             internet: false
           },
+          // Module Selections
+          selectedWellsoft: [],
+          selectedJeeva: [],
           // Internet Purposes (only used when internet service is selected)
           internetPurposes: ['', '', '', '']
         }
@@ -1097,6 +1072,11 @@
       filledInternetPurposes() {
         return this.formData.internetPurposes.filter((purpose) => purpose.trim() !== '')
       }
+    },
+
+    watch: {
+      // Note: No module auto-selection needed since HOD selects modules during approval
+      // Users only select services (Jeeva, Wellsoft, Internet Access)
     },
 
     async mounted() {
@@ -1265,6 +1245,30 @@
           this.formData.services.internet = data.internet_access || data.internet || false
         }
 
+        // Module selections
+        if (data.selectedWellsoft && Array.isArray(data.selectedWellsoft)) {
+          this.formData.selectedWellsoft = [...data.selectedWellsoft]
+        } else if (
+          data.wellsoft_modules_selected &&
+          Array.isArray(data.wellsoft_modules_selected)
+        ) {
+          this.formData.selectedWellsoft = [...data.wellsoft_modules_selected]
+        } else if (data.wellsoft_modules && Array.isArray(data.wellsoft_modules)) {
+          this.formData.selectedWellsoft = [...data.wellsoft_modules]
+        } else {
+          this.formData.selectedWellsoft = []
+        }
+
+        if (data.selectedJeeva && Array.isArray(data.selectedJeeva)) {
+          this.formData.selectedJeeva = [...data.selectedJeeva]
+        } else if (data.jeeva_modules_selected && Array.isArray(data.jeeva_modules_selected)) {
+          this.formData.selectedJeeva = [...data.jeeva_modules_selected]
+        } else if (data.jeeva_modules && Array.isArray(data.jeeva_modules)) {
+          this.formData.selectedJeeva = [...data.jeeva_modules]
+        } else {
+          this.formData.selectedJeeva = []
+        }
+
         // Internet purposes
         if (data.internet_purposes && Array.isArray(data.internet_purposes)) {
           console.log('🔍 Internet purposes found:', data.internet_purposes)
@@ -1295,6 +1299,8 @@
           phoneNumber: this.formData.phoneNumber,
           department: this.formData.department,
           services: this.formData.services,
+          selectedWellsoft: this.formData.selectedWellsoft,
+          selectedJeeva: this.formData.selectedJeeva,
           internetPurposes: this.formData.internetPurposes
         })
 
@@ -1484,6 +1490,14 @@
           return
         }
 
+        // Note: Module selection is done by HOD during approval process
+        // Users only select services, HOD selects specific modules at /both-service-form/:id
+        console.log('📋 Service selections for HOD approval:', {
+          jeeva: this.formData.services.jeeva,
+          wellsoft: this.formData.services.wellsoft,
+          internet: this.formData.services.internet
+        })
+
         // Validate internet purposes if internet service is selected
         if (this.formData.services.internet && !this.formData.internetPurposes[0]) {
           this.showNotification('Please provide at least one internet purpose', 'error')
@@ -1547,6 +1561,15 @@
           // Add request types
           requestTypes.forEach((type, index) => {
             formData.append(`request_type[${index}]`, type)
+          })
+
+          // Note: Module selections are handled by HOD during approval at /both-service-form/:id
+          // User form only submits service selections (Jeeva, Wellsoft, Internet Access)
+          console.log('📝 Submitting service selections only (modules selected by HOD later):', {
+            jeeva: this.formData.services.jeeva,
+            wellsoft: this.formData.services.wellsoft,
+            internet: this.formData.services.internet,
+            requestTypes: requestTypes
           })
 
           // Add internet purposes if internet service is selected
@@ -1622,6 +1645,8 @@
             wellsoft: false,
             internet: false
           },
+          selectedWellsoft: [],
+          selectedJeeva: [],
           internetPurposes: ['', '', '', '']
         }
         this.clearSignature()

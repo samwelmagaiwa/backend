@@ -67,20 +67,27 @@
                   <i class="fas fa-bolt mr-2 text-blue-400"></i>
                   Quick Actions
                 </h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                  <router-link
-                    to="/hod-dashboard/combined-requests"
-                    class="medical-card bg-gradient-to-r from-blue-600/25 to-cyan-600/25 border-2 border-blue-400/40 p-4 rounded-xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-300 group text-center"
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <!-- Use button element for better click handling -->
+                  <button
+                    type="button"
+                    @click="navigateToDivisionalRecommendations"
+                    class="medical-card bg-gradient-to-r from-blue-600/25 to-cyan-600/25 border-2 border-blue-400/40 p-4 rounded-xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-300 group text-center cursor-pointer w-full"
+                    style="
+                      background: none;
+                      border: 2px solid rgba(96, 165, 250, 0.4);
+                      outline: none;
+                    "
                   >
                     <div class="flex flex-col items-center">
                       <div
                         class="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50 mb-2"
                       >
-                        <i class="fas fa-list text-white"></i>
+                        <i class="fas fa-comments text-white"></i>
                       </div>
-                      <span class="text-white font-medium text-sm">View Requests</span>
+                      <span class="text-white font-medium text-sm">Divisional Recommendations</span>
                     </div>
-                  </router-link>
+                  </button>
 
                   <router-link
                     to="/hod-dashboard/combined-requests"
@@ -93,48 +100,6 @@
                         <i class="fas fa-layer-group text-white"></i>
                       </div>
                       <span class="text-white font-medium text-sm">Combined Requests</span>
-                    </div>
-                  </router-link>
-
-                  <router-link
-                    to="/jeeva-access"
-                    class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-600/25 border-2 border-blue-400/40 p-4 rounded-xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-300 group text-center"
-                  >
-                    <div class="flex flex-col items-center">
-                      <div
-                        class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50 mb-2"
-                      >
-                        <i class="fas fa-database text-white"></i>
-                      </div>
-                      <span class="text-white font-medium text-sm">Jeeva Access</span>
-                    </div>
-                  </router-link>
-
-                  <router-link
-                    to="/wellsoft-access"
-                    class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-600/25 border-2 border-blue-400/40 p-4 rounded-xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-300 group text-center"
-                  >
-                    <div class="flex flex-col items-center">
-                      <div
-                        class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50 mb-2"
-                      >
-                        <i class="fas fa-laptop-medical text-white"></i>
-                      </div>
-                      <span class="text-white font-medium text-sm">Wellsoft Access</span>
-                    </div>
-                  </router-link>
-
-                  <router-link
-                    to="/internet-access"
-                    class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-600/25 border-2 border-blue-400/40 p-4 rounded-xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-300 group text-center"
-                  >
-                    <div class="flex flex-col items-center">
-                      <div
-                        class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50 mb-2"
-                      >
-                        <i class="fas fa-wifi text-white"></i>
-                      </div>
-                      <span class="text-white font-medium text-sm">Internet Access</span>
                     </div>
                   </router-link>
                 </div>
@@ -152,6 +117,7 @@
 
 <script>
   import { ref, onMounted } from 'vue'
+  import { useRouter } from 'vue-router'
   import Header from '@/components/header.vue'
   import ModernSidebar from './ModernSidebar.vue'
   import AppFooter from '@/components/footer.vue'
@@ -165,6 +131,7 @@
       AppFooter
     },
     setup() {
+      const router = useRouter()
       const { userName, ROLES, requireRole } = useAuth()
 
       // Local state
@@ -172,15 +139,50 @@
 
       const recentRequests = ref([])
       const quickActions = ref([
-        { name: 'View Requests', icon: 'fas fa-list', route: '/hod-dashboard/request-list' },
-        { name: 'Jeeva Access', icon: 'fas fa-database', route: '/jeeva-access' },
-        { name: 'Wellsoft Access', icon: 'fas fa-laptop-medical', route: '/wellsoft-access' },
-        { name: 'Internet Access', icon: 'fas fa-wifi', route: '/internet-access' }
+        { name: 'View Requests', icon: 'fas fa-list', route: '/hod-dashboard/request-list' }
       ])
 
       const performAction = (action) => {
         console.log('Performing action:', action)
         // Add your action implementation here
+      }
+
+      const navigateToDivisionalRecommendations = async (event) => {
+        console.log('🔍 Divisional Recommendations button clicked!')
+
+        // Prevent default behavior
+        if (event) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+
+        const targetPath = '/hod-dashboard/divisional-recommendations'
+
+        try {
+          console.log('🚀 Attempting Vue Router navigation first...')
+
+          // Try Vue Router first (most elegant solution)
+          if (router && typeof router.push === 'function') {
+            await router.push(targetPath)
+            console.log('✅ Vue Router navigation successful!')
+            return
+          }
+
+          console.log('⚠️ Vue Router not available, trying window.location...')
+        } catch (routerError) {
+          console.warn('⚠️ Vue Router failed:', routerError.message)
+        }
+
+        try {
+          // Fallback: Use window.location.href
+          const targetUrl = window.location.origin + targetPath
+          console.log('Target URL:', targetUrl)
+          window.location.href = targetUrl
+        } catch (locationError) {
+          console.error('❌ All navigation methods failed:', locationError)
+          // Last resort: direct pathname change
+          window.location.pathname = targetPath
+        }
       }
 
       // Guard this route - only Head of Department can access
@@ -192,7 +194,8 @@
         userName,
         recentRequests,
         quickActions,
-        performAction
+        performAction,
+        navigateToDivisionalRecommendations
       }
     }
   }
@@ -220,6 +223,9 @@
     background: rgba(59, 130, 246, 0.1);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
+    cursor: pointer;
+    pointer-events: auto;
+    z-index: 10;
   }
 
   .medical-card::before {
@@ -231,6 +237,8 @@
     height: 100%;
     background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.2), transparent);
     transition: left 0.5s;
+    pointer-events: none;
+    z-index: -1;
   }
 
   .medical-card:hover::before {
@@ -295,5 +303,51 @@
   /* Button hover effects */
   button:hover {
     transform: translateY(-1px);
+  }
+
+  /* Router link specific styles */
+  .medical-card.router-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    outline: none;
+    position: relative;
+    z-index: 10;
+  }
+
+  .medical-card:focus {
+    outline: 2px solid rgba(96, 165, 250, 0.8);
+    outline-offset: 2px;
+  }
+
+  .medical-card:active {
+    transform: scale(0.98);
+    transition: transform 0.1s;
+  }
+
+  /* Debug styles - ensure clickability */
+  .medical-card {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+  }
+
+  .medical-card:hover {
+    cursor: pointer !important;
+    border-color: rgba(96, 165, 250, 0.8) !important;
+    background: rgba(59, 130, 246, 0.3) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 32px rgba(59, 130, 246, 0.6) !important;
+  }
+
+  /* Ensure all child elements don't block pointer events */
+  .medical-card * {
+    pointer-events: none;
+  }
+
+  /* But allow the card itself to receive events */
+  .medical-card {
+    pointer-events: auto !important;
   }
 </style>

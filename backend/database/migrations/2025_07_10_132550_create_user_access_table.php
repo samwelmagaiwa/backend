@@ -11,7 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user_access', function (Blueprint $table) {
+        if (!Schema::hasTable('user_access')) {
+            Schema::create('user_access', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('pf_number');
@@ -28,7 +29,10 @@ return new class extends Migration
             $table->index(['pf_number']);
             $table->index(['status', 'created_at']);
             $table->index('department_id');
-        });
+            });
+        } else {
+            echo "⚠️ Table user_access already exists. Skipping creation.\n";
+        }
     }
 
     /**

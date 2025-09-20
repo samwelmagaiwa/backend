@@ -7,7 +7,6 @@
       </div>
       <main class="flex-1 p-4 bg-blue-900 overflow-y-auto">
         <div class="max-w-full mx-auto">
-
           <!-- Error Display -->
           <div
             v-if="error"
@@ -511,17 +510,17 @@
 </script>
 
 <style scoped>
-.sidebar-narrow {
-  /* Force the sidebar to be narrower */
-  max-width: 200px;
-}
+  .sidebar-narrow {
+    /* Force the sidebar to be narrower */
+    max-width: 200px;
+  }
 
-/* Override the sidebar width classes for this component */
-.sidebar-narrow :deep(.sidebar-expanded) {
-  width: 200px !important;
-}
+  /* Override the sidebar width classes for this component */
+  .sidebar-narrow :deep(.sidebar-expanded) {
+    width: 200px !important;
+  }
 
-.sidebar-narrow :deep(.sidebar-collapsed) {
-  width: 64px !important;
-}
+  .sidebar-narrow :deep(.sidebar-collapsed) {
+    width: 64px !important;
+  }
 </style>

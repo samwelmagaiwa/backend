@@ -14,7 +14,14 @@ use App\Http\Controllers\Api\v1\AdminDepartmentController;
 use App\Http\Controllers\Api\v1\DeviceInventoryController;
 use App\Http\Controllers\Api\v1\HodCombinedAccessController;
 use App\Http\Controllers\Api\v1\DivisionalCombinedAccessController;
+use App\Http\Controllers\Api\v1\HodDivisionalRecommendationsController;
 use App\Http\Controllers\Api\v1\ModuleAccessApprovalController;
+use App\Http\Controllers\Api\v1\ModuleRequestController;
+use App\Http\Controllers\Api\v1\JeevaModuleRequestController;
+use App\Http\Controllers\Api\v1\AccessRightsApprovalController;
+use App\Http\Controllers\Api\v1\ImplementationWorkflowController;
+use App\Http\Controllers\Api\HealthController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -28,66 +35,70 @@ Route::get('/test-simple', function () {
 });
 
 // Public routes
-    // Health check endpoint
-    Route::get('/health', function () {
-        return response()->json([
-            'status' => 'ok',
-            'timestamp' => now()->toISOString(),
-            'database' => 'checking...'
-        ]);
-    });
-    
-    // Detailed health check with database test
-    Route::get('/health/detailed', function () {
-        $dbStatus = 'ok';
-        $dbError = null;
-        
-        try {
-            \DB::connection()->getPdo();
-            \DB::table('users')->count(); // Test a simple query
-        } catch (\Exception $e) {
-            $dbStatus = 'error';
-            $dbError = $e->getMessage();
-        }
-        
-        return response()->json([
-            'status' => $dbStatus === 'ok' ? 'ok' : 'error',
-            'timestamp' => now()->toISOString(),
-            'database' => [
-                'status' => $dbStatus,
-                'error' => $dbError
-            ],
-            'environment' => app()->environment(),
-            'php_version' => PHP_VERSION,
-            'laravel_version' => app()->version()
-        ]);
-    });
-    
-    // Authentication routes
-    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login')->name('login');
-    Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:register')->name('register');
-    
-    // Security Test Routes (for testing security implementations)
-    Route::prefix('security-test')->group(function () {
-        Route::get('/test', [SecurityTestController::class, 'test'])->name('security-test.basic');
-        Route::get('/health', [SecurityTestController::class, 'healthCheck'])->name('security-test.health');
-        Route::get('/rate-limit', [SecurityTestController::class, 'rateLimitTest'])->name('security-test.rate-limit');
-        Route::post('/sanitization', [SecurityTestController::class, 'sanitizationTest'])->name('security-test.sanitization');
-        Route::post('/xss', [SecurityTestController::class, 'xssTest'])->name('security-test.xss');
-    });
+// Health check endpoint
+Route::get('/health', function () {
+    return response()->json([
+        'status' => 'ok',
+        'timestamp' => now()->toISOString(),
+        'database' => 'checking...'
+    ]);
+});
+
+// Detailed health check with database test
+Route::get('/health/detailed', function () {
+    $dbStatus = 'ok';
+    $dbError = null;
+
+    try {
+        \DB::connection()->getPdo();
+        \DB::table('users')->count(); // Test a simple query
+    } catch (\Exception $e) {
+        $dbStatus = 'error';
+        $dbError = $e->getMessage();
+    }
+
+    return response()->json([
+        'status' => $dbStatus === 'ok' ? 'ok' : 'error',
+        'timestamp' => now()->toISOString(),
+        'database' => [
+            'status' => $dbStatus,
+            'error' => $dbError
+        ],
+        'environment' => app()->environment(),
+        'php_version' => PHP_VERSION,
+        'laravel_version' => app()->version()
+    ]);
+});
+
+// CORS test endpoints
+Route::get('/cors-test', [HealthController::class, 'corsTest'])->name('api.cors-test');
+Route::options('/cors-test', [HealthController::class, 'corsTest'])->name('api.cors-test.options');
+
+// Authentication routes
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login')->name('login');
+Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:register')->name('register');
+
+// Security Test Routes (for testing security implementations)
+Route::prefix('security-test')->group(function () {
+    Route::get('/test', [SecurityTestController::class, 'test'])->name('security-test.basic');
+    Route::get('/health', [SecurityTestController::class, 'healthCheck'])->name('security-test.health');
+    Route::get('/rate-limit', [SecurityTestController::class, 'rateLimitTest'])->name('security-test.rate-limit');
+    Route::post('/sanitization', [SecurityTestController::class, 'sanitizationTest'])->name('security-test.sanitization');
+    Route::post('/xss', [SecurityTestController::class, 'xssTest'])->name('security-test.xss');
+});
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         $user = $request->user();
-        
+
         // Load the roles relationship (new system)
         $user->load('roles', 'department');
-        
+
         // Get primary role for consistent role handling
         $primaryRole = $user->getPrimaryRoleName();
         $userRoles = $user->roles->pluck('name')->toArray();
-        
+
         // Return user with role information using new system
         return [
             'id' => $user->id,
@@ -122,7 +133,7 @@ Route::middleware('auth:sanctum')->group(function () {
             'updated_at' => $user->updated_at,
         ];
     });
-    
+
     // Authentication routes
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('throttle:sensitive')->name('logout');
     Route::post('/logout-all', [AuthController::class, 'logoutAll'])->middleware('throttle:sensitive')->name('logout-all');
@@ -157,7 +168,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/users/reset-onboarding', [AdminController::class, 'resetUserOnboarding'])->name('admin.users.reset-onboarding');
         Route::post('/users/bulk-reset-onboarding', [AdminController::class, 'bulkResetOnboarding'])->name('admin.users.bulk-reset-onboarding');
         Route::get('/onboarding/stats', [AdminController::class, 'getOnboardingStats'])->name('admin.onboarding.stats');
-        
+
         // New comprehensive user management routes
         Route::prefix('users')->group(function () {
             Route::get('/', [AdminUserController::class, 'index'])->name('admin.users.index');
@@ -172,7 +183,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::delete('/{user}', [AdminUserController::class, 'destroy'])->name('admin.users.destroy');
             Route::patch('/{user}/toggle-status', [AdminUserController::class, 'toggleStatus'])->name('admin.users.toggle-status');
         });
-        
+
         // Department management routes
         Route::prefix('departments')->group(function () {
             Route::get('/', [AdminDepartmentController::class, 'index'])->name('admin.departments.index');
@@ -185,7 +196,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::delete('/{department}', [AdminDepartmentController::class, 'destroy'])->name('admin.departments.destroy');
             Route::patch('/{department}/toggle-status', [AdminDepartmentController::class, 'toggleStatus'])->name('admin.departments.toggle-status');
         });
-        
+
         // Legacy user management routes (keep for backward compatibility)
         Route::prefix('user-management')->group(function () {
             Route::get('/', [AdminUserController::class, 'index'])->name('admin.user-management.index');
@@ -205,17 +216,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('v1')->group(function () {
         // Specific utility routes MUST come before apiResource to avoid parameter capture
         Route::get('user-access/pending-status', [UserAccessController::class, 'checkPendingRequests']);
-        
+
         // User Access Request CRUD operations
         Route::apiResource('user-access', UserAccessController::class);
-        
+
         // POST route with method spoofing for updates (to handle multipart/form-data)
         Route::post('user-access/{userAccess}', [UserAccessController::class, 'update'])
             ->name('user-access.update-multipart');
-        
+
         // Combined Access Request route
         Route::post('combined-access', [UserAccessController::class, 'store'])->name('combined-access.store');
-        
+
         // Additional utility routes
         Route::get('departments', [UserAccessController::class, 'getDepartments']);
         Route::post('check-signature', [UserAccessController::class, 'checkSignature']);
@@ -235,10 +246,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('booking-service')->group(function () {
         // CRUD operations
         Route::apiResource('bookings', BookingServiceController::class);
-        
+
         // Edit rejected booking request route
         Route::put('bookings/{bookingId}/edit-rejected', [BookingServiceController::class, 'updateRejectedRequest'])->name('booking-service.edit-rejected');
-        
+
         // Utility routes
         Route::get('device-types', [BookingServiceController::class, 'getDeviceTypes'])->name('booking-service.device-types');
         Route::get('departments', [BookingServiceController::class, 'getDepartments'])->name('booking-service.departments');
@@ -246,21 +257,21 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('debug-departments', [BookingServiceController::class, 'debugDepartments'])->name('booking-service.debug-departments');
         Route::get('debug-assessment-schema', [BookingServiceController::class, 'debugAssessmentSchema'])->name('booking-service.debug-assessment-schema');
         Route::post('seed-departments', [BookingServiceController::class, 'seedDepartments'])->name('booking-service.seed-departments');
-        
 
-        
+
+
         // Device availability checking
         Route::get('devices/{deviceInventoryId}/availability', [BookingServiceController::class, 'checkDeviceAvailability'])->name('booking-service.device-availability');
         Route::get('devices/{deviceInventoryId}/bookings', [BookingServiceController::class, 'getDeviceBookings'])->name('booking-service.device-bookings');
-        
+
         // Pending request checking
         Route::get('check-pending-requests', [BookingServiceController::class, 'checkPendingRequests'])->name('booking-service.check-pending-requests');
         Route::get('can-submit-new-request', [BookingServiceController::class, 'canUserSubmitNewRequest'])->name('booking-service.can-submit-new-request');
-        
+
         // Admin actions
         Route::post('bookings/{bookingService}/approve', [BookingServiceController::class, 'approve'])->name('booking-service.approve');
         Route::post('bookings/{bookingService}/reject', [BookingServiceController::class, 'reject'])->name('booking-service.reject');
-        
+
         // ICT Officer actions
         Route::get('ict-approval-requests', [BookingServiceController::class, 'getIctApprovalRequests'])
             ->middleware('role:ict_officer,admin,ict_director')
@@ -275,7 +286,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('bookings/{bookingService}/ict-reject', [BookingServiceController::class, 'ictReject'])
             ->middleware('role:ict_officer,admin,ict_director')
             ->name('booking-service.ict-reject');
-        
+
         // Device condition assessment routes
         Route::post('bookings/{bookingService}/assessment/issuing', [BookingServiceController::class, 'saveIssuingAssessment'])
             ->middleware('role:ict_officer,admin,ict_director')
@@ -289,23 +300,23 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('ict-approval')->middleware('role:ict_officer,admin,ict_director')->group(function () {
         // Debug endpoint (must be before parameterized routes)
         Route::get('debug', [ICTApprovalController::class, 'debugICTApprovalSystem'])->name('ict-approval.debug');
-        
+
         // Statistics (must be before parameterized routes)
         Route::get('device-requests/statistics', [ICTApprovalController::class, 'getDeviceBorrowingStatistics'])->name('ict-approval.statistics');
-        
+
         // Device borrowing requests management
         Route::get('device-requests', [ICTApprovalController::class, 'getDeviceBorrowingRequests'])->name('ict-approval.device-requests');
         Route::get('device-requests/{requestId}', [ICTApprovalController::class, 'getDeviceBorrowingRequestDetails'])->name('ict-approval.device-request-details');
-        
+
         // Approval/rejection actions
         Route::post('device-requests/{requestId}/approve', [ICTApprovalController::class, 'approveDeviceBorrowingRequest'])->name('ict-approval.approve');
         Route::post('device-requests/{requestId}/reject', [ICTApprovalController::class, 'rejectDeviceBorrowingRequest'])->name('ict-approval.reject');
         Route::delete('device-requests/{requestId}', [ICTApprovalController::class, 'deleteDeviceBorrowingRequest'])->name('ict-approval.delete');
         Route::post('device-requests/bulk-delete', [ICTApprovalController::class, 'bulkDeleteDeviceBorrowingRequests'])->name('ict-approval.bulk-delete');
-        
+
         // User details auto-capture
         Route::post('device-requests/{bookingId}/link-user', [ICTApprovalController::class, 'linkUserDetailsToBooking'])->name('ict-approval.link-user');
-        
+
         // Device condition assessment routes
         Route::post('device-requests/{requestId}/assessment/issuing', [ICTApprovalController::class, 'saveIssuingAssessment'])->name('ict-approval.assessment.issuing');
         Route::post('device-requests/{requestId}/assessment/receiving', [ICTApprovalController::class, 'saveReceivingAssessment'])->name('ict-approval.assessment.receiving');
@@ -317,10 +328,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/', [BothServiceFormController::class, 'index'])->name('both-service-form.index');
         Route::post('/', [BothServiceFormController::class, 'store'])->name('both-service-form.store');
         Route::get('/{id}', [BothServiceFormController::class, 'show'])->name('both-service-form.show');
-        
+        Route::put('/{id}', [BothServiceFormController::class, 'update'])->name('both-service-form.update');
+        Route::post('/{id}/update', [BothServiceFormController::class, 'update'])->name('both-service-form.update-multipart'); // For multipart/form-data
+
         // Table data with specific columns
         Route::get('/table/data', [BothServiceFormController::class, 'getTableData'])->name('both-service-form.table-data');
-        
+
         // HOD specific routes
         Route::get('/{id}/hod-view', [BothServiceFormController::class, 'getFormForHOD'])
             ->middleware('both.service.role:hod')
@@ -328,21 +341,53 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/{id}/hod-submit', [BothServiceFormController::class, 'hodSubmitToNextStage'])
             ->middleware('both.service.role:hod')
             ->name('both-service-form.hod-submit');
-        
+
         // Utility routes
         Route::get('/user/info', [BothServiceFormController::class, 'getUserInfo'])->name('both-service-form.user-info');
         Route::get('/departments/list', [BothServiceFormController::class, 'getDepartments'])->name('both-service-form.departments');
 
         Route::get('/debug-hod', [BothServiceFormController::class, 'debugHodAssignments'])->name('both-service-form.debug-hod');
         Route::get('/{id}/export-pdf', [BothServiceFormController::class, 'exportPdf'])->name('both-service-form.export-pdf');
-        
+
         // Personal information routes from user_access table
         Route::get('/user-access/{userAccessId}/personal-info', [BothServiceFormController::class, 'getPersonalInfoFromUserAccess'])
             ->name('both-service-form.personal-info');
         Route::get('/hod/user-access-requests', [BothServiceFormController::class, 'getUserAccessRequestsForHOD'])
             ->middleware('both.service.role:hod,divisional_director')
             ->name('both-service-form.hod.user-access-requests');
+
+        // Module request data routes
+        Route::get('/module-requests/{userAccessId}', [BothServiceFormController::class, 'getModuleRequestData'])
+            ->middleware('both.service.role:hod,divisional_director,dict,ict_officer')
+            ->name('both-service-form.module-requests.show');
+        Route::get('/module-requests', [BothServiceFormController::class, 'getPendingModuleRequests'])
+            ->middleware('both.service.role:hod,divisional_director,dict,ict_officer')
+            ->name('both-service-form.module-requests.pending');
+        Route::get('/module-requests-statistics', [BothServiceFormController::class, 'getModuleRequestStatistics'])
+            ->middleware('both.service.role:hod,divisional_director,dict,ict_officer')
+            ->name('both-service-form.module-requests.statistics');
+
+        // HOD approval with access rights validation
+        Route::post('/module-requests/{userAccessId}/hod-approve', [BothServiceFormController::class, 'updateHodApproval'])
+            ->middleware('both.service.role:hod')
+            ->name('both-service-form.module-requests.hod-approve');
+
+        // Update HOD approval for existing record
+        Route::post('/{id}/update-hod-approval', [BothServiceFormController::class, 'updateHodApprovalForRecord'])
+            ->name('both-service-form.update-hod-approval');
         
+        // Divisional Director approval routes
+        Route::post('/module-requests/{userAccessId}/divisional-approve', [BothServiceFormController::class, 'approveDivisionalDirector'])
+            ->middleware('both.service.role:divisional_director')
+            ->name('both-service-form.module-requests.divisional-approve');
+        Route::post('/module-requests/{userAccessId}/divisional-reject', [BothServiceFormController::class, 'rejectDivisionalDirector'])
+            ->middleware('both.service.role:divisional_director')
+            ->name('both-service-form.module-requests.divisional-reject');
+        
+        // TEMPORARY: Debug record data
+        Route::get('/debug-record/{id}', [BothServiceFormController::class, 'debugRecord'])
+            ->name('both-service-form.debug-record');
+
         // Role-based approval routes with specific role requirements
         Route::post('/{id}/approve/hod', [BothServiceFormController::class, 'approveAsHOD'])
             ->middleware('both.service.role:hod')
@@ -403,19 +448,33 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/recent-activity', [\App\Http\Controllers\Api\v1\UserDashboardController::class, 'getRecentActivity'])->name('user.recent-activity');
     });
 
-    // HOD Combined Access Request routes (HOD only) - LEGACY
-    Route::prefix('hod')->middleware('role:head_of_department,divisional_director,ict_director,admin')->group(function () {
-        Route::get('combined-access-requests', [HodCombinedAccessController::class, 'index'])
-            ->name('hod.combined-access-requests.index');
-        Route::get('combined-access-requests/statistics', [HodCombinedAccessController::class, 'statistics'])
-            ->name('hod.combined-access-requests.statistics');
-        Route::get('combined-access-requests/{id}', [HodCombinedAccessController::class, 'show'])
-            ->name('hod.combined-access-requests.show');
-        Route::post('combined-access-requests/{id}/approve', [HodCombinedAccessController::class, 'updateApproval'])
-            ->name('hod.combined-access-requests.approve');
-        Route::post('combined-access-requests/{id}/cancel', [HodCombinedAccessController::class, 'cancel'])
-            ->name('hod.combined-access-requests.cancel');
-    });
+// HOD Combined Access Request routes (HOD only) - LEGACY
+Route::prefix('hod')->middleware('role:head_of_department,divisional_director,ict_director,admin')->group(function () {
+    Route::get('combined-access-requests', [HodCombinedAccessController::class, 'index'])
+        ->name('hod.combined-access-requests.index');
+    Route::get('combined-access-requests/statistics', [HodCombinedAccessController::class, 'statistics'])
+        ->name('hod.combined-access-requests.statistics');
+    Route::get('combined-access-requests/{id}', [HodCombinedAccessController::class, 'show'])
+        ->name('hod.combined-access-requests.show');
+    Route::post('combined-access-requests/{id}/approve', [HodCombinedAccessController::class, 'updateApproval'])
+        ->name('hod.combined-access-requests.approve');
+    Route::post('combined-access-requests/{id}/cancel', [HodCombinedAccessController::class, 'cancel'])
+        ->name('hod.combined-access-requests.cancel');
+    
+    // HOD Divisional Director Recommendations
+    Route::get('divisional-recommendations', [\App\Http\Controllers\Api\v1\HodDivisionalRecommendationsController::class, 'getDivisionalRecommendations'])
+        ->middleware('role:head_of_department')
+        ->name('hod.divisional-recommendations.list');
+    Route::get('divisional-recommendations/stats', [\App\Http\Controllers\Api\v1\HodDivisionalRecommendationsController::class, 'getRecommendationStats'])
+        ->middleware('role:head_of_department')
+        ->name('hod.divisional-recommendations.stats');
+    Route::get('divisional-recommendations/{userAccessId}/details', [\App\Http\Controllers\Api\v1\HodDivisionalRecommendationsController::class, 'getRequestDetails'])
+        ->middleware('role:head_of_department')
+        ->name('hod.divisional-recommendations.details');
+    Route::post('divisional-recommendations/{userAccessId}/resubmit', [\App\Http\Controllers\Api\v1\HodDivisionalRecommendationsController::class, 'resubmitRequest'])
+        ->middleware('role:head_of_department')
+        ->name('hod.divisional-recommendations.resubmit');
+});
 
     // Divisional Director Combined Access Request routes (Divisional Director only)
     Route::prefix('divisional')->middleware('role:divisional_director,ict_director,admin')->group(function () {
@@ -434,7 +493,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // ========================================
     // NEW COMPLETE USER ACCESS WORKFLOW ROUTES
     // ========================================
-    
+
     // User Access Workflow routes - Complete system for all stakeholders
     Route::prefix('user-access-workflow')->group(function () {
         // Basic CRUD operations
@@ -446,7 +505,7 @@ Route::middleware('auth:sanctum')->group(function () {
             ->name('user-access-workflow.show');
         Route::put('/{userAccess}', [\App\Http\Controllers\Api\UserAccessWorkflowController::class, 'update'])
             ->name('user-access-workflow.update');
-        
+
         // Utility routes
         Route::get('/options/form-data', [\App\Http\Controllers\Api\UserAccessWorkflowController::class, 'getFormOptions'])
             ->name('user-access-workflow.form-options');
@@ -456,7 +515,7 @@ Route::middleware('auth:sanctum')->group(function () {
             ->name('user-access-workflow.export');
         Route::post('/{userAccess}/cancel', [\App\Http\Controllers\Api\UserAccessWorkflowController::class, 'cancel'])
             ->name('user-access-workflow.cancel');
-        
+
         // Approval workflow routes - Role-based access control
         Route::post('/{userAccess}/approve/hod', [\App\Http\Controllers\Api\UserAccessWorkflowController::class, 'processHodApproval'])
             ->middleware('role:head_of_department')
@@ -484,41 +543,65 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/departments', [\App\Http\Controllers\Api\v1\UserProfileController::class, 'getDepartments'])->name('profile.departments');
     });
 
-    // COMMENTED OUT: Individual form routes - now using Combined Access Form only
-    /*
-    // User Jeeva Form routes (Staff only)
-    Route::prefix('user-jeeva')->group(function () {
-        Route::post('submit', [UserJeevaFormController::class, 'store'])->name('user-jeeva.submit');
-        Route::get('requests', [UserJeevaFormController::class, 'index'])->name('user-jeeva.index');
-        Route::get('requests/{userAccess}', [UserJeevaFormController::class, 'show'])->name('user-jeeva.show');
-        Route::get('departments', [UserJeevaFormController::class, 'getDepartments'])->name('user-jeeva.departments');
-        Route::post('check-signature', [UserJeevaFormController::class, 'checkSignature'])->name('user-jeeva.check-signature');
-    });
 
-    // User Wellsoft Form routes (Staff only)
-    Route::prefix('user-wellsoft')->group(function () {
-        Route::post('submit', [UserWellsoftFormController::class, 'store'])->name('user-wellsoft.submit');
-        Route::get('requests', [UserWellsoftFormController::class, 'index'])->name('user-wellsoft.index');
-        Route::get('requests/{userAccess}', [UserWellsoftFormController::class, 'show'])->name('user-wellsoft.show');
-        Route::get('departments', [UserWellsoftFormController::class, 'getDepartments'])->name('user-wellsoft.departments');
-        Route::post('check-signature', [UserWellsoftFormController::class, 'checkSignature'])->name('user-wellsoft.check-signature');
-    });
-
-    // User Internet Access Form routes (Staff only)
-    Route::prefix('user-internet-access')->group(function () {
-        Route::post('submit', [UserInternetAccessFormController::class, 'store'])->name('user-internet-access.submit');
-        Route::get('requests', [UserInternetAccessFormController::class, 'index'])->name('user-internet-access.index');
-        Route::get('requests/{userAccess}', [UserInternetAccessFormController::class, 'show'])->name('user-internet-access.show');
-        Route::get('departments', [UserInternetAccessFormController::class, 'getDepartments'])->name('user-internet-access.departments');
-        Route::post('check-signature', [UserInternetAccessFormController::class, 'checkSignature'])->name('user-internet-access.check-signature');
-    });
-    */
-    
     // Module Access Approval routes - Universal approval handling
     Route::prefix('module-access-approval')->group(function () {
         Route::get('/{id}', [ModuleAccessApprovalController::class, 'getRequestForApproval'])
             ->name('module-access-approval.get');
         Route::post('/{id}/process', [ModuleAccessApprovalController::class, 'processApproval'])
             ->name('module-access-approval.process');
+    });
+
+    // Module Request routes - For handling Wellsoft module requests
+    Route::prefix('module-requests')->group(function () {
+        Route::post('/', [ModuleRequestController::class, 'store'])
+            ->name('module-requests.store');
+        Route::get('/modules', [ModuleRequestController::class, 'getAvailableModules'])
+            ->name('module-requests.modules');
+        Route::get('/{userAccessId}', [ModuleRequestController::class, 'show'])
+            ->name('module-requests.show');
+        Route::put('/{userAccessId}', [ModuleRequestController::class, 'update'])
+            ->name('module-requests.update');
+
+        // Jeeva Module Request routes
+        Route::prefix('jeeva')->group(function () {
+            Route::post('/', [JeevaModuleRequestController::class, 'store'])
+                ->name('module-requests.jeeva.store');
+            Route::get('/modules', [JeevaModuleRequestController::class, 'getAvailableModules'])
+                ->name('module-requests.jeeva.modules');
+            Route::get('/{userAccessId}', [JeevaModuleRequestController::class, 'show'])
+                ->name('module-requests.jeeva.show');
+            Route::put('/{userAccessId}', [JeevaModuleRequestController::class, 'update'])
+                ->name('module-requests.jeeva.update');
+        });
+    });
+
+    // Access Rights and Approval Workflow routes
+    Route::prefix('access-rights-approval')->group(function () {
+        Route::post('/', [AccessRightsApprovalController::class, 'store'])
+            ->name('access-rights-approval.store');
+        Route::get('/{userAccessId}', [AccessRightsApprovalController::class, 'show'])
+            ->name('access-rights-approval.show');
+        Route::put('/{userAccessId}', [AccessRightsApprovalController::class, 'update'])
+            ->name('access-rights-approval.update');
+    });
+
+    // Implementation Workflow routes (Head of IT and ICT Officer)
+    Route::prefix('implementation-workflow')->group(function () {
+        Route::post('/', [ImplementationWorkflowController::class, 'store'])
+            ->name('implementation-workflow.store');
+        Route::get('/{userAccessId}', [ImplementationWorkflowController::class, 'show'])
+            ->name('implementation-workflow.show');
+        Route::put('/{userAccessId}', [ImplementationWorkflowController::class, 'update'])
+            ->name('implementation-workflow.update');
+    });
+
+    // Notification routes
+    Route::prefix('notifications')->group(function () {
+        Route::get('/', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::get('/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unread-count');
+        Route::patch('/{id}/mark-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
+        Route::patch('/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+        Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
     });
 });
