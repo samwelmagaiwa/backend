@@ -197,7 +197,7 @@
                     <i class="fas fa-clock mr-2 text-blue-300"></i>
                     Last refreshed: {{ lastRefreshTime.toLocaleTimeString() }}
                   </div>
-                  <div class="flex items-center text-xs text-blue-300">
+                  <div class="flex items-center text-sm text-blue-300">
                     <div class="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
                     Auto-refresh: 30s
                   </div>
@@ -302,7 +302,7 @@
                     <thead class="bg-blue-800/50">
                       <tr>
                         <th
-                          class="px-4 py-3 text-left text-xs font-semibold text-blue-100 uppercase tracking-wider cursor-pointer hover:bg-blue-700/30"
+                          class="px-4 py-3 text-left text-sm font-semibold text-blue-100 uppercase tracking-wider cursor-pointer hover:bg-blue-700/30"
                           @click="sortBy('id')"
                         >
                           <i class="fas fa-hashtag mr-1"></i>Request ID
@@ -315,7 +315,7 @@
                           ></i>
                         </th>
                         <th
-                          class="px-4 py-3 text-left text-xs font-semibold text-blue-100 uppercase tracking-wider cursor-pointer hover:bg-blue-700/30"
+                          class="px-4 py-3 text-left text-sm font-semibold text-blue-100 uppercase tracking-wider cursor-pointer hover:bg-blue-700/30"
                           @click="sortBy('type')"
                         >
                           <i class="fas fa-layer-group mr-1"></i>Request Type
@@ -328,12 +328,12 @@
                           ></i>
                         </th>
                         <th
-                          class="px-4 py-3 text-left text-xs font-semibold text-blue-100 uppercase tracking-wider"
+                          class="px-4 py-3 text-left text-sm font-semibold text-blue-100 uppercase tracking-wider"
                         >
                           <i class="fas fa-user mr-1"></i>Personal Information
                         </th>
                         <th
-                          class="px-4 py-3 text-left text-xs font-semibold text-blue-100 uppercase tracking-wider cursor-pointer hover:bg-blue-700/30"
+                          class="px-4 py-3 text-left text-sm font-semibold text-blue-100 uppercase tracking-wider cursor-pointer hover:bg-blue-700/30"
                           @click="sortBy('submissionDate')"
                         >
                           <i class="fas fa-calendar mr-1"></i>Submission Date (FIFO)
@@ -346,12 +346,12 @@
                           ></i>
                         </th>
                         <th
-                          class="px-4 py-3 text-left text-xs font-semibold text-blue-100 uppercase tracking-wider"
+                          class="px-4 py-3 text-left text-sm font-semibold text-blue-100 uppercase tracking-wider"
                         >
                           <i class="fas fa-flag mr-1"></i>Current Status
                         </th>
                         <th
-                          class="px-4 py-3 text-center text-xs font-semibold text-blue-100 uppercase tracking-wider"
+                          class="px-4 py-3 text-center text-sm font-semibold text-blue-100 uppercase tracking-wider"
                         >
                           <i class="fas fa-tools mr-1"></i>Actions
                         </th>
@@ -366,8 +366,8 @@
                       >
                         <!-- Request ID -->
                         <td class="px-4 py-3 whitespace-nowrap">
-                          <div class="text-sm font-medium text-white">#{{ request.id }}</div>
-                          <div class="text-xs text-blue-300">
+                          <div class="text-base font-medium text-white">#{{ request.id }}</div>
+                          <div class="text-sm text-blue-300">
                             {{ getRequestPriority(request) }}
                           </div>
                         </td>
@@ -381,7 +381,7 @@
                             >
                               <i :class="getTypeIcon(request.type)" class="text-white text-sm"></i>
                             </div>
-                            <div class="text-sm text-white">
+                            <div class="text-base text-white">
                               <div class="font-medium">
                                 {{ getRequestTypeCode(request.type) }}
                               </div>
@@ -394,7 +394,7 @@
 
                         <!-- Personal Information -->
                         <td class="px-4 py-3">
-                          <div class="text-sm text-white">
+                          <div class="text-base text-white">
                             <div class="font-medium">
                               {{ request.staffName }}
                             </div>
@@ -420,10 +420,10 @@
 
                         <!-- Submission Date (FIFO) -->
                         <td class="px-4 py-3 whitespace-nowrap">
-                          <div class="text-sm text-white font-medium">
+                          <div class="text-base text-white font-medium">
                             {{ formatDate(request.submissionDate) }}
                           </div>
-                          <div class="text-xs text-blue-300">
+                          <div class="text-sm text-blue-300">
                             {{ getTimeAgo(request.submissionDate) }}
                           </div>
                           <div class="text-xs text-yellow-300 font-medium">
@@ -440,7 +440,7 @@
                             <i :class="getStatusIcon(request.currentStatus)" class="mr-2"></i>
                             {{ getStatusText(request.currentStatus) }}
                           </span>
-                          <div class="text-xs text-blue-300 mt-1">
+                          <div class="text-sm text-blue-300 mt-1">
                             {{ getCurrentApprovalStage(request) }}
                           </div>
                         </td>
@@ -458,7 +458,7 @@
                               {{ isNavigating ? 'Loading...' : 'View & Process' }}
                             </button>
                           </div>
-                          <div class="text-xs text-blue-300 mt-1">
+                          <div class="text-sm text-blue-300 mt-1">
                             Click to capture: Module Requested for, Module Request, Access Rights,
                             Comments
                           </div>

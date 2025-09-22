@@ -227,9 +227,16 @@
                       class="px-4 py-3 bg-white/15 border border-blue-300/30 rounded-lg focus:border-teal-400 focus:outline-none text-white backdrop-blur-sm transition-all appearance-none cursor-pointer text-sm"
                     >
                       <option value="">All Statuses</option>
+                      <option value="pending">Pending Submission</option>
                       <option value="pending_hod">Pending HOD</option>
                       <option value="hod_approved">HOD Approved</option>
                       <option value="hod_rejected">HOD Rejected</option>
+                      <option value="divisional_approved">Divisional Approved</option>
+                      <option value="divisional_rejected">Divisional Rejected</option>
+                      <option value="approved">Fully Approved</option>
+                      <option value="implemented">Implemented</option>
+                      <option value="completed">Completed</option>
+                      <option value="cancelled">Cancelled</option>
                     </select>
 
                     <button
@@ -312,7 +319,7 @@
                               <i class="fas fa-hashtag text-white text-sm"></i>
                             </div>
                             <div>
-                              <div class="text-sm font-medium text-white">
+                              <div class="text-base font-medium text-white">
                                 {{
                                   request.request_id ||
                                   `REQ-${request.id.toString().padStart(6, '0')}`
@@ -345,7 +352,7 @@
                               <i class="fas fa-wifi mr-1"></i>Internet
                             </span>
                           </div>
-                          <div class="text-xs text-blue-300 mt-1">Combined Access Request</div>
+                          <div class="text-sm text-blue-300 mt-1">Combined Access Request</div>
                         </td>
 
                         <!-- Personal Information -->
@@ -357,13 +364,13 @@
                               <i class="fas fa-user text-white text-sm"></i>
                             </div>
                             <div>
-                              <div class="text-sm font-medium text-white">
+                              <div class="text-base font-medium text-white">
                                 {{ request.staff_name || request.full_name || 'Unknown User' }}
                               </div>
                               <div class="text-sm text-blue-300">
                                 {{ request.phone || request.phone_number || 'No phone' }}
                               </div>
-                              <div v-if="request.pf_number" class="text-xs text-teal-300">
+                              <div v-if="request.pf_number" class="text-sm text-teal-300">
                                 PF: {{ request.pf_number }}
                               </div>
                               <div class="text-xs text-blue-200">
@@ -375,10 +382,10 @@
 
                         <!-- Submission Date -->
                         <td class="px-6 py-4 whitespace-nowrap">
-                          <div class="text-sm text-white font-medium">
+                          <div class="text-base text-white font-medium">
                             {{ formatDate(request.created_at || request.submission_date) }}
                           </div>
-                          <div class="text-xs text-blue-300">
+                          <div class="text-sm text-blue-300">
                             {{ formatTime(request.created_at || request.submission_date) }}
                           </div>
                         </td>
@@ -631,6 +638,7 @@
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppFooter from '@/components/footer.vue'
   import combinedAccessService from '@/services/combinedAccessService'
+  import statusUtils from '@/utils/statusUtils'
 
   export default {
     name: 'HodRequestList',
@@ -657,7 +665,9 @@
           total: 0
         },
         error: null,
-        activeDropdown: null
+        activeDropdown: null,
+        // Add status utilities for consistent status handling
+        $statusUtils: statusUtils
       }
     },
     computed: {
@@ -850,6 +860,10 @@
           pendingHod: requests.filter((r) => (r.hod_status || r.status) === 'pending_hod').length,
           hodApproved: requests.filter((r) => (r.hod_status || r.status) === 'hod_approved').length,
           hodRejected: requests.filter((r) => (r.hod_status || r.status) === 'hod_rejected').length,
+          approved: requests.filter((r) => (r.hod_status || r.status) === 'approved').length,
+          implemented: requests.filter((r) => (r.hod_status || r.status) === 'implemented').length,
+          completed: requests.filter((r) => (r.hod_status || r.status) === 'completed').length,
+          cancelled: requests.filter((r) => (r.hod_status || r.status) === 'cancelled').length,
           total: requests.length
         }
       },
@@ -951,33 +965,16 @@
       },
 
       getStatusBadgeClass(status) {
-        const classes = {
-          pending_hod: 'bg-yellow-100 text-yellow-800',
-          hod_approved: 'bg-green-100 text-green-800',
-          hod_rejected: 'bg-red-100 text-red-800',
-          cancelled: 'bg-gray-100 text-gray-800'
-        }
-        return classes[status] || 'bg-gray-100 text-gray-800'
+        return this.$statusUtils.getStatusBadgeClass(status)
       },
 
       getStatusIcon(status) {
-        const icons = {
-          pending_hod: 'fas fa-clock',
-          hod_approved: 'fas fa-check',
-          hod_rejected: 'fas fa-times',
-          cancelled: 'fas fa-ban'
-        }
-        return icons[status] || 'fas fa-question'
+        return this.$statusUtils.getStatusIcon(status)
       },
 
       getStatusText(status) {
-        const texts = {
-          pending_hod: 'Pending HOD Approval',
-          hod_approved: 'HOD Approved',
-          hod_rejected: 'HOD Rejected',
-          cancelled: 'Cancelled'
-        }
-        return texts[status] || 'Unknown Status'
+        // Use centralized status utility with component name for debugging
+        return this.$statusUtils.getStatusText(status, 'HodRequestList')
       }
     }
   }

@@ -137,7 +137,7 @@
             <div class="relative">
               <select
                 v-model="filterStatus"
-                class="appearance-none bg-white/15 backdrop-blur-sm border-2 border-blue-300/30 rounded-xl px-4 py-3 pr-10 text-sm font-medium text-white hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 hover:bg-white/20 focus:bg-white/20 shadow-lg cursor-pointer"
+                class="appearance-none bg-white/15 backdrop-blur-sm border-2 border-blue-300/30 rounded-xl px-4 py-3 pr-10 text-base font-medium text-white hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 hover:bg-white/20 focus:bg-white/20 shadow-lg cursor-pointer"
                 @change="handleFilter"
               >
                 <option value="" class="bg-gray-800 text-white">All Status</option>

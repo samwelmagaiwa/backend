@@ -127,7 +127,7 @@
 
                   <!-- Search Users -->
                   <div class="mb-4">
-                    <label class="block text-sm font-bold text-teal-100 mb-2">Search Users</label>
+                    <label class="block text-base font-bold text-teal-100 mb-2">Search Users</label>
                     <div class="relative">
                       <input
                         v-model="userSearchQuery"
@@ -240,7 +240,7 @@
                     <!-- Role Selection Dropdown -->
                     <div class="space-y-4">
                       <div>
-                        <label class="block text-sm font-bold text-purple-100 mb-2">
+                        <label class="block text-base font-bold text-purple-100 mb-2">
                           <i class="fas fa-list mr-2"></i>Select Roles
                         </label>
                         <div class="relative">
@@ -328,7 +328,7 @@
 
                       <!-- Selected Roles Preview -->
                       <div v-if="selectedRoleIds.length > 0">
-                        <label class="block text-sm font-bold text-purple-100 mb-2">
+                        <label class="block text-base font-bold text-purple-100 mb-2">
                           <i class="fas fa-check mr-2"></i>Selected Roles ({{
                             selectedRoleIds.length
                           }}):
@@ -355,7 +355,7 @@
 
                       <!-- Current User Roles -->
                       <div v-if="selectedUser.roles && selectedUser.roles.length > 0">
-                        <label class="block text-sm font-bold text-purple-100 mb-2">
+                        <label class="block text-base font-bold text-purple-100 mb-2">
                           <i class="fas fa-user-shield mr-2"></i>Current Roles:
                         </label>
                         <div class="flex flex-wrap gap-2">

@@ -317,7 +317,7 @@ class RequestStatusController extends Controller
             'type' => 'combined_access',
             'services' => $services,
             'status' => $accessRequest->status,
-            'current_step' => $this->getCurrentStep($accessRequest->status),
+            'current_step' => $this->getCurrentStep($accessRequest->status, $accessRequest),
             'created_at' => $accessRequest->created_at->toISOString(),
             'updated_at' => $accessRequest->updated_at->toISOString(),
             'staff_name' => $accessRequest->staff_name,
@@ -400,11 +400,12 @@ class RequestStatusController extends Controller
             'temporaryUntil' => null,
             'submissionDate' => $accessRequest->created_at->format('Y-m-d'),
             'currentStatus' => $accessRequest->status,
-            'hodApprovalStatus' => $this->getApprovalStatus($accessRequest->status, 'hod'),
-            'divisionalStatus' => $this->getApprovalStatus($accessRequest->status, 'divisional'),
-            'dictStatus' => $this->getApprovalStatus($accessRequest->status, 'dict'),
-            'headOfItStatus' => $this->getApprovalStatus($accessRequest->status, 'head_of_it'),
-            'ictStatus' => $this->getApprovalStatus($accessRequest->status, 'ict'),
+            // Use new status columns if available, fallback to legacy status
+            'hodApprovalStatus' => $accessRequest->hod_status ?? $this->getApprovalStatus($accessRequest->status, 'hod'),
+            'divisionalStatus' => $accessRequest->divisional_status ?? $this->getApprovalStatus($accessRequest->status, 'divisional'),
+            'dictStatus' => $accessRequest->ict_director_status ?? $this->getApprovalStatus($accessRequest->status, 'dict'),
+            'headOfItStatus' => $accessRequest->head_it_status ?? $this->getApprovalStatus($accessRequest->status, 'head_of_it'),
+            'ictStatus' => $accessRequest->ict_officer_status ?? $this->getApprovalStatus($accessRequest->status, 'ict'),
             'comments' => is_array($accessRequest->purpose) ? implode(', ', $accessRequest->purpose) : ($accessRequest->purpose ?? 'No comments provided'),
             'hodApprovalDate' => null,
             'divisionalApprovalDate' => null,
@@ -574,20 +575,60 @@ class RequestStatusController extends Controller
     }
 
     /**
-     * Get current step for access requests.
+     * Get current step for access requests using new status columns.
      */
-    private function getCurrentStep(string $status): int
+    private function getCurrentStep(string $status, UserAccess $accessRequest = null): int
     {
+        // If we have access to the request object, use new status columns
+        if ($accessRequest) {
+            return $this->getCurrentStepFromColumns($accessRequest);
+        }
+        
+        // Fallback to legacy status mapping
         $stepMap = [
             'pending' => 2, // HOD Review
+            'pending_hod' => 2, // HOD Review
             'hod_approved' => 3, // Divisional Director Review
+            'pending_divisional' => 3, // Divisional Director Review
             'hod_rejected' => 2, // Stopped at HOD Review
-            'in_review' => 3, // Divisional Director
+            'divisional_approved' => 4, // ICT Director Review
+            'pending_ict_director' => 4, // ICT Director Review
+            'divisional_rejected' => 3, // Stopped at Divisional Review
+            'ict_director_approved' => 5, // Head IT Review
+            'pending_head_it' => 5, // Head IT Review
+            'ict_director_rejected' => 4, // Stopped at ICT Director Review
+            'head_it_approved' => 6, // ICT Officer Implementation
+            'pending_ict_officer' => 6, // ICT Officer Implementation
+            'head_it_rejected' => 5, // Stopped at Head IT Review
+            'implemented' => 7, // Completed
             'approved' => 7, // Completed
             'rejected' => 2, // Stopped at current step
+            'in_review' => 3, // Divisional Director
         ];
 
         return $stepMap[$status] ?? 1;
+    }
+    
+    /**
+     * Get current step using new status columns
+     */
+    private function getCurrentStepFromColumns(UserAccess $accessRequest): int
+    {
+        // Check for rejections first
+        if ($accessRequest->hod_status === 'rejected') return 2;
+        if ($accessRequest->divisional_status === 'rejected') return 3;
+        if ($accessRequest->ict_director_status === 'rejected') return 4;
+        if ($accessRequest->head_it_status === 'rejected') return 5;
+        if ($accessRequest->ict_officer_status === 'rejected') return 6;
+        
+        // Check workflow progression
+        if ($accessRequest->ict_officer_status === 'implemented') return 7; // Complete
+        if ($accessRequest->head_it_status === 'approved') return 6; // ICT Officer Implementation
+        if ($accessRequest->ict_director_status === 'approved') return 5; // Head IT Review
+        if ($accessRequest->divisional_status === 'approved') return 4; // ICT Director Review
+        if ($accessRequest->hod_status === 'approved') return 3; // Divisional Director Review
+        
+        return 2; // HOD Review (default)
     }
 
     /**

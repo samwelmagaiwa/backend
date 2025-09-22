@@ -7,7 +7,7 @@
       <form @submit.prevent="submitForm" class="space-y-6">
         <!-- User Access ID Selection -->
         <div>
-          <label for="userAccessId" class="block text-sm font-medium text-gray-700 mb-2">
+          <label for="userAccessId" class="block text-base font-medium text-gray-700 mb-2">
             Select User Access Request
           </label>
           <select
@@ -25,7 +25,9 @@
 
         <!-- Module Requested For (Radio Button) -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2"> Module Requested For </label>
+          <label class="block text-base font-medium text-gray-700 mb-2">
+            Module Requested For
+          </label>
           <div class="space-y-2">
             <label class="flex items-center">
               <input
@@ -52,7 +54,7 @@
 
         <!-- Wellsoft Modules (Checkboxes) -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2"> Wellsoft Modules </label>
+          <label class="block text-base font-medium text-gray-700 mb-2"> Wellsoft Modules </label>
           <div class="grid grid-cols-2 gap-2">
             <label v-for="module in availableModules" :key="module.id" class="flex items-center">
               <input

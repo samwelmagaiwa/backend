@@ -8,15 +8,15 @@
         <h2 class="text-xl font-semibold text-gray-700 mb-4">URL Parameters</h2>
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-600">Request ID</label>
+            <label class="block text-base font-medium text-gray-600">Request ID</label>
             <p class="text-lg text-gray-800">{{ $route.query.id || 'Not provided' }}</p>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-600">Request Type</label>
+            <label class="block text-base font-medium text-gray-600">Request Type</label>
             <p class="text-lg text-gray-800">{{ $route.query.type || 'Not provided' }}</p>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-600">User Access ID</label>
+            <label class="block text-base font-medium text-gray-600">User Access ID</label>
             <p class="text-lg text-gray-800">{{ $route.query.userAccessId || 'Not provided' }}</p>
           </div>
         </div>
@@ -27,19 +27,19 @@
         <h2 class="text-xl font-semibold text-gray-700 mb-4">Current User</h2>
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-600">User ID</label>
+            <label class="block text-base font-medium text-gray-600">User ID</label>
             <p class="text-lg text-gray-800">{{ userInfo.id || 'Not available' }}</p>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-600">User Name</label>
+            <label class="block text-base font-medium text-gray-600">User Name</label>
             <p class="text-lg text-gray-800">{{ userInfo.name || 'Not available' }}</p>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-600">User Role</label>
+            <label class="block text-base font-medium text-gray-600">User Role</label>
             <p class="text-lg text-gray-800">{{ userInfo.role || 'Not available' }}</p>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-600">User Email</label>
+            <label class="block text-base font-medium text-gray-600">User Email</label>
             <p class="text-lg text-gray-800">{{ userInfo.email || 'Not available' }}</p>
           </div>
         </div>

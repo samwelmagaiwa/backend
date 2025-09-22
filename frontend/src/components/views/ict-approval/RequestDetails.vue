@@ -259,7 +259,7 @@
                   <div
                     class="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-700 rounded-md flex items-center justify-center"
                   >
-                    <i class="fas fa-clipboard-check text-white text-xs"></i>
+                    <i class="fas fa-clipboard-check text-white text-sm"></i>
                   </div>
                   <h3 class="text-base font-bold text-white">Device Condition Assessment</h3>
                 </div>
@@ -400,7 +400,7 @@
                       <div
                         class="w-4 h-4 bg-purple-600 rounded-sm flex items-center justify-center"
                       >
-                        <i class="fas fa-puzzle-piece text-white text-xs"></i>
+                        <i class="fas fa-puzzle-piece text-white text-sm"></i>
                       </div>
                       <input
                         type="checkbox"
@@ -415,7 +415,7 @@
                   <div class="bg-red-800/20 rounded-lg p-2">
                     <label class="flex items-center gap-2 cursor-pointer mb-1">
                       <div class="w-4 h-4 bg-red-600 rounded-sm flex items-center justify-center">
-                        <i class="fas fa-exclamation-triangle text-white text-xs"></i>
+                        <i class="fas fa-exclamation-triangle text-white text-sm"></i>
                       </div>
                       <input
                         type="checkbox"
@@ -428,7 +428,7 @@
                       <textarea
                         v-model="currentAssessment.damage_description"
                         rows="1"
-                        class="w-full px-1 py-1 bg-red-900/30 border border-red-600/40 rounded text-white text-xs placeholder-red-300 resize-none focus:outline-none focus:border-red-500"
+                        class="w-full px-1 py-1 bg-red-900/30 border border-red-600/40 rounded text-white text-sm placeholder-red-300 resize-none focus:outline-none focus:border-red-500"
                         placeholder="Describe damage..."
                       ></textarea>
                     </div>
@@ -439,7 +439,7 @@
                 <div class="bg-indigo-800/20 rounded-lg p-2 mb-2">
                   <label class="flex items-center gap-2 mb-1">
                     <div class="w-4 h-4 bg-indigo-600 rounded-sm flex items-center justify-center">
-                      <i class="fas fa-sticky-note text-white text-xs"></i>
+                      <i class="fas fa-sticky-note text-white text-sm"></i>
                     </div>
                     <span class="text-xs font-medium text-white">Additional Notes</span>
                     <span class="text-xs text-indigo-300">(Optional)</span>
@@ -447,7 +447,7 @@
                   <textarea
                     v-model="currentAssessmentNotes"
                     rows="1"
-                    class="w-full px-1 py-1 bg-indigo-900/30 border border-indigo-600/40 rounded text-white text-xs placeholder-indigo-300 resize-none focus:outline-none focus:border-indigo-500"
+                    class="w-full px-1 py-1 bg-indigo-900/30 border border-indigo-600/40 rounded text-white text-sm placeholder-indigo-300 resize-none focus:outline-none focus:border-indigo-500"
                     placeholder="Special instructions, warranty info..."
                   ></textarea>
                 </div>
@@ -1730,7 +1730,7 @@
   }
 
   .checkbox-description {
-    @apply block text-blue-300 text-sm leading-relaxed;
+    @apply block text-blue-300 text-base leading-relaxed;
   }
 
   .checkbox-indicator {
@@ -1797,7 +1797,7 @@
   }
 
   .notes-hint {
-    @apply text-blue-300 text-sm leading-relaxed;
+    @apply text-blue-300 text-base leading-relaxed;
   }
 
   /* Hover effects */

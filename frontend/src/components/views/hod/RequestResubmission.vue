@@ -177,7 +177,7 @@
                           @change="handleSignatureUpload"
                           :disabled="submitting"
                           accept=".jpg,.jpeg,.png,.pdf"
-                          class="block w-full text-sm text-gray-300 bg-white/10 border border-green-400/30 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-green-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                          class="block w-full text-base text-gray-300 bg-white/10 border border-green-400/30 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-green-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
                         />
                         <p class="text-green-300 text-xs">
                           Upload a new signature if needed. Accepted formats: JPG, PNG, PDF (max

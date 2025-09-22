@@ -42,7 +42,7 @@
         <!-- Message -->
         <p
           v-if="notification.message"
-          class="text-sm text-white/90 mt-3 leading-relaxed relative z-10"
+          class="text-base text-white/90 mt-3 leading-relaxed relative z-10"
         >
           {{ notification.message }}
         </p>

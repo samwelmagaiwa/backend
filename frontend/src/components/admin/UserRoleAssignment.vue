@@ -143,7 +143,7 @@
                 <!-- Filters and Search -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                   <div>
-                    <label class="block text-sm font-bold text-teal-100 mb-2">Search Users</label>
+                    <label class="block text-base font-bold text-teal-100 mb-2">Search Users</label>
                     <div class="relative">
                       <input
                         v-model="searchQuery"
@@ -159,7 +159,9 @@
                   </div>
 
                   <div>
-                    <label class="block text-sm font-bold text-teal-100 mb-2">Filter by Role</label>
+                    <label class="block text-base font-bold text-teal-100 mb-2"
+                      >Filter by Role</label
+                    >
                     <div class="relative">
                       <select
                         v-model="filterRole"
@@ -185,7 +187,7 @@
                   </div>
 
                   <div>
-                    <label class="block text-sm font-bold text-teal-100 mb-2"
+                    <label class="block text-base font-bold text-teal-100 mb-2"
                       >Filter by Department</label
                     >
                     <div class="relative">
@@ -213,7 +215,7 @@
                   </div>
 
                   <div>
-                    <label class="block text-sm font-bold text-teal-100 mb-2">Sort By</label>
+                    <label class="block text-base font-bold text-teal-100 mb-2">Sort By</label>
                     <div class="relative">
                       <select
                         v-model="sortBy"
@@ -303,7 +305,7 @@
                         <div
                           class="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center"
                         >
-                          <i class="fas fa-crown text-white text-xs"></i>
+                          <i class="fas fa-crown text-white text-sm"></i>
                         </div>
                         <span class="text-yellow-100 text-sm font-medium">HOD Status</span>
                       </div>

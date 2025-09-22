@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api\v1;
 use App\Http\Controllers\Controller;
 use App\Models\UserAccess;
 use App\Models\Department;
+use App\Services\UserAccessWorkflowService;
+use App\Traits\HandlesStatusQueries;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +16,14 @@ use Carbon\Carbon;
 
 class DivisionalCombinedAccessController extends Controller
 {
+    use HandlesStatusQueries;
+
+    protected $workflowService;
+
+    public function __construct(UserAccessWorkflowService $workflowService)
+    {
+        $this->workflowService = $workflowService;
+    }
     /**
      * Get all HOD-approved combined access requests for Divisional Director approval
      */
@@ -28,13 +38,8 @@ class DivisionalCombinedAccessController extends Controller
             ]);
 
             $query = UserAccess::with(['user', 'department'])
-                ->whereNotNull('request_type')
-                ->where(function ($q) {
-                    // Get HOD-approved requests that need divisional approval or are already processed by divisional
-                    $q->where('status', 'hod_approved')
-                        ->orWhere('status', 'divisional_approved')
-                        ->orWhere('status', 'divisional_rejected');
-                });
+                ->whereNotNull('request_type');
+                // Show ALL requests regardless of status - Divisional Directors should see the complete history
 
             // DEPARTMENT FILTERING: Divisional Director only sees requests from their department(s)
             $currentUser = auth()->user();
@@ -50,9 +55,9 @@ class DivisionalCombinedAccessController extends Controller
                     'requests_before_dept_filter' => UserAccess::with(['user', 'department'])
                         ->whereNotNull('request_type')
                         ->where(function ($q) {
-                            $q->where('status', 'hod_approved')
-                                ->orWhere('status', 'divisional_approved')
-                                ->orWhere('status', 'divisional_rejected');
+                            $q->where('hod_status', 'approved')
+                                ->orWhere('divisional_status', 'approved')
+                                ->orWhere('divisional_status', 'rejected');
                         })->count(),
                     'requests_after_dept_filter' => (clone $query)->count()
                 ]);
@@ -155,19 +160,8 @@ class DivisionalCombinedAccessController extends Controller
                 ], 403);
             }
 
-            // Ensure request is HOD-approved before divisional can access it
-            if (!in_array($request->status, ['hod_approved', 'divisional_approved', 'divisional_rejected'])) {
-                Log::warning('Divisional Access Denied: Request not HOD-approved', [
-                    'request_id' => $id,
-                    'status' => $request->status
-                ]);
-                
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Access denied. Request must be HOD-approved first.',
-                    'error' => 'Request not ready for divisional approval'
-                ], 403);
-            }
+            // Allow viewing all requests for complete visibility and history
+            // Divisional directors can see the full request lifecycle
 
             $transformedData = $this->transformRequestData($request);
 
@@ -229,9 +223,10 @@ class DivisionalCombinedAccessController extends Controller
             }
 
             // Ensure request is HOD-approved before divisional can approve it
-            if ($userAccessRequest->status !== 'hod_approved') {
+            if ($userAccessRequest->hod_status !== 'approved') {
                 Log::warning('Divisional Approval Denied: Request not HOD-approved', [
                     'request_id' => $id,
+                    'hod_status' => $userAccessRequest->hod_status,
                     'status' => $userAccessRequest->status
                 ]);
                 
@@ -256,6 +251,7 @@ class DivisionalCombinedAccessController extends Controller
             $currentUser = auth()->user();
             $updateData = [
                 'status' => $validatedData['divisional_status'] === 'approved' ? 'divisional_approved' : 'divisional_rejected',
+                'divisional_status' => $validatedData['divisional_status'], // Set the new divisional_status column
                 'divisional_comments' => $validatedData['divisional_comments'] ?? '',
                 'divisional_name' => $currentUser->name, // Always use authenticated user's name
                 'divisional_approved_by' => $currentUser->id,
@@ -374,16 +370,21 @@ class DivisionalCombinedAccessController extends Controller
             }
             
             $stats = [
-                'pendingDivisional' => (clone $baseQuery)->where('status', 'hod_approved')->count(),
-                'divisionalApproved' => (clone $baseQuery)->where('status', 'divisional_approved')->count(),
-                'divisionalRejected' => (clone $baseQuery)->where('status', 'divisional_rejected')->count(),
-                'total' => (clone $baseQuery)->whereIn('status', ['hod_approved', 'divisional_approved', 'divisional_rejected'])->count(),
-                'thisMonth' => (clone $baseQuery)->whereIn('status', ['hod_approved', 'divisional_approved', 'divisional_rejected'])
-                    ->whereMonth('created_at', Carbon::now()->month)
+                'pending' => (clone $baseQuery)->where(function($q) { $q->whereNull('hod_status')->orWhere('hod_status', 'pending'); })->count(),
+                'hodApproved' => (clone $baseQuery)->where('hod_status', 'approved')->count(),
+                'pendingDivisional' => (clone $baseQuery)->where('hod_status', 'approved')
+                    ->where(function($q) { $q->whereNull('divisional_status')->orWhere('divisional_status', 'pending'); })->count(),
+                'divisionalApproved' => (clone $baseQuery)->where('divisional_status', 'approved')->count(),
+                'divisionalRejected' => (clone $baseQuery)->where('divisional_status', 'rejected')->count(),
+                'approved' => (clone $baseQuery)->where('status', 'approved')->count(),
+                'implemented' => (clone $baseQuery)->where('status', 'implemented')->count(),
+                'completed' => (clone $baseQuery)->where('status', 'completed')->count(),
+                'cancelled' => (clone $baseQuery)->where('status', 'cancelled')->count(),
+                'total' => (clone $baseQuery)->count(),
+                'thisMonth' => (clone $baseQuery)->whereMonth('created_at', Carbon::now()->month)
                     ->whereYear('created_at', Carbon::now()->year)
                     ->count(),
-                'lastMonth' => (clone $baseQuery)->whereIn('status', ['hod_approved', 'divisional_approved', 'divisional_rejected'])
-                    ->whereMonth('created_at', Carbon::now()->subMonth()->month)
+                'lastMonth' => (clone $baseQuery)->whereMonth('created_at', Carbon::now()->subMonth()->month)
                     ->whereYear('created_at', Carbon::now()->subMonth()->year)
                     ->count(),
                 'departments' => !empty($divisionalDepartmentIds) ? Department::whereIn('id', $divisionalDepartmentIds)->pluck('name')->toArray() : []
@@ -406,9 +407,15 @@ class DivisionalCombinedAccessController extends Controller
                 'success' => false,
                 'message' => 'Failed to retrieve statistics',
                 'data' => [
+                    'pending' => 0,
+                    'hodApproved' => 0,
                     'pendingDivisional' => 0,
                     'divisionalApproved' => 0,
                     'divisionalRejected' => 0,
+                    'approved' => 0,
+                    'implemented' => 0,
+                    'completed' => 0,
+                    'cancelled' => 0,
                     'total' => 0,
                     'thisMonth' => 0,
                     'lastMonth' => 0
@@ -480,27 +487,17 @@ class DivisionalCombinedAccessController extends Controller
     {
         switch ($role) {
             case 'hod':
-                if ($request->status === 'hod_approved' || in_array($request->status, ['divisional_approved', 'divisional_rejected'])) return 'approved';
-                if ($request->status === 'hod_rejected') return 'rejected';
-                return 'pending';
+                return $request->hod_status ?? 'pending';
             case 'divisional':
-                if ($request->status === 'divisional_approved') return 'approved';
-                if ($request->status === 'divisional_rejected') return 'rejected';
-                if ($request->status === 'hod_approved') return 'pending';
-                return 'pending';
+                return $request->divisional_status ?? 'pending';
             case 'dict':
-                if (in_array($request->status, ['dict_approved', 'approved'])) return 'approved';
-                if ($request->status === 'dict_rejected') return 'rejected';
-                if ($request->status === 'divisional_approved') return 'pending';
-                return 'pending';
+            case 'ict_director':
+                return $request->ict_director_status ?? 'pending';
             case 'head_it':
-                if (in_array($request->status, ['head_it_approved', 'approved'])) return 'approved';
-                if ($request->status === 'head_it_rejected') return 'rejected';
-                return 'pending';
+                return $request->head_it_status ?? 'pending';
             case 'ict':
-                if ($request->status === 'approved') return 'approved';
-                if ($request->status === 'ict_rejected') return 'rejected';
-                return 'pending';
+            case 'ict_officer':
+                return $request->ict_officer_status === 'implemented' ? 'approved' : ($request->ict_officer_status ?? 'pending');
             default:
                 return 'pending';
         }

@@ -7,7 +7,7 @@
       <form @submit.prevent="submitForm" class="space-y-8">
         <!-- User Access ID Selection -->
         <div>
-          <label for="userAccessId" class="block text-sm font-medium text-gray-700 mb-2">
+          <label for="userAccessId" class="block text-base font-medium text-gray-700 mb-2">
             Select User Access Request
           </label>
           <select
@@ -33,7 +33,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
+                <label class="block text-base font-medium text-gray-700 mb-1">
                   Name <span class="text-red-500">*</span>
                 </label>
                 <input
@@ -46,7 +46,7 @@
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
+                <label class="block text-base font-medium text-gray-700 mb-1">
                   Date <span class="text-red-500">*</span>
                 </label>
                 <input
@@ -58,7 +58,7 @@
               </div>
 
               <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">
+                <label class="block text-base font-medium text-gray-700 mb-1">
                   Signature Upload <span class="text-red-500">*</span>
                 </label>
                 <input
@@ -75,7 +75,7 @@
               </div>
 
               <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Comments</label>
+                <label class="block text-base font-medium text-gray-700 mb-1">Comments</label>
                 <textarea
                   v-model="formData.headItComments"
                   rows="3"
@@ -94,7 +94,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
+                <label class="block text-base font-medium text-gray-700 mb-1">
                   Name <span class="text-red-500">*</span>
                 </label>
                 <input
@@ -107,7 +107,7 @@
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
+                <label class="block text-base font-medium text-gray-700 mb-1">
                   Date <span class="text-red-500">*</span>
                 </label>
                 <input
@@ -119,7 +119,7 @@
               </div>
 
               <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">
+                <label class="block text-base font-medium text-gray-700 mb-1">
                   Signature Upload <span class="text-red-500">*</span>
                 </label>
                 <input
@@ -136,7 +136,7 @@
               </div>
 
               <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1"
+                <label class="block text-base font-medium text-gray-700 mb-1"
                   >ICT Officer Comments</label
                 >
                 <textarea
@@ -148,7 +148,7 @@
               </div>
 
               <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1"
+                <label class="block text-base font-medium text-gray-700 mb-1"
                   >Implementation Comments</label
                 >
                 <textarea

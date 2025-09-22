@@ -603,6 +603,90 @@ class BothServiceFormService {
   }
 
   /**
+   * ICT Director approves a user access request
+   * @param {number} requestId - ID of the request to approve
+   * @param {Object} payload - Approval data including signature and details
+   * @returns {Promise<Object>} Response with approval result
+   */
+  async ictDirectorApprove(requestId, payload) {
+    try {
+      console.log('🔄 ICT Director approving request:', requestId, payload)
+
+      const fd = new FormData()
+
+      // Required ICT Director fields
+      fd.append('ict_director_name', payload.ictDirectorName || '')
+      fd.append('approved_date', payload.approvedDate || new Date().toISOString().slice(0, 10))
+      fd.append('comments', payload.comments || '')
+
+      if (payload.ictDirectorSignature) {
+        fd.append('ict_director_signature', payload.ictDirectorSignature)
+      } else {
+        throw new Error('ICT Director signature file is required')
+      }
+
+      // POST to ICT Director approve endpoint
+      const res = await apiClient.post(
+        `/both-service-form/module-requests/${requestId}/ict-director-approve`,
+        fd,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      )
+
+      if (res.data?.success) {
+        console.log('✅ ICT Director approval saved successfully:', res.data)
+        return { success: true, data: res.data.data, message: res.data.message }
+      }
+      throw new Error(res.data?.message || 'Failed to save ICT Director approval')
+    } catch (error) {
+      console.error('❌ Error in ictDirectorApprove:', error)
+      return {
+        success: false,
+        error:
+          error.response?.data?.message || error.message || 'Failed to save ICT Director approval',
+        errors: error.response?.data?.errors || null
+      }
+    }
+  }
+
+  /**
+   * ICT Director rejects a user access request
+   * @param {number} requestId - ID of the request to reject
+   * @param {Object} payload - Rejection data including reason
+   * @returns {Promise<Object>} Response with rejection result
+   */
+  async ictDirectorReject(requestId, payload) {
+    try {
+      console.log('🔄 ICT Director rejecting request:', requestId, payload)
+
+      const data = {
+        ict_director_name: payload.ictDirectorName || '',
+        rejection_reason: payload.rejectionReason || '',
+        rejection_date: payload.rejectionDate || new Date().toISOString().slice(0, 10)
+      }
+
+      // POST to ICT Director reject endpoint
+      const res = await apiClient.post(
+        `/both-service-form/module-requests/${requestId}/ict-director-reject`,
+        data
+      )
+
+      if (res.data?.success) {
+        console.log('✅ ICT Director rejection saved successfully:', res.data)
+        return { success: true, data: res.data.data, message: res.data.message }
+      }
+      throw new Error(res.data?.message || 'Failed to save ICT Director rejection')
+    } catch (error) {
+      console.error('❌ Error in ictDirectorReject:', error)
+      return {
+        success: false,
+        error:
+          error.response?.data?.message || error.message || 'Failed to save ICT Director rejection',
+        errors: error.response?.data?.errors || null
+      }
+    }
+  }
+
+  /**
    * Validate form data before submission
    * @param {Object} formData - Form data to validate
    * @returns {Object} Validation result

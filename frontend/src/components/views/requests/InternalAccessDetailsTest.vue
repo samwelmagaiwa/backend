@@ -46,7 +46,7 @@
                   <div
                     class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md"
                   >
-                    <i class="fas fa-route text-white text-xs"></i>
+                    <i class="fas fa-route text-white text-sm"></i>
                   </div>
                   <h3 class="text-lg font-bold text-white">Approval Trail</h3>
                 </div>
@@ -70,7 +70,7 @@
                         </div>
                       </div>
                       <div class="text-right">
-                        <p class="text-xs text-blue-300">Sep 9, 2025</p>
+                        <p class="text-sm text-blue-300">Sep 9, 2025</p>
                       </div>
                     </div>
                   </div>
@@ -94,7 +94,7 @@
                           </div>
                         </div>
                         <div
-                          class="bg-red-600 text-red-100 border border-blue-400/50 px-2 py-1 rounded text-xs font-semibold uppercase"
+                          class="bg-red-600 text-red-100 border border-blue-400/50 px-2 py-1 rounded text-sm font-semibold uppercase"
                         >
                           rejected
                         </div>
@@ -102,7 +102,7 @@
 
                       <!-- Comment Content -->
                       <div class="mb-3">
-                        <p class="text-white text-sm leading-relaxed">sitaki tu</p>
+                        <p class="text-white text-base leading-relaxed">sitaki tu</p>
                       </div>
 
                       <!-- Footer -->

@@ -147,7 +147,7 @@
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <!-- Name of Borrower -->
                     <div class="group">
-                      <label class="block text-sm font-bold text-blue-100 mb-1 flex items-center">
+                      <label class="block text-base font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-user mr-2 text-blue-300"></i>
                         Name of Borrower
                         <span class="text-red-400 ml-1">*</span>
@@ -186,7 +186,7 @@
 
                     <!-- Booking Date -->
                     <div class="group">
-                      <label class="block text-sm font-bold text-blue-100 mb-1 flex items-center">
+                      <label class="block text-base font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-calendar mr-2 text-blue-300"></i>
                         Booking Date <span class="text-red-400 ml-1">*</span>
                       </label>
@@ -217,7 +217,7 @@
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <!-- Type of Device -->
                     <div class="group">
-                      <label class="block text-sm font-bold text-blue-100 mb-1 flex items-center">
+                      <label class="block text-base font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-laptop mr-2 text-blue-300"></i>
                         Type of Device Borrowed
                         <span class="text-red-400 ml-1">*</span>
@@ -276,7 +276,7 @@
 
                     <!-- Department -->
                     <div class="group">
-                      <label class="block text-sm font-bold text-blue-100 mb-1 flex items-center">
+                      <label class="block text-base font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-building mr-2 text-blue-300"></i>
                         Department <span class="text-red-400 ml-1">*</span>
                       </label>
@@ -348,7 +348,7 @@
                     v-if="formData.deviceInventoryId === 'others'"
                     class="group animate-slide-down"
                   >
-                    <label class="block text-sm font-bold text-blue-100 mb-1 flex items-center">
+                    <label class="block text-base font-bold text-blue-100 mb-1 flex items-center">
                       <i class="fas fa-edit mr-2 text-blue-300"></i>
                       Specify Device <span class="text-red-400 ml-1">*</span>
                     </label>
@@ -378,7 +378,7 @@
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <!-- Phone Number -->
                     <div class="group">
-                      <label class="block text-sm font-bold text-blue-100 mb-1 flex items-center">
+                      <label class="block text-base font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-phone mr-2 text-blue-300"></i>
                         Phone Number <span class="text-red-400 ml-1">*</span>
                       </label>
@@ -416,7 +416,7 @@
 
                     <!-- Date of Collection -->
                     <div class="group">
-                      <label class="block text-sm font-bold text-blue-100 mb-1 flex items-center">
+                      <label class="block text-base font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-calendar-plus mr-2 text-blue-300"></i>
                         Date of returning
                         <span class="text-red-400 ml-1">*</span>
@@ -447,7 +447,7 @@
                   <!-- Return Time -->
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div class="group">
-                      <label class="block text-sm font-bold text-blue-100 mb-1 flex items-center">
+                      <label class="block text-base font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-clock mr-2 text-blue-300"></i>
                         Return Time <span class="text-red-400 ml-1">*</span>
                       </label>
@@ -493,15 +493,15 @@
                         <div
                           class="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
                         >
-                          <i class="fas fa-signature text-white text-xs"></i>
+                          <i class="fas fa-signature text-white text-sm"></i>
                         </div>
                         <h3 class="text-sm font-bold text-white">Digital Signature</h3>
                       </div>
 
-                      <label class="block text-sm font-bold text-blue-100 mb-1 flex items-center">
+                      <label class="block text-base font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-signature mr-2 text-blue-300"></i>
                         Signature <span class="text-red-400 ml-1">*</span>
-                        <span class="ml-2 text-xs text-blue-300/70 font-normal"
+                        <span class="ml-2 text-sm text-blue-300/70 font-normal"
                           >(PNG, JPG, JPEG)</span
                         >
                       </label>
@@ -557,7 +557,7 @@
                             type="button"
                             @click="$refs.signatureInput.click()"
                             :disabled="uploadProgress > 0 && uploadProgress < 100"
-                            class="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-medium rounded-lg hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/30"
+                            class="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-medium rounded-lg hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/30"
                           >
                             <span v-if="uploadProgress === 0" class="flex items-center">
                               <i class="fas fa-upload mr-1"></i>
@@ -591,7 +591,7 @@
 
                     <!-- Reason for Borrowing Section (Right) -->
                     <div class="group">
-                      <label class="block text-sm font-bold text-blue-100 mb-1 flex items-center">
+                      <label class="block text-base font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-comment-alt mr-2 text-blue-300"></i>
                         Reason for Borrowing
                         <span class="text-red-400 ml-1">*</span>
@@ -790,7 +790,7 @@
             <!-- Status Badge -->
             <div class="mt-4 text-center">
               <span
-                class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold rounded-full shadow-lg animate-pulse"
+                class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-sm font-bold rounded-full shadow-lg animate-pulse"
               >
                 <i class="fas fa-clock mr-2"></i>
                 PENDING REVIEW
@@ -954,7 +954,7 @@
             <!-- Status Badge -->
             <div class="mt-4 text-center">
               <span
-                class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-orange-400 to-yellow-500 text-white text-xs font-bold rounded-full shadow-lg animate-pulse"
+                class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-orange-400 to-yellow-500 text-white text-sm font-bold rounded-full shadow-lg animate-pulse"
               >
                 <i class="fas fa-hourglass-half mr-2"></i>
                 AWAITING APPROVAL

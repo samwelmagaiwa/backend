@@ -156,14 +156,14 @@
                         <!-- Auto-population status indicator -->
                         <span
                           v-if="isLoadingProfile"
-                          class="text-xs text-blue-300 font-medium bg-blue-500/20 px-2 py-1 rounded-full border border-blue-400/30 animate-pulse"
+                          class="text-sm text-blue-300 font-medium bg-blue-500/20 px-2 py-1 rounded-full border border-blue-400/30 animate-pulse"
                         >
                           <i class="fas fa-spinner fa-spin mr-1 text-xs"></i>
                           Loading your details...
                         </span>
                         <span
                           v-else-if="autoPopulated"
-                          class="text-xs text-green-300 font-medium bg-green-500/20 px-2 py-1 rounded-full border border-green-400/30"
+                          class="text-sm text-green-300 font-medium bg-green-500/20 px-2 py-1 rounded-full border border-green-400/30"
                         >
                           <i class="fas fa-check mr-1 text-xs"></i>
                           Auto-populated
@@ -185,7 +185,9 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <!-- PF Number -->
                       <div class="group">
-                        <label class="block text-sm font-bold text-blue-100 mb-2 flex items-center">
+                        <label
+                          class="block text-base font-bold text-blue-100 mb-2 flex items-center"
+                        >
                           <i class="fas fa-id-badge mr-2 text-blue-300"></i>
                           PF Number <span class="text-red-400 ml-1">*</span>
                         </label>
@@ -222,7 +224,9 @@
 
                       <!-- Staff Name -->
                       <div class="group">
-                        <label class="block text-sm font-bold text-blue-100 mb-2 flex items-center">
+                        <label
+                          class="block text-base font-bold text-blue-100 mb-2 flex items-center"
+                        >
                           <i class="fas fa-user mr-2 text-blue-300"></i>
                           Staff Name <span class="text-red-400 ml-1">*</span>
                         </label>
@@ -262,7 +266,9 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <!-- Phone Number -->
                       <div class="group">
-                        <label class="block text-sm font-bold text-blue-100 mb-2 flex items-center">
+                        <label
+                          class="block text-base font-bold text-blue-100 mb-2 flex items-center"
+                        >
                           <i class="fas fa-phone mr-2 text-blue-300"></i>
                           Phone Number <span class="text-red-400 ml-1">*</span>
                         </label>
@@ -299,7 +305,9 @@
 
                       <!-- Department -->
                       <div class="group">
-                        <label class="block text-sm font-bold text-blue-100 mb-2 flex items-center">
+                        <label
+                          class="block text-base font-bold text-blue-100 mb-2 flex items-center"
+                        >
                           <i class="fas fa-building mr-2 text-blue-300"></i>
                           Department <span class="text-red-400 ml-1">*</span>
                         </label>
@@ -342,11 +350,13 @@
                       class="bg-gradient-to-r from-blue-500/10 to-blue-500/10 p-3 rounded-lg border border-blue-300/20 backdrop-blur-sm"
                     >
                       <div class="group">
-                        <label class="block text-sm font-bold text-blue-100 mb-2 flex items-center">
+                        <label
+                          class="block text-base font-bold text-blue-100 mb-2 flex items-center"
+                        >
                           <i class="fas fa-signature mr-2 text-blue-300"></i>
                           Digital Signature
                           <span class="text-red-400 ml-1">*</span>
-                          <span class="ml-2 text-xs text-blue-300/70 font-normal"
+                          <span class="ml-2 text-sm text-blue-300/70 font-normal"
                             >(PNG, JPG, JPEG)</span
                           >
                         </label>

@@ -37,7 +37,7 @@ export const ROLE_PERMISSIONS = {
   [ROLES.DIVISIONAL_DIRECTOR]: {
     routes: [
       '/divisional-dashboard',
-      '/divisional-dashboard/combined-request',
+      '/divisional-dashboard/combined-requests',
       '/jeeva-access',
       '/wellsoft-access',
       '/internet-access',
@@ -60,6 +60,8 @@ export const ROLE_PERMISSIONS = {
     routes: [
       '/hod-dashboard',
       '/hod-dashboard/request-list',
+      '/hod-dashboard/combined-requests',
+      '/hod-dashboard/divisional-recommendations',
       '/jeeva-access',
       '/wellsoft-access',
       '/internet-access',
@@ -77,7 +79,7 @@ export const ROLE_PERMISSIONS = {
   [ROLES.ICT_DIRECTOR]: {
     routes: [
       '/dict-dashboard',
-      '/hod-dashboard/request-list',
+      '/dict-dashboard/combined-requests',
       '/jeeva-access',
       '/wellsoft-access',
       '/internet-access',
@@ -90,7 +92,7 @@ export const ROLE_PERMISSIONS = {
     forms: ['jeeva-access', 'wellsoft-access', 'internet-access', 'both-service-form'],
     userManagement: [],
     requestsManagement: [
-      'hod-dashboard/request-list',
+      'dict-dashboard/combined-requests',
       'internal-access/list',
       'internal-access/details'
     ]

@@ -400,7 +400,7 @@
                                 </div>
                                 <div
                                   v-if="request.device_availability.nearest_return"
-                                  class="text-xs text-blue-300"
+                                  class="text-sm text-blue-300"
                                 >
                                   {{ request.device_availability.nearest_return.date_time }}
                                 </div>

@@ -67,7 +67,7 @@
                   </div>
                   <!-- Status Indicator -->
                   <div
-                    class="absolute -bottom-1 -right-1 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg"
+                    class="absolute -bottom-1 -right-1 bg-green-500 text-white text-sm px-2 py-1 rounded-full font-bold shadow-lg"
                   >
                     Online
                   </div>
@@ -158,7 +158,7 @@
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Full Name -->
                     <div class="group">
-                      <label class="block text-sm font-bold text-blue-100 mb-3 flex items-center">
+                      <label class="block text-base font-bold text-blue-100 mb-3 flex items-center">
                         <i class="fas fa-user mr-2 text-blue-300"></i>
                         Full Name
                       </label>
@@ -181,7 +181,7 @@
 
                     <!-- Email -->
                     <div class="group">
-                      <label class="block text-sm font-bold text-blue-100 mb-3 flex items-center">
+                      <label class="block text-base font-bold text-blue-100 mb-3 flex items-center">
                         <i class="fas fa-envelope mr-2 text-blue-300"></i>
                         Email Address
                       </label>
@@ -204,7 +204,7 @@
 
                     <!-- Phone Number -->
                     <div class="group">
-                      <label class="block text-sm font-bold text-blue-100 mb-3 flex items-center">
+                      <label class="block text-base font-bold text-blue-100 mb-3 flex items-center">
                         <i class="fas fa-phone mr-2 text-blue-300"></i>
                         Phone Number
                       </label>
@@ -227,7 +227,7 @@
 
                     <!-- Department -->
                     <div class="group">
-                      <label class="block text-sm font-bold text-blue-100 mb-3 flex items-center">
+                      <label class="block text-base font-bold text-blue-100 mb-3 flex items-center">
                         <i class="fas fa-building mr-2 text-blue-300"></i>
                         Department
                       </label>
@@ -482,7 +482,9 @@
 
           <form @submit.prevent="changePassword" class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2"> Current Password </label>
+              <label class="block text-base font-medium text-gray-700 mb-2">
+                Current Password
+              </label>
               <input
                 v-model="passwordData.current"
                 type="password"
@@ -493,7 +495,7 @@
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2"> New Password </label>
+              <label class="block text-base font-medium text-gray-700 mb-2"> New Password </label>
               <input
                 v-model="passwordData.new"
                 type="password"
@@ -504,7 +506,7 @@
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
+              <label class="block text-base font-medium text-gray-700 mb-2">
                 Confirm New Password
               </label>
               <input

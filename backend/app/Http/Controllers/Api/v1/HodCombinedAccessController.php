@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\v1;
 use App\Http\Controllers\Controller;
 use App\Models\UserAccess;
 use App\Models\Department;
+use App\Traits\HandlesStatusQueries;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +15,7 @@ use Carbon\Carbon;
 
 class HodCombinedAccessController extends Controller
 {
+    use HandlesStatusQueries;
     /**
      * Get all combined access requests for HOD approval
      */
@@ -28,14 +30,9 @@ class HodCombinedAccessController extends Controller
             ]);
 
             $query = UserAccess::with(['user', 'department'])
-                ->whereNotNull('request_type')
-                ->where(function ($q) {
-                    // Get requests that need HOD approval or are pending HOD
-                    $q->where('status', 'pending')
-                        ->orWhere('status', 'pending_hod')
-                        ->orWhere('status', 'hod_approved')
-                        ->orWhere('status', 'hod_rejected');
-                });
+                ->whereNotNull('request_type');
+                // Show ALL requests regardless of status - HODs should see the complete history
+                // including pending, approved, rejected, implemented, and completed requests
 
             // DEPARTMENT FILTERING: HOD only sees requests from their department(s)
             $currentUser = auth()->user();
@@ -240,6 +237,7 @@ class HodCombinedAccessController extends Controller
             $currentUser = auth()->user();
             $updateData = [
                 'status' => $validatedData['hod_status'] === 'approved' ? 'hod_approved' : 'hod_rejected',
+                'hod_status' => $validatedData['hod_status'], // Set the new hod_status column
                 'hod_comments' => $validatedData['hod_comments'] ?? '',
                 'hod_name' => $currentUser->name, // Always use authenticated user's name
                 'hod_approved_by' => $currentUser->id,
@@ -382,9 +380,13 @@ class HodCombinedAccessController extends Controller
             }
             
             $stats = [
-                'pendingHod' => (clone $baseQuery)->whereIn('status', ['pending', 'pending_hod'])->count(),
-                'hodApproved' => (clone $baseQuery)->where('status', 'hod_approved')->count(),
-                'hodRejected' => (clone $baseQuery)->where('status', 'hod_rejected')->count(),
+                'pendingHod' => (clone $baseQuery)->where(function($q) { $q->whereNull('hod_status')->orWhere('hod_status', 'pending'); })->count(),
+                'hodApproved' => (clone $baseQuery)->where('hod_status', 'approved')->count(),
+                'hodRejected' => (clone $baseQuery)->where('hod_status', 'rejected')->count(),
+                'approved' => (clone $baseQuery)->where('status', 'approved')->count(),
+                'implemented' => (clone $baseQuery)->where('status', 'implemented')->count(),
+                'completed' => (clone $baseQuery)->where('status', 'completed')->count(),
+                'cancelled' => (clone $baseQuery)->where('status', 'cancelled')->count(),
                 'total' => (clone $baseQuery)->count(),
                 'thisMonth' => (clone $baseQuery)->whereMonth('created_at', Carbon::now()->month)
                     ->whereYear('created_at', Carbon::now()->year)
@@ -415,6 +417,10 @@ class HodCombinedAccessController extends Controller
                     'pendingHod' => 0,
                     'hodApproved' => 0,
                     'hodRejected' => 0,
+                    'approved' => 0,
+                    'implemented' => 0,
+                    'completed' => 0,
+                    'cancelled' => 0,
                     'total' => 0,
                     'thisMonth' => 0,
                     'lastMonth' => 0
@@ -474,24 +480,23 @@ class HodCombinedAccessController extends Controller
     }
 
     /**
-     * Get approval status for a specific role
+     * Get approval status for a specific role using new status columns
      */
     private function getApprovalStatus($request, $role): string
     {
         switch ($role) {
             case 'hod':
-                if ($request->status === 'hod_approved') return 'approved';
-                if ($request->status === 'hod_rejected') return 'rejected';
-                return 'pending';
+                return $request->hod_status ?? 'pending';
             case 'divisional':
-                // Add logic based on your workflow
-                return 'pending';
+                return $request->divisional_status ?? 'pending';
             case 'dict':
-                return 'pending';
+            case 'ict_director':
+                return $request->ict_director_status ?? 'pending';
             case 'head_it':
-                return 'pending';
+                return $request->head_it_status ?? 'pending';
             case 'ict':
-                return 'pending';
+            case 'ict_officer':
+                return $request->ict_officer_status ?? 'pending';
             default:
                 return 'pending';
         }

@@ -23,20 +23,20 @@
           <!-- Stats -->
           <div class="grid grid-cols-4 gap-4 mb-6">
             <div class="bg-yellow-600/25 border border-yellow-400/40 p-4 rounded-lg">
-              <h3 class="text-yellow-200 text-sm">Pending HOD Approval</h3>
-              <p class="text-white text-2xl font-bold">{{ stats.pendingHod }}</p>
+              <h3 class="text-yellow-200 text-base font-semibold">Pending HOD Approval</h3>
+              <p class="text-white text-3xl font-bold">{{ stats.pendingHod }}</p>
             </div>
             <div class="bg-green-600/25 border border-green-400/40 p-4 rounded-lg">
-              <h3 class="text-green-200 text-sm">HOD Approved</h3>
-              <p class="text-white text-2xl font-bold">{{ stats.hodApproved }}</p>
+              <h3 class="text-green-200 text-base font-semibold">HOD Approved</h3>
+              <p class="text-white text-3xl font-bold">{{ stats.hodApproved }}</p>
             </div>
             <div class="bg-red-600/25 border border-red-400/40 p-4 rounded-lg">
-              <h3 class="text-red-200 text-sm">HOD Rejected</h3>
-              <p class="text-white text-2xl font-bold">{{ stats.hodRejected }}</p>
+              <h3 class="text-red-200 text-base font-semibold">HOD Rejected</h3>
+              <p class="text-white text-3xl font-bold">{{ stats.hodRejected }}</p>
             </div>
             <div class="bg-blue-600/25 border border-blue-400/40 p-4 rounded-lg">
-              <h3 class="text-blue-200 text-sm">Total Requests</h3>
-              <p class="text-white text-2xl font-bold">{{ stats.total }}</p>
+              <h3 class="text-blue-200 text-base font-semibold">Total Requests</h3>
+              <p class="text-white text-3xl font-bold">{{ stats.total }}</p>
             </div>
           </div>
 
@@ -47,22 +47,37 @@
                 v-model="searchQuery"
                 type="text"
                 placeholder="Search by staff name, PF number, or department..."
-                class="flex-1 px-3 py-2 bg-white/20 border border-blue-300/30 rounded text-white placeholder-blue-200/60"
+                class="flex-1 px-3 py-2 bg-white/20 border border-blue-300/30 rounded text-white placeholder-blue-200/60 text-base"
               />
               <select
                 v-model="statusFilter"
-                class="px-3 py-2 bg-white/20 border border-blue-300/30 rounded text-white"
+                class="px-3 py-2 bg-white/20 border border-blue-300/30 rounded text-white text-base"
               >
                 <option value="">All Statuses</option>
-                <option value="pending">Pending</option>
+                <option value="pending">Pending Submission</option>
                 <option value="pending_hod">Pending HOD</option>
-                <option value="approved">Approved</option>
                 <option value="hod_approved">HOD Approved</option>
                 <option value="hod_rejected">HOD Rejected</option>
+                <option value="pending_divisional">Pending Divisional</option>
+                <option value="divisional_approved">Divisional Approved</option>
+                <option value="divisional_rejected">Divisional Rejected</option>
+                <option value="pending_ict_director">Pending ICT Director</option>
+                <option value="ict_director_approved">ICT Director Approved</option>
+                <option value="ict_director_rejected">ICT Director Rejected</option>
+                <option value="pending_head_it">Pending Head IT</option>
+                <option value="head_it_approved">Head IT Approved</option>
+                <option value="head_it_rejected">Head IT Rejected</option>
+                <option value="pending_ict_officer">Pending ICT Officer</option>
+                <option value="ict_officer_approved">ICT Officer Approved</option>
+                <option value="ict_officer_rejected">ICT Officer Rejected</option>
+                <option value="approved">Fully Approved</option>
+                <option value="implemented">Implemented</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
               </select>
               <button
                 @click="refreshRequests"
-                class="px-6 py-2 bg-teal-600 text-white rounded hover:bg-teal-700"
+                class="px-6 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 text-base font-medium"
               >
                 Refresh
               </button>
@@ -75,13 +90,23 @@
               <table class="w-full">
                 <thead class="bg-blue-800/50">
                   <tr>
-                    <th class="px-4 py-3 text-left text-blue-100">Request ID</th>
-                    <th class="px-4 py-3 text-left text-blue-100">Request Type</th>
-                    <th class="px-4 py-3 text-left text-blue-100">Personal Information</th>
-                    <th class="px-4 py-3 text-left text-blue-100">Submission Date (FIFO)</th>
-                    <th class="px-4 py-3 text-left text-blue-100">Current Status</th>
+                    <th class="px-4 py-3 text-left text-blue-100 text-base font-semibold">
+                      Request ID
+                    </th>
+                    <th class="px-4 py-3 text-left text-blue-100 text-base font-semibold">
+                      Request Type
+                    </th>
+                    <th class="px-4 py-3 text-left text-blue-100 text-base font-semibold">
+                      Personal Information
+                    </th>
+                    <th class="px-4 py-3 text-left text-blue-100 text-base font-semibold">
+                      Submission Date (FIFO)
+                    </th>
+                    <th class="px-4 py-3 text-left text-blue-100 text-base font-semibold">
+                      Current Status
+                    </th>
                     <th
-                      class="px-4 py-3 text-center text-sm font-semibold text-blue-100 uppercase tracking-wider"
+                      class="px-4 py-3 text-center text-base font-semibold text-blue-100 uppercase tracking-wider"
                     >
                       <div class="flex items-center justify-center">
                         <span
@@ -106,10 +131,10 @@
                   >
                     <!-- Request ID -->
                     <td class="px-4 py-3">
-                      <div class="text-white font-medium">
+                      <div class="text-white font-medium text-base">
                         {{ request.request_id || `REQ-${request.id.toString().padStart(6, '0')}` }}
                       </div>
-                      <div class="text-purple-300 text-xs">ID: {{ request.id }}</div>
+                      <div class="text-purple-300 text-sm">ID: {{ request.id }}</div>
                     </td>
 
                     <!-- Request Type -->
@@ -117,19 +142,19 @@
                       <div class="flex flex-wrap gap-1">
                         <span
                           v-if="hasService(request, 'jeeva')"
-                          class="px-2 py-1 rounded text-xs bg-blue-100 text-blue-800"
+                          class="px-2 py-1 rounded text-sm bg-blue-100 text-blue-800 font-medium"
                         >
                           Jeeva
                         </span>
                         <span
                           v-if="hasService(request, 'wellsoft')"
-                          class="px-2 py-1 rounded text-xs bg-green-100 text-green-800"
+                          class="px-2 py-1 rounded text-sm bg-green-100 text-green-800 font-medium"
                         >
                           Wellsoft
                         </span>
                         <span
                           v-if="hasService(request, 'internet')"
-                          class="px-2 py-1 rounded text-xs bg-cyan-100 text-cyan-800"
+                          class="px-2 py-1 rounded text-sm bg-cyan-100 text-cyan-800 font-medium"
                         >
                           Internet
                         </span>
@@ -138,26 +163,26 @@
 
                     <!-- Personal Information -->
                     <td class="px-4 py-3">
-                      <div class="text-white font-medium">
+                      <div class="text-white font-medium text-base">
                         {{ request.staff_name || request.full_name || 'Unknown User' }}
                       </div>
                       <div class="text-blue-300 text-sm">
                         {{ request.phone || request.phone_number || 'No phone' }}
                       </div>
-                      <div v-if="request.pf_number" class="text-teal-300 text-xs">
+                      <div v-if="request.pf_number" class="text-teal-300 text-sm">
                         PF: {{ request.pf_number }}
                       </div>
-                      <div class="text-blue-200 text-xs">
+                      <div class="text-blue-200 text-sm">
                         Dept: {{ request.department || 'Unknown' }}
                       </div>
                     </td>
 
                     <!-- Submission Date -->
                     <td class="px-4 py-3">
-                      <div class="text-white font-medium">
+                      <div class="text-white font-medium text-base">
                         {{ formatDate(request.created_at || request.submission_date) }}
                       </div>
-                      <div class="text-blue-300 text-xs">
+                      <div class="text-blue-300 text-sm">
                         {{ formatTime(request.created_at || request.submission_date) }}
                       </div>
                     </td>
@@ -165,15 +190,40 @@
                     <!-- Current Status -->
                     <td class="px-4 py-3">
                       <div class="flex flex-col">
-                        <!-- Display the exact database status -->
-                        <span
-                          :class="getStatusBadgeClass(request.status)"
-                          class="px-2 py-1 rounded text-xs font-medium mb-1"
-                        >
-                          {{ getStatusText(request.status) }}
-                        </span>
-                        <!-- Show raw status for debugging -->
-                        <div class="text-xs text-gray-400">Raw: {{ request.status }}</div>
+                        <!-- Enhanced workflow status display with split colors -->
+                        <div class="flex flex-wrap gap-1 mb-1">
+                          <!-- Current/Approved part - Green background -->
+                          <span
+                            v-if="getWorkflowStatusParts(request).approved"
+                            class="px-2 py-1 rounded text-sm font-medium bg-green-100 text-green-800"
+                          >
+                            {{ getWorkflowStatusParts(request).approved }}
+                          </span>
+
+                          <!-- Next/Pending part - Yellow background -->
+                          <span
+                            v-if="getWorkflowStatusParts(request).next"
+                            class="px-2 py-1 rounded text-sm font-medium bg-yellow-100 text-yellow-800"
+                          >
+                            {{ getWorkflowStatusParts(request).next }}
+                          </span>
+
+                          <!-- Single status for final states or rejections -->
+                          <span
+                            v-if="
+                              !getWorkflowStatusParts(request).approved &&
+                              !getWorkflowStatusParts(request).next
+                            "
+                            :class="getWorkflowBadgeClass(request)"
+                            class="px-2 py-1 rounded text-sm font-medium"
+                          >
+                            {{ formatWorkflowStatus(request) }}
+                          </span>
+                        </div>
+                        <!-- Show raw status for debugging (only in development) -->
+                        <div v-if="$env !== 'production'" class="text-sm text-gray-400">
+                          Raw: {{ request.status }}
+                        </div>
                       </div>
                     </td>
 
@@ -203,8 +253,8 @@
 
             <!-- Empty State -->
             <div v-if="filteredRequests.length === 0" class="text-center py-12">
-              <h3 class="text-white text-lg font-medium mb-2">No requests found</h3>
-              <p class="text-blue-300">
+              <h3 class="text-white text-xl font-medium mb-2">No requests found</h3>
+              <p class="text-blue-300 text-base">
                 {{
                   searchQuery || statusFilter
                     ? 'No requests are pending your approval.'
@@ -215,7 +265,7 @@
 
             <!-- Pagination -->
             <div v-if="filteredRequests.length > 0" class="px-4 py-3 border-t border-blue-300/30">
-              <div class="text-blue-300 text-sm">
+              <div class="text-blue-300 text-base">
                 Showing {{ filteredRequests.length }} of {{ requests.length }} requests
               </div>
             </div>
@@ -320,6 +370,7 @@
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppFooter from '@/components/footer.vue'
   import combinedAccessService from '@/services/combinedAccessService'
+  import statusUtils from '@/utils/statusUtils'
 
   export default {
     name: 'HodRequestListSimplified',
@@ -341,7 +392,9 @@
           total: 0
         },
         error: null,
-        activeDropdown: null
+        activeDropdown: null,
+        // Add status utilities for consistent status handling
+        $statusUtils: statusUtils
       }
     },
     computed: {
@@ -680,41 +733,171 @@
       },
 
       getStatusBadgeClass(status) {
-        const classes = {
-          // Actual database status values from user_access table
-          pending: 'bg-blue-100 text-blue-800',
-          pending_hod: 'bg-yellow-100 text-yellow-800',
-          approved: 'bg-green-100 text-green-800',
-          // Additional workflow statuses
-          hod_approved: 'bg-green-100 text-green-800',
-          hod_rejected: 'bg-red-100 text-red-800',
-          cancelled: 'bg-gray-100 text-gray-800'
-        }
-        return classes[status] || 'bg-gray-100 text-gray-800'
+        return this.$statusUtils.getStatusBadgeClass(status)
       },
 
       getStatusIcon(status) {
-        const icons = {
-          pending_hod: 'fas fa-clock',
-          hod_approved: 'fas fa-check',
-          hod_rejected: 'fas fa-times',
-          cancelled: 'fas fa-ban'
-        }
-        return icons[status] || 'fas fa-question'
+        return this.$statusUtils.getStatusIcon(status)
       },
 
       getStatusText(status) {
-        const texts = {
-          // Actual database status values from user_access table
-          pending: 'Pending',
-          pending_hod: 'Pending HOD Approval',
-          approved: 'Approved',
-          // Additional workflow statuses
-          hod_approved: 'HOD Approved',
-          hod_rejected: 'HOD Rejected',
-          cancelled: 'Cancelled'
+        // Use centralized status utility with component name for debugging
+        return this.$statusUtils.getStatusText(status, 'HodRequestListSimplified')
+      },
+
+      // Enhanced status display showing workflow progression
+      getWorkflowStatus(request) {
+        const status = request.status
+
+        // Define the workflow progression (short "Next" labels without "Approval/Decision")
+        const workflow = {
+          pending: { current: 'Pending Submission', next: 'HOD' },
+          pending_hod: { current: 'Pending HOD Approval', next: 'HOD' },
+          hod_approved: { current: 'HOD Approved', next: 'Divisional', lastApproved: 'HOD' },
+          pending_divisional: {
+            current: 'Pending Divisional Approval',
+            next: 'Divisional',
+            lastApproved: 'HOD'
+          },
+          divisional_approved: {
+            current: 'Divisional Approved',
+            next: 'ICT Director',
+            lastApproved: 'Divisional Director'
+          },
+          pending_ict_director: {
+            current: 'Pending ICT Director Approval',
+            next: 'ICT Director',
+            lastApproved: 'Divisional Director'
+          },
+          ict_director_approved: {
+            current: 'ICT Director Approved',
+            next: 'Head IT',
+            lastApproved: 'ICT Director'
+          },
+          pending_head_it: {
+            current: 'Pending Head IT Approval',
+            next: 'Head IT',
+            lastApproved: 'ICT Director'
+          },
+          head_it_approved: {
+            current: 'Head IT Approved',
+            next: 'ICT Officer',
+            lastApproved: 'Head IT'
+          },
+          pending_ict_officer: {
+            current: 'Pending ICT Officer Approval',
+            next: 'ICT Officer',
+            lastApproved: 'Head IT'
+          },
+          ict_officer_approved: {
+            current: 'ICT Officer Approved',
+            next: 'Implementation',
+            lastApproved: 'ICT Officer'
+          },
+          approved: {
+            current: 'Fully Approved',
+            next: 'Implementation',
+            lastApproved: 'ICT Officer'
+          },
+          implemented: { current: 'Implemented', next: 'Complete', lastApproved: 'ICT Officer' },
+          completed: { current: 'Completed', next: null, lastApproved: 'System' },
+          hod_rejected: { current: 'HOD Rejected', next: null, lastApproved: null },
+          divisional_rejected: {
+            current: 'Divisional Rejected',
+            next: 'HOD Review',
+            lastApproved: 'HOD'
+          },
+          ict_director_rejected: {
+            current: 'ICT Director Rejected',
+            next: 'HOD Review',
+            lastApproved: 'Divisional Director'
+          },
+          head_it_rejected: {
+            current: 'Head IT Rejected',
+            next: 'HOD Review',
+            lastApproved: 'ICT Director'
+          },
+          ict_officer_rejected: {
+            current: 'ICT Officer Rejected',
+            next: 'HOD Review',
+            lastApproved: 'Head IT'
+          },
+          cancelled: { current: 'Cancelled', next: null, lastApproved: null }
         }
-        return texts[status] || `Unknown Status (${status})`
+
+        return (
+          workflow[status] || {
+            current: this.getStatusText(status),
+            next: null,
+            lastApproved: null
+          }
+        )
+      },
+
+      // Format workflow status for display
+      formatWorkflowStatus(request) {
+        const workflow = this.getWorkflowStatus(request)
+
+        if (workflow.lastApproved && workflow.next && !workflow.next.includes('Review')) {
+          return `${workflow.lastApproved} approved — Next: ${workflow.next} pending`
+        } else if (workflow.next && workflow.next.includes('Review')) {
+          return `${workflow.current} — Next: ${workflow.next}`
+        } else if (workflow.next === null) {
+          return workflow.current
+        } else {
+          return `${workflow.current} — Next: ${workflow.next}`
+        }
+      },
+
+      // Split workflow status into approved (green) and next (yellow) parts
+      getWorkflowStatusParts(request) {
+        const workflow = this.getWorkflowStatus(request)
+
+        // For statuses with both approved role and next step
+        if (workflow.lastApproved && workflow.next && !workflow.next.includes('Review')) {
+          return {
+            approved: `${workflow.lastApproved} approved`,
+            next: `Next: ${workflow.next} pending`
+          }
+        }
+
+        // For rejected statuses with review next step
+        if (workflow.next && workflow.next.includes('Review')) {
+          return {
+            approved: null,
+            next: `Next: ${workflow.next}`
+          }
+        }
+
+        // For pending statuses that don't have a "lastApproved"
+        if (workflow.next && !workflow.lastApproved) {
+          return {
+            approved: null,
+            next: `Next: ${workflow.next} pending`
+          }
+        }
+
+        // For final states or single status (no splitting)
+        return {
+          approved: null,
+          next: null
+        }
+      },
+
+      // Badge color that reflects a pending next step (yellow), rejections (red), else fallback
+      getWorkflowBadgeClass(request) {
+        const status = request.status
+        const wf = this.getWorkflowStatus(request)
+        // Rejected takes precedence
+        if (status && status.includes('rejected')) {
+          return 'bg-red-100 text-red-800'
+        }
+        // If there is a next step pending, show yellow as requested
+        if (wf && wf.next) {
+          return 'bg-yellow-100 text-yellow-800'
+        }
+        // Otherwise use default mapping
+        return this.$statusUtils.getStatusBadgeClass(status)
       }
     }
   }

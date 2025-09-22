@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\API\ICTApproval;
+namespace App\Http\Controllers\Api\ICTApproval;
 
 use App\Http\Controllers\Controller;
 use App\Models\DeviceAssessment;

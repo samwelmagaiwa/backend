@@ -7,7 +7,7 @@
       <form @submit.prevent="submitForm" class="space-y-6">
         <!-- User Access ID Selection -->
         <div>
-          <label for="userAccessId" class="block text-sm font-medium text-gray-700 mb-2">
+          <label for="userAccessId" class="block text-base font-medium text-gray-700 mb-2">
             Select User Access Request
           </label>
           <select
@@ -25,7 +25,7 @@
 
         <!-- Jeeva Modules (Checkboxes) -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2"> Jeeva Modules </label>
+          <label class="block text-base font-medium text-gray-700 mb-2"> Jeeva Modules </label>
           <div
             class="grid grid-cols-3 gap-2 max-h-96 overflow-y-auto border border-gray-200 rounded-md p-4"
           >

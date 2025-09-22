@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import pinia from './stores' // Add Pinia
+import statusUtilsPlugin from './plugins/statusUtils' // Add Status Utils Plugin
 
 // Import CSS files with error handling
 try {
@@ -19,6 +20,7 @@ try {
 
   // Use plugins (but don't mount yet)
   app.use(pinia) // Add Pinia
+  app.use(statusUtilsPlugin) // Add Status Utils Plugin
 
   // Global error handler
   app.config.errorHandler = (err, vm, info) => {
@@ -47,6 +49,31 @@ try {
   // Mount the app
   app.mount('#app')
   console.log('✅ Vue application mounted successfully')
+
+  // Add global debug functions for status testing (development only)
+  if (process.env.NODE_ENV !== 'production') {
+    window.debugStatus = async () => {
+      const { runAllStatusTests } = await import('./utils/statusTest')
+      runAllStatusTests()
+    }
+    window.testWorkflow = async () => {
+      const { testWorkflowStatuses } = await import('./utils/testWorkflowStatus')
+      testWorkflowStatuses()
+    }
+    window.testDivisionalApproved = async () => {
+      const { testDivisionalApprovedCase } = await import('./utils/testWorkflowStatus')
+      testDivisionalApprovedCase()
+    }
+    window.testSplitColors = async () => {
+      const { testSplitStatusParts } = await import('./utils/testWorkflowStatus')
+      testSplitStatusParts()
+    }
+    console.log('🛠️ Debug functions available:')
+    console.log('  - window.debugStatus() - Test status utilities')
+    console.log('  - window.testWorkflow() - Test workflow progression')
+    console.log('  - window.testDivisionalApproved() - Test divisional approved case')
+    console.log('  - window.testSplitColors() - Test split status colors')
+  }
 
   // Initialize sidebar state with Pinia immediately after mount
   setTimeout(async () => {

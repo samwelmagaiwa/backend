@@ -54,7 +54,7 @@
           <h3 class="text-lg font-bold text-blue-800 mb-2 drop-shadow-sm">
             {{ userName }}
           </h3>
-          <p class="text-blue-600 text-sm leading-relaxed font-medium">
+          <p class="text-blue-600 text-base leading-relaxed font-medium">
             {{ message }}
           </p>
         </div>
@@ -67,7 +67,7 @@
             <div
               class="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0 shadow-lg"
             >
-              <i class="fas fa-check text-white text-xs drop-shadow-sm"></i>
+              <i class="fas fa-check text-white text-sm drop-shadow-sm"></i>
             </div>
             <span class="text-blue-800 font-semibold text-sm">Terms of Service Accepted</span>
           </div>
@@ -78,7 +78,7 @@
             <div
               class="w-6 h-6 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-lg flex items-center justify-center flex-shrink-0 shadow-lg"
             >
-              <i class="fas fa-check text-white text-xs drop-shadow-sm"></i>
+              <i class="fas fa-check text-white text-sm drop-shadow-sm"></i>
             </div>
             <span class="text-blue-900 font-semibold text-sm">ICT Policy Acknowledged</span>
           </div>
@@ -89,7 +89,7 @@
             <div
               class="w-6 h-6 bg-gradient-to-br from-blue-700 to-blue-800 rounded-lg flex items-center justify-center flex-shrink-0 shadow-lg"
             >
-              <i class="fas fa-check text-white text-xs drop-shadow-sm"></i>
+              <i class="fas fa-check text-white text-sm drop-shadow-sm"></i>
             </div>
             <span class="text-blue-900 font-semibold text-sm">Declaration Form Submitted</span>
           </div>

@@ -7,7 +7,7 @@
       <form @submit.prevent="submitForm" class="space-y-8">
         <!-- User Access ID Selection -->
         <div>
-          <label for="userAccessId" class="block text-sm font-medium text-gray-700 mb-2">
+          <label for="userAccessId" class="block text-base font-medium text-gray-700 mb-2">
             Select User Access Request
           </label>
           <select
@@ -83,7 +83,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                <label class="block text-base font-medium text-gray-700 mb-1">Name</label>
                 <input
                   type="text"
                   v-model="formData.hodName"
@@ -93,7 +93,7 @@
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                <label class="block text-base font-medium text-gray-700 mb-1">Date</label>
                 <input
                   type="date"
                   v-model="formData.hodDate"
@@ -102,7 +102,9 @@
               </div>
 
               <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Signature Upload</label>
+                <label class="block text-base font-medium text-gray-700 mb-1"
+                  >Signature Upload</label
+                >
                 <input
                   type="file"
                   @change="handleFileUpload($event, 'hodSignature')"
@@ -113,7 +115,7 @@
               </div>
 
               <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Comments</label>
+                <label class="block text-base font-medium text-gray-700 mb-1">Comments</label>
                 <textarea
                   v-model="formData.hodComments"
                   rows="3"
@@ -132,7 +134,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                <label class="block text-base font-medium text-gray-700 mb-1">Name</label>
                 <input
                   type="text"
                   v-model="formData.divisionalDirectorName"
@@ -142,7 +144,7 @@
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                <label class="block text-base font-medium text-gray-700 mb-1">Date</label>
                 <input
                   type="date"
                   v-model="formData.divisionalDirectorDate"
@@ -151,7 +153,9 @@
               </div>
 
               <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Signature Upload</label>
+                <label class="block text-base font-medium text-gray-700 mb-1"
+                  >Signature Upload</label
+                >
                 <input
                   type="file"
                   @change="handleFileUpload($event, 'divisionalDirectorSignature')"
@@ -162,7 +166,7 @@
               </div>
 
               <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Comments</label>
+                <label class="block text-base font-medium text-gray-700 mb-1">Comments</label>
                 <textarea
                   v-model="formData.divisionalDirectorComments"
                   rows="3"
@@ -179,7 +183,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                <label class="block text-base font-medium text-gray-700 mb-1">Name</label>
                 <input
                   type="text"
                   v-model="formData.ictDirectorName"
@@ -189,7 +193,7 @@
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                <label class="block text-base font-medium text-gray-700 mb-1">Date</label>
                 <input
                   type="date"
                   v-model="formData.ictDirectorDate"
@@ -198,7 +202,9 @@
               </div>
 
               <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Signature Upload</label>
+                <label class="block text-base font-medium text-gray-700 mb-1"
+                  >Signature Upload</label
+                >
                 <input
                   type="file"
                   @change="handleFileUpload($event, 'ictDirectorSignature')"
@@ -209,7 +215,7 @@
               </div>
 
               <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Comments</label>
+                <label class="block text-base font-medium text-gray-700 mb-1">Comments</label>
                 <textarea
                   v-model="formData.ictDirectorComments"
                   rows="3"

@@ -130,7 +130,7 @@
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label class="block text-sm font-bold text-blue-100 mb-2">
+                        <label class="block text-base font-bold text-blue-100 mb-2">
                           Search by Name or Email
                         </label>
                         <div class="relative">
@@ -148,7 +148,7 @@
                       </div>
 
                       <div>
-                        <label class="block text-sm font-bold text-blue-100 mb-2">
+                        <label class="block text-base font-bold text-blue-100 mb-2">
                           Filter by Role
                         </label>
                         <div class="relative">
@@ -398,7 +398,7 @@
             <h4 class="text-lg font-semibold text-gray-800 mb-3 drop-shadow-sm">
               {{ confirmData.userName }}
             </h4>
-            <p class="text-gray-600 text-sm leading-relaxed">
+            <p class="text-gray-600 text-base leading-relaxed">
               {{ confirmData.message }}
             </p>
           </div>
@@ -415,7 +415,7 @@
                 <div
                   class="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center shadow-lg policy-icon-shadow"
                 >
-                  <i class="fas fa-file-contract text-white text-xs drop-shadow-sm"></i>
+                  <i class="fas fa-file-contract text-white text-sm drop-shadow-sm"></i>
                 </div>
                 <span class="text-sm font-medium text-gray-700 drop-shadow-sm"
                   >Terms of Service</span
@@ -433,7 +433,7 @@
                 <div
                   class="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center shadow-lg policy-icon-shadow"
                 >
-                  <i class="fas fa-shield-alt text-white text-xs drop-shadow-sm"></i>
+                  <i class="fas fa-shield-alt text-white text-sm drop-shadow-sm"></i>
                 </div>
                 <span class="text-sm font-medium text-gray-700 drop-shadow-sm">ICT Policy</span>
               </div>

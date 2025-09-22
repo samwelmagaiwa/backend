@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api\v1;
 use App\Http\Controllers\Controller;
 use App\Models\UserAccess;
 use App\Models\WellsoftModule;
+use App\Services\StatusMigrationService;
+use App\Traits\HandlesStatusQueries;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +15,14 @@ use Illuminate\Validation\ValidationException;
 
 class ModuleRequestController extends Controller
 {
+    use HandlesStatusQueries;
+    
+    protected StatusMigrationService $statusMigrationService;
+    
+    public function __construct(StatusMigrationService $statusMigrationService)
+    {
+        $this->statusMigrationService = $statusMigrationService;
+    }
     /**
      * Store a new module request.
      */
@@ -105,7 +115,19 @@ class ModuleRequestController extends Controller
                     'module_requested_for' => $userAccess->module_requested_for,
                     'selected_modules' => $userAccess->selectedWellsoftModules->pluck('name')->toArray(),
                     'selected_modules_count' => $userAccess->selectedWellsoftModules->count(),
-                    'request_status' => $userAccess->status,
+                    'request_status' => $userAccess->status, // Legacy status for backward compatibility
+                    
+                    // New granular status information
+                    'workflow_status' => [
+                        'hod_status' => $userAccess->hod_status,
+                        'divisional_status' => $userAccess->divisional_status,
+                        'ict_director_status' => $userAccess->ict_director_status,
+                        'head_it_status' => $userAccess->head_it_status,
+                        'ict_officer_status' => $userAccess->ict_officer_status
+                    ],
+                    'current_stage' => $this->determineCurrentWorkflowStage($userAccess),
+                    'can_be_modified' => $userAccess->hod_status === 'pending', // Only editable if not yet approved by HOD
+                    
                     'user_name' => $userAccess->user->name,
                     'department_name' => $userAccess->department->name ?? 'Unknown'
                 ]
@@ -196,7 +218,20 @@ class ModuleRequestController extends Controller
                         ];
                     }),
                     'selected_modules_count' => $userAccess->selectedWellsoftModules->count(),
-                    'request_status' => $userAccess->status,
+                    'request_status' => $userAccess->status, // Legacy status for backward compatibility
+                    
+                    // New granular status information
+                    'workflow_status' => [
+                        'hod_status' => $userAccess->hod_status,
+                        'divisional_status' => $userAccess->divisional_status,
+                        'ict_director_status' => $userAccess->ict_director_status,
+                        'head_it_status' => $userAccess->head_it_status,
+                        'ict_officer_status' => $userAccess->ict_officer_status
+                    ],
+                    'current_stage' => $this->determineCurrentWorkflowStage($userAccess),
+                    'can_be_modified' => $userAccess->hod_status === 'pending', // Only editable if not yet approved by HOD
+                    'approval_history' => $this->getApprovalHistory($userAccess),
+                    
                     'user_info' => [
                         'id' => $userAccess->user->id,
                         'name' => $userAccess->user->name,
@@ -260,11 +295,20 @@ class ModuleRequestController extends Controller
                 ], 403);
             }
 
-            // Check if the request can be updated (only pending or rejected requests)
-            if (!$userAccess->canBeUpdated()) {
+            // Check if the request can be updated using new granular status system
+            // Only allow updates if the request hasn't entered the approval workflow yet
+            if ($userAccess->hod_status !== 'pending') {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'This request cannot be updated. Current status: ' . $userAccess->status
+                    'message' => 'This request cannot be updated as it has already entered the approval workflow.',
+                    'error' => 'Request is no longer modifiable',
+                    'current_workflow_stage' => [
+                        'hod_status' => $userAccess->hod_status,
+                        'divisional_status' => $userAccess->divisional_status,
+                        'ict_director_status' => $userAccess->ict_director_status,
+                        'head_it_status' => $userAccess->head_it_status,
+                        'ict_officer_status' => $userAccess->ict_officer_status
+                    ]
                 ], 403);
             }
 
@@ -325,7 +369,19 @@ class ModuleRequestController extends Controller
                     'module_requested_for' => $userAccess->module_requested_for,
                     'selected_modules' => $userAccess->selectedWellsoftModules->pluck('name')->toArray(),
                     'selected_modules_count' => $userAccess->selectedWellsoftModules->count(),
-                    'request_status' => $userAccess->status,
+                    'request_status' => $userAccess->status, // Legacy status for backward compatibility
+                    
+                    // New granular status information
+                    'workflow_status' => [
+                        'hod_status' => $userAccess->hod_status,
+                        'divisional_status' => $userAccess->divisional_status,
+                        'ict_director_status' => $userAccess->ict_director_status,
+                        'head_it_status' => $userAccess->head_it_status,
+                        'ict_officer_status' => $userAccess->ict_officer_status
+                    ],
+                    'current_stage' => $this->determineCurrentWorkflowStage($userAccess),
+                    'can_be_modified' => $userAccess->hod_status === 'pending', // Only editable if not yet approved by HOD
+                    
                     'user_name' => $userAccess->user->name,
                     'department_name' => $userAccess->department->name ?? 'Unknown'
                 ]
@@ -351,6 +407,166 @@ class ModuleRequestController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to update module request.',
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
+            ], 500);
+        }
+    }
+    
+    /**
+     * Determine the current workflow stage based on granular status columns
+     */
+    private function determineCurrentWorkflowStage(UserAccess $userAccess): string
+    {
+        if ($userAccess->ict_officer_status === 'implemented') {
+            return 'completed';
+        }
+        
+        if ($userAccess->hod_status === 'rejected' || 
+            $userAccess->divisional_status === 'rejected' ||
+            $userAccess->ict_director_status === 'rejected' ||
+            $userAccess->head_it_status === 'rejected' ||
+            $userAccess->ict_officer_status === 'rejected') {
+            return 'rejected';
+        }
+        
+        if ($userAccess->head_it_status === 'approved' && $userAccess->ict_officer_status === 'pending') {
+            return 'pending_ict_officer';
+        }
+        
+        if ($userAccess->ict_director_status === 'approved' && $userAccess->head_it_status === 'pending') {
+            return 'pending_head_it';
+        }
+        
+        if ($userAccess->divisional_status === 'approved' && $userAccess->ict_director_status === 'pending') {
+            return 'pending_ict_director';
+        }
+        
+        if ($userAccess->hod_status === 'approved' && $userAccess->divisional_status === 'pending') {
+            return 'pending_divisional';
+        }
+        
+        if ($userAccess->hod_status === 'pending') {
+            return 'pending_hod';
+        }
+        
+        return 'unknown';
+    }
+    
+    /**
+     * Get approval history information
+     */
+    private function getApprovalHistory(UserAccess $userAccess): array
+    {
+        return [
+            'hod' => [
+                'status' => $userAccess->hod_status,
+                'approved_by' => $userAccess->hod_name,
+                'approved_at' => $userAccess->hod_approved_at,
+                'comments' => $userAccess->hod_comments
+            ],
+            'divisional' => [
+                'status' => $userAccess->divisional_status,
+                'approved_by' => $userAccess->divisional_name,
+                'approved_at' => $userAccess->divisional_approved_at,
+                'comments' => $userAccess->divisional_comments
+            ],
+            'ict_director' => [
+                'status' => $userAccess->ict_director_status,
+                'approved_by' => $userAccess->dict_name,
+                'approved_at' => $userAccess->dict_approved_at,
+                'comments' => $userAccess->dict_comments
+            ],
+            'head_it' => [
+                'status' => $userAccess->head_it_status,
+                'approved_by' => $userAccess->head_it_name ?? null,
+                'approved_at' => $userAccess->head_it_approved_at ?? null,
+                'comments' => $userAccess->head_it_comments ?? null
+            ],
+            'ict_officer' => [
+                'status' => $userAccess->ict_officer_status,
+                'implemented_by' => $userAccess->ict_officer_name ?? null,
+                'implemented_at' => $userAccess->ict_officer_implemented_at ?? null,
+                'comments' => $userAccess->ict_officer_comments ?? null
+            ]
+        ];
+    }
+    
+    /**
+     * Get module request statistics using granular status system
+     */
+    public function getStatistics(Request $request): JsonResponse
+    {
+        try {
+            // Use trait methods for comprehensive statistics
+            $systemStats = $this->getSystemStatistics();
+            
+            // Module-specific statistics
+            $moduleStats = [
+                'total_requests' => UserAccess::whereNotNull('module_requested_for')->count(),
+                'requests_with_modules' => UserAccess::whereNotNull('module_requested_for')
+                                                   ->whereHas('selectedWellsoftModules')
+                                                   ->count(),
+                'use_requests' => UserAccess::where('module_requested_for', 'use')->count(),
+                'revoke_requests' => UserAccess::where('module_requested_for', 'revoke')->count(),
+                
+                // Workflow stage statistics
+                'workflow_stages' => [
+                    'pending_hod' => $this->getPendingRequestsForStage('hod')
+                                         ->whereNotNull('module_requested_for')
+                                         ->count(),
+                    'pending_divisional' => $this->getPendingRequestsForStage('divisional')
+                                                ->whereNotNull('module_requested_for')
+                                                ->count(),
+                    'pending_ict_director' => $this->getPendingRequestsForStage('ict_director')
+                                                 ->whereNotNull('module_requested_for')
+                                                 ->count(),
+                    'pending_head_it' => $this->getPendingRequestsForStage('head_it')
+                                            ->whereNotNull('module_requested_for')
+                                            ->count(),
+                    'pending_ict_officer' => $this->getPendingRequestsForStage('ict_officer')
+                                                ->whereNotNull('module_requested_for')
+                                                ->count(),
+                ],
+                
+                // Popular modules statistics
+                'popular_modules' => WellsoftModule::withCount('userAccessRequests')
+                                                  ->orderByDesc('user_access_requests_count')
+                                                  ->limit(10)
+                                                  ->get(['name', 'user_access_requests_count']),
+                                                  
+                // Recent activity
+                'recent_activity' => [
+                    'today' => UserAccess::whereNotNull('module_requested_for')
+                                        ->whereDate('created_at', today())
+                                        ->count(),
+                    'this_week' => UserAccess::whereNotNull('module_requested_for')
+                                            ->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])
+                                            ->count(),
+                    'this_month' => UserAccess::whereNotNull('module_requested_for')
+                                             ->whereMonth('created_at', now()->month)
+                                             ->whereYear('created_at', now()->year)
+                                             ->count(),
+                ]
+            ];
+            
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Module request statistics retrieved successfully',
+                'data' => [
+                    'system_overview' => $systemStats,
+                    'module_statistics' => $moduleStats
+                ]
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Error fetching module request statistics', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to retrieve module request statistics',
                 'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
             ], 500);
         }

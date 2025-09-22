@@ -2,7 +2,7 @@
   <aside
     v-if="shouldShowSidebar"
     class="min-h-full flex flex-col transition-all duration-300 ease-in-out overflow-hidden relative shadow-2xl sidebar-responsive"
-    :class="[isCollapsed ? 'w-16 sidebar-collapsed' : 'w-72 sidebar-expanded']"
+    :class="[isCollapsed ? 'w-16 sidebar-collapsed' : 'w-80 sidebar-expanded']"
     aria-label="Sidebar navigation"
     style="
       background: linear-gradient(
@@ -893,12 +893,19 @@
             category: 'requests-management',
             description: 'Review access requests'
           },
-          '/divisional-dashboard/combined-request': {
+          '/divisional-dashboard/combined-requests': {
             name: 'DivisionalCombinedRequestList',
             displayName: 'Combined Requests',
             icon: 'fas fa-clipboard-list',
             category: 'requests-management',
             description: 'Review HOD-approved requests'
+          },
+          '/dict-dashboard/combined-requests': {
+            name: 'DictCombinedRequestList',
+            displayName: 'Access Requests',
+            icon: 'fas fa-clipboard-check',
+            category: 'requests-management',
+            description: 'Review Divisional Director-approved requests'
           }
         }
 

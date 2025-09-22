@@ -259,7 +259,7 @@
                           <button
                             type="button"
                             @click="triggerFileUpload"
-                            class="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/50"
+                            class="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/50"
                           >
                             <i class="fas fa-upload"></i>
                             Upload Signature
@@ -373,7 +373,7 @@
 
                   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div>
-                      <label class="block text-sm font-bold text-blue-100 mb-3">
+                      <label class="block text-base font-bold text-blue-100 mb-3">
                         Head of Department Name
                         <span class="text-red-400">*</span>
                       </label>
@@ -391,7 +391,7 @@
                       </div>
                     </div>
                     <div>
-                      <label class="block text-sm font-bold text-blue-100 mb-3">
+                      <label class="block text-base font-bold text-blue-100 mb-3">
                         Signature <span class="text-red-400">*</span>
                       </label>
                       <div class="relative">
@@ -470,7 +470,7 @@
                       </div>
                     </div>
                     <div>
-                      <label class="block text-sm font-bold text-blue-100 mb-3">
+                      <label class="block text-base font-bold text-blue-100 mb-3">
                         Date <span class="text-red-400">*</span>
                       </label>
                       <div class="relative">
@@ -499,7 +499,7 @@
 
                   <!-- Approval/Disapproval Radio Buttons -->
                   <div class="mb-6">
-                    <label class="block text-sm font-bold text-blue-100 mb-3">
+                    <label class="block text-base font-bold text-blue-100 mb-3">
                       Decision (please choose which is applicable/not applicable)
                       <span class="text-red-400">*</span>
                     </label>
@@ -553,7 +553,7 @@
                             Reason for Disapproval
                           </h5>
                         </div>
-                        <label class="block text-sm font-bold text-blue-100 mb-3">
+                        <label class="block text-base font-bold text-blue-100 mb-3">
                           Reason for Disapproval - Please provide the reason for disapproving this
                           internet access request
                           <span class="text-red-400">*</span>
@@ -583,7 +583,7 @@
 
                   <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <label class="block text-sm font-bold text-blue-100 mb-3">
+                      <label class="block text-base font-bold text-blue-100 mb-3">
                         Director's Name <span class="text-red-400">*</span>
                       </label>
                       <div class="relative">
@@ -600,7 +600,7 @@
                       </div>
                     </div>
                     <div>
-                      <label class="block text-sm font-bold text-blue-100 mb-3">
+                      <label class="block text-base font-bold text-blue-100 mb-3">
                         Signature <span class="text-red-400">*</span>
                       </label>
                       <div class="relative">
@@ -616,7 +616,7 @@
                             <button
                               type="button"
                               @click="triggerDirectorSignatureUpload"
-                              class="px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-blue-600 text-white text-xs font-semibold rounded-lg hover:from-emerald-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-emerald-400/50"
+                              class="px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-blue-600 text-white text-sm font-semibold rounded-lg hover:from-emerald-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-emerald-400/50"
                             >
                               <i class="fas fa-upload"></i>
                               Upload Signature
@@ -679,7 +679,7 @@
                       </div>
                     </div>
                     <div>
-                      <label class="block text-sm font-bold text-blue-100 mb-3">
+                      <label class="block text-base font-bold text-blue-100 mb-3">
                         Date <span class="text-red-400">*</span>
                       </label>
                       <div class="relative">
@@ -723,14 +723,14 @@
                   </h4>
 
                   <div class="mb-6">
-                    <label class="block text-sm font-bold text-blue-100 mb-3">
+                    <label class="block text-base font-bold text-blue-100 mb-3">
                       Access Status <span class="text-red-400">*</span>
                     </label>
                     <div
                       class="bg-purple-500/20 p-4 rounded-xl border border-purple-400/30 backdrop-blur-sm"
                     >
                       <div class="flex items-center gap-3 mb-3 flex-wrap">
-                        <span class="text-sm text-white font-medium">The mentioned person</span>
+                        <span class="text-base text-white font-medium">The mentioned person</span>
                         <div class="relative">
                           <input
                             v-model="formData.itDepartment.personName"
@@ -740,7 +740,7 @@
                             required
                           />
                         </div>
-                        <span class="text-sm text-white font-medium"
+                        <span class="text-base text-white font-medium"
                           >has been granted internet access as</span
                         >
                         <div class="relative">
@@ -758,7 +758,7 @@
 
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                     <div>
-                      <label class="block text-sm font-bold text-blue-100 mb-3">
+                      <label class="block text-base font-bold text-blue-100 mb-3">
                         IT Officer Signature <span class="text-red-400">*</span>
                       </label>
                       <div class="relative">
@@ -774,7 +774,7 @@
                             <button
                               type="button"
                               @click="triggerItSignatureUpload"
-                              class="px-3 py-1.5 bg-gradient-to-r from-purple-500 to-blue-600 text-white text-xs font-semibold rounded-lg hover:from-purple-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-purple-400/50"
+                              class="px-3 py-1.5 bg-gradient-to-r from-purple-500 to-blue-600 text-white text-sm font-semibold rounded-lg hover:from-purple-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-purple-400/50"
                             >
                               <i class="fas fa-upload"></i>
                               Upload Signature
@@ -837,7 +837,7 @@
                       </div>
                     </div>
                     <div>
-                      <label class="block text-sm font-bold text-blue-100 mb-3">
+                      <label class="block text-base font-bold text-blue-100 mb-3">
                         Date <span class="text-red-400">*</span>
                       </label>
                       <div class="relative">
@@ -855,7 +855,7 @@
                   </div>
 
                   <div>
-                    <label class="block text-sm font-bold text-blue-100 mb-3">
+                    <label class="block text-base font-bold text-blue-100 mb-3">
                       Other Comments DICT
                     </label>
                     <div class="relative">

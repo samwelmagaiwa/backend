@@ -20,9 +20,9 @@ module.exports = {
       maxWidth: {
         '8xl': '88rem',
         '9xl': '96rem',
-        '10xl': '120rem',  // 1920px
-        '11xl': '132rem',  // 2112px
-        '12xl': '144rem'   // 2304px
+        '10xl': '120rem', // 1920px
+        '11xl': '132rem', // 2112px
+        '12xl': '144rem' // 2304px
       }
     }
   },

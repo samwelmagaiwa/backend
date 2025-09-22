@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
+use App\Traits\HandlesStatusQueries;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -12,6 +13,7 @@ use Carbon\Carbon;
 
 class UserDashboardController extends Controller
 {
+    use HandlesStatusQueries;
     /**
      * Get user dashboard statistics
      * 
@@ -88,18 +90,56 @@ class UserDashboardController extends Controller
         try {
             $baseQuery = UserAccess::where('user_id', $userId);
             
+            // Get counts using new status columns
+            $pendingHodCount = $baseQuery->clone()->where('hod_status', 'pending')->count();
+            $pendingDivisionalCount = $baseQuery->clone()->where('divisional_status', 'pending')
+                ->where('hod_status', 'approved')->count();
+            $pendingIctDirectorCount = $baseQuery->clone()->where('ict_director_status', 'pending')
+                ->where('hod_status', 'approved')
+                ->where('divisional_status', 'approved')->count();
+            $pendingHeadItCount = $baseQuery->clone()->where('head_it_status', 'pending')
+                ->where('hod_status', 'approved')
+                ->where('divisional_status', 'approved')
+                ->where('ict_director_status', 'approved')->count();
+            $pendingIctOfficerCount = $baseQuery->clone()->where('ict_officer_status', 'pending')
+                ->where('hod_status', 'approved')
+                ->where('divisional_status', 'approved')
+                ->where('ict_director_status', 'approved')
+                ->where('head_it_status', 'approved')->count();
+            
+            $implementedCount = $baseQuery->clone()->where('ict_officer_status', 'implemented')->count();
+            
+            $rejectedCount = $baseQuery->clone()->where(function($query) {
+                $query->where('hod_status', 'rejected')
+                    ->orWhere('divisional_status', 'rejected')
+                    ->orWhere('ict_director_status', 'rejected')
+                    ->orWhere('head_it_status', 'rejected');
+            })->count();
+            
+            $totalPending = $pendingHodCount + $pendingDivisionalCount + $pendingIctDirectorCount + $pendingHeadItCount + $pendingIctOfficerCount;
+            
             $stats = [
-                'processing' => $baseQuery->clone()->whereIn('status', ['pending'])->count(),
-                'under_review' => $baseQuery->clone()->whereIn('status', ['in_review', 'pending'])->count(),
-                'completed' => $baseQuery->clone()->where('status', 'approved')->count(),
-                'granted_access' => $baseQuery->clone()->where('status', 'approved')->count(),
-                'revision' => $baseQuery->clone()->where('status', 'needs_revision')->count(),
-                'needs_revision' => $baseQuery->clone()->where('status', 'needs_revision')->count(),
-                'rejected' => $baseQuery->clone()->where('status', 'rejected')->count(),
-                'total' => $baseQuery->clone()->count()
+                'processing' => $totalPending,
+                'under_review' => $totalPending,
+                'completed' => $implementedCount,
+                'granted_access' => $implementedCount,
+                'revision' => 0, // No revision in new workflow
+                'needs_revision' => 0, // No revision in new workflow
+                'rejected' => $rejectedCount,
+                'total' => $baseQuery->clone()->count(),
+                // Additional breakdown for detailed view
+                'stage_breakdown' => [
+                    'pending_hod' => $pendingHodCount,
+                    'pending_divisional' => $pendingDivisionalCount,
+                    'pending_ict_director' => $pendingIctDirectorCount,
+                    'pending_head_it' => $pendingHeadItCount,
+                    'pending_ict_officer' => $pendingIctOfficerCount,
+                    'implemented' => $implementedCount,
+                    'rejected' => $rejectedCount
+                ]
             ];
 
-            Log::info('User Access stats calculated', [
+            Log::info('User Access stats calculated with new status system', [
                 'user_id' => $userId,
                 'stats' => $stats
             ]);
@@ -116,7 +156,16 @@ class UserDashboardController extends Controller
                 'revision' => 0,
                 'needs_revision' => 0,
                 'rejected' => 0,
-                'total' => 0
+                'total' => 0,
+                'stage_breakdown' => [
+                    'pending_hod' => 0,
+                    'pending_divisional' => 0,
+                    'pending_ict_director' => 0,
+                    'pending_head_it' => 0,
+                    'pending_ict_officer' => 0,
+                    'implemented' => 0,
+                    'rejected' => 0
+                ]
             ];
         }
     }
@@ -297,6 +346,89 @@ class UserDashboardController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch recent activity',
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
+            ], 500);
+        }
+    }
+
+    /**
+     * Get workflow stage statistics for the user
+     */
+    public function getWorkflowStageStats(Request $request)
+    {
+        try {
+            $user = Auth::user();
+            
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User not authenticated'
+                ], 401);
+            }
+
+            $baseQuery = UserAccess::where('user_id', $user->id);
+            
+            // Get detailed workflow stage statistics
+            $stageStats = [
+                'hod' => [
+                    'pending' => $baseQuery->clone()->where('hod_status', 'pending')->count(),
+                    'approved' => $baseQuery->clone()->where('hod_status', 'approved')->count(),
+                    'rejected' => $baseQuery->clone()->where('hod_status', 'rejected')->count(),
+                ],
+                'divisional' => [
+                    'pending' => $baseQuery->clone()->where('divisional_status', 'pending')
+                        ->where('hod_status', 'approved')->count(),
+                    'approved' => $baseQuery->clone()->where('divisional_status', 'approved')->count(),
+                    'rejected' => $baseQuery->clone()->where('divisional_status', 'rejected')->count(),
+                ],
+                'ict_director' => [
+                    'pending' => $baseQuery->clone()->where('ict_director_status', 'pending')
+                        ->where('hod_status', 'approved')
+                        ->where('divisional_status', 'approved')->count(),
+                    'approved' => $baseQuery->clone()->where('ict_director_status', 'approved')->count(),
+                    'rejected' => $baseQuery->clone()->where('ict_director_status', 'rejected')->count(),
+                ],
+                'head_it' => [
+                    'pending' => $baseQuery->clone()->where('head_it_status', 'pending')
+                        ->where('hod_status', 'approved')
+                        ->where('divisional_status', 'approved')
+                        ->where('ict_director_status', 'approved')->count(),
+                    'approved' => $baseQuery->clone()->where('head_it_status', 'approved')->count(),
+                    'rejected' => $baseQuery->clone()->where('head_it_status', 'rejected')->count(),
+                ],
+                'ict_officer' => [
+                    'pending' => $baseQuery->clone()->where('ict_officer_status', 'pending')
+                        ->where('hod_status', 'approved')
+                        ->where('divisional_status', 'approved')
+                        ->where('ict_director_status', 'approved')
+                        ->where('head_it_status', 'approved')->count(),
+                    'implemented' => $baseQuery->clone()->where('ict_officer_status', 'implemented')->count(),
+                ]
+            ];
+
+            // Calculate overall progress
+            $totalRequests = $baseQuery->clone()->count();
+            $completedRequests = $stageStats['ict_officer']['implemented'];
+            $overallProgress = $totalRequests > 0 ? round(($completedRequests / $totalRequests) * 100, 1) : 0;
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'stage_statistics' => $stageStats,
+                    'overall_progress' => $overallProgress,
+                    'total_requests' => $totalRequests,
+                    'completed_requests' => $completedRequests
+                ],
+                'user_id' => $user->id,
+                'generated_at' => Carbon::now()->toISOString()
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error fetching workflow stage stats: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch workflow stage statistics',
                 'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
             ], 500);
         }

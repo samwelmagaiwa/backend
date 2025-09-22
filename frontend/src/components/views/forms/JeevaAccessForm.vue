@@ -133,7 +133,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                   <!-- PF Number -->
                   <div>
-                    <label class="block text-sm font-bold text-blue-100 mb-1">
+                    <label class="block text-base font-bold text-blue-100 mb-1">
                       PF Number <span class="text-red-400">*</span>
                     </label>
                     <div class="relative">
@@ -152,7 +152,7 @@
 
                   <!-- Staff Name -->
                   <div>
-                    <label class="block text-sm font-bold text-blue-100 mb-1">
+                    <label class="block text-base font-bold text-blue-100 mb-1">
                       Staff Name <span class="text-red-400">*</span>
                     </label>
                     <div class="relative">
@@ -171,7 +171,7 @@
 
                   <!-- Department -->
                   <div class="md:col-span-2">
-                    <label class="block text-sm font-bold text-blue-100 mb-1">
+                    <label class="block text-base font-bold text-blue-100 mb-1">
                       Department <span class="text-red-400">*</span>
                     </label>
                     <div class="relative">
@@ -228,7 +228,7 @@
 
                   <!-- Digital Signature -->
                   <div class="md:col-span-2">
-                    <label class="block text-sm font-bold text-blue-100 mb-1">
+                    <label class="block text-base font-bold text-blue-100 mb-1">
                       Digital Signature <span class="text-red-400">*</span>
                     </label>
 
@@ -245,7 +245,7 @@
                           <button
                             type="button"
                             @click="triggerFileUpload"
-                            class="px-3 py-1.5 bg-gradient-to-r from-teal-500 to-blue-600 text-white text-xs font-semibold rounded-lg hover:from-teal-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-teal-400/50"
+                            class="px-3 py-1.5 bg-gradient-to-r from-teal-500 to-blue-600 text-white text-sm font-semibold rounded-lg hover:from-teal-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-teal-400/50"
                           >
                             <i class="fas fa-upload"></i>
                             Load Signature
@@ -328,7 +328,7 @@
 
                 <!-- Request Type -->
                 <div class="mb-4">
-                  <label class="block text-sm font-bold text-blue-100 mb-2 text-center">
+                  <label class="block text-base font-bold text-blue-100 mb-2 text-center">
                     Module Requested for <span class="text-red-400">*</span>
                   </label>
                   <div class="flex justify-center gap-4 mb-3">
@@ -359,7 +359,7 @@
 
                 <!-- Modules Selection -->
                 <div>
-                  <label class="block text-sm font-bold text-blue-100 mb-2">
+                  <label class="block text-base font-bold text-blue-100 mb-2">
                     Select Modules <span class="text-red-400">*</span>
                   </label>
                   <div
@@ -426,7 +426,7 @@
                             <button
                               type="button"
                               @click="triggerHodSignatureUpload"
-                              class="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors duration-200 flex items-center gap-1 mx-auto"
+                              class="px-2 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors duration-200 flex items-center gap-1 mx-auto"
                             >
                               <i class="fas fa-upload"></i>
                               Press to load your signature
@@ -508,7 +508,7 @@
                         v-if="userRole === ROLES.DIVISIONAL_DIRECTOR && canApproveAtStage()"
                         class="mb-4"
                       >
-                        <label class="block text-sm font-bold text-blue-100 mb-2">
+                        <label class="block text-base font-bold text-blue-100 mb-2">
                           Decision <span class="text-red-400">*</span>
                         </label>
                         <div class="flex gap-3 mb-3">
@@ -541,7 +541,7 @@
                           v-if="formData.approvals.divisionalDirector.decision === 'reject'"
                           class="mb-3"
                         >
-                          <label class="block text-sm font-bold text-blue-100 mb-2">
+                          <label class="block text-base font-bold text-blue-100 mb-2">
                             Reason for Rejection
                             <span class="text-red-400">*</span>
                           </label>
@@ -574,7 +574,7 @@
                             <button
                               type="button"
                               @click="triggerDivDirectorSignatureUpload"
-                              class="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors duration-200 flex items-center gap-1 mx-auto"
+                              class="px-2 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors duration-200 flex items-center gap-1 mx-auto"
                             >
                               <i class="fas fa-upload"></i>
                               Press to load your signature
@@ -668,7 +668,7 @@
                             <button
                               type="button"
                               @click="triggerDirectorICTSignatureUpload"
-                              class="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors duration-200 flex items-center gap-1 mx-auto"
+                              class="px-2 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors duration-200 flex items-center gap-1 mx-auto"
                             >
                               <i class="fas fa-upload"></i>
                               Press to load your signature
@@ -809,7 +809,7 @@
                             <button
                               type="button"
                               @click="triggerHeadITSignatureUpload"
-                              class="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors duration-200 flex items-center gap-1 mx-auto"
+                              class="px-2 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors duration-200 flex items-center gap-1 mx-auto"
                             >
                               <i class="fas fa-upload"></i>
                               Press to load your signature
@@ -905,7 +905,7 @@
                             <button
                               type="button"
                               @click="triggerIctOfficerSignatureUpload"
-                              class="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors duration-200 flex items-center gap-1 mx-auto"
+                              class="px-2 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors duration-200 flex items-center gap-1 mx-auto"
                             >
                               <i class="fas fa-upload"></i>
                               Press to load your signature

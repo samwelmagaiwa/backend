@@ -100,7 +100,7 @@
               <!-- Role display removed -->
               <div class="flex items-center mt-1">
                 <div class="w-2 h-2 bg-green-400 rounded-full mr-2 shadow-sm"></div>
-                <span class="text-xs text-green-300 font-medium">Online</span>
+                <span class="text-sm text-green-300 font-medium">Online</span>
               </div>
             </div>
           </div>
@@ -112,7 +112,7 @@
           <div class="mb-6">
             <div class="px-6 py-2">
               <h3
-                class="text-xs font-semibold text-blue-200 uppercase tracking-wider drop-shadow-sm flex items-center"
+                class="text-sm font-semibold text-blue-200 uppercase tracking-wider drop-shadow-sm flex items-center"
               >
                 <i class="fas fa-tachometer-alt mr-2 text-blue-300"></i>
                 Dashboard
@@ -187,7 +187,7 @@
           <div class="mb-6">
             <div class="px-6 py-2">
               <h3
-                class="text-xs font-semibold text-blue-200 uppercase tracking-wider drop-shadow-sm flex items-center"
+                class="text-sm font-semibold text-blue-200 uppercase tracking-wider drop-shadow-sm flex items-center"
               >
                 <i class="fas fa-file-alt mr-2 text-blue-300"></i>
                 Request Forms
@@ -245,7 +245,7 @@
           class="mt-auto border-t-2 border-blue-600/30 p-6 bg-gradient-to-r from-blue-800/30 to-blue-700/30"
         >
           <div class="text-center">
-            <div class="text-xs text-blue-300 drop-shadow-sm mb-2">
+            <div class="text-sm text-blue-300 drop-shadow-sm mb-2">
               © 2025 Muhimbili National Hospital
             </div>
             <!-- Footer text removed -->

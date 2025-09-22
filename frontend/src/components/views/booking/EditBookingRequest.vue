@@ -127,7 +127,7 @@
                 <div
                   class="w-8 h-8 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center shadow-lg flex-shrink-0"
                 >
-                  <i class="fas fa-exclamation-triangle text-white text-xs"></i>
+                  <i class="fas fa-exclamation-triangle text-white text-sm"></i>
                 </div>
                 <div>
                   <h4 class="text-red-100 font-semibold text-sm mb-1">Rejection Reason:</h4>
@@ -291,7 +291,7 @@
 
                     <!-- Return Date -->
                     <div class="group">
-                      <label class="block text-sm font-bold text-blue-100 mb-2 flex items-center">
+                      <label class="block text-base font-bold text-blue-100 mb-2 flex items-center">
                         <i class="fas fa-calendar-check mr-2 text-blue-300"></i>
                         Return Date <span class="text-red-400 ml-1">*</span>
                       </label>
@@ -311,7 +311,7 @@
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <!-- Return Time -->
                     <div class="group">
-                      <label class="block text-sm font-bold text-blue-100 mb-2 flex items-center">
+                      <label class="block text-base font-bold text-blue-100 mb-2 flex items-center">
                         <i class="fas fa-clock mr-2 text-blue-300"></i>
                         Return Time <span class="text-red-400 ml-1">*</span>
                       </label>

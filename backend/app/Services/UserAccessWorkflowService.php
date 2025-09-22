@@ -71,8 +71,14 @@ class UserAccessWorkflowService
             ];
 
             if ($request->action === 'approve') {
+                // Update specific HOD status column
+                $data['hod_status'] = 'approved';
+                // Keep legacy status for backward compatibility during transition
                 $data['status'] = 'pending_divisional';
             } else {
+                // Update specific HOD status column
+                $data['hod_status'] = 'rejected';
+                // Keep legacy status for backward compatibility during transition
                 $data['status'] = 'hod_rejected';
             }
 
@@ -109,8 +115,14 @@ class UserAccessWorkflowService
             ];
 
             if ($request->action === 'approve') {
+                // Update specific divisional status column
+                $data['divisional_status'] = 'approved';
+                // Keep legacy status for backward compatibility during transition
                 $data['status'] = 'pending_ict_director';
             } else {
+                // Update specific divisional status column
+                $data['divisional_status'] = 'rejected';
+                // Keep legacy status for backward compatibility during transition
                 $data['status'] = 'divisional_rejected';
             }
 
@@ -146,8 +158,14 @@ class UserAccessWorkflowService
             ];
 
             if ($request->action === 'approve') {
+                // Update specific ICT Director status column
+                $data['ict_director_status'] = 'approved';
+                // Keep legacy status for backward compatibility during transition
                 $data['status'] = 'pending_head_it';
             } else {
+                // Update specific ICT Director status column
+                $data['ict_director_status'] = 'rejected';
+                // Keep legacy status for backward compatibility during transition
                 $data['status'] = 'ict_director_rejected';
             }
 
@@ -183,8 +201,14 @@ class UserAccessWorkflowService
             ];
 
             if ($request->action === 'approve') {
+                // Update specific Head IT status column
+                $data['head_it_status'] = 'approved';
+                // Keep legacy status for backward compatibility during transition
                 $data['status'] = 'pending_ict_officer';
             } else {
+                // Update specific Head IT status column
+                $data['head_it_status'] = 'rejected';
+                // Keep legacy status for backward compatibility during transition
                 $data['status'] = 'head_it_rejected';
             }
 
@@ -206,19 +230,30 @@ class UserAccessWorkflowService
     public function processIctOfficerImplementation(UserAccess $userAccess, Request $request): UserAccess
     {
         $request->validate([
+            'action' => 'required|in:implement,reject',
+            'comments' => 'nullable|string|max:1000',
             'ict_officer_name' => 'required|string|max:255',
-            'implementation_comments' => 'nullable|string|max:1000',
             'signature' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048'
         ]);
 
         return DB::transaction(function () use ($userAccess, $request) {
             $data = [
                 'ict_officer_name' => $request->ict_officer_name,
-                'ict_officer_comments' => $request->implementation_comments,
-                'implementation_comments' => $request->implementation_comments,
+                'ict_officer_comments' => $request->comments,
                 'ict_officer_implemented_at' => now(),
-                'status' => 'implemented',
             ];
+
+            if ($request->action === 'implement') {
+                // Update specific ICT Officer status column
+                $data['ict_officer_status'] = 'implemented';
+                // Keep legacy status for backward compatibility during transition
+                $data['status'] = 'implemented';
+            } else {
+                // Update specific ICT Officer status column
+                $data['ict_officer_status'] = 'rejected';
+                // Keep legacy status for backward compatibility during transition
+                $data['status'] = 'rejected';
+            }
 
             if ($request->hasFile('signature')) {
                 $data['ict_officer_signature_path'] = $this->handleSignatureUpload(
@@ -231,6 +266,7 @@ class UserAccessWorkflowService
             return $userAccess->fresh();
         });
     }
+
 
     /**
      * Get requests based on user role and approval stage
@@ -340,7 +376,14 @@ class UserAccessWorkflowService
             'internet_purposes' => $request->internet_purposes,
             'access_type' => $request->access_type,
             'temporary_until' => $request->temporary_until,
+            // Keep legacy status for backward compatibility during transition
             'status' => 'pending_hod',
+            // Initialize new status columns
+            'hod_status' => 'pending',
+            'divisional_status' => 'pending',
+            'ict_director_status' => 'pending',
+            'head_it_status' => 'pending',
+            'ict_officer_status' => 'pending',
         ];
     }
 
@@ -366,15 +409,9 @@ class UserAccessWorkflowService
             return null;
         }
 
-        return match($user->role->name) {
-            'HEAD_OF_DEPARTMENT' => ['pending_hod', 'hod_approved', 'hod_rejected'],
-            'DIVISIONAL_DIRECTOR' => ['pending_divisional', 'divisional_approved', 'divisional_rejected'],
-            'ICT_DIRECTOR' => ['pending_ict_director', 'ict_director_approved', 'ict_director_rejected'],
-            'HEAD_IT' => ['pending_head_it', 'head_it_approved', 'head_it_rejected'],
-            'ICT_OFFICER' => ['pending_ict_officer', 'implemented'],
-            'ADMIN' => UserAccess::STATUSES,
-            default => null
-        };
+        // Show ALL statuses for complete visibility and history tracking
+        // Users should see the entire request lifecycle, not just their specific approval stage
+        return UserAccess::STATUSES; // Return all statuses for all roles
     }
 
     /**

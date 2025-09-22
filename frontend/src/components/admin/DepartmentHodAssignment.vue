@@ -243,7 +243,7 @@
                 <!-- Filters and Search -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                   <div>
-                    <label class="block text-sm font-bold text-teal-100 mb-2">
+                    <label class="block text-base font-bold text-teal-100 mb-2">
                       Search Departments
                     </label>
                     <div class="relative">
@@ -261,7 +261,7 @@
                   </div>
 
                   <div>
-                    <label class="block text-sm font-bold text-teal-100 mb-2"> HOD Status </label>
+                    <label class="block text-base font-bold text-teal-100 mb-2"> HOD Status </label>
                     <div class="relative">
                       <select
                         v-model="hodStatus"
@@ -283,7 +283,7 @@
                   </div>
 
                   <div>
-                    <label class="block text-sm font-bold text-teal-100 mb-2"> Sort By </label>
+                    <label class="block text-base font-bold text-teal-100 mb-2"> Sort By </label>
                     <div class="relative">
                       <select
                         v-model="sortBy"
@@ -305,7 +305,7 @@
                   </div>
 
                   <div>
-                    <label class="block text-sm font-bold text-teal-100 mb-2">
+                    <label class="block text-base font-bold text-teal-100 mb-2">
                       Filter Options
                     </label>
                     <div class="flex items-center space-x-3 h-12">
@@ -564,7 +564,7 @@
 
           <form ref="assignHodForm" @submit.prevent="assignHod">
             <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-2"> Select HOD * </label>
+              <label class="block text-base font-medium text-gray-700 mb-2"> Select HOD * </label>
               <div class="relative">
                 <select
                   v-model="selectedHodId"
@@ -662,7 +662,7 @@
             <h4 class="text-lg font-semibold text-gray-800 mb-3">
               {{ departmentToRemoveHod?.hod?.name }}
             </h4>
-            <p class="text-gray-600 text-sm leading-relaxed">
+            <p class="text-gray-600 text-base leading-relaxed">
               Are you sure you want to remove this HOD from
               <strong>{{ departmentToRemoveHod?.name }}</strong
               >?
@@ -678,7 +678,7 @@
               <div
                 class="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center shadow-lg"
               >
-                <i class="fas fa-exclamation text-white text-xs"></i>
+                <i class="fas fa-exclamation text-white text-sm"></i>
               </div>
               <span class="text-sm font-medium text-orange-800"> Warning: Pending Requests </span>
             </div>
@@ -798,7 +798,7 @@
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Department Name -->
                 <div class="group/field">
-                  <label class="block text-sm font-bold text-gray-700 mb-3 flex items-center">
+                  <label class="block text-base font-bold text-gray-700 mb-3 flex items-center">
                     <i class="fas fa-building mr-2 text-blue-500"></i>
                     Department Name
                     <span class="text-red-500 ml-1">*</span>
@@ -831,7 +831,7 @@
 
                 <!-- Department Code -->
                 <div class="group/field">
-                  <label class="block text-sm font-bold text-gray-700 mb-3 flex items-center">
+                  <label class="block text-base font-bold text-gray-700 mb-3 flex items-center">
                     <i class="fas fa-code mr-2 text-blue-500"></i>
                     Department Code
                     <span class="text-red-500 ml-1">*</span>
@@ -865,7 +865,7 @@
 
               <!-- Description -->
               <div class="mt-6 group/field">
-                <label class="block text-sm font-bold text-gray-700 mb-3 flex items-center">
+                <label class="block text-base font-bold text-gray-700 mb-3 flex items-center">
                   <i class="fas fa-align-left mr-2 text-blue-500"></i>
                   Description
                   <span class="text-gray-400 text-xs ml-2">(Optional)</span>
@@ -914,7 +914,7 @@
 
               <!-- Status Toggle -->
               <div class="mb-6">
-                <label class="block text-sm font-bold text-gray-700 mb-4 flex items-center">
+                <label class="block text-base font-bold text-gray-700 mb-4 flex items-center">
                   <i class="fas fa-toggle-on mr-2 text-green-500"></i>
                   Department Status
                 </label>

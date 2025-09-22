@@ -169,7 +169,8 @@ class BothServiceFormController extends Controller
                 'hod_approved_by_name' => $currentUser->name,
                 'access_type' => $validated['access_type'],
                 'temporary_until' => $validated['access_type'] === 'temporary' ? $validated['temporary_until'] : null,
-                'status' => 'hod_approved'
+                'status' => 'hod_approved',
+                'hod_status' => 'approved' // Set the new hod_status column
             ];
             
             // Handle module selections if provided
@@ -781,7 +782,8 @@ class BothServiceFormController extends Controller
                 'divisional_director_signature_path' => $divisionalSignaturePath,
                 'divisional_approved_at' => $validated['approved_date'],
                 'divisional_director_comments' => $validated['comments'] ?? null,
-                'status' => 'divisional_approved'
+                'status' => 'divisional_approved',
+                'divisional_status' => 'approved' // Set the new divisional_status column
             ];
             
             Log::info('🔄 Updating user access record for divisional approval', [
@@ -945,7 +947,8 @@ class BothServiceFormController extends Controller
                 'divisional_director_name' => $validated['divisional_director_name'],
                 'divisional_director_comments' => $validated['rejection_reason'],
                 'divisional_approved_at' => $validated['rejection_date'],
-                'status' => 'divisional_rejected'
+                'status' => 'divisional_rejected',
+                'divisional_status' => 'rejected' // Set the new divisional_status column
             ];
             
             Log::info('🔄 Updating user access record for divisional rejection', [
@@ -1038,6 +1041,339 @@ class BothServiceFormController extends Controller
             DB::rollBack();
             
             Log::error('❌ Error updating Divisional Director rejection', [
+                'error' => $e->getMessage(),
+                'user_access_id' => $userAccessId,
+                'current_user_id' => $request->user()?->id,
+                'stack_trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to reject request: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * ICT Director approval for a user access request
+     */
+    public function approveIctDirector(Request $request, int $userAccessId): JsonResponse
+    {
+        try {
+            $currentUser = $request->user();
+            $userRoles = $currentUser->roles()->pluck('name')->toArray();
+            
+            // Check if user is ICT Director
+            if (!array_intersect($userRoles, ['ict_director', 'dict'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Access denied. Only ICT Director can perform this action.'
+                ], 403);
+            }
+            
+            Log::info('🔍 ICT DIRECTOR APPROVAL START', [
+                'user_access_id' => $userAccessId,
+                'ict_director_user_id' => $currentUser->id,
+                'request_method' => $request->method(),
+                'content_type' => $request->header('Content-Type'),
+                'has_files' => $request->hasFile('ict_director_signature'),
+                'all_input_keys' => array_keys($request->all())
+            ]);
+            
+            // Validation
+            $validated = $request->validate([
+                'ict_director_name' => 'required|string|max:255',
+                'ict_director_signature' => 'required|file|mimes:jpeg,jpg,png,pdf|max:2048',
+                'approved_date' => 'required|date',
+                'comments' => 'nullable|string|max:1000',
+            ], [
+                'ict_director_name.required' => 'ICT Director name is required',
+                'ict_director_signature.required' => 'ICT Director signature file is required',
+                'ict_director_signature.mimes' => 'Signature must be in JPEG, JPG, PNG, or PDF format',
+                'ict_director_signature.max' => 'Signature file must not exceed 2MB',
+                'approved_date.required' => 'Approval date is required',
+                'approved_date.date' => 'Please provide a valid approval date',
+            ]);
+            
+            Log::info('✅ Validation passed', [
+                'validated_data' => Arr::except($validated, ['ict_director_signature']),
+                'has_signature_file' => isset($validated['ict_director_signature'])
+            ]);
+            
+            // Get user access record
+            $userAccess = UserAccess::findOrFail($userAccessId);
+            
+            // Verify request is in correct status (must be Divisional approved)
+            if ($userAccess->status !== 'divisional_approved') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Request must be Divisional Director approved before ICT Director can approve it.'
+                ], 422);
+            }
+            
+            DB::beginTransaction();
+            
+            // Handle signature upload
+            $ictDirectorSignaturePath = null;
+            if ($request->hasFile('ict_director_signature')) {
+                try {
+                    $signatureFile = $request->file('ict_director_signature');
+                    
+                    if (!$signatureFile->isValid()) {
+                        throw new \Exception('Uploaded signature file is invalid');
+                    }
+                    
+                    $signatureDir = 'signatures/ict_director';
+                    if (!Storage::disk('public')->exists($signatureDir)) {
+                        Storage::disk('public')->makeDirectory($signatureDir);
+                    }
+                    
+                    $filename = 'ict_director_signature_' . $userAccess->pf_number . '_' . time() . '.' . $signatureFile->getClientOriginalExtension();
+                    $ictDirectorSignaturePath = $signatureFile->storeAs($signatureDir, $filename, 'public');
+                    
+                    if (!Storage::disk('public')->exists($ictDirectorSignaturePath)) {
+                        throw new \Exception('Failed to store signature file');
+                    }
+                    
+                    Log::info('✅ ICT Director signature uploaded successfully', [
+                        'original_name' => $signatureFile->getClientOriginalName(),
+                        'stored_path' => $ictDirectorSignaturePath,
+                        'file_size' => $signatureFile->getSize(),
+                        'mime_type' => $signatureFile->getMimeType()
+                    ]);
+                    
+                } catch (\Exception $e) {
+                    Log::error('❌ ICT Director signature upload failed', [
+                        'error' => $e->getMessage(),
+                        'file_info' => [
+                            'name' => $request->file('ict_director_signature')->getClientOriginalName(),
+                            'size' => $request->file('ict_director_signature')->getSize(),
+                            'mime' => $request->file('ict_director_signature')->getMimeType()
+                        ]
+                    ]);
+                    
+                    DB::rollBack();
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Failed to upload ICT Director signature: ' . $e->getMessage()
+                    ], 500);
+                }
+            }
+            
+            // Update the user access record
+            $updateData = [
+                'ict_director_name' => $validated['ict_director_name'],
+                'ict_director_signature_path' => $ictDirectorSignaturePath,
+                'ict_director_approved_at' => $validated['approved_date'],
+                'ict_director_comments' => $validated['comments'] ?? null,
+                'status' => 'ict_director_approved',
+                'ict_director_status' => 'approved' // Set the new ict_director_status column
+            ];
+            
+            Log::info('🔄 Updating user access record for ICT Director approval', [
+                'user_access_id' => $userAccess->id,
+                'update_data' => Arr::except($updateData, ['ict_director_signature_path']),
+                'has_signature_path' => !empty($updateData['ict_director_signature_path'])
+            ]);
+            
+            $userAccess->update($updateData);
+            $userAccess->refresh();
+            
+            Log::info('✅ User access record updated successfully for ICT Director approval', [
+                'user_access_id' => $userAccess->id,
+                'ict_director_name' => $userAccess->ict_director_name,
+                'ict_director_signature_path' => $userAccess->ict_director_signature_path,
+                'ict_director_approved_at' => $userAccess->ict_director_approved_at,
+                'status' => $userAccess->status
+            ]);
+            
+            // Create notification for Divisional Director about ICT director approval
+            try {
+                // Find the Divisional Director who approved this request - for now we'll skip this
+                // as we don't have a direct relationship to find the divisional director
+                
+                Log::info('✅ ICT Director approval notification skipped (no direct divisional director relationship)');
+            } catch (\Exception $e) {
+                Log::error('❌ Failed to create notification for ICT Director approval', [
+                    'error' => $e->getMessage(),
+                    'user_access_id' => $userAccess->id
+                ]);
+                // Don't fail the main operation if notification fails
+            }
+            
+            DB::commit();
+            
+            // Load relationships for response
+            $userAccess->load(['user', 'department']);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'ICT Director approval updated successfully.',
+                'data' => [
+                    'request_id' => $userAccess->id,
+                    'status' => $userAccess->status,
+                    'ict_director_approval' => [
+                        'name' => $userAccess->ict_director_name,
+                        'approved_at' => $userAccess->ict_director_approved_at->format('Y-m-d H:i:s'),
+                        'approved_at_formatted' => $userAccess->ict_director_approved_at->format('m/d/Y'),
+                        'comments' => $userAccess->ict_director_comments,
+                        'signature_url' => Storage::url($userAccess->ict_director_signature_path),
+                        'signature_path' => $userAccess->ict_director_signature_path
+                    ],
+                    'next_step' => 'head_it_approval'
+                ]
+            ]);
+            
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            
+            Log::error('❌ Validation failed for ICT Director approval', [
+                'errors' => $e->errors(),
+                'user_access_id' => $userAccessId
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            Log::error('❌ Error updating ICT Director approval', [
+                'error' => $e->getMessage(),
+                'user_access_id' => $userAccessId,
+                'current_user_id' => $request->user()?->id,
+                'stack_trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update ICT Director approval: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * ICT Director rejection for a user access request
+     */
+    public function rejectIctDirector(Request $request, int $userAccessId): JsonResponse
+    {
+        try {
+            $currentUser = $request->user();
+            $userRoles = $currentUser->roles()->pluck('name')->toArray();
+            
+            // Check if user is ICT Director
+            if (!array_intersect($userRoles, ['ict_director', 'dict'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Access denied. Only ICT Director can perform this action.'
+                ], 403);
+            }
+            
+            Log::info('🔍 ICT DIRECTOR REJECTION START', [
+                'user_access_id' => $userAccessId,
+                'ict_director_user_id' => $currentUser->id,
+                'request_method' => $request->method(),
+            ]);
+            
+            // Validation
+            $validated = $request->validate([
+                'ict_director_name' => 'required|string|max:255',
+                'rejection_reason' => 'required|string|max:1000',
+                'rejection_date' => 'required|date',
+            ], [
+                'ict_director_name.required' => 'ICT Director name is required',
+                'rejection_reason.required' => 'Rejection reason is required',
+                'rejection_date.required' => 'Rejection date is required',
+                'rejection_date.date' => 'Please provide a valid rejection date',
+            ]);
+            
+            // Get user access record
+            $userAccess = UserAccess::findOrFail($userAccessId);
+            
+            // Verify request is in correct status (must be Divisional approved)
+            if ($userAccess->status !== 'divisional_approved') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Request must be Divisional Director approved before ICT Director can reject it.'
+                ], 422);
+            }
+            
+            DB::beginTransaction();
+            
+            // Update the user access record
+            $updateData = [
+                'ict_director_name' => $validated['ict_director_name'],
+                'ict_director_comments' => $validated['rejection_reason'],
+                'ict_director_approved_at' => $validated['rejection_date'],
+                'status' => 'ict_director_rejected',
+                'ict_director_status' => 'rejected' // Set the new ict_director_status column
+            ];
+            
+            Log::info('🔄 Updating user access record for ICT Director rejection', [
+                'user_access_id' => $userAccess->id,
+                'update_data' => $updateData
+            ]);
+            
+            $userAccess->update($updateData);
+            $userAccess->refresh();
+            
+            Log::info('✅ User access record updated successfully for ICT Director rejection', [
+                'user_access_id' => $userAccess->id,
+                'ict_director_name' => $userAccess->ict_director_name,
+                'status' => $userAccess->status
+            ]);
+            
+            // Create notification for Divisional Director about ICT director rejection
+            try {
+                // For now we'll skip this as we don't have a direct relationship to find the divisional director
+                Log::info('✅ ICT Director rejection notification skipped (no direct divisional director relationship)');
+            } catch (\Exception $e) {
+                Log::error('❌ Failed to create notification for ICT Director rejection', [
+                    'error' => $e->getMessage(),
+                    'user_access_id' => $userAccess->id
+                ]);
+                // Don't fail the main operation if notification fails
+            }
+            
+            DB::commit();
+            
+            // Load relationships for response
+            $userAccess->load(['user', 'department']);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Request rejected by ICT Director.',
+                'data' => [
+                    'request_id' => $userAccess->id,
+                    'status' => $userAccess->status,
+                    'ict_director_rejection' => [
+                        'name' => $userAccess->ict_director_name,
+                        'rejected_at' => $userAccess->ict_director_approved_at->format('Y-m-d H:i:s'),
+                        'rejected_at_formatted' => $userAccess->ict_director_approved_at->format('m/d/Y'),
+                        'reason' => $userAccess->ict_director_comments
+                    ]
+                ]
+            ]);
+            
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            
+            Log::error('❌ Validation failed for ICT Director rejection', [
+                'errors' => $e->errors(),
+                'user_access_id' => $userAccessId
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            Log::error('❌ Error updating ICT Director rejection', [
                 'error' => $e->getMessage(),
                 'user_access_id' => $userAccessId,
                 'current_user_id' => $request->user()?->id,

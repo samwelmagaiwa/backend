@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\v1\AdminDepartmentController;
 use App\Http\Controllers\Api\v1\DeviceInventoryController;
 use App\Http\Controllers\Api\v1\HodCombinedAccessController;
 use App\Http\Controllers\Api\v1\DivisionalCombinedAccessController;
+use App\Http\Controllers\Api\v1\DictCombinedAccessController;
 use App\Http\Controllers\Api\v1\HodDivisionalRecommendationsController;
 use App\Http\Controllers\Api\v1\ModuleAccessApprovalController;
 use App\Http\Controllers\Api\v1\ModuleRequestController;
@@ -22,12 +23,32 @@ use App\Http\Controllers\Api\v1\AccessRightsApprovalController;
 use App\Http\Controllers\Api\v1\ImplementationWorkflowController;
 use App\Http\Controllers\Api\HealthController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\Api\SwaggerController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return redirect('/api/documentation');
+    return response()->json([
+        'message' => 'Welcome to the User Access Management API',
+        'version' => '1.0.0',
+        'documentation' => url('/api/documentation'),
+        'api_schema' => url('/api/api-docs'),
+        'status' => 'active',
+        'endpoints' => [
+            'authentication' => url('/api/login'),
+            'user_profile' => url('/api/user'),
+            'user_access_requests' => url('/api/v1/user-access'),
+            'device_bookings' => url('/api/booking-service/bookings'),
+            'ict_approvals' => url('/api/ict-approval/device-requests')
+        ]
+    ]);
 });
+
+// Swagger Documentation Routes
+Route::get('/documentation', [SwaggerController::class, 'documentation'])->name('api.documentation');
+Route::get('/api-docs', [SwaggerController::class, 'apiDocs'])->name('api.docs');
+Route::get('/docs.json', [SwaggerController::class, 'apiDocs'])->name('api.docs.json');
+Route::get('/swagger-test', [SwaggerController::class, 'test'])->name('api.swagger.test');
 
 // Simple test route - should work if routing is functioning
 Route::get('/test-simple', function () {
@@ -384,6 +405,14 @@ Route::middleware('auth:sanctum')->group(function () {
             ->middleware('both.service.role:divisional_director')
             ->name('both-service-form.module-requests.divisional-reject');
         
+        // ICT Director approval routes
+        Route::post('/module-requests/{userAccessId}/ict-director-approve', [BothServiceFormController::class, 'approveIctDirector'])
+            ->middleware('both.service.role:dict,ict_director')
+            ->name('both-service-form.module-requests.ict-director-approve');
+        Route::post('/module-requests/{userAccessId}/ict-director-reject', [BothServiceFormController::class, 'rejectIctDirector'])
+            ->middleware('both.service.role:dict,ict_director')
+            ->name('both-service-form.module-requests.ict-director-reject');
+        
         // TEMPORARY: Debug record data
         Route::get('/debug-record/{id}', [BothServiceFormController::class, 'debugRecord'])
             ->name('both-service-form.debug-record');
@@ -474,6 +503,11 @@ Route::prefix('hod')->middleware('role:head_of_department,divisional_director,ic
     Route::post('divisional-recommendations/{userAccessId}/resubmit', [\App\Http\Controllers\Api\v1\HodDivisionalRecommendationsController::class, 'resubmitRequest'])
         ->middleware('role:head_of_department')
         ->name('hod.divisional-recommendations.resubmit');
+    
+    // Debug route for HOD recommendations
+    Route::get('debug-recommendations', [\App\Http\Controllers\Api\v1\DebugHodRecommendationsController::class, 'debugHodRecommendations'])
+        ->middleware('role:head_of_department')
+        ->name('hod.debug-recommendations');
 });
 
     // Divisional Director Combined Access Request routes (Divisional Director only)
@@ -488,6 +522,34 @@ Route::prefix('hod')->middleware('role:head_of_department,divisional_director,ic
             ->name('divisional.combined-access-requests.approve');
         Route::post('combined-access-requests/{id}/cancel', [DivisionalCombinedAccessController::class, 'cancel'])
             ->name('divisional.combined-access-requests.cancel');
+            
+        // Divisional Director Dict Recommendations
+        Route::get('dict-recommendations', [\App\Http\Controllers\Api\v1\DivisionalDictRecommendationsController::class, 'getDictRecommendations'])
+            ->middleware('role:divisional_director')
+            ->name('divisional.dict-recommendations.list');
+        Route::get('dict-recommendations/stats', [\App\Http\Controllers\Api\v1\DivisionalDictRecommendationsController::class, 'getRecommendationStats'])
+            ->middleware('role:divisional_director')
+            ->name('divisional.dict-recommendations.stats');
+        Route::get('dict-recommendations/{userAccessId}/details', [\App\Http\Controllers\Api\v1\DivisionalDictRecommendationsController::class, 'getRequestDetails'])
+            ->middleware('role:divisional_director')
+            ->name('divisional.dict-recommendations.details');
+        Route::post('dict-recommendations/{userAccessId}/respond', [\App\Http\Controllers\Api\v1\DivisionalDictRecommendationsController::class, 'submitResponse'])
+            ->middleware('role:divisional_director')
+            ->name('divisional.dict-recommendations.respond');
+    });
+
+    // ICT Director Combined Access Request routes (ICT Director only)
+    Route::prefix('dict')->middleware('role:ict_director,admin')->group(function () {
+        Route::get('combined-access-requests', [\App\Http\Controllers\Api\v1\DictCombinedAccessController::class, 'index'])
+            ->name('dict.combined-access-requests.index');
+        Route::get('combined-access-requests/statistics', [\App\Http\Controllers\Api\v1\DictCombinedAccessController::class, 'statistics'])
+            ->name('dict.combined-access-requests.statistics');
+        Route::get('combined-access-requests/{id}', [\App\Http\Controllers\Api\v1\DictCombinedAccessController::class, 'show'])
+            ->name('dict.combined-access-requests.show');
+        Route::post('combined-access-requests/{id}/approve', [\App\Http\Controllers\Api\v1\DictCombinedAccessController::class, 'updateApproval'])
+            ->name('dict.combined-access-requests.approve');
+        Route::post('combined-access-requests/{id}/cancel', [\App\Http\Controllers\Api\v1\DictCombinedAccessController::class, 'cancel'])
+            ->name('dict.combined-access-requests.cancel');
     });
 
     // ========================================

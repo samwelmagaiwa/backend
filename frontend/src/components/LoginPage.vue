@@ -133,7 +133,7 @@
               <button
                 @click="testConnection"
                 :disabled="testingConnection"
-                class="px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 disabled:opacity-50"
+                class="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 disabled:opacity-50"
               >
                 <i v-if="testingConnection" class="fas fa-spinner fa-spin mr-1"></i>
                 <i v-else class="fas fa-plug mr-1"></i>

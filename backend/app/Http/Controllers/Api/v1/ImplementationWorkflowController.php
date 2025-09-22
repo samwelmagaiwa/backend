@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
 use App\Models\UserAccess;
+use App\Services\UserAccessWorkflowService;
+use App\Traits\HandlesStatusQueries;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +15,14 @@ use Illuminate\Validation\ValidationException;
 
 class ImplementationWorkflowController extends Controller
 {
+    use HandlesStatusQueries;
+
+    protected $workflowService;
+
+    public function __construct(UserAccessWorkflowService $workflowService)
+    {
+        $this->workflowService = $workflowService;
+    }
     /**
      * Store implementation workflow data (Head of IT and ICT Officer).
      */
@@ -435,20 +445,179 @@ class ImplementationWorkflowController extends Controller
     private function updateRequestStatus(UserAccess $userAccess): void
     {
         if ($this->isImplementationComplete($userAccess)) {
-            $userAccess->update(['status' => 'implemented']);
+            // Set ICT Officer status to implemented
+            $userAccess->update([
+                'ict_officer_status' => 'implemented',
+                'status' => 'implemented'
+            ]);
             Log::info('✅ Request status updated to implemented', [
                 'user_access_id' => $userAccess->id
             ]);
         } elseif (!empty($userAccess->head_it_name)) {
-            $userAccess->update(['status' => 'pending_ict_officer']);
+            // Head IT approved, now pending ICT Officer implementation
+            $userAccess->update([
+                'head_it_status' => 'approved',
+                'ict_officer_status' => 'pending',
+                'status' => 'pending_ict_officer'
+            ]);
             Log::info('✅ Request status updated to pending ICT officer', [
                 'user_access_id' => $userAccess->id
             ]);
         } elseif (!empty($userAccess->ict_director_name)) {
-            $userAccess->update(['status' => 'pending_head_it']);
+            // ICT Director approved, now pending Head IT
+            $userAccess->update([
+                'ict_director_status' => 'approved',
+                'head_it_status' => 'pending',
+                'status' => 'pending_head_it'
+            ]);
             Log::info('✅ Request status updated to pending Head of IT', [
                 'user_access_id' => $userAccess->id
             ]);
+        }
+    }
+
+    /**
+     * Get requests pending Head IT approval.
+     */
+    public function getPendingHeadItRequests(Request $request): JsonResponse
+    {
+        try {
+            $user = $request->user();
+            
+            if (!$user->hasRole(['admin', 'head_it'])) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'You do not have permission to view these requests.'
+                ], 403);
+            }
+
+            $requests = $this->getPendingRequestsForStage('head_it')
+                ->with(['user', 'department'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $requests->map(function ($request) {
+                    return [
+                        'id' => $request->id,
+                        'user_name' => $request->user->name,
+                        'pf_number' => $request->pf_number,
+                        'department_name' => $request->department->name ?? 'Unknown',
+                        'request_type' => $request->request_type,
+                        'created_at' => $request->created_at,
+                        'updated_at' => $request->updated_at,
+                        'workflow_progress' => $request->getWorkflowProgressFromColumns()
+                    ];
+                })
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error fetching pending Head IT requests', [
+                'error' => $e->getMessage(),
+                'user_id' => $request->user()?->id
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to fetch pending Head IT requests.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Get requests pending ICT Officer implementation.
+     */
+    public function getPendingIctOfficerRequests(Request $request): JsonResponse
+    {
+        try {
+            $user = $request->user();
+            
+            if (!$user->hasRole(['admin', 'ict_officer'])) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'You do not have permission to view these requests.'
+                ], 403);
+            }
+
+            $requests = $this->getPendingRequestsForStage('ict_officer')
+                ->with(['user', 'department'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $requests->map(function ($request) {
+                    return [
+                        'id' => $request->id,
+                        'user_name' => $request->user->name,
+                        'pf_number' => $request->pf_number,
+                        'department_name' => $request->department->name ?? 'Unknown',
+                        'request_type' => $request->request_type,
+                        'created_at' => $request->created_at,
+                        'updated_at' => $request->updated_at,
+                        'workflow_progress' => $request->getWorkflowProgressFromColumns(),
+                        'head_it_approved' => !empty($request->head_it_name),
+                        'head_it_approved_at' => $request->head_it_approved_at
+                    ];
+                })
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error fetching pending ICT Officer requests', [
+                'error' => $e->getMessage(),
+                'user_id' => $request->user()?->id
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to fetch pending ICT Officer requests.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Get implementation statistics.
+     */
+    public function getImplementationStatistics(Request $request): JsonResponse
+    {
+        try {
+            $user = $request->user();
+            
+            if (!$user->hasRole(['admin', 'head_it', 'ict_officer'])) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'You do not have permission to view these statistics.'
+                ], 403);
+            }
+
+            $stats = [
+                'head_it' => [
+                    'pending' => $this->getPendingRequestsForStage('head_it')->count(),
+                    'approved' => $this->getApprovedRequestsForStage('head_it')->count(),
+                ],
+                'ict_officer' => [
+                    'pending' => $this->getPendingRequestsForStage('ict_officer')->count(),
+                    'implemented' => $this->getApprovedRequestsForStage('ict_officer')->count(),
+                ],
+                'total_implemented' => UserAccess::where('ict_officer_status', 'implemented')->count()
+            ];
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $stats
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error fetching implementation statistics', [
+                'error' => $e->getMessage(),
+                'user_id' => $request->user()?->id
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to fetch implementation statistics.'
+            ], 500);
         }
     }
 }

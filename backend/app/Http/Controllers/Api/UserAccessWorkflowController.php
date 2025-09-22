@@ -5,17 +5,23 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\UserAccess;
 use App\Services\UserAccessWorkflowService;
+use App\Services\StatusMigrationService;
+use App\Traits\HandlesStatusQueries;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
 
 class UserAccessWorkflowController extends Controller
 {
+    use HandlesStatusQueries;
+    
     protected UserAccessWorkflowService $workflowService;
+    protected StatusMigrationService $statusMigrationService;
 
-    public function __construct(UserAccessWorkflowService $workflowService)
+    public function __construct(UserAccessWorkflowService $workflowService, StatusMigrationService $statusMigrationService)
     {
         $this->workflowService = $workflowService;
+        $this->statusMigrationService = $statusMigrationService;
     }
 
     /**
@@ -103,11 +109,19 @@ class UserAccessWorkflowController extends Controller
     public function update(Request $request, UserAccess $userAccess): JsonResponse
     {
         try {
-            // Only allow updates if request is still pending
-            if (!in_array($userAccess->status, ['pending', 'pending_hod'])) {
+            // Only allow updates if request is still at initial pending stage using new status columns
+            if ($userAccess->hod_status !== 'pending') {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Cannot update request that is already in approval process'
+                    'message' => 'Cannot update request that has already entered the approval workflow',
+                    'error' => 'Request is no longer editable',
+                    'current_workflow_stage' => [
+                        'hod_status' => $userAccess->hod_status,
+                        'divisional_status' => $userAccess->divisional_status,
+                        'ict_director_status' => $userAccess->ict_director_status,
+                        'head_it_status' => $userAccess->head_it_status,
+                        'ict_officer_status' => $userAccess->ict_officer_status
+                    ]
                 ], 403);
             }
 
@@ -147,10 +161,19 @@ class UserAccessWorkflowController extends Controller
                 ], 403);
             }
 
-            if (!in_array($userAccess->status, ['pending', 'pending_hod'])) {
+            // Validate using new granular status columns - HOD can only approve if HOD status is pending
+            if ($userAccess->hod_status !== 'pending') {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Request is not in HOD approval stage'
+                    'message' => 'Request is not available for HOD approval',
+                    'error' => 'Invalid workflow stage for HOD approval',
+                    'current_workflow_stage' => [
+                        'hod_status' => $userAccess->hod_status,
+                        'divisional_status' => $userAccess->divisional_status,
+                        'ict_director_status' => $userAccess->ict_director_status,
+                        'head_it_status' => $userAccess->head_it_status,
+                        'ict_officer_status' => $userAccess->ict_officer_status
+                    ]
                 ], 400);
             }
 
@@ -190,10 +213,19 @@ class UserAccessWorkflowController extends Controller
                 ], 403);
             }
 
-            if ($userAccess->status !== 'pending_divisional') {
+            // Validate using new granular status columns - Divisional can only approve if HOD approved and Divisional is pending
+            if ($userAccess->hod_status !== 'approved' || $userAccess->divisional_status !== 'pending') {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Request is not in Divisional Director approval stage'
+                    'message' => 'Request is not available for Divisional Director approval',
+                    'error' => 'Request must have HOD approval and be pending divisional approval',
+                    'current_workflow_stage' => [
+                        'hod_status' => $userAccess->hod_status,
+                        'divisional_status' => $userAccess->divisional_status,
+                        'ict_director_status' => $userAccess->ict_director_status,
+                        'head_it_status' => $userAccess->head_it_status,
+                        'ict_officer_status' => $userAccess->ict_officer_status
+                    ]
                 ], 400);
             }
 
@@ -233,10 +265,21 @@ class UserAccessWorkflowController extends Controller
                 ], 403);
             }
 
-            if ($userAccess->status !== 'pending_ict_director') {
+            // Validate using new granular status columns - ICT Director can only approve if HOD and Divisional approved, ICT Director is pending
+            if ($userAccess->hod_status !== 'approved' || 
+                $userAccess->divisional_status !== 'approved' || 
+                $userAccess->ict_director_status !== 'pending') {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Request is not in ICT Director approval stage'
+                    'message' => 'Request is not available for ICT Director approval',
+                    'error' => 'Request must have HOD and Divisional approval and be pending ICT Director approval',
+                    'current_workflow_stage' => [
+                        'hod_status' => $userAccess->hod_status,
+                        'divisional_status' => $userAccess->divisional_status,
+                        'ict_director_status' => $userAccess->ict_director_status,
+                        'head_it_status' => $userAccess->head_it_status,
+                        'ict_officer_status' => $userAccess->ict_officer_status
+                    ]
                 ], 400);
             }
 
@@ -276,10 +319,22 @@ class UserAccessWorkflowController extends Controller
                 ], 403);
             }
 
-            if ($userAccess->status !== 'pending_head_it') {
+            // Validate using new granular status columns - Head IT can only approve if all previous stages approved and Head IT is pending
+            if ($userAccess->hod_status !== 'approved' || 
+                $userAccess->divisional_status !== 'approved' || 
+                $userAccess->ict_director_status !== 'approved' || 
+                $userAccess->head_it_status !== 'pending') {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Request is not in Head IT approval stage'
+                    'message' => 'Request is not available for Head IT approval',
+                    'error' => 'Request must have HOD, Divisional, and ICT Director approval and be pending Head IT approval',
+                    'current_workflow_stage' => [
+                        'hod_status' => $userAccess->hod_status,
+                        'divisional_status' => $userAccess->divisional_status,
+                        'ict_director_status' => $userAccess->ict_director_status,
+                        'head_it_status' => $userAccess->head_it_status,
+                        'ict_officer_status' => $userAccess->ict_officer_status
+                    ]
                 ], 400);
             }
 
@@ -319,10 +374,23 @@ class UserAccessWorkflowController extends Controller
                 ], 403);
             }
 
-            if ($userAccess->status !== 'pending_ict_officer') {
+            // Validate using new granular status columns - ICT Officer can only implement if all previous stages approved and ICT Officer is pending
+            if ($userAccess->hod_status !== 'approved' || 
+                $userAccess->divisional_status !== 'approved' || 
+                $userAccess->ict_director_status !== 'approved' || 
+                $userAccess->head_it_status !== 'approved' || 
+                $userAccess->ict_officer_status !== 'pending') {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Request is not in ICT Officer implementation stage'
+                    'message' => 'Request is not available for ICT Officer implementation',
+                    'error' => 'Request must have all previous approvals and be pending ICT Officer implementation',
+                    'current_workflow_stage' => [
+                        'hod_status' => $userAccess->hod_status,
+                        'divisional_status' => $userAccess->divisional_status,
+                        'ict_director_status' => $userAccess->ict_director_status,
+                        'head_it_status' => $userAccess->head_it_status,
+                        'ict_officer_status' => $userAccess->ict_officer_status
+                    ]
                 ], 400);
             }
 
@@ -354,12 +422,19 @@ class UserAccessWorkflowController extends Controller
     public function getStatistics(): JsonResponse
     {
         try {
-            $statistics = $this->workflowService->getStatistics(auth()->user());
+            // Get enhanced statistics using both legacy service and new granular status methods
+            $legacyStatistics = $this->workflowService->getStatistics(auth()->user());
+            
+            // Get enhanced statistics using new granular status system
+            $enhancedStatistics = $this->getEnhancedStatistics(auth()->user());
+            
+            // Merge both statistics for complete view
+            $combinedStatistics = array_merge($legacyStatistics, $enhancedStatistics);
             
             return response()->json([
                 'success' => true,
                 'message' => 'Statistics retrieved successfully',
-                'data' => $statistics
+                'data' => $combinedStatistics
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -368,6 +443,57 @@ class UserAccessWorkflowController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+    
+    /**
+     * Get enhanced statistics using new granular status system
+     */
+    private function getEnhancedStatistics($user): array
+    {
+        // Use trait methods for comprehensive statistics
+        $systemStats = $this->getSystemStatistics();
+        
+        // Role-specific statistics
+        $roleBasedStats = [];
+        if ($user->hasRole()) {
+            $userRole = $user->role->name;
+            switch ($userRole) {
+                case 'HEAD_OF_DEPARTMENT':
+                    $roleBasedStats = $this->getStageStatistics('hod');
+                    break;
+                case 'DIVISIONAL_DIRECTOR':
+                    $roleBasedStats = $this->getStageStatistics('divisional');
+                    break;
+                case 'ICT_DIRECTOR':
+                    $roleBasedStats = $this->getStageStatistics('ict_director');
+                    break;
+                case 'HEAD_IT':
+                    $roleBasedStats = $this->getStageStatistics('head_it');
+                    break;
+                case 'ICT_OFFICER':
+                    $roleBasedStats = $this->getStageStatistics('ict_officer');
+                    break;
+            }
+        }
+        
+        return [
+            'enhanced_workflow_statistics' => [
+                'system_overview' => $systemStats,
+                'role_specific' => $roleBasedStats,
+                'workflow_breakdown' => [
+                    'pending_hod' => $this->getPendingRequestsForStage('hod')->count(),
+                    'pending_divisional' => $this->getPendingRequestsForStage('divisional')->count(),
+                    'pending_ict_director' => $this->getPendingRequestsForStage('ict_director')->count(),
+                    'pending_head_it' => $this->getPendingRequestsForStage('head_it')->count(),
+                    'pending_ict_officer' => $this->getPendingRequestsForStage('ict_officer')->count(),
+                ],
+                'completion_statistics' => [
+                    'fully_completed' => $this->getCompletedRequests()->count(),
+                    'in_progress' => $this->getRequestsInProgress()->count(),
+                    'rejected_somewhere' => $this->getRequestsWithRejections()->count(),
+                ]
+            ]
+        ];
     }
 
     /**
@@ -383,6 +509,20 @@ class UserAccessWorkflowController extends Controller
                     'request_types' => UserAccess::REQUEST_TYPES,
                     'access_types' => UserAccess::ACCESS_TYPES,
                     'statuses' => UserAccess::STATUSES,
+                    'granular_status_options' => [
+                        'hod_statuses' => ['pending', 'approved', 'rejected'],
+                        'divisional_statuses' => ['pending', 'approved', 'rejected'],
+                        'ict_director_statuses' => ['pending', 'approved', 'rejected'],
+                        'head_it_statuses' => ['pending', 'approved', 'rejected'],
+                        'ict_officer_statuses' => ['pending', 'implemented', 'rejected']
+                    ],
+                    'workflow_stages' => [
+                        'hod' => 'Head of Department',
+                        'divisional' => 'Divisional Director',
+                        'ict_director' => 'ICT Director',
+                        'head_it' => 'Head IT',
+                        'ict_officer' => 'ICT Officer'
+                    ],
                     'wellsoft_modules' => [
                         'Registrar',
                         'Specialist',

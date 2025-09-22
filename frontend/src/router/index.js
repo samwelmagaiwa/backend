@@ -386,12 +386,7 @@ const routes = [
       import(/* webpackChunkName: "hod" */ '../components/views/hod/HodRequestListSimplified.vue'),
     meta: {
       requiresAuth: true,
-      roles: [
-        ROLES.HEAD_OF_DEPARTMENT,
-        ROLES.DIVISIONAL_DIRECTOR,
-        ROLES.ICT_DIRECTOR,
-        ROLES.ICT_OFFICER
-      ]
+      roles: [ROLES.HEAD_OF_DEPARTMENT]
     }
   },
 
@@ -421,7 +416,7 @@ const routes = [
 
   // Divisional Director Combined Access Requests List
   {
-    path: '/divisional-dashboard/combined-request',
+    path: '/divisional-dashboard/combined-requests',
     name: 'DivisionalCombinedRequestList',
     component: () =>
       import(
@@ -429,7 +424,34 @@ const routes = [
       ),
     meta: {
       requiresAuth: true,
-      roles: [ROLES.DIVISIONAL_DIRECTOR, ROLES.ICT_DIRECTOR, ROLES.ICT_OFFICER]
+      roles: [ROLES.DIVISIONAL_DIRECTOR]
+    }
+  },
+
+  // Divisional Director Dict Recommendations
+  {
+    path: '/divisional-dashboard/dict-recommendations',
+    name: 'DivisionalDictRecommendations',
+    component: () =>
+      import(
+        /* webpackChunkName: "divisional" */ '../components/views/divisional/DictRecommendations.vue'
+      ),
+    meta: {
+      requiresAuth: true,
+      roles: [ROLES.DIVISIONAL_DIRECTOR]
+    }
+  },
+
+  // ICT Director Combined Access Requests List
+  {
+    path: '/dict-dashboard/combined-requests',
+    name: 'DictCombinedRequestList',
+    component: () =>
+      import(/* webpackChunkName: "dict" */ '../components/views/dict/DictRequestList.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: [ROLES.ICT_DIRECTOR],
+      refreshOnEnter: true // Force refresh when entering this route
     }
   },
 

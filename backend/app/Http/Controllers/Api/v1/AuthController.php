@@ -17,6 +17,99 @@ class AuthController extends Controller
      * Handle user login and return an authentication token.
      * Supports multiple concurrent sessions per user.
      *
+     * @OA\Post(
+     *     path="/api/login",
+     *     summary="User Login",
+     *     description="Authenticate user and return access token",
+     *     operationId="login",
+     *     tags={"Authentication"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 required={"email", "password"},
+     *                 @OA\Property(
+     *                     property="email",
+     *                     type="string",
+     *                     format="email",
+     *                     example="user@example.com",
+     *                     description="User email address"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="password",
+     *                     type="string",
+     *                     format="password",
+     *                     minLength=6,
+     *                     example="password123",
+     *                     description="User password (minimum 6 characters)"
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Login successful",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="user",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="name", type="string", example="John Doe"),
+     *                 @OA\Property(property="email", type="string", example="user@example.com"),
+     *                 @OA\Property(property="phone", type="string", example="+1234567890"),
+     *                 @OA\Property(property="pf_number", type="string", example="PF12345"),
+     *                 @OA\Property(property="role", type="string", example="staff"),
+     *                 @OA\Property(property="primary_role", type="string", example="staff"),
+     *                 @OA\Property(property="roles", type="array", @OA\Items(type="string"), example={"staff"}),
+     *                 @OA\Property(property="needs_onboarding", type="boolean", example=false),
+     *                 @OA\Property(property="onboarding_step", type="string", example="completed")
+     *             ),
+     *             @OA\Property(property="token", type="string", example="1|abcdef123456..."),
+     *             @OA\Property(property="token_name", type="string", example="STAFF_Chrome_192.168.1.1_2024-01-01 12:00:00"),
+     *             @OA\Property(
+     *                 property="session_info",
+     *                 type="object",
+     *                 @OA\Property(property="ip_address", type="string", example="192.168.1.1"),
+     *                 @OA\Property(property="user_agent", type="string", example="Mozilla/5.0..."),
+     *                 @OA\Property(property="created_at", type="string", format="date-time")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Invalid credentials",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Invalid email or password.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="The given data was invalid."),
+     *             @OA\Property(
+     *                 property="errors",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="email",
+     *                     type="array",
+     *                     @OA\Items(type="string", example="The email field is required.")
+     *                 ),
+     *                 @OA\Property(
+     *                     property="password",
+     *                     type="array",
+     *                     @OA\Items(type="string", example="The password field is required.")
+     *                 )
+     *             )
+     *         )
+     *     )
+     * )
+     *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -211,6 +304,43 @@ class AuthController extends Controller
      * Logout user by revoking the current token.
      * Only affects the current session/tab.
      *
+     * @OA\Post(
+     *     path="/api/logout",
+     *     summary="User Logout",
+     *     description="Logout user from current session by revoking the current token",
+     *     operationId="logout",
+     *     tags={"Authentication"},
+     *     security={"sanctum": {}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Logout successful",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Logged out successfully"),
+     *             @OA\Property(property="session_ended", type="boolean", example=true)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="No authenticated user or token found")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Logout failed")
+     *         )
+     *     )
+     * )
+     *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -262,6 +392,43 @@ class AuthController extends Controller
     
     /**
      * Logout from all sessions by revoking all tokens.
+     *
+     * @OA\Post(
+     *     path="/api/logout-all",
+     *     summary="Logout from All Sessions",
+     *     description="Logout user from all sessions by revoking all tokens",
+     *     operationId="logoutAll",
+     *     tags={"Authentication"},
+     *     security={"sanctum": {}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Logout from all sessions successful",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Logged out from all sessions successfully"),
+     *             @OA\Property(property="tokens_revoked", type="integer", example=3)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="No authenticated user found")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Logout from all sessions failed")
+     *         )
+     *     )
+     * )
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse

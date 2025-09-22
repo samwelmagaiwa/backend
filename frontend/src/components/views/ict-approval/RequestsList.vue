@@ -387,7 +387,7 @@
                               <i class="fas fa-hashtag text-white text-sm"></i>
                             </div>
                             <div>
-                              <div class="text-sm font-medium text-white">
+                              <div class="text-base font-medium text-white">
                                 {{
                                   request.request_id ||
                                   `REQ-${request.id.toString().padStart(6, '0')}`
@@ -405,7 +405,7 @@
                               <i class="fas fa-user text-white text-sm"></i>
                             </div>
                             <div>
-                              <div class="text-sm font-medium text-white">
+                              <div class="text-base font-medium text-white">
                                 {{
                                   request.borrower_name || request.borrowerName || 'Unknown User'
                                 }}
@@ -413,14 +413,14 @@
                               <div class="text-sm text-blue-300">
                                 {{ request.borrower_phone || request.phoneNumber || 'No phone' }}
                               </div>
-                              <div v-if="request.pf_number" class="text-xs text-teal-300">
+                              <div v-if="request.pf_number" class="text-sm text-teal-300">
                                 PF: {{ request.pf_number }}
                               </div>
                             </div>
                           </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                          <div class="text-sm text-white font-medium">
+                          <div class="text-base text-white font-medium">
                             {{ request.department || 'Unknown Department' }}
                           </div>
                         </td>
@@ -428,7 +428,7 @@
                           <div class="flex items-center">
                             <i class="fas fa-laptop text-teal-300 mr-2"></i>
                             <div class="flex flex-col">
-                              <span class="text-sm text-white font-medium">{{
+                              <span class="text-base text-white font-medium">{{
                                 request.device_name ||
                                 getDeviceDisplayName(
                                   request.device_type || request.deviceType,
@@ -448,10 +448,10 @@
                           </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                          <div class="text-sm text-white font-medium">
+                          <div class="text-base text-white font-medium">
                             {{ formatDate(request.booking_date || request.bookingDate) }}
                           </div>
-                          <div class="text-xs text-blue-300">
+                          <div class="text-sm text-blue-300">
                             Return:
                             {{ formatDate(request.collection_date || request.collectionDate) }}
                           </div>
@@ -504,7 +504,7 @@
                             <!-- Compact Actions Dropdown Button -->
                             <button
                               @click="toggleActionsDropdown(request.id)"
-                              class="relative inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-xs font-medium rounded-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-1 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 group overflow-hidden"
+                              class="relative inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-medium rounded-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-1 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 group overflow-hidden"
                             >
                               <!-- Animated Background Gradient -->
                               <div

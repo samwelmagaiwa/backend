@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Api\v1;
 use App\Http\Controllers\Controller;
 use App\Models\UserAccess;
 use App\Models\Department;
+use App\Traits\HandlesStatusQueries;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class HodDivisionalRecommendationsController extends Controller
 {
+    use HandlesStatusQueries;
     /**
      * Get divisional director recommendations for HOD's department
      */
@@ -63,26 +65,18 @@ class HodDivisionalRecommendationsController extends Controller
                 'department_names' => $hodDepartments->pluck('name')->toArray()
             ]);
             
-            // Build query for requests from HOD's departments that have divisional director comments
+            // Build query for requests from HOD's departments that have divisional director feedback
             $query = UserAccess::with(['user', 'department'])
                 ->whereIn('department_id', $hodDepartmentIds)
                 ->whereNotNull('divisional_director_comments')
                 ->where('divisional_director_comments', '!=', '')
-                // Include requests that have been reviewed by divisional director
-                ->whereIn('status', [
-                    'divisional_approved',
-                    'divisional_rejected', 
-                    'pending_ict_director',
-                    'ict_director_approved',
-                    'ict_director_rejected',
-                    'pending_head_it',
-                    'head_it_approved',
-                    'head_it_rejected',
-                    'pending_ict_officer',
-                    'implemented',
-                    'approved',
-                    'rejected'
-                ])
+                // Use new status columns - HOD should see requests that have been reviewed by divisional director
+                ->where(function($q) {
+                    $q->where('divisional_status', 'approved')
+                      ->orWhere('divisional_status', 'rejected');
+                })
+                // Additional filtering for workflow progression - show requests regardless of subsequent stages
+                ->where('hod_status', 'approved') // Only show requests that this HOD has approved
                 ->orderBy('divisional_approved_at', 'desc')
                 ->orderBy('updated_at', 'desc');
             
@@ -305,8 +299,8 @@ class HodDivisionalRecommendationsController extends Controller
                 ], 403);
             }
             
-            // Verify request can be resubmitted (must be rejected by divisional director)
-            if ($userAccess->status !== 'divisional_rejected') {
+            // Verify request can be resubmitted (must be rejected by divisional director using new status columns)
+            if ($userAccess->divisional_status !== 'rejected') {
                 return response()->json([
                     'success' => false,
                     'message' => 'Only requests rejected by divisional director can be resubmitted.'
@@ -344,6 +338,9 @@ class HodDivisionalRecommendationsController extends Controller
                 'hod_resubmission_notes' => $validated['resubmission_notes'],
                 'resubmitted_at' => now(),
                 'resubmitted_by' => $currentUser->id,
+                // Reset new status columns
+                'divisional_status' => 'pending', // Reset divisional status to pending for re-review
+                // Keep legacy status for backward compatibility during transition
                 'status' => 'hod_approved', // Reset to HOD approved so divisional director can review again
             ];
             
@@ -461,7 +458,8 @@ class HodDivisionalRecommendationsController extends Controller
                     'resubmitted_by' => $userAccess->resubmitted_by
                 ],
                 
-                'can_resubmit' => $userAccess->status === 'divisional_rejected',
+                // Use new status columns to determine if can resubmit
+                'can_resubmit' => $userAccess->divisional_status === 'rejected',
                 'created_at' => $userAccess->created_at,
                 'updated_at' => $userAccess->updated_at
             ];

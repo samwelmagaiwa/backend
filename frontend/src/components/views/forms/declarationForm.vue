@@ -151,14 +151,14 @@
               <div class="flex items-center space-x-2">
                 <span
                   v-if="isLoadingProfile"
-                  class="text-xs text-blue-300 font-medium bg-blue-500/20 px-2 py-1 rounded-full border border-blue-400/30 animate-pulse"
+                  class="text-sm text-blue-300 font-medium bg-blue-500/20 px-2 py-1 rounded-full border border-blue-400/30 animate-pulse"
                 >
                   <i class="fas fa-spinner fa-spin mr-1 text-xs"></i>
                   Loading...
                 </span>
                 <span
                   v-else-if="autoPopulated"
-                  class="text-xs text-green-300 font-medium bg-green-500/20 px-2 py-1 rounded-full border border-green-400/30"
+                  class="text-sm text-green-300 font-medium bg-green-500/20 px-2 py-1 rounded-full border border-green-400/30"
                 >
                   <i class="fas fa-check mr-1 text-xs"></i>
                   Auto-populated
@@ -177,12 +177,12 @@
               <!-- Full Name -->
               <div class="md:col-span-2">
                 <label
-                  class="block text-sm font-bold text-blue-100 mb-2 flex items-center justify-between"
+                  class="block text-base font-bold text-blue-100 mb-2 flex items-center justify-between"
                 >
                   <span>Full Name <span class="text-red-400">*</span></span>
                   <span
                     v-if="autoPopulated && formData.fullName && !isLoadingProfile"
-                    class="text-xs text-green-300 font-medium bg-green-500/20 px-2 py-1 rounded-full border border-green-400/30 flex items-center gap-1"
+                    class="text-sm text-green-300 font-medium bg-green-500/20 px-2 py-1 rounded-full border border-green-400/30 flex items-center gap-1"
                   >
                     <i class="fas fa-lock text-xs"></i>
                     Protected
@@ -235,12 +235,12 @@
               <!-- PF Number -->
               <div>
                 <label
-                  class="block text-sm font-bold text-blue-100 mb-2 flex items-center justify-between"
+                  class="block text-base font-bold text-blue-100 mb-2 flex items-center justify-between"
                 >
                   <span>PF Number <span class="text-red-400">*</span></span>
                   <span
                     v-if="autoPopulated && formData.pfNumber && !isLoadingProfile"
-                    class="text-xs text-green-300 font-medium bg-green-500/20 px-2 py-1 rounded-full border border-green-400/30 flex items-center gap-1"
+                    class="text-sm text-green-300 font-medium bg-green-500/20 px-2 py-1 rounded-full border border-green-400/30 flex items-center gap-1"
                   >
                     <i class="fas fa-lock text-xs"></i>
                     Protected
@@ -292,7 +292,7 @@
 
               <!-- Department/Unit -->
               <div>
-                <label class="block text-sm font-bold text-blue-100 mb-2">
+                <label class="block text-base font-bold text-blue-100 mb-2">
                   Department/Unit <span class="text-red-400">*</span>
                 </label>
                 <div class="relative">
@@ -326,7 +326,7 @@
 
               <!-- Job Title -->
               <div class="md:col-span-2">
-                <label class="block text-sm font-bold text-blue-100 mb-2">
+                <label class="block text-base font-bold text-blue-100 mb-2">
                   Job Title <span class="text-red-400">*</span>
                 </label>
                 <div class="relative">
@@ -397,7 +397,7 @@
               <div
                 class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
               >
-                <i class="fas fa-signature text-white text-xs"></i>
+                <i class="fas fa-signature text-white text-sm"></i>
               </div>
               <h3 class="text-base font-bold text-white flex items-center">
                 <i class="fas fa-pen-fancy mr-2 text-blue-300 text-xs"></i>
@@ -408,7 +408,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
               <!-- Signature Upload -->
               <div class="md:col-span-2">
-                <label class="block text-sm font-bold text-blue-100 mb-2">
+                <label class="block text-base font-bold text-blue-100 mb-2">
                   Signature <span class="text-red-400">*</span>
                 </label>
 
@@ -425,7 +425,7 @@
                       <button
                         type="button"
                         @click="loadSignature"
-                        class="px-2 py-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-semibold rounded-md hover:from-blue-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/50"
+                        class="px-2 py-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-semibold rounded-md hover:from-blue-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/50"
                       >
                         <i class="fas fa-download text-xs"></i>
                         Load
@@ -490,7 +490,7 @@
 
               <!-- Date -->
               <div>
-                <label class="block text-sm font-bold text-blue-100 mb-2">
+                <label class="block text-base font-bold text-blue-100 mb-2">
                   Date <span class="text-red-400">*</span>
                 </label>
                 <div class="relative">

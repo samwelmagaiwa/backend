@@ -150,7 +150,7 @@
                 <!-- Filters and Search -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                   <div>
-                    <label class="block text-sm font-bold text-blue-100 mb-2"
+                    <label class="block text-base font-bold text-blue-100 mb-2"
                       >Search Departments</label
                     >
                     <div class="relative">
@@ -168,7 +168,7 @@
                   </div>
 
                   <div>
-                    <label class="block text-sm font-bold text-blue-100 mb-2"
+                    <label class="block text-base font-bold text-blue-100 mb-2"
                       >Filter by Status</label
                     >
                     <div class="relative">
@@ -190,7 +190,9 @@
                   </div>
 
                   <div>
-                    <label class="block text-sm font-bold text-blue-100 mb-2">Filter by HOD</label>
+                    <label class="block text-base font-bold text-blue-100 mb-2"
+                      >Filter by HOD</label
+                    >
                     <div class="relative">
                       <select
                         v-model="filterHod"
@@ -212,7 +214,7 @@
                   </div>
 
                   <div>
-                    <label class="block text-sm font-bold text-blue-100 mb-2">Sort By</label>
+                    <label class="block text-base font-bold text-blue-100 mb-2">Sort By</label>
                     <div class="relative">
                       <select
                         v-model="sortBy"
@@ -289,10 +291,10 @@
                         <div
                           class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center"
                         >
-                          <i class="fas fa-user-tie text-white text-xs"></i>
+                          <i class="fas fa-user-tie text-white text-sm"></i>
                         </div>
                         <div>
-                          <div class="text-sm text-white font-medium">
+                          <div class="text-base text-white font-medium">
                             {{
                               department.hod_status || `Head of Department: ${department.hod.name}`
                             }}
@@ -321,10 +323,10 @@
                         <div
                           class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center"
                         >
-                          <i class="fas fa-crown text-white text-xs"></i>
+                          <i class="fas fa-crown text-white text-sm"></i>
                         </div>
                         <div>
-                          <div class="text-sm text-white font-medium">
+                          <div class="text-base text-white font-medium">
                             {{ department.divisional_director.name }}
                           </div>
                           <div class="text-xs text-blue-100">

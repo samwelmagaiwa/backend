@@ -64,93 +64,39 @@
           <!-- Main Content -->
           <div class="medical-glass-card rounded-3xl overflow-hidden mt-4">
             <div class="p-6">
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div
-                  class="medical-card bg-gradient-to-r from-blue-600/25 to-cyan-600/25 border-2 border-blue-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
-                >
-                  <div class="flex items-center mb-4">
-                    <div
-                      class="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50 mr-4"
-                    >
-                      <i class="fas fa-file-alt text-white text-xl"></i>
+              <!-- Quick Actions Section -->
+              <div class="mb-8">
+                <h3 class="text-xl font-bold text-white mb-4 flex items-center">
+                  <i class="fas fa-bolt mr-2 text-blue-400"></i>
+                  Quick Actions
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  <router-link
+                    to="/dict-dashboard/combined-requests"
+                    class="medical-card bg-gradient-to-r from-purple-600/25 to-pink-600/25 border-2 border-purple-400/40 p-4 rounded-xl backdrop-blur-sm hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 group text-center"
+                  >
+                    <div class="flex flex-col items-center">
+                      <div
+                        class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-purple-300/50 mb-2"
+                      >
+                        <i class="fas fa-layer-group text-white"></i>
+                      </div>
+                      <span class="text-white font-medium text-sm">Access Requests</span>
                     </div>
-                    <h3 class="text-lg font-semibold text-white drop-shadow-md">TOTAL FORMS</h3>
-                  </div>
-                  <p class="text-3xl font-bold text-blue-100 drop-shadow-lg">1,234</p>
-                </div>
+                  </router-link>
 
-                <div
-                  class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-600/25 border-2 border-blue-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
-                >
-                  <div class="flex items-center mb-4">
-                    <div
-                      class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50 mr-4"
-                    >
-                      <i class="fas fa-check-circle text-white text-xl"></i>
+                  <div
+                    class="medical-card bg-gradient-to-r from-blue-600/25 to-cyan-600/25 border-2 border-blue-400/40 p-4 rounded-xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-300 group text-center opacity-50 cursor-not-allowed"
+                  >
+                    <div class="flex flex-col items-center">
+                      <div
+                        class="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50 mb-2"
+                      >
+                        <i class="fas fa-chart-bar text-white"></i>
+                      </div>
+                      <span class="text-white font-medium text-sm">Analytics (Coming Soon)</span>
                     </div>
-                    <h3 class="text-lg font-semibold text-white drop-shadow-md">FORMS APPROVED</h3>
                   </div>
-                  <p class="text-3xl font-bold text-blue-100 drop-shadow-lg">56</p>
-                </div>
-
-                <div
-                  class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-600/25 border-2 border-blue-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
-                >
-                  <div class="flex items-center mb-4">
-                    <div
-                      class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50 mr-4"
-                    >
-                      <i class="fas fa-clock text-white text-xl"></i>
-                    </div>
-                    <h3 class="text-lg font-semibold text-white drop-shadow-md">
-                      PENDING REQUESTS
-                    </h3>
-                  </div>
-                  <p class="text-3xl font-bold text-blue-100 drop-shadow-lg">89</p>
-                </div>
-
-                <div
-                  class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-600/25 border-2 border-blue-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
-                >
-                  <div class="flex items-center mb-4">
-                    <div
-                      class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50 mr-4"
-                    >
-                      <i class="fas fa-database text-white text-xl"></i>
-                    </div>
-                    <h3 class="text-lg font-semibold text-white drop-shadow-md">JEEVA REQUESTS</h3>
-                  </div>
-                  <p class="text-3xl font-bold text-blue-100 drop-shadow-lg">70</p>
-                </div>
-
-                <div
-                  class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-600/25 border-2 border-blue-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
-                >
-                  <div class="flex items-center mb-4">
-                    <div
-                      class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50 mr-4"
-                    >
-                      <i class="fas fa-laptop-medical text-white text-xl"></i>
-                    </div>
-                    <h3 class="text-lg font-semibold text-white drop-shadow-md">
-                      WELLSOFT REQUESTS
-                    </h3>
-                  </div>
-                  <p class="text-3xl font-bold text-blue-100 drop-shadow-lg">89</p>
-                </div>
-
-                <div
-                  class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-600/25 border-2 border-blue-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
-                >
-                  <div class="flex items-center mb-4">
-                    <div
-                      class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50 mr-4"
-                    >
-                      <i class="fas fa-wifi text-white text-xl"></i>
-                    </div>
-                    <h3 class="text-lg font-semibold text-white drop-shadow-md">INTERNET ACCESS</h3>
-                  </div>
-                  <p class="text-3xl font-bold text-blue-100 drop-shadow-lg">900</p>
                 </div>
               </div>
 

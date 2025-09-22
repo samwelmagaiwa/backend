@@ -7,6 +7,8 @@ use App\Http\Requests\UserAccessRequest;
 use App\Models\UserAccess;
 use App\Models\Department;
 use App\Services\SignatureService;
+use App\Services\StatusMigrationService;
+use App\Traits\HandlesStatusQueries;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -15,22 +17,128 @@ use Illuminate\Support\Facades\Auth;
 
 class UserAccessController extends Controller
 {
+    use HandlesStatusQueries;
+
     /**
      * The signature service instance.
      */
     private SignatureService $signatureService;
 
     /**
+     * The status migration service instance.
+     */
+    private StatusMigrationService $statusMigrationService;
+
+    /**
      * Create a new controller instance.
      */
-    public function __construct(SignatureService $signatureService)
+    public function __construct(SignatureService $signatureService, StatusMigrationService $statusMigrationService)
     {
         $this->middleware('auth:sanctum');
         $this->signatureService = $signatureService;
+        $this->statusMigrationService = $statusMigrationService;
     }
 
     /**
      * Display a listing of user access requests.
+     *
+     * @OA\Get(
+     *     path="/api/v1/user-access",
+     *     summary="Get User Access Requests",
+     *     description="Retrieve a paginated list of user access requests for the authenticated user",
+     *     operationId="getUserAccessRequests",
+     *     tags={"User Access"},
+     *     security={"sanctum": {}},
+     *     @OA\Parameter(
+     *         name="status",
+     *         in="query",
+     *         description="Filter by request status",
+     *         required=false,
+     *         @OA\Schema(type="string", enum={"pending", "approved", "rejected", "completed"})
+     *     ),
+     *     @OA\Parameter(
+     *         name="request_type",
+     *         in="query",
+     *         description="Filter by request type",
+     *         required=false,
+     *         @OA\Schema(type="string", enum={"wellsoft_access", "jeeva_access", "internet_access_request"})
+     *     ),
+     *     @OA\Parameter(
+     *         name="search",
+     *         in="query",
+     *         description="Search in PF number, staff name, or phone number",
+     *         required=false,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="sort_by",
+     *         in="query",
+     *         description="Sort by field",
+     *         required=false,
+     *         @OA\Schema(type="string", default="created_at")
+     *     ),
+     *     @OA\Parameter(
+     *         name="sort_order",
+     *         in="query",
+     *         description="Sort order",
+     *         required=false,
+     *         @OA\Schema(type="string", enum={"asc", "desc"}, default="desc")
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="Number of items per page (max 100)",
+     *         required=false,
+     *         @OA\Schema(type="integer", default=15, maximum=100)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="User access requests retrieved successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="User access requests retrieved successfully."),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="current_page", type="integer", example=1),
+     *                 @OA\Property(property="per_page", type="integer", example=15),
+     *                 @OA\Property(property="total", type="integer", example=42),
+     *                 @OA\Property(
+     *                     property="data",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="pf_number", type="string", example="PF12345"),
+     *                         @OA\Property(property="staff_name", type="string", example="John Doe"),
+     *                         @OA\Property(property="phone_number", type="string", example="+1234567890"),
+     *                         @OA\Property(property="status", type="string", example="pending"),
+     *                         @OA\Property(property="request_type", type="array", @OA\Items(type="string"), example={"wellsoft_access"}),
+     *                         @OA\Property(property="created_at", type="string", format="date-time")
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Failed to retrieve user access requests.")
+     *         )
+     *     )
+     * )
      */
     public function index(Request $request): JsonResponse
     {
@@ -40,7 +148,61 @@ class UserAccessController extends Controller
 
             // Apply filters
             if ($request->has('status') && $request->status !== '') {
-                $query->where('status', $request->status);
+                $statusFilter = $request->status;
+                
+                // Check if it's a legacy status or specific stage status
+                if (in_array($statusFilter, ['pending', 'approved', 'rejected', 'completed', 'implemented'])) {
+                    // Handle common status filters
+                    switch ($statusFilter) {
+                        case 'pending':
+                            // Show all pending requests across stages
+                            $query->where(function($q) {
+                                $q->where('hod_status', 'pending')
+                                  ->orWhere(function($q2) {
+                                      $q2->where('hod_status', 'approved')
+                                         ->where('divisional_status', 'pending');
+                                  })
+                                  ->orWhere(function($q3) {
+                                      $q3->where('hod_status', 'approved')
+                                         ->where('divisional_status', 'approved')
+                                         ->where('ict_director_status', 'pending');
+                                  })
+                                  ->orWhere(function($q4) {
+                                      $q4->where('hod_status', 'approved')
+                                         ->where('divisional_status', 'approved')
+                                         ->where('ict_director_status', 'approved')
+                                         ->where('head_it_status', 'pending');
+                                  })
+                                  ->orWhere(function($q5) {
+                                      $q5->where('hod_status', 'approved')
+                                         ->where('divisional_status', 'approved')
+                                         ->where('ict_director_status', 'approved')
+                                         ->where('head_it_status', 'approved')
+                                         ->where('ict_officer_status', 'pending');
+                                  });
+                            });
+                            break;
+                        case 'rejected':
+                            $query->where(function($q) {
+                                $q->where('hod_status', 'rejected')
+                                  ->orWhere('divisional_status', 'rejected')
+                                  ->orWhere('ict_director_status', 'rejected')
+                                  ->orWhere('head_it_status', 'rejected');
+                            });
+                            break;
+                        case 'completed':
+                        case 'implemented':
+                            $query->where('ict_officer_status', 'implemented');
+                            break;
+                        case 'approved':
+                            // Show fully approved (implemented) requests
+                            $query->where('ict_officer_status', 'implemented');
+                            break;
+                    }
+                } else {
+                    // Fall back to original status column for backward compatibility
+                    $query->where('status', $statusFilter);
+                }
             }
 
             if ($request->has('request_type') && $request->request_type !== '') {
@@ -91,6 +253,86 @@ class UserAccessController extends Controller
 
     /**
      * Store a newly created combined user access request.
+     *
+     * @OA\Post(
+     *     path="/api/v1/user-access",
+     *     summary="Create User Access Request",
+     *     description="Submit a new user access request with digital signature",
+     *     operationId="createUserAccessRequest",
+     *     tags={"User Access"},
+     *     security={"sanctum": {}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 required={"pf_number", "staff_name", "phone_number", "department_id", "signature", "request_type"},
+     *                 @OA\Property(property="pf_number", type="string", example="PF12345", description="Personal File Number"),
+     *                 @OA\Property(property="staff_name", type="string", example="John Doe", description="Staff full name"),
+     *                 @OA\Property(property="phone_number", type="string", example="+1234567890", description="Phone number"),
+     *                 @OA\Property(property="department_id", type="integer", example=1, description="Department ID"),
+     *                 @OA\Property(property="signature", type="string", format="binary", description="Digital signature file"),
+     *                 @OA\Property(
+     *                     property="request_type",
+     *                     type="array",
+     *                     @OA\Items(type="string", enum={"wellsoft_access", "jeeva_access", "internet_access_request"}),
+     *                     description="Array of requested access types"
+     *                 ),
+     *                 @OA\Property(property="accessType", type="string", enum={"permanent", "temporary"}, default="permanent"),
+     *                 @OA\Property(property="temporaryUntil", type="string", format="date", description="End date for temporary access"),
+     *                 @OA\Property(
+     *                     property="internetPurposes",
+     *                     type="array",
+     *                     @OA\Items(type="string"),
+     *                     description="Purposes for internet access (required if requesting internet access)"
+     *                 ),
+     *                 @OA\Property(property="wellsoftRequestType", type="string", enum={"use", "admin"}, default="use"),
+     *                 @OA\Property(property="hodName", type="string", description="Head of Department name"),
+     *                 @OA\Property(property="hodSignature", type="string", format="binary", description="HOD signature file"),
+     *                 @OA\Property(property="hodDate", type="string", format="date", description="HOD approval date"),
+     *                 @OA\Property(property="hodComments", type="string", description="HOD comments")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="User access request created successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="User access request submitted successfully."),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="pf_number", type="string", example="PF12345"),
+     *                 @OA\Property(property="staff_name", type="string", example="John Doe"),
+     *                 @OA\Property(property="status", type="string", example="pending"),
+     *                 @OA\Property(property="request_type", type="array", @OA\Items(type="string")),
+     *                 @OA\Property(property="created_at", type="string", format="date-time")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="The given data was invalid."),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Failed to create user access request.")
+     *         )
+     *     )
+     * )
      */
     public function store(UserAccessRequest $request): JsonResponse
     {
@@ -178,6 +420,13 @@ class UserAccessController extends Controller
                 'purpose' => $purposes,
                 'request_type' => $selectedServices, // Array stored as JSON
                 'status' => 'pending',
+                
+                // Initialize new status columns
+                'hod_status' => 'pending',
+                'divisional_status' => 'pending',
+                'ict_director_status' => 'pending',
+                'head_it_status' => 'pending',
+                'ict_officer_status' => 'pending',
                 
                 // Module selections will be populated by HOD during approval process
                 'wellsoft_modules' => [],
@@ -428,6 +677,13 @@ class UserAccessController extends Controller
                 'request_type' => $selectedServices, // Update services
                 'purpose' => $purposes, // Update internet purposes
                 'status' => 'pending', // Reset status to pending for resubmission
+                
+                // Reset new status columns for resubmission
+                'hod_status' => 'pending',
+                'divisional_status' => 'pending',
+                'ict_director_status' => 'pending',
+                'head_it_status' => 'pending',
+                'ict_officer_status' => 'pending',
                 
                 // Update module selections
                 'wellsoft_modules' => $selectedWellsoft,
@@ -725,24 +981,33 @@ class UserAccessController extends Controller
         try {
             $user = Auth::user();
             
-            // Define pending statuses
-            $pendingStatuses = [
-                'pending',
-                'pending_hod',
-                'hod_approved',
-                'pending_divisional',
-                'divisional_approved',
-                'pending_ict_director',
-                'ict_director_approved',
-                'pending_head_it',
-                'head_it_approved',
-                'pending_ict_officer',
-                'in_review'
-            ];
-            
-            // Check for any pending requests by the current user
+            // Check for any pending requests using new status columns
             $pendingRequest = UserAccess::where('user_id', $user->id)
-                ->whereIn('status', $pendingStatuses)
+                ->where(function($query) {
+                    $query->where('hod_status', 'pending')
+                          ->orWhere(function($q) {
+                              $q->where('hod_status', 'approved')
+                                ->where('divisional_status', 'pending');
+                          })
+                          ->orWhere(function($q) {
+                              $q->where('hod_status', 'approved')
+                                ->where('divisional_status', 'approved')
+                                ->where('ict_director_status', 'pending');
+                          })
+                          ->orWhere(function($q) {
+                              $q->where('hod_status', 'approved')
+                                ->where('divisional_status', 'approved')
+                                ->where('ict_director_status', 'approved')
+                                ->where('head_it_status', 'pending');
+                          })
+                          ->orWhere(function($q) {
+                              $q->where('hod_status', 'approved')
+                                ->where('divisional_status', 'approved')
+                                ->where('ict_director_status', 'approved')
+                                ->where('head_it_status', 'approved')
+                                ->where('ict_officer_status', 'pending');
+                          });
+                })
                 ->first();
                 
             $hasPendingRequest = !is_null($pendingRequest);
@@ -757,21 +1022,35 @@ class UserAccessController extends Controller
             
             // Include pending request details if found
             if ($hasPendingRequest) {
+                // Determine current stage and workflow progress
+                $currentStage = $pendingRequest->getNextPendingStageFromColumns();
+                $workflowProgress = $pendingRequest->getWorkflowProgressFromColumns();
+                
                 $response['pending_request'] = [
                     'id' => $pendingRequest->id,
                     'request_id' => 'REQ-' . str_pad($pendingRequest->id, 6, '0', STR_PAD_LEFT),
                     'status' => $pendingRequest->status,
-                    'status_name' => $pendingRequest->getStatusNameAttribute(),
+                    'calculated_status' => $pendingRequest->getCalculatedOverallStatus(),
+                    'current_stage' => $currentStage,
+                    'workflow_progress' => $workflowProgress,
+                    'stage_statuses' => [
+                        'hod' => $pendingRequest->hod_status ?? 'pending',
+                        'divisional' => $pendingRequest->divisional_status ?? 'pending',
+                        'ict_director' => $pendingRequest->ict_director_status ?? 'pending',
+                        'head_it' => $pendingRequest->head_it_status ?? 'pending',
+                        'ict_officer' => $pendingRequest->ict_officer_status ?? 'pending'
+                    ],
                     'request_types' => $pendingRequest->request_type,
                     'created_at' => $pendingRequest->created_at,
                     'updated_at' => $pendingRequest->updated_at
                 ];
             }
             
-            Log::info('Pending request check completed', [
+            Log::info('Pending request check completed with new status system', [
                 'user_id' => $user->id,
                 'has_pending_request' => $hasPendingRequest,
-                'pending_request_id' => $pendingRequest?->id
+                'pending_request_id' => $pendingRequest?->id,
+                'current_stage' => $pendingRequest?->getNextPendingStageFromColumns()
             ]);
             
             return response()->json($response);
@@ -845,5 +1124,164 @@ class UserAccessController extends Controller
         
         // Ensure arrays are properly indexed and cleaned
         return array_values(array_filter($result));
+    }
+
+    /**
+     * Get user requests by workflow stage.
+     */
+    public function getRequestsByStage(Request $request, string $stage): JsonResponse
+    {
+        try {
+            $user = Auth::user();
+            
+            if (!in_array($stage, ['hod', 'divisional', 'ict_director', 'head_it', 'ict_officer'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid stage parameter.'
+                ], 400);
+            }
+
+            $status = $request->get('status', 'pending'); // pending, approved, rejected
+            
+            $query = UserAccess::with(['user', 'department'])
+                ->where('user_id', $user->id);
+
+            // Apply stage and status filtering
+            switch ($stage) {
+                case 'hod':
+                    $query->where('hod_status', $status);
+                    break;
+                case 'divisional':
+                    $query->where('divisional_status', $status)
+                          ->where('hod_status', 'approved');
+                    break;
+                case 'ict_director':
+                    $query->where('ict_director_status', $status)
+                          ->where('hod_status', 'approved')
+                          ->where('divisional_status', 'approved');
+                    break;
+                case 'head_it':
+                    $query->where('head_it_status', $status)
+                          ->where('hod_status', 'approved')
+                          ->where('divisional_status', 'approved')
+                          ->where('ict_director_status', 'approved');
+                    break;
+                case 'ict_officer':
+                    if ($status === 'implemented') {
+                        $query->where('ict_officer_status', 'implemented');
+                    } else {
+                        $query->where('ict_officer_status', $status)
+                              ->where('hod_status', 'approved')
+                              ->where('divisional_status', 'approved')
+                              ->where('ict_director_status', 'approved')
+                              ->where('head_it_status', 'approved');
+                    }
+                    break;
+            }
+
+            $requests = $query->orderBy('updated_at', 'desc')->get();
+
+            // Add workflow progress to each request
+            $requests->transform(function ($userAccess) {
+                $userAccess->workflow_progress = $userAccess->getWorkflowProgressFromColumns();
+                $userAccess->current_stage = $userAccess->getNextPendingStageFromColumns();
+                $userAccess->calculated_status = $userAccess->getCalculatedOverallStatus();
+                $userAccess->signature_url = $this->signatureService->getSignatureUrl($userAccess->signature_path);
+                return $userAccess;
+            });
+
+            return response()->json([
+                'success' => true,
+                'data' => $requests,
+                'stage' => $stage,
+                'status' => $status,
+                'count' => $requests->count(),
+                'message' => "Requests at {$stage} stage retrieved successfully."
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error retrieving requests by stage: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve requests by stage.',
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
+            ], 500);
+        }
+    }
+
+    /**
+     * Get user's workflow statistics.
+     */
+    public function getWorkflowStatistics(Request $request): JsonResponse
+    {
+        try {
+            $user = Auth::user();
+            $baseQuery = UserAccess::where('user_id', $user->id);
+            
+            $stats = [
+                'total_requests' => $baseQuery->clone()->count(),
+                'stages' => [
+                    'hod' => [
+                        'pending' => $baseQuery->clone()->where('hod_status', 'pending')->count(),
+                        'approved' => $baseQuery->clone()->where('hod_status', 'approved')->count(),
+                        'rejected' => $baseQuery->clone()->where('hod_status', 'rejected')->count(),
+                    ],
+                    'divisional' => [
+                        'pending' => $baseQuery->clone()->where('divisional_status', 'pending')
+                            ->where('hod_status', 'approved')->count(),
+                        'approved' => $baseQuery->clone()->where('divisional_status', 'approved')->count(),
+                        'rejected' => $baseQuery->clone()->where('divisional_status', 'rejected')->count(),
+                    ],
+                    'ict_director' => [
+                        'pending' => $baseQuery->clone()->where('ict_director_status', 'pending')
+                            ->where('hod_status', 'approved')
+                            ->where('divisional_status', 'approved')->count(),
+                        'approved' => $baseQuery->clone()->where('ict_director_status', 'approved')->count(),
+                        'rejected' => $baseQuery->clone()->where('ict_director_status', 'rejected')->count(),
+                    ],
+                    'head_it' => [
+                        'pending' => $baseQuery->clone()->where('head_it_status', 'pending')
+                            ->where('hod_status', 'approved')
+                            ->where('divisional_status', 'approved')
+                            ->where('ict_director_status', 'approved')->count(),
+                        'approved' => $baseQuery->clone()->where('head_it_status', 'approved')->count(),
+                        'rejected' => $baseQuery->clone()->where('head_it_status', 'rejected')->count(),
+                    ],
+                    'ict_officer' => [
+                        'pending' => $baseQuery->clone()->where('ict_officer_status', 'pending')
+                            ->where('hod_status', 'approved')
+                            ->where('divisional_status', 'approved')
+                            ->where('ict_director_status', 'approved')
+                            ->where('head_it_status', 'approved')->count(),
+                        'implemented' => $baseQuery->clone()->where('ict_officer_status', 'implemented')->count(),
+                    ]
+                ],
+                'overall' => [
+                    'completed' => $baseQuery->clone()->where('ict_officer_status', 'implemented')->count(),
+                    'rejected' => $baseQuery->clone()->where(function($query) {
+                        $query->where('hod_status', 'rejected')
+                              ->orWhere('divisional_status', 'rejected')
+                              ->orWhere('ict_director_status', 'rejected')
+                              ->orWhere('head_it_status', 'rejected');
+                    })->count()
+                ]
+            ];
+
+            return response()->json([
+                'success' => true,
+                'data' => $stats,
+                'message' => 'Workflow statistics retrieved successfully.'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error retrieving workflow statistics: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve workflow statistics.',
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
+            ], 500);
+        }
     }
 }

@@ -47,7 +47,7 @@
 
             <!-- User Info -->
             <div v-if="safeCurrentUser" class="text-left">
-              <p class="text-sm font-medium text-white leading-tight">
+              <p class="text-base font-medium text-white leading-tight">
                 {{ safeCurrentUser.name }}
               </p>
               <p class="text-xs text-blue-200 capitalize leading-tight">

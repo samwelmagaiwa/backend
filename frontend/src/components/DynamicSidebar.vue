@@ -168,7 +168,7 @@
         <!-- User Management Section (Admin only) -->
         <li v-if="userManagementItems.length > 0" class="mt-6">
           <div v-show="!isCollapsed" class="px-3 py-2">
-            <h3 class="text-xs font-semibold text-blue-200 uppercase tracking-wider drop-shadow-sm">
+            <h3 class="text-sm font-semibold text-blue-200 uppercase tracking-wider drop-shadow-sm">
               User Management
             </h3>
           </div>

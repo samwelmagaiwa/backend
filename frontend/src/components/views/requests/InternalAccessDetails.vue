@@ -84,7 +84,7 @@
                           </div>
                         </div>
                         <div class="text-right">
-                          <p class="text-xs text-blue-300">
+                          <p class="text-sm text-blue-300">
                             {{
                               requestData?.ict_approved_at
                                 ? formatDate(requestData.ict_approved_at)
@@ -134,7 +134,7 @@
                           </div>
                           <div
                             :class="getIctCommentsStatusBadgeClass()"
-                            class="px-2 py-1 rounded text-xs font-semibold uppercase"
+                            class="px-2 py-1 rounded text-sm font-semibold uppercase"
                           >
                             {{ requestData?.ictStatus }}
                           </div>
@@ -142,7 +142,7 @@
 
                         <!-- Comment Content -->
                         <div class="mb-3">
-                          <p class="text-white text-sm leading-relaxed">
+                          <p class="text-white text-base leading-relaxed">
                             {{ requestData?.ictNotes || requestData?.ict_notes }}
                           </p>
                         </div>
@@ -326,7 +326,7 @@
                           </div>
                         </div>
                         <div class="text-right">
-                          <p class="text-xs text-blue-300">
+                          <p class="text-sm text-blue-300">
                             {{
                               requestData?.hodApproval?.approved_at ||
                               requestData?.hod_approved_at ||
@@ -378,7 +378,7 @@
                           </div>
                           <div
                             :class="getHODCommentsStatusBadgeClass()"
-                            class="px-2 py-1 rounded text-xs font-semibold uppercase"
+                            class="px-2 py-1 rounded text-sm font-semibold uppercase"
                           >
                             {{ getHODApprovalStatus() }}
                           </div>
@@ -386,7 +386,7 @@
 
                         <!-- Comment Content -->
                         <div class="mb-3">
-                          <p class="text-white text-sm leading-relaxed">
+                          <p class="text-white text-base leading-relaxed">
                             {{
                               getHODComment() ||
                               (getHODApprovalStatus() === 'rejected'

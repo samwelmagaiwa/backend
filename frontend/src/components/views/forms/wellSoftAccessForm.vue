@@ -133,7 +133,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <!-- PF Number -->
                   <div>
-                    <label class="block text-sm font-bold text-blue-100 mb-3">
+                    <label class="block text-base font-bold text-blue-100 mb-3">
                       PF Number <span class="text-red-400">*</span>
                     </label>
                     <div class="relative">
@@ -152,7 +152,7 @@
 
                   <!-- Staff Name -->
                   <div>
-                    <label class="block text-sm font-bold text-blue-100 mb-3">
+                    <label class="block text-base font-bold text-blue-100 mb-3">
                       Staff Name <span class="text-red-400">*</span>
                     </label>
                     <div class="relative">
@@ -171,7 +171,7 @@
 
                   <!-- Department -->
                   <div>
-                    <label class="block text-sm font-bold text-blue-100 mb-3">
+                    <label class="block text-base font-bold text-blue-100 mb-3">
                       Department <span class="text-red-400">*</span>
                     </label>
                     <div class="relative">
@@ -189,7 +189,7 @@
                   </div>
                   <!-- Digital Signature -->
                   <div>
-                    <label class="block text-sm font-bold text-blue-100 mb-3">
+                    <label class="block text-base font-bold text-blue-100 mb-3">
                       Digital Signature <span class="text-red-400">*</span>
                     </label>
 
@@ -289,7 +289,7 @@
 
                 <!-- Request Type -->
                 <div class="mb-6">
-                  <label class="block text-sm font-bold text-blue-100 mb-3">
+                  <label class="block text-base font-bold text-blue-100 mb-3">
                     Action Requested <span class="text-red-400">*</span>
                   </label>
                   <div class="flex gap-6 mb-4">
@@ -320,7 +320,7 @@
 
                 <!-- Modules Selection -->
                 <div>
-                  <label class="block text-sm font-bold text-blue-100 mb-3">
+                  <label class="block text-base font-bold text-blue-100 mb-3">
                     Module Requested for (tick as applicable)
                     <span class="text-red-400">*</span>
                   </label>
@@ -388,7 +388,7 @@
                             <button
                               type="button"
                               @click="triggerHodSignatureUpload"
-                              class="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors duration-200 flex items-center gap-1 mx-auto"
+                              class="px-2 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors duration-200 flex items-center gap-1 mx-auto"
                             >
                               <i class="fas fa-upload"></i>
                               Press to load your signature
@@ -484,7 +484,7 @@
                             <button
                               type="button"
                               @click="triggerDivDirectorSignatureUpload"
-                              class="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors duration-200 flex items-center gap-1 mx-auto"
+                              class="px-2 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors duration-200 flex items-center gap-1 mx-auto"
                             >
                               <i class="fas fa-upload"></i>
                               Press to load your signature
@@ -578,7 +578,7 @@
                             <button
                               type="button"
                               @click="triggerDirectorICTSignatureUpload"
-                              class="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors duration-200 flex items-center gap-1 mx-auto"
+                              class="px-2 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors duration-200 flex items-center gap-1 mx-auto"
                             >
                               <i class="fas fa-upload"></i>
                               Press to load your signature
@@ -719,7 +719,7 @@
                             <button
                               type="button"
                               @click="triggerHeadITSignatureUpload"
-                              class="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors duration-200 flex items-center gap-1 mx-auto"
+                              class="px-2 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors duration-200 flex items-center gap-1 mx-auto"
                             >
                               <i class="fas fa-upload"></i>
                               Press to load your signature
@@ -810,7 +810,7 @@
                             <button
                               type="button"
                               @click="triggerIctOfficerSignatureUpload"
-                              class="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors duration-200 flex items-center gap-1 mx-auto"
+                              class="px-2 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors duration-200 flex items-center gap-1 mx-auto"
                             >
                               <i class="fas fa-upload"></i>
                               Press to load your signature

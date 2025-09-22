@@ -56,9 +56,15 @@
                 class="px-3 py-2 bg-white/20 border border-blue-300/30 rounded text-white"
               >
                 <option value="">All Statuses</option>
-                <option value="hod_approved">HOD Approved</option>
+                <option value="pending">Pending Submission</option>
+                <option value="pending_hod">Pending HOD</option>
+                <option value="hod_approved">Pending Divisional</option>
                 <option value="divisional_approved">Divisional Approved</option>
                 <option value="divisional_rejected">Divisional Rejected</option>
+                <option value="approved">Fully Approved</option>
+                <option value="implemented">Implemented</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
               </select>
               <button
                 @click="refreshRequests"
@@ -152,12 +158,11 @@
                       <!-- Display the exact database status -->
                       <span
                         :class="getStatusBadgeClass(request.status)"
-                        class="px-2 py-1 rounded text-xs font-medium mb-1"
+                        class="rounded text-xs font-medium inline-block"
+                        :style="{ padding: '2px 6px', width: 'fit-content' }"
                       >
                         {{ getStatusText(request.status) }}
                       </span>
-                      <!-- Show raw status for debugging -->
-                      <div class="text-xs text-gray-400">Raw: {{ request.status }}</div>
                     </div>
                   </td>
 
@@ -166,21 +171,24 @@
                     <div class="flex flex-col items-center space-y-1">
                       <button
                         @click="viewAndProcessRequest(request.id)"
-                        class="w-full px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700"
+                        class="bg-blue-600 text-white text-sm rounded hover:bg-blue-700 inline-block"
+                        :style="{ padding: '4px 8px', width: 'fit-content' }"
                       >
                         View & Process
                       </button>
                       <button
                         v-if="canEdit(request)"
                         @click="editRequest(request.id)"
-                        class="w-full px-2 py-1 bg-amber-600 text-white text-xs rounded hover:bg-amber-700"
+                        class="bg-amber-600 text-white text-sm rounded hover:bg-amber-700 inline-block"
+                        :style="{ padding: '4px 8px', width: 'fit-content' }"
                       >
                         Edit
                       </button>
                       <button
                         v-if="canCancel(request)"
                         @click="cancelRequest(request.id)"
-                        class="w-full px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700"
+                        class="bg-red-600 text-white text-sm rounded hover:bg-red-700 inline-block"
+                        :style="{ padding: '4px 8px', width: 'fit-content' }"
                       >
                         Cancel
                       </button>
@@ -235,6 +243,7 @@
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppFooter from '@/components/footer.vue'
   import divisionalAccessService from '@/services/divisionalAccessService'
+  import statusUtils from '@/utils/statusUtils'
 
   export default {
     name: 'DivisionalRequestList',
@@ -255,7 +264,9 @@
           divisionalRejected: 0,
           total: 0
         },
-        error: null
+        error: null,
+        // Add status utilities for consistent status handling
+        $statusUtils: statusUtils
       }
     },
     computed: {
@@ -368,9 +379,16 @@
 
         this.stats = {
           // Count based on exact database status values for divisional director
+          pending: requests.filter((r) => r.status === 'pending' || r.status === 'pending_hod')
+            .length,
+          hodApproved: requests.filter((r) => r.status === 'hod_approved').length,
           pendingDivisional: requests.filter((r) => r.status === 'hod_approved').length,
           divisionalApproved: requests.filter((r) => r.status === 'divisional_approved').length,
           divisionalRejected: requests.filter((r) => r.status === 'divisional_rejected').length,
+          approved: requests.filter((r) => r.status === 'approved').length,
+          implemented: requests.filter((r) => r.status === 'implemented').length,
+          completed: requests.filter((r) => r.status === 'completed').length,
+          cancelled: requests.filter((r) => r.status === 'cancelled').length,
           total: requests.length
         }
       },
@@ -444,13 +462,15 @@
       },
 
       canCancel(request) {
-        // Divisional Director can cancel requests that are not already rejected, cancelled, or fully approved
-        return (
-          request.status !== 'divisional_rejected' &&
-          request.status !== 'cancelled' &&
-          request.status !== 'approved' &&
-          request.status !== 'dict_approved'
-        )
+        // Divisional Director can cancel requests that are not in final states
+        const finalStatuses = [
+          'divisional_rejected',
+          'cancelled',
+          'approved',
+          'implemented',
+          'completed'
+        ]
+        return !finalStatuses.includes(request.status)
       },
 
       formatDate(dateString) {
@@ -473,37 +493,16 @@
       },
 
       getStatusBadgeClass(status) {
-        const classes = {
-          // HOD-approved requests ready for divisional approval
-          hod_approved: 'bg-yellow-100 text-yellow-800',
-          // Divisional Director decisions
-          divisional_approved: 'bg-green-100 text-green-800',
-          divisional_rejected: 'bg-red-100 text-red-800',
-          cancelled: 'bg-gray-100 text-gray-800'
-        }
-        return classes[status] || 'bg-gray-100 text-gray-800'
+        return this.$statusUtils.getStatusBadgeClass(status)
       },
 
       getStatusIcon(status) {
-        const icons = {
-          hod_approved: 'fas fa-clock',
-          divisional_approved: 'fas fa-check',
-          divisional_rejected: 'fas fa-times',
-          cancelled: 'fas fa-ban'
-        }
-        return icons[status] || 'fas fa-question'
+        return this.$statusUtils.getStatusIcon(status)
       },
 
       getStatusText(status) {
-        const texts = {
-          // HOD-approved requests ready for divisional approval
-          hod_approved: 'Pending Divisional Approval',
-          // Divisional Director decisions
-          divisional_approved: 'Divisional Approved',
-          divisional_rejected: 'Divisional Rejected',
-          cancelled: 'Cancelled'
-        }
-        return texts[status] || `Unknown Status (${status})`
+        // Use centralized status utility with component name for debugging
+        return this.$statusUtils.getStatusText(status, 'DivisionalRequestList')
       }
     }
   }

@@ -34,6 +34,11 @@ class UserAccess extends Model
         'access_type',
         'temporary_until',
         'status',
+        'divisional_status',
+        'hod_status',
+        'ict_director_status',
+        'head_it_status',
+        'ict_officer_status',
         'hod_comments',
         'hod_resubmission_notes',
         'resubmitted_at',
@@ -50,6 +55,7 @@ class UserAccess extends Model
         'ict_director_name',
         'ict_director_signature_path',
         'ict_director_comments',
+        'ict_director_rejection_reasons',
         'ict_director_approved_at',
         'head_it_name',
         'head_it_signature_path',
@@ -207,17 +213,28 @@ class UserAccess extends Model
         return !empty($this->ict_director_name) && !empty($this->ict_director_approved_at);
     }
 
+    // ========================================
+    // STATUS CONSTANTS FOR NEW COLUMNS
+    // ========================================
+    
+    const HOD_STATUSES = ['pending', 'approved', 'rejected'];
+    const DIVISIONAL_STATUSES = ['pending', 'approved', 'rejected'];
+    const ICT_DIRECTOR_STATUSES = ['pending', 'approved', 'rejected'];
+    const HEAD_IT_STATUSES = ['pending', 'approved', 'rejected'];
+    const ICT_OFFICER_STATUSES = ['pending', 'implemented', 'rejected'];
+
     /**
-     * Get the approval progress percentage.
+     * Get the approval progress percentage (using new status columns).
      */
     public function getApprovalProgress(): int
     {
         $totalSteps = 3; // HOD, Divisional Director, ICT Director
         $completedSteps = 0;
         
-        if ($this->isHodApproved()) $completedSteps++;
-        if ($this->isDivisionalDirectorApproved()) $completedSteps++;
-        if ($this->isIctDirectorApproved()) $completedSteps++;
+        // Use new status columns if available, fallback to old logic
+        if ($this->hod_status === 'approved' || $this->isHodApproved()) $completedSteps++;
+        if ($this->divisional_status === 'approved' || $this->isDivisionalDirectorApproved()) $completedSteps++;
+        if ($this->ict_director_status === 'approved' || $this->isIctDirectorApproved()) $completedSteps++;
         
         return (int) (($completedSteps / $totalSteps) * 100);
     }
@@ -264,6 +281,180 @@ class UserAccess extends Model
     public function isIctOfficerImplemented(): bool
     {
         return !empty($this->ict_officer_name) && !empty($this->ict_officer_implemented_at);
+    }
+
+    // ========================================
+    // NEW APPROVAL STATUS COLUMN HELPERS
+    // ========================================
+
+    /**
+     * Get the approval status for HOD
+     */
+    public function getHodApprovalStatus(): string
+    {
+        return $this->hod_status ?? 'pending';
+    }
+
+    /**
+     * Check if HOD has approved using new status column
+     */
+    public function isHodApprovedByStatus(): bool
+    {
+        return $this->hod_status === 'approved';
+    }
+
+    /**
+     * Get the approval status for Divisional Director
+     */
+    public function getDivisionalApprovalStatus(): string
+    {
+        return $this->divisional_status ?? 'pending';
+    }
+
+    /**
+     * Check if Divisional Director has approved using new status column
+     */
+    public function isDivisionalApprovedByStatus(): bool
+    {
+        return $this->divisional_status === 'approved';
+    }
+
+    /**
+     * Get the approval status for ICT Director
+     */
+    public function getIctDirectorApprovalStatus(): string
+    {
+        return $this->ict_director_status ?? 'pending';
+    }
+
+    /**
+     * Check if ICT Director has approved using new status column
+     */
+    public function isIctDirectorApprovedByStatus(): bool
+    {
+        return $this->ict_director_status === 'approved';
+    }
+
+    /**
+     * Get the approval status for Head IT
+     */
+    public function getHeadItApprovalStatus(): string
+    {
+        return $this->head_it_status ?? 'pending';
+    }
+
+    /**
+     * Check if Head IT has approved using new status column
+     */
+    public function isHeadItApprovedByStatus(): bool
+    {
+        return $this->head_it_status === 'approved';
+    }
+
+    /**
+     * Get the implementation status for ICT Officer
+     */
+    public function getIctOfficerImplementationStatus(): string
+    {
+        return $this->ict_officer_status ?? 'pending';
+    }
+
+    /**
+     * Check if ICT Officer has implemented using new status column
+     */
+    public function isIctOfficerImplementedByStatus(): bool
+    {
+        return $this->ict_officer_status === 'implemented';
+    }
+
+    /**
+     * Get the calculated overall status from new status columns
+     */
+    public function getCalculatedOverallStatus(): string
+    {
+        $migrationService = new \App\Services\StatusMigrationService();
+        
+        $statusColumns = [
+            'hod_status' => $this->hod_status,
+            'divisional_status' => $this->divisional_status,
+            'ict_director_status' => $this->ict_director_status,
+            'head_it_status' => $this->head_it_status,
+            'ict_officer_status' => $this->ict_officer_status
+        ];
+        
+        return $migrationService->calculateOverallStatus($statusColumns);
+    }
+
+    /**
+     * Get the next pending approval stage using new status columns
+     */
+    public function getNextPendingStageFromColumns(): ?string
+    {
+        $migrationService = new \App\Services\StatusMigrationService();
+        
+        $statusColumns = [
+            'hod_status' => $this->hod_status,
+            'divisional_status' => $this->divisional_status,
+            'ict_director_status' => $this->ict_director_status,
+            'head_it_status' => $this->head_it_status,
+            'ict_officer_status' => $this->ict_officer_status
+        ];
+        
+        return $migrationService->getNextPendingStage($statusColumns);
+    }
+
+    /**
+     * Check if workflow is complete using new status columns
+     */
+    public function isWorkflowCompleteByColumns(): bool
+    {
+        $migrationService = new \App\Services\StatusMigrationService();
+        
+        $statusColumns = [
+            'hod_status' => $this->hod_status,
+            'divisional_status' => $this->divisional_status,
+            'ict_director_status' => $this->ict_director_status,
+            'head_it_status' => $this->head_it_status,
+            'ict_officer_status' => $this->ict_officer_status
+        ];
+        
+        return $migrationService->isWorkflowComplete($statusColumns);
+    }
+
+    /**
+     * Check if workflow has rejections using new status columns
+     */
+    public function hasRejectionsInColumns(): bool
+    {
+        $migrationService = new \App\Services\StatusMigrationService();
+        
+        $statusColumns = [
+            'hod_status' => $this->hod_status,
+            'divisional_status' => $this->divisional_status,
+            'ict_director_status' => $this->ict_director_status,
+            'head_it_status' => $this->head_it_status,
+            'ict_officer_status' => $this->ict_officer_status
+        ];
+        
+        return $migrationService->hasRejections($statusColumns);
+    }
+
+    /**
+     * Get workflow progress percentage using new status columns
+     */
+    public function getWorkflowProgressFromColumns(): int
+    {
+        $migrationService = new \App\Services\StatusMigrationService();
+        
+        $statusColumns = [
+            'hod_status' => $this->hod_status,
+            'divisional_status' => $this->divisional_status,
+            'ict_director_status' => $this->ict_director_status,
+            'head_it_status' => $this->head_it_status,
+            'ict_officer_status' => $this->ict_officer_status
+        ];
+        
+        return $migrationService->getWorkflowProgress($statusColumns);
     }
 
     /**

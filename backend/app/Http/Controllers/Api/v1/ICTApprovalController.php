@@ -24,6 +24,105 @@ class ICTApprovalController extends Controller
     /**
      * Get all device borrowing requests with auto-captured user details
      * 
+     * @OA\Get(
+     *     path="/api/ict-approval/device-requests",
+     *     summary="Get Device Borrowing Requests for ICT Approval",
+     *     description="Retrieve all device borrowing requests pending ICT officer approval with auto-captured user details",
+     *     operationId="getDeviceBorrowingRequests",
+     *     tags={"ICT Approval"},
+     *     security={"sanctum": {}},
+     *     @OA\Parameter(
+     *         name="status",
+     *         in="query",
+     *         description="Filter by request status",
+     *         required=false,
+     *         @OA\Schema(type="string", enum={"pending", "ict_approved", "approved", "rejected", "completed"})
+     *     ),
+     *     @OA\Parameter(
+     *         name="device_type",
+     *         in="query",
+     *         description="Filter by device type",
+     *         required=false,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="department",
+     *         in="query",
+     *         description="Filter by department",
+     *         required=false,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="start_date",
+     *         in="query",
+     *         description="Filter by start date (YYYY-MM-DD)",
+     *         required=false,
+     *         @OA\Schema(type="string", format="date")
+     *     ),
+     *     @OA\Parameter(
+     *         name="end_date",
+     *         in="query",
+     *         description="Filter by end date (YYYY-MM-DD)",
+     *         required=false,
+     *         @OA\Schema(type="string", format="date")
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="Number of items per page",
+     *         required=false,
+     *         @OA\Schema(type="integer", default=50)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Device borrowing requests retrieved successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Device borrowing requests retrieved successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="current_page", type="integer", example=1),
+     *                 @OA\Property(property="per_page", type="integer", example=50),
+     *                 @OA\Property(property="total", type="integer", example=25),
+     *                 @OA\Property(
+     *                     property="data",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="borrower_name", type="string", example="John Doe"),
+     *                         @OA\Property(property="device_type", type="string", example="Laptop"),
+     *                         @OA\Property(property="status", type="string", example="pending"),
+     *                         @OA\Property(property="booking_date", type="string", format="date"),
+     *                         @OA\Property(property="return_date", type="string", format="date"),
+     *                         @OA\Property(property="purpose", type="string", example="Official work")
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Unauthorized - ICT officer access required",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Unauthorized. ICT officer access required.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Error retrieving device borrowing requests")
+     *         )
+     *     )
+     * )
+     * 
      * @param Request $request
      * @return JsonResponse
      */
@@ -162,8 +261,79 @@ class ICTApprovalController extends Controller
     /**
      * Get detailed information for a specific device borrowing request
      * 
+     * @OA\Get(
+     *     path="/api/ict-approval/device-requests/{requestId}",
+     *     summary="Get Device Borrowing Request Details",
+     *     description="Retrieve detailed information for a specific device borrowing request",
+     *     operationId="getDeviceBorrowingRequestDetails",
+     *     tags={"ICT Approval"},
+     *     security={"sanctum": {}},
+     *     @OA\Parameter(
+     *         name="requestId",
+     *         in="path",
+     *         description="Device borrowing request ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Device borrowing request details retrieved successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Request details retrieved successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="borrower_name", type="string", example="John Doe"),
+     *                 @OA\Property(property="device_type", type="string", example="Laptop"),
+     *                 @OA\Property(property="status", type="string", example="pending"),
+     *                 @OA\Property(property="booking_date", type="string", format="date"),
+     *                 @OA\Property(property="return_date", type="string", format="date"),
+     *                 @OA\Property(property="purpose", type="string", example="Official work"),
+     *                 @OA\Property(
+     *                     property="user",
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="name", type="string", example="John Doe"),
+     *                     @OA\Property(property="email", type="string", example="john@example.com"),
+     *                     @OA\Property(property="phone", type="string", example="+1234567890"),
+     *                     @OA\Property(property="pf_number", type="string", example="PF12345")
+     *                 ),
+     *                 @OA\Property(
+     *                     property="device_inventory",
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="device_name", type="string", example="Dell Latitude 5420"),
+     *                     @OA\Property(property="device_code", type="string", example="DL-001"),
+     *                     @OA\Property(property="description", type="string")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Device borrowing request not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Device borrowing request not found")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Unauthorized - ICT officer access required",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Unauthorized. ICT officer access required.")
+     *         )
+     *     )
+     * )
+     * 
      * @param Request $request
-     * @param int $requestId
+     * @param string $requestId
      * @return JsonResponse
      */
     public function getDeviceBorrowingRequestDetails(Request $request, string $requestId): JsonResponse

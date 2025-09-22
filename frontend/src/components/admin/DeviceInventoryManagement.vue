@@ -314,7 +314,7 @@
                       >
                         <td class="px-4 py-3">
                           <div>
-                            <div class="text-sm font-medium text-white">
+                            <div class="text-base font-medium text-white">
                               {{ device.device_name }}
                             </div>
                             <div class="text-xs text-blue-200" v-if="device.description">
@@ -328,7 +328,7 @@
                           }}</span>
                         </td>
                         <td class="px-4 py-3">
-                          <span class="text-sm font-medium text-white">{{
+                          <span class="text-base font-medium text-white">{{
                             device.total_quantity
                           }}</span>
                         </td>
@@ -428,7 +428,7 @@
 
           <form @submit.prevent="saveDevice" class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Device Name *</label>
+              <label class="block text-base font-medium text-gray-700 mb-2">Device Name *</label>
               <input
                 v-model="deviceForm.device_name"
                 type="text"
@@ -439,7 +439,7 @@
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+              <label class="block text-base font-medium text-gray-700 mb-2">Description</label>
               <textarea
                 v-model="deviceForm.description"
                 rows="3"
@@ -449,7 +449,7 @@
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Total Quantity *</label>
+              <label class="block text-base font-medium text-gray-700 mb-2">Total Quantity *</label>
               <input
                 v-model.number="deviceForm.total_quantity"
                 type="number"
