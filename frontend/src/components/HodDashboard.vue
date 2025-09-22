@@ -85,7 +85,7 @@
                       >
                         <i class="fas fa-comments text-white"></i>
                       </div>
-                      <span class="text-white font-medium text-sm">Divisional Recommendations</span>
+                      <span class="text-white font-medium text-lg">Divisional Recommendations</span>
                     </div>
                   </button>
 
@@ -99,7 +99,7 @@
                       >
                         <i class="fas fa-layer-group text-white"></i>
                       </div>
-                      <span class="text-white font-medium text-sm">Combined Requests</span>
+                      <span class="text-white font-medium text-lg">Combined Requests</span>
                     </div>
                   </router-link>
                 </div>

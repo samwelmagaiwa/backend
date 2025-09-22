@@ -70,12 +70,17 @@ class SwaggerController extends Controller
             'tags' => [
                 ['name' => 'Authentication', 'description' => 'User authentication and authorization endpoints'],
                 ['name' => 'User Access', 'description' => 'User access request management'],
+                ['name' => 'Both Service Form', 'description' => 'Combined service forms for multi-level approval workflow'],
                 ['name' => 'Module Requests', 'description' => 'Wellsoft and Jeeva module access requests'],
                 ['name' => 'Device Booking', 'description' => 'ICT device booking and management'],
-                ['name' => 'Admin', 'description' => 'Administrative functions'],
-                ['name' => 'Workflow', 'description' => 'Approval workflow management'],
                 ['name' => 'ICT Approval', 'description' => 'ICT officer approval processes'],
-                ['name' => 'Profile', 'description' => 'User profile management'],
+                ['name' => 'Admin', 'description' => 'Administrative functions (user and department management)'],
+                ['name' => 'HOD Workflow', 'description' => 'Head of Department approval workflow'],
+                ['name' => 'Divisional Workflow', 'description' => 'Divisional Director approval workflow'],
+                ['name' => 'ICT Director Workflow', 'description' => 'ICT Director approval workflow'],
+                ['name' => 'Profile', 'description' => 'User profile management and auto-population'],
+                ['name' => 'Notifications', 'description' => 'User notification management'],
+                ['name' => 'Utility', 'description' => 'Health checks and system utilities'],
                 ['name' => 'Dashboard', 'description' => 'Dashboard and statistics endpoints']
             ],
             'paths' => $this->generatePaths()
@@ -85,9 +90,25 @@ class SwaggerController extends Controller
     }
 
     /**
-     * Generate basic paths from the documented controllers
+     * Generate comprehensive paths from all documented controllers
      */
     private function generatePaths()
+    {
+        return array_merge(
+            $this->getAuthenticationPaths(),
+            $this->getUserAccessPaths(),
+            $this->getDeviceBookingPaths(),
+            $this->getAdminPaths(),
+            $this->getWorkflowPaths(),
+            $this->getProfilePaths(),
+            $this->getUtilityPaths()
+        );
+    }
+
+    /**
+     * Authentication API paths
+     */
+    private function getAuthenticationPaths()
     {
         return [
             '/login' => [
@@ -141,6 +162,35 @@ class SwaggerController extends Controller
                     ]
                 ]
             ],
+            '/register' => [
+                'post' => [
+                    'tags' => ['Authentication'],
+                    'summary' => 'User Registration',
+                    'description' => 'Register a new user account',
+                    'operationId' => 'register',
+                    'requestBody' => [
+                        'required' => true,
+                        'content' => [
+                            'application/json' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'required' => ['name', 'email', 'password', 'password_confirmation'],
+                                    'properties' => [
+                                        'name' => ['type' => 'string', 'example' => 'John Doe'],
+                                        'email' => ['type' => 'string', 'format' => 'email', 'example' => 'john@example.com'],
+                                        'password' => ['type' => 'string', 'format' => 'password'],
+                                        'password_confirmation' => ['type' => 'string', 'format' => 'password']
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    'responses' => [
+                        '201' => ['description' => 'User registered successfully'],
+                        '422' => ['description' => 'Validation errors']
+                    ]
+                ]
+            ],
             '/logout' => [
                 'post' => [
                     'tags' => ['Authentication'],
@@ -149,15 +199,35 @@ class SwaggerController extends Controller
                     'operationId' => 'logout',
                     'security' => [['sanctum' => []]],
                     'responses' => [
-                        '200' => [
-                            'description' => 'Logout successful'
-                        ],
-                        '401' => [
-                            'description' => 'Unauthorized'
-                        ]
+                        '200' => ['description' => 'Logout successful'],
+                        '401' => ['description' => 'Unauthorized']
                     ]
                 ]
             ],
+            '/logout-all' => [
+                'post' => [
+                    'tags' => ['Authentication'],
+                    'summary' => 'Logout from all sessions',
+                    'description' => 'Logout user from all active sessions',
+                    'operationId' => 'logoutAll',
+                    'security' => [['sanctum' => []]],
+                    'responses' => [
+                        '200' => ['description' => 'Logged out from all sessions successfully'],
+                        '401' => ['description' => 'Unauthorized']
+                    ]
+                ]
+            ]
+        ];
+    }
+        ];
+    }
+
+    /**
+     * User Access API paths
+     */
+    private function getUserAccessPaths()
+    {
+        return [
             '/v1/user-access' => [
                 'get' => [
                     'tags' => ['User Access'],
@@ -174,34 +244,10 @@ class SwaggerController extends Controller
                                 'type' => 'string',
                                 'enum' => ['pending', 'approved', 'rejected', 'completed']
                             ]
-                        ],
-                        [
-                            'name' => 'per_page',
-                            'in' => 'query',
-                            'description' => 'Items per page',
-                            'schema' => [
-                                'type' => 'integer',
-                                'default' => 15,
-                                'maximum' => 100
-                            ]
                         ]
                     ],
                     'responses' => [
-                        '200' => [
-                            'description' => 'Success',
-                            'content' => [
-                                'application/json' => [
-                                    'schema' => [
-                                        'type' => 'object',
-                                        'properties' => [
-                                            'success' => ['type' => 'boolean'],
-                                            'data' => ['type' => 'object'],
-                                            'message' => ['type' => 'string']
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ]
+                        '200' => ['description' => 'Success']
                     ]
                 ],
                 'post' => [
@@ -236,75 +282,57 @@ class SwaggerController extends Controller
                         ]
                     ],
                     'responses' => [
-                        '201' => [
-                            'description' => 'User access request created successfully'
-                        ]
+                        '201' => ['description' => 'User access request created successfully']
                     ]
                 ]
             ],
-            '/ict-approval/device-requests' => [
+            '/both-service-form' => [
                 'get' => [
-                    'tags' => ['ICT Approval'],
-                    'summary' => 'Get Device Borrowing Requests for ICT Approval',
-                    'description' => 'Retrieve device borrowing requests pending ICT officer approval',
-                    'operationId' => 'getDeviceBorrowingRequests',
+                    'tags' => ['Both Service Form'],
+                    'summary' => 'Get Both Service Forms',
+                    'description' => 'Retrieve list of combined service forms for HOD/Divisional/ICT approval workflow',
+                    'operationId' => 'getBothServiceForms',
                     'security' => [['sanctum' => []]],
-                    'parameters' => [
-                        [
-                            'name' => 'status',
-                            'in' => 'query',
-                            'description' => 'Filter by status',
-                            'schema' => [
-                                'type' => 'string',
-                                'enum' => ['pending', 'ict_approved', 'approved', 'rejected', 'completed']
+                    'responses' => [
+                        '200' => ['description' => 'Forms retrieved successfully']
+                    ]
+                ],
+                'post' => [
+                    'tags' => ['Both Service Form'],
+                    'summary' => 'Create Both Service Form',
+                    'description' => 'Create new combined service form with module requests',
+                    'operationId' => 'createBothServiceForm',
+                    'security' => [['sanctum' => []]],
+                    'requestBody' => [
+                        'required' => true,
+                        'content' => [
+                            'multipart/form-data' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'required' => ['shared', 'approvals', 'request_types'],
+                                    'properties' => [
+                                        'shared' => ['type' => 'object'],
+                                        'approvals' => ['type' => 'object'],
+                                        'request_types' => ['type' => 'array', 'items' => ['type' => 'string']]
+                                    ]
+                                ]
                             ]
-                        ],
-                        [
-                            'name' => 'device_type',
-                            'in' => 'query',
-                            'description' => 'Filter by device type',
-                            'schema' => ['type' => 'string']
                         ]
                     ],
                     'responses' => [
-                        '200' => [
-                            'description' => 'Device borrowing requests retrieved successfully'
-                        ],
-                        '403' => [
-                            'description' => 'Unauthorized - ICT officer access required'
-                        ]
+                        '201' => ['description' => 'Form created successfully']
                     ]
                 ]
-            ],
-            '/ict-approval/device-requests/{requestId}' => [
-                'get' => [
-                    'tags' => ['ICT Approval'],
-                    'summary' => 'Get Device Borrowing Request Details',
-                    'description' => 'Retrieve detailed information for a specific device borrowing request',
-                    'operationId' => 'getDeviceBorrowingRequestDetails',
-                    'security' => [['sanctum' => []]],
-                    'parameters' => [
-                        [
-                            'name' => 'requestId',
-                            'in' => 'path',
-                            'description' => 'Device borrowing request ID',
-                            'required' => true,
-                            'schema' => ['type' => 'integer']
-                        ]
-                    ],
-                    'responses' => [
-                        '200' => [
-                            'description' => 'Request details retrieved successfully'
-                        ],
-                        '404' => [
-                            'description' => 'Request not found'
-                        ],
-                        '403' => [
-                            'description' => 'Unauthorized - ICT officer access required'
-                        ]
-                    ]
-                ]
-            ],
+            ]
+        ];
+    }
+
+    /**
+     * Device Booking API paths
+     */
+    private function getDeviceBookingPaths()
+    {
+        return [
             '/booking-service/bookings' => [
                 'get' => [
                     'tags' => ['Device Booking'],
@@ -324,9 +352,7 @@ class SwaggerController extends Controller
                         ]
                     ],
                     'responses' => [
-                        '200' => [
-                            'description' => 'Device bookings retrieved successfully'
-                        ]
+                        '200' => ['description' => 'Device bookings retrieved successfully']
                     ]
                 ],
                 'post' => [
@@ -347,21 +373,203 @@ class SwaggerController extends Controller
                                         'device_type' => ['type' => 'string', 'example' => 'Laptop'],
                                         'booking_date' => ['type' => 'string', 'format' => 'date', 'example' => '2024-01-15'],
                                         'return_date' => ['type' => 'string', 'format' => 'date', 'example' => '2024-01-20'],
-                                        'purpose' => ['type' => 'string', 'example' => 'Official work'],
-                                        'borrower_name' => ['type' => 'string', 'example' => 'John Doe'],
-                                        'department' => ['type' => 'string', 'example' => 'IT Department']
+                                        'purpose' => ['type' => 'string', 'example' => 'Official work']
                                     ]
                                 ]
                             ]
                         ]
                     ],
                     'responses' => [
-                        '201' => [
-                            'description' => 'Device booking created successfully'
-                        ]
+                        '201' => ['description' => 'Device booking created successfully']
                     ]
                 ]
             ],
+            '/ict-approval/device-requests' => [
+                'get' => [
+                    'tags' => ['ICT Approval'],
+                    'summary' => 'Get Device Borrowing Requests for ICT Approval',
+                    'description' => 'Retrieve device borrowing requests pending ICT officer approval',
+                    'operationId' => 'getDeviceBorrowingRequests',
+                    'security' => [['sanctum' => []]],
+                    'parameters' => [
+                        [
+                            'name' => 'status',
+                            'in' => 'query',
+                            'description' => 'Filter by status',
+                            'schema' => [
+                                'type' => 'string',
+                                'enum' => ['pending', 'ict_approved', 'approved', 'rejected', 'completed']
+                            ]
+                        ]
+                    ],
+                    'responses' => [
+                        '200' => ['description' => 'Device borrowing requests retrieved successfully'],
+                        '403' => ['description' => 'Unauthorized - ICT officer access required']
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * Admin API paths
+     */
+    private function getAdminPaths()
+    {
+        return [
+            '/admin/users' => [
+                'get' => [
+                    'tags' => ['Admin'],
+                    'summary' => 'Get All Users',
+                    'description' => 'Retrieve paginated list of all users (Admin only)',
+                    'operationId' => 'getAllUsers',
+                    'security' => [['sanctum' => []]],
+                    'parameters' => [
+                        [
+                            'name' => 'per_page',
+                            'in' => 'query',
+                            'description' => 'Items per page',
+                            'schema' => ['type' => 'integer', 'default' => 15]
+                        ],
+                        [
+                            'name' => 'search',
+                            'in' => 'query',
+                            'description' => 'Search users by name, email, or PF number',
+                            'schema' => ['type' => 'string']
+                        ]
+                    ],
+                    'responses' => [
+                        '200' => ['description' => 'Users retrieved successfully'],
+                        '403' => ['description' => 'Unauthorized - Admin access required']
+                    ]
+                ],
+                'post' => [
+                    'tags' => ['Admin'],
+                    'summary' => 'Create New User',
+                    'description' => 'Create a new user account (Admin only)',
+                    'operationId' => 'createUser',
+                    'security' => [['sanctum' => []]],
+                    'requestBody' => [
+                        'required' => true,
+                        'content' => [
+                            'application/json' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'required' => ['name', 'email', 'password', 'pf_number'],
+                                    'properties' => [
+                                        'name' => ['type' => 'string', 'example' => 'John Doe'],
+                                        'email' => ['type' => 'string', 'format' => 'email', 'example' => 'john@example.com'],
+                                        'password' => ['type' => 'string', 'format' => 'password'],
+                                        'pf_number' => ['type' => 'string', 'example' => 'PF12345'],
+                                        'phone' => ['type' => 'string'],
+                                        'department_id' => ['type' => 'integer'],
+                                        'roles' => ['type' => 'array', 'items' => ['type' => 'string']]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    'responses' => [
+                        '201' => ['description' => 'User created successfully'],
+                        '403' => ['description' => 'Unauthorized - Admin access required']
+                    ]
+                ]
+            ],
+            '/admin/departments' => [
+                'get' => [
+                    'tags' => ['Admin'],
+                    'summary' => 'Get All Departments',
+                    'description' => 'Retrieve all departments (Admin only)',
+                    'operationId' => 'getAllDepartments',
+                    'security' => [['sanctum' => []]],
+                    'responses' => [
+                        '200' => ['description' => 'Departments retrieved successfully']
+                    ]
+                ],
+                'post' => [
+                    'tags' => ['Admin'],
+                    'summary' => 'Create Department',
+                    'description' => 'Create a new department (Admin only)',
+                    'operationId' => 'createDepartment',
+                    'security' => [['sanctum' => []]],
+                    'requestBody' => [
+                        'required' => true,
+                        'content' => [
+                            'application/json' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'required' => ['name', 'code'],
+                                    'properties' => [
+                                        'name' => ['type' => 'string', 'example' => 'Information Technology'],
+                                        'code' => ['type' => 'string', 'example' => 'IT'],
+                                        'description' => ['type' => 'string']
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    'responses' => [
+                        '201' => ['description' => 'Department created successfully']
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * Workflow API paths (HOD, Divisional, ICT Director approvals)
+     */
+    private function getWorkflowPaths()
+    {
+        return [
+            '/hod/combined-access-requests' => [
+                'get' => [
+                    'tags' => ['HOD Workflow'],
+                    'summary' => 'Get HOD Combined Access Requests',
+                    'description' => 'Retrieve requests pending HOD approval',
+                    'operationId' => 'getHodRequests',
+                    'security' => [['sanctum' => []]],
+                    'responses' => [
+                        '200' => ['description' => 'HOD requests retrieved successfully'],
+                        '403' => ['description' => 'Unauthorized - HOD access required']
+                    ]
+                ]
+            ],
+            '/divisional/combined-access-requests' => [
+                'get' => [
+                    'tags' => ['Divisional Workflow'],
+                    'summary' => 'Get Divisional Director Requests',
+                    'description' => 'Retrieve requests pending Divisional Director approval',
+                    'operationId' => 'getDivisionalRequests',
+                    'security' => [['sanctum' => []]],
+                    'responses' => [
+                        '200' => ['description' => 'Divisional requests retrieved successfully'],
+                        '403' => ['description' => 'Unauthorized - Divisional Director access required']
+                    ]
+                ]
+            ],
+            '/dict/combined-access-requests' => [
+                'get' => [
+                    'tags' => ['ICT Director Workflow'],
+                    'summary' => 'Get ICT Director Requests',
+                    'description' => 'Retrieve requests pending ICT Director approval',
+                    'operationId' => 'getIctDirectorRequests',
+                    'security' => [['sanctum' => []]],
+                    'responses' => [
+                        '200' => ['description' => 'ICT Director requests retrieved successfully'],
+                        '403' => ['description' => 'Unauthorized - ICT Director access required']
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * Profile API paths
+     */
+    private function getProfilePaths()
+    {
+        return [
             '/user' => [
                 'get' => [
                     'tags' => ['Profile'],
@@ -393,6 +601,139 @@ class SwaggerController extends Controller
                                                 ]
                                             ],
                                             'needs_onboarding' => ['type' => 'boolean']
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            '/profile/current' => [
+                'get' => [
+                    'tags' => ['Profile'],
+                    'summary' => 'Get Extended User Profile',
+                    'description' => 'Get detailed current user profile for form auto-population',
+                    'operationId' => 'getExtendedProfile',
+                    'security' => [['sanctum' => []]],
+                    'responses' => [
+                        '200' => ['description' => 'Extended profile retrieved successfully']
+                    ]
+                ],
+                'put' => [
+                    'tags' => ['Profile'],
+                    'summary' => 'Update User Profile',
+                    'description' => 'Update current user profile information',
+                    'operationId' => 'updateProfile',
+                    'security' => [['sanctum' => []]],
+                    'requestBody' => [
+                        'required' => true,
+                        'content' => [
+                            'application/json' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'properties' => [
+                                        'name' => ['type' => 'string'],
+                                        'phone' => ['type' => 'string'],
+                                        'staff_name' => ['type' => 'string']
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    'responses' => [
+                        '200' => ['description' => 'Profile updated successfully']
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * Utility API paths (health, notifications, etc.)
+     */
+    private function getUtilityPaths()
+    {
+        return [
+            '/health' => [
+                'get' => [
+                    'tags' => ['Utility'],
+                    'summary' => 'API Health Check',
+                    'description' => 'Check API health status',
+                    'operationId' => 'healthCheck',
+                    'responses' => [
+                        '200' => [
+                            'description' => 'API is healthy',
+                            'content' => [
+                                'application/json' => [
+                                    'schema' => [
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'status' => ['type' => 'string', 'example' => 'ok'],
+                                            'timestamp' => ['type' => 'string', 'format' => 'date-time']
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            '/health/detailed' => [
+                'get' => [
+                    'tags' => ['Utility'],
+                    'summary' => 'Detailed Health Check',
+                    'description' => 'Get detailed API health status including database connection',
+                    'operationId' => 'detailedHealthCheck',
+                    'responses' => [
+                        '200' => [
+                            'description' => 'Detailed health information',
+                            'content' => [
+                                'application/json' => [
+                                    'schema' => [
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'status' => ['type' => 'string'],
+                                            'database' => ['type' => 'object'],
+                                            'environment' => ['type' => 'string'],
+                                            'php_version' => ['type' => 'string'],
+                                            'laravel_version' => ['type' => 'string']
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            '/notifications' => [
+                'get' => [
+                    'tags' => ['Notifications'],
+                    'summary' => 'Get User Notifications',
+                    'description' => 'Retrieve user notifications',
+                    'operationId' => 'getNotifications',
+                    'security' => [['sanctum' => []]],
+                    'responses' => [
+                        '200' => ['description' => 'Notifications retrieved successfully']
+                    ]
+                ]
+            ],
+            '/notifications/unread-count' => [
+                'get' => [
+                    'tags' => ['Notifications'],
+                    'summary' => 'Get Unread Notifications Count',
+                    'description' => 'Get count of unread notifications for current user',
+                    'operationId' => 'getUnreadCount',
+                    'security' => [['sanctum' => []]],
+                    'responses' => [
+                        '200' => [
+                            'description' => 'Unread count retrieved successfully',
+                            'content' => [
+                                'application/json' => [
+                                    'schema' => [
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'unread_count' => ['type' => 'integer', 'example' => 5]
                                         ]
                                     ]
                                 ]

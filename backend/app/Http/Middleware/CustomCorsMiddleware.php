@@ -21,7 +21,16 @@ class CustomCorsMiddleware
         if ($request->getMethod() === 'OPTIONS') {
             $response = response('', 200);
         } else {
-            $response = $next($request);
+            try {
+                $response = $next($request);
+            } catch (\Exception $e) {
+                // Create error response with CORS headers
+                $response = response()->json([
+                    'success' => false,
+                    'message' => 'Internal server error.',
+                    'error' => app()->environment('local') ? $e->getMessage() : 'Something went wrong'
+                ], 500);
+            }
         }
 
         // In local environment, allow all origins for development

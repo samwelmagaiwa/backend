@@ -6,7 +6,13 @@
       <main
         :class="[
           'flex-1 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative',
-          isDivisionalDirectorUser ? 'p-1' : isHodApprovalEditable ? 'p-2' : 'p-3'
+          isReviewMode
+            ? 'p-1'
+            : isDivisionalDirectorUser
+              ? 'p-1'
+              : isHodApprovalEditable
+                ? 'p-1'
+                : 'p-3'
         ]"
       >
         <!-- Medical Background Pattern -->
@@ -50,30 +56,25 @@
 
         <div
           :class="[
-            isReviewMode && (isIctDirectorUser || isDivisionalDirectorUser)
-              ? isDivisionalDirectorUser
-                ? 'max-w-full mx-1'
-                : 'max-w-full mx-4'
-              : isHodApprovalEditable
-                ? 'max-w-4xl mx-auto'
-                : 'max-w-7xl mx-auto',
+            isReviewMode ? 'max-w-full mx-1' : 'max-w-7xl mx-auto',
             'relative z-10',
-            isDivisionalDirectorUser ? 'divisional-director-compact' : '',
-            isHodApprovalEditable ? 'hod-compact' : ''
+            isReviewMode ? 'review-mode-compact' : '',
+            !isReviewMode && isDivisionalDirectorUser ? 'divisional-director-compact' : '',
+            !isReviewMode && isHodApprovalEditable ? 'hod-compact' : ''
           ]"
         >
           <!-- Header Section - Reduced height for divisional directors and ICT directors -->
           <div
             :class="[
               'medical-glass-card rounded-t-3xl border-b border-blue-300/30',
-              isReviewMode && isIctDirectorUser
+              isReviewMode
                 ? 'p-1 mb-0'
                 : isDivisionalDirectorUser
                   ? 'p-0.5 mb-0'
                   : isIctDirectorUser
                     ? 'p-1.5 mb-0'
                     : isHodApprovalEditable
-                      ? 'p-2 mb-0'
+                      ? 'p-1 mb-0'
                       : 'p-4 mb-0'
             ]"
           >
@@ -82,14 +83,14 @@
               <div
                 :class="[
                   'mr-2 transform hover:scale-110 transition-transform duration-300',
-                  isReviewMode && isIctDirectorUser
+                  isReviewMode
                     ? 'w-10 h-10'
                     : isDivisionalDirectorUser
                       ? 'w-10 h-10'
                       : isIctDirectorUser
                         ? 'w-12 h-12'
                         : isHodApprovalEditable
-                          ? 'w-14 h-14'
+                          ? 'w-12 h-12'
                           : 'w-20 h-20'
                 ]"
               >
@@ -100,14 +101,14 @@
                     src="/assets/images/ngao2.png"
                     alt="National Shield"
                     :class="
-                      isReviewMode && isIctDirectorUser
+                      isReviewMode
                         ? 'max-w-8 max-h-8'
                         : isDivisionalDirectorUser
                           ? 'max-w-8 max-h-8'
                           : isIctDirectorUser
                             ? 'max-w-10 max-h-10'
                             : isHodApprovalEditable
-                              ? 'max-w-12 max-h-12'
+                              ? 'max-w-10 max-h-10'
                               : 'max-w-18 max-h-18'
                     "
                     class="object-contain"
@@ -120,13 +121,15 @@
                 <h1
                   class="text-xl font-bold text-white tracking-wide drop-shadow-lg animate-fade-in"
                   :class="
-                    isReviewMode && isIctDirectorUser
+                    isReviewMode
                       ? 'mb-0'
                       : isDivisionalDirectorUser
                         ? 'mb-0'
                         : isIctDirectorUser
                           ? 'mb-0.5'
-                          : 'mb-2'
+                          : isHodApprovalEditable
+                            ? 'mb-0.5'
+                            : 'mb-2'
                   "
                 >
                   MUHIMBILI NATIONAL HOSPITAL
@@ -134,25 +137,29 @@
                 <div
                   :class="[
                     'relative inline-block',
-                    isReviewMode && isIctDirectorUser
+                    isReviewMode
                       ? 'mb-0'
                       : isDivisionalDirectorUser
                         ? 'mb-0'
                         : isIctDirectorUser
                           ? 'mb-1'
-                          : 'mb-4'
+                          : isHodApprovalEditable
+                            ? 'mb-1'
+                            : 'mb-4'
                   ]"
                 >
                   <div
                     :class="[
                       'bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-full text-base font-bold shadow-xl transform hover:scale-105 transition-all duration-300 border-2 border-blue-400/60',
-                      isReviewMode && isIctDirectorUser
+                      isReviewMode
                         ? 'px-2 py-0'
                         : isDivisionalDirectorUser
                           ? 'px-2 py-0'
                           : isIctDirectorUser
                             ? 'px-3 py-0.5'
-                            : 'px-6 py-2'
+                            : isHodApprovalEditable
+                              ? 'px-4 py-1'
+                              : 'px-6 py-2'
                     ]"
                   >
                     <span class="relative z-10 flex items-center gap-2">
@@ -175,14 +182,14 @@
               <div
                 :class="[
                   'ml-2 transform hover:scale-110 transition-transform duration-300',
-                  isReviewMode && isIctDirectorUser
+                  isReviewMode
                     ? 'w-10 h-10'
                     : isDivisionalDirectorUser
                       ? 'w-10 h-10'
                       : isIctDirectorUser
                         ? 'w-12 h-12'
                         : isHodApprovalEditable
-                          ? 'w-14 h-14'
+                          ? 'w-12 h-12'
                           : 'w-20 h-20'
                 ]"
               >
@@ -193,14 +200,14 @@
                     src="/assets/images/logo2.png"
                     alt="Muhimbili Logo"
                     :class="
-                      isReviewMode && isIctDirectorUser
+                      isReviewMode
                         ? 'max-w-8 max-h-8'
                         : isDivisionalDirectorUser
                           ? 'max-w-8 max-h-8'
                           : isIctDirectorUser
                             ? 'max-w-10 max-h-10'
                             : isHodApprovalEditable
-                              ? 'max-w-12 max-h-12'
+                              ? 'max-w-10 max-h-10'
                               : 'max-w-18 max-h-18'
                     "
                     class="object-contain"
@@ -215,14 +222,14 @@
             <form
               @submit.prevent="onSubmit"
               :class="[
-                isReviewMode && isIctDirectorUser
+                isReviewMode
                   ? 'p-1 space-y-1'
                   : isDivisionalDirectorUser
                     ? 'p-1 space-y-1'
                     : isIctDirectorUser
                       ? 'p-1.5 space-y-1.5'
                       : isHodApprovalEditable
-                        ? 'p-2 space-y-2'
+                        ? 'p-1.5 space-y-1.5'
                         : 'p-4 space-y-4',
                 { 'review-mode': isReviewMode }
               ]"
@@ -230,14 +237,14 @@
               <div
                 :class="[
                   'flex-1 grid grid-cols-1 min-h-0',
-                  isReviewMode && isIctDirectorUser
+                  isReviewMode
                     ? 'gap-1'
                     : isDivisionalDirectorUser
                       ? 'gap-1'
                       : isIctDirectorUser
                         ? 'gap-2'
                         : isHodApprovalEditable
-                          ? 'gap-3'
+                          ? 'gap-2'
                           : 'gap-6'
                 ]"
               >
@@ -246,14 +253,14 @@
                   aria-labelledby="applicant-details"
                   :class="[
                     'xl:col-span-4',
-                    isReviewMode && isIctDirectorUser
+                    isReviewMode
                       ? 'space-y-0.5'
                       : isDivisionalDirectorUser
                         ? 'space-y-0.5'
                         : isIctDirectorUser
                           ? 'space-y-1'
                           : isHodApprovalEditable
-                            ? 'space-y-1.5'
+                            ? 'space-y-1'
                             : 'space-y-2'
                   ]"
                 >
@@ -261,23 +268,27 @@
                   <div
                     :class="[
                       'medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 rounded-lg backdrop-blur-sm hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 group',
-                      isReviewMode && isIctDirectorUser
+                      isReviewMode
                         ? 'p-0.5'
                         : isDivisionalDirectorUser
                           ? 'p-0.5'
                           : isIctDirectorUser
                             ? 'p-1'
-                            : 'p-2'
+                            : isHodApprovalEditable
+                              ? 'p-1'
+                              : 'p-2'
                     ]"
                   >
                     <div
                       :class="[
                         'flex items-center space-x-2',
-                        isReviewMode && isIctDirectorUser
-                          ? 'mb-1'
+                        isReviewMode
+                          ? 'mb-0.5'
                           : isDivisionalDirectorUser
                             ? 'mb-1'
-                            : 'mb-2'
+                            : isHodApprovalEditable
+                              ? 'mb-1'
+                              : 'mb-2'
                       ]"
                     >
                       <div
@@ -293,7 +304,11 @@
                     <div
                       :class="[
                         'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4',
-                        isDivisionalDirectorUser ? 'gap-2' : 'gap-4'
+                        isDivisionalDirectorUser
+                          ? 'gap-2'
+                          : isHodApprovalEditable
+                            ? 'gap-3'
+                            : 'gap-4'
                       ]"
                     >
                       <div>
@@ -385,7 +400,12 @@
                         <label class="block text-xs font-bold text-blue-100 mb-2 text-center">
                           Signature <span class="text-red-400">*</span>
                         </label>
-                        <div class="relative max-w-md mx-auto">
+                        <div
+                          :class="[
+                            'relative mx-auto',
+                            isHodApprovalEditable ? 'max-w-lg' : 'max-w-md'
+                          ]"
+                        >
                           <!-- Review mode: Show signature status from database -->
                           <div
                             v-if="isReviewMode"
@@ -529,7 +549,9 @@
                         ? 'p-0.5'
                         : isDivisionalDirectorUser || isIctDirectorUser
                           ? 'p-1'
-                          : 'p-2'
+                          : isHodApprovalEditable
+                            ? 'p-1'
+                            : 'p-2'
                     ]"
                   >
                     <div class="flex items-center space-x-2 mb-2">
@@ -995,7 +1017,9 @@
                         ? 'p-0.5'
                         : isDivisionalDirectorUser || isIctDirectorUser
                           ? 'p-1'
-                          : 'p-3'
+                          : isHodApprovalEditable
+                            ? 'p-1.5'
+                            : 'p-3'
                     ]"
                   >
                     <div class="flex items-center space-x-2 mb-3">
@@ -1013,14 +1037,18 @@
                     <div
                       :class="[
                         'grid grid-cols-1 lg:grid-cols-3',
-                        isDivisionalDirectorUser ? 'gap-3' : 'gap-6'
+                        isDivisionalDirectorUser
+                          ? 'gap-3'
+                          : isHodApprovalEditable
+                            ? 'gap-4'
+                            : 'gap-6'
                       ]"
                     >
                       <!-- HoD/BM -->
                       <div
                         :class="[
                           'bg-white/15 rounded-lg border border-blue-300/30 backdrop-blur-sm',
-                          isDivisionalDirectorUser ? 'p-3' : 'p-4',
+                          isDivisionalDirectorUser ? 'p-3' : isHodApprovalEditable ? 'p-3' : 'p-4',
                           { 'opacity-50': !isHodApprovalEditable }
                         ]"
                       >
@@ -1279,8 +1307,32 @@
                         >
                           <i class="fas fa-user-circle mr-2 text-blue-300"></i>
                           Divisional Director
+                          <!-- HOD view - Show signature status for higher approvers -->
                           <span
-                            v-if="isStageCompleted('divisional')"
+                            v-if="
+                              isHodApprovalEditable &&
+                              isReviewMode &&
+                              requestData?.divisional_signature_path
+                            "
+                            class="text-xs px-2 py-1 bg-green-500/30 rounded-full text-green-300"
+                          >
+                            <i class="fas fa-signature text-xs mr-1"></i>
+                            Signed
+                          </span>
+                          <span
+                            v-else-if="
+                              isHodApprovalEditable &&
+                              isReviewMode &&
+                              !requestData?.divisional_signature_path
+                            "
+                            class="text-xs px-2 py-1 bg-red-500/30 rounded-full text-red-300"
+                          >
+                            <i class="fas fa-times text-xs mr-1"></i>
+                            No Signature
+                          </span>
+                          <!-- Other roles view -->
+                          <span
+                            v-else-if="isStageCompleted('divisional')"
                             class="text-xs px-2 py-1 bg-green-500/30 rounded-full text-green-300"
                           >
                             <i class="fas fa-check text-xs mr-1"></i>
@@ -1521,8 +1573,32 @@
                         >
                           <i class="fas fa-laptop-code mr-2 text-blue-300"></i>
                           Director of ICT
+                          <!-- HOD view - Show signature status for higher approvers -->
                           <span
-                            v-if="isStageCompleted('ict_director')"
+                            v-if="
+                              isHodApprovalEditable &&
+                              isReviewMode &&
+                              requestData?.ict_director_signature_path
+                            "
+                            class="text-xs px-2 py-1 bg-green-500/30 rounded-full text-green-300"
+                          >
+                            <i class="fas fa-signature text-xs mr-1"></i>
+                            Signed
+                          </span>
+                          <span
+                            v-else-if="
+                              isHodApprovalEditable &&
+                              isReviewMode &&
+                              !requestData?.ict_director_signature_path
+                            "
+                            class="text-xs px-2 py-1 bg-red-500/30 rounded-full text-red-300"
+                          >
+                            <i class="fas fa-times text-xs mr-1"></i>
+                            No Signature
+                          </span>
+                          <!-- Other roles view -->
+                          <span
+                            v-else-if="isStageCompleted('ict_director')"
                             class="text-xs px-2 py-1 bg-green-500/30 rounded-full text-green-300"
                           >
                             <i class="fas fa-check text-xs mr-1"></i>
@@ -1862,8 +1938,32 @@
                         >
                           <i class="fas fa-user-cog mr-2"></i>
                           Head of IT
+                          <!-- HOD view - Show signature status for higher approvers -->
                           <span
-                            v-if="isStageCompleted('head_it')"
+                            v-if="
+                              isHodApprovalEditable &&
+                              isReviewMode &&
+                              requestData?.head_it_signature_path
+                            "
+                            class="text-xs px-2 py-1 bg-green-500/30 rounded-full text-green-300"
+                          >
+                            <i class="fas fa-signature text-xs mr-1"></i>
+                            Signed
+                          </span>
+                          <span
+                            v-else-if="
+                              isHodApprovalEditable &&
+                              isReviewMode &&
+                              !requestData?.head_it_signature_path
+                            "
+                            class="text-xs px-2 py-1 bg-red-500/30 rounded-full text-red-300"
+                          >
+                            <i class="fas fa-times text-xs mr-1"></i>
+                            No Signature
+                          </span>
+                          <!-- Other roles view -->
+                          <span
+                            v-else-if="isStageCompleted('head_it')"
                             class="text-xs px-2 py-1 bg-green-500/30 rounded-full text-green-300"
                           >
                             <i class="fas fa-check text-xs mr-1"></i>
@@ -2062,24 +2162,38 @@
                       </div>
 
                       <!-- ICT Officer granting access -->
-                      <div
-                        :class="[
-                          'bg-white/15 rounded-lg border border-blue-300/30 backdrop-blur-sm',
-                          isReviewMode && isIctDirectorUser
-                            ? 'p-1'
-                            : isDivisionalDirectorUser
-                              ? 'p-3'
-                              : 'p-4',
-                          { 'opacity-50': !isIctOfficerApprovalEditable }
-                        ]"
-                      >
+                      <div :class="ictOfficerSectionClass">
                         <h5
                           class="font-bold text-white mb-3 text-center text-sm flex items-center justify-center gap-2"
                         >
                           <i class="fas fa-user-shield mr-2"></i>
                           ICT Officer granting access
+                          <!-- HOD view - Show signature status for higher approvers -->
                           <span
-                            v-if="isStageCompleted('ict_officer')"
+                            v-if="
+                              isHodApprovalEditable &&
+                              isReviewMode &&
+                              requestData?.ict_officer_signature_path
+                            "
+                            class="text-xs px-2 py-1 bg-green-500/30 rounded-full text-green-300"
+                          >
+                            <i class="fas fa-signature text-xs mr-1"></i>
+                            Signed
+                          </span>
+                          <span
+                            v-else-if="
+                              isHodApprovalEditable &&
+                              isReviewMode &&
+                              !requestData?.ict_officer_signature_path
+                            "
+                            class="text-xs px-2 py-1 bg-red-500/30 rounded-full text-red-300"
+                          >
+                            <i class="fas fa-times text-xs mr-1"></i>
+                            No Signature
+                          </span>
+                          <!-- Other roles view -->
+                          <span
+                            v-else-if="isStageCompleted('ict_officer')"
                             class="text-xs px-2 py-1 bg-green-500/30 rounded-full text-green-300"
                           >
                             <i class="fas fa-check text-xs mr-1"></i>
@@ -2213,17 +2327,7 @@
                   </div>
 
                   <!-- Action Buttons (Review Mode Only) -->
-                  <div
-                    v-if="isReviewMode && canApproveAtStage()"
-                    :class="[
-                      'flex flex-col',
-                      isReviewMode && isIctDirectorUser
-                        ? 'gap-1 mt-1'
-                        : isDivisionalDirectorUser || isIctDirectorUser
-                          ? 'gap-1.5 mt-2'
-                          : 'gap-4 mt-6'
-                    ]"
-                  >
+                  <div v-if="isReviewMode && canApproveAtStage()" :class="actionButtonsClass">
                     <!-- Signature Required Warning -->
                     <div
                       v-if="isSignatureRequiredForApproval"
@@ -2649,11 +2753,122 @@
     font-weight: 600 !important;
   }
 
-  /* Review mode card and section spacing */
+  /* Review mode card and section spacing - ORIGINAL (overridden by compact) */
   .review-mode .card,
   .review-mode .border-l-2 {
     padding: 2rem !important;
     margin-bottom: 1.5rem;
+  }
+
+  /* Review mode compact layout - overrides above for minimal scrolling */
+  .review-mode-compact {
+    /* Ultra-compact spacing for all review mode roles */
+    line-height: 1.3 !important;
+  }
+
+  .review-mode-compact .medical-card {
+    /* Minimal card spacing */
+    margin-bottom: 0.25rem !important;
+    padding: 0.5rem !important;
+  }
+
+  .review-mode-compact .space-y-0\.5 > * + * {
+    margin-top: 0.125rem !important;
+  }
+
+  .review-mode-compact .space-y-1 > * + * {
+    margin-top: 0.25rem !important;
+  }
+
+  .review-mode-compact .space-y-2 > * + * {
+    margin-top: 0.375rem !important;
+  }
+
+  .review-mode-compact .space-y-3 > * + * {
+    margin-top: 0.5rem !important;
+  }
+
+  .review-mode-compact .space-y-4 > * + * {
+    margin-top: 0.75rem !important;
+  }
+
+  .review-mode-compact .grid {
+    gap: 0.5rem !important;
+  }
+
+  .review-mode-compact .p-1 {
+    padding: 0.25rem !important;
+  }
+
+  .review-mode-compact .p-2 {
+    padding: 0.5rem !important;
+  }
+
+  .review-mode-compact .p-3 {
+    padding: 0.75rem !important;
+  }
+
+  .review-mode-compact .p-4 {
+    padding: 1rem !important;
+  }
+
+  .review-mode-compact .mb-0\.5 {
+    margin-bottom: 0.125rem !important;
+  }
+
+  .review-mode-compact .mb-1 {
+    margin-bottom: 0.25rem !important;
+  }
+
+  .review-mode-compact .mb-2 {
+    margin-bottom: 0.5rem !important;
+  }
+
+  .review-mode-compact .mb-3 {
+    margin-bottom: 0.75rem !important;
+  }
+
+  .review-mode-compact .mb-4 {
+    margin-bottom: 1rem !important;
+  }
+
+  .review-mode-compact h1,
+  .review-mode-compact h2,
+  .review-mode-compact h3,
+  .review-mode-compact h4,
+  .review-mode-compact h5 {
+    margin-bottom: 0.25rem !important;
+    line-height: 1.3 !important;
+  }
+
+  .review-mode-compact input,
+  .review-mode-compact textarea,
+  .review-mode-compact select {
+    padding-top: 0.375rem !important;
+    padding-bottom: 0.375rem !important;
+    line-height: 1.4 !important;
+  }
+
+  .review-mode-compact label {
+    margin-bottom: 0.25rem !important;
+    line-height: 1.3 !important;
+  }
+
+  .review-mode-compact .bg-white\/15,
+  .review-mode-compact .bg-white\/20 {
+    padding: 0.375rem !important;
+  }
+
+  /* Override review-mode card spacing for compact mode */
+  .review-mode-compact.review-mode .card,
+  .review-mode-compact.review-mode .border-l-2 {
+    padding: 0.5rem !important;
+    margin-bottom: 0.25rem !important;
+  }
+
+  .review-mode-compact button {
+    padding: 0.5rem 1rem !important;
+    font-size: 1rem !important;
   }
 
   /* Divisional Director compact layout */
@@ -2753,72 +2968,129 @@
     padding: 0.5rem !important;
   }
 
-  /* HOD compact layout */
+  /* HOD compact layout - Enhanced for minimal scrolling */
   .hod-compact {
-    /* Reduce overall width and spacing for better visibility on smaller screens */
+    /* Better utilization of screen width for HOD users */
+    width: 100% !important;
+    max-width: 100% !important;
+    line-height: 1.1 !important; /* Even tighter line height */
   }
 
   .hod-compact .medical-card {
-    /* Tighter card spacing for HOD users */
-    margin-bottom: 1rem !important;
-    padding: 0.75rem !important;
+    /* Tighter card spacing for HOD users while utilizing full width */
+    margin-bottom: 0.375rem !important; /* Reduced from 0.5rem */
+    padding: 0.375rem !important; /* Reduced from 0.5rem */
+    width: 100% !important;
+  }
+
+  .hod-compact .space-y-1 > * + * {
+    margin-top: 0.125rem !important; /* Reduced from 0.25rem */
   }
 
   .hod-compact .space-y-2 > * + * {
-    margin-top: 0.5rem !important;
+    margin-top: 0.25rem !important; /* Reduced from 0.375rem */
   }
 
   .hod-compact .space-y-3 > * + * {
-    margin-top: 0.75rem !important;
+    margin-top: 0.375rem !important; /* Reduced from 0.5rem */
   }
 
   .hod-compact .space-y-4 > * + * {
-    margin-top: 1rem !important;
+    margin-top: 0.5rem !important; /* Reduced from 0.75rem */
   }
 
   .hod-compact .grid {
-    gap: 1rem !important;
+    gap: 0.5rem !important; /* Reduced from 0.75rem */
+    width: 100% !important;
+  }
+
+  .hod-compact .grid.grid-cols-1 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .hod-compact .grid.grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .hod-compact .grid.grid-cols-4 {
+    grid-template-columns: repeat(4, 1fr) !important;
   }
 
   .hod-compact .p-2 {
-    padding: 0.5rem !important;
+    padding: 0.25rem !important; /* Reduced from 0.375rem */
   }
 
   .hod-compact .p-3 {
-    padding: 0.75rem !important;
+    padding: 0.375rem !important; /* Reduced from 0.5rem */
   }
 
   .hod-compact .p-4 {
-    padding: 1rem !important;
+    padding: 0.5rem !important; /* Reduced from 0.75rem */
+  }
+
+  .hod-compact .mb-1 {
+    margin-bottom: 0.125rem !important; /* Reduced from 0.25rem */
   }
 
   .hod-compact .mb-2 {
-    margin-bottom: 0.5rem !important;
+    margin-bottom: 0.25rem !important; /* Reduced from 0.375rem */
   }
 
   .hod-compact .mb-3 {
-    margin-bottom: 0.75rem !important;
+    margin-bottom: 0.375rem !important; /* Reduced from 0.5rem */
   }
 
   .hod-compact .mb-4 {
-    margin-bottom: 1rem !important;
+    margin-bottom: 0.5rem !important; /* Reduced from 0.75rem */
   }
 
   .hod-compact h3,
   .hod-compact h4,
   .hod-compact h5 {
     font-size: 1rem !important;
-    margin-bottom: 0.5rem !important;
+    margin-bottom: 0.25rem !important;
+    line-height: 1.3 !important;
+  }
+
+  /* Additional HOD-specific reductions for input elements */
+  .hod-compact input,
+  .hod-compact textarea,
+  .hod-compact select {
+    padding-top: 0.25rem !important; /* Reduced from 0.375rem */
+    padding-bottom: 0.25rem !important; /* Reduced from 0.375rem */
+  }
+
+  .hod-compact label {
+    margin-bottom: 0.125rem !important; /* Reduced from 0.25rem */
   }
 
   .hod-compact .medical-input {
-    padding: 0.375rem 0.75rem !important;
+    padding: 0.25rem 0.5rem !important; /* Reduced from 0.375rem 0.75rem */
     font-size: 0.875rem !important;
   }
 
   .hod-compact label {
     font-size: 0.875rem !important;
-    margin-bottom: 0.25rem !important;
+    margin-bottom: 0.125rem !important; /* Reduced from 0.25rem */
+  }
+
+  /* Better width utilization for HOD form sections */
+  .hod-compact .flex-1 {
+    width: 100% !important;
+  }
+
+  .hod-compact form {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .hod-compact .medical-glass-card {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .hod-compact section {
+    width: 100% !important;
   }
 </style>
 
@@ -3937,8 +4209,9 @@
 
       // UI class helpers to simplify template conditions
       implementationCardClass() {
-        const baseClass = 'medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 rounded-lg backdrop-blur-sm hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 group'
-        
+        const baseClass =
+          'medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 rounded-lg backdrop-blur-sm hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 group'
+
         if (this.isReviewMode && this.isIctDirectorUser) {
           return `${baseClass} p-0.5`
         } else if (this.isDivisionalDirectorUser || this.isIctDirectorUser) {
@@ -3950,12 +4223,14 @@
 
       implementationHeaderClass() {
         const baseClass = 'flex items-center space-x-2'
-        return this.isReviewMode && this.isIctDirectorUser ? `${baseClass} mb-1` : `${baseClass} mb-3`
+        return this.isReviewMode && this.isIctDirectorUser
+          ? `${baseClass} mb-1`
+          : `${baseClass} mb-3`
       },
 
       implementationGridClass() {
         const baseClass = 'grid grid-cols-1 lg:grid-cols-2'
-        
+
         if (this.isReviewMode && this.isIctDirectorUser) {
           return `${baseClass} gap-1`
         } else if (this.isDivisionalDirectorUser) {
@@ -3967,7 +4242,7 @@
 
       headItSectionClass() {
         const baseClass = 'bg-white/15 rounded-lg border border-blue-300/30 backdrop-blur-sm'
-        
+
         let paddingClass = ''
         if (this.isReviewMode && this.isIctDirectorUser) {
           paddingClass = 'p-1'
@@ -3976,10 +4251,39 @@
         } else {
           paddingClass = 'p-4'
         }
-        
+
         const opacityClass = this.isHeadItApprovalEditable ? '' : 'opacity-50'
-        
+
         return [baseClass, paddingClass, opacityClass].filter(Boolean).join(' ')
+      },
+
+      ictOfficerSectionClass() {
+        const baseClass = 'bg-white/15 rounded-lg border border-blue-300/30 backdrop-blur-sm'
+
+        let paddingClass = ''
+        if (this.isReviewMode && this.isIctDirectorUser) {
+          paddingClass = 'p-1'
+        } else if (this.isDivisionalDirectorUser) {
+          paddingClass = 'p-3'
+        } else {
+          paddingClass = 'p-4'
+        }
+
+        const opacityClass = this.isIctOfficerApprovalEditable ? '' : 'opacity-50'
+
+        return [baseClass, paddingClass, opacityClass].filter(Boolean).join(' ')
+      },
+
+      actionButtonsClass() {
+        const baseClass = 'flex flex-col'
+
+        if (this.isReviewMode && this.isIctDirectorUser) {
+          return `${baseClass} gap-1 mt-1`
+        } else if (this.isDivisionalDirectorUser || this.isIctDirectorUser) {
+          return `${baseClass} gap-2 mt-2`
+        } else {
+          return `${baseClass} gap-4 mt-4`
+        }
       }
     },
     async mounted() {
@@ -4140,7 +4444,9 @@
       }
     },
     methods: {
-      // Jeeva Requested for selector handlers
+      // ===========================================
+      // JEEVA DROPDOWN HANDLERS
+      // ===========================================
       isJeevaItemSelected(label) {
         return this.jeevaItemSelections.includes(label)
       },
@@ -4185,7 +4491,9 @@
         }
       },
 
-      // Tabs
+      // ===========================================
+      // TABS AND MODULE MANAGEMENT
+      // ===========================================
       syncTabs(type, values) {
         const prefix = { wellsoft: 'W', jeeva: 'J', internet: 'I' }[type]
         const newTabs = []
@@ -4205,17 +4513,22 @@
         this.activeTab = this.tabs[0]?.key || ''
       },
 
-      // Helpers
+      // ===========================================
+      // HELPER FUNCTIONS
+      // ===========================================
       isSelected(type, value) {
         if (type === 'wellsoft') return this.selectedWellsoft.includes(value)
         if (type === 'jeeva') return this.selectedJeeva.includes(value)
         return false
       },
 
+      // ===========================================
+      // APPROVAL AND USER ROLE METHODS
+      // ===========================================
+
       /**
        * Get the appropriate name placeholder for approval sections based on user role
        */
-
       getApprovalNamePlaceholder(approvalType) {
         const userRole = this.getUserRole()
         const roleMapping = {
@@ -4307,6 +4620,10 @@
 
         return role || ''
       },
+
+      // ===========================================
+      // MODULE SELECTION METHODS
+      // ===========================================
       toggleWellsoft(m) {
         this.selectedWellsoft = this.isSelected('wellsoft', m)
           ? this.selectedWellsoft.filter((x) => x !== m)
@@ -4330,6 +4647,10 @@
         if (type === 'jeeva') return 'JeevaPanel'
         return 'InternetPanel'
       },
+
+      // ===========================================
+      // UI INTERACTION METHODS
+      // ===========================================
       toggleAccordion(key) {
         this.openAccordions.has(key)
           ? this.openAccordions.delete(key)
@@ -6478,4 +6799,3 @@
     }
   }
 </style>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                 

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 py-8 px-4 relative overflow-hidden"
+    class="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 py-2 px-4 relative overflow-hidden"
   >
     <!-- Medical Background Pattern -->
     <div class="absolute inset-0 overflow-hidden">
@@ -41,19 +41,19 @@
       </div>
     </div>
 
-    <div class="max-w-8xl mx-auto relative z-10">
+    <div class="max-w-none mx-auto relative z-10 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 3xl:px-20">
       <!-- Header Section -->
-      <div class="medical-glass-card rounded-t-3xl p-6 mb-0 border-b border-blue-300/30">
+      <div class="medical-glass-card rounded-t-3xl p-3 mb-0 border-b border-blue-300/30">
         <div class="flex justify-between items-center">
           <!-- Left Logo -->
-          <div class="w-28 h-28 mr-6 transform hover:scale-110 transition-transform duration-300">
+          <div class="w-16 h-16 mr-3 transform hover:scale-110 transition-transform duration-300">
             <div
               class="w-full h-full bg-gradient-to-br from-blue-500/20 to-teal-500/20 rounded-2xl backdrop-blur-sm border-2 border-blue-300/40 flex items-center justify-center shadow-2xl hover:shadow-blue-500/25"
             >
               <img
                 src="/assets/images/ngao2.png"
                 alt="National Shield"
-                class="max-w-18 max-h-18 object-contain"
+                class="max-w-12 max-h-12 object-contain"
               />
             </div>
           </div>
@@ -61,16 +61,16 @@
           <!-- Center Content -->
           <div class="text-center flex-1">
             <h1
-              class="text-4xl font-bold text-white mb-4 tracking-wide drop-shadow-lg animate-fade-in"
+              class="text-2xl font-bold text-white mb-1 tracking-wide drop-shadow-lg animate-fade-in"
             >
               MUHIMBILI NATIONAL HOSPITAL
             </h1>
-            <div class="relative inline-block mb-4">
+            <div class="relative inline-block mb-1">
               <div
-                class="bg-gradient-to-r from-red-600 to-red-700 text-white px-10 py-4 rounded-full text-xl font-bold shadow-2xl transform hover:scale-105 transition-all duration-300 border-2 border-red-400/60"
+                class="bg-gradient-to-r from-red-600 to-red-700 text-white px-4 py-1 rounded-full text-base font-bold shadow-2xl transform hover:scale-105 transition-all duration-300 border-2 border-red-400/60"
               >
-                <span class="relative z-10 flex items-center gap-2">
-                  <i class="fas fa-shield-alt text-red-200"></i>
+                <span class="relative z-10 flex items-center gap-1">
+                  <i class="fas fa-shield-alt text-red-200 text-xs"></i>
                   RESTRICTED
                 </span>
                 <div
@@ -86,14 +86,14 @@
           </div>
 
           <!-- Right Logo -->
-          <div class="w-28 h-28 ml-6 transform hover:scale-110 transition-transform duration-300">
+          <div class="w-16 h-16 ml-3 transform hover:scale-110 transition-transform duration-300">
             <div
               class="w-full h-full bg-gradient-to-br from-teal-500/20 to-blue-500/20 rounded-2xl backdrop-blur-sm border-2 border-teal-300/40 flex items-center justify-center shadow-2xl hover:shadow-teal-500/25"
             >
               <img
                 src="/assets/images/logo2.png"
                 alt="Muhimbili Logo"
-                class="max-w-18 max-h-18 object-contain"
+                class="max-w-12 max-h-12 object-contain"
               />
             </div>
           </div>
@@ -102,10 +102,10 @@
 
       <!-- Main Form -->
       <div class="medical-glass-card rounded-b-3xl overflow-hidden">
-        <form @submit.prevent="submitDeclaration" class="p-6 space-y-6">
+        <form @submit.prevent="submitDeclaration" class="p-3 space-y-3">
           <!-- Declaration Text -->
           <div
-            class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-5 rounded-xl backdrop-blur-sm hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-300 group"
+            class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-2 rounded-xl backdrop-blur-sm hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-300 group"
           >
             <div class="flex items-start space-x-4">
               <div class="flex-shrink-0">
@@ -116,12 +116,12 @@
                 </div>
               </div>
               <div class="flex-1">
-                <h3 class="text-lg font-bold text-white mb-3 flex items-center">
+                <h3 class="text-base font-bold text-white mb-1 flex items-center">
                   <i class="fas fa-clipboard-list mr-2 text-blue-300"></i>
                   Declaration Information
                 </h3>
-                <div class="text-blue-100 leading-relaxed space-y-3">
-                  <p class="text-sm font-medium">
+                <div class="text-blue-100 leading-relaxed space-y-1">
+                  <p class="text-base font-medium">
                     These declarations have been designed to certify that users acknowledge that
                     they are aware of Muhimbili National Hospital Acceptable Information and
                     Communication Technology use policy and agree to abide by their terms.
@@ -133,16 +133,16 @@
 
           <!-- Personal Information Section -->
           <div
-            class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-5 rounded-xl backdrop-blur-sm hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-300 group"
+            class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-2 rounded-xl backdrop-blur-sm hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-300 group"
           >
-            <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center justify-between mb-2">
               <div class="flex items-center space-x-3">
                 <div
                   class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
                 >
                   <i class="fas fa-user-md text-white text-lg"></i>
                 </div>
-                <h3 class="text-lg font-bold text-white flex items-center">
+                <h3 class="text-xl font-bold text-white flex items-center">
                   <i class="fas fa-id-card mr-2 text-blue-300"></i>
                   Personal Information
                 </h3>
@@ -158,9 +158,9 @@
                 </span>
                 <span
                   v-else-if="autoPopulated"
-                  class="text-sm text-green-300 font-medium bg-green-500/20 px-2 py-1 rounded-full border border-green-400/30"
+                  class="text-base text-green-300 font-medium bg-green-500/20 px-2 py-1 rounded-full border border-green-400/30"
                 >
-                  <i class="fas fa-check mr-1 text-xs"></i>
+                  <i class="fas fa-check mr-1 text-sm"></i>
                   Auto-populated
                 </span>
                 <span
@@ -173,18 +173,20 @@
               </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div
+              class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-6 gap-4 md:gap-6 lg:gap-8"
+            >
               <!-- Full Name -->
-              <div class="md:col-span-2">
+              <div class="md:col-span-2 xl:col-span-4 2xl:col-span-6">
                 <label
-                  class="block text-base font-bold text-blue-100 mb-2 flex items-center justify-between"
+                  class="block text-lg font-bold text-blue-100 mb-2 flex items-center justify-between"
                 >
                   <span>Full Name <span class="text-red-400">*</span></span>
                   <span
                     v-if="autoPopulated && formData.fullName && !isLoadingProfile"
-                    class="text-sm text-green-300 font-medium bg-green-500/20 px-2 py-1 rounded-full border border-green-400/30 flex items-center gap-1"
+                    class="text-base text-green-300 font-medium bg-green-500/20 px-2 py-1 rounded-full border border-green-400/30 flex items-center gap-1"
                   >
-                    <i class="fas fa-lock text-xs"></i>
+                    <i class="fas fa-lock text-sm"></i>
                     Protected
                   </span>
                 </label>
@@ -192,7 +194,7 @@
                   <input
                     v-model="formData.fullName"
                     type="text"
-                    class="medical-input w-full px-2 py-1.5 border-2 rounded-lg focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 text-sm"
+                    class="medical-input w-full px-2 py-1.5 border-2 rounded-lg focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 text-base"
                     :class="{
                       'bg-blue-500/30 border-blue-400/60 focus:border-blue-500 hover:bg-blue-500/40 focus:bg-blue-500/50 focus:shadow-lg focus:shadow-blue-500/30':
                         !autoPopulated || isLoadingProfile,
@@ -225,7 +227,7 @@
                 <!-- Help text for protected field -->
                 <p
                   v-if="autoPopulated && formData.fullName && !isLoadingProfile"
-                  class="text-xs text-green-200/70 mt-1 italic flex items-center"
+                  class="text-sm text-green-200/70 mt-1 italic flex items-center"
                 >
                   <i class="fas fa-info-circle mr-1"></i>
                   This field is auto-populated from your profile and cannot be edited
@@ -233,16 +235,16 @@
               </div>
 
               <!-- PF Number -->
-              <div>
+              <div class="xl:col-span-2 2xl:col-span-2">
                 <label
-                  class="block text-base font-bold text-blue-100 mb-2 flex items-center justify-between"
+                  class="block text-lg font-bold text-blue-100 mb-2 flex items-center justify-between"
                 >
                   <span>PF Number <span class="text-red-400">*</span></span>
                   <span
                     v-if="autoPopulated && formData.pfNumber && !isLoadingProfile"
-                    class="text-sm text-green-300 font-medium bg-green-500/20 px-2 py-1 rounded-full border border-green-400/30 flex items-center gap-1"
+                    class="text-base text-green-300 font-medium bg-green-500/20 px-2 py-1 rounded-full border border-green-400/30 flex items-center gap-1"
                   >
-                    <i class="fas fa-lock text-xs"></i>
+                    <i class="fas fa-lock text-sm"></i>
                     Protected
                   </span>
                 </label>
@@ -250,7 +252,7 @@
                   <input
                     v-model="formData.pfNumber"
                     type="text"
-                    class="medical-input w-full px-2 py-1.5 border-2 rounded-lg focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 text-sm"
+                    class="medical-input w-full px-2 py-1.5 border-2 rounded-lg focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 text-base"
                     :class="{
                       'bg-blue-500/30 border-blue-400/60 focus:border-blue-500 hover:bg-blue-500/40 focus:bg-blue-500/50 focus:shadow-lg focus:shadow-blue-500/30':
                         !autoPopulated || isLoadingProfile,
@@ -283,7 +285,7 @@
                 <!-- Help text for protected field -->
                 <p
                   v-if="autoPopulated && formData.pfNumber && !isLoadingProfile"
-                  class="text-xs text-green-200/70 mt-1 italic flex items-center"
+                  class="text-sm text-green-200/70 mt-1 italic flex items-center"
                 >
                   <i class="fas fa-info-circle mr-1"></i>
                   This field is auto-populated from your profile and cannot be edited
@@ -291,14 +293,25 @@
               </div>
 
               <!-- Department/Unit -->
-              <div>
-                <label class="block text-base font-bold text-blue-100 mb-2">
-                  Department/Unit <span class="text-red-400">*</span>
+              <div class="xl:col-span-1 2xl:col-span-2">
+                <label
+                  class="block text-lg font-bold text-blue-100 mb-2 flex items-center justify-between"
+                >
+                  <span>Department/Unit <span class="text-red-400">*</span></span>
+                  <span
+                    v-if="autoPopulated && formData.department && !isLoadingProfile"
+                    class="text-base text-green-300 font-medium bg-green-500/20 px-2 py-1 rounded-full border border-green-400/30 flex items-center gap-1"
+                  >
+                    <i class="fas fa-lock text-sm"></i>
+                    Protected
+                  </span>
                 </label>
                 <div class="relative">
                   <select
                     v-model="formData.department"
-                    class="medical-input w-full px-2 py-1.5 bg-blue-500/30 border-2 border-blue-400/60 rounded-lg focus:border-blue-500 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-blue-500/40 focus:bg-blue-500/50 focus:shadow-lg focus:shadow-blue-500/30 appearance-none cursor-pointer text-sm"
+                    class="medical-input w-full px-2 py-1.5 bg-blue-500/30 border-2 border-blue-400/60 rounded-lg focus:border-blue-500 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-blue-500/40 focus:bg-blue-500/50 focus:shadow-lg focus:shadow-blue-500/30 appearance-none text-base"
+                    :disabled="isLoadingProfile || (autoPopulated && formData.department)"
+                    :readonly="autoPopulated && formData.department && !isLoadingProfile"
                     required
                   >
                     <option value="" disabled class="bg-gray-800 text-gray-300">
@@ -322,18 +335,25 @@
                     class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/10 to-blue-600/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
                   ></div>
                 </div>
+                <p
+                  v-if="autoPopulated && formData.department && !isLoadingProfile"
+                  class="text-sm text-green-200/70 mt-1 italic flex items-center"
+                >
+                  <i class="fas fa-info-circle mr-1"></i>
+                  This field is auto-populated from your profile and cannot be edited
+                </p>
               </div>
 
               <!-- Job Title -->
-              <div class="md:col-span-2">
-                <label class="block text-base font-bold text-blue-100 mb-2">
+              <div class="xl:col-span-1 2xl:col-span-2">
+                <label class="block text-lg font-bold text-blue-100 mb-2">
                   Job Title <span class="text-red-400">*</span>
                 </label>
                 <div class="relative">
                   <input
                     v-model="formData.jobTitle"
                     type="text"
-                    class="medical-input w-full px-2 py-1.5 bg-blue-500/30 border-2 border-blue-400/60 rounded-lg focus:border-blue-500 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-blue-500/40 focus:bg-blue-500/50 focus:shadow-lg focus:shadow-blue-500/30 text-sm"
+                    class="medical-input w-full px-2 py-1.5 bg-blue-500/30 border-2 border-blue-400/60 rounded-lg focus:border-blue-500 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-blue-500/40 focus:bg-blue-500/50 focus:shadow-lg focus:shadow-blue-500/30 text-base"
                     placeholder="Enter your job title"
                     required
                   />
@@ -347,22 +367,22 @@
 
           <!-- Declaration Statement -->
           <div
-            class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
+            class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-3 rounded-xl backdrop-blur-sm hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-300 group"
           >
-            <div class="flex items-center space-x-3 mb-4">
+            <div class="flex items-center space-x-2 mb-2">
               <div
-                class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
+                class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
               >
-                <i class="fas fa-file-contract text-white text-sm"></i>
+                <i class="fas fa-file-contract text-white text-xs"></i>
               </div>
-              <h3 class="text-lg font-bold text-white flex items-center">
-                <i class="fas fa-scroll mr-2 text-blue-300 text-sm"></i>
+              <h3 class="text-base font-bold text-white flex items-center">
+                <i class="fas fa-scroll mr-2 text-blue-300 text-xs"></i>
                 Declaration Statement
               </h3>
             </div>
 
-            <div class="bg-white/15 p-6 rounded-xl backdrop-blur-sm border-2 border-blue-300/30">
-              <div class="text-blue-100 leading-relaxed text-lg space-y-5 text-justify">
+            <div class="bg-white/15 p-3 rounded-xl backdrop-blur-sm border-2 border-blue-300/30">
+              <div class="text-blue-100 leading-relaxed text-lg space-y-3 text-justify">
                 <p>
                   I
                   <strong class="text-blue-300">{{
@@ -391,9 +411,9 @@
 
           <!-- Signature Section -->
           <div
-            class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-4 rounded-xl backdrop-blur-sm hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-300 group"
+            class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-3 rounded-xl backdrop-blur-sm hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-300 group"
           >
-            <div class="flex items-center space-x-2 mb-3">
+            <div class="flex items-center space-x-2 mb-2">
               <div
                 class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
               >
@@ -405,9 +425,11 @@
               </h3>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div
+              class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-4 md:gap-6 lg:gap-8"
+            >
               <!-- Signature Upload -->
-              <div class="md:col-span-2">
+              <div class="md:col-span-2 xl:col-span-3 2xl:col-span-5">
                 <label class="block text-base font-bold text-blue-100 mb-2">
                   Signature <span class="text-red-400">*</span>
                 </label>
@@ -489,7 +511,7 @@
               </div>
 
               <!-- Date -->
-              <div>
+              <div class="2xl:col-span-1">
                 <label class="block text-base font-bold text-blue-100 mb-2">
                   Date <span class="text-red-400">*</span>
                 </label>
@@ -510,7 +532,7 @@
 
           <!-- Agreement Checkbox -->
           <div
-            class="medical-card bg-gradient-to-r from-red-600/25 to-rose-600/25 border-2 border-red-400/40 p-8 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-red-500/20 transition-all duration-500 group"
+            class="medical-card bg-gradient-to-r from-red-600/25 to-rose-600/25 border-2 border-red-400/40 p-3 rounded-xl backdrop-blur-sm hover:shadow-xl hover:shadow-red-500/20 transition-all duration-300 group"
           >
             <div class="flex items-start space-x-4">
               <div class="flex-shrink-0 mt-1">
@@ -527,7 +549,7 @@
                   ></div>
                 </div>
               </div>
-              <label for="agreement" class="text-sm text-blue-100 leading-relaxed flex-1">
+              <label for="agreement" class="text-base text-blue-100 leading-relaxed flex-1">
                 <span class="font-bold text-red-300 flex items-center gap-2"
                   ><i class="fas fa-exclamation-triangle"></i>I hereby confirm that:</span
                 >
@@ -539,12 +561,12 @@
           </div>
 
           <!-- Form Actions -->
-          <div class="border-t-2 border-blue-300/30 pt-8">
-            <div class="flex flex-col sm:flex-row justify-center gap-6">
+          <div class="border-t-2 border-blue-300/30 pt-3">
+            <div class="flex flex-col sm:flex-row justify-center gap-3">
               <button
                 type="submit"
                 :disabled="!isFormValid || isSubmitting"
-                class="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-semibold flex items-center justify-center shadow-xl hover:shadow-2xl hover:shadow-blue-500/25 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none border-2 border-blue-500/50"
+                class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-semibold flex items-center justify-center shadow-lg hover:shadow-xl hover:shadow-blue-500/25 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none border-2 border-blue-500/50"
               >
                 <i v-if="isSubmitting" class="fas fa-spinner fa-spin mr-3"></i>
                 <i v-else class="fas fa-file-signature mr-3"></i>
@@ -657,15 +679,45 @@
             this.formData.fullName = result.data.staffName || result.data.fullName || ''
             this.formData.pfNumber = result.data.pfNumber || ''
 
+            // Auto-populate department - use the best available department name
+            const departmentName =
+              result.data.departmentFullName ||
+              result.data.departmentName ||
+              result.data.departmentCode ||
+              ''
+
+            // Ensure department is in the departments list, or add it
+            if (departmentName && !this.departments.includes(departmentName)) {
+              console.log('📝 Adding user department to available options:', departmentName)
+              this.departments.push(departmentName)
+              this.departments.sort() // Keep list sorted
+            }
+
+            this.formData.department = departmentName
             this.autoPopulated = true
 
             console.log('✅ Declaration form auto-populated:', {
               fullName: this.formData.fullName,
-              pfNumber: this.formData.pfNumber
+              pfNumber: this.formData.pfNumber,
+              department: this.formData.department,
+              departmentSource: result.data.departmentFullName
+                ? 'departmentFullName'
+                : result.data.departmentName
+                  ? 'departmentName'
+                  : result.data.departmentCode
+                    ? 'departmentCode'
+                    : 'none'
             })
 
-            // Show success notification
-            this.showNotification('Your name and PF number have been auto-populated', 'info')
+            // Show success notification with specific fields populated
+            const populatedFields = []
+            if (this.formData.fullName) populatedFields.push('name')
+            if (this.formData.pfNumber) populatedFields.push('PF number')
+            if (this.formData.department) populatedFields.push('department')
+
+            if (populatedFields.length > 0) {
+              this.showNotification(`Auto-populated: ${populatedFields.join(', ')}`, 'info')
+            }
           } else {
             console.warn('⚠️ Failed to auto-populate declaration form:', result.error)
             this.profileLoadError = result.error || 'Failed to load profile data'
@@ -863,6 +915,36 @@
 
       goBack() {
         this.$emit('go-back')
+      },
+
+      /**
+       * Load available departments from backend API
+       */
+      async loadAvailableDepartments() {
+        try {
+          console.log('🏢 Loading departments from backend...')
+          const result = await userProfileService.getDepartments()
+
+          if (result.success && result.data && Array.isArray(result.data)) {
+            // Extract department display names and merge with existing list
+            const backendDepartments = result.data
+              .map((dept) => dept.display_name || dept.full_name || dept.name || '')
+              .filter((name) => name.length > 0)
+
+            // Merge with existing departments, remove duplicates, and sort
+            const allDepartments = [...new Set([...this.departments, ...backendDepartments])]
+            this.departments = allDepartments.sort()
+
+            console.log(
+              `✅ Loaded ${backendDepartments.length} departments from backend, total: ${this.departments.length}`
+            )
+          } else {
+            console.warn('⚠️ Failed to load departments from backend, using static list')
+          }
+        } catch (error) {
+          console.warn('⚠️ Error loading departments from backend:', error.message)
+          console.log('📋 Using static department list as fallback')
+        }
       }
     },
 
@@ -872,6 +954,9 @@
       // Set current date as default
       const today = new Date().toISOString().split('T')[0]
       this.formData.date = today
+
+      // Load available departments from backend (parallel with auto-population)
+      this.loadAvailableDepartments()
 
       // Auto-populate user data using the profile service
       await this.autoPopulateUserData()
