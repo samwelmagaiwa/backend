@@ -131,6 +131,15 @@ const routes = [
       roles: [ROLES.ICT_OFFICER]
     }
   },
+  {
+    path: '/head-it-dashboard',
+    name: 'HeadItDashboard',
+    component: () => import('../components/IctDashboard.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: [ROLES.HEAD_OF_IT]
+    }
+  },
 
   // Onboarding flow (for first-time users)
   {
@@ -176,6 +185,7 @@ const routes = [
         ROLES.DIVISIONAL_DIRECTOR,
         ROLES.HEAD_OF_DEPARTMENT,
         ROLES.ICT_DIRECTOR,
+        ROLES.HEAD_OF_IT,
         ROLES.ICT_OFFICER
       ]
     }
@@ -190,6 +200,7 @@ const routes = [
         ROLES.DIVISIONAL_DIRECTOR,
         ROLES.HEAD_OF_DEPARTMENT,
         ROLES.ICT_DIRECTOR,
+        ROLES.HEAD_OF_IT,
         ROLES.ICT_OFFICER
       ]
     }
@@ -204,6 +215,7 @@ const routes = [
         ROLES.DIVISIONAL_DIRECTOR,
         ROLES.HEAD_OF_DEPARTMENT,
         ROLES.ICT_DIRECTOR,
+        ROLES.HEAD_OF_IT,
         ROLES.ICT_OFFICER
       ]
     }
@@ -218,6 +230,7 @@ const routes = [
         ROLES.DIVISIONAL_DIRECTOR,
         ROLES.HEAD_OF_DEPARTMENT,
         ROLES.ICT_DIRECTOR,
+        ROLES.HEAD_OF_IT,
         ROLES.ICT_OFFICER,
         ROLES.STAFF // Allow staff to edit their own rejected requests
       ]
@@ -234,6 +247,7 @@ const routes = [
         ROLES.DIVISIONAL_DIRECTOR,
         ROLES.HEAD_OF_DEPARTMENT,
         ROLES.ICT_DIRECTOR,
+        ROLES.HEAD_OF_IT,
         ROLES.ICT_OFFICER,
         ROLES.STAFF // Allow staff to edit their own rejected requests
       ]

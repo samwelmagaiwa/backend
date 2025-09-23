@@ -280,7 +280,7 @@ class AuthController extends Controller
             ]);
         }
         
-        if (array_intersect($userRoles, ['divisional_director', 'head_of_department', 'ict_director', 'ict_officer'])) {
+        if (array_intersect($userRoles, ['divisional_director', 'head_of_department', 'ict_director', 'head_of_it', 'ict_officer'])) {
             $abilities = array_merge($abilities, [
                 'approver-access',
                 'review-requests',
@@ -686,6 +686,7 @@ class AuthController extends Controller
                 'head_of_department' => '/hod-dashboard',
                 'divisional_director' => '/divisional-dashboard',
                 'ict_director' => '/dict-dashboard',
+                'head_of_it' => '/head-it-dashboard',
                 'ict_officer' => '/ict-dashboard',
                 'staff' => '/user-dashboard'
             ];

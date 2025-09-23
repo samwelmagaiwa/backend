@@ -1,114 +1,88 @@
 <template>
   <div
-    class="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4"
+    class="fixed inset-0 bg-gradient-to-br from-blue-900/80 via-blue-800/80 to-blue-700/80 backdrop-blur-md flex items-center justify-center z-50 p-4"
     style="backdrop-filter: blur(12px)"
   >
     <div
-      class="bg-gradient-to-br from-blue-50 via-white to-blue-100 rounded-3xl max-w-md w-full transform transition-all duration-500 scale-100 animate-slideUp border-2 border-blue-300/60"
+      class="bg-gradient-to-br from-blue-700 via-blue-600 to-blue-800 rounded-2xl max-w-sm w-full transform transition-all duration-500 scale-100 animate-slideUp border border-blue-300/30 shadow-2xl"
       style="
         box-shadow:
-          0 35px 60px -12px rgba(29, 78, 216, 0.5),
-          0 25px 50px -12px rgba(59, 130, 246, 0.3),
-          0 0 0 1px rgba(59, 130, 246, 0.4),
-          inset 0 2px 0 rgba(255, 255, 255, 0.9);
-        backdrop-filter: blur(20px);
+          0 25px 50px -12px rgba(29, 78, 216, 0.6),
+          0 15px 35px -12px rgba(59, 130, 246, 0.4),
+          0 0 0 1px rgba(255, 255, 255, 0.1),
+          inset 0 2px 0 rgba(255, 255, 255, 0.2);
       "
     >
       <!-- Header -->
-      <div
-        class="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-700 rounded-t-3xl p-6 text-center relative overflow-hidden"
-      >
-        <!-- Background pattern -->
-        <div class="absolute inset-0 opacity-15">
-          <div
-            class="absolute inset-0 bg-gradient-to-r from-blue-600/30 to-cyan-600/30 animate-pulse"
-          ></div>
-          <div
-            class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-400 to-transparent"
-          ></div>
+      <div class="text-center p-5 relative overflow-hidden">
+        <!-- Trophy Icon -->
+        <div
+          class="w-10 h-10 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg animate-pulse"
+        >
+          <i class="fas fa-trophy text-white text-sm drop-shadow-lg"></i>
         </div>
 
-        <div class="relative z-10">
-          <div
-            class="w-12 h-12 bg-gradient-to-br from-blue-400 via-blue-500 to-cyan-600 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-2xl border-2 border-white/30"
-          >
-            <div
-              class="absolute inset-0 bg-gradient-to-br from-blue-300/50 to-transparent rounded-xl"
-            ></div>
-            <i class="fas fa-trophy text-white text-lg drop-shadow-lg relative z-10"></i>
-          </div>
-          <h2 class="text-xl font-bold text-white mb-1 drop-shadow-lg">Congratulations!</h2>
-          <p class="text-blue-100 text-sm font-medium drop-shadow-sm">{{ userRoleDisplay }}</p>
-        </div>
+        <h2 class="text-lg font-bold text-white mb-1 drop-shadow-lg">Congratulations!</h2>
+        <p class="text-blue-100 text-xs font-medium drop-shadow-sm">{{ userRoleDisplay }}</p>
       </div>
 
       <!-- Body -->
-      <div class="p-6">
-        <!-- User Info -->
-        <div class="text-center mb-6">
-          <div
-            class="w-16 h-16 bg-gradient-to-br from-blue-500 via-blue-600 to-cyan-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl border-2 border-blue-400/60"
-          >
-            <i class="fas fa-user-tie text-white text-xl drop-shadow-sm"></i>
-          </div>
-          <h3 class="text-lg font-bold text-blue-800 mb-2 drop-shadow-sm">
+      <div class="px-5 pb-5">
+        <!-- User Name -->
+        <div class="text-center mb-4">
+          <h3 class="text-sm font-bold text-white mb-2 drop-shadow-sm">
             {{ userName }}
           </h3>
-          <p class="text-blue-600 text-base leading-relaxed font-medium">
-            {{ message }}
+          <p class="text-blue-100 text-xs leading-relaxed font-medium opacity-90">
+            You have successfully completed the onboarding process. Now you can proceed with your
+            requests.
           </p>
         </div>
 
-        <!-- Progress Steps -->
-        <div class="space-y-3 mb-6">
+        <!-- Progress Steps - Compact -->
+        <div class="space-y-2 mb-4">
           <div
-            class="flex items-center space-x-3 p-2 bg-gradient-to-r from-blue-100 to-blue-50 rounded-lg border border-blue-300/60 shadow-sm hover:shadow-md transition-all duration-300"
+            class="flex items-center space-x-2 p-2 bg-white/10 rounded-lg border border-white/20 backdrop-blur-sm"
           >
             <div
-              class="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0 shadow-lg"
+              class="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0"
             >
-              <i class="fas fa-check text-white text-sm drop-shadow-sm"></i>
+              <i class="fas fa-check text-white text-xs"></i>
             </div>
-            <span class="text-blue-800 font-semibold text-sm">Terms of Service Accepted</span>
+            <span class="text-white font-medium text-xs">Terms of Service Accepted</span>
           </div>
 
           <div
-            class="flex items-center space-x-3 p-2 bg-gradient-to-r from-blue-200 to-cyan-100 rounded-lg border border-blue-400/60 shadow-sm hover:shadow-md transition-all duration-300"
+            class="flex items-center space-x-2 p-2 bg-white/10 rounded-lg border border-white/20 backdrop-blur-sm"
           >
             <div
-              class="w-6 h-6 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-lg flex items-center justify-center flex-shrink-0 shadow-lg"
+              class="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0"
             >
-              <i class="fas fa-check text-white text-sm drop-shadow-sm"></i>
+              <i class="fas fa-check text-white text-xs"></i>
             </div>
-            <span class="text-blue-900 font-semibold text-sm">ICT Policy Acknowledged</span>
+            <span class="text-white font-medium text-xs">ICT Policy Acknowledged</span>
           </div>
 
           <div
-            class="flex items-center space-x-3 p-2 bg-gradient-to-r from-blue-300 to-blue-100 rounded-lg border border-blue-500/60 shadow-sm hover:shadow-md transition-all duration-300"
+            class="flex items-center space-x-2 p-2 bg-white/10 rounded-lg border border-white/20 backdrop-blur-sm"
           >
             <div
-              class="w-6 h-6 bg-gradient-to-br from-blue-700 to-blue-800 rounded-lg flex items-center justify-center flex-shrink-0 shadow-lg"
+              class="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0"
             >
-              <i class="fas fa-check text-white text-sm drop-shadow-sm"></i>
+              <i class="fas fa-check text-white text-xs"></i>
             </div>
-            <span class="text-blue-900 font-semibold text-sm">Declaration Form Submitted</span>
+            <span class="text-white font-medium text-xs">Declaration Form Submitted</span>
           </div>
         </div>
 
         <!-- Action Button -->
         <button
           @click="handleContinue"
-          class="w-full bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 hover:from-blue-700 hover:via-blue-800 hover:to-blue-900 text-white py-3 px-4 rounded-xl font-bold text-base transition-all duration-400 transform hover:scale-105 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-offset-2 shadow-xl border-2 border-blue-500/50 relative overflow-hidden group"
+          class="w-full bg-gradient-to-r from-white/20 to-white/10 hover:from-white/30 hover:to-white/20 text-white py-2.5 px-4 rounded-lg font-semibold text-sm transition-all duration-300 transform hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-white/50 border border-white/30 backdrop-blur-sm relative overflow-hidden group"
         >
-          <div
-            class="absolute inset-0 bg-gradient-to-r from-blue-400/30 to-cyan-400/30 opacity-0 group-hover:opacity-100 transition-opacity duration-400"
-          ></div>
-          <div
-            class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-400"
-          ></div>
           <div class="relative z-10 flex items-center justify-center">
-            <i class="fas fa-arrow-right mr-2 text-base drop-shadow-lg"></i>
-            <span class="drop-shadow-lg">Continue to Dashboard</span>
+            <i class="fas fa-arrow-right mr-2 text-sm"></i>
+            <span>Continue to Dashboard</span>
           </div>
         </button>
       </div>
@@ -184,11 +158,20 @@
 
   /* Responsive design */
   @media (max-width: 640px) {
-    .max-w-md {
-      max-width: 90vw;
+    .max-w-sm {
+      max-width: 95vw;
     }
 
-    .p-6 {
+    .px-5 {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    .pb-5 {
+      padding-bottom: 1rem;
+    }
+
+    .p-5 {
       padding: 1rem;
     }
   }

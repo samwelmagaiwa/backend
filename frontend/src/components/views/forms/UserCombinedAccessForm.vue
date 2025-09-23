@@ -158,7 +158,7 @@
                           v-if="isLoadingProfile"
                           class="text-sm text-blue-300 font-medium bg-blue-500/20 px-2 py-1 rounded-full border border-blue-400/30 animate-pulse"
                         >
-                          <i class="fas fa-spinner fa-spin mr-1 text-xs"></i>
+                          <OrbitingDots size="xs" class="mr-1" />
                           Loading your details...
                         </span>
                         <span
@@ -208,7 +208,7 @@
                           <div
                             class="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-300/50"
                           >
-                            <i v-if="isLoadingProfile" class="fas fa-spinner fa-spin"></i>
+                            <OrbitingDots v-if="isLoadingProfile" size="xs" />
                             <i
                               v-else-if="autoPopulated && formData.pfNumber"
                               class="fas fa-check text-green-400"
@@ -247,7 +247,7 @@
                           <div
                             class="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-300/50"
                           >
-                            <i v-if="isLoadingProfile" class="fas fa-spinner fa-spin"></i>
+                            <OrbitingDots v-if="isLoadingProfile" size="xs" />
                             <i
                               v-else-if="autoPopulated && formData.staffName"
                               class="fas fa-check text-green-400"
@@ -289,7 +289,7 @@
                           <div
                             class="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-300/50"
                           >
-                            <i v-if="isLoadingProfile" class="fas fa-spinner fa-spin"></i>
+                            <OrbitingDots v-if="isLoadingProfile" size="xs" />
                             <i
                               v-else-if="autoPopulated && formData.phoneNumber"
                               class="fas fa-check text-green-400"
@@ -813,7 +813,7 @@
                       :disabled="isSubmitting || !hasSelectedService"
                       class="px-5 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-semibold flex items-center shadow-lg hover:shadow-xl text-sm transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                     >
-                      <i v-if="isSubmitting" class="fas fa-spinner fa-spin mr-2"></i>
+                      <OrbitingDots v-if="isSubmitting" size="sm" class="mr-2" />
                       <i
                         v-else
                         :class="isEditMode ? 'fas fa-save' : 'fas fa-paper-plane'"
@@ -980,6 +980,7 @@
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppFooter from '@/components/footer.vue'
   import AppHeader from '@/components/AppHeader.vue'
+  import OrbitingDots from '@/components/common/OrbitingDots.vue'
   import userCombinedAccessService from '@/services/userCombinedAccessService'
   import userProfileService from '@/services/userProfileService'
 
@@ -988,7 +989,8 @@
     components: {
       ModernSidebar,
       AppFooter,
-      AppHeader
+      AppHeader,
+      OrbitingDots
     },
 
     // Route guard to check for pending requests before entering the form

@@ -454,7 +454,7 @@
                               class="inline-flex items-center px-3 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-medium rounded-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                             >
                               <i v-if="!isNavigating" class="fas fa-eye mr-2"></i>
-                              <i v-else class="fas fa-spinner fa-spin mr-2"></i>
+                              <OrbitingDots v-else size="xs" class="mr-2" />
                               {{ isNavigating ? 'Loading...' : 'View & Process' }}
                             </button>
                           </div>
@@ -531,9 +531,9 @@
       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
     >
       <div class="bg-white rounded-xl shadow-2xl p-8 text-center">
-        <div
-          class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"
-        ></div>
+        <div class="flex justify-center mb-4">
+          <OrbitingDots size="lg" />
+        </div>
         <p class="text-gray-600">Loading requests...</p>
       </div>
     </div>
@@ -544,9 +544,9 @@
       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
     >
       <div class="bg-white rounded-xl shadow-2xl p-8 text-center">
-        <div
-          class="w-16 h-16 border-4 border-green-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"
-        ></div>
+        <div class="flex justify-center mb-4">
+          <OrbitingDots size="lg" />
+        </div>
         <p class="text-gray-600">Opening request form...</p>
         <p class="text-sm text-gray-500 mt-2">Please wait while we load the form</p>
       </div>
@@ -560,6 +560,7 @@
   import Header from '@/components/header.vue'
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppFooter from '@/components/footer.vue'
+  import OrbitingDots from '@/components/common/OrbitingDots.vue'
   import { useAuth } from '@/composables/useAuth'
   import personalInfoService from '@/services/personalInfoService'
   // Temporarily commented out to fix blank page issue
@@ -570,7 +571,8 @@
     components: {
       Header,
       ModernSidebar,
-      AppFooter
+      AppFooter,
+      OrbitingDots
     },
     setup() {
       const router = useRouter()

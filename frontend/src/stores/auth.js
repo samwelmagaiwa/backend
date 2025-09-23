@@ -56,6 +56,7 @@ export const useAuthStore = defineStore('auth', () => {
       'divisional_director',
       'head_of_department',
       'ict_director',
+      'head_of_it',
       'ict_officer'
     ]
     return approverRoles.includes(role) || userRoles.value.some((r) => approverRoles.includes(r))

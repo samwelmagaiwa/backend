@@ -209,7 +209,8 @@
                       :disabled="loading"
                       class="px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-lg text-blue-300 text-sm font-medium transition-colors"
                     >
-                      <i class="fas fa-sync-alt mr-2" :class="{ 'fa-spin': loading }"></i>
+                      <OrbitingDots v-if="loading" size="xs" class="mr-2" />
+                      <i v-else class="fas fa-sync-alt mr-2"></i>
                       Refresh
                     </button>
                     <div class="bg-blue-500/20 px-3 py-1 rounded-full border border-blue-400/30">
@@ -222,8 +223,8 @@
 
                 <!-- Loading State -->
                 <div v-if="loading" class="text-center py-8">
-                  <div class="inline-flex items-center space-x-2 text-blue-100">
-                    <i class="fas fa-spinner fa-spin text-xl"></i>
+                  <div class="inline-flex items-center space-x-3 text-blue-100">
+                    <OrbitingDots size="md" />
                     <span>Loading your requests...</span>
                   </div>
                 </div>
@@ -645,6 +646,7 @@
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppHeader from '@/components/AppHeader.vue'
   import EditRequestModal from '@/components/modals/EditRequestModal.vue'
+  import OrbitingDots from '@/components/common/OrbitingDots.vue'
   import { useAuth } from '@/composables/useAuth'
   import { useAuthStore } from '@/stores/auth'
   import requestStatusService from '@/services/requestStatusService'
@@ -654,7 +656,8 @@
     components: {
       ModernSidebar,
       AppHeader,
-      EditRequestModal
+      EditRequestModal,
+      OrbitingDots
     },
     setup() {
       const router = useRouter()

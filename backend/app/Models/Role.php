@@ -110,11 +110,13 @@ class Role extends Model
     {
         $hierarchy = [
             'admin' => 100,
-            'dict' => 90,
+            'ict_director' => 90,
+            'dict' => 90, // Legacy support
             'divisional_director' => 80,
             'head_of_department' => 70,
+            'head_of_it' => 65,
             'ict_officer' => 60,
-            'hod_it' => 55,
+            'hod_it' => 55, // Legacy support
             'staff' => 10,
         ];
 

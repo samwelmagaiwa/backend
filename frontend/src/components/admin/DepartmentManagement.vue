@@ -141,7 +141,8 @@
                       :disabled="loading"
                       class="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 shadow-lg flex items-center space-x-2"
                     >
-                      <i :class="loading ? 'fas fa-spinner fa-spin' : 'fas fa-refresh'"></i>
+                      <OrbitingDots v-if="loading" size="xs" />
+                      <i v-else class="fas fa-refresh"></i>
                       <span>{{ loading ? 'Loading...' : 'Refresh' }}</span>
                     </button>
                   </div>
@@ -239,7 +240,7 @@
                 <!-- Departments List -->
                 <div v-if="loading" class="text-center py-8">
                   <div class="inline-flex items-center space-x-2 text-blue-100">
-                    <i class="fas fa-spinner fa-spin text-xl"></i>
+                    <OrbitingDots size="sm" />
                     <span>Loading departments...</span>
                   </div>
                 </div>
@@ -692,7 +693,7 @@
             "
             class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-medium hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
           >
-            <i v-if="submitting" class="fas fa-spinner fa-spin"></i>
+            <OrbitingDots v-if="submitting" size="xs" />
             <i v-else class="fas fa-save"></i>
             <span>{{
               submitting ? 'Saving...' : isEditing ? 'Update Department' : 'Create Department'
@@ -738,7 +739,7 @@
               :disabled="deleting"
               class="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center space-x-2"
             >
-              <i v-if="deleting" class="fas fa-spinner fa-spin"></i>
+              <OrbitingDots v-if="deleting" size="xs" />
               <i v-else class="fas fa-trash"></i>
               <span>{{ deleting ? 'Deleting...' : 'Delete' }}</span>
             </button>
@@ -789,13 +790,15 @@
   import { debounce } from 'lodash'
   import AppHeader from '@/components/AppHeader.vue'
   import ModernSidebar from '@/components/ModernSidebar.vue'
+  import OrbitingDots from '@/components/common/OrbitingDots.vue'
   import departmentService from '@/services/departmentService'
 
   export default {
     name: 'DepartmentManagement',
     components: {
       AppHeader,
-      ModernSidebar
+      ModernSidebar,
+      OrbitingDots
     },
     setup() {
       // Reactive data

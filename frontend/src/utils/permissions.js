@@ -11,6 +11,7 @@ export const ROLES = {
   DIVISIONAL_DIRECTOR: 'divisional_director',
   HEAD_OF_DEPARTMENT: 'head_of_department',
   ICT_DIRECTOR: 'ict_director',
+  HEAD_OF_IT: 'head_of_it',
   STAFF: 'staff',
   ICT_OFFICER: 'ict_officer'
 }
@@ -137,6 +138,23 @@ export const ROLE_PERMISSIONS = {
     userManagement: [],
     deviceManagement: ['ict-approval/requests', 'ict-approval/request/:id'],
     requestsManagement: ['internal-access/list', 'internal-access/details']
+  },
+
+  [ROLES.HEAD_OF_IT]: {
+    routes: [
+      '/head-it-dashboard',
+      '/jeeva-access',
+      '/wellsoft-access',
+      '/internet-access',
+      '/both-service-form',
+      '/internal-access/list',
+      '/internal-access/details',
+      '/onboarding'
+    ],
+    dashboards: ['head-it-dashboard'],
+    forms: ['jeeva-access', 'wellsoft-access', 'internet-access', 'both-service-form'],
+    userManagement: [],
+    requestsManagement: ['internal-access/list', 'internal-access/details']
   }
 }
 
@@ -228,7 +246,8 @@ export function getDefaultDashboard(userRole) {
     'dict-dashboard': '/dict-dashboard',
     'hod-dashboard': '/hod-dashboard',
     'divisional-dashboard': '/divisional-dashboard',
-    'ict-dashboard': '/ict-dashboard'
+    'ict-dashboard': '/ict-dashboard',
+    'head-it-dashboard': '/head-it-dashboard'
   }
 
   return dashboardRoutes[dashboardName] || null

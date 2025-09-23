@@ -219,8 +219,6 @@ class SwaggerController extends Controller
             ]
         ];
     }
-        ];
-    }
 
     /**
      * User Access API paths

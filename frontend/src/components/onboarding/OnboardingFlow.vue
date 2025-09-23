@@ -1,15 +1,12 @@
 <template>
   <div>
     <!-- Loading State -->
-    <div
+    <SimpleLoadingBanner
       v-if="loading"
-      class="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900"
-    >
-      <div class="text-center">
-        <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-white mx-auto mb-4"></div>
-        <p class="text-white text-lg">Loading onboarding status...</p>
-      </div>
-    </div>
+      :show="loading"
+      :auto-start="true"
+      @loading-complete="onLoadingComplete"
+    />
 
     <!-- Onboarding Flow (only show when not loading) -->
     <div v-else>
@@ -76,6 +73,7 @@
   import IctPolicy from './IctPolicy.vue'
   import DeclarationForm from '../views/forms/declarationForm.vue'
   import SuccessPopup from './SuccessPopup.vue'
+  import SimpleLoadingBanner from '../common/SimpleLoadingBanner.vue'
 
   export default {
     name: 'OnboardingFlow',
@@ -84,7 +82,8 @@
       TermsOfService,
       IctPolicy,
       DeclarationForm,
-      SuccessPopup
+      SuccessPopup,
+      SimpleLoadingBanner
     },
     props: {
       userName: {
@@ -191,6 +190,13 @@
       saveCurrentStep() {
         // Save current step to localStorage for this user
         localStorage.setItem(`onboarding_step_${this.userId}`, this.currentStep)
+      },
+
+      /**
+       * Handle loading banner completion
+       */
+      onLoadingComplete() {
+        console.log('🎉 Onboarding loading banner animation completed')
       },
 
       showTermsOfService() {

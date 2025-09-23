@@ -527,9 +527,9 @@
       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
     >
       <div class="bg-white rounded-xl shadow-2xl p-8 text-center">
-        <div
-          class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"
-        ></div>
+        <div class="flex justify-center mb-4">
+          <OrbitingDots size="lg" />
+        </div>
         <p class="text-gray-600">Loading requests...</p>
       </div>
     </div>
@@ -637,6 +637,7 @@
   import Header from '@/components/header.vue'
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppFooter from '@/components/footer.vue'
+  import OrbitingDots from '@/components/common/OrbitingDots.vue'
   import combinedAccessService from '@/services/combinedAccessService'
   import statusUtils from '@/utils/statusUtils'
 
@@ -645,7 +646,8 @@
     components: {
       Header,
       ModernSidebar,
-      AppFooter
+      AppFooter,
+      OrbitingDots
     },
     setup() {
       return {

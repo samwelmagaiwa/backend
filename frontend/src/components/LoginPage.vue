@@ -99,7 +99,7 @@
               class="w-full bg-primary text-white p-2 rounded hover:bg-opacity-90 transition ease-in-out duration-300 animate-fadeIn delay-2 animate-bounceIn disabled:opacity-50"
             >
               <span v-if="loading">
-                <i class="fas fa-spinner fa-spin mr-2"></i>
+                <OrbitingDots size="sm" class="mr-2" />
                 Logging in...
               </span>
               <span v-else>
@@ -135,7 +135,7 @@
                 :disabled="testingConnection"
                 class="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 disabled:opacity-50"
               >
-                <i v-if="testingConnection" class="fas fa-spinner fa-spin mr-1"></i>
+                <OrbitingDots v-if="testingConnection" size="xs" class="mr-1" />
                 <i v-else class="fas fa-plug mr-1"></i>
                 {{ testingConnection ? 'Testing...' : 'Test' }}
               </button>
@@ -181,9 +181,13 @@
   import { useRoute } from 'vue-router'
   import { useAuth } from '@/composables/useAuth'
   import loginMemory from '@/utils/loginMemory'
+  import OrbitingDots from '@/components/common/OrbitingDots.vue'
 
   export default {
     name: 'LoginPage',
+    components: {
+      OrbitingDots
+    },
     setup() {
       const { login, isLoading, error, clearError } = useAuth()
       const route = useRoute()

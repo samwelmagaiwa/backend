@@ -159,7 +159,7 @@
               <i class="fas fa-file-excel mr-2 text-sm drop-shadow-sm"></i>
               <span v-if="!exporting" class="drop-shadow-sm">Export</span>
               <span v-else class="flex items-center">
-                <i class="fas fa-spinner fa-spin mr-2 text-sm"></i>
+                <OrbitingDots size="xs" class="mr-2" />
                 <span class="drop-shadow-sm">Exporting...</span>
               </span>
             </button>
@@ -253,10 +253,14 @@
 <script>
   import { fetchJeevaUsers, fetchWellsoftUsers, fetchInternetUsers } from '@/utils/api'
   import DataTable from './tables/DataTable.vue'
+  import OrbitingDots from '@/components/common/OrbitingDots.vue'
 
   export default {
     name: 'UserManagementDropdown',
-    components: { DataTable },
+    components: { 
+      DataTable,
+      OrbitingDots 
+    },
     props: {
       defaultOpen: { type: Boolean, default: false }
     },

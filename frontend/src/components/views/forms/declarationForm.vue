@@ -1,42 +1,48 @@
 <template>
-  <div
-    class="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 py-2 px-4 relative overflow-hidden"
+  <div class="declaration-form-container">
+    <!-- Simple Loading Banner Component -->
+    <SimpleLoadingBanner
+      v-if="isLoadingProfile"
+      :show="isLoadingProfile"
+      :auto-start="true"
+      @loading-complete="onLoadingComplete"
+    />
+
+    <div
+      v-show="!isLoadingProfile"
+      class="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 py-2 px-4 relative overflow-hidden"
+    role="main"
+    aria-label="Staff Declaration Form for Muhimbili National Hospital"
+    :aria-busy="isLoadingProfile"
   >
     <!-- Medical Background Pattern -->
-    <div class="absolute inset-0 overflow-hidden">
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
       <!-- Medical Cross Pattern -->
       <div class="absolute inset-0 opacity-5">
         <div class="grid grid-cols-12 gap-8 h-full transform rotate-45">
           <div
-            v-for="i in 48"
-            :key="i"
+            v-for="i in backgroundDots"
+            :key="i.id"
             class="bg-white rounded-full w-2 h-2 animate-pulse"
-            :style="{ animationDelay: i * 0.1 + 's' }"
+            :style="{ animationDelay: i.delay }"
           ></div>
         </div>
       </div>
       <!-- Floating medical icons -->
       <div class="absolute inset-0">
         <div
-          v-for="i in 15"
-          :key="i"
+          v-for="icon in floatingIcons"
+          :key="icon.id"
           class="absolute text-white opacity-10 animate-float"
           :style="{
-            left: Math.random() * 100 + '%',
-            top: Math.random() * 100 + '%',
-            animationDelay: Math.random() * 3 + 's',
-            animationDuration: Math.random() * 3 + 2 + 's',
-            fontSize: Math.random() * 20 + 10 + 'px'
+            left: icon.left,
+            top: icon.top,
+            animationDelay: icon.animationDelay,
+            animationDuration: icon.animationDuration,
+            fontSize: icon.fontSize
           }"
         >
-          <i
-            :class="[
-              'fas',
-              ['fa-heartbeat', 'fa-user-md', 'fa-hospital', 'fa-stethoscope', 'fa-plus'][
-                Math.floor(Math.random() * 5)
-              ]
-            ]"
-          ></i>
+          <i :class="icon.iconClass"></i>
         </div>
       </div>
     </div>
@@ -102,7 +108,13 @@
 
       <!-- Main Form -->
       <div class="medical-glass-card rounded-b-3xl overflow-hidden">
-        <form @submit.prevent="submitDeclaration" class="p-3 space-y-3">
+        <form
+          @submit.prevent="submitDeclaration"
+          class="p-3 space-y-3"
+          role="form"
+          aria-labelledby="form-title"
+          novalidate
+        >
           <!-- Declaration Text -->
           <div
             class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-2 rounded-xl backdrop-blur-sm hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-300 group"
@@ -116,8 +128,8 @@
                 </div>
               </div>
               <div class="flex-1">
-                <h3 class="text-base font-bold text-white mb-1 flex items-center">
-                  <i class="fas fa-clipboard-list mr-2 text-blue-300"></i>
+                <h3 id="form-title" class="text-base font-bold text-white mb-1 flex items-center">
+                  <i class="fas fa-clipboard-list mr-2 text-blue-300" aria-hidden="true"></i>
                   Declaration Information
                 </h3>
                 <div class="text-blue-100 leading-relaxed space-y-1">
@@ -153,7 +165,7 @@
                   v-if="isLoadingProfile"
                   class="text-sm text-blue-300 font-medium bg-blue-500/20 px-2 py-1 rounded-full border border-blue-400/30 animate-pulse"
                 >
-                  <i class="fas fa-spinner fa-spin mr-1 text-xs"></i>
+                  <OrbitingDots size="xs" class="mr-1" />
                   Loading...
                 </span>
                 <span
@@ -192,6 +204,7 @@
                 </label>
                 <div class="relative">
                   <input
+                    id="full-name"
                     v-model="formData.fullName"
                     type="text"
                     class="medical-input w-full px-2 py-1.5 border-2 rounded-lg focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 text-base"
@@ -210,6 +223,11 @@
                     "
                     :disabled="isLoadingProfile || (autoPopulated && formData.fullName)"
                     :readonly="autoPopulated && formData.fullName && !isLoadingProfile"
+                    :aria-describedby="
+                      autoPopulated && formData.fullName ? 'full-name-help' : undefined
+                    "
+                    aria-required="true"
+                    autocomplete="name"
                     required
                   />
                   <div
@@ -217,7 +235,7 @@
                   ></div>
                   <!-- Loading/Success indicator -->
                   <div class="absolute right-2 top-1/2 transform -translate-y-1/2 text-blue-300/70">
-                    <i v-if="isLoadingProfile" class="fas fa-spinner fa-spin text-xs"></i>
+                    <OrbitingDots v-if="isLoadingProfile" size="xs" />
                     <i
                       v-else-if="autoPopulated && formData.fullName"
                       class="fas fa-check text-green-400 text-xs"
@@ -226,10 +244,12 @@
                 </div>
                 <!-- Help text for protected field -->
                 <p
+                  id="full-name-help"
                   v-if="autoPopulated && formData.fullName && !isLoadingProfile"
                   class="text-sm text-green-200/70 mt-1 italic flex items-center"
+                  role="status"
                 >
-                  <i class="fas fa-info-circle mr-1"></i>
+                  <i class="fas fa-info-circle mr-1" aria-hidden="true"></i>
                   This field is auto-populated from your profile and cannot be edited
                 </p>
               </div>
@@ -250,6 +270,7 @@
                 </label>
                 <div class="relative">
                   <input
+                    id="pf-number"
                     v-model="formData.pfNumber"
                     type="text"
                     class="medical-input w-full px-2 py-1.5 border-2 rounded-lg focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 text-base"
@@ -268,6 +289,12 @@
                     "
                     :disabled="isLoadingProfile || (autoPopulated && formData.pfNumber)"
                     :readonly="autoPopulated && formData.pfNumber && !isLoadingProfile"
+                    :aria-describedby="
+                      autoPopulated && formData.pfNumber ? 'pf-number-help' : undefined
+                    "
+                    aria-required="true"
+                    autocomplete="off"
+                    pattern="[-A-Za-z0-9/]+"
                     required
                   />
                   <div
@@ -275,7 +302,7 @@
                   ></div>
                   <!-- Loading/Success indicator -->
                   <div class="absolute right-2 top-1/2 transform -translate-y-1/2 text-blue-300/70">
-                    <i v-if="isLoadingProfile" class="fas fa-spinner fa-spin text-xs"></i>
+                    <OrbitingDots v-if="isLoadingProfile" size="xs" />
                     <i
                       v-else-if="autoPopulated && formData.pfNumber"
                       class="fas fa-check text-green-400 text-xs"
@@ -284,10 +311,12 @@
                 </div>
                 <!-- Help text for protected field -->
                 <p
+                  id="pf-number-help"
                   v-if="autoPopulated && formData.pfNumber && !isLoadingProfile"
                   class="text-sm text-green-200/70 mt-1 italic flex items-center"
+                  role="status"
                 >
-                  <i class="fas fa-info-circle mr-1"></i>
+                  <i class="fas fa-info-circle mr-1" aria-hidden="true"></i>
                   This field is auto-populated from your profile and cannot be edited
                 </p>
               </div>
@@ -308,10 +337,15 @@
                 </label>
                 <div class="relative">
                   <select
+                    id="department"
                     v-model="formData.department"
                     class="medical-input w-full px-2 py-1.5 bg-blue-500/30 border-2 border-blue-400/60 rounded-lg focus:border-blue-500 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-blue-500/40 focus:bg-blue-500/50 focus:shadow-lg focus:shadow-blue-500/30 appearance-none text-base"
                     :disabled="isLoadingProfile || (autoPopulated && formData.department)"
                     :readonly="autoPopulated && formData.department && !isLoadingProfile"
+                    :aria-describedby="
+                      autoPopulated && formData.department ? 'department-help' : undefined
+                    "
+                    aria-required="true"
                     required
                   >
                     <option value="" disabled class="bg-gray-800 text-gray-300">
@@ -336,10 +370,12 @@
                   ></div>
                 </div>
                 <p
+                  id="department-help"
                   v-if="autoPopulated && formData.department && !isLoadingProfile"
                   class="text-sm text-green-200/70 mt-1 italic flex items-center"
+                  role="status"
                 >
-                  <i class="fas fa-info-circle mr-1"></i>
+                  <i class="fas fa-info-circle mr-1" aria-hidden="true"></i>
                   This field is auto-populated from your profile and cannot be edited
                 </p>
               </div>
@@ -351,10 +387,13 @@
                 </label>
                 <div class="relative">
                   <input
+                    id="job-title"
                     v-model="formData.jobTitle"
                     type="text"
                     class="medical-input w-full px-2 py-1.5 bg-blue-500/30 border-2 border-blue-400/60 rounded-lg focus:border-blue-500 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-blue-500/40 focus:bg-blue-500/50 focus:shadow-lg focus:shadow-blue-500/30 text-base"
                     placeholder="Enter your job title"
+                    aria-required="true"
+                    autocomplete="organization-title"
                     required
                   />
                   <div
@@ -447,10 +486,13 @@
                       <button
                         type="button"
                         @click="loadSignature"
-                        class="px-2 py-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-semibold rounded-md hover:from-blue-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/50"
+                        @keydown.enter="loadSignature"
+                        @keydown.space.prevent="loadSignature"
+                        class="px-2 py-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-semibold rounded-md hover:from-blue-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/50 focus:ring-2 focus:ring-blue-300 focus:ring-offset-2"
+                        aria-label="Upload digital signature file"
                       >
-                        <i class="fas fa-download text-xs"></i>
-                        Load
+                        <i class="fas fa-download text-xs" aria-hidden="true"></i>
+                        Load Signature
                       </button>
                     </div>
                   </div>
@@ -505,7 +547,8 @@
                     type="file"
                     accept="image/png,image/jpeg,image/jpg,application/pdf"
                     @change="onSignatureChange"
-                    class="hidden"
+                    class="sr-only"
+                    aria-label="Upload digital signature file"
                   />
                 </div>
               </div>
@@ -517,9 +560,12 @@
                 </label>
                 <div class="relative">
                   <input
+                    id="signature-date"
                     v-model="formData.date"
                     type="date"
                     class="medical-input w-full px-2 py-1.5 bg-blue-500/30 border-2 border-blue-400/60 rounded-lg focus:border-blue-500 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-blue-500/40 focus:bg-blue-500/50 focus:shadow-lg focus:shadow-blue-500/30 text-sm"
+                    aria-required="true"
+                    :max="maxFutureDate"
                     required
                   />
                   <div
@@ -542,6 +588,8 @@
                     type="checkbox"
                     id="agreement"
                     class="w-7 h-7 text-red-500 bg-white/15 border-2 border-red-300/40 rounded-lg focus:ring-red-400 focus:ring-2 backdrop-blur-sm transition-all duration-300"
+                    aria-required="true"
+                    aria-describedby="agreement-text"
                     required
                   />
                   <div
@@ -550,12 +598,15 @@
                 </div>
               </div>
               <label for="agreement" class="text-base text-blue-100 leading-relaxed flex-1">
-                <span class="font-bold text-red-300 flex items-center gap-2"
-                  ><i class="fas fa-exclamation-triangle"></i>I hereby confirm that:</span
-                >
-                I have read, understood, and agree to abide by all terms and conditions of the
-                Muhimbili National Hospital Acceptable ICT Use Policy. I acknowledge that violation
-                of this policy may result in disciplinary action or legal consequences.
+                <span class="font-bold text-red-300 flex items-center gap-2">
+                  <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+                  I hereby confirm that:
+                </span>
+                <span id="agreement-text">
+                  I have read, understood, and agree to abide by all terms and conditions of the
+                  Muhimbili National Hospital Acceptable ICT Use Policy. I acknowledge that
+                  violation of this policy may result in disciplinary action or legal consequences.
+                </span>
               </label>
             </div>
           </div>
@@ -566,10 +617,13 @@
               <button
                 type="submit"
                 :disabled="!isFormValid || isSubmitting"
-                class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-semibold flex items-center justify-center shadow-lg hover:shadow-xl hover:shadow-blue-500/25 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none border-2 border-blue-500/50"
+                class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-semibold flex items-center justify-center shadow-lg hover:shadow-xl hover:shadow-blue-500/25 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none border-2 border-blue-500/50 focus:ring-2 focus:ring-blue-300 focus:ring-offset-2"
+                :aria-label="
+                  isSubmitting ? 'Submitting declaration form' : 'Submit declaration form'
+                "
               >
-                <i v-if="isSubmitting" class="fas fa-spinner fa-spin mr-3"></i>
-                <i v-else class="fas fa-file-signature mr-3"></i>
+                <OrbitingDots v-if="isSubmitting" size="sm" class="mr-3" />
+                <i v-else class="fas fa-file-signature mr-3" aria-hidden="true"></i>
                 {{ isSubmitting ? 'Submitting...' : 'Submit Declaration' }}
               </button>
             </div>
@@ -581,19 +635,87 @@
     <!-- Back Button -->
     <button
       @click="goBack"
+      @keydown.enter="goBack"
+      @keydown.space.prevent="goBack"
       class="fixed bottom-6 left-6 w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-offset-2 z-40 group"
-      title="Go Back"
+      aria-label="Go back to previous page"
     >
-      <i class="fas fa-arrow-left text-lg group-hover:animate-pulse"></i>
+      <i class="fas fa-arrow-left text-lg group-hover:animate-pulse" aria-hidden="true"></i>
     </button>
   </div>
 </template>
 
 <script>
   import userProfileService from '../../../services/userProfileService'
+  import SimpleLoadingBanner from '../../common/SimpleLoadingBanner.vue'
+  import OrbitingDots from '../../common/OrbitingDots.vue'
+
+  // Constants for better maintainability
+  const FORM_CONSTANTS = {
+    MAX_FILE_SIZE: 5 * 1024 * 1024, // 5MB
+    ALLOWED_FILE_TYPES: ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf'],
+    MAX_RETRIES: 3,
+    RETRY_BASE_DELAY: 1000,
+    MAX_RETRY_DELAY: 3000,
+    NOTIFICATION_DURATION: 4000,
+    SUCCESS_DELAY: 1500,
+    MAX_FIELD_LENGTH: 255,
+    MAX_TEXT_LENGTH: 1000
+  }
+
+  const DEPARTMENTS = Object.freeze([
+    'Administration',
+    'Anesthesiology',
+    'Cardiology',
+    'Dermatology',
+    'Emergency Medicine',
+    'Endocrinology',
+    'Gastroenterology',
+    'General Surgery',
+    'Gynecology',
+    'Hematology',
+    'ICT Department',
+    'Internal Medicine',
+    'Laboratory',
+    'Nephrology',
+    'Neurology',
+    'Nursing',
+    'Obstetrics',
+    'Oncology',
+    'Ophthalmology',
+    'Orthopedics',
+    'Pediatrics',
+    'Pharmacy',
+    'Psychiatry',
+    'Pulmonology',
+    'Radiology',
+    'Rehabilitation',
+    'Urology',
+    'Other'
+  ])
+
+  const NOTIFICATION_COLORS = Object.freeze({
+    success: 'green',
+    error: 'red',
+    info: 'blue',
+    warning: 'yellow'
+  })
+
+  // eslint-disable-next-line no-unused-vars
+  const FLOATING_ICON_CLASSES = Object.freeze([
+    'fa-heartbeat',
+    'fa-user-md',
+    'fa-hospital',
+    'fa-stethoscope',
+    'fa-plus'
+  ])
 
   export default {
     name: 'DeclarationForm',
+    components: {
+      SimpleLoadingBanner,
+      OrbitingDots
+    },
     emits: ['form-submitted', 'go-back'],
     data() {
       return {
@@ -604,36 +726,7 @@
         isLoadingProfile: true,
         profileLoadError: null,
         autoPopulated: false,
-        departments: [
-          'Administration',
-          'Anesthesiology',
-          'Cardiology',
-          'Dermatology',
-          'Emergency Medicine',
-          'Endocrinology',
-          'Gastroenterology',
-          'General Surgery',
-          'Gynecology',
-          'Hematology',
-          'ICT Department',
-          'Internal Medicine',
-          'Laboratory',
-          'Nephrology',
-          'Neurology',
-          'Nursing',
-          'Obstetrics',
-          'Oncology',
-          'Ophthalmology',
-          'Orthopedics',
-          'Pediatrics',
-          'Pharmacy',
-          'Psychiatry',
-          'Pulmonology',
-          'Radiology',
-          'Rehabilitation',
-          'Urology',
-          'Other'
-        ],
+        departments: [...DEPARTMENTS], // Use spread to create mutable copy
         formData: {
           fullName: '',
           pfNumber: '',
@@ -642,25 +735,80 @@
           signature: null,
           date: '',
           agreement: false
-        }
+        },
+        // Performance optimization caches
+        backgroundDotsCache: null,
+        floatingIconsCache: null,
+
+        // Memory management references
+        retryButton: null,
+        retryClickHandler: null,
+        retryTimeout: null,
+        fileReaders: new Set()
       }
     },
 
     computed: {
       isFormValid() {
-        return (
-          this.formData.fullName &&
-          this.formData.pfNumber &&
-          this.formData.department &&
-          this.formData.jobTitle &&
-          this.formData.date &&
-          this.formData.agreement &&
-          (this.formData.signature || this.signaturePreview)
-        )
+        return this.formValidationState.isValid
+      },
+
+      // Calculate maximum future date (3 months from today)
+      maxFutureDate() {
+        const date = new Date()
+        date.setMonth(date.getMonth() + 3)
+        return date.toISOString().split('T')[0]
+      },
+
+      backgroundDots() {
+        // Return pre-computed dots (initialized in created hook)
+        return this.backgroundDotsCache || []
+      },
+      floatingIcons() {
+        // Return pre-computed icons (initialized in created hook)
+        return this.floatingIconsCache || []
+      },
+      formValidationState() {
+        // Cache validation state to avoid repeated calculations
+        const hasName = !!this.formData.fullName
+        const hasPfNumber = !!this.formData.pfNumber
+        const hasDepartment = !!this.formData.department
+        const hasJobTitle = !!this.formData.jobTitle
+        const hasDate = !!this.formData.date
+        const hasAgreement = !!this.formData.agreement
+        const hasSignature = !!(this.formData.signature || this.signaturePreview)
+
+        return {
+          isValid:
+            hasName &&
+            hasPfNumber &&
+            hasDepartment &&
+            hasJobTitle &&
+            hasDate &&
+            hasAgreement &&
+            hasSignature,
+          missingFields: [
+            !hasName && 'Full Name',
+            !hasPfNumber && 'PF Number',
+            !hasDepartment && 'Department',
+            !hasJobTitle && 'Job Title',
+            !hasDate && 'Date',
+            !hasAgreement && 'Agreement',
+            !hasSignature && 'Signature'
+          ].filter(Boolean)
+        }
       }
     },
 
     methods: {
+      /**
+       * Handle loading banner completion
+       */
+      onLoadingComplete() {
+        console.log('🎉 Loading banner animation completed')
+        // The loading banner will automatically hide when isLoadingProfile becomes false
+      },
+
       /**
        * Auto-populate user data from the authenticated user's profile
        */
@@ -669,54 +817,41 @@
         this.isLoadingProfile = true
         this.profileLoadError = null
 
+        // Check authentication first
+        const token = localStorage.getItem('auth_token')
+        if (!token) {
+          console.error('❌ No authentication token found')
+          this.profileLoadError = 'No authentication token found'
+          this.isLoadingProfile = false
+          return
+        }
+
+        console.log('✅ Authentication token found, proceeding with profile fetch')
+
         try {
           const result = await userProfileService.getFormAutoPopulationData()
+          console.log('📋 Auto-population API response:', result)
 
           if (result.success && result.data) {
             console.log('✅ User profile retrieved for declaration:', result.data)
 
-            // Auto-populate form fields
-            this.formData.fullName = result.data.staffName || result.data.fullName || ''
-            this.formData.pfNumber = result.data.pfNumber || ''
+            // Validate and populate form fields safely
+            const populationResult = this.processUserProfileData(result.data)
 
-            // Auto-populate department - use the best available department name
-            const departmentName =
-              result.data.departmentFullName ||
-              result.data.departmentName ||
-              result.data.departmentCode ||
-              ''
+            if (populationResult.success) {
+              this.autoPopulated = true
+              console.log('✅ Declaration form auto-populated:', populationResult.data)
 
-            // Ensure department is in the departments list, or add it
-            if (departmentName && !this.departments.includes(departmentName)) {
-              console.log('📝 Adding user department to available options:', departmentName)
-              this.departments.push(departmentName)
-              this.departments.sort() // Keep list sorted
-            }
-
-            this.formData.department = departmentName
-            this.autoPopulated = true
-
-            console.log('✅ Declaration form auto-populated:', {
-              fullName: this.formData.fullName,
-              pfNumber: this.formData.pfNumber,
-              department: this.formData.department,
-              departmentSource: result.data.departmentFullName
-                ? 'departmentFullName'
-                : result.data.departmentName
-                  ? 'departmentName'
-                  : result.data.departmentCode
-                    ? 'departmentCode'
-                    : 'none'
-            })
-
-            // Show success notification with specific fields populated
-            const populatedFields = []
-            if (this.formData.fullName) populatedFields.push('name')
-            if (this.formData.pfNumber) populatedFields.push('PF number')
-            if (this.formData.department) populatedFields.push('department')
-
-            if (populatedFields.length > 0) {
-              this.showNotification(`Auto-populated: ${populatedFields.join(', ')}`, 'info')
+              // Show success notification with specific fields populated
+              if (populationResult.populatedFields.length > 0) {
+                this.showNotification(
+                  `Auto-populated: ${populationResult.populatedFields.join(', ')}`,
+                  'info'
+                )
+              }
+            } else {
+              console.warn('⚠️ No fields could be auto-populated:', populationResult.error)
+              this.showNotification('Profile data available but could not be used', 'warning')
             }
           } else {
             console.warn('⚠️ Failed to auto-populate declaration form:', result.error)
@@ -752,28 +887,39 @@
           return
         }
 
-        // Validate file type
-        const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf']
-        if (!allowedTypes.includes(file.type)) {
-          this.showNotification('Please select a valid file (PNG, JPG, JPEG, PDF)', 'error')
+        // Enhanced security validation
+        const securityChecks = this.validateFileSecurity(file)
+        if (!securityChecks.isValid) {
+          this.showNotification(securityChecks.error, 'error')
           this.clearSignature()
           return
         }
 
-        // Validate file size (max 5MB)
-        if (file.size > 5 * 1024 * 1024) {
-          this.showNotification('File size must be less than 5MB', 'error')
-          this.clearSignature()
-          return
-        }
-
-        this.signatureFileName = file.name
+        // Sanitize filename to prevent XSS
+        this.signatureFileName = file.name.replace(/[<>"'&]/g, '')
 
         if (file.type.startsWith('image/')) {
           const reader = new FileReader()
+
+          // Add to set for cleanup tracking
+          this.fileReaders.add(reader)
+
           reader.onload = () => {
             this.signaturePreview = reader.result
+            // Remove from tracking set once complete
+            this.fileReaders.delete(reader)
           }
+
+          reader.onerror = () => {
+            console.error('File reader error')
+            this.fileReaders.delete(reader)
+            this.showNotification('Error reading signature file', 'error')
+          }
+
+          reader.onabort = () => {
+            this.fileReaders.delete(reader)
+          }
+
           reader.readAsDataURL(file)
         } else {
           this.signaturePreview = 'pdf'
@@ -793,12 +939,189 @@
         }
       },
 
+      /**
+       * Process and validate user profile data for auto-population
+       */
+      processUserProfileData(profileData) {
+        if (!profileData || typeof profileData !== 'object') {
+          return { success: false, error: 'Invalid profile data format' }
+        }
+
+        const populatedFields = []
+        const errors = []
+
+        try {
+          // Validate and set full name
+          const fullName = this.validateAndSanitizeText(
+            profileData.staffName || profileData.fullName || '',
+            'Full Name'
+          )
+          if (fullName.isValid) {
+            this.formData.fullName = fullName.value
+            populatedFields.push('name')
+          } else if (fullName.error) {
+            errors.push(fullName.error)
+          }
+
+          // Validate and set PF number
+          const pfNumber = this.validateAndSanitizeText(profileData.pfNumber || '', 'PF Number')
+          if (pfNumber.isValid) {
+            this.formData.pfNumber = pfNumber.value
+            populatedFields.push('PF number')
+          } else if (pfNumber.error) {
+            errors.push(pfNumber.error)
+          }
+
+          // Validate and set department
+          const departmentName =
+            profileData.departmentFullName ||
+            profileData.departmentName ||
+            profileData.departmentCode ||
+            ''
+          const department = this.validateAndSanitizeText(departmentName, 'Department')
+
+          if (department.isValid && department.value) {
+            // Add to departments list if not present
+            if (!this.departments.includes(department.value)) {
+              console.log('📝 Adding user department to available options:', department.value)
+              this.departments.push(department.value)
+              this.departments.sort()
+            }
+
+            this.formData.department = department.value
+            populatedFields.push('department')
+          } else if (department.error) {
+            errors.push(department.error)
+          }
+
+          return {
+            success: populatedFields.length > 0,
+            populatedFields,
+            errors,
+            data: {
+              fullName: this.formData.fullName,
+              pfNumber: this.formData.pfNumber,
+              department: this.formData.department
+            }
+          }
+        } catch (error) {
+          console.error('Error processing profile data:', error)
+          return {
+            success: false,
+            error: 'Error processing profile data',
+            populatedFields: [],
+            errors: [error.message]
+          }
+        }
+      },
+
+      /**
+       * Validate and sanitize text input
+       */
+      validateAndSanitizeText(value, fieldName) {
+        if (!value || typeof value !== 'string') {
+          return { isValid: false, value: '', error: null }
+        }
+
+        // Trim and sanitize
+        const cleaned = value.trim().replace(/[<>"'&]/g, '')
+
+        // Length validation
+        if (cleaned.length === 0) {
+          return { isValid: false, value: '', error: null }
+        }
+
+        if (cleaned.length > FORM_CONSTANTS.MAX_FIELD_LENGTH) {
+          return {
+            isValid: false,
+            value: '',
+            error: `${fieldName} is too long (max ${FORM_CONSTANTS.MAX_FIELD_LENGTH} characters)`
+          }
+        }
+
+        // Pattern validation for specific fields
+        if (fieldName === 'PF Number' && cleaned && !/^[A-Z0-9\-\/]+$/i.test(cleaned)) {
+          return {
+            isValid: false,
+            value: '',
+            error: 'PF Number contains invalid characters'
+          }
+        }
+
+        return { isValid: true, value: cleaned, error: null }
+      },
+
+      /**
+       * Enhanced file security validation
+       */
+      validateFileSecurity(file) {
+        // Basic file type validation
+        if (!FORM_CONSTANTS.ALLOWED_FILE_TYPES.includes(file.type)) {
+          return {
+            isValid: false,
+            error: `Please select a valid file type: ${FORM_CONSTANTS.ALLOWED_FILE_TYPES.join(', ')
+              .replace(/image\//g, '')
+              .replace(/application\//g, '')
+              .toUpperCase()}`
+          }
+        }
+
+        // File size validation
+        if (file.size > FORM_CONSTANTS.MAX_FILE_SIZE) {
+          return {
+            isValid: false,
+            error: `File size must be less than ${FORM_CONSTANTS.MAX_FILE_SIZE / (1024 * 1024)}MB`
+          }
+        }
+
+        // Filename security validation
+        const dangerousPatterns = [
+          /\.exe$/i,
+          /\.bat$/i,
+          /\.cmd$/i,
+          /\.com$/i,
+          /\.scr$/i,
+          /\.js$/i,
+          /\.vbs$/i
+        ]
+        if (dangerousPatterns.some((pattern) => pattern.test(file.name))) {
+          return {
+            isValid: false,
+            error: 'File type not allowed for security reasons'
+          }
+        }
+
+        // File name length validation
+        if (file.name.length > 255) {
+          return {
+            isValid: false,
+            error: 'Filename is too long'
+          }
+        }
+
+        // Check for double extensions
+        const parts = file.name.split('.')
+        if (parts.length > 2) {
+          return {
+            isValid: false,
+            error: 'Files with multiple extensions are not allowed'
+          }
+        }
+
+        return { isValid: true }
+      },
+
       async submitDeclaration() {
         if (!this.isFormValid) {
-          this.showNotification(
-            'Please fill in all required fields and agree to the terms',
-            'error'
-          )
+          const missingFields = this.formValidationState.missingFields
+          this.showNotification(`Missing required fields: ${missingFields.join(', ')}`, 'error')
+          return
+        }
+
+        // Additional runtime validation
+        const validationResult = this.validateFormData()
+        if (!validationResult.isValid) {
+          this.showNotification(validationResult.error, 'error')
           return
         }
 
@@ -852,7 +1175,7 @@
             // Emit event to parent component with the declaration data
             setTimeout(() => {
               this.$emit('form-submitted', declarationData)
-            }, 1500) // Wait 1.5 seconds to show success message
+            }, FORM_CONSTANTS.SUCCESS_DELAY)
           } else {
             console.error('Declaration submission failed:', result.error)
             this.showNotification(result.error || 'Failed to submit declaration', 'error')
@@ -894,27 +1217,281 @@
       },
 
       showNotification(message, type = 'info') {
-        const colors = {
-          success: 'green',
-          error: 'red',
-          info: 'blue'
+        if (!message) return
+
+        // Sanitize message to prevent XSS
+        const sanitizedMessage = String(message).replace(/<[^>]*>/g, '')
+        const colors = NOTIFICATION_COLORS
+
+        // Use a more efficient notification system
+        this.createOptimizedNotification(sanitizedMessage, colors[type] || 'blue')
+      },
+
+      /**
+       * Optimized notification creation with better performance
+       */
+      createOptimizedNotification(message, bgColor) {
+        // Reuse notification container if it exists
+        let container = document.getElementById('notification-container')
+        if (!container) {
+          container = document.createElement('div')
+          container.id = 'notification-container'
+          container.className = 'fixed top-4 right-4 z-[9999] space-y-2 pointer-events-none'
+          document.body.appendChild(container)
         }
 
-        // Create a simple toast notification
         const toast = document.createElement('div')
-        toast.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white font-semibold z-50 bg-${colors[type]}-600 shadow-lg`
+        toast.className = `px-6 py-3 rounded-lg text-white font-semibold bg-${bgColor}-600 shadow-lg transform transition-all duration-300 max-w-md pointer-events-auto`
         toast.textContent = message
-        document.body.appendChild(toast)
+        toast.style.transform = 'translateX(100%)'
 
-        setTimeout(() => {
-          if (document.body.contains(toast)) {
-            document.body.removeChild(toast)
+        container.appendChild(toast)
+
+        // Use RAF for smooth animation
+        requestAnimationFrame(() => {
+          toast.style.transform = 'translateX(0)'
+        })
+
+        // Auto-remove with optimized cleanup
+        setTimeout(
+          () => this.removeNotification(toast, container),
+          FORM_CONSTANTS.NOTIFICATION_DURATION
+        )
+      },
+
+      /**
+       * Optimized notification removal
+       */
+      removeNotification(toast, container) {
+        if (!toast.parentNode) return
+
+        toast.style.transform = 'translateX(100%)'
+        const removeTimeout = setTimeout(() => {
+          if (toast.parentNode) {
+            container.removeChild(toast)
+
+            // Remove container if empty and still in DOM
+            if (container.children.length === 0 && document.body.contains(container)) {
+              document.body.removeChild(container)
+            }
           }
-        }, 4000)
+          clearTimeout(removeTimeout)
+        }, 300)
+      },
+
+      /**
+       * Comprehensive form data validation
+       */
+      validateFormData() {
+        const errors = []
+
+        // Validate each field
+        const nameValidation = this.validateAndSanitizeText(this.formData.fullName, 'Full Name')
+        if (!nameValidation.isValid) {
+          errors.push(nameValidation.error || 'Full name is required')
+        }
+
+        const pfValidation = this.validateAndSanitizeText(this.formData.pfNumber, 'PF Number')
+        if (!pfValidation.isValid) {
+          errors.push(pfValidation.error || 'PF Number is required')
+        }
+
+        const deptValidation = this.validateAndSanitizeText(this.formData.department, 'Department')
+        if (!deptValidation.isValid) {
+          errors.push(deptValidation.error || 'Department is required')
+        }
+
+        const jobValidation = this.validateAndSanitizeText(this.formData.jobTitle, 'Job Title')
+        if (!jobValidation.isValid) {
+          errors.push(jobValidation.error || 'Job title is required')
+        }
+
+        // Date validation
+        if (!this.formData.date) {
+          errors.push('Date is required')
+        } else {
+          const selectedDate = new Date(this.formData.date)
+          const maxFutureDate = new Date()
+          maxFutureDate.setMonth(maxFutureDate.getMonth() + 3)
+
+          if (selectedDate > maxFutureDate) {
+            errors.push('Date cannot be more than 3 months in the future')
+          }
+        }
+
+        // Agreement validation
+        if (!this.formData.agreement) {
+          errors.push('You must agree to the terms and conditions')
+        }
+
+        // Signature validation
+        if (!this.formData.signature && !this.signaturePreview) {
+          errors.push('Digital signature is required')
+        }
+
+        return {
+          isValid: errors.length === 0,
+          error: errors.length > 0 ? errors[0] : null,
+          errors
+        }
       },
 
       goBack() {
         this.$emit('go-back')
+      },
+
+      /**
+       * Check if user is properly authenticated
+       */
+      checkAuthentication() {
+        const token = localStorage.getItem('auth_token')
+        const userData = localStorage.getItem('user_data')
+
+        if (!token) {
+          console.error('❌ No authentication token found')
+          return false
+        }
+
+        if (!userData) {
+          console.warn('⚠️ No user data found in localStorage')
+        }
+
+        // Check if token is expired (basic check)
+        try {
+          const tokenData = JSON.parse(atob(token.split('.')[1]))
+          const now = Math.floor(Date.now() / 1000)
+
+          if (tokenData.exp && tokenData.exp < now) {
+            console.error('❌ Authentication token has expired')
+            return false
+          }
+        } catch (error) {
+          console.warn('⚠️ Could not decode token for expiry check:', error.message)
+        }
+
+        return true
+      },
+
+      /**
+       * Handle authentication failure
+       */
+      handleAuthenticationFailure() {
+        // Clear potentially invalid tokens
+        localStorage.removeItem('auth_token')
+        localStorage.removeItem('user_data')
+        localStorage.removeItem('session_data')
+
+        // Show user-friendly message
+        this.showNotification('Session expired. Please log in again.', 'error')
+
+        // Redirect to login after a short delay
+        setTimeout(() => {
+          if (typeof window !== 'undefined') {
+            window.location.href = '/'
+          }
+        }, 2000)
+      },
+
+      /**
+       * Initialize form with retry logic
+       */
+      async initializeFormWithRetry() {
+        let attempt = 1
+
+        while (attempt <= FORM_CONSTANTS.MAX_RETRIES) {
+          try {
+            console.log(`🔄 Initializing form attempt ${attempt}/${FORM_CONSTANTS.MAX_RETRIES}`)
+            await this.autoPopulateUserData()
+
+            // If successful, break out of retry loop
+            if (!this.profileLoadError) {
+              console.log('✅ Form initialization successful')
+              return
+            }
+          } catch (error) {
+            console.error(`❌ Form initialization attempt ${attempt} failed:`, error)
+          }
+
+          attempt++
+
+          // If not the last attempt, wait before retrying
+          if (attempt <= FORM_CONSTANTS.MAX_RETRIES) {
+            const delay = Math.min(
+              FORM_CONSTANTS.RETRY_BASE_DELAY * attempt,
+              FORM_CONSTANTS.MAX_RETRY_DELAY
+            )
+            console.log(`⏳ Retrying in ${delay}ms...`)
+            await new Promise((resolve) => setTimeout(resolve, delay))
+          }
+        }
+
+        // All retries failed
+        console.error('❌ All initialization attempts failed')
+        this.handleInitializationFailure()
+      },
+
+      /**
+       * Handle complete initialization failure
+       */
+      handleInitializationFailure() {
+        this.isLoadingProfile = false
+        this.profileLoadError = 'Failed to initialize form after multiple attempts'
+
+        this.showNotification(
+          'Unable to load your profile data. You can still fill the form manually.',
+          'warning'
+        )
+
+        // Provide manual fallback option
+        this.showManualEntryOption()
+      },
+
+      /**
+       * Show manual entry option when auto-population fails
+       */
+      showManualEntryOption() {
+        // Create a retry button with proper cleanup
+        const retryButton = document.createElement('button')
+        retryButton.className =
+          'fixed bottom-20 right-6 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-lg z-50 flex items-center gap-2 transition-all duration-300'
+        retryButton.innerHTML = '<i class="fas fa-sync-alt"></i> Retry Loading Profile'
+
+        const handleRetryClick = async () => {
+          this.removeRetryButton(retryButton, handleRetryClick)
+          this.isLoadingProfile = true
+          this.profileLoadError = null
+          await this.initializeFormWithRetry()
+        }
+
+        retryButton.addEventListener('click', handleRetryClick)
+        document.body.appendChild(retryButton)
+
+        // Store reference for cleanup
+        this.retryButton = retryButton
+        this.retryClickHandler = handleRetryClick
+
+        // Auto-remove after 10 seconds
+        this.retryTimeout = setTimeout(() => {
+          this.removeRetryButton(retryButton, handleRetryClick)
+        }, 10000)
+      },
+
+      /**
+       * Clean up retry button and its event listeners
+       */
+      removeRetryButton(button, handler) {
+        if (button && document.body.contains(button)) {
+          button.removeEventListener('click', handler)
+          document.body.removeChild(button)
+        }
+
+        if (this.retryTimeout) {
+          clearTimeout(this.retryTimeout)
+          this.retryTimeout = null
+        }
+
+        this.retryButton = null
+        this.retryClickHandler = null
       },
 
       /**
@@ -933,7 +1510,7 @@
 
             // Merge with existing departments, remove duplicates, and sort
             const allDepartments = [...new Set([...this.departments, ...backendDepartments])]
-            this.departments = allDepartments.sort()
+            this.departments = Object.freeze(allDepartments.sort()) // Freeze to prevent accidental mutations
 
             console.log(
               `✅ Loaded ${backendDepartments.length} departments from backend, total: ${this.departments.length}`
@@ -945,11 +1522,101 @@
           console.warn('⚠️ Error loading departments from backend:', error.message)
           console.log('📋 Using static department list as fallback')
         }
+      },
+
+      /**
+       * Initialize background dots cache
+       */
+      initializeBackgroundDots() {
+        if (this.backgroundDotsCache) return
+
+        const dots = []
+        for (let i = 1; i <= 48; i++) {
+          dots.push({
+            id: `dot-${i}`,
+            delay: `${i * 0.1}s`
+          })
+        }
+
+        this.backgroundDotsCache = Object.freeze(dots)
+      },
+
+      /**
+       * Initialize floating icons cache
+       */
+      initializeFloatingIcons() {
+        if (this.floatingIconsCache) return
+
+        const icons = []
+        const iconClasses = FLOATING_ICON_CLASSES
+
+        // Use seed-based randomization for consistent positioning
+        const seedRandom = (seed) => {
+          const x = Math.sin(seed) * 10000
+          return x - Math.floor(x)
+        }
+
+        for (let i = 1; i <= 15; i++) {
+          const seed1 = i * 12345
+          const seed2 = i * 67890
+          const seed3 = i * 54321
+          const seed4 = i * 98765
+          const seed5 = i * 13579
+
+          icons.push({
+            id: `icon-${i}`,
+            left: `${seedRandom(seed1) * 100}%`,
+            top: `${seedRandom(seed2) * 100}%`,
+            animationDelay: `${seedRandom(seed3) * 3}s`,
+            animationDuration: `${seedRandom(seed4) * 3 + 2}s`,
+            fontSize: `${seedRandom(seed5) * 20 + 10}px`,
+            iconClass: `fas ${iconClasses[Math.floor(seedRandom(seed1 * 2) * iconClasses.length)]}`
+          })
+        }
+
+        this.floatingIconsCache = Object.freeze(icons)
+      },
+
+      /**
+       * Clean up component resources
+       */
+      cleanupResources() {
+        // Cleanup file readers
+        if (this.fileReaders && this.fileReaders.size > 0) {
+          this.fileReaders.forEach((reader) => {
+            if (reader.readyState === FileReader.LOADING) {
+              reader.abort()
+            }
+          })
+          this.fileReaders.clear()
+        }
+
+        // Cleanup retry button
+        if (this.retryButton || this.retryClickHandler) {
+          this.removeRetryButton(this.retryButton, this.retryClickHandler)
+        }
+
+        // Clear notification container
+        const container = document.getElementById('notification-container')
+        if (container && document.body.contains(container)) {
+          document.body.removeChild(container)
+        }
+
+        // Clear caches
+        this.backgroundDotsCache = null
+        this.floatingIconsCache = null
       }
     },
 
     async mounted() {
       console.log('🔄 Declaration form mounted, starting initialization...')
+
+      // Check authentication first
+      if (!this.checkAuthentication()) {
+        console.error('❌ User not authenticated, redirecting to login')
+        this.handleAuthenticationFailure()
+        return
+      }
 
       // Set current date as default
       const today = new Date().toISOString().split('T')[0]
@@ -958,8 +1625,17 @@
       // Load available departments from backend (parallel with auto-population)
       this.loadAvailableDepartments()
 
-      // Auto-populate user data using the profile service
-      await this.autoPopulateUserData()
+      // Initialize background elements for better performance
+      this.initializeBackgroundDots()
+      this.initializeFloatingIcons()
+
+      // Auto-populate user data using the profile service with retry logic
+      await this.initializeFormWithRetry()
+    },
+
+    beforeUnmount() {
+      // Cleanup resources to prevent memory leaks
+      this.cleanupResources()
     }
   }
 </script>

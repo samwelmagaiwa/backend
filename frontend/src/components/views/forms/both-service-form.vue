@@ -420,7 +420,7 @@
                           >
                             <!-- Loading state -->
                             <div v-if="loading" class="text-center">
-                              <i class="fas fa-spinner fa-spin text-blue-300 text-lg mb-1"></i>
+                              <OrbitingDots size="sm" class="mb-1" />
                               <p class="text-blue-100 text-xs">Loading signature...</p>
                             </div>
                             <!-- Loaded state -->
