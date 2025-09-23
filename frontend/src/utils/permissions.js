@@ -142,7 +142,8 @@ export const ROLE_PERMISSIONS = {
 
   [ROLES.HEAD_OF_IT]: {
     routes: [
-      '/head-it-dashboard',
+      '/head_of_it-dashboard',
+      '/head_of_it-dashboard/combined-requests',
       '/jeeva-access',
       '/wellsoft-access',
       '/internet-access',
@@ -151,10 +152,14 @@ export const ROLE_PERMISSIONS = {
       '/internal-access/details',
       '/onboarding'
     ],
-    dashboards: ['head-it-dashboard'],
+    dashboards: ['head_of_it-dashboard'],
     forms: ['jeeva-access', 'wellsoft-access', 'internet-access', 'both-service-form'],
     userManagement: [],
-    requestsManagement: ['internal-access/list', 'internal-access/details']
+    requestsManagement: [
+      'head_of_it-dashboard/combined-requests',
+      'internal-access/list',
+      'internal-access/details'
+    ]
   }
 }
 
@@ -238,19 +243,7 @@ export function getDefaultDashboard(userRole) {
 
   // Return the first dashboard as default
   const dashboardName = permissions.dashboards[0]
-
-  // Map dashboard names to routes
-  const dashboardRoutes = {
-    'admin-dashboard': '/admin-dashboard', // Back to original route
-    'user-dashboard': '/user-dashboard',
-    'dict-dashboard': '/dict-dashboard',
-    'hod-dashboard': '/hod-dashboard',
-    'divisional-dashboard': '/divisional-dashboard',
-    'ict-dashboard': '/ict-dashboard',
-    'head-it-dashboard': '/head-it-dashboard'
-  }
-
-  return dashboardRoutes[dashboardName] || null
+  return DASHBOARD_ROUTES[dashboardName] || null
 }
 
 /**
@@ -261,6 +254,64 @@ export function getDefaultDashboard(userRole) {
 export function hasUserManagementAccess(userRole) {
   const permissions = ROLE_PERMISSIONS[userRole]
   return permissions && permissions.userManagement.length > 0
+}
+
+// Centralized dashboard route mapping - single source of truth
+const DASHBOARD_ROUTES = {
+  'admin-dashboard': '/admin-dashboard',
+  'user-dashboard': '/user-dashboard',
+  'dict-dashboard': '/dict-dashboard',
+  'hod-dashboard': '/hod-dashboard',
+  'divisional-dashboard': '/divisional-dashboard',
+  'ict-dashboard': '/ict-dashboard',
+  'head_of_it-dashboard': '/head_of_it-dashboard'
+}
+
+/**
+ * Get all dashboard routes from role permissions
+ * @returns {string[]} - Array of all dashboard routes
+ */
+export function getAllDashboardRoutes() {
+  const dashboardRoutes = new Set()
+
+  // Extract all dashboard routes from role permissions
+  Object.values(ROLE_PERMISSIONS).forEach((permissions) => {
+    if (permissions.dashboards) {
+      permissions.dashboards.forEach((dashboardName) => {
+        const route = DASHBOARD_ROUTES[dashboardName]
+        if (route) {
+          dashboardRoutes.add(route)
+        }
+      })
+    }
+  })
+
+  return Array.from(dashboardRoutes)
+}
+
+/**
+ * Check if a route path is a dashboard route
+ * @param {string} routePath - The route path to check
+ * @returns {boolean} - Whether the route is a dashboard route
+ */
+export function isDashboardRoute(routePath) {
+  return Object.values(DASHBOARD_ROUTES).includes(routePath)
+}
+
+/**
+ * Get dashboard routes for a specific role
+ * @param {string} userRole - The user's role
+ * @returns {string[]} - Array of dashboard routes for the role
+ */
+export function getDashboardRoutesForRole(userRole) {
+  const permissions = ROLE_PERMISSIONS[userRole]
+  if (!permissions || !permissions.dashboards) {
+    return []
+  }
+
+  return permissions.dashboards
+    .map((dashboardName) => DASHBOARD_ROUTES[dashboardName])
+    .filter((route) => route)
 }
 
 /**

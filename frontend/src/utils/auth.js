@@ -29,6 +29,7 @@ const roleMapping = {
   hod: ROLES.HEAD_OF_DEPARTMENT, // Handle lowercase
 
   ict_director: ROLES.ICT_DIRECTOR,
+  head_of_it: ROLES.HEAD_OF_IT,
   staff: ROLES.STAFF,
   ict_officer: ROLES.ICT_OFFICER
 }

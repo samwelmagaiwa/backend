@@ -18,6 +18,57 @@ use Illuminate\Validation\ValidationException;
 class BothServiceFormController extends Controller
 {
     /**
+     * Helper method to safely count JSON array fields
+     */
+    private function getJsonArrayCount($jsonField)
+    {
+        if (is_null($jsonField)) {
+            return 0;
+        }
+        
+        // If it's already an array, count it
+        if (is_array($jsonField)) {
+            return count($jsonField);
+        }
+        
+        // If it's a string, try to decode as JSON
+        if (is_string($jsonField)) {
+            try {
+                $decoded = json_decode($jsonField, true);
+                if (is_array($decoded)) {
+                    return count($decoded);
+                }
+            } catch (Exception $e) {
+                // If JSON decode fails, return 0
+                return 0;
+            }
+        }
+        
+        return 0;
+    }
+    
+    /**
+     * Helper method to format signature status with visual indicators
+     */
+    private function formatSignatureStatus($signaturePath, $approvalDate = null, $approverName = null)
+    {
+        if (!empty($signaturePath)) {
+            return [
+                'signature_status' => 'Signed',
+                'signature_status_color' => 'green',
+                'has_signature_file' => true,
+                'signature_display' => 'Signed'
+            ];
+        }
+        
+        return [
+            'signature_status' => 'No signature',
+            'signature_status_color' => 'red',
+            'has_signature_file' => false,
+            'signature_display' => 'No signature'
+        ];
+    }
+    /**
      * Update HOD approval for a module request with proper file upload and module selection
      */
     public function updateHodApproval(Request $request, int $userAccessId): JsonResponse
@@ -313,7 +364,7 @@ class BothServiceFormController extends Controller
                 ->findOrFail($userAccessId);
             
             // Check permissions
-            $allowedRoles = ['head_of_department', 'divisional_director', 'ict_director', 'ict_officer', 'admin', 'super_admin'];
+            $allowedRoles = ['head_of_department', 'divisional_director', 'ict_director', 'head_of_it', 'ict_officer', 'admin', 'super_admin'];
             $canView = false;
             
             if ($userAccess->user_id === $currentUser->id) {
@@ -359,9 +410,9 @@ class BothServiceFormController extends Controller
                 'request_type' => $userAccess->request_type ?? [],
                 'status' => $userAccess->status,
                 
-                // Complete approval information
+                // Complete approval information with signature status indicators
                 'approvals' => [
-                    'hod' => [
+                    'hod' => array_merge([
                         'name' => $userAccess->hod_name,
                         'signature' => $userAccess->hod_signature_path,
                         'signature_url' => $userAccess->hod_signature_path ? Storage::url($userAccess->hod_signature_path) : null,
@@ -370,8 +421,8 @@ class BothServiceFormController extends Controller
                         'approved_by' => $userAccess->hod_approved_by_name,
                         'has_signature' => !empty($userAccess->hod_signature_path),
                         'is_approved' => !empty($userAccess->hod_approved_at)
-                    ],
-                    'divisionalDirector' => [
+                    ], $this->formatSignatureStatus($userAccess->hod_signature_path, $userAccess->hod_approved_at, $userAccess->hod_name)),
+                    'divisionalDirector' => array_merge([
                         'name' => $userAccess->divisional_director_name,
                         'signature' => $userAccess->divisional_director_signature_path,
                         'signature_url' => $userAccess->divisional_director_signature_path ? Storage::url($userAccess->divisional_director_signature_path) : null,
@@ -379,8 +430,8 @@ class BothServiceFormController extends Controller
                         'comments' => $userAccess->divisional_director_comments,
                         'has_signature' => !empty($userAccess->divisional_director_signature_path),
                         'is_approved' => !empty($userAccess->divisional_approved_at)
-                    ],
-                    'directorICT' => [
+                    ], $this->formatSignatureStatus($userAccess->divisional_director_signature_path, $userAccess->divisional_approved_at, $userAccess->divisional_director_name)),
+                    'directorICT' => array_merge([
                         'name' => $userAccess->ict_director_name,
                         'signature' => $userAccess->ict_director_signature_path,
                         'signature_url' => $userAccess->ict_director_signature_path ? Storage::url($userAccess->ict_director_signature_path) : null,
@@ -388,20 +439,20 @@ class BothServiceFormController extends Controller
                         'comments' => $userAccess->ict_director_comments,
                         'has_signature' => !empty($userAccess->ict_director_signature_path),
                         'is_approved' => !empty($userAccess->ict_director_approved_at)
-                    ]
+                    ], $this->formatSignatureStatus($userAccess->ict_director_signature_path, $userAccess->ict_director_approved_at, $userAccess->ict_director_name))
                 ],
                 
-                // Implementation data
+                // Implementation data with signature status indicators
                 'implementation' => [
-                    'headIT' => [
+                    'headIT' => array_merge([
                         'name' => $userAccess->head_it_name,
                         'signature' => $userAccess->head_it_signature_path,
                         'signature_url' => $userAccess->head_it_signature_path ? Storage::url($userAccess->head_it_signature_path) : null,
                         'date' => $userAccess->head_it_approved_at,
                         'has_signature' => !empty($userAccess->head_it_signature_path),
                         'is_approved' => !empty($userAccess->head_it_approved_at)
-                    ],
-                    'ictOfficer' => [
+                    ], $this->formatSignatureStatus($userAccess->head_it_signature_path, $userAccess->head_it_approved_at, $userAccess->head_it_name)),
+                    'ictOfficer' => array_merge([
                         'name' => $userAccess->ict_officer_name,
                         'signature' => $userAccess->ict_officer_signature_path,
                         'signature_url' => $userAccess->ict_officer_signature_path ? Storage::url($userAccess->ict_officer_signature_path) : null,
@@ -410,7 +461,7 @@ class BothServiceFormController extends Controller
                         'implementation_comments' => $userAccess->implementation_comments,
                         'has_signature' => !empty($userAccess->ict_officer_signature_path),
                         'is_implemented' => !empty($userAccess->ict_officer_implemented_at)
-                    ]
+                    ], $this->formatSignatureStatus($userAccess->ict_officer_signature_path, $userAccess->ict_officer_implemented_at, $userAccess->ict_officer_name))
                 ],
                 
                 'created_at' => $userAccess->created_at,
@@ -453,7 +504,7 @@ class BothServiceFormController extends Controller
                 ->findOrFail($id);
             
             // Check permissions
-            $allowedRoles = ['head_of_department', 'divisional_director', 'ict_director', 'ict_officer', 'admin', 'super_admin'];
+            $allowedRoles = ['head_of_department', 'divisional_director', 'ict_director', 'head_of_it', 'ict_officer', 'admin', 'super_admin'];
             $canView = false;
             
             if ($userAccess->user_id === $currentUser->id) {
@@ -500,9 +551,9 @@ class BothServiceFormController extends Controller
                 'request_type' => $userAccess->request_type ?? [],
                 'status' => $userAccess->status,
                 
-                // Complete approval information
+                // Complete approval information with signature status indicators
                 'approvals' => [
-                    'hod' => [
+                    'hod' => array_merge([
                         'name' => $userAccess->hod_name,
                         'signature' => $userAccess->hod_signature_path,
                         'signature_url' => $userAccess->hod_signature_path ? Storage::url($userAccess->hod_signature_path) : null,
@@ -511,8 +562,8 @@ class BothServiceFormController extends Controller
                         'approved_by' => $userAccess->hod_approved_by_name,
                         'has_signature' => !empty($userAccess->hod_signature_path),
                         'is_approved' => !empty($userAccess->hod_approved_at)
-                    ],
-                    'divisionalDirector' => [
+                    ], $this->formatSignatureStatus($userAccess->hod_signature_path, $userAccess->hod_approved_at, $userAccess->hod_name)),
+                    'divisionalDirector' => array_merge([
                         'name' => $userAccess->divisional_director_name,
                         'signature' => $userAccess->divisional_director_signature_path,
                         'signature_url' => $userAccess->divisional_director_signature_path ? Storage::url($userAccess->divisional_director_signature_path) : null,
@@ -520,8 +571,8 @@ class BothServiceFormController extends Controller
                         'comments' => $userAccess->divisional_director_comments,
                         'has_signature' => !empty($userAccess->divisional_director_signature_path),
                         'is_approved' => !empty($userAccess->divisional_approved_at)
-                    ],
-                    'directorICT' => [
+                    ], $this->formatSignatureStatus($userAccess->divisional_director_signature_path, $userAccess->divisional_approved_at, $userAccess->divisional_director_name)),
+                    'directorICT' => array_merge([
                         'name' => $userAccess->ict_director_name,
                         'signature' => $userAccess->ict_director_signature_path,
                         'signature_url' => $userAccess->ict_director_signature_path ? Storage::url($userAccess->ict_director_signature_path) : null,
@@ -529,20 +580,20 @@ class BothServiceFormController extends Controller
                         'comments' => $userAccess->ict_director_comments,
                         'has_signature' => !empty($userAccess->ict_director_signature_path),
                         'is_approved' => !empty($userAccess->ict_director_approved_at)
-                    ]
+                    ], $this->formatSignatureStatus($userAccess->ict_director_signature_path, $userAccess->ict_director_approved_at, $userAccess->ict_director_name))
                 ],
                 
-                // Implementation data
+                // Implementation data with signature status indicators
                 'implementation' => [
-                    'headIT' => [
+                    'headIT' => array_merge([
                         'name' => $userAccess->head_it_name,
                         'signature' => $userAccess->head_it_signature_path,
                         'signature_url' => $userAccess->head_it_signature_path ? Storage::url($userAccess->head_it_signature_path) : null,
                         'date' => $userAccess->head_it_approved_at,
                         'has_signature' => !empty($userAccess->head_it_signature_path),
                         'is_approved' => !empty($userAccess->head_it_approved_at)
-                    ],
-                    'ictOfficer' => [
+                    ], $this->formatSignatureStatus($userAccess->head_it_signature_path, $userAccess->head_it_approved_at, $userAccess->head_it_name)),
+                    'ictOfficer' => array_merge([
                         'name' => $userAccess->ict_officer_name,
                         'signature' => $userAccess->ict_officer_signature_path,
                         'signature_url' => $userAccess->ict_officer_signature_path ? Storage::url($userAccess->ict_officer_signature_path) : null,
@@ -551,7 +602,7 @@ class BothServiceFormController extends Controller
                         'implementation_comments' => $userAccess->implementation_comments,
                         'has_signature' => !empty($userAccess->ict_officer_signature_path),
                         'is_implemented' => !empty($userAccess->ict_officer_implemented_at)
-                    ]
+                    ], $this->formatSignatureStatus($userAccess->ict_officer_signature_path, $userAccess->ict_officer_implemented_at, $userAccess->ict_officer_name))
                 ],
                 
                 'created_at' => $userAccess->created_at,
@@ -566,8 +617,8 @@ class BothServiceFormController extends Controller
                 'user_id' => $currentUser->id,
                 'status' => $userAccess->status,
                 'has_hod_signature' => !empty($userAccess->hod_signature_path),
-                'jeeva_modules_count' => count($userAccess->jeeva_modules_selected ?? []),
-                'wellsoft_modules_count' => count($userAccess->wellsoft_modules_selected ?? [])
+                'jeeva_modules_count' => $this->getJsonArrayCount($userAccess->jeeva_modules_selected),
+                'wellsoft_modules_count' => $this->getJsonArrayCount($userAccess->wellsoft_modules_selected)
             ]);
             
             return response()->json([
@@ -643,8 +694,8 @@ class BothServiceFormController extends Controller
                     'request_type' => $request->request_type ?? [],
                     'status' => $request->status,
                     'created_at' => $request->created_at,
-                    'wellsoft_modules_count' => count($request->wellsoft_modules_selected ?? []),
-                    'jeeva_modules_count' => count($request->jeeva_modules_selected ?? []),
+                    'wellsoft_modules_count' => $this->getJsonArrayCount($request->wellsoft_modules_selected),
+                    'jeeva_modules_count' => $this->getJsonArrayCount($request->jeeva_modules_selected),
                     'has_hod_approval' => !empty($request->hod_approved_at),
                     'has_divisional_approval' => !empty($request->divisional_approved_at),
                     'has_ict_director_approval' => !empty($request->ict_director_approved_at),
@@ -1374,6 +1425,318 @@ class BothServiceFormController extends Controller
             DB::rollBack();
             
             Log::error('❌ Error updating ICT Director rejection', [
+                'error' => $e->getMessage(),
+                'user_access_id' => $userAccessId,
+                'current_user_id' => $request->user()?->id,
+                'stack_trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to reject request: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    /**
+     * Head of IT approval for a user access request
+     */
+    public function approveHeadOfIT(Request $request, int $userAccessId): JsonResponse
+    {
+        try {
+            $currentUser = $request->user();
+            $userRoles = $currentUser->roles()->pluck('name')->toArray();
+            
+            // Check if user is Head of IT
+            if (!in_array('head_of_it', $userRoles)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Access denied. Only Head of IT can perform this action.'
+                ], 403);
+            }
+            
+            Log::info('🔍 HEAD OF IT APPROVAL START', [
+                'user_access_id' => $userAccessId,
+                'head_it_user_id' => $currentUser->id,
+                'request_method' => $request->method(),
+                'content_type' => $request->header('Content-Type'),
+                'has_files' => $request->hasFile('head_it_signature'),
+                'all_input_keys' => array_keys($request->all())
+            ]);
+            
+            // Validation
+            $validated = $request->validate([
+                'head_it_name' => 'required|string|max:255',
+                'head_it_signature' => 'required|file|mimes:jpeg,jpg,png,pdf|max:2048',
+                'approved_date' => 'required|date',
+                'comments' => 'nullable|string|max:1000',
+            ], [
+                'head_it_name.required' => 'Head of IT name is required',
+                'head_it_signature.required' => 'Head of IT signature file is required',
+                'head_it_signature.mimes' => 'Signature must be in JPEG, JPG, PNG, or PDF format',
+                'head_it_signature.max' => 'Signature file must not exceed 2MB',
+                'approved_date.required' => 'Approval date is required',
+                'approved_date.date' => 'Please provide a valid approval date',
+            ]);
+            
+            Log::info('✅ Validation passed', [
+                'validated_data' => Arr::except($validated, ['head_it_signature']),
+                'has_signature_file' => isset($validated['head_it_signature'])
+            ]);
+            
+            // Get user access record
+            $userAccess = UserAccess::findOrFail($userAccessId);
+            
+            // Verify request is in correct status (must be ICT Director approved)
+            if ($userAccess->ict_director_status !== 'approved') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Request must be ICT Director approved before Head of IT can approve it.'
+                ], 422);
+            }
+            
+            DB::beginTransaction();
+            
+            // Handle signature upload
+            $headItSignaturePath = null;
+            if ($request->hasFile('head_it_signature')) {
+                try {
+                    $signatureFile = $request->file('head_it_signature');
+                    
+                    if (!$signatureFile->isValid()) {
+                        throw new \Exception('Uploaded signature file is invalid');
+                    }
+                    
+                    $signatureDir = 'signatures/head_of_it';
+                    if (!Storage::disk('public')->exists($signatureDir)) {
+                        Storage::disk('public')->makeDirectory($signatureDir);
+                    }
+                    
+                    $filename = 'head_it_signature_' . $userAccess->pf_number . '_' . time() . '.' . $signatureFile->getClientOriginalExtension();
+                    $headItSignaturePath = $signatureFile->storeAs($signatureDir, $filename, 'public');
+                    
+                    if (!Storage::disk('public')->exists($headItSignaturePath)) {
+                        throw new \Exception('Failed to store signature file');
+                    }
+                    
+                    Log::info('✅ Head of IT signature uploaded successfully', [
+                        'original_name' => $signatureFile->getClientOriginalName(),
+                        'stored_path' => $headItSignaturePath,
+                        'file_size' => $signatureFile->getSize(),
+                        'mime_type' => $signatureFile->getMimeType()
+                    ]);
+                    
+                } catch (\Exception $e) {
+                    Log::error('❌ Head of IT signature upload failed', [
+                        'error' => $e->getMessage(),
+                        'file_info' => [
+                            'name' => $request->file('head_it_signature')->getClientOriginalName(),
+                            'size' => $request->file('head_it_signature')->getSize(),
+                            'mime' => $request->file('head_it_signature')->getMimeType()
+                        ]
+                    ]);
+                    
+                    DB::rollBack();
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Failed to upload Head of IT signature: ' . $e->getMessage()
+                    ], 500);
+                }
+            }
+            
+            // Update the user access record
+            $updateData = [
+                'head_it_name' => $validated['head_it_name'],
+                'head_it_signature_path' => $headItSignaturePath,
+                'head_it_approved_at' => $validated['approved_date'],
+                'head_it_comments' => $validated['comments'] ?? null,
+                'status' => 'head_it_approved',
+                'head_it_status' => 'approved',
+                'ict_officer_status' => 'pending' // Advance to ICT Officer for implementation
+            ];
+            
+            Log::info('🔄 Updating user access record for Head of IT approval', [
+                'user_access_id' => $userAccess->id,
+                'update_data' => Arr::except($updateData, ['head_it_signature_path']),
+                'has_signature_path' => !empty($updateData['head_it_signature_path'])
+            ]);
+            
+            $userAccess->update($updateData);
+            $userAccess->refresh();
+            
+            Log::info('✅ User access record updated successfully for Head of IT approval', [
+                'user_access_id' => $userAccess->id,
+                'head_it_name' => $userAccess->head_it_name,
+                'head_it_signature_path' => $userAccess->head_it_signature_path,
+                'head_it_approved_at' => $userAccess->head_it_approved_at,
+                'status' => $userAccess->status
+            ]);
+            
+            DB::commit();
+            
+            // Load relationships for response
+            $userAccess->load(['user', 'department']);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Request approved by Head of IT successfully.',
+                'data' => [
+                    'request_id' => $userAccess->id,
+                    'status' => $userAccess->status,
+                    'head_it_approval' => [
+                        'name' => $userAccess->head_it_name,
+                        'approved_at' => $userAccess->head_it_approved_at->format('Y-m-d H:i:s'),
+                        'approved_at_formatted' => $userAccess->head_it_approved_at->format('m/d/Y'),
+                        'comments' => $userAccess->head_it_comments,
+                        'signature_path' => $userAccess->head_it_signature_path
+                    ]
+                ]
+            ]);
+            
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            
+            Log::error('❌ Validation failed for Head of IT approval', [
+                'errors' => $e->errors(),
+                'user_access_id' => $userAccessId
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            Log::error('❌ Error updating Head of IT approval', [
+                'error' => $e->getMessage(),
+                'user_access_id' => $userAccessId,
+                'current_user_id' => $request->user()?->id,
+                'stack_trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to approve request: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    /**
+     * Head of IT rejection for a user access request
+     */
+    public function rejectHeadOfIT(Request $request, int $userAccessId): JsonResponse
+    {
+        try {
+            $currentUser = $request->user();
+            $userRoles = $currentUser->roles()->pluck('name')->toArray();
+            
+            // Check if user is Head of IT
+            if (!in_array('head_of_it', $userRoles)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Access denied. Only Head of IT can perform this action.'
+                ], 403);
+            }
+            
+            Log::info('🔍 HEAD OF IT REJECTION START', [
+                'user_access_id' => $userAccessId,
+                'head_it_user_id' => $currentUser->id,
+                'request_method' => $request->method(),
+                'all_input_keys' => array_keys($request->all())
+            ]);
+            
+            // Validation
+            $validated = $request->validate([
+                'head_it_name' => 'required|string|max:255',
+                'rejection_date' => 'required|date',
+                'rejection_reason' => 'required|string|max:1000',
+            ], [
+                'head_it_name.required' => 'Head of IT name is required',
+                'rejection_date.required' => 'Rejection date is required',
+                'rejection_date.date' => 'Please provide a valid rejection date',
+                'rejection_reason.required' => 'Rejection reason is required'
+            ]);
+            
+            Log::info('✅ Validation passed', [
+                'validated_data' => $validated
+            ]);
+            
+            // Get user access record
+            $userAccess = UserAccess::findOrFail($userAccessId);
+            
+            // Verify request is in correct status (must be ICT Director approved)
+            if ($userAccess->ict_director_status !== 'approved') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Request must be ICT Director approved before Head of IT can reject it.'
+                ], 422);
+            }
+            
+            DB::beginTransaction();
+            
+            // Update the user access record
+            $updateData = [
+                'head_it_name' => $validated['head_it_name'],
+                'head_it_approved_at' => $validated['rejection_date'],
+                'head_it_comments' => $validated['rejection_reason'],
+                'status' => 'head_it_rejected',
+                'head_it_status' => 'rejected'
+            ];
+            
+            Log::info('🔄 Updating user access record for Head of IT rejection', [
+                'user_access_id' => $userAccess->id,
+                'update_data' => $updateData
+            ]);
+            
+            $userAccess->update($updateData);
+            $userAccess->refresh();
+            
+            Log::info('✅ User access record updated successfully for Head of IT rejection', [
+                'user_access_id' => $userAccess->id,
+                'head_it_name' => $userAccess->head_it_name,
+                'head_it_approved_at' => $userAccess->head_it_approved_at,
+                'status' => $userAccess->status
+            ]);
+            
+            DB::commit();
+            
+            // Load relationships for response
+            $userAccess->load(['user', 'department']);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Request rejected by Head of IT.',
+                'data' => [
+                    'request_id' => $userAccess->id,
+                    'status' => $userAccess->status,
+                    'head_it_rejection' => [
+                        'name' => $userAccess->head_it_name,
+                        'rejected_at' => $userAccess->head_it_approved_at->format('Y-m-d H:i:s'),
+                        'rejected_at_formatted' => $userAccess->head_it_approved_at->format('m/d/Y'),
+                        'reason' => $userAccess->head_it_comments
+                    ]
+                ]
+            ]);
+            
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            
+            Log::error('❌ Validation failed for Head of IT rejection', [
+                'errors' => $e->errors(),
+                'user_access_id' => $userAccessId
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            Log::error('❌ Error updating Head of IT rejection', [
                 'error' => $e->getMessage(),
                 'user_access_id' => $userAccessId,
                 'current_user_id' => $request->user()?->id,

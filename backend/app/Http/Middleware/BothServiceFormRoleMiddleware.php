@@ -45,6 +45,7 @@ class BothServiceFormRoleMiddleware
             'head_of_department',
             'divisional_director',
             'ict_director',
+            'head_of_it',
             'ict_officer',
             'admin',
             'staff' // Regular staff can create forms
@@ -70,6 +71,7 @@ class BothServiceFormRoleMiddleware
                 'hod' => ['head_of_department'],
                 'divisional_director' => ['divisional_director'],
                 'dict' => ['ict_director'],
+                'head_of_it' => ['head_of_it'],
                 'ict_officer' => ['ict_officer'],
                 'admin' => ['admin'],
             ];

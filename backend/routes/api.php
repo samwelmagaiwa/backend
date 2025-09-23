@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\v1\ModuleRequestController;
 use App\Http\Controllers\Api\v1\JeevaModuleRequestController;
 use App\Http\Controllers\Api\v1\AccessRightsApprovalController;
 use App\Http\Controllers\Api\v1\ImplementationWorkflowController;
+use App\Http\Controllers\Api\v1\HeadOfItController;
 use App\Http\Controllers\Api\HealthController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Api\SwaggerController;
@@ -379,13 +380,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Module request data routes
         Route::get('/module-requests/{userAccessId}', [BothServiceFormController::class, 'getModuleRequestData'])
-            ->middleware('both.service.role:hod,divisional_director,dict,ict_officer')
+            ->middleware('both.service.role:hod,divisional_director,dict,head_of_it,ict_officer')
             ->name('both-service-form.module-requests.show');
         Route::get('/module-requests', [BothServiceFormController::class, 'getPendingModuleRequests'])
-            ->middleware('both.service.role:hod,divisional_director,dict,ict_officer')
+            ->middleware('both.service.role:hod,divisional_director,dict,head_of_it,ict_officer')
             ->name('both-service-form.module-requests.pending');
         Route::get('/module-requests-statistics', [BothServiceFormController::class, 'getModuleRequestStatistics'])
-            ->middleware('both.service.role:hod,divisional_director,dict,ict_officer')
+            ->middleware('both.service.role:hod,divisional_director,dict,head_of_it,ict_officer')
             ->name('both-service-form.module-requests.statistics');
 
         // HOD approval with access rights validation
@@ -413,6 +414,14 @@ Route::middleware('auth:sanctum')->group(function () {
             ->middleware('both.service.role:dict,ict_director')
             ->name('both-service-form.module-requests.ict-director-reject');
         
+        // Head of IT approval routes
+        Route::post('/module-requests/{userAccessId}/head-of-it-approve', [BothServiceFormController::class, 'approveHeadOfIT'])
+            ->middleware('both.service.role:head_of_it')
+            ->name('both-service-form.module-requests.head-of-it-approve');
+        Route::post('/module-requests/{userAccessId}/head-of-it-reject', [BothServiceFormController::class, 'rejectHeadOfIT'])
+            ->middleware('both.service.role:head_of_it')
+            ->name('both-service-form.module-requests.head-of-it-reject');
+        
         // TEMPORARY: Debug record data
         Route::get('/debug-record/{id}', [BothServiceFormController::class, 'debugRecord'])
             ->name('both-service-form.debug-record');
@@ -428,7 +437,7 @@ Route::middleware('auth:sanctum')->group(function () {
             ->middleware('both.service.role:dict')
             ->name('both-service-form.approve.dict');
         Route::post('/{id}/approve/hod-it', [BothServiceFormController::class, 'approveAsHODIT'])
-
+            ->middleware('both.service.role:head_of_it')
             ->name('both-service-form.approve.hod-it');
         Route::post('/{id}/approve/ict-officer', [BothServiceFormController::class, 'approveAsICTOfficer'])
             ->middleware('both.service.role:ict_officer')
@@ -538,8 +547,8 @@ Route::prefix('hod')->middleware('role:head_of_department,divisional_director,ic
             ->name('divisional.dict-recommendations.respond');
     });
 
-    // ICT Director Combined Access Request routes (ICT Director only)
-    Route::prefix('dict')->middleware('role:ict_director,admin')->group(function () {
+    // ICT Director Combined Access Request routes (ICT Director and Head of IT)
+    Route::prefix('dict')->middleware('role:ict_director,head_of_it,admin')->group(function () {
         Route::get('combined-access-requests', [\App\Http\Controllers\Api\v1\DictCombinedAccessController::class, 'index'])
             ->name('dict.combined-access-requests.index');
         Route::get('combined-access-requests/statistics', [\App\Http\Controllers\Api\v1\DictCombinedAccessController::class, 'statistics'])
@@ -550,6 +559,35 @@ Route::prefix('hod')->middleware('role:head_of_department,divisional_director,ic
             ->name('dict.combined-access-requests.approve');
         Route::post('combined-access-requests/{id}/cancel', [\App\Http\Controllers\Api\v1\DictCombinedAccessController::class, 'cancel'])
             ->name('dict.combined-access-requests.cancel');
+    });
+
+    // Head of IT routes (Head of IT only)
+    Route::prefix('head-of-it')->middleware('role:head_of_it,admin')->group(function () {
+        // Get requests pending Head of IT approval
+        Route::get('pending-requests', [HeadOfItController::class, 'getPendingRequests'])
+            ->name('head-of-it.pending-requests');
+        
+        // Get specific request details
+        Route::get('requests/{id}', [HeadOfItController::class, 'getRequestById'])
+            ->name('head-of-it.request-details');
+        
+        // Approve/Reject request actions
+        Route::post('requests/{id}/approve', [HeadOfItController::class, 'approveRequest'])
+            ->name('head-of-it.approve-request');
+        Route::post('requests/{id}/reject', [HeadOfItController::class, 'rejectRequest'])
+            ->name('head-of-it.reject-request');
+        
+        // ICT Officer management
+        Route::get('ict-officers', [HeadOfItController::class, 'getIctOfficers'])
+            ->name('head-of-it.ict-officers');
+        Route::post('assign-task', [HeadOfItController::class, 'assignTaskToIctOfficer'])
+            ->name('head-of-it.assign-task');
+        
+        // Task assignment management
+        Route::get('tasks/{requestId}/history', [HeadOfItController::class, 'getTaskHistory'])
+            ->name('head-of-it.task-history');
+        Route::post('tasks/{requestId}/cancel', [HeadOfItController::class, 'cancelTaskAssignment'])
+            ->name('head-of-it.cancel-task');
     });
 
     // ========================================

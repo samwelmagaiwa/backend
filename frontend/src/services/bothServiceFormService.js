@@ -687,6 +687,90 @@ class BothServiceFormService {
   }
 
   /**
+   * Head IT approves a user access request
+   * @param {number} requestId - ID of the request to approve
+   * @param {Object} payload - Approval data including signature and details
+   * @returns {Promise<Object>} Response with approval result
+   */
+  async headItApprove(requestId, payload) {
+    try {
+      console.log('🔄 Head IT approving request:', requestId, payload)
+
+      const fd = new FormData()
+
+      // Required Head IT fields
+      fd.append('head_it_name', payload.headItName || '')
+      fd.append('approved_date', payload.approvedDate || new Date().toISOString().slice(0, 10))
+      fd.append('comments', payload.comments || '')
+
+      if (payload.headItSignature) {
+        fd.append('head_it_signature', payload.headItSignature)
+      } else {
+        throw new Error('Head IT signature file is required')
+      }
+
+      // POST to Head IT approve endpoint
+      const res = await apiClient.post(
+        `/both-service-form/module-requests/${requestId}/head-of-it-approve`,
+        fd,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      )
+
+      if (res.data?.success) {
+        console.log('✅ Head IT approval saved successfully:', res.data)
+        return { success: true, data: res.data.data, message: res.data.message }
+      }
+      throw new Error(res.data?.message || 'Failed to save Head IT approval')
+    } catch (error) {
+      console.error('❌ Error in headItApprove:', error)
+      return {
+        success: false,
+        error:
+          error.response?.data?.message || error.message || 'Failed to save Head IT approval',
+        errors: error.response?.data?.errors || null
+      }
+    }
+  }
+
+  /**
+   * Head IT rejects a user access request
+   * @param {number} requestId - ID of the request to reject
+   * @param {Object} payload - Rejection data including reason
+   * @returns {Promise<Object>} Response with rejection result
+   */
+  async headItReject(requestId, payload) {
+    try {
+      console.log('🔄 Head IT rejecting request:', requestId, payload)
+
+      const data = {
+        head_it_name: payload.headItName || '',
+        rejection_reason: payload.rejectionReason || '',
+        rejection_date: payload.rejectionDate || new Date().toISOString().slice(0, 10)
+      }
+
+      // POST to Head IT reject endpoint
+      const res = await apiClient.post(
+        `/both-service-form/module-requests/${requestId}/head-it-reject`,
+        data
+      )
+
+      if (res.data?.success) {
+        console.log('✅ Head IT rejection saved successfully:', res.data)
+        return { success: true, data: res.data.data, message: res.data.message }
+      }
+      throw new Error(res.data?.message || 'Failed to save Head IT rejection')
+    } catch (error) {
+      console.error('❌ Error in headItReject:', error)
+      return {
+        success: false,
+        error:
+          error.response?.data?.message || error.message || 'Failed to save Head IT rejection',
+        errors: error.response?.data?.errors || null
+      }
+    }
+  }
+
+  /**
    * Validate form data before submission
    * @param {Object} formData - Form data to validate
    * @returns {Object} Validation result

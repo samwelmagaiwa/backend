@@ -141,23 +141,26 @@ class RoleManagementSeeder extends Seeder
      */
     private function migrateUserRoles(): void
     {
-        $users = User::with('role')->get();
+        $users = User::all();
         
         foreach ($users as $user) {
             // Check if user already has roles in the new system
             $existingRoles = $user->roles()->count();
             
             if ($existingRoles === 0) {
-                // If user has old role_id, migrate it
-                if ($user->role_id && $user->role) {
-                    $user->roles()->attach($user->role_id, [
-                        'assigned_at' => $user->created_at ?? now(),
-                        'assigned_by' => 1, // System migration
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
-                    
-                    $this->command->info("Migrated user {$user->email} from role {$user->role->name}");
+                // Check if user has role_id column and value
+                if (Schema::hasColumn('users', 'role_id') && $user->role_id) {
+                    $role = Role::find($user->role_id);
+                    if ($role) {
+                        $user->roles()->attach($user->role_id, [
+                            'assigned_at' => $user->created_at ?? now(),
+                            'assigned_by' => 1, // System migration
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                        
+                        $this->command->info("Migrated user {$user->email} from role {$role->name}");
+                    }
                 } else {
                     // Assign default 'staff' role if no role exists
                     $staffRole = Role::where('name', 'staff')->first();

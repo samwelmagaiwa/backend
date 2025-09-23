@@ -218,12 +218,12 @@
           <div
             class="space-y-1 transition-all duration-300 ease-in-out overflow-hidden"
             :class="{
-              'max-h-0 opacity-0': !isCollapsed && !expandedSections.dashboard,
-              'max-h-96 opacity-100': isCollapsed || expandedSections.dashboard
+              'max-h-0 opacity-0': !isCollapsed && !expandedSections.dashboard && !debugHeadOfIt,
+              'max-h-96 opacity-100': isCollapsed || expandedSections.dashboard || debugHeadOfIt
             }"
             :style="{
-              maxHeight: isCollapsed || expandedSections.dashboard ? '24rem' : '0',
-              opacity: isCollapsed || expandedSections.dashboard ? '1' : '0'
+              maxHeight: isCollapsed || expandedSections.dashboard || debugHeadOfIt ? '24rem' : '0',
+              opacity: isCollapsed || expandedSections.dashboard || debugHeadOfIt ? '1' : '0'
             }"
           >
             <router-link
@@ -350,12 +350,16 @@
           <div
             class="space-y-1 transition-all duration-300 ease-in-out overflow-hidden"
             :class="{
-              'max-h-0 opacity-0': !isCollapsed && !expandedSections.requestsManagement,
-              'max-h-96 opacity-100': isCollapsed || expandedSections.requestsManagement
+              'max-h-0 opacity-0':
+                !isCollapsed && !expandedSections.requestsManagement && !debugHeadOfIt,
+              'max-h-96 opacity-100':
+                isCollapsed || expandedSections.requestsManagement || debugHeadOfIt
             }"
             :style="{
-              maxHeight: isCollapsed || expandedSections.requestsManagement ? '24rem' : '0',
-              opacity: isCollapsed || expandedSections.requestsManagement ? '1' : '0'
+              maxHeight:
+                isCollapsed || expandedSections.requestsManagement || debugHeadOfIt ? '24rem' : '0',
+              opacity:
+                isCollapsed || expandedSections.requestsManagement || debugHeadOfIt ? '1' : '0'
             }"
           >
             <router-link
@@ -695,6 +699,22 @@
       const showHelpModal = ref(false)
       // expandedSections now comes from useSidebar composable
 
+      // Debug logging for Head of IT
+      const debugHeadOfIt = computed(() => {
+        const role = piniaAuthStore?.userRole || userRole?.value || stableUserRole?.value
+        const isHeadOfIt = role === ROLES.HEAD_OF_IT
+        if (isHeadOfIt) {
+          console.log('🔧 HEAD OF IT Debug:', {
+            role,
+            menuItems: menuItems.value.length,
+            dashboardItems: dashboardItems.value.length,
+            requestsItems: requestsManagementItems.value.length,
+            expandedSections: expandedSections.value
+          })
+        }
+        return isHeadOfIt
+      })
+
       // Responsive behavior
       const isSmallScreen = ref(window.innerWidth < 768)
 
@@ -751,6 +771,13 @@
 
         if (isAuthenticated?.value && userRole?.value) {
           stableUserRole.value = userRole.value
+
+          // Auto-expand sections for Head of IT
+          if (userRole.value === ROLES.HEAD_OF_IT) {
+            console.log('📦 Expanding sections for Head of IT')
+            _setSectionExpanded('dashboard', true)
+            _setSectionExpanded('requestsManagement', true)
+          }
         }
       })
 
@@ -866,6 +893,13 @@
             category: 'dashboard',
             description: 'ICT Officer panel'
           },
+          '/head_of_it-dashboard': {
+            name: 'HeadOfItDashboard',
+            displayName: 'Dashboard',
+            icon: 'fas fa-user-cog',
+            category: 'dashboard',
+            description: 'Head of IT control panel'
+          },
 
           // User Management (Admin only)
           '/service-users': {
@@ -906,6 +940,13 @@
             icon: 'fas fa-clipboard-check',
             category: 'requests-management',
             description: 'Review Divisional Director-approved requests'
+          },
+          '/head_of_it-dashboard/combined-requests': {
+            name: 'HeadOfItCombinedRequestList',
+            displayName: 'Access Requests',
+            icon: 'fas fa-clipboard-check',
+            category: 'requests-management',
+            description: 'Review ICT Director-approved requests'
           }
         }
 
@@ -1068,6 +1109,7 @@
           [ROLES.DIVISIONAL_DIRECTOR]: 'Divisional Director',
           [ROLES.HEAD_OF_DEPARTMENT]: 'Head of Department',
           [ROLES.ICT_DIRECTOR]: 'ICT Director',
+          [ROLES.HEAD_OF_IT]: 'Head of IT',
           [ROLES.STAFF]: 'D. IN MEDICINE',
           [ROLES.ICT_OFFICER]: 'ICT Officer'
         }
@@ -1115,6 +1157,7 @@
         filteredUserManagementItems,
         filteredDeviceManagementItems,
         filteredRequestsManagementItems,
+        debugHeadOfIt,
 
         // Methods
         toggleCollapse,
@@ -1158,34 +1201,34 @@
 
     /* Icon sizes */
     --icon-size-small: 1rem; /* 16px */
-    --icon-size-medium: 1.25rem; /* 20px */
+    --icon-size-medium: 1.125rem; /* 18px */
 
     /* Transition for font sizes */
     transition: all 0.3s ease-in-out;
   }
 
   .sidebar-expanded {
-    --brand-font-size: 1.125rem; /* 18px */
+    --brand-font-size: 1rem; /* 16px */
     --profile-name-size: 0.875rem; /* 14px */
     --profile-role-size: 0.75rem; /* 12px */
     --section-header-size: 0.75rem; /* 12px */
     --nav-item-size: 0.875rem; /* 14px */
     --bottom-section-size: 0.875rem; /* 14px */
 
-    --icon-size-small: 1.25rem; /* 20px */
-    --icon-size-medium: 1.5rem; /* 24px */
+    --icon-size-small: 1.125rem; /* 18px */
+    --icon-size-medium: 1.25rem; /* 20px */
   }
 
   .sidebar-collapsed {
-    --brand-font-size: 0.75rem; /* 12px - hidden anyway */
-    --profile-name-size: 0.75rem; /* 12px - hidden anyway */
-    --profile-role-size: 0.625rem; /* 10px - hidden anyway */
-    --section-header-size: 0.625rem; /* 10px - hidden anyway */
-    --nav-item-size: 0.75rem; /* 12px - hidden anyway */
-    --bottom-section-size: 0.75rem; /* 12px - hidden anyway */
+    --brand-font-size: 0.625rem; /* 10px - hidden anyway */
+    --profile-name-size: 0.625rem; /* 10px - hidden anyway */
+    --profile-role-size: 0.5rem; /* 8px - hidden anyway */
+    --section-header-size: 0.5rem; /* 8px - hidden anyway */
+    --nav-item-size: 0.625rem; /* 10px - hidden anyway */
+    --bottom-section-size: 0.625rem; /* 10px - hidden anyway */
 
-    --icon-size-small: 1rem; /* 16px */
-    --icon-size-medium: 1.25rem; /* 20px */
+    --icon-size-small: 0.875rem; /* 14px */
+    --icon-size-medium: 1rem; /* 16px */
   }
 
   /* Responsive text classes */

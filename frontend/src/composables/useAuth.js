@@ -170,6 +170,7 @@ export function useAuth() {
       [ROLES.DIVISIONAL_DIRECTOR]: 'Divisional Director',
       [ROLES.HEAD_OF_DEPARTMENT]: 'Head of Department',
       [ROLES.ICT_DIRECTOR]: 'ICT Director',
+      [ROLES.HEAD_OF_IT]: 'Head of IT',
       [ROLES.STAFF]: 'D. IN MEDICINE',
       [ROLES.ICT_OFFICER]: 'ICT Officer'
     }

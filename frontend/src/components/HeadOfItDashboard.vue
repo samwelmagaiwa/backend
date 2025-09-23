@@ -7,7 +7,7 @@
         class="flex-1 p-6 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative"
       >
         <!-- Medical Background Pattern -->
-        <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute inset-0 overflow-hidden" style="z-index: 1; pointer-events: none">
           <!-- Medical Cross Pattern -->
           <div class="absolute inset-0 opacity-5">
             <div class="grid grid-cols-12 gap-8 h-full transform rotate-45">
@@ -49,12 +49,12 @@
           </div>
         </div>
 
-        <div class="max-w-full mx-auto relative z-10">
+        <div class="max-w-full mx-auto relative" style="z-index: 10">
           <!-- Header Section -->
           <div class="medical-glass-card rounded-3xl p-4 mb-0">
             <div class="text-center">
               <h2
-                class="text-2xl font-bold text-blue-100 tracking-wide drop-shadow-md animate-fade-in-delay"
+                class="text-xl font-bold text-blue-100 tracking-wide drop-shadow-md animate-fade-in-delay"
               >
                 Welcome, {{ userName }}
               </h2>
@@ -66,14 +66,15 @@
             <div class="p-6">
               <!-- Quick Actions Section -->
               <div class="mb-8">
-                <h3 class="text-2xl font-bold text-white mb-4 flex items-center">
+                <h3 class="text-xl font-bold text-white mb-4 flex items-center">
                   <i class="fas fa-bolt mr-2 text-blue-400"></i>
                   Quick Actions
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                  <router-link
-                    to="/dict-dashboard/combined-requests"
-                    class="medical-card bg-gradient-to-r from-purple-600/25 to-pink-600/25 border-2 border-purple-400/40 p-4 rounded-xl backdrop-blur-sm hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 group text-center"
+                  <div
+                    @click="navigateToRequests"
+                    class="medical-card bg-gradient-to-r from-purple-600/25 to-pink-600/25 border-2 border-purple-400/40 p-4 rounded-xl backdrop-blur-sm hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 group text-center cursor-pointer"
+                    style="z-index: 20; position: relative"
                   >
                     <div class="flex flex-col items-center">
                       <div
@@ -81,9 +82,9 @@
                       >
                         <i class="fas fa-layer-group text-white"></i>
                       </div>
-                      <span class="text-white font-medium text-base">Access Requests</span>
+                      <span class="text-white font-medium text-sm">Access Requests</span>
                     </div>
-                  </router-link>
+                  </div>
 
                   <div
                     class="medical-card bg-gradient-to-r from-blue-600/25 to-cyan-600/25 border-2 border-blue-400/40 p-4 rounded-xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-300 group text-center opacity-50 cursor-not-allowed"
@@ -94,7 +95,7 @@
                       >
                         <i class="fas fa-chart-bar text-white"></i>
                       </div>
-                      <span class="text-white font-medium text-base">Analytics (Coming Soon)</span>
+                      <span class="text-white font-medium text-sm">Analytics (Coming Soon)</span>
                     </div>
                   </div>
                 </div>
@@ -118,7 +119,7 @@
   import { useAuth } from '@/composables/useAuth'
 
   export default {
-    name: 'DictDashboard',
+    name: 'HeadOfItDashboard',
     components: {
       Header,
       ModernSidebar,
@@ -127,16 +128,20 @@
     setup() {
       const { userName, ROLES, requireRole } = useAuth()
 
-      // Local state
-      // Sidebar state now managed by Pinia - no local state needed
-
-      // Guard this route - only ICT Directors can access
+      // Guard this route - only Head of IT can access
       onMounted(() => {
-        requireRole([ROLES.ICT_DIRECTOR])
+        console.log('HeadOfItDashboard: Component mounted, user:', userName.value)
+        requireRole([ROLES.HEAD_OF_IT])
       })
 
       return {
         userName
+      }
+    },
+    methods: {
+      navigateToRequests() {
+        console.log('Navigating to requests page...')
+        this.$router.push('/head_of_it-dashboard/combined-requests')
       }
     }
   }

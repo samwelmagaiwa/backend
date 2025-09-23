@@ -157,17 +157,9 @@ export async function checkRouteAccess(route) {
 
     // Special case: If no specific route meta but user is authenticated, allow access to dashboard routes
     if (!route.meta?.roles && isAuthenticated) {
-      const dashboardRoutes = [
-        '/admin-dashboard',
-        '/user-dashboard',
-        '/hod-dashboard',
-        '/dict-dashboard',
-        '/divisional-dashboard',
-        '/ict-dashboard'
-      ]
+      const { isDashboardRoute, getDefaultDashboard } = await import('./permissions')
 
-      if (dashboardRoutes.includes(route.path)) {
-        const { getDefaultDashboard } = await import('./permissions')
+      if (isDashboardRoute(route.path)) {
         const userDefaultDashboard = getDefaultDashboard(userRole)
 
         // Allow access if this is the user's default dashboard

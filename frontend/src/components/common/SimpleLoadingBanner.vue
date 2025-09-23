@@ -18,7 +18,7 @@
           v-for="(dot, index) in logoDots"
           :key="`logo-${index}`"
           :class="`orbit-dot ${dot.color}`"
-          :style="{ transform: `rotate(${rotation + index * 15}deg) translateX(60px)` }"
+          :style="{ transform: `rotate(${rotation + index * 15}deg) translateX(100px)` }"
         ></div>
       </div>
     </div>
@@ -201,13 +201,13 @@
     position: relative;
     z-index: 2;
     border-radius: 50%;
-    padding: 0.5rem;
+    padding: 1rem;
   }
 
   /* Hospital logo styling */
   .hospital-logo {
-    width: 60px;
-    height: 60px;
+    width: 120px;
+    height: 120px;
     object-fit: contain;
   }
 
@@ -217,8 +217,8 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 200px;
-    height: 200px;
+    width: 320px;
+    height: 320px;
     pointer-events: none;
   }
 
@@ -227,8 +227,8 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 8px;
-    height: 8px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
     transform-origin: 0 0;
     animation: logoPulse 2s ease-in-out infinite;
@@ -252,11 +252,11 @@
   @keyframes logoPulse {
     0%,
     100% {
-      transform: translateX(60px) scale(1);
+      transform: translateX(100px) scale(1);
       opacity: 0.8;
     }
     50% {
-      transform: translateX(60px) scale(1.3);
+      transform: translateX(100px) scale(1.4);
       opacity: 1;
     }
   }
@@ -264,28 +264,28 @@
   /* Responsive Design */
   @media (max-width: 768px) {
     .hospital-logo {
-      width: 50px;
-      height: 50px;
+      width: 80px;
+      height: 80px;
     }
 
     .orbit-container {
-      width: 150px;
-      height: 150px;
+      width: 240px;
+      height: 240px;
     }
 
     .orbit-dot {
-      width: 6px;
-      height: 6px;
+      width: 10px;
+      height: 10px;
     }
 
     @keyframes logoPulse {
       0%,
       100% {
-        transform: translateX(45px) scale(1);
+        transform: translateX(75px) scale(1);
         opacity: 0.8;
       }
       50% {
-        transform: translateX(45px) scale(1.2);
+        transform: translateX(75px) scale(1.3);
         opacity: 1;
       }
     }
@@ -293,28 +293,28 @@
 
   @media (max-width: 480px) {
     .hospital-logo {
-      width: 40px;
-      height: 40px;
+      width: 60px;
+      height: 60px;
     }
 
     .orbit-container {
-      width: 120px;
-      height: 120px;
+      width: 180px;
+      height: 180px;
     }
 
     .orbit-dot {
-      width: 5px;
-      height: 5px;
+      width: 8px;
+      height: 8px;
     }
 
     @keyframes logoPulse {
       0%,
       100% {
-        transform: translateX(35px) scale(1);
+        transform: translateX(55px) scale(1);
         opacity: 0.8;
       }
       50% {
-        transform: translateX(35px) scale(1.1);
+        transform: translateX(55px) scale(1.2);
         opacity: 1;
       }
     }

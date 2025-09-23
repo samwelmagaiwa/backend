@@ -18,6 +18,28 @@ class DictCombinedAccessController extends Controller
 {
     use HandlesStatusQueries;
     
+    /**
+     * Helper method to format signature status with visual indicators
+     */
+    private function formatSignatureStatus($signaturePath, $approvalDate = null, $approverName = null, $status = null)
+    {
+        if (!empty($signaturePath)) {
+            return [
+                'signature_status' => 'Signed',
+                'signature_status_color' => 'green',
+                'has_signature_file' => true,
+                'signature_display' => 'Signed'
+            ];
+        }
+        
+        return [
+            'signature_status' => 'No signature',
+            'signature_status_color' => 'red',
+            'has_signature_file' => false,
+            'signature_display' => 'No signature'
+        ];
+    }
+    
     protected $statusMigrationService;
     
     public function __construct(StatusMigrationService $statusMigrationService)
@@ -25,30 +47,43 @@ class DictCombinedAccessController extends Controller
         $this->statusMigrationService = $statusMigrationService;
     }
     /**
-     * Get all Divisional Director-approved combined access requests for ICT Director approval
+     * Get combined access requests for ICT Director or Head of IT approval based on user role
      */
     public function index(Request $request): JsonResponse
     {
         try {
-            Log::info('ICT Director Combined Access: Fetching requests', [
-                'user_id' => auth()->id(),
-                'user_name' => auth()->user()->name ?? 'Unknown',
-                'user_email' => auth()->user()->email ?? 'Unknown',
+            $user = auth()->user();
+            $isHeadOfIT = $user->hasRole('head_of_it');
+            
+            Log::info('Combined Access: Fetching requests', [
+                'user_id' => $user->id,
+                'user_name' => $user->name ?? 'Unknown',
+                'user_email' => $user->email ?? 'Unknown',
+                'role' => $isHeadOfIT ? 'head_of_it' : 'ict_director',
                 'filters' => $request->all()
             ]);
 
-            // ICT Director sees requests using new granular status system:
-            // 1. Requests where HOD and Divisional have approved, pending ICT Director approval
-            // 2. Requests already processed by ICT Director (for history tracking)
             $query = UserAccess::with(['user', 'department'])
                 ->whereNotNull('request_type')
                 ->where('hod_status', 'approved') // Must have HOD approval
-                ->where('divisional_status', 'approved') // Must have Divisional approval
-                ->where(function ($q) {
+                ->where('divisional_status', 'approved'); // Must have Divisional approval
+
+            if ($isHeadOfIT) {
+                // Head of IT sees requests that ICT Director has approved and are pending Head IT approval
+                $query->where('ict_director_status', 'approved') // ICT Director already approved
+                      ->where(function ($q) {
+                          $q->where('head_it_status', 'pending') // Pending Head IT approval
+                            ->orWhere('head_it_status', 'approved') // Already approved by Head IT
+                            ->orWhere('head_it_status', 'rejected'); // Already rejected by Head IT
+                      });
+            } else {
+                // ICT Director sees requests pending their approval or already processed by them
+                $query->where(function ($q) {
                     $q->where('ict_director_status', 'pending') // Pending ICT Director approval
                       ->orWhere('ict_director_status', 'approved') // Already approved by ICT Director
                       ->orWhere('ict_director_status', 'rejected'); // Already rejected by ICT Director
                 });
+            }
 
             // Apply filters
             if ($request->filled('search')) {
@@ -64,26 +99,43 @@ class DictCombinedAccessController extends Controller
             }
 
             if ($request->filled('status')) {
-                // Map frontend status values to appropriate granular status filtering
+                // Map frontend status values to appropriate granular status filtering based on user role
                 $statusFilter = $request->status;
                 
-                switch ($statusFilter) {
-                    case 'pending':
-                        $query->where('ict_director_status', 'pending');
-                        break;
-                    case 'approved':
-                        $query->where('ict_director_status', 'approved');
-                        break;
-                    case 'rejected':
-                        $query->where('ict_director_status', 'rejected');
-                        break;
-                    default:
-                        // For backward compatibility, also check legacy status column
-                        $query->where(function($q) use ($statusFilter) {
-                            $q->where('ict_director_status', $statusFilter)
-                              ->orWhere('status', $statusFilter);
-                        });
-                        break;
+                if ($isHeadOfIT) {
+                    switch ($statusFilter) {
+                        case 'pending':
+                            $query->where('head_it_status', 'pending');
+                            break;
+                        case 'approved':
+                            $query->where('head_it_status', 'approved');
+                            break;
+                        case 'rejected':
+                            $query->where('head_it_status', 'rejected');
+                            break;
+                        default:
+                            $query->where('head_it_status', $statusFilter);
+                            break;
+                    }
+                } else {
+                    switch ($statusFilter) {
+                        case 'pending':
+                            $query->where('ict_director_status', 'pending');
+                            break;
+                        case 'approved':
+                            $query->where('ict_director_status', 'approved');
+                            break;
+                        case 'rejected':
+                            $query->where('ict_director_status', 'rejected');
+                            break;
+                        default:
+                            // For backward compatibility, also check legacy status column
+                            $query->where(function($q) use ($statusFilter) {
+                                $q->where('ict_director_status', $statusFilter)
+                                  ->orWhere('status', $statusFilter);
+                            });
+                            break;
+                    }
                 }
             }
 
@@ -91,10 +143,16 @@ class DictCombinedAccessController extends Controller
                 $query->where('department_id', $request->department);
             }
 
-            // Order by divisional approval date (FIFO - oldest divisional approval first)
-            // Also order by ICT Director status (pending first for action items)
-            $query->orderByRaw("CASE WHEN ict_director_status = 'pending' THEN 0 ELSE 1 END")
-                  ->orderBy('divisional_approved_at', 'asc');
+            // Order by approval priority based on user role
+            if ($isHeadOfIT) {
+                // Head of IT: pending Head IT items first, then by ICT Director approval date
+                $query->orderByRaw("CASE WHEN head_it_status = 'pending' THEN 0 ELSE 1 END")
+                      ->orderBy('ict_director_approved_at', 'asc');
+            } else {
+                // ICT Director: pending ICT Director items first, then by divisional approval date
+                $query->orderByRaw("CASE WHEN ict_director_status = 'pending' THEN 0 ELSE 1 END")
+                      ->orderBy('divisional_approved_at', 'asc');
+            }
 
             $perPage = $request->get('per_page', 50);
             $requests = $query->paginate($perPage);
@@ -104,13 +162,15 @@ class DictCombinedAccessController extends Controller
                 return $this->transformRequestData($request);
             });
 
-            Log::info('ICT Director Combined Access: Requests retrieved successfully', [
+            Log::info('Combined Access: Requests retrieved successfully', [
+                'role' => $isHeadOfIT ? 'head_of_it' : 'ict_director',
                 'count' => $requests->total()
             ]);
 
+            $roleName = $isHeadOfIT ? 'Head of IT' : 'ICT Director';
             return response()->json([
                 'success' => true,
-                'message' => 'Divisional Director-approved combined access requests retrieved successfully',
+                'message' => "Combined access requests for {$roleName} retrieved successfully",
                 'data' => $transformedData
             ]);
 
@@ -170,89 +230,171 @@ class DictCombinedAccessController extends Controller
     }
 
     /**
-     * Update ICT Director approval status
+     * Update approval status for ICT Director or Head of IT based on user role
      */
     public function updateApproval(Request $request, $id): JsonResponse
     {
         try {
-            Log::info('ICT Director Combined Access: Updating approval', [
+            $user = auth()->user();
+            $isHeadOfIT = $user->hasRole('head_of_it');
+            
+            Log::info('Combined Access: Updating approval', [
                 'request_id' => $id,
-                'user_id' => auth()->id(),
+                'user_id' => $user->id,
+                'role' => $isHeadOfIT ? 'head_of_it' : 'ict_director',
                 'approval_data' => $request->all()
             ]);
 
             $userAccessRequest = UserAccess::findOrFail($id);
 
-            // Ensure request is available for ICT Director approval using new status columns
-            // Check that HOD and Divisional have approved and ICT Director is pending
-            if ($userAccessRequest->hod_status !== 'approved' || 
-                $userAccessRequest->divisional_status !== 'approved' ||
-                $userAccessRequest->ict_director_status !== 'pending') {
+            // Validate workflow state based on user role
+            if ($isHeadOfIT) {
+                // Head of IT approval requirements
+                if ($userAccessRequest->hod_status !== 'approved' || 
+                    $userAccessRequest->divisional_status !== 'approved' ||
+                    $userAccessRequest->ict_director_status !== 'approved' ||
+                    $userAccessRequest->head_it_status !== 'pending') {
+                        
+                    Log::warning('Head of IT Approval Denied: Invalid approval workflow state', [
+                        'request_id' => $id,
+                        'hod_status' => $userAccessRequest->hod_status,
+                        'divisional_status' => $userAccessRequest->divisional_status,
+                        'ict_director_status' => $userAccessRequest->ict_director_status,
+                        'head_it_status' => $userAccessRequest->head_it_status
+                    ]);
                     
-                Log::warning('ICT Director Approval Denied: Invalid approval workflow state', [
-                    'request_id' => $id,
-                    'hod_status' => $userAccessRequest->hod_status,
-                    'divisional_status' => $userAccessRequest->divisional_status,
-                    'ict_director_status' => $userAccessRequest->ict_director_status
-                ]);
-                
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Request must have HOD and Divisional approval before ICT Director can process it.',
-                    'error' => 'Invalid workflow state for ICT Director approval',
-                    'hod_status' => $userAccessRequest->hod_status,
-                    'divisional_status' => $userAccessRequest->divisional_status,
-                    'ict_director_status' => $userAccessRequest->ict_director_status
-                ], 400);
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Request must be approved by ICT Director before Head of IT can process it.',
+                        'error' => 'Invalid workflow state for Head of IT approval',
+                        'current_statuses' => [
+                            'hod_status' => $userAccessRequest->hod_status,
+                            'divisional_status' => $userAccessRequest->divisional_status,
+                            'ict_director_status' => $userAccessRequest->ict_director_status,
+                            'head_it_status' => $userAccessRequest->head_it_status
+                        ]
+                    ], 400);
+                }
+            } else {
+                // ICT Director approval requirements
+                if ($userAccessRequest->hod_status !== 'approved' || 
+                    $userAccessRequest->divisional_status !== 'approved' ||
+                    $userAccessRequest->ict_director_status !== 'pending') {
+                        
+                    Log::warning('ICT Director Approval Denied: Invalid approval workflow state', [
+                        'request_id' => $id,
+                        'hod_status' => $userAccessRequest->hod_status,
+                        'divisional_status' => $userAccessRequest->divisional_status,
+                        'ict_director_status' => $userAccessRequest->ict_director_status
+                    ]);
+                    
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Request must have HOD and Divisional approval before ICT Director can process it.',
+                        'error' => 'Invalid workflow state for ICT Director approval',
+                        'hod_status' => $userAccessRequest->hod_status,
+                        'divisional_status' => $userAccessRequest->divisional_status,
+                        'ict_director_status' => $userAccessRequest->ict_director_status
+                    ], 400);
+                }
             }
 
-            // Validate the approval data
-            $validatedData = $request->validate([
-                'dict_status' => 'required|in:approved,rejected',
-                'dict_comments' => 'nullable|string|max:1000',
-                'dict_name' => 'nullable|string|max:255',
-                'dict_approved_at' => 'nullable|string',
-            ]);
+            // Validate the approval data with role-appropriate field names
+            if ($isHeadOfIT) {
+                $validatedData = $request->validate([
+                    'head_it_status' => 'required|in:approved,rejected',
+                    'head_it_comments' => 'nullable|string|max:1000',
+                    'head_it_name' => 'nullable|string|max:255',
+                    // Accept legacy field names for backward compatibility
+                    'dict_status' => 'nullable|in:approved,rejected',
+                    'dict_comments' => 'nullable|string|max:1000',
+                ]);
+                // Map legacy field names if present
+                if (!isset($validatedData['head_it_status']) && isset($validatedData['dict_status'])) {
+                    $validatedData['head_it_status'] = $validatedData['dict_status'];
+                }
+                if (!isset($validatedData['head_it_comments']) && isset($validatedData['dict_comments'])) {
+                    $validatedData['head_it_comments'] = $validatedData['dict_comments'];
+                }
+            } else {
+                $validatedData = $request->validate([
+                    'dict_status' => 'required|in:approved,rejected',
+                    'dict_comments' => 'nullable|string|max:1000',
+                    'dict_name' => 'nullable|string|max:255',
+                    'dict_approved_at' => 'nullable|string',
+                ]);
+            }
 
             DB::beginTransaction();
 
-            // Update the request - automatically capture authenticated user's name
+            // Update the request based on user role
             $currentUser = auth()->user();
-            $updateData = [
-                'status' => $validatedData['dict_status'] === 'approved' ? 'dict_approved' : 'dict_rejected',
-                'ict_director_status' => $validatedData['dict_status'], // Set the new ict_director_status column
-                'dict_name' => $currentUser->name, // Always use authenticated user's name
-                'dict_approved_by' => $currentUser->id,
-                'dict_approved_by_name' => $currentUser->name,
-                'dict_approved_at' => now(),
-                'updated_at' => now()
-            ];
             
-            // Store comments in appropriate field based on decision
-            if ($validatedData['dict_status'] === 'rejected') {
-                // For rejections, store in the rejection_reasons field
-                $updateData['ict_director_rejection_reasons'] = $validatedData['dict_comments'] ?? '';
-                $updateData['dict_comments'] = null; // Clear comments field for rejections
-                $updateData['ict_director_comments'] = null; // Clear ICT director comments field
+            if ($isHeadOfIT) {
+                // Head of IT approval logic
+                $approvalStatus = $validatedData['head_it_status'];
+                $updateData = [
+                    'head_it_status' => $approvalStatus,
+                    'head_it_name' => $currentUser->name,
+                    'head_it_approved_at' => now(),
+                    'updated_at' => now()
+                ];
+                
+                if ($approvalStatus === 'approved') {
+                    $updateData['status'] = 'head_it_approved';
+                    $updateData['head_it_comments'] = $validatedData['head_it_comments'] ?? '';
+                    // Advance to ICT Officer for implementation
+                    $updateData['ict_officer_status'] = 'pending';
+                } else {
+                    $updateData['status'] = 'head_it_rejected';
+                    // Store rejection reasons for Head of IT
+                    $updateData['head_it_comments'] = $validatedData['head_it_comments'] ?? '';
+                }
+                
             } else {
-                // For approvals/recommendations, store in comments fields
-                $updateData['dict_comments'] = $validatedData['dict_comments'] ?? '';
-                $updateData['ict_director_comments'] = $validatedData['dict_comments'] ?? '';
-                $updateData['ict_director_rejection_reasons'] = null; // Clear rejection reasons for approvals
+                // ICT Director approval logic
+                $approvalStatus = $validatedData['dict_status'];
+                $updateData = [
+                    'status' => $approvalStatus === 'approved' ? 'dict_approved' : 'dict_rejected',
+                    'ict_director_status' => $approvalStatus,
+                    'dict_name' => $currentUser->name,
+                    'dict_approved_by' => $currentUser->id,
+                    'dict_approved_by_name' => $currentUser->name,
+                    'dict_approved_at' => now(),
+                    'updated_at' => now()
+                ];
+                
+                if ($approvalStatus === 'rejected') {
+                    $updateData['ict_director_rejection_reasons'] = $validatedData['dict_comments'] ?? '';
+                    $updateData['dict_comments'] = null;
+                    $updateData['ict_director_comments'] = null;
+                } else {
+                    $updateData['dict_comments'] = $validatedData['dict_comments'] ?? '';
+                    $updateData['ict_director_comments'] = $validatedData['dict_comments'] ?? '';
+                    $updateData['ict_director_rejection_reasons'] = null;
+                    
+                    // CRITICAL: When ICT Director approves, advance workflow to Head of IT
+                    $updateData['head_it_status'] = 'pending';
+                }
             }
 
             $userAccessRequest->update($updateData);
 
             DB::commit();
 
-            Log::info('ICT Director Combined Access: Approval updated successfully', [
+            $roleName = $isHeadOfIT ? 'Head of IT' : 'ICT Director';
+            $statusKey = $isHeadOfIT ? 'head_it_status' : 'dict_status';
+            $statusValue = $isHeadOfIT ? $validatedData['head_it_status'] : $validatedData['dict_status'];
+            
+            Log::info($roleName . ' Combined Access: Approval updated successfully', [
                 'request_id' => $id,
-                'status' => $validatedData['dict_status']
+                'role' => $isHeadOfIT ? 'head_of_it' : 'ict_director',
+                'status' => $statusValue
             ]);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Request approval updated successfully',
+                'message' => $roleName . ' approval updated successfully',
                 'data' => $this->transformRequestData($userAccessRequest->fresh())
             ]);
 
@@ -425,6 +567,20 @@ class DictCombinedAccessController extends Controller
      */
     private function transformRequestData($request): array
     {
+        $user = auth()->user();
+        $isHeadOfIT = $user->hasRole('head_of_it');
+        
+        // Determine which status to show based on user role
+        if ($isHeadOfIT) {
+            $relevantStatus = $request->head_it_status ?? 'pending';
+            $mappedStatus = $this->mapStatusForHeadOfIT($relevantStatus);
+            $displayName = $this->getStatusDisplayNameForHeadOfIT($relevantStatus);
+        } else {
+            $relevantStatus = $request->ict_director_status ?? $request->status;
+            $mappedStatus = $this->mapStatusForICTDirector($relevantStatus);
+            $displayName = $this->getStatusDisplayName($relevantStatus);
+        }
+        
         return [
             'id' => $request->id,
             'request_id' => 'REQ-' . str_pad($request->id, 6, '0', STR_PAD_LEFT),
@@ -448,9 +604,9 @@ class DictCombinedAccessController extends Controller
             'access_type' => $request->access_type,
             'temporary_until' => $request->temporary_until?->format('Y-m-d'),
             
-            'status' => $this->mapStatusForICTDirector($request->ict_director_status ?? $request->status),
-            'dict_status' => $request->ict_director_status, // Direct access to new status column
-            'status_display' => $this->getStatusDisplayName($request->ict_director_status ?? $request->status),
+            'status' => $mappedStatus,
+            'dict_status' => $isHeadOfIT ? $request->head_it_status : $request->ict_director_status, // Role-appropriate status
+            'status_display' => $displayName,
             'raw_status' => $request->status, // Keep legacy status for debugging
             
             // New granular status columns
@@ -480,14 +636,77 @@ class DictCombinedAccessController extends Controller
             'ict_director_comments' => $request->ict_director_comments ?? '',
             'ict_director_rejection_reasons' => $request->ict_director_rejection_reasons ?? '',
             'dict_name' => $request->dict_name ?? '',
-            'dict_approved_at' => $request->dict_approved_at,
+            'dict_approved_at' => $request->ict_director_approved_at,
             
-            // Approval workflow status
+            // Head of IT approval info
+            'head_it_comments' => $request->head_it_comments ?? '',
+            'head_it_name' => $request->head_it_name ?? '',
+            'head_it_approved_at' => $request->head_it_approved_at,
+            
+            // Approval workflow status with visual indicators
             'hod_approval_status' => $this->getApprovalStatus($request, 'hod'),
             'divisional_approval_status' => $this->getApprovalStatus($request, 'divisional'),
             'dict_approval_status' => $this->getApprovalStatus($request, 'dict'),
             'head_it_approval_status' => $this->getApprovalStatus($request, 'head_it'),
             'ict_approval_status' => $this->getApprovalStatus($request, 'ict'),
+            
+            // Complete approval information with signature status indicators
+            'approvals' => [
+                'hod' => array_merge([
+                    'name' => $request->hod_name,
+                    'signature' => $request->hod_signature_path ?? null,
+                    'signature_url' => $request->hod_signature_path ? storage_path('app/public/' . $request->hod_signature_path) : null,
+                    'date' => $request->hod_approved_at,
+                    'comments' => $request->hod_comments,
+                    'approved_by' => $request->hod_approved_by_name ?? null,
+                    'has_signature' => !empty($request->hod_signature_path),
+                    'is_approved' => !empty($request->hod_approved_at)
+                ], $this->formatSignatureStatus($request->hod_signature_path, $request->hod_approved_at, $request->hod_name, $request->hod_status)),
+                
+                'divisionalDirector' => array_merge([
+                    'name' => $request->divisional_director_name,
+                    'signature' => $request->divisional_director_signature_path ?? null,
+                    'signature_url' => $request->divisional_director_signature_path ? storage_path('app/public/' . $request->divisional_director_signature_path) : null,
+                    'date' => $request->divisional_approved_at,
+                    'comments' => $request->divisional_director_comments ?? $request->divisional_comments,
+                    'has_signature' => !empty($request->divisional_director_signature_path),
+                    'is_approved' => !empty($request->divisional_approved_at)
+                ], $this->formatSignatureStatus($request->divisional_director_signature_path, $request->divisional_approved_at, $request->divisional_director_name, $request->divisional_status)),
+                
+                'directorICT' => array_merge([
+                    'name' => $request->ict_director_name ?? $request->dict_name,
+                    'signature' => $request->ict_director_signature_path ?? null,
+                    'signature_url' => $request->ict_director_signature_path ? storage_path('app/public/' . $request->ict_director_signature_path) : null,
+                    'date' => $request->ict_director_approved_at ?? $request->dict_approved_at,
+                    'comments' => $request->ict_director_comments ?? $request->dict_comments,
+                    'has_signature' => !empty($request->ict_director_signature_path),
+                    'is_approved' => !empty($request->ict_director_approved_at ?? $request->dict_approved_at)
+                ], $this->formatSignatureStatus($request->ict_director_signature_path, $request->ict_director_approved_at ?? $request->dict_approved_at, $request->ict_director_name ?? $request->dict_name, $request->ict_director_status))
+            ],
+            
+            // Implementation data with visual status indicators
+            'implementation' => [
+                'headIT' => array_merge([
+                    'name' => $request->head_it_name,
+                    'signature' => $request->head_it_signature_path ?? null,
+                    'signature_url' => $request->head_it_signature_path ? storage_path('app/public/' . $request->head_it_signature_path) : null,
+                    'date' => $request->head_it_approved_at,
+                    'comments' => $request->head_it_comments,
+                    'has_signature' => !empty($request->head_it_signature_path),
+                    'is_approved' => !empty($request->head_it_approved_at)
+                ], $this->formatSignatureStatus($request->head_it_signature_path, $request->head_it_approved_at, $request->head_it_name, $request->head_it_status)),
+                
+                'ictOfficer' => array_merge([
+                    'name' => $request->ict_officer_name,
+                    'signature' => $request->ict_officer_signature_path ?? null,
+                    'signature_url' => $request->ict_officer_signature_path ? storage_path('app/public/' . $request->ict_officer_signature_path) : null,
+                    'date' => $request->ict_officer_implemented_at,
+                    'comments' => $request->ict_officer_comments,
+                    'implementation_comments' => $request->implementation_comments,
+                    'has_signature' => !empty($request->ict_officer_signature_path),
+                    'is_implemented' => !empty($request->ict_officer_implemented_at)
+                ], $this->formatSignatureStatus($request->ict_officer_signature_path, $request->ict_officer_implemented_at, $request->ict_officer_name, $request->ict_officer_status))
+            ],
         ];
     }
 
@@ -510,6 +729,24 @@ class DictCombinedAccessController extends Controller
     }
     
     /**
+     * Map database status to Head of IT perspective using new granular status columns
+     */
+    private function mapStatusForHeadOfIT($headItStatus): string
+    {
+        // Map the granular Head of IT status to frontend-friendly values
+        switch ($headItStatus) {
+            case 'pending':
+                return 'pending'; // Pending Head of IT approval
+            case 'approved':
+                return 'approved'; // Approved by Head of IT
+            case 'rejected':
+                return 'rejected'; // Rejected by Head of IT
+            default:
+                return $headItStatus ?: 'pending'; // Default to pending if null
+        }
+    }
+    
+    /**
      * Get user-friendly status display name using new granular status columns
      */
     private function getStatusDisplayName($ictDirectorStatus): string
@@ -527,6 +764,27 @@ class DictCombinedAccessController extends Controller
                 return 'Cancelled';
             default:
                 return ucwords(str_replace('_', ' ', $ictDirectorStatus ?: 'pending'));
+        }
+    }
+    
+    /**
+     * Get user-friendly status display name for Head of IT using new granular status columns
+     */
+    private function getStatusDisplayNameForHeadOfIT($headItStatus): string
+    {
+        switch ($headItStatus) {
+            case 'pending':
+                return 'Pending Head of IT Approval';
+            case 'approved':
+                return 'Approved by Head of IT';
+            case 'rejected':
+                return 'Rejected by Head of IT';
+            case 'implemented':
+                return 'Implemented';
+            case 'cancelled':
+                return 'Cancelled';
+            default:
+                return ucwords(str_replace('_', ' ', $headItStatus ?: 'pending'));
         }
     }
 

@@ -132,9 +132,9 @@ const routes = [
     }
   },
   {
-    path: '/head-it-dashboard',
-    name: 'HeadItDashboard',
-    component: () => import('../components/IctDashboard.vue'),
+    path: '/head_of_it-dashboard',
+    name: 'HeadOfItDashboard',
+    component: () => import('../components/HeadOfItDashboard.vue'),
     meta: {
       requiresAuth: true,
       roles: [ROLES.HEAD_OF_IT]
@@ -466,6 +466,72 @@ const routes = [
       requiresAuth: true,
       roles: [ROLES.ICT_DIRECTOR],
       refreshOnEnter: true // Force refresh when entering this route
+    }
+  },
+
+  // Head of IT Combined Access Requests List
+  {
+    path: '/head_of_it-dashboard/combined-requests',
+    name: 'HeadOfItCombinedRequestList',
+    component: () =>
+      import(
+        /* webpackChunkName: "head-of-it" */ '../components/views/head-of-it/HeadOfItRequestList.vue'
+      ),
+    meta: {
+      requiresAuth: true,
+      roles: [ROLES.HEAD_OF_IT],
+      refreshOnEnter: true // Force refresh when entering this route
+    }
+  },
+
+  // Head of IT Process Request
+  {
+    path: '/head_of_it-dashboard/process-request/:id',
+    name: 'HeadOfItProcessRequest',
+    component: () =>
+      import(
+        /* webpackChunkName: "head-of-it" */ '../components/views/head-of-it/ProcessRequest.vue'
+      ),
+    meta: {
+      requiresAuth: true,
+      roles: [ROLES.HEAD_OF_IT]
+    }
+  },
+
+  // Head of IT Select ICT Officer
+  {
+    path: '/head_of_it-dashboard/select-ict-officer/:id',
+    name: 'HeadOfItSelectIctOfficer',
+    component: () =>
+      import(
+        /* webpackChunkName: "head-of-it" */ '../components/views/head-of-it/SelectIctOfficer.vue'
+      ),
+    meta: {
+      requiresAuth: true,
+      roles: [ROLES.HEAD_OF_IT]
+    }
+  },
+
+  // Head of IT Review Form (redirects to both-service-form for Head of IT review)
+  {
+    path: '/head_of_it-dashboard/both-service-form/:id',
+    name: 'HeadOfItBothServiceFormReview',
+    component: () => import('../components/views/forms/both-service-form.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: [ROLES.HEAD_OF_IT]
+    }
+  },
+
+  // Head of IT Debug (temporary)
+  {
+    path: '/debug/head-of-it',
+    name: 'HeadOfItDebug',
+    component: () =>
+      import(/* webpackChunkName: "debug" */ '../components/debug/HeadOfItDebug.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: [ROLES.HEAD_OF_IT, ROLES.ADMIN]
     }
   },
 

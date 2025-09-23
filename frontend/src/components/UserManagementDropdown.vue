@@ -257,9 +257,9 @@
 
   export default {
     name: 'UserManagementDropdown',
-    components: { 
+    components: {
       DataTable,
-      OrbitingDots 
+      OrbitingDots
     },
     props: {
       defaultOpen: { type: Boolean, default: false }

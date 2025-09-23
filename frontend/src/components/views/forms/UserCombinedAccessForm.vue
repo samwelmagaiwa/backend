@@ -67,13 +67,13 @@
               <!-- Center Content -->
               <div class="text-center flex-1">
                 <h1
-                  class="text-xl font-bold text-white mb-2 tracking-wide drop-shadow-lg animate-fade-in"
+                  class="text-2xl font-bold text-white mb-2 tracking-wide drop-shadow-lg animate-fade-in"
                 >
                   MUHIMBILI NATIONAL HOSPITAL
                 </h1>
                 <div class="relative inline-block mb-2">
                   <div
-                    class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2 rounded-full text-base font-bold shadow-2xl transform hover:scale-105 transition-all duration-300 border-2 border-blue-400/60"
+                    class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2 rounded-full text-lg font-bold shadow-2xl transform hover:scale-105 transition-all duration-300 border-2 border-blue-400/60"
                   >
                     <span class="relative z-10 flex items-center gap-2">
                       <i :class="isEditMode ? 'fas fa-edit' : 'fas fa-layer-group'"></i>
@@ -85,7 +85,7 @@
                   </div>
                 </div>
                 <h2
-                  class="text-base font-bold text-blue-100 tracking-wide drop-shadow-md animate-fade-in-delay"
+                  class="text-lg font-bold text-blue-100 tracking-wide drop-shadow-md animate-fade-in-delay"
                 >
                   {{ isEditMode ? 'MODIFY AND RESUBMIT REQUEST' : 'COMPREHENSIVE SYSTEM ACCESS' }}
                 </h2>
@@ -142,7 +142,7 @@
                       ></div>
                     </div>
                     <div class="flex-1">
-                      <h3 class="text-lg font-bold text-white flex items-center">
+                      <h3 class="text-xl font-bold text-white flex items-center">
                         <i class="fas fa-id-card mr-2 text-blue-300"></i>
                         Applicant Details
                       </h3>
@@ -185,9 +185,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <!-- PF Number -->
                       <div class="group">
-                        <label
-                          class="block text-base font-bold text-blue-100 mb-2 flex items-center"
-                        >
+                        <label class="block text-lg font-bold text-blue-100 mb-2 flex items-center">
                           <i class="fas fa-id-badge mr-2 text-blue-300"></i>
                           PF Number <span class="text-red-400 ml-1">*</span>
                         </label>
@@ -224,9 +222,7 @@
 
                       <!-- Staff Name -->
                       <div class="group">
-                        <label
-                          class="block text-base font-bold text-blue-100 mb-2 flex items-center"
-                        >
+                        <label class="block text-lg font-bold text-blue-100 mb-2 flex items-center">
                           <i class="fas fa-user mr-2 text-blue-300"></i>
                           Staff Name <span class="text-red-400 ml-1">*</span>
                         </label>
@@ -266,9 +262,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <!-- Phone Number -->
                       <div class="group">
-                        <label
-                          class="block text-base font-bold text-blue-100 mb-2 flex items-center"
-                        >
+                        <label class="block text-lg font-bold text-blue-100 mb-2 flex items-center">
                           <i class="fas fa-phone mr-2 text-blue-300"></i>
                           Phone Number <span class="text-red-400 ml-1">*</span>
                         </label>
@@ -305,9 +299,7 @@
 
                       <!-- Department -->
                       <div class="group">
-                        <label
-                          class="block text-base font-bold text-blue-100 mb-2 flex items-center"
-                        >
+                        <label class="block text-lg font-bold text-blue-100 mb-2 flex items-center">
                           <i class="fas fa-building mr-2 text-blue-300"></i>
                           Department <span class="text-red-400 ml-1">*</span>
                         </label>
@@ -350,13 +342,11 @@
                       class="bg-gradient-to-r from-blue-500/10 to-blue-500/10 p-3 rounded-lg border border-blue-300/20 backdrop-blur-sm"
                     >
                       <div class="group">
-                        <label
-                          class="block text-base font-bold text-blue-100 mb-2 flex items-center"
-                        >
+                        <label class="block text-lg font-bold text-blue-100 mb-2 flex items-center">
                           <i class="fas fa-signature mr-2 text-blue-300"></i>
                           Digital Signature
                           <span class="text-red-400 ml-1">*</span>
-                          <span class="ml-2 text-sm text-blue-300/70 font-normal"
+                          <span class="ml-2 text-base text-blue-300/70 font-normal"
                             >(PNG, JPG, JPEG)</span
                           >
                         </label>
@@ -459,11 +449,11 @@
                       ></div>
                     </div>
                     <div>
-                      <h3 class="text-lg font-bold text-white flex items-center">
+                      <h3 class="text-xl font-bold text-white flex items-center">
                         <i class="fas fa-cogs mr-2 text-blue-300"></i>
                         Select Services
                       </h3>
-                      <p class="text-sm text-blue-100/80">
+                      <p class="text-base text-blue-100/80">
                         Choose which services you need access to
                       </p>
                     </div>
@@ -513,8 +503,8 @@
                                 <i class="fas fa-file-medical text-lg relative z-10"></i>
                               </div>
                               <div>
-                                <h4 class="font-bold text-white text-base">Jeeva Access</h4>
-                                <p class="text-xs text-blue-200/80">Medical records system</p>
+                                <h4 class="font-bold text-white text-lg">Jeeva Access</h4>
+                                <p class="text-sm text-blue-200/80">Medical records system</p>
                               </div>
                             </div>
                             <div
@@ -534,11 +524,11 @@
 
                           <!-- Service Features -->
                           <div class="space-y-1">
-                            <div class="flex items-center text-xs text-blue-100/70">
+                            <div class="flex items-center text-sm text-blue-100/70">
                               <i class="fas fa-check-circle mr-1 text-blue-400"></i>
                               Patient Records
                             </div>
-                            <div class="flex items-center text-xs text-blue-100/70">
+                            <div class="flex items-center text-sm text-blue-100/70">
                               <i class="fas fa-check-circle mr-1 text-blue-400"></i>
                               Medical History
                             </div>
@@ -590,8 +580,8 @@
                                 <i class="fas fa-laptop-medical text-lg relative z-10"></i>
                               </div>
                               <div>
-                                <h4 class="font-bold text-white text-base">Wellsoft Access</h4>
-                                <p class="text-xs text-blue-200/80">Hospital management</p>
+                                <h4 class="font-bold text-white text-lg">Wellsoft Access</h4>
+                                <p class="text-sm text-blue-200/80">Hospital management</p>
                               </div>
                             </div>
                             <div
@@ -611,11 +601,11 @@
 
                           <!-- Service Features -->
                           <div class="space-y-1">
-                            <div class="flex items-center text-xs text-blue-100/70">
+                            <div class="flex items-center text-sm text-blue-100/70">
                               <i class="fas fa-check-circle mr-1 text-blue-400"></i>
                               Patient Management
                             </div>
-                            <div class="flex items-center text-xs text-blue-100/70">
+                            <div class="flex items-center text-sm text-blue-100/70">
                               <i class="fas fa-check-circle mr-1 text-blue-400"></i>
                               Hospital Operations
                             </div>
@@ -667,8 +657,8 @@
                                 <i class="fas fa-wifi text-lg relative z-10"></i>
                               </div>
                               <div>
-                                <h4 class="font-bold text-white text-base">Internet Access</h4>
-                                <p class="text-xs text-blue-200/80">Internet connectivity</p>
+                                <h4 class="font-bold text-white text-lg">Internet Access</h4>
+                                <p class="text-sm text-blue-200/80">Internet connectivity</p>
                               </div>
                             </div>
                             <div
@@ -688,11 +678,11 @@
 
                           <!-- Service Features -->
                           <div class="space-y-1">
-                            <div class="flex items-center text-xs text-blue-100/70">
+                            <div class="flex items-center text-sm text-blue-100/70">
                               <i class="fas fa-check-circle mr-1 text-blue-400"></i>
                               Web Access
                             </div>
-                            <div class="flex items-center text-xs text-blue-100/70">
+                            <div class="flex items-center text-sm text-blue-100/70">
                               <i class="fas fa-check-circle mr-1 text-blue-400"></i>
                               Email & Communication
                             </div>
@@ -745,11 +735,11 @@
                       ></div>
                     </div>
                     <div>
-                      <h3 class="text-lg font-bold text-white flex items-center">
+                      <h3 class="text-xl font-bold text-white flex items-center">
                         <i class="fas fa-globe mr-2 text-blue-300"></i>
                         Internet Purpose
                       </h3>
-                      <p class="text-sm text-blue-100/80">
+                      <p class="text-base text-blue-100/80">
                         Specify the purposes for internet access
                       </p>
                     </div>
@@ -774,7 +764,7 @@
                         :required="index === 0 && formData.services.internet"
                       />
                     </div>
-                    <p class="text-xs text-blue-200 mt-2 italic">
+                    <p class="text-sm text-blue-200 mt-2 italic">
                       <i class="fas fa-info-circle mr-1"></i>
                       Please provide at least one purpose for internet access. You can add up to 4
                       purposes.
@@ -803,7 +793,7 @@
                     <button
                       type="button"
                       @click="goBack"
-                      class="px-5 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-all duration-300 font-semibold flex items-center shadow-lg hover:shadow-xl text-sm transform hover:scale-105"
+                      class="px-5 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-all duration-300 font-semibold flex items-center shadow-lg hover:shadow-xl text-base transform hover:scale-105"
                     >
                       <i class="fas fa-arrow-left mr-2"></i>
                       Back to Dashboard
@@ -811,7 +801,7 @@
                     <button
                       type="submit"
                       :disabled="isSubmitting || !hasSelectedService"
-                      class="px-5 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-semibold flex items-center shadow-lg hover:shadow-xl text-sm transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                      class="px-5 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-semibold flex items-center shadow-lg hover:shadow-xl text-base transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                     >
                       <OrbitingDots v-if="isSubmitting" size="sm" class="mr-2" />
                       <i

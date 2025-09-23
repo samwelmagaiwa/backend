@@ -341,4 +341,110 @@ class User extends Authenticatable
     {
         return $this->department?->getFullNameAttribute();
     }
+
+    /**
+     * Task assignments assigned to this user (as ICT Officer)
+     */
+    public function taskAssignments()
+    {
+        return $this->hasMany(TaskAssignment::class, 'assigned_to');
+    }
+
+    /**
+     * Task assignments created by this user (as Head of IT)
+     */
+    public function createdTaskAssignments()
+    {
+        return $this->hasMany(TaskAssignment::class, 'assigned_by');
+    }
+
+    /**
+     * Current active task assignments for this user
+     */
+    public function currentTaskAssignments()
+    {
+        return $this->hasMany(TaskAssignment::class, 'assigned_to')
+            ->whereIn('status', ['assigned', 'in_progress']);
+    }
+
+    /**
+     * Get access requests assigned to this ICT Officer
+     */
+    public function assignedAccessRequests()
+    {
+        return $this->hasMany(UserCombinedAccessRequest::class, 'assigned_ict_officer_id');
+    }
+
+    /**
+     * Access requests approved by this user as Head of IT
+     */
+    public function approvedAccessRequests()
+    {
+        return $this->hasMany(UserCombinedAccessRequest::class, 'head_of_it_approved_by');
+    }
+
+    /**
+     * Access requests rejected by this user as Head of IT
+     */
+    public function rejectedAccessRequests()
+    {
+        return $this->hasMany(UserCombinedAccessRequest::class, 'head_of_it_rejected_by');
+    }
+
+    /**
+     * Check if user is ICT Officer
+     */
+    public function isIctOfficer(): bool
+    {
+        return $this->hasRole('ict_officer');
+    }
+
+    /**
+     * Check if user is Head of IT
+     */
+    public function isHeadOfIt(): bool
+    {
+        return $this->hasRole('head_of_it');
+    }
+
+    /**
+     * Get user's current workload (number of active task assignments)
+     */
+    public function getCurrentWorkload(): int
+    {
+        return $this->currentTaskAssignments()->count();
+    }
+
+    /**
+     * Check if ICT Officer is available for new task assignments
+     */
+    public function isAvailableForTasks(): bool
+    {
+        if (!$this->isIctOfficer()) {
+            return false;
+        }
+
+        // Available if has less than 3 active assignments
+        return $this->getCurrentWorkload() < 3;
+    }
+
+    /**
+     * Get ICT Officer availability status
+     */
+    public function getAvailabilityStatus(): string
+    {
+        if (!$this->isIctOfficer()) {
+            return 'Not ICT Officer';
+        }
+
+        $workload = $this->getCurrentWorkload();
+        
+        if ($workload === 0) {
+            return 'Available';
+        } elseif ($workload < 3) {
+            return 'Assigned';
+        } else {
+            return 'Busy';
+        }
+    }
 }

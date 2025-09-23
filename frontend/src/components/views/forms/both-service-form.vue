@@ -10,9 +10,9 @@
             ? 'p-1'
             : isDivisionalDirectorUser
               ? 'p-1'
-              : isHodApprovalEditable
+            : isHodApprovalEditable
                 ? 'p-1'
-                : 'p-3'
+                : 'p-1'
         ]"
       >
         <!-- Medical Background Pattern -->
@@ -75,7 +75,7 @@
                     ? 'p-1.5 mb-0'
                     : isHodApprovalEditable
                       ? 'p-1 mb-0'
-                      : 'p-4 mb-0'
+                      : 'p-1 mb-0'
             ]"
           >
             <div class="flex justify-between items-center">
@@ -91,7 +91,7 @@
                         ? 'w-12 h-12'
                         : isHodApprovalEditable
                           ? 'w-12 h-12'
-                          : 'w-20 h-20'
+                          : 'w-14 h-14'
                 ]"
               >
                 <div
@@ -109,7 +109,7 @@
                             ? 'max-w-10 max-h-10'
                             : isHodApprovalEditable
                               ? 'max-w-10 max-h-10'
-                              : 'max-w-18 max-h-18'
+                              : 'max-w-12 max-h-12'
                     "
                     class="object-contain"
                   />
@@ -129,7 +129,7 @@
                           ? 'mb-0.5'
                           : isHodApprovalEditable
                             ? 'mb-0.5'
-                            : 'mb-2'
+                            : 'mb-1'
                   "
                 >
                   MUHIMBILI NATIONAL HOSPITAL
@@ -145,7 +145,7 @@
                           ? 'mb-1'
                           : isHodApprovalEditable
                             ? 'mb-1'
-                            : 'mb-4'
+                            : 'mb-1'
                   ]"
                 >
                   <div
@@ -159,7 +159,7 @@
                             ? 'px-3 py-0.5'
                             : isHodApprovalEditable
                               ? 'px-4 py-1'
-                              : 'px-6 py-2'
+                              : 'px-4 py-1'
                     ]"
                   >
                     <span class="relative z-10 flex items-center gap-2">
@@ -190,7 +190,7 @@
                         ? 'w-12 h-12'
                         : isHodApprovalEditable
                           ? 'w-12 h-12'
-                          : 'w-20 h-20'
+                          : 'w-14 h-14'
                 ]"
               >
                 <div
@@ -207,8 +207,8 @@
                           : isIctDirectorUser
                             ? 'max-w-10 max-h-10'
                             : isHodApprovalEditable
-                              ? 'max-w-10 max-h-10'
-                              : 'max-w-18 max-h-18'
+                          ? 'max-w-10 max-h-10'
+                          : 'max-w-12 max-h-12'
                     "
                     class="object-contain"
                   />
@@ -230,7 +230,7 @@
                       ? 'p-1.5 space-y-1.5'
                       : isHodApprovalEditable
                         ? 'p-1.5 space-y-1.5'
-                        : 'p-4 space-y-4',
+                        : 'p-0.5 space-y-0.5',
                 { 'review-mode': isReviewMode }
               ]"
             >
@@ -245,7 +245,7 @@
                         ? 'gap-2'
                         : isHodApprovalEditable
                           ? 'gap-2'
-                          : 'gap-6'
+                          : 'gap-1'
                 ]"
               >
                 <!-- Left: shared + selectors -->
@@ -261,7 +261,7 @@
                           ? 'space-y-1'
                           : isHodApprovalEditable
                             ? 'space-y-1'
-                            : 'space-y-2'
+                            : 'space-y-0.5'
                   ]"
                 >
                   <!-- Personal Information Section -->
@@ -276,7 +276,7 @@
                             ? 'p-1'
                             : isHodApprovalEditable
                               ? 'p-1'
-                              : 'p-2'
+                              : 'p-0.5'
                     ]"
                   >
                     <div
@@ -288,7 +288,7 @@
                             ? 'mb-1'
                             : isHodApprovalEditable
                               ? 'mb-1'
-                              : 'mb-2'
+                              : 'mb-0.5'
                       ]"
                     >
                       <div
@@ -308,7 +308,7 @@
                           ? 'gap-2'
                           : isHodApprovalEditable
                             ? 'gap-3'
-                            : 'gap-4'
+                            : 'gap-1'
                       ]"
                     >
                       <div>
@@ -397,7 +397,7 @@
                         </div>
                       </div>
                       <div class="md:col-span-2 lg:col-span-4">
-                        <label class="block text-xs font-bold text-blue-100 mb-2 text-center">
+                        <label class="block text-xs font-bold text-blue-100 mb-1 text-center">
                           Signature <span class="text-red-400">*</span>
                         </label>
                         <div
@@ -414,8 +414,8 @@
                               isReviewMode && isIctDirectorUser
                                 ? 'min-h-[30px]'
                                 : isDivisionalDirectorUser || isIctDirectorUser
-                                  ? 'min-h-[40px]'
-                                  : 'min-h-[60px]'
+                                  ? 'min-h-[35px]'
+                                  : 'min-h-[35px]'
                             ]"
                           >
                             <!-- Loading state -->
@@ -455,8 +455,8 @@
                               isReviewMode && isIctDirectorUser
                                 ? 'min-h-[30px]'
                                 : isDivisionalDirectorUser || isIctDirectorUser
-                                  ? 'min-h-[40px]'
-                                  : 'min-h-[60px]'
+                                  ? 'min-h-[35px]'
+                                  : 'min-h-[35px]'
                             ]"
                           >
                             <div class="text-center">
@@ -483,8 +483,8 @@
                               isReviewMode && isIctDirectorUser
                                 ? 'min-h-[30px]'
                                 : isDivisionalDirectorUser || isIctDirectorUser
-                                  ? 'min-h-[40px]'
-                                  : 'min-h-[60px]'
+                                  ? 'min-h-[35px]'
+                                  : 'min-h-[35px]'
                             ]"
                           >
                             <div v-if="isImage(signaturePreview)" class="text-center">
@@ -499,7 +499,7 @@
                             </div>
                             <div v-else class="text-center">
                               <div
-                                class="w-16 h-16 bg-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-2"
+                                class="w-16 h-16 bg-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-1"
                               >
                                 <i class="fas fa-file-pdf text-red-400 text-2xl"></i>
                               </div>
@@ -554,7 +554,7 @@
                             : 'p-2'
                     ]"
                   >
-                    <div class="flex items-center space-x-2 mb-2">
+                    <div class="flex items-center space-x-2 mb-1">
                       <div
                         class="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
                       >
@@ -577,7 +577,7 @@
                         class="bg-white/10 rounded-lg p-2 border border-blue-300/30 backdrop-blur-sm"
                       >
                         <label
-                          class="block text-base font-bold text-blue-100 mb-2 text-center flex items-center justify-center gap-2"
+                          class="block text-base font-bold text-blue-100 mb-1 text-center flex items-center justify-center gap-2"
                         >
                           <i class="fas fa-toggle-on mr-1 text-blue-300 text-xs"></i>
                           Module Requested for
@@ -696,9 +696,9 @@
                     </div>
 
                     <!-- Wellsoft selector -->
-                    <div class="mb-6" :class="{ 'opacity-50': isWellsoftReadonly }">
+                    <div class="mb-1" :class="{ 'opacity-50': isWellsoftReadonly }">
                       <label
-                        class="block text-base font-bold text-blue-100 mb-3 flex items-center gap-2"
+                        class="block text-base font-bold text-blue-100 mb-1 flex items-center gap-2"
                       >
                         Wellsoft Modules <span class="text-red-400">*</span>
                         <span
@@ -709,7 +709,7 @@
                           Not Requested
                         </span>
                       </label>
-                      <div class="flex items-center justify-between mb-3">
+                      <div class="flex items-center justify-between mb-1">
                         <span
                           class="text-sm transition-all duration-300"
                           :class="{
@@ -741,7 +741,7 @@
                           </button>
                         </div>
                       </div>
-                      <div v-if="!isWellsoftReadonly" class="relative mb-2">
+                      <div v-if="!isWellsoftReadonly" class="relative mb-1">
                         <input
                           v-model.trim="wellsoftQuery"
                           class="medical-input w-full px-3 py-2 pl-8 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm text-sm"
@@ -753,7 +753,7 @@
                       </div>
 
                       <!-- Selected chips -->
-                      <div v-if="selectedWellsoft.length" class="flex flex-wrap gap-2 mb-4">
+                      <div v-if="selectedWellsoft.length" class="flex flex-wrap gap-1 mb-1">
                         <span
                           v-for="m in selectedWellsoft"
                           :key="'selW-' + m"
@@ -795,22 +795,22 @@
                         v-if="isWellsoftReadonly && selectedWellsoft.length === 0"
                         class="bg-gray-500/10 rounded-lg p-4 border border-gray-400/30 text-center"
                       >
-                        <i class="fas fa-info-circle text-gray-400 mb-2 text-lg"></i>
+                        <i class="fas fa-info-circle text-gray-400 mb-1 text-lg"></i>
                         <p class="text-gray-300 text-sm">No Wellsoft modules requested</p>
                       </div>
 
                       <!-- Options grid -->
                       <div
                         v-if="!isWellsoftReadonly"
-                        class="bg-white/10 rounded-lg p-3 max-h-40 border border-blue-300/30 overflow-y-auto backdrop-blur-sm"
+                        class="bg-white/10 rounded-lg p-2 max-h-32 border border-blue-300/30 overflow-y-auto backdrop-blur-sm"
                       >
                         <div
-                          class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-3"
+                          class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-1"
                         >
                           <label
                             v-for="m in filteredWellsoft"
                             :key="'optW-' + m"
-                            class="flex items-center p-2 hover:bg-blue-500/20 rounded-lg cursor-pointer transition-colors border border-blue-400/20"
+                            class="flex items-center p-1 hover:bg-blue-500/20 rounded-lg cursor-pointer transition-colors border border-blue-400/20"
                           >
                             <input
                               type="checkbox"
@@ -825,9 +825,9 @@
                     </div>
 
                     <!-- Jeeva selector -->
-                    <div class="mb-6" :class="{ 'opacity-50': isJeevaReadonly }">
+                    <div class="mb-1" :class="{ 'opacity-50': isJeevaReadonly }">
                       <label
-                        class="block text-base font-bold text-blue-100 mb-3 flex items-center gap-2"
+                        class="block text-base font-bold text-blue-100 mb-1 flex items-center gap-2"
                       >
                         Jeeva Modules <span class="text-red-400">*</span>
                         <span
@@ -838,7 +838,7 @@
                           Not Requested
                         </span>
                       </label>
-                      <div class="flex items-center justify-between mb-3">
+                      <div class="flex items-center justify-between mb-1">
                         <span
                           class="text-sm transition-all duration-300"
                           :class="{
@@ -870,7 +870,7 @@
                           </button>
                         </div>
                       </div>
-                      <div v-if="!isJeevaReadonly" class="relative mb-2">
+                      <div v-if="!isJeevaReadonly" class="relative mb-1">
                         <input
                           v-model.trim="jeevaQuery"
                           class="medical-input w-full px-3 py-2 pl-8 bg-white/15 border border-blue-300/30 rounded-lg focus:border-cyan-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm text-sm"
@@ -881,7 +881,7 @@
                         ></i>
                       </div>
 
-                      <div v-if="selectedJeeva.length" class="flex flex-wrap gap-2 mb-4">
+                      <div v-if="selectedJeeva.length" class="flex flex-wrap gap-1 mb-1">
                         <span
                           v-for="m in selectedJeeva"
                           :key="'selJ-' + m"
@@ -923,7 +923,7 @@
                         v-if="isJeevaReadonly && selectedJeeva.length === 0"
                         class="bg-gray-500/10 rounded-lg p-4 border border-gray-400/30 text-center"
                       >
-                        <i class="fas fa-info-circle text-gray-400 mb-2 text-lg"></i>
+                        <i class="fas fa-info-circle text-gray-400 mb-1 text-lg"></i>
                         <p class="text-gray-300 text-sm">No Jeeva modules requested</p>
                       </div>
 
@@ -952,9 +952,9 @@
                     </div>
 
                     <!-- Internet selector -->
-                    <div class="mb-6" :class="{ 'opacity-50': isInternetReadonly }">
+                    <div class="mb-1" :class="{ 'opacity-50': isInternetReadonly }">
                       <label
-                        class="block text-base font-bold text-blue-100 mb-3 flex items-center gap-2"
+                        class="block text-base font-bold text-blue-100 mb-1 flex items-center gap-2"
                       >
                         Internet Purpose <span class="text-red-400">*</span>
                         <span
@@ -971,7 +971,7 @@
                         v-if="isInternetReadonly && !internetPurposes.some((p) => p.trim())"
                         class="bg-gray-500/10 rounded-lg p-4 border border-gray-400/30 text-center"
                       >
-                        <i class="fas fa-info-circle text-gray-400 mb-2 text-lg"></i>
+                        <i class="fas fa-info-circle text-gray-400 mb-1 text-lg"></i>
                         <p class="text-gray-300 text-sm">No internet access purposes requested</p>
                       </div>
 
@@ -1019,10 +1019,10 @@
                           ? 'p-1'
                           : isHodApprovalEditable
                             ? 'p-1.5'
-                            : 'p-3'
+                            : 'p-1'
                     ]"
                   >
-                    <div class="flex items-center space-x-2 mb-3">
+                    <div class="flex items-center space-x-2 mb-1">
                       <div
                         class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
                       >
@@ -1041,19 +1041,19 @@
                           ? 'gap-3'
                           : isHodApprovalEditable
                             ? 'gap-4'
-                            : 'gap-6'
+                            : 'gap-1'
                       ]"
                     >
                       <!-- HoD/BM -->
                       <div
                         :class="[
                           'bg-white/15 rounded-lg border border-blue-300/30 backdrop-blur-sm',
-                          isDivisionalDirectorUser ? 'p-3' : isHodApprovalEditable ? 'p-3' : 'p-4',
+                          isDivisionalDirectorUser ? 'p-3' : isHodApprovalEditable ? 'p-3' : 'p-2',
                           { 'opacity-50': !isHodApprovalEditable }
                         ]"
                       >
                         <h5
-                          class="font-bold text-white mb-4 text-center text-sm flex items-center justify-center gap-2"
+                          class="font-bold text-white mb-1 text-center text-sm flex items-center justify-center gap-2"
                         >
                           <i class="fas fa-user-tie mr-2 text-blue-300"></i>
                           HoD/BM
@@ -1074,7 +1074,7 @@
                         </h5>
                         <div class="space-y-3">
                           <div>
-                            <label class="block text-base font-medium text-blue-100 mb-2"
+                            <label class="block text-base font-medium text-blue-100 mb-1"
                               >Name<span class="text-red-400">*</span></label
                             >
                             <div class="relative">
@@ -1095,7 +1095,7 @@
                             </div>
                           </div>
                           <div>
-                            <label class="block text-base font-medium text-blue-100 mb-2"
+                            <label class="block text-base font-medium text-blue-100 mb-1"
                               >Signature<span class="text-red-400">*</span></label
                             >
                             <div class="relative">
@@ -1106,7 +1106,7 @@
                               <div
                                 v-if="shouldShowHodSignedIndicator"
                                 :class="[
-                                  'w-full px-3 py-3 rounded-xl backdrop-blur-sm transition-all duration-300 min-h-[70px] flex items-center justify-center relative',
+                                  'w-full px-3 py-2 rounded-xl backdrop-blur-sm transition-all duration-300 min-h-[35px] flex items-center justify-center relative',
                                   'border-2 border-green-400/50 bg-green-500/10 shadow-lg',
                                   isIctDirectorApprovalActive
                                     ? 'ring-1 ring-green-300/40 shadow-xl'
@@ -1114,7 +1114,7 @@
                                 ]"
                               >
                                 <div class="text-center">
-                                  <div class="flex items-center justify-center space-x-2 mb-2">
+                                  <div class="flex items-center justify-center space-x-2 mb-1">
                                     <div
                                       class="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center"
                                     >
@@ -1156,10 +1156,10 @@
                               <!-- Default read-only indicator for next stage when HOD has not signed -->
                               <div
                                 v-else-if="shouldShowHodNoSignatureIndicator"
-                                class="w-full px-3 py-3 border-2 border-red-400/50 rounded-xl bg-red-500/10 backdrop-blur-sm transition-all duration-300 shadow-lg min-h-[70px] flex items-center justify-center"
+                                class="w-full px-3 py-2 border-2 border-red-400/50 rounded-xl bg-red-500/10 backdrop-blur-sm transition-all duration-300 shadow-lg min-h-[35px] flex items-center justify-center"
                               >
                                 <div class="text-center">
-                                  <div class="flex items-center justify-center space-x-2 mb-2">
+                                  <div class="flex items-center justify-center space-x-2 mb-1">
                                     <div
                                       class="w-8 h-8 bg-red-500/20 rounded-full flex items-center justify-center"
                                     >
@@ -1176,7 +1176,7 @@
                               <!-- Edit mode: Show uploaded signature preview -->
                               <div
                                 v-else-if="hodSignaturePreview && !isReviewMode"
-                                class="w-full px-2 py-2 border-2 border-blue-300/40 rounded-lg bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 min-h-[60px] flex items-center justify-center relative"
+                                class="w-full px-2 py-2 border-2 border-blue-300/40 rounded-lg bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 min-h-[35px] flex items-center justify-center relative"
                               >
                                 <div v-if="isImage(hodSignaturePreview)" class="text-center">
                                   <img
@@ -1225,13 +1225,72 @@
                               <!-- Default signature upload area (for HODs when they can edit) -->
                               <div
                                 v-else
-                                class="w-full px-3 py-2 border-2 border-dashed border-blue-300/40 rounded-lg focus-within:border-blue-400 bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 min-h-[50px] flex items-center justify-center hover:bg-white/20"
+                                class="w-full px-3 py-2 border-2 border-dashed border-blue-300/40 rounded-lg focus-within:border-blue-400 bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 min-h-[30px] flex items-center justify-center hover:bg-white/20"
                               >
-                                <div class="text-center">
-                                  <div class="mb-2">
-                                    <i class="fas fa-signature text-blue-300 text-lg mb-1"></i>
-                                    <p class="text-blue-100 text-xs">No signature uploaded</p>
+                                <!-- Display signature status with proper styling like others -->
+                                <div
+                                  :class="[
+                                    'w-full px-3 py-2 rounded-xl backdrop-blur-sm transition-all duration-300 min-h-[35px] flex items-center justify-center relative',
+                                    requestData?.approvals?.hod?.signature_status === 'Signed'
+                                      ? 'border-2 border-green-400/50 bg-green-500/10 shadow-lg'
+                                      : 'border-2 border-red-400/50 bg-red-500/10 shadow-lg'
+                                  ]"
+                                >
+                                  <div class="text-center">
+                                    <div class="flex items-center justify-center space-x-2 mb-1">
+                                      <div
+                                        :class="[
+                                          'w-8 h-8 rounded-full flex items-center justify-center',
+                                          requestData?.approvals?.hod?.signature_status === 'Signed'
+                                            ? 'bg-green-500/20'
+                                            : 'bg-red-500/20'
+                                        ]"
+                                      >
+                                        <i
+                                          :class="[
+                                            'text-sm',
+                                            requestData?.approvals?.hod?.signature_status ===
+                                            'Signed'
+                                              ? 'fas fa-check text-green-400'
+                                              : 'fas fa-times text-red-400'
+                                          ]"
+                                        ></i>
+                                      </div>
+                                      <span
+                                        :class="[
+                                          'text-sm font-semibold',
+                                          requestData?.approvals?.hod?.signature_status === 'Signed'
+                                            ? 'text-green-400'
+                                            : 'text-red-400'
+                                        ]"
+                                      >
+                                        {{
+                                          requestData?.approvals?.hod?.signature_display ||
+                                          'No signature'
+                                        }}
+                                      </span>
+                                    </div>
+                                    <!-- Optional: Show signature preview icon for signed status -->
+                                    <div
+                                      v-if="
+                                        requestData?.approvals?.hod?.signature_status === 'Signed'
+                                      "
+                                      class="absolute top-2 right-2"
+                                    >
+                                      <div
+                                        class="w-6 h-6 bg-green-500/30 rounded-full flex items-center justify-center"
+                                      >
+                                        <i
+                                          class="fas fa-signature text-green-400 text-xs"
+                                          title="Signature on file"
+                                        ></i>
+                                      </div>
+                                    </div>
                                   </div>
+                                </div>
+
+                                <!-- Keep upload button section for when user can edit -->
+                                <div class="text-center mt-2">
                                   <button
                                     v-if="isHodApprovalEditable"
                                     type="button"
@@ -1253,7 +1312,7 @@
                             </div>
                           </div>
                           <div>
-                            <label class="block text-base font-medium text-blue-100 mb-2"
+                            <label class="block text-base font-medium text-blue-100 mb-1"
                               >Date (mm/dd/yyyy)<span class="text-red-400">*</span></label
                             >
                             <div class="relative">
@@ -1303,7 +1362,7 @@
                         ]"
                       >
                         <h5
-                          class="font-bold text-white mb-4 text-center text-sm flex items-center justify-center gap-2"
+                          class="font-bold text-white mb-1 text-center text-sm flex items-center justify-center gap-2"
                         >
                           <i class="fas fa-user-circle mr-2 text-blue-300"></i>
                           Divisional Director
@@ -1348,7 +1407,7 @@
                         </h5>
                         <div class="space-y-3">
                           <div>
-                            <label class="block text-base font-medium text-blue-100 mb-2"
+                            <label class="block text-base font-medium text-blue-100 mb-1"
                               >Name<span class="text-red-400">*</span></label
                             >
                             <div class="relative">
@@ -1369,7 +1428,7 @@
                             </div>
                           </div>
                           <div>
-                            <label class="block text-base font-medium text-blue-100 mb-2"
+                            <label class="block text-base font-medium text-blue-100 mb-1"
                               >Signature<span class="text-red-400">*</span></label
                             >
                             <div class="relative">
@@ -1377,7 +1436,7 @@
                               <div
                                 v-if="shouldShowDivisionalSignedIndicator"
                                 :class="[
-                                  'w-full px-3 py-3 rounded-xl backdrop-blur-sm transition-all duration-300 min-h-[70px] flex items-center justify-center',
+                                  'w-full px-3 py-2 rounded-xl backdrop-blur-sm transition-all duration-300 min-h-[35px] flex items-center justify-center',
                                   'border-2 border-green-400/50 bg-green-500/10 shadow-lg',
                                   isIctDirectorApprovalActive
                                     ? 'ring-1 ring-green-300/40 shadow-xl'
@@ -1416,7 +1475,7 @@
                               <!-- Show Divisional Director missing signature indicator for ICT Director stage -->
                               <div
                                 v-else-if="shouldShowDivisionalNoSignatureIndicator"
-                                class="w-full px-3 py-3 border-2 border-red-400/50 rounded-xl bg-red-500/10 backdrop-blur-sm transition-all duration-300 shadow-lg min-h-[70px] flex items-center justify-center"
+                                class="w-full px-3 py-2 border-2 border-red-400/50 rounded-xl bg-red-500/10 backdrop-blur-sm transition-all duration-300 shadow-lg min-h-[35px] flex items-center justify-center"
                               >
                                 <div class="text-center">
                                   <div class="flex items-center justify-center space-x-2 mb-1">
@@ -1437,13 +1496,76 @@
 
                               <div
                                 v-else-if="!divDirectorSignaturePreview"
-                                class="w-full px-3 py-2 border-2 border-dashed border-blue-300/40 rounded-lg focus-within:border-blue-400 bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 min-h-[50px] flex items-center justify-center hover:bg-white/20"
+                                class="w-full px-3 py-2 border-2 border-dashed border-blue-300/40 rounded-lg focus-within:border-blue-400 bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 min-h-[30px] flex items-center justify-center hover:bg-white/20"
                               >
-                                <div class="text-center">
-                                  <div class="mb-2">
-                                    <i class="fas fa-signature text-blue-300 text-lg mb-1"></i>
-                                    <p class="text-blue-100 text-xs">No signature uploaded</p>
+                                <!-- Display signature status with proper styling like HOD -->
+                                <div
+                                  :class="[
+                                    'w-full px-3 py-2 rounded-xl backdrop-blur-sm transition-all duration-300 min-h-[35px] flex items-center justify-center relative',
+                                    requestData?.approvals?.divisionalDirector?.signature_status ===
+                                    'Signed'
+                                      ? 'border-2 border-green-400/50 bg-green-500/10 shadow-lg'
+                                      : 'border-2 border-red-400/50 bg-red-500/10 shadow-lg'
+                                  ]"
+                                >
+                                  <div class="text-center">
+                                    <div class="flex items-center justify-center space-x-2 mb-1">
+                                      <div
+                                        :class="[
+                                          'w-8 h-8 rounded-full flex items-center justify-center',
+                                          requestData?.approvals?.divisionalDirector
+                                            ?.signature_status === 'Signed'
+                                            ? 'bg-green-500/20'
+                                            : 'bg-red-500/20'
+                                        ]"
+                                      >
+                                        <i
+                                          :class="[
+                                            'text-sm',
+                                            requestData?.approvals?.divisionalDirector
+                                              ?.signature_status === 'Signed'
+                                              ? 'fas fa-check text-green-400'
+                                              : 'fas fa-times text-red-400'
+                                          ]"
+                                        ></i>
+                                      </div>
+                                      <span
+                                        :class="[
+                                          'text-sm font-semibold',
+                                          requestData?.approvals?.divisionalDirector
+                                            ?.signature_status === 'Signed'
+                                            ? 'text-green-400'
+                                            : 'text-red-400'
+                                        ]"
+                                      >
+                                        {{
+                                          requestData?.approvals?.divisionalDirector
+                                            ?.signature_display || 'No signature'
+                                        }}
+                                      </span>
+                                    </div>
+                                    <!-- Optional: Show signature preview icon for signed status -->
+                                    <div
+                                      v-if="
+                                        requestData?.approvals?.divisionalDirector
+                                          ?.signature_status === 'Signed'
+                                      "
+                                      class="absolute top-2 right-2"
+                                    >
+                                      <div
+                                        class="w-6 h-6 bg-green-500/30 rounded-full flex items-center justify-center"
+                                      >
+                                        <i
+                                          class="fas fa-signature text-green-400 text-xs"
+                                          title="Signature on file"
+                                        ></i>
+                                      </div>
+                                    </div>
                                   </div>
+                                </div>
+
+                                <!-- Keep upload button section for when user can edit -->
+                                <div class="text-center mt-2">
                                   <button
                                     v-if="isDivisionalApprovalEditable"
                                     type="button"
@@ -1458,7 +1580,7 @@
 
                               <div
                                 v-else
-                                class="w-full px-3 py-3 border-2 border-emerald-300/40 rounded-xl bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-emerald-500/20 min-h-[70px] flex items-center justify-center relative"
+                                class="w-full px-3 py-2 border-2 border-emerald-300/40 rounded-xl bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-emerald-500/20 min-h-[35px] flex items-center justify-center relative"
                               >
                                 <div
                                   v-if="isImage(divDirectorSignaturePreview)"
@@ -1517,7 +1639,7 @@
                             </div>
                           </div>
                           <div>
-                            <label class="block text-base font-medium text-blue-100 mb-2"
+                            <label class="block text-base font-medium text-blue-100 mb-1"
                               >Date (mm/dd/yyyy)<span class="text-red-400">*</span></label
                             >
                             <div class="relative">
@@ -1569,7 +1691,7 @@
                         ]"
                       >
                         <h5
-                          class="font-bold text-white mb-4 text-center text-sm flex items-center justify-center gap-2"
+                          class="font-bold text-white mb-1 text-center text-sm flex items-center justify-center gap-2"
                         >
                           <i class="fas fa-laptop-code mr-2 text-blue-300"></i>
                           Director of ICT
@@ -1614,7 +1736,7 @@
                         </h5>
                         <div class="space-y-3">
                           <div>
-                            <label class="block text-base font-medium text-blue-100 mb-2"
+                            <label class="block text-base font-medium text-blue-100 mb-1"
                               >Name<span class="text-red-400">*</span></label
                             >
                             <div class="relative">
@@ -1635,14 +1757,14 @@
                             </div>
                           </div>
                           <div>
-                            <label class="block text-base font-medium text-blue-100 mb-2"
+                            <label class="block text-base font-medium text-blue-100 mb-1"
                               >Signature<span class="text-red-400">*</span></label
                             >
                             <div class="relative">
                               <!-- Show ICT Director signed indicator for Head IT stage -->
                               <div
                                 v-if="shouldShowIctDirectorSignedIndicator"
-                                class="w-full px-3 py-3 border-2 border-green-400/50 rounded-xl bg-green-500/10 backdrop-blur-sm transition-all duration-300 shadow-lg min-h-[70px] flex items-center justify-center"
+                                class="w-full px-3 py-2 border-2 border-green-400/50 rounded-xl bg-green-500/10 backdrop-blur-sm transition-all duration-300 shadow-lg min-h-[35px] flex items-center justify-center"
                               >
                                 <div class="text-center">
                                   <div class="flex items-center justify-center space-x-2 mb-1">
@@ -1662,7 +1784,7 @@
                               <!-- Show ICT Director missing signature indicator for Head IT stage -->
                               <div
                                 v-else-if="shouldShowIctDirectorNoSignatureIndicator"
-                                class="w-full px-3 py-3 border-2 border-red-400/50 rounded-xl bg-red-500/10 backdrop-blur-sm transition-all duration-300 shadow-lg min-h-[70px] flex items-center justify-center"
+                                class="w-full px-3 py-2 border-2 border-red-400/50 rounded-xl bg-red-500/10 backdrop-blur-sm transition-all duration-300 shadow-lg min-h-[35px] flex items-center justify-center"
                               >
                                 <div class="text-center">
                                   <div class="flex items-center justify-center space-x-2 mb-1">
@@ -1683,13 +1805,76 @@
 
                               <div
                                 v-else-if="!directorICTSignaturePreview"
-                                class="w-full px-3 py-2 border-2 border-dashed border-blue-300/40 rounded-lg focus-within:border-blue-400 bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 min-h-[50px] flex items-center justify-center hover:bg-white/20"
+                                class="w-full px-3 py-2 border-2 border-dashed border-blue-300/40 rounded-lg focus-within:border-blue-400 bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 min-h-[30px] flex items-center justify-center hover:bg-white/20"
                               >
-                                <div class="text-center">
-                                  <div class="mb-2">
-                                    <i class="fas fa-signature text-blue-300 text-lg mb-1"></i>
-                                    <p class="text-blue-100 text-xs">No signature uploaded</p>
+                                <!-- Display signature status with proper styling like HOD -->
+                                <div
+                                  :class="[
+                                    'w-full px-3 py-2 rounded-xl backdrop-blur-sm transition-all duration-300 min-h-[35px] flex items-center justify-center relative',
+                                    requestData?.approvals?.directorICT?.signature_status ===
+                                    'Signed'
+                                      ? 'border-2 border-green-400/50 bg-green-500/10 shadow-lg'
+                                      : 'border-2 border-red-400/50 bg-red-500/10 shadow-lg'
+                                  ]"
+                                >
+                                  <div class="text-center">
+                                    <div class="flex items-center justify-center space-x-2 mb-1">
+                                      <div
+                                        :class="[
+                                          'w-8 h-8 rounded-full flex items-center justify-center',
+                                          requestData?.approvals?.directorICT?.signature_status ===
+                                          'Signed'
+                                            ? 'bg-green-500/20'
+                                            : 'bg-red-500/20'
+                                        ]"
+                                      >
+                                        <i
+                                          :class="[
+                                            'text-sm',
+                                            requestData?.approvals?.directorICT
+                                              ?.signature_status === 'Signed'
+                                              ? 'fas fa-check text-green-400'
+                                              : 'fas fa-times text-red-400'
+                                          ]"
+                                        ></i>
+                                      </div>
+                                      <span
+                                        :class="[
+                                          'text-sm font-semibold',
+                                          requestData?.approvals?.directorICT?.signature_status ===
+                                          'Signed'
+                                            ? 'text-green-400'
+                                            : 'text-red-400'
+                                        ]"
+                                      >
+                                        {{
+                                          requestData?.approvals?.directorICT?.signature_display ||
+                                          'No signature'
+                                        }}
+                                      </span>
+                                    </div>
+                                    <!-- Optional: Show signature preview icon for signed status -->
+                                    <div
+                                      v-if="
+                                        requestData?.approvals?.directorICT?.signature_status ===
+                                        'Signed'
+                                      "
+                                      class="absolute top-2 right-2"
+                                    >
+                                      <div
+                                        class="w-6 h-6 bg-green-500/30 rounded-full flex items-center justify-center"
+                                      >
+                                        <i
+                                          class="fas fa-signature text-green-400 text-xs"
+                                          title="Signature on file"
+                                        ></i>
+                                      </div>
+                                    </div>
                                   </div>
+                                </div>
+
+                                <!-- Keep upload button section for when user can edit -->
+                                <div class="text-center mt-2">
                                   <button
                                     v-if="isIctDirectorApprovalEditable"
                                     type="button"
@@ -1704,7 +1889,7 @@
 
                               <div
                                 v-else
-                                class="w-full px-3 py-3 border-2 border-emerald-300/40 rounded-xl bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-emerald-500/20 min-h-[70px] flex items-center justify-center relative"
+                                class="w-full px-3 py-2 border-2 border-emerald-300/40 rounded-xl bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-emerald-500/20 min-h-[35px] flex items-center justify-center relative"
                               >
                                 <div
                                   v-if="isImage(directorICTSignaturePreview)"
@@ -1763,7 +1948,7 @@
                             </div>
                           </div>
                           <div>
-                            <label class="block text-base font-medium text-blue-100 mb-2"
+                            <label class="block text-base font-medium text-blue-100 mb-1"
                               >Date (mm/dd/yyyy)<span class="text-red-400">*</span></label
                             >
                             <div class="relative">
@@ -1814,7 +1999,7 @@
                     v-if="isHodApprovalEditable"
                     class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-2 rounded-lg backdrop-blur-sm hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 group"
                   >
-                    <div class="flex items-center space-x-2 mb-2">
+                    <div class="flex items-center space-x-2 mb-1">
                       <div
                         class="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
                       >
@@ -1830,7 +2015,7 @@
                       class="bg-white/15 rounded-lg p-2 border border-blue-300/30 backdrop-blur-sm"
                     >
                       <!-- Radio buttons in one row -->
-                      <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-1">
                         <!-- Permanent Access - Left Side -->
                         <label
                           class="flex items-center cursor-pointer hover:bg-blue-500/20 p-2 rounded-lg transition-all border border-blue-400/30"
@@ -1934,7 +2119,7 @@
                       <!-- Head of IT -->
                       <div :class="headItSectionClass">
                         <h5
-                          class="font-bold text-white mb-3 text-center text-sm flex items-center justify-center gap-2"
+                          class="font-bold text-white mb-1 text-center text-sm flex items-center justify-center gap-2"
                         >
                           <i class="fas fa-user-cog mr-2"></i>
                           Head of IT
@@ -1977,37 +2162,54 @@
                             Pending
                           </span>
                         </h5>
-                        <div class="space-y-3">
+                        <div class="space-y-2">
                           <div>
-                            <label class="block text-base font-medium text-blue-100 mb-2"
+                            <label class="block text-base font-medium text-blue-100 mb-1"
                               >Name<span class="text-red-400">*</span></label
                             >
                             <div class="relative">
                               <input
                                 v-model="form.implementation.headIT.name"
                                 type="text"
-                                readonly
+                                :readonly="!isHeadItApprovalEditable || (isHeadItApprovalEditable && !!form.implementation.headIT.name)"
                                 :placeholder="getApprovalNamePlaceholder('head_it')"
-                                class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm cursor-not-allowed"
-                                :title="getApprovalNameTitle('head_it')"
+                                class="medical-input w-full px-3 py-2 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm"
+                                :class="{
+                                  'cursor-not-allowed bg-gray-500/20': !isHeadItApprovalEditable || (isHeadItApprovalEditable && !!form.implementation.headIT.name),
+                                  'bg-white/15': !form.implementation.headIT.name && isHeadItApprovalEditable,
+                                  'bg-blue-500/20 border-blue-400/50': isHeadItApprovalEditable && !!form.implementation.headIT.name,
+                                  'font-bold text-yellow-300': isHeadItApprovalEditable && form.implementation.headIT.name
+                                }"
+                                :title="form.implementation.headIT.name ? 'Auto-populated from your account - cannot be modified' : getApprovalNameTitle('head_it')"
                               />
-                              <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
+                              <div
+                                class="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2"
+                              >
+                                <!-- Debug button for Head IT auto-population (development only) -->
                                 <i
                                   class="fas fa-lock text-blue-300 text-xs"
-                                  title="This field is auto-populated from your account"
+                                  :class="{
+                                    'text-yellow-300':
+                                      isHeadItApprovalEditable && form.implementation.headIT.name
+                                  }"
+                                  :title="
+                                    isHeadItApprovalEditable
+                                      ? 'This field is auto-populated from your account'
+                                      : 'This field will be auto-populated when Head IT reviews the request'
+                                  "
                                 ></i>
                               </div>
                             </div>
                           </div>
                           <div>
-                            <label class="block text-base font-medium text-blue-100 mb-2"
+                            <label class="block text-base font-medium text-blue-100 mb-1"
                               >Signature<span class="text-red-400">*</span></label
                             >
                             <div class="relative">
                               <!-- Show Head IT signed indicator for ICT Officer stage -->
                               <div
                                 v-if="shouldShowHeadITSignedIndicator"
-                                class="w-full px-3 py-3 border-2 border-green-400/50 rounded-xl bg-green-500/10 backdrop-blur-sm transition-all duration-300 shadow-lg min-h-[70px] flex items-center justify-center"
+                                class="w-full px-3 py-2 border-2 border-green-400/50 rounded-xl bg-green-500/10 backdrop-blur-sm transition-all duration-300 shadow-lg min-h-[35px] flex items-center justify-center"
                               >
                                 <div class="text-center">
                                   <div class="flex items-center justify-center space-x-2 mb-1">
@@ -2027,7 +2229,7 @@
                               <!-- Show Head IT missing signature indicator for ICT Officer stage -->
                               <div
                                 v-else-if="shouldShowHeadITNoSignatureIndicator"
-                                class="w-full px-3 py-3 border-2 border-red-400/50 rounded-xl bg-red-500/10 backdrop-blur-sm transition-all duration-300 shadow-lg min-h-[70px] flex items-center justify-center"
+                                class="w-full px-3 py-2 border-2 border-red-400/50 rounded-xl bg-red-500/10 backdrop-blur-sm transition-all duration-300 shadow-lg min-h-[35px] flex items-center justify-center"
                               >
                                 <div class="text-center">
                                   <div class="flex items-center justify-center space-x-2 mb-1">
@@ -2046,7 +2248,7 @@
 
                               <div
                                 v-else-if="!headITSignaturePreview"
-                                class="w-full px-2 py-2 border border-blue-300/30 rounded-lg focus-within:border-blue-400 bg-white/15 transition-all duration-300 shadow-sm hover:shadow-md min-h-[50px] flex items-center justify-center backdrop-blur-sm"
+                                class="w-full px-2 py-2 border border-blue-300/30 rounded-lg focus-within:border-blue-400 bg-white/15 transition-all duration-300 shadow-sm hover:shadow-md min-h-[30px] flex items-center justify-center backdrop-blur-sm"
                               >
                                 <div class="text-center">
                                   <div class="mb-1">
@@ -2060,14 +2262,14 @@
                                     class="px-2 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors duration-200 flex items-center gap-1 mx-auto"
                                   >
                                     <i class="fas fa-upload"></i>
-                                    Press to load your signature
+                                    Upload your signature
                                   </button>
                                 </div>
                               </div>
 
                               <div
                                 v-else
-                                class="w-full px-2 py-2 border border-blue-300 rounded bg-gray-50 transition-all duration-300 shadow-sm hover:shadow-md min-h-[50px] flex items-center justify-center relative"
+                                class="w-full px-2 py-2 border border-blue-300/30 rounded-lg bg-blue-500/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 min-h-[30px] flex items-center justify-center relative"
                               >
                                 <div v-if="isImage(headITSignaturePreview)" class="text-center">
                                   <img
@@ -2075,17 +2277,17 @@
                                     alt="Head IT Signature"
                                     class="max-h-[35px] max-w-full object-contain mx-auto mb-1"
                                   />
-                                  <p class="text-xs text-gray-600">
+                                  <p class="text-xs text-blue-100">
                                     {{ headITSignatureFileName }}
                                   </p>
                                 </div>
                                 <div v-else class="text-center">
                                   <div
-                                    class="w-8 h-8 bg-red-100 rounded flex items-center justify-center mx-auto mb-1"
+                                    class="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center mx-auto mb-1"
                                   >
-                                    <i class="fas fa-file-pdf text-red-600 text-sm"></i>
+                                    <i class="fas fa-file-pdf text-red-400 text-sm"></i>
                                   </div>
-                                  <p class="text-xs text-gray-600">
+                                  <p class="text-xs text-blue-100">
                                     {{ headITSignatureFileName }}
                                   </p>
                                 </div>
@@ -2123,16 +2325,19 @@
                             </div>
                           </div>
                           <div>
-                            <label class="block text-base font-medium text-blue-100 mb-2"
+                            <label class="block text-base font-medium text-blue-100 mb-1"
                               >Date (mm/dd/yyyy)<span class="text-red-400">*</span></label
                             >
                             <div class="relative">
                               <input
                                 v-model="form.implementation.headIT.date"
                                 type="date"
-                                :readonly="true"
-                                class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm cursor-not-allowed"
+                                :readonly="!isHeadItApprovalEditable"
+                                class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm"
                                 :class="{
+                                  'cursor-not-allowed': !isHeadItApprovalEditable,
+                                  'font-bold text-yellow-300':
+                                    isHeadItApprovalEditable && form.implementation.headIT.date,
                                   'bg-green-100/20 border-green-400/40':
                                     shouldShowHeadITSignedIndicator,
                                   'bg-red-100/20 border-red-400/40':
@@ -2159,6 +2364,7 @@
                             </div>
                           </div>
                         </div>
+
                       </div>
 
                       <!-- ICT Officer granting access -->
@@ -2209,7 +2415,7 @@
                         </h5>
                         <div class="space-y-3">
                           <div>
-                            <label class="block text-base font-medium text-blue-100 mb-2"
+                            <label class="block text-base font-medium text-blue-100 mb-1"
                               >Name<span class="text-red-400">*</span></label
                             >
                             <div class="relative">
@@ -2230,16 +2436,16 @@
                             </div>
                           </div>
                           <div>
-                            <label class="block text-base font-medium text-blue-100 mb-2"
+                            <label class="block text-base font-medium text-blue-100 mb-1"
                               >Signature<span class="text-red-400">*</span></label
                             >
                             <div class="relative">
                               <div
                                 v-if="!ictOfficerSignaturePreview"
-                                class="w-full px-3 py-2 border-2 border-dashed border-blue-300/40 rounded-lg focus-within:border-blue-400 bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 min-h-[50px] flex items-center justify-center hover:bg-white/20"
+                                class="w-full px-3 py-2 border-2 border-dashed border-blue-300/40 rounded-lg focus-within:border-blue-400 bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 min-h-[30px] flex items-center justify-center hover:bg-white/20"
                               >
                                 <div class="text-center">
-                                  <div class="mb-2">
+                                  <div class="mb-1">
                                     <i class="fas fa-signature text-blue-300 text-lg mb-1"></i>
                                     <p class="text-blue-100 text-xs">No signature uploaded</p>
                                   </div>
@@ -2257,7 +2463,7 @@
 
                               <div
                                 v-else
-                                class="w-full px-3 py-3 border-2 border-purple-300/40 rounded-xl bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-purple-500/20 min-h-[70px] flex items-center justify-center relative"
+                                class="w-full px-3 py-2 border-2 border-purple-300/40 rounded-xl bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-purple-500/20 min-h-[35px] flex items-center justify-center relative"
                               >
                                 <div v-if="isImage(ictOfficerSignaturePreview)" class="text-center">
                                   <img
@@ -2310,7 +2516,7 @@
                             </div>
                           </div>
                           <div>
-                            <label class="block text-base font-medium text-blue-100 mb-2"
+                            <label class="block text-base font-medium text-blue-100 mb-1"
                               >Date<span class="text-red-400">*</span></label
                             >
                             <div class="relative">
@@ -2328,26 +2534,6 @@
 
                   <!-- Action Buttons (Review Mode Only) -->
                   <div v-if="isReviewMode && canApproveAtStage()" :class="actionButtonsClass">
-                    <!-- Signature Required Warning -->
-                    <div
-                      v-if="isSignatureRequiredForApproval"
-                      class="bg-amber-500/20 border border-amber-400/30 rounded-lg p-3 backdrop-blur-sm"
-                    >
-                      <div class="flex items-center space-x-2">
-                        <div
-                          class="w-8 h-8 bg-amber-500/30 rounded-lg flex items-center justify-center"
-                        >
-                          <i class="fas fa-exclamation-triangle text-amber-400 text-sm"></i>
-                        </div>
-                        <div>
-                          <h4 class="text-amber-200 font-semibold text-sm">Signature Required</h4>
-                          <p class="text-amber-300/80 text-xs">
-                            Please upload your signature above before you can approve or reject this
-                            request.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
 
                     <!-- Action Buttons -->
                     <div class="flex justify-between gap-4">
@@ -2553,7 +2739,7 @@
           </div>
 
           <div class="mb-4">
-            <label class="block text-base font-medium text-gray-700 mb-2">Rejection Reason *</label>
+            <label class="block text-base font-medium text-gray-700 mb-1">Rejection Reason *</label>
             <textarea
               v-model="rejectionReason"
               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm"
@@ -2820,7 +3006,7 @@
     margin-bottom: 0.25rem !important;
   }
 
-  .review-mode-compact .mb-2 {
+  .review-mode-compact .mb-1 {
     margin-bottom: 0.5rem !important;
   }
 
@@ -2948,7 +3134,7 @@
     margin-bottom: 0.125rem !important;
   }
 
-  .divisional-director-compact .mb-2 {
+  .divisional-director-compact .mb-1 {
     margin-bottom: 0.25rem !important;
   }
 
@@ -3032,7 +3218,7 @@
     margin-bottom: 0.125rem !important; /* Reduced from 0.25rem */
   }
 
-  .hod-compact .mb-2 {
+  .hod-compact .mb-1 {
     margin-bottom: 0.25rem !important; /* Reduced from 0.375rem */
   }
 
@@ -3255,21 +3441,21 @@
       <label class="label">Approval</label>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         <div class="bg-indigo-50 rounded-lg p-3">
-          <h5 class="font-semibold text-indigo-800 text-xs mb-2 text-center">HoD / BM</h5>
-          <input class="input mb-2" placeholder="Name*" :value="modelValue?.approvals?.hod?.name||''" @input="$emit('update:modelValue', { ...modelValue, approvals: { ...(modelValue?.approvals||{}), hod: { ...(modelValue?.approvals?.hod||{}), name: $event.target.value } } })"/>
-          <input class="input mb-2" placeholder="Signature*" :value="modelValue?.approvals?.hod?.signature||''" @input="$emit('update:modelValue', { ...modelValue, approvals: { ...(modelValue?.approvals||{}), hod: { ...(modelValue?.approvals?.hod||{}), signature: $event.target.value } } })"/>
+          <h5 class="font-semibold text-indigo-800 text-xs mb-1 text-center">HoD / BM</h5>
+          <input class="input mb-1" placeholder="Name*" :value="modelValue?.approvals?.hod?.name||''" @input="$emit('update:modelValue', { ...modelValue, approvals: { ...(modelValue?.approvals||{}), hod: { ...(modelValue?.approvals?.hod||{}), name: $event.target.value } } })"/>
+          <input class="input mb-1" placeholder="Signature*" :value="modelValue?.approvals?.hod?.signature||''" @input="$emit('update:modelValue', { ...modelValue, approvals: { ...(modelValue?.approvals||{}), hod: { ...(modelValue?.approvals?.hod||{}), signature: $event.target.value } } })"/>
           <input type="date" class="input" placeholder="Date*" :value="modelValue?.approvals?.hod?.date||''" @input="$emit('update:modelValue', { ...modelValue, approvals: { ...(modelValue?.approvals||{}), hod: { ...(modelValue?.approvals?.hod||{}), date: $event.target.value } } })"/>
         </div>
         <div class="bg-indigo-50 rounded-lg p-3">
-          <h5 class="font-semibold text-indigo-800 text-xs mb-2 text-center">Divisional Director</h5>
-          <input class="input mb-2" placeholder="Name*" :value="modelValue?.approvals?.divisionalDirector?.name||''" @input="$emit('update:modelValue', { ...modelValue, approvals: { ...(modelValue?.approvals||{}), divisionalDirector: { ...(modelValue?.approvals?.divisionalDirector||{}), name: $event.target.value } } })"/>
-          <input class="input mb-2" placeholder="Signature*" :value="modelValue?.approvals?.divisionalDirector?.signature||''" @input="$emit('update:modelValue', { ...modelValue, approvals: { ...(modelValue?.approvals||{}), divisionalDirector: { ...(modelValue?.approvals?.divisionalDirector||{}), signature: $event.target.value } } })"/>
+          <h5 class="font-semibold text-indigo-800 text-xs mb-1 text-center">Divisional Director</h5>
+          <input class="input mb-1" placeholder="Name*" :value="modelValue?.approvals?.divisionalDirector?.name||''" @input="$emit('update:modelValue', { ...modelValue, approvals: { ...(modelValue?.approvals||{}), divisionalDirector: { ...(modelValue?.approvals?.divisionalDirector||{}), name: $event.target.value } } })"/>
+          <input class="input mb-1" placeholder="Signature*" :value="modelValue?.approvals?.divisionalDirector?.signature||''" @input="$emit('update:modelValue', { ...modelValue, approvals: { ...(modelValue?.approvals||{}), divisionalDirector: { ...(modelValue?.approvals?.divisionalDirector||{}), signature: $event.target.value } } })"/>
           <input type="date" class="input" placeholder="Date*" :value="modelValue?.approvals?.divisionalDirector?.date||''" @input="$emit('update:modelValue', { ...modelValue, approvals: { ...(modelValue?.approvals||{}), divisionalDirector: { ...(modelValue?.approvals?.divisionalDirector||{}), date: $event.target.value } } })"/>
         </div>
         <div class="bg-indigo-50 rounded-lg p-3">
-          <h5 class="font-semibold text-indigo-800 text-xs mb-2 text-center">Director of ICT</h5>
-          <input class="input mb-2" placeholder="Name*" :value="modelValue?.approvals?.directorICT?.name||''" @input="$emit('update:modelValue', { ...modelValue, approvals: { ...(modelValue?.approvals||{}), directorICT: { ...(modelValue?.approvals?.directorICT||{}), name: $event.target.value } } })"/>
-          <input class="input mb-2" placeholder="Signature*" :value="modelValue?.approvals?.directorICT?.signature||''" @input="$emit('update:modelValue', { ...modelValue, approvals: { ...(modelValue?.approvals||{}), directorICT: { ...(modelValue?.approvals?.directorICT||{}), signature: $event.target.value } } })"/>
+          <h5 class="font-semibold text-indigo-800 text-xs mb-1 text-center">Director of ICT</h5>
+          <input class="input mb-1" placeholder="Name*" :value="modelValue?.approvals?.directorICT?.name||''" @input="$emit('update:modelValue', { ...modelValue, approvals: { ...(modelValue?.approvals||{}), directorICT: { ...(modelValue?.approvals?.directorICT||{}), name: $event.target.value } } })"/>
+          <input class="input mb-1" placeholder="Signature*" :value="modelValue?.approvals?.directorICT?.signature||''" @input="$emit('update:modelValue', { ...modelValue, approvals: { ...(modelValue?.approvals||{}), directorICT: { ...(modelValue?.approvals?.directorICT||{}), signature: $event.target.value } } })"/>
           <input type="date" class="input" placeholder="Date*" :value="modelValue?.approvals?.directorICT?.date||''" @input="$emit('update:modelValue', { ...modelValue, approvals: { ...(modelValue?.approvals||{}), directorICT: { ...(modelValue?.approvals?.directorICT||{}), date: $event.target.value } } })"/>
         </div>
       </div>
@@ -3284,15 +3470,15 @@
       <label class="label">For Implementation</label>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div class="bg-emerald-50 rounded-lg p-3">
-          <h5 class="font-semibold text-emerald-800 text-xs mb-2 text-center">Head of IT</h5>
-          <input class="input mb-2" placeholder="Name*" :value="modelValue?.implementation?.headIT?.name||''" @input="$emit('update:modelValue', { ...modelValue, implementation: { ...(modelValue?.implementation||{}), headIT: { ...(modelValue?.implementation?.headIT||{}), name: $event.target.value } } })"/>
-          <input class="input mb-2" placeholder="Signature*" :value="modelValue?.implementation?.headIT?.signature||''" @input="$emit('update:modelValue', { ...modelValue, implementation: { ...(modelValue?.implementation||{}), headIT: { ...(modelValue?.implementation?.headIT||{}), signature: $event.target.value } } })"/>
+          <h5 class="font-semibold text-emerald-800 text-xs mb-1 text-center">Head of IT</h5>
+          <input class="input mb-1" placeholder="Name*" :value="modelValue?.implementation?.headIT?.name||''" @input="$emit('update:modelValue', { ...modelValue, implementation: { ...(modelValue?.implementation||{}), headIT: { ...(modelValue?.implementation?.headIT||{}), name: $event.target.value } } })"/>
+          <input class="input mb-1" placeholder="Signature*" :value="modelValue?.implementation?.headIT?.signature||''" @input="$emit('update:modelValue', { ...modelValue, implementation: { ...(modelValue?.implementation||{}), headIT: { ...(modelValue?.implementation?.headIT||{}), signature: $event.target.value } } })"/>
           <input type="date" class="input" placeholder="Date*" :value="modelValue?.implementation?.headIT?.date||''" @input="$emit('update:modelValue', { ...modelValue, implementation: { ...(modelValue?.implementation||{}), headIT: { ...(modelValue?.implementation?.headIT||{}), date: $event.target.value } } })"/>
         </div>
         <div class="bg-emerald-50 rounded-lg p-3">
-          <h5 class="font-semibold text-emerald-800 text-xs mb-2 text-center">ICT Officer granting access</h5>
-          <input class="input mb-2" placeholder="Name*" :value="modelValue?.implementation?.ictOfficer?.name||''" @input="$emit('update:modelValue', { ...modelValue, implementation: { ...(modelValue?.implementation||{}), ictOfficer: { ...(modelValue?.implementation?.ictOfficer||{}), name: $event.target.value } } })"/>
-          <input class="input mb-2" placeholder="Signature*" :value="modelValue?.implementation?.ictOfficer?.signature||''" @input="$emit('update:modelValue', { ...modelValue, implementation: { ...(modelValue?.implementation||{}), ictOfficer: { ...(modelValue?.implementation?.ictOfficer||{}), signature: $event.target.value } } })"/>
+          <h5 class="font-semibold text-emerald-800 text-xs mb-1 text-center">ICT Officer granting access</h5>
+          <input class="input mb-1" placeholder="Name*" :value="modelValue?.implementation?.ictOfficer?.name||''" @input="$emit('update:modelValue', { ...modelValue, implementation: { ...(modelValue?.implementation||{}), ictOfficer: { ...(modelValue?.implementation?.ictOfficer||{}), name: $event.target.value } } })"/>
+          <input class="input mb-1" placeholder="Signature*" :value="modelValue?.implementation?.ictOfficer?.signature||''" @input="$emit('update:modelValue', { ...modelValue, implementation: { ...(modelValue?.implementation||{}), ictOfficer: { ...(modelValue?.implementation?.ictOfficer||{}), signature: $event.target.value } } })"/>
           <input type="date" class="input" placeholder="Date*" :value="modelValue?.implementation?.ictOfficer?.date||''" @input="$emit('update:modelValue', { ...modelValue, implementation: { ...(modelValue?.implementation||{}), ictOfficer: { ...(modelValue?.implementation?.ictOfficer||{}), date: $event.target.value } } })"/>
         </div>
       </div>
@@ -3357,6 +3543,7 @@
   import Header from '@/components/header.vue'
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppFooter from '@/components/footer.vue'
+  import OrbitingDots from '@/components/common/OrbitingDots.vue'
   import combinedAccessService from '@/services/combinedAccessService.js'
   import bothServiceFormService from '@/services/bothServiceFormService.js'
   import authService from '@/services/authService.js'
@@ -3370,13 +3557,15 @@
       InternetPanel,
       Header,
       ModernSidebar,
-      AppFooter
+      AppFooter,
+      OrbitingDots
     },
     setup() {
-      // Sidebar state now managed by Pinia - no local state needed
+      // Initialize auth store
+      const authStore = useAuthStore()
 
       return {
-        // No local state needed for sidebar
+        authStore
       }
     },
     data() {
@@ -3531,6 +3720,18 @@
       }
     },
     computed: {
+      // Environment check for development features
+      isDevelopment() {
+        // Use process.env.NODE_ENV if available (provided by webpack DefinePlugin)
+        // or fallback to checking hostname for development detection
+        try {
+          return process.env.NODE_ENV === 'development'
+        } catch {
+          // Fallback if process.env is not available
+          return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        }
+      },
+
       // Review mode check
       isReviewMode() {
         return this.$route.params.id != null || this.$route.query.id != null
@@ -3589,7 +3790,7 @@
         const pathNotEmpty = hasPath && this.requestData.signature_path.trim() !== ''
 
         // Debug signature status (development only)
-        if (process.env.NODE_ENV === 'development') {
+        if (this.isDevelopment) {
           console.log('hasSignature debug:', {
             hasData,
             hasPath,
@@ -3612,7 +3813,7 @@
           types = [types]
         }
 
-        if (process.env.NODE_ENV === 'development') {
+        if (this.isDevelopment) {
           console.log('Request types:', types)
         }
         return types
@@ -3844,7 +4045,7 @@
         const result = currentStage === 'head_it' && headItRoles.includes(userRole)
 
         // Debug logging for role-based access control verification (development only)
-        if (process.env.NODE_ENV === 'development') {
+        if (this.isDevelopment) {
           console.log('🔒 Head IT Approval Access Control Check:', {
             userRole,
             currentStage,
@@ -3870,7 +4071,7 @@
         const result = currentStage === 'ict_officer' && ictOfficerRoles.includes(userRole)
 
         // Debug logging for role-based access control verification (development only)
-        if (process.env.NODE_ENV === 'development') {
+        if (this.isDevelopment) {
           console.log('🔒 ICT Officer Approval Access Control Check:', {
             userRole,
             currentStage,
@@ -3962,6 +4163,11 @@
           return !this.form.approvals.directorICT.signature
         }
 
+        // For Head IT stage, check Head IT signature
+        if (stage === 'head_it' && ['head_it', 'head_of_it'].includes(userRole)) {
+          return !this.form.implementation.headIT.signature
+        }
+
         // For other stages, assume no signature required for now
         return false
       },
@@ -3977,7 +4183,7 @@
           this.requestData.approvals?.hod?.comments ||
           null
 
-        if (process.env.NODE_ENV === 'development') {
+        if (this.isDevelopment) {
           console.log('HOD Comments debug:', {
             requestData_keys: Object.keys(this.requestData),
             hodComments: hodComments,
@@ -4000,7 +4206,7 @@
           this.requestData.approvals?.divisionalDirector?.comments ||
           null
 
-        if (process.env.NODE_ENV === 'development') {
+        if (this.isDevelopment) {
           console.log('Divisional Director Comments debug:', {
             requestData_keys: Object.keys(this.requestData),
             divisionalComments: divisionalComments,
@@ -4103,7 +4309,7 @@
           // Special case for HOD: if hod_signature_path exists, consider it signed
           if (stage === 'hod' && this.requestData?.hod_signature_path) {
             result = true
-            if (process.env.NODE_ENV === 'development') {
+            if (this.isDevelopment) {
               console.log(
                 '\u2705 HOD signature found via hod_signature_path:',
                 this.requestData.hod_signature_path
@@ -4112,7 +4318,7 @@
           }
 
           // Debug logging for signature detection (development only)
-          if (process.env.NODE_ENV === 'development') {
+          if (this.isDevelopment) {
             console.log(`\ud83d\udd0d Stage ${stage} signature check:`, {
               signature: e.sig,
               date: e.date,
@@ -4142,7 +4348,7 @@
 
         const result = baseResult || fallbackResult
 
-        if (process.env.NODE_ENV === 'development') {
+        if (this.isDevelopment) {
           console.log('\ud83d\udfe2 shouldShowHodSignedIndicator:', {
             isReviewMode: this.isReviewMode,
             viewerAfter_hod: this.viewerAfter('hod'),
@@ -4164,7 +4370,7 @@
           this.isReviewMode && this.viewerAfter('hod') && !this.hasStageSigned('hod')
         const result = baseResult && !shouldShowSigned
 
-        if (process.env.NODE_ENV === 'development') {
+        if (this.isDevelopment) {
           console.log('\ud83d\udd34 shouldShowHodNoSignatureIndicator:', {
             isReviewMode: this.isReviewMode,
             viewerAfter_hod: this.viewerAfter('hod'),
@@ -4217,15 +4423,15 @@
         } else if (this.isDivisionalDirectorUser || this.isIctDirectorUser) {
           return `${baseClass} p-1`
         } else {
-          return `${baseClass} p-3`
+          return `${baseClass} p-1`
         }
       },
 
       implementationHeaderClass() {
         const baseClass = 'flex items-center space-x-2'
         return this.isReviewMode && this.isIctDirectorUser
-          ? `${baseClass} mb-1`
-          : `${baseClass} mb-3`
+          ? `${baseClass} mb-0.5`
+          : `${baseClass} mb-1`
       },
 
       implementationGridClass() {
@@ -4234,9 +4440,9 @@
         if (this.isReviewMode && this.isIctDirectorUser) {
           return `${baseClass} gap-1`
         } else if (this.isDivisionalDirectorUser) {
-          return `${baseClass} gap-3`
+          return `${baseClass} gap-2`
         } else {
-          return `${baseClass} gap-6`
+          return `${baseClass} gap-2`
         }
       },
 
@@ -4287,30 +4493,51 @@
       }
     },
     async mounted() {
+      console.log('🚀 Component mounted - starting user authentication...')
+
       // Try to get current user from multiple sources
       await this.getCurrentUser()
+      console.log('🔍 After getCurrentUser:', {
+        hasCurrentUser: !!this.currentUser,
+        userName: this.currentUser?.name,
+        userRole: this.currentUser?.role || this.currentUser?.user_role
+      })
 
-      // Fallback to localStorage or Vuex if API fails
+      // Fallback to localStorage if API fails
       if (!this.currentUser || !this.currentUser.name) {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('\ud83d\udd04 API failed, trying localStorage fallback...')
-        }
+        console.log('🔄 API failed, trying localStorage fallback...')
         this.tryGetUserFromLocalStorage()
+        console.log('🔍 After localStorage:', {
+          hasCurrentUser: !!this.currentUser,
+          userName: this.currentUser?.name
+        })
       }
 
-      // Fallback to Vuex store
+      // Fallback to Pinia store
       if (!this.currentUser || !this.currentUser.name) {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('\ud83d\udd04 localStorage failed, trying Vuex store fallback...')
-        }
+        console.log('🔄 localStorage failed, trying Pinia store fallback...')
         this.tryGetUserFromStore()
+        console.log('🔍 After Pinia store:', {
+          hasCurrentUser: !!this.currentUser,
+          userName: this.currentUser?.name,
+          userRole: this.getUserRole()
+        })
+      }
+
+      // Final check
+      if (!this.currentUser || !this.currentUser.name) {
+        console.error('❌ CRITICAL: Unable to load user from any source!')
+        console.error('❌ This will cause role detection to fail')
+      } else {
+        console.log('✅ User successfully loaded:', this.currentUser.name)
+        console.log('✅ Detected user role:', this.getUserRole())
       }
 
       if (this.isReviewMode && this.requestId) {
         await this.loadRequestData()
 
         // Debug: Check signature indicators after data loads (development only)
-        if (process.env.NODE_ENV === 'development') {
+        if (this.isDevelopment) {
           setTimeout(() => {
             console.log('\u23f0 5-second debug check after mount:', {
               shouldShowHodSignedIndicator: this.shouldShowHodSignedIndicator,
@@ -4345,7 +4572,7 @@
       // Watch for when approval sections become editable (now just for logging)
       isHodApprovalEditable: {
         handler(isEditable) {
-          if (process.env.NODE_ENV === 'development') {
+          if (this.isDevelopment) {
             console.log('HOD approval editable changed:', {
               isEditable,
               currentHodName: this.form.approvals.hod.name,
@@ -4360,7 +4587,7 @@
       },
       isDivisionalApprovalEditable: {
         handler(isEditable) {
-          if (process.env.NODE_ENV === 'development') {
+          if (this.isDevelopment) {
             console.log('Divisional approval editable changed:', {
               isEditable,
               currentDivisionalName: this.form.approvals.divisionalDirector.name,
@@ -4379,7 +4606,7 @@
       },
       isIctDirectorApprovalEditable: {
         handler(isEditable) {
-          if (process.env.NODE_ENV === 'development') {
+          if (this.isDevelopment) {
             console.log('ICT Director approval editable changed:', {
               isEditable,
               currentIctDirectorName: this.form.approvals.directorICT.name,
@@ -4394,22 +4621,35 @@
       },
       isHeadItApprovalEditable: {
         handler(isEditable) {
-          if (process.env.NODE_ENV === 'development') {
+          if (this.isDevelopment) {
             console.log('Head IT approval editable changed:', {
               isEditable,
               currentHeadItName: this.form.implementation.headIT.name,
               hasCurrentUser: !!this.currentUser,
               isReviewMode: this.isReviewMode,
-              currentApprovalStage: this.currentApprovalStage
+              currentApprovalStage: this.currentApprovalStage,
+              userRole: this.getUserRole()
             })
           }
-          // Role-based population is now handled by currentUser watcher
+          
+          // Auto-populate Head IT name when section becomes editable
+          if (isEditable && this.currentUser && this.currentUser.name) {
+            const userRole = (this.getUserRole() || '').toLowerCase()
+            const isHeadIt = ['head_it', 'head_of_it', 'ict_head', 'it_head'].includes(userRole)
+            
+            if (isHeadIt && !this.form.implementation.headIT.name) {
+              console.log('🎯 Auto-populating Head IT name:', this.currentUser.name)
+              this.form.implementation.headIT.name = this.currentUser.name
+              this.form.implementation.headIT.date = this.formatDateForInput(new Date())
+              this.$forceUpdate() // Force reactivity update
+            }
+          }
         },
         immediate: true
       },
       isIctOfficerApprovalEditable: {
         handler(isEditable) {
-          if (process.env.NODE_ENV === 'development') {
+          if (this.isDevelopment) {
             console.log('ICT Officer approval editable changed:', {
               isEditable,
               currentIctOfficerName: this.form.implementation.ictOfficer.name,
@@ -4426,7 +4666,7 @@
       currentUser: {
         handler(newUser) {
           if (newUser && newUser.name) {
-            if (process.env.NODE_ENV === 'development') {
+            if (this.isDevelopment) {
               console.log('Current user data loaded, role-based auto-population:', {
                 userName: newUser.name,
                 userId: newUser.id,
@@ -4441,6 +4681,30 @@
           }
         },
         immediate: true
+      },
+
+      // Watch for when request data is loaded and user is Head IT
+      requestData: {
+        handler(newRequestData) {
+          if (newRequestData && this.currentUser && this.currentUser.name) {
+            const userRole = (this.getUserRole() || '').toLowerCase()
+            const isHeadIt = ['head_it', 'head_of_it'].includes(userRole)
+            const isHeadItStage = this.currentApprovalStage === 'head_it'
+
+            if (isHeadIt && isHeadItStage && this.isReviewMode) {
+              console.log(
+                '🎯 Head IT user detected with loaded request data - triggering name population'
+              )
+
+              // Force population of Head IT name if it's empty
+              if (!this.form.implementation.headIT.name) {
+                console.log('🔄 Force-populating Head IT name field')
+                this.populateApproverName('head_it')
+              }
+            }
+          }
+        },
+        immediate: false
       }
     },
     methods: {
@@ -4606,17 +4870,69 @@
         // Try multiple sources for user role from currentUser data
         if (!this.currentUser) {
           console.warn('No current user found for role detection')
+
+          // Try to get from authStore as backup
+          if (this.authStore && (this.authStore.user || this.authStore.currentUser)) {
+            const storeUser = this.authStore.user || this.authStore.currentUser
+            console.log('🔄 Trying to get role from authStore:', storeUser)
+            const storeRole = storeUser.role || storeUser.user_role || storeUser.primary_role
+            if (storeRole) {
+              console.log('✅ Got role from authStore:', storeRole)
+              return storeRole
+            }
+          }
+
           return null
         }
 
         // Try different role properties
         const role =
-          this.currentUser.role || this.currentUser.user_role || this.currentUser.primary_role
+          this.currentUser.role ||
+          this.currentUser.user_role ||
+          this.currentUser.primary_role ||
+          this.currentUser.userRole
 
-        // Handle array of roles - use first role if available
+        // Handle array of roles - prioritize specific roles if user has multiple
         if (Array.isArray(this.currentUser.roles) && this.currentUser.roles.length > 0) {
-          return this.currentUser.roles[0]
+          // Priority order for roles (highest to lowest)
+          const rolePriority = [
+            'head_of_it',
+            'head_it', 
+            'ict_director',
+            'divisional_director',
+            'head_of_department',
+            'ict_officer'
+          ]
+          
+          // Extract role names from the roles array
+          const userRoleNames = this.currentUser.roles.map(roleObj => {
+            return typeof roleObj === 'string' ? roleObj : roleObj.name
+          })
+          
+          console.log('📦 User has multiple roles:', userRoleNames)
+          
+          // Find highest priority role
+          for (const priorityRole of rolePriority) {
+            if (userRoleNames.includes(priorityRole)) {
+              console.log('✨ Using prioritized role:', priorityRole)
+              return priorityRole
+            }
+          }
+          
+          // Fallback to first role if no priority match
+          const firstRole = userRoleNames[0]
+          console.log('📦 Using first role as fallback:', firstRole)
+          return firstRole
         }
+
+        console.log('🔍 getUserRole debug:', {
+          role,
+          currentUser: this.currentUser,
+          roleProperty: this.currentUser.role,
+          userRoleProperty: this.currentUser.user_role,
+          primaryRoleProperty: this.currentUser.primary_role,
+          rolesArray: this.currentUser.roles
+        })
 
         return role || ''
       },
@@ -4974,15 +5290,26 @@
           this.error = null
 
           // Load request data for review mode
-          if (process.env.NODE_ENV === 'development') {
+          if (this.isDevelopment) {
             console.log('Loading request data for ID:', this.requestId)
           }
           const response = await combinedAccessService.getRequestById(this.requestId)
 
           if (response.success && response.data) {
             this.requestData = response.data
-            if (process.env.NODE_ENV === 'development') {
+            if (this.isDevelopment) {
               console.log('Loaded request data:', this.requestData)
+              console.log('🔍 Signature Status Debug:', {
+                hod_signature_status: this.requestData.approvals?.hod?.signature_status,
+                hod_signature_display: this.requestData.approvals?.hod?.signature_display,
+                divisional_signature_status:
+                  this.requestData.approvals?.divisionalDirector?.signature_status,
+                divisional_signature_display:
+                  this.requestData.approvals?.divisionalDirector?.signature_display,
+                ict_signature_status: this.requestData.approvals?.directorICT?.signature_status,
+                ict_signature_display: this.requestData.approvals?.directorICT?.signature_display,
+                full_approvals_object: this.requestData.approvals
+              })
             }
             // Initialize HOD access rights from server if present
             if (this.requestData.access_type) {
@@ -4998,13 +5325,13 @@
                 this.hodTemporaryUntil = `${yyyy}-${mm}-${dd}`
               }
             }
-            if (process.env.NODE_ENV === 'development') {
+            if (this.isDevelopment) {
               console.log('Signature path from API:', this.requestData.signature_path)
               console.log('Type of signature_path:', typeof this.requestData.signature_path)
             }
 
             // Populate form with request data
-            if (process.env.NODE_ENV === 'development') {
+            if (this.isDevelopment) {
               console.log('🔍 Debug: Full requestData structure:', this.requestData)
               console.log('🔍 Debug: requestData.shared structure:', this.requestData.shared)
             }
@@ -5015,7 +5342,7 @@
               const impl = this.requestData.implementation || {}
               const rd = this.requestData
 
-              if (process.env.NODE_ENV === 'development') {
+              if (this.isDevelopment) {
                 console.log('🔍 Mapping approvals debug:', {
                   approvals_nested: ap,
                   direct_hod_name: rd.hod_name,
@@ -5084,7 +5411,7 @@
                   this.form.implementation.ictOfficer.date
               )
 
-              if (process.env.NODE_ENV === 'development') {
+              if (this.isDevelopment) {
                 console.log('✅ Form after mapping:', {
                   hod: {
                     name: this.form.approvals.hod.name,
@@ -5103,7 +5430,7 @@
 
               // Force reactivity update after mapping
               this.$nextTick(() => {
-                if (process.env.NODE_ENV === 'development') {
+                if (this.isDevelopment) {
                   console.log('🔄 After nextTick - checking signature status:', {
                     shouldShowHodSignedIndicator: this.shouldShowHodSignedIndicator,
                     shouldShowHodNoSignatureIndicator: this.shouldShowHodNoSignatureIndicator,
@@ -5120,7 +5447,7 @@
 
             // Check if data is in the 'shared' object (as returned by backend API)
             if (this.requestData.shared) {
-              if (process.env.NODE_ENV === 'development') {
+              if (this.isDevelopment) {
                 console.log('✅ Using data from requestData.shared')
               }
               this.form.shared = {
@@ -5131,7 +5458,7 @@
               }
             } else {
               // Fallback to direct properties (legacy support)
-              if (process.env.NODE_ENV === 'development') {
+              if (this.isDevelopment) {
                 console.log('⚠️ Fallback: Using direct properties from requestData')
               }
               this.form.shared = {
@@ -5142,19 +5469,22 @@
               }
             }
 
-            if (process.env.NODE_ENV === 'development') {
+            if (this.isDevelopment) {
               console.log('✅ Personal Information populated:', this.form.shared)
             }
 
             // Auto-populate Divisional Director date field from HOD approval date
             this.populateDivisionalDirectorDateFromHod()
 
+            // Trigger Head IT name population if user is Head IT
+            this.triggerHeadItNamePopulationIfNeeded()
+
             // Force reactivity update
             this.$forceUpdate()
 
             // Handle signature data
             if (this.requestData.signature_path) {
-              if (process.env.NODE_ENV === 'development') {
+              if (this.isDevelopment) {
                 console.log('Signature found:', this.requestData.signature_path)
               }
               // In review mode, we don't load the actual file, just show the status
@@ -5188,7 +5518,7 @@
                 }
 
                 this.selectedWellsoft = Array.isArray(parsedWellsoft) ? parsedWellsoft : []
-                if (process.env.NODE_ENV === 'development') {
+                if (this.isDevelopment) {
                   console.log('Loaded Wellsoft selected modules:', this.selectedWellsoft)
                 }
               } else {
@@ -5218,7 +5548,7 @@
                 }
 
                 this.selectedJeeva = Array.isArray(parsedJeeva) ? parsedJeeva : []
-                if (process.env.NODE_ENV === 'development') {
+                if (this.isDevelopment) {
                   console.log('Loaded Jeeva selected modules:', this.selectedJeeva)
                 }
               } else {
@@ -5234,7 +5564,7 @@
                   : [internetPurposes]
                 // Ensure we have exactly 4 purpose slots
                 this.internetPurposes = [...purposes, '', '', '', ''].slice(0, 4)
-                if (process.env.NODE_ENV === 'development') {
+                if (this.isDevelopment) {
                   console.log('Loaded Internet purposes:', this.internetPurposes)
                 }
               } else {
@@ -5247,7 +5577,7 @@
               this.internetPurposes = ['', '', '', '']
             }
 
-            if (process.env.NODE_ENV === 'development') {
+            if (this.isDevelopment) {
               console.log('Form populated successfully')
             }
           } else {
@@ -5322,6 +5652,14 @@
           return status === 'divisional_approved'
         }
 
+        // Head IT roles check
+        const headItRoles = ['head_it', 'head_of_it']
+        if (stage === 'head_it' && headItRoles.includes(userRole)) {
+          // Allow if request is ICT Director approved and Head IT approval is pending
+          const status = this.requestData.status || 'pending'
+          return status === 'ict_director_approved' || status === 'pending_head_it'
+        }
+
         return false
       },
 
@@ -5367,6 +5705,8 @@
             await this.approveAsDivisionalDirector()
           } else if (stage === 'ict_director' && ['ict_director', 'dict'].includes(userRole)) {
             await this.approveAsIctDirector()
+          } else if (stage === 'head_it' && ['head_it', 'head_of_it'].includes(userRole)) {
+            await this.approveAsHeadIt()
           } else {
             throw new Error('You do not have permission to approve at this stage')
           }
@@ -5655,6 +5995,120 @@
         }
       },
 
+      // Head IT specific approval method
+      async approveHeadItRequest() {
+        // Prevent multiple rapid clicks
+        if (this.processing || this.loading) {
+          return
+        }
+
+        // Check if signature is required but missing
+        if (!this.form.implementation.headIT.signature) {
+          this.toast = {
+            show: true,
+            message: 'Please upload your Head of IT signature before approving this request.'
+          }
+          setTimeout(() => (this.toast.show = false), 4000)
+          return
+        }
+
+        try {
+          this.processing = true
+          this.loading = true
+
+          await this.approveAsHeadIt()
+        } catch (error) {
+          console.error('Error approving request as Head IT:', error)
+          this.toast = {
+            show: true,
+            message: `Error approving request: ${error.message}`
+          }
+          setTimeout(() => (this.toast.show = false), 3000)
+        } finally {
+          this.processing = false
+          this.loading = false
+        }
+      },
+
+      // Head IT specific rejection method
+      async rejectHeadItRequest() {
+        // Check if signature is required but missing
+        if (!this.form.implementation.headIT.signature) {
+          this.toast = {
+            show: true,
+            message: 'Please upload your Head of IT signature before rejecting this request.'
+          }
+          setTimeout(() => (this.toast.show = false), 4000)
+          return
+        }
+
+        // Show rejection reason modal
+        this.showRejectionModal = true
+      },
+
+      async approveAsHeadIt() {
+        // Validate Head IT fields
+        const headItName = this.form.implementation.headIT.name || this.currentUser?.name || ''
+        const headItSignature = this.form.implementation.headIT.signature
+
+        if (!headItSignature) {
+          this.toast = {
+            show: true,
+            message: 'Please upload your Head of IT signature before approving'
+          }
+          setTimeout(() => (this.toast.show = false), 4000)
+          return
+        }
+
+        // Auto-populate date if not set
+        const headItDate =
+          this.form.implementation.headIT.date || new Date().toISOString().slice(0, 10)
+        this.form.implementation.headIT.date = headItDate
+
+        const payload = {
+          headItName: headItName,
+          approvedDate: headItDate,
+          headItSignature: headItSignature,
+          comments: this.form.comments || 'Approved by Head of IT'
+        }
+
+        // Use the both service form service for Head IT approval
+        const result = await bothServiceFormService.headItApprove(this.requestId, payload)
+
+        if (result.success) {
+          this.toast = {
+            show: true,
+            message: 'Request approved successfully by Head of IT'
+          }
+          setTimeout(() => {
+            this.toast.show = false
+            this.goBackToHeadItRequests()
+          }, 2000)
+        } else {
+          // Handle specific error types
+          let errorMessage = 'Failed to approve request'
+
+          if (result.errors && Object.keys(result.errors).length > 0) {
+            errorMessage = 'Validation errors: ' + Object.values(result.errors).flat().join(', ')
+          } else if (result.error) {
+            errorMessage = result.error
+          }
+
+          throw new Error(errorMessage)
+        }
+      },
+
+      goBackToHeadItRequests() {
+        try {
+          console.log('Navigating back to Head IT combined requests list')
+          this.$router.push('/head-it-dashboard/combined-requests')
+        } catch (error) {
+          console.error('Error navigating back to Head IT requests:', error)
+          // Fallback navigation
+          this.$router.push('/head-it-dashboard')
+        }
+      },
+
       async rejectRequest() {
         // Check if signature is required but missing
         if (this.isSignatureRequiredForApproval) {
@@ -5724,6 +6178,13 @@
               rejectionReason: this.rejectionReason,
               rejectionDate: new Date().toISOString().slice(0, 10)
             })
+          } else if (stage === 'head_it' && ['head_it', 'head_of_it'].includes(userRole)) {
+            // Head IT rejection using both service form service
+            result = await bothServiceFormService.headItReject(this.requestId, {
+              headItName: this.currentUser?.name || '',
+              rejectionReason: this.rejectionReason,
+              rejectionDate: new Date().toISOString().slice(0, 10)
+            })
           } else {
             throw new Error('You do not have permission to reject at this stage')
           }
@@ -5738,6 +6199,8 @@
               // Navigate back to appropriate dashboard based on user role
               if (['ict_director', 'dict'].includes(userRole)) {
                 this.goBackToDictRequests()
+              } else if (['head_it', 'head_of_it'].includes(userRole)) {
+                this.goBackToHeadItRequests()
               } else {
                 this.goBackToRequests()
               }
@@ -6139,10 +6602,12 @@
           const reader = new FileReader()
           reader.onload = () => {
             this.headITSignaturePreview = reader.result
+            this.showSignatureUploadSuccess('Head of IT')
           }
           reader.readAsDataURL(file)
         } else {
           this.headITSignaturePreview = 'pdf'
+          this.showSignatureUploadSuccess('Head of IT')
         }
       },
 
@@ -6246,6 +6711,76 @@
         }
       },
 
+      // Trigger Head IT name population if the current user is Head IT
+      triggerHeadItNamePopulationIfNeeded() {
+        if (!this.currentUser || !this.currentUser.name || !this.isReviewMode) {
+          return
+        }
+
+        const userRole = (this.getUserRole() || '').toLowerCase()
+        const isHeadIt = ['head_it', 'head_of_it', 'ict_head', 'it_head'].includes(userRole)
+        const isHeadItStage = this.currentApprovalStage === 'head_it'
+        const isHeadItEditable = this.isHeadItApprovalEditable
+
+        console.log('🔍 Head IT name population check:', {
+          userRole,
+          isHeadIt,
+          isHeadItStage,
+          isHeadItEditable,
+          currentApprovalStage: this.currentApprovalStage,
+          currentHeadItName: this.form.implementation.headIT.name,
+          userName: this.currentUser.name
+        })
+
+        if (isHeadIt && isHeadItStage && isHeadItEditable) {
+          console.log('✅ All conditions met for Head IT name population')
+
+          // Only populate if the field is currently empty
+          if (!this.form.implementation.headIT.name) {
+            console.log('🎯 Populating Head IT name field with:', this.currentUser.name)
+            this.populateApproverName('head_it')
+          } else {
+            console.log('ℹ️ Head IT name already populated:', this.form.implementation.headIT.name)
+          }
+        } else {
+          console.log('⚠️ Conditions not met for Head IT name population')
+        }
+      },
+
+      // Debug method to check Head IT status
+      debugHeadItStatus() {
+        console.log('\n=== HEAD IT DEBUG STATUS ===');
+        console.log('User Info:', {
+          currentUser: this.currentUser,
+          userName: this.currentUser?.name,
+          userRole: this.getUserRole(),
+          allRoles: this.currentUser?.roles
+        });
+        console.log('Request Info:', {
+          requestId: this.requestId,
+          requestStatus: this.requestData?.status,
+          currentApprovalStage: this.currentApprovalStage
+        });
+        console.log('Form State:', {
+          headItName: this.form.implementation.headIT.name,
+          headItDate: this.form.implementation.headIT.date,
+          headItSignature: this.form.implementation.headIT.signature,
+          hasSignaturePreview: !!this.headITSignaturePreview
+        });
+        console.log('Computed Properties:', {
+          isReviewMode: this.isReviewMode,
+          isHeadItApprovalEditable: this.isHeadItApprovalEditable,
+          currentApprovalStage: this.currentApprovalStage
+        });
+        console.log('Button Conditions:', {
+          condition1_isReviewMode: this.isReviewMode,
+          condition2_isHeadItApprovalEditable: this.isHeadItApprovalEditable,
+          condition3_hasHeadItSignature: !!this.form.implementation.headIT.signature,
+          allConditionsMet: this.isReviewMode && this.isHeadItApprovalEditable && this.form.implementation.headIT.signature
+        });
+        console.log('=== END HEAD IT DEBUG ===\n');
+      },
+
       // Determine viewer stage and rank helpers
       viewerStage() {
         const userRole = (this.getUserRole() || '').toLowerCase()
@@ -6259,6 +6794,8 @@
           director_ict: 'ict_director',
           head_it: 'head_it',
           head_of_it: 'head_it',
+          ict_head: 'head_it',
+          it_head: 'head_it',
           ict_officer: 'ict_officer',
           officer_ict: 'ict_officer'
         }
@@ -6373,19 +6910,24 @@
       // Fallback method to get user from Pinia store
       tryGetUserFromStore() {
         try {
-          // Try to get from Pinia store
-          const authStore = useAuthStore()
+          // Use the injected auth store
+          const storeUser = this.authStore.user || this.authStore.currentUser
+          console.log('🏪 Checking Pinia store for user:', {
+            hasAuthStore: !!this.authStore,
+            storeUser: storeUser,
+            storeUserName: storeUser?.name,
+            storeProperties: this.authStore ? Object.keys(this.authStore) : []
+          })
 
-          const storeUser = authStore.user || authStore.currentUser
           if (storeUser && storeUser.name) {
             this.currentUser = storeUser
             console.log('✅ Using Pinia store user data:', this.currentUser.name)
+            console.log('✅ User role from store:', storeUser.role || storeUser.user_role)
           } else {
             console.log('❌ No user found in Pinia store')
           }
         } catch (error) {
           console.error('❌ Error accessing Pinia store:', error)
-          // Fallback: no store available
           console.log('❌ Pinia store not available, skipping store access')
         }
       },
@@ -6538,7 +7080,13 @@
             break
           case 'head_it':
             this.form.implementation.headIT.name = userName
-            console.log(`✅ Head of IT name populated: ${userName}`)
+            // Auto-populate current date if not already set
+            if (!this.form.implementation.headIT.date) {
+              this.form.implementation.headIT.date = new Date().toISOString().slice(0, 10)
+            }
+            console.log(
+              `✅ Head of IT name and date populated: ${userName}, ${this.form.implementation.headIT.date}`
+            )
             break
           case 'ict_officer':
             this.form.implementation.ictOfficer.name = userName

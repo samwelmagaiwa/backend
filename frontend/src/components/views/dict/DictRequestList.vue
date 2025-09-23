@@ -12,8 +12,8 @@
             v-if="error"
             class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"
           >
-            <h3 class="font-bold text-lg">Error</h3>
-            <p class="text-base">{{ error }}</p>
+            <h3 class="font-bold text-xl">Error</h3>
+            <p class="text-lg">{{ error }}</p>
             <button
               @click="fetchRequests"
               class="mt-2 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 text-base font-medium"
@@ -25,19 +25,19 @@
           <!-- Stats -->
           <div class="grid grid-cols-4 gap-4 mb-6">
             <div class="bg-yellow-600/25 border border-yellow-400/40 p-4 rounded-lg">
-              <h3 class="text-yellow-200 text-base font-semibold">Pending My Approval</h3>
+              <h3 class="text-yellow-200 text-lg font-semibold">Pending My Approval</h3>
               <p class="text-white text-3xl font-bold">{{ stats.pendingDict }}</p>
             </div>
             <div class="bg-green-600/25 border border-green-400/40 p-4 rounded-lg">
-              <h3 class="text-green-200 text-base font-semibold">Approved by Me</h3>
+              <h3 class="text-green-200 text-lg font-semibold">Approved by Me</h3>
               <p class="text-white text-3xl font-bold">{{ stats.dictApproved }}</p>
             </div>
             <div class="bg-red-600/25 border border-red-400/40 p-4 rounded-lg">
-              <h3 class="text-red-200 text-base font-semibold">Rejected by Me</h3>
+              <h3 class="text-red-200 text-lg font-semibold">Rejected by Me</h3>
               <p class="text-white text-3xl font-bold">{{ stats.dictRejected }}</p>
             </div>
             <div class="bg-blue-600/25 border border-blue-400/40 p-4 rounded-lg">
-              <h3 class="text-blue-200 text-base font-semibold">Total Requests</h3>
+              <h3 class="text-blue-200 text-lg font-semibold">Total Requests</h3>
               <p class="text-white text-3xl font-bold">{{ stats.total }}</p>
             </div>
           </div>
@@ -119,12 +119,12 @@
                       <div class="flex-shrink-0">
                         <i
                           v-if="isPendingStatus(request.status)"
-                          class="fas fa-clock text-yellow-400 text-sm"
+                          class="fas fa-clock text-yellow-400 text-base"
                           title="Pending your approval"
                         ></i>
                         <i
                           v-else
-                          class="fas fa-check-circle text-green-400 text-sm"
+                          class="fas fa-check-circle text-green-400 text-base"
                           title="Processed by you"
                         ></i>
                       </div>
@@ -144,19 +144,19 @@
                     <div class="flex flex-wrap gap-1">
                       <span
                         v-if="hasService(request, 'jeeva')"
-                        class="px-2 py-1 rounded text-xs bg-blue-100 text-blue-800"
+                        class="px-2 py-1 rounded text-sm bg-blue-100 text-blue-800"
                       >
                         Jeeva
                       </span>
                       <span
                         v-if="hasService(request, 'wellsoft')"
-                        class="px-2 py-1 rounded text-xs bg-green-100 text-green-800"
+                        class="px-2 py-1 rounded text-sm bg-green-100 text-green-800"
                       >
                         Wellsoft
                       </span>
                       <span
                         v-if="hasService(request, 'internet')"
-                        class="px-2 py-1 rounded text-xs bg-cyan-100 text-cyan-800"
+                        class="px-2 py-1 rounded text-sm bg-cyan-100 text-cyan-800"
                       >
                         Internet
                       </span>
@@ -195,7 +195,7 @@
                       <!-- Display the exact database status -->
                       <span
                         :class="getStatusBadgeClass(request.status)"
-                        class="rounded text-sm font-medium inline-block"
+                        class="rounded text-base font-medium inline-block"
                         :style="{ padding: '4px 8px', width: 'fit-content' }"
                       >
                         {{ getStatusText(request.status) }}
@@ -208,7 +208,7 @@
                     <div class="flex flex-col items-center space-y-1">
                       <button
                         @click="viewAndProcessRequest(request.id)"
-                        class="bg-blue-600 text-white text-sm rounded hover:bg-blue-700 inline-block font-medium"
+                        class="bg-blue-600 text-white text-base rounded hover:bg-blue-700 inline-block font-medium"
                         :style="{ padding: '6px 12px', width: 'fit-content' }"
                       >
                         View & Process
@@ -216,7 +216,7 @@
                       <button
                         v-if="canEdit(request)"
                         @click="editRequest(request.id)"
-                        class="bg-amber-600 text-white text-sm rounded hover:bg-amber-700 inline-block font-medium"
+                        class="bg-amber-600 text-white text-base rounded hover:bg-amber-700 inline-block font-medium"
                         :style="{ padding: '6px 12px', width: 'fit-content' }"
                       >
                         Edit
@@ -224,7 +224,7 @@
                       <button
                         v-if="canCancel(request)"
                         @click="cancelRequest(request.id)"
-                        class="bg-red-600 text-white text-sm rounded hover:bg-red-700 inline-block font-medium"
+                        class="bg-red-600 text-white text-base rounded hover:bg-red-700 inline-block font-medium"
                         :style="{ padding: '6px 12px', width: 'fit-content' }"
                       >
                         Cancel

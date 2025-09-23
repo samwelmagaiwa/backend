@@ -1,5 +1,5 @@
 <template>
-  <div class="declaration-form-container">
+  <div>
     <!-- Simple Loading Banner Component -->
     <SimpleLoadingBanner
       v-if="isLoadingProfile"
@@ -11,624 +11,633 @@
     <div
       v-show="!isLoadingProfile"
       class="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 py-2 px-4 relative overflow-hidden"
-    role="main"
-    aria-label="Staff Declaration Form for Muhimbili National Hospital"
-    :aria-busy="isLoadingProfile"
-  >
-    <!-- Medical Background Pattern -->
-    <div class="absolute inset-0 overflow-hidden pointer-events-none">
-      <!-- Medical Cross Pattern -->
-      <div class="absolute inset-0 opacity-5">
-        <div class="grid grid-cols-12 gap-8 h-full transform rotate-45">
-          <div
-            v-for="i in backgroundDots"
-            :key="i.id"
-            class="bg-white rounded-full w-2 h-2 animate-pulse"
-            :style="{ animationDelay: i.delay }"
-          ></div>
-        </div>
-      </div>
-      <!-- Floating medical icons -->
-      <div class="absolute inset-0">
-        <div
-          v-for="icon in floatingIcons"
-          :key="icon.id"
-          class="absolute text-white opacity-10 animate-float"
-          :style="{
-            left: icon.left,
-            top: icon.top,
-            animationDelay: icon.animationDelay,
-            animationDuration: icon.animationDuration,
-            fontSize: icon.fontSize
-          }"
-        >
-          <i :class="icon.iconClass"></i>
-        </div>
-      </div>
-    </div>
-
-    <div class="max-w-none mx-auto relative z-10 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 3xl:px-20">
-      <!-- Header Section -->
-      <div class="medical-glass-card rounded-t-3xl p-3 mb-0 border-b border-blue-300/30">
-        <div class="flex justify-between items-center">
-          <!-- Left Logo -->
-          <div class="w-16 h-16 mr-3 transform hover:scale-110 transition-transform duration-300">
+      role="main"
+      aria-label="Staff Declaration Form for Muhimbili National Hospital"
+      :aria-busy="isLoadingProfile"
+    >
+      <!-- Medical Background Pattern -->
+      <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <!-- Medical Cross Pattern -->
+        <div class="absolute inset-0 opacity-5">
+          <div class="grid grid-cols-12 gap-8 h-full transform rotate-45">
             <div
-              class="w-full h-full bg-gradient-to-br from-blue-500/20 to-teal-500/20 rounded-2xl backdrop-blur-sm border-2 border-blue-300/40 flex items-center justify-center shadow-2xl hover:shadow-blue-500/25"
-            >
-              <img
-                src="/assets/images/ngao2.png"
-                alt="National Shield"
-                class="max-w-12 max-h-12 object-contain"
-              />
-            </div>
+              v-for="i in backgroundDots"
+              :key="i.id"
+              class="bg-white rounded-full w-2 h-2 animate-pulse"
+              :style="{ animationDelay: i.delay }"
+            ></div>
           </div>
+        </div>
+        <!-- Floating medical icons -->
+        <div class="absolute inset-0">
+          <div
+            v-for="icon in floatingIcons"
+            :key="icon.id"
+            class="absolute text-white opacity-10 animate-float"
+            :style="{
+              left: icon.left,
+              top: icon.top,
+              animationDelay: icon.animationDelay,
+              animationDuration: icon.animationDuration,
+              fontSize: icon.fontSize
+            }"
+          >
+            <i :class="icon.iconClass"></i>
+          </div>
+        </div>
+      </div>
 
-          <!-- Center Content -->
-          <div class="text-center flex-1">
-            <h1
-              class="text-2xl font-bold text-white mb-1 tracking-wide drop-shadow-lg animate-fade-in"
-            >
-              MUHIMBILI NATIONAL HOSPITAL
-            </h1>
-            <div class="relative inline-block mb-1">
+      <div
+        class="max-w-none mx-auto relative z-10 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 3xl:px-20"
+      >
+        <!-- Header Section -->
+        <div class="medical-glass-card rounded-t-3xl p-3 mb-0 border-b border-blue-300/30">
+          <div class="flex justify-between items-center">
+            <!-- Left Logo -->
+            <div class="w-16 h-16 mr-3 transform hover:scale-110 transition-transform duration-300">
               <div
-                class="bg-gradient-to-r from-red-600 to-red-700 text-white px-4 py-1 rounded-full text-base font-bold shadow-2xl transform hover:scale-105 transition-all duration-300 border-2 border-red-400/60"
+                class="w-full h-full bg-gradient-to-br from-blue-500/20 to-teal-500/20 rounded-2xl backdrop-blur-sm border-2 border-blue-300/40 flex items-center justify-center shadow-2xl hover:shadow-blue-500/25"
               >
-                <span class="relative z-10 flex items-center gap-1">
-                  <i class="fas fa-shield-alt text-red-200 text-xs"></i>
-                  RESTRICTED
-                </span>
-                <div
-                  class="absolute inset-0 bg-gradient-to-r from-red-700 to-red-800 rounded-full opacity-0 hover:opacity-100 transition-opacity duration-300"
-                ></div>
+                <img
+                  src="/assets/images/ngao2.png"
+                  alt="National Shield"
+                  class="max-w-12 max-h-12 object-contain"
+                />
               </div>
             </div>
-            <h2
-              class="text-2xl font-bold text-blue-100 tracking-wide drop-shadow-md animate-fade-in-delay"
-            >
-              DECLARATIONS BY STAFF
-            </h2>
-          </div>
 
-          <!-- Right Logo -->
-          <div class="w-16 h-16 ml-3 transform hover:scale-110 transition-transform duration-300">
-            <div
-              class="w-full h-full bg-gradient-to-br from-teal-500/20 to-blue-500/20 rounded-2xl backdrop-blur-sm border-2 border-teal-300/40 flex items-center justify-center shadow-2xl hover:shadow-teal-500/25"
-            >
-              <img
-                src="/assets/images/logo2.png"
-                alt="Muhimbili Logo"
-                class="max-w-12 max-h-12 object-contain"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Main Form -->
-      <div class="medical-glass-card rounded-b-3xl overflow-hidden">
-        <form
-          @submit.prevent="submitDeclaration"
-          class="p-3 space-y-3"
-          role="form"
-          aria-labelledby="form-title"
-          novalidate
-        >
-          <!-- Declaration Text -->
-          <div
-            class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-2 rounded-xl backdrop-blur-sm hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-300 group"
-          >
-            <div class="flex items-start space-x-4">
-              <div class="flex-shrink-0">
+            <!-- Center Content -->
+            <div class="text-center flex-1">
+              <h1
+                class="text-2xl font-bold text-white mb-1 tracking-wide drop-shadow-lg animate-fade-in"
+              >
+                MUHIMBILI NATIONAL HOSPITAL
+              </h1>
+              <div class="relative inline-block mb-1">
                 <div
-                  class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
+                  class="bg-gradient-to-r from-red-600 to-red-700 text-white px-4 py-1 rounded-full text-base font-bold shadow-2xl transform hover:scale-105 transition-all duration-300 border-2 border-red-400/60"
                 >
-                  <i class="fas fa-info-circle text-white text-lg"></i>
+                  <span class="relative z-10 flex items-center gap-1">
+                    <i class="fas fa-shield-alt text-red-200 text-xs"></i>
+                    RESTRICTED
+                  </span>
+                  <div
+                    class="absolute inset-0 bg-gradient-to-r from-red-700 to-red-800 rounded-full opacity-0 hover:opacity-100 transition-opacity duration-300"
+                  ></div>
                 </div>
               </div>
-              <div class="flex-1">
-                <h3 id="form-title" class="text-base font-bold text-white mb-1 flex items-center">
-                  <i class="fas fa-clipboard-list mr-2 text-blue-300" aria-hidden="true"></i>
-                  Declaration Information
+              <h2
+                class="text-2xl font-bold text-blue-100 tracking-wide drop-shadow-md animate-fade-in-delay"
+              >
+                DECLARATIONS BY STAFF
+              </h2>
+            </div>
+
+            <!-- Right Logo -->
+            <div class="w-16 h-16 ml-3 transform hover:scale-110 transition-transform duration-300">
+              <div
+                class="w-full h-full bg-gradient-to-br from-teal-500/20 to-blue-500/20 rounded-2xl backdrop-blur-sm border-2 border-teal-300/40 flex items-center justify-center shadow-2xl hover:shadow-teal-500/25"
+              >
+                <img
+                  src="/assets/images/logo2.png"
+                  alt="Muhimbili Logo"
+                  class="max-w-12 max-h-12 object-contain"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Form -->
+        <div class="medical-glass-card rounded-b-3xl overflow-hidden">
+          <form
+            @submit.prevent="submitDeclaration"
+            class="p-3 space-y-3"
+            role="form"
+            aria-labelledby="form-title"
+            novalidate
+          >
+            <!-- Declaration Text -->
+            <div
+              class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-2 rounded-xl backdrop-blur-sm hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-300 group"
+            >
+              <div class="flex items-start space-x-4">
+                <div class="flex-shrink-0">
+                  <div
+                    class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
+                  >
+                    <i class="fas fa-info-circle text-white text-lg"></i>
+                  </div>
+                </div>
+                <div class="flex-1">
+                  <h3 id="form-title" class="text-base font-bold text-white mb-1 flex items-center">
+                    <i class="fas fa-clipboard-list mr-2 text-blue-300" aria-hidden="true"></i>
+                    Declaration Information
+                  </h3>
+                  <div class="text-blue-100 leading-relaxed space-y-1">
+                    <p class="text-base font-medium">
+                      These declarations have been designed to certify that users acknowledge that
+                      they are aware of Muhimbili National Hospital Acceptable Information and
+                      Communication Technology use policy and agree to abide by their terms.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Personal Information Section -->
+            <div
+              class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-2 rounded-xl backdrop-blur-sm hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-300 group"
+            >
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center space-x-3">
+                  <div
+                    class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
+                  >
+                    <i class="fas fa-user-md text-white text-lg"></i>
+                  </div>
+                  <h3 class="text-xl font-bold text-white flex items-center">
+                    <i class="fas fa-id-card mr-2 text-blue-300"></i>
+                    Personal Information
+                  </h3>
+                </div>
+                <!-- Auto-population status -->
+                <div class="flex items-center space-x-2">
+                  <span
+                    v-if="isLoadingProfile"
+                    class="text-sm text-blue-300 font-medium bg-blue-500/20 px-2 py-1 rounded-full border border-blue-400/30 animate-pulse"
+                  >
+                    <OrbitingDots size="xs" class="mr-1" />
+                    Loading...
+                  </span>
+                  <span
+                    v-else-if="autoPopulated"
+                    class="text-base text-green-300 font-medium bg-green-500/20 px-2 py-1 rounded-full border border-green-400/30"
+                  >
+                    <i class="fas fa-check mr-1 text-sm"></i>
+                    Auto-populated
+                  </span>
+                  <span
+                    v-else-if="profileLoadError"
+                    class="text-xs text-yellow-300 font-medium bg-yellow-500/20 px-2 py-1 rounded-full border border-yellow-400/30"
+                  >
+                    <i class="fas fa-exclamation-triangle mr-1 text-xs"></i>
+                    Manual entry
+                  </span>
+                </div>
+              </div>
+
+              <div
+                class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-6 gap-4 md:gap-6 lg:gap-8"
+              >
+                <!-- Full Name -->
+                <div class="md:col-span-2 xl:col-span-4 2xl:col-span-6">
+                  <label
+                    class="block text-lg font-bold text-blue-100 mb-2 flex items-center justify-between"
+                  >
+                    <span>Full Name <span class="text-red-400">*</span></span>
+                    <span
+                      v-if="autoPopulated && formData.fullName && !isLoadingProfile"
+                      class="text-base text-green-300 font-medium bg-green-500/20 px-2 py-1 rounded-full border border-green-400/30 flex items-center gap-1"
+                    >
+                      <i class="fas fa-lock text-sm"></i>
+                      Protected
+                    </span>
+                  </label>
+                  <div class="relative">
+                    <input
+                      id="full-name"
+                      v-model="formData.fullName"
+                      type="text"
+                      class="medical-input w-full px-2 py-1.5 border-2 rounded-lg focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 text-base"
+                      :class="{
+                        'bg-blue-500/30 border-blue-400/60 focus:border-blue-500 hover:bg-blue-500/40 focus:bg-blue-500/50 focus:shadow-lg focus:shadow-blue-500/30':
+                          !autoPopulated || isLoadingProfile,
+                        'bg-green-500/20 border-green-400/60 cursor-not-allowed':
+                          autoPopulated && formData.fullName && !isLoadingProfile
+                      }"
+                      :placeholder="
+                        isLoadingProfile
+                          ? 'Loading your name...'
+                          : autoPopulated && formData.fullName
+                            ? 'Auto-populated from your profile'
+                            : 'Enter your full name'
+                      "
+                      :disabled="isLoadingProfile || (autoPopulated && formData.fullName)"
+                      :readonly="autoPopulated && formData.fullName && !isLoadingProfile"
+                      :aria-describedby="
+                        autoPopulated && formData.fullName ? 'full-name-help' : undefined
+                      "
+                      aria-required="true"
+                      autocomplete="name"
+                      required
+                    />
+                    <div
+                      class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/10 to-blue-600/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                    ></div>
+                    <!-- Loading/Success indicator -->
+                    <div
+                      class="absolute right-2 top-1/2 transform -translate-y-1/2 text-blue-300/70"
+                    >
+                      <OrbitingDots v-if="isLoadingProfile" size="xs" />
+                      <i
+                        v-else-if="autoPopulated && formData.fullName"
+                        class="fas fa-check text-green-400 text-xs"
+                      ></i>
+                    </div>
+                  </div>
+                  <!-- Help text for protected field -->
+                  <p
+                    id="full-name-help"
+                    v-if="autoPopulated && formData.fullName && !isLoadingProfile"
+                    class="text-sm text-green-200/70 mt-1 italic flex items-center"
+                    role="status"
+                  >
+                    <i class="fas fa-info-circle mr-1" aria-hidden="true"></i>
+                    This field is auto-populated from your profile and cannot be edited
+                  </p>
+                </div>
+
+                <!-- PF Number -->
+                <div class="xl:col-span-2 2xl:col-span-2">
+                  <label
+                    class="block text-lg font-bold text-blue-100 mb-2 flex items-center justify-between"
+                  >
+                    <span>PF Number <span class="text-red-400">*</span></span>
+                    <span
+                      v-if="autoPopulated && formData.pfNumber && !isLoadingProfile"
+                      class="text-base text-green-300 font-medium bg-green-500/20 px-2 py-1 rounded-full border border-green-400/30 flex items-center gap-1"
+                    >
+                      <i class="fas fa-lock text-sm"></i>
+                      Protected
+                    </span>
+                  </label>
+                  <div class="relative">
+                    <input
+                      id="pf-number"
+                      v-model="formData.pfNumber"
+                      type="text"
+                      class="medical-input w-full px-2 py-1.5 border-2 rounded-lg focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 text-base"
+                      :class="{
+                        'bg-blue-500/30 border-blue-400/60 focus:border-blue-500 hover:bg-blue-500/40 focus:bg-blue-500/50 focus:shadow-lg focus:shadow-blue-500/30':
+                          !autoPopulated || isLoadingProfile,
+                        'bg-green-500/20 border-green-400/60 cursor-not-allowed':
+                          autoPopulated && formData.pfNumber && !isLoadingProfile
+                      }"
+                      :placeholder="
+                        isLoadingProfile
+                          ? 'Loading your PF Number...'
+                          : autoPopulated && formData.pfNumber
+                            ? 'Auto-populated from your profile'
+                            : 'Enter PF Number'
+                      "
+                      :disabled="isLoadingProfile || (autoPopulated && formData.pfNumber)"
+                      :readonly="autoPopulated && formData.pfNumber && !isLoadingProfile"
+                      :aria-describedby="
+                        autoPopulated && formData.pfNumber ? 'pf-number-help' : undefined
+                      "
+                      aria-required="true"
+                      autocomplete="off"
+                      pattern="[-A-Za-z0-9/]+"
+                      required
+                    />
+                    <div
+                      class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/10 to-blue-600/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                    ></div>
+                    <!-- Loading/Success indicator -->
+                    <div
+                      class="absolute right-2 top-1/2 transform -translate-y-1/2 text-blue-300/70"
+                    >
+                      <OrbitingDots v-if="isLoadingProfile" size="xs" />
+                      <i
+                        v-else-if="autoPopulated && formData.pfNumber"
+                        class="fas fa-check text-green-400 text-xs"
+                      ></i>
+                    </div>
+                  </div>
+                  <!-- Help text for protected field -->
+                  <p
+                    id="pf-number-help"
+                    v-if="autoPopulated && formData.pfNumber && !isLoadingProfile"
+                    class="text-sm text-green-200/70 mt-1 italic flex items-center"
+                    role="status"
+                  >
+                    <i class="fas fa-info-circle mr-1" aria-hidden="true"></i>
+                    This field is auto-populated from your profile and cannot be edited
+                  </p>
+                </div>
+
+                <!-- Department/Unit -->
+                <div class="xl:col-span-1 2xl:col-span-2">
+                  <label
+                    class="block text-lg font-bold text-blue-100 mb-2 flex items-center justify-between"
+                  >
+                    <span>Department/Unit <span class="text-red-400">*</span></span>
+                    <span
+                      v-if="autoPopulated && formData.department && !isLoadingProfile"
+                      class="text-base text-green-300 font-medium bg-green-500/20 px-2 py-1 rounded-full border border-green-400/30 flex items-center gap-1"
+                    >
+                      <i class="fas fa-lock text-sm"></i>
+                      Protected
+                    </span>
+                  </label>
+                  <div class="relative">
+                    <select
+                      id="department"
+                      v-model="formData.department"
+                      class="medical-input w-full px-2 py-1.5 bg-blue-500/30 border-2 border-blue-400/60 rounded-lg focus:border-blue-500 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-blue-500/40 focus:bg-blue-500/50 focus:shadow-lg focus:shadow-blue-500/30 appearance-none text-base"
+                      :disabled="isLoadingProfile || (autoPopulated && formData.department)"
+                      :readonly="autoPopulated && formData.department && !isLoadingProfile"
+                      :aria-describedby="
+                        autoPopulated && formData.department ? 'department-help' : undefined
+                      "
+                      aria-required="true"
+                      required
+                    >
+                      <option value="" disabled class="bg-gray-800 text-gray-300">
+                        Select your department
+                      </option>
+                      <option
+                        v-for="dept in departments"
+                        :key="dept"
+                        :value="dept"
+                        class="bg-gray-800 text-white"
+                      >
+                        {{ dept }}
+                      </option>
+                    </select>
+                    <div
+                      class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none"
+                    >
+                      <i class="fas fa-chevron-down text-blue-300"></i>
+                    </div>
+                    <div
+                      class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/10 to-blue-600/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                    ></div>
+                  </div>
+                  <p
+                    id="department-help"
+                    v-if="autoPopulated && formData.department && !isLoadingProfile"
+                    class="text-sm text-green-200/70 mt-1 italic flex items-center"
+                    role="status"
+                  >
+                    <i class="fas fa-info-circle mr-1" aria-hidden="true"></i>
+                    This field is auto-populated from your profile and cannot be edited
+                  </p>
+                </div>
+
+                <!-- Job Title -->
+                <div class="xl:col-span-1 2xl:col-span-2">
+                  <label class="block text-lg font-bold text-blue-100 mb-2">
+                    Job Title <span class="text-red-400">*</span>
+                  </label>
+                  <div class="relative">
+                    <input
+                      id="job-title"
+                      v-model="formData.jobTitle"
+                      type="text"
+                      class="medical-input w-full px-2 py-1.5 bg-blue-500/30 border-2 border-blue-400/60 rounded-lg focus:border-blue-500 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-blue-500/40 focus:bg-blue-500/50 focus:shadow-lg focus:shadow-blue-500/30 text-base"
+                      placeholder="Enter your job title"
+                      aria-required="true"
+                      autocomplete="organization-title"
+                      required
+                    />
+                    <div
+                      class="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/10 to-blue-600/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Declaration Statement -->
+            <div
+              class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-3 rounded-xl backdrop-blur-sm hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-300 group"
+            >
+              <div class="flex items-center space-x-2 mb-2">
+                <div
+                  class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
+                >
+                  <i class="fas fa-file-contract text-white text-xs"></i>
+                </div>
+                <h3 class="text-base font-bold text-white flex items-center">
+                  <i class="fas fa-scroll mr-2 text-blue-300 text-xs"></i>
+                  Declaration Statement
                 </h3>
-                <div class="text-blue-100 leading-relaxed space-y-1">
-                  <p class="text-base font-medium">
-                    These declarations have been designed to certify that users acknowledge that
-                    they are aware of Muhimbili National Hospital Acceptable Information and
-                    Communication Technology use policy and agree to abide by their terms.
+              </div>
+
+              <div class="bg-white/15 p-3 rounded-xl backdrop-blur-sm border-2 border-blue-300/30">
+                <div class="text-blue-100 leading-relaxed text-lg space-y-3 text-justify">
+                  <p>
+                    I
+                    <strong class="text-blue-300">{{
+                      formData.fullName || '______________________'
+                    }}</strong>
+                    PF No.
+                    <strong class="text-blue-300">{{ formData.pfNumber || '______' }}</strong>
+                    acknowledge that Muhimbili National Hospital acceptable ICT use policy has been
+                    made available to me for adequate review and understanding.
+                  </p>
+
+                  <p>
+                    I certify that I have been given ample opportunity to read and understand it,
+                    and ask questions about my responsibilities on it. I am, therefore, aware that I
+                    am accountable to all its terms and requirements; and that I shall abide by
+                    them.
+                  </p>
+
+                  <p>
+                    I also understand that failure to abide by them; Muhimbili National Hospital
+                    shall take against me appropriate disciplinary action or legal action, or both,
+                    as the case may be.
                   </p>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Personal Information Section -->
-          <div
-            class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-2 rounded-xl backdrop-blur-sm hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-300 group"
-          >
-            <div class="flex items-center justify-between mb-2">
-              <div class="flex items-center space-x-3">
+            <!-- Signature Section -->
+            <div
+              class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-3 rounded-xl backdrop-blur-sm hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-300 group"
+            >
+              <div class="flex items-center space-x-2 mb-2">
                 <div
-                  class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
+                  class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
                 >
-                  <i class="fas fa-user-md text-white text-lg"></i>
+                  <i class="fas fa-signature text-white text-sm"></i>
                 </div>
-                <h3 class="text-xl font-bold text-white flex items-center">
-                  <i class="fas fa-id-card mr-2 text-blue-300"></i>
-                  Personal Information
+                <h3 class="text-base font-bold text-white flex items-center">
+                  <i class="fas fa-pen-fancy mr-2 text-blue-300 text-xs"></i>
+                  Digital Signature
                 </h3>
               </div>
-              <!-- Auto-population status -->
-              <div class="flex items-center space-x-2">
-                <span
-                  v-if="isLoadingProfile"
-                  class="text-sm text-blue-300 font-medium bg-blue-500/20 px-2 py-1 rounded-full border border-blue-400/30 animate-pulse"
-                >
-                  <OrbitingDots size="xs" class="mr-1" />
-                  Loading...
-                </span>
-                <span
-                  v-else-if="autoPopulated"
-                  class="text-base text-green-300 font-medium bg-green-500/20 px-2 py-1 rounded-full border border-green-400/30"
-                >
-                  <i class="fas fa-check mr-1 text-sm"></i>
-                  Auto-populated
-                </span>
-                <span
-                  v-else-if="profileLoadError"
-                  class="text-xs text-yellow-300 font-medium bg-yellow-500/20 px-2 py-1 rounded-full border border-yellow-400/30"
-                >
-                  <i class="fas fa-exclamation-triangle mr-1 text-xs"></i>
-                  Manual entry
-                </span>
-              </div>
-            </div>
 
-            <div
-              class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-6 gap-4 md:gap-6 lg:gap-8"
-            >
-              <!-- Full Name -->
-              <div class="md:col-span-2 xl:col-span-4 2xl:col-span-6">
-                <label
-                  class="block text-lg font-bold text-blue-100 mb-2 flex items-center justify-between"
-                >
-                  <span>Full Name <span class="text-red-400">*</span></span>
-                  <span
-                    v-if="autoPopulated && formData.fullName && !isLoadingProfile"
-                    class="text-base text-green-300 font-medium bg-green-500/20 px-2 py-1 rounded-full border border-green-400/30 flex items-center gap-1"
-                  >
-                    <i class="fas fa-lock text-sm"></i>
-                    Protected
-                  </span>
-                </label>
-                <div class="relative">
-                  <input
-                    id="full-name"
-                    v-model="formData.fullName"
-                    type="text"
-                    class="medical-input w-full px-2 py-1.5 border-2 rounded-lg focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 text-base"
-                    :class="{
-                      'bg-blue-500/30 border-blue-400/60 focus:border-blue-500 hover:bg-blue-500/40 focus:bg-blue-500/50 focus:shadow-lg focus:shadow-blue-500/30':
-                        !autoPopulated || isLoadingProfile,
-                      'bg-green-500/20 border-green-400/60 cursor-not-allowed':
-                        autoPopulated && formData.fullName && !isLoadingProfile
-                    }"
-                    :placeholder="
-                      isLoadingProfile
-                        ? 'Loading your name...'
-                        : autoPopulated && formData.fullName
-                          ? 'Auto-populated from your profile'
-                          : 'Enter your full name'
-                    "
-                    :disabled="isLoadingProfile || (autoPopulated && formData.fullName)"
-                    :readonly="autoPopulated && formData.fullName && !isLoadingProfile"
-                    :aria-describedby="
-                      autoPopulated && formData.fullName ? 'full-name-help' : undefined
-                    "
-                    aria-required="true"
-                    autocomplete="name"
-                    required
-                  />
-                  <div
-                    class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/10 to-blue-600/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                  ></div>
-                  <!-- Loading/Success indicator -->
-                  <div class="absolute right-2 top-1/2 transform -translate-y-1/2 text-blue-300/70">
-                    <OrbitingDots v-if="isLoadingProfile" size="xs" />
-                    <i
-                      v-else-if="autoPopulated && formData.fullName"
-                      class="fas fa-check text-green-400 text-xs"
-                    ></i>
-                  </div>
-                </div>
-                <!-- Help text for protected field -->
-                <p
-                  id="full-name-help"
-                  v-if="autoPopulated && formData.fullName && !isLoadingProfile"
-                  class="text-sm text-green-200/70 mt-1 italic flex items-center"
-                  role="status"
-                >
-                  <i class="fas fa-info-circle mr-1" aria-hidden="true"></i>
-                  This field is auto-populated from your profile and cannot be edited
-                </p>
-              </div>
+              <div
+                class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-4 md:gap-6 lg:gap-8"
+              >
+                <!-- Signature Upload -->
+                <div class="md:col-span-2 xl:col-span-3 2xl:col-span-5">
+                  <label class="block text-base font-bold text-blue-100 mb-2">
+                    Signature <span class="text-red-400">*</span>
+                  </label>
 
-              <!-- PF Number -->
-              <div class="xl:col-span-2 2xl:col-span-2">
-                <label
-                  class="block text-lg font-bold text-blue-100 mb-2 flex items-center justify-between"
-                >
-                  <span>PF Number <span class="text-red-400">*</span></span>
-                  <span
-                    v-if="autoPopulated && formData.pfNumber && !isLoadingProfile"
-                    class="text-base text-green-300 font-medium bg-green-500/20 px-2 py-1 rounded-full border border-green-400/30 flex items-center gap-1"
-                  >
-                    <i class="fas fa-lock text-sm"></i>
-                    Protected
-                  </span>
-                </label>
-                <div class="relative">
-                  <input
-                    id="pf-number"
-                    v-model="formData.pfNumber"
-                    type="text"
-                    class="medical-input w-full px-2 py-1.5 border-2 rounded-lg focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 text-base"
-                    :class="{
-                      'bg-blue-500/30 border-blue-400/60 focus:border-blue-500 hover:bg-blue-500/40 focus:bg-blue-500/50 focus:shadow-lg focus:shadow-blue-500/30':
-                        !autoPopulated || isLoadingProfile,
-                      'bg-green-500/20 border-green-400/60 cursor-not-allowed':
-                        autoPopulated && formData.pfNumber && !isLoadingProfile
-                    }"
-                    :placeholder="
-                      isLoadingProfile
-                        ? 'Loading your PF Number...'
-                        : autoPopulated && formData.pfNumber
-                          ? 'Auto-populated from your profile'
-                          : 'Enter PF Number'
-                    "
-                    :disabled="isLoadingProfile || (autoPopulated && formData.pfNumber)"
-                    :readonly="autoPopulated && formData.pfNumber && !isLoadingProfile"
-                    :aria-describedby="
-                      autoPopulated && formData.pfNumber ? 'pf-number-help' : undefined
-                    "
-                    aria-required="true"
-                    autocomplete="off"
-                    pattern="[-A-Za-z0-9/]+"
-                    required
-                  />
-                  <div
-                    class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/10 to-blue-600/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                  ></div>
-                  <!-- Loading/Success indicator -->
-                  <div class="absolute right-2 top-1/2 transform -translate-y-1/2 text-blue-300/70">
-                    <OrbitingDots v-if="isLoadingProfile" size="xs" />
-                    <i
-                      v-else-if="autoPopulated && formData.pfNumber"
-                      class="fas fa-check text-green-400 text-xs"
-                    ></i>
-                  </div>
-                </div>
-                <!-- Help text for protected field -->
-                <p
-                  id="pf-number-help"
-                  v-if="autoPopulated && formData.pfNumber && !isLoadingProfile"
-                  class="text-sm text-green-200/70 mt-1 italic flex items-center"
-                  role="status"
-                >
-                  <i class="fas fa-info-circle mr-1" aria-hidden="true"></i>
-                  This field is auto-populated from your profile and cannot be edited
-                </p>
-              </div>
-
-              <!-- Department/Unit -->
-              <div class="xl:col-span-1 2xl:col-span-2">
-                <label
-                  class="block text-lg font-bold text-blue-100 mb-2 flex items-center justify-between"
-                >
-                  <span>Department/Unit <span class="text-red-400">*</span></span>
-                  <span
-                    v-if="autoPopulated && formData.department && !isLoadingProfile"
-                    class="text-base text-green-300 font-medium bg-green-500/20 px-2 py-1 rounded-full border border-green-400/30 flex items-center gap-1"
-                  >
-                    <i class="fas fa-lock text-sm"></i>
-                    Protected
-                  </span>
-                </label>
-                <div class="relative">
-                  <select
-                    id="department"
-                    v-model="formData.department"
-                    class="medical-input w-full px-2 py-1.5 bg-blue-500/30 border-2 border-blue-400/60 rounded-lg focus:border-blue-500 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-blue-500/40 focus:bg-blue-500/50 focus:shadow-lg focus:shadow-blue-500/30 appearance-none text-base"
-                    :disabled="isLoadingProfile || (autoPopulated && formData.department)"
-                    :readonly="autoPopulated && formData.department && !isLoadingProfile"
-                    :aria-describedby="
-                      autoPopulated && formData.department ? 'department-help' : undefined
-                    "
-                    aria-required="true"
-                    required
-                  >
-                    <option value="" disabled class="bg-gray-800 text-gray-300">
-                      Select your department
-                    </option>
-                    <option
-                      v-for="dept in departments"
-                      :key="dept"
-                      :value="dept"
-                      class="bg-gray-800 text-white"
+                  <div class="relative">
+                    <div
+                      v-if="!signaturePreview"
+                      class="w-full px-2 py-2 border-2 border-dashed border-blue-400/60 rounded-lg focus-within:border-blue-500 bg-blue-500/20 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/30 min-h-[40px] flex items-center justify-center hover:bg-blue-500/30"
                     >
-                      {{ dept }}
-                    </option>
-                  </select>
-                  <div
-                    class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none"
-                  >
-                    <i class="fas fa-chevron-down text-blue-300"></i>
+                      <div class="text-center">
+                        <div class="mb-1">
+                          <i class="fas fa-signature text-blue-300 text-sm mb-1"></i>
+                          <p class="text-blue-100 text-xs">No signature</p>
+                        </div>
+                        <button
+                          type="button"
+                          @click="loadSignature"
+                          @keydown.enter="loadSignature"
+                          @keydown.space.prevent="loadSignature"
+                          class="px-2 py-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-semibold rounded-md hover:from-blue-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/50 focus:ring-2 focus:ring-blue-300 focus:ring-offset-2"
+                          aria-label="Upload digital signature file"
+                        >
+                          <i class="fas fa-download text-xs" aria-hidden="true"></i>
+                          Load Signature
+                        </button>
+                      </div>
+                    </div>
+
+                    <div
+                      v-else
+                      class="w-full px-2 py-1.5 border-2 border-blue-400/60 rounded-lg bg-blue-500/20 backdrop-blur-sm transition-all duration-300 shadow-sm hover:shadow-md hover:bg-blue-500/30 min-h-[35px] flex items-center justify-center relative"
+                    >
+                      <div v-if="isImage(signaturePreview)" class="text-center">
+                        <img
+                          :src="signaturePreview"
+                          alt="Digital Signature"
+                          class="max-h-[25px] max-w-full object-contain mx-auto mb-1"
+                        />
+                        <p class="text-xs text-blue-100 truncate">
+                          {{ signatureFileName }}
+                        </p>
+                      </div>
+                      <div v-else class="text-center">
+                        <div
+                          class="w-5 h-5 bg-red-500/20 rounded-lg flex items-center justify-center mx-auto mb-1"
+                        >
+                          <i class="fas fa-file-pdf text-red-400 text-xs"></i>
+                        </div>
+                        <p class="text-xs text-blue-100 truncate">
+                          {{ signatureFileName }}
+                        </p>
+                      </div>
+
+                      <div class="absolute top-0.5 right-0.5 flex gap-0.5">
+                        <button
+                          type="button"
+                          @click="loadSignature"
+                          class="w-4 h-4 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-blue-600 transition-colors duration-200"
+                          title="Change signature"
+                        >
+                          <i class="fas fa-edit text-xs"></i>
+                        </button>
+                        <button
+                          type="button"
+                          @click="clearSignature"
+                          class="w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors duration-200"
+                          title="Remove signature"
+                        >
+                          <i class="fas fa-times text-xs"></i>
+                        </button>
+                      </div>
+                    </div>
+
+                    <input
+                      ref="signatureInput"
+                      type="file"
+                      accept="image/png,image/jpeg,image/jpg,application/pdf"
+                      @change="onSignatureChange"
+                      class="sr-only"
+                      aria-label="Upload digital signature file"
+                    />
                   </div>
-                  <div
-                    class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/10 to-blue-600/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                  ></div>
                 </div>
-                <p
-                  id="department-help"
-                  v-if="autoPopulated && formData.department && !isLoadingProfile"
-                  class="text-sm text-green-200/70 mt-1 italic flex items-center"
-                  role="status"
-                >
-                  <i class="fas fa-info-circle mr-1" aria-hidden="true"></i>
-                  This field is auto-populated from your profile and cannot be edited
-                </p>
-              </div>
 
-              <!-- Job Title -->
-              <div class="xl:col-span-1 2xl:col-span-2">
-                <label class="block text-lg font-bold text-blue-100 mb-2">
-                  Job Title <span class="text-red-400">*</span>
-                </label>
-                <div class="relative">
-                  <input
-                    id="job-title"
-                    v-model="formData.jobTitle"
-                    type="text"
-                    class="medical-input w-full px-2 py-1.5 bg-blue-500/30 border-2 border-blue-400/60 rounded-lg focus:border-blue-500 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-blue-500/40 focus:bg-blue-500/50 focus:shadow-lg focus:shadow-blue-500/30 text-base"
-                    placeholder="Enter your job title"
-                    aria-required="true"
-                    autocomplete="organization-title"
-                    required
-                  />
-                  <div
-                    class="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/10 to-blue-600/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                  ></div>
+                <!-- Date -->
+                <div class="2xl:col-span-1">
+                  <label class="block text-base font-bold text-blue-100 mb-2">
+                    Date <span class="text-red-400">*</span>
+                  </label>
+                  <div class="relative">
+                    <input
+                      id="signature-date"
+                      v-model="formData.date"
+                      type="date"
+                      class="medical-input w-full px-2 py-1.5 bg-blue-500/30 border-2 border-blue-400/60 rounded-lg focus:border-blue-500 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-blue-500/40 focus:bg-blue-500/50 focus:shadow-lg focus:shadow-blue-500/30 text-sm"
+                      aria-required="true"
+                      :max="maxFutureDate"
+                      required
+                    />
+                    <div
+                      class="absolute inset-0 rounded-xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Declaration Statement -->
-          <div
-            class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-3 rounded-xl backdrop-blur-sm hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-300 group"
-          >
-            <div class="flex items-center space-x-2 mb-2">
-              <div
-                class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
-              >
-                <i class="fas fa-file-contract text-white text-xs"></i>
-              </div>
-              <h3 class="text-base font-bold text-white flex items-center">
-                <i class="fas fa-scroll mr-2 text-blue-300 text-xs"></i>
-                Declaration Statement
-              </h3>
-            </div>
-
-            <div class="bg-white/15 p-3 rounded-xl backdrop-blur-sm border-2 border-blue-300/30">
-              <div class="text-blue-100 leading-relaxed text-lg space-y-3 text-justify">
-                <p>
-                  I
-                  <strong class="text-blue-300">{{
-                    formData.fullName || '______________________'
-                  }}</strong>
-                  PF No.
-                  <strong class="text-blue-300">{{ formData.pfNumber || '______' }}</strong>
-                  acknowledge that Muhimbili National Hospital acceptable ICT use policy has been
-                  made available to me for adequate review and understanding.
-                </p>
-
-                <p>
-                  I certify that I have been given ample opportunity to read and understand it, and
-                  ask questions about my responsibilities on it. I am, therefore, aware that I am
-                  accountable to all its terms and requirements; and that I shall abide by them.
-                </p>
-
-                <p>
-                  I also understand that failure to abide by them; Muhimbili National Hospital shall
-                  take against me appropriate disciplinary action or legal action, or both, as the
-                  case may be.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Signature Section -->
-          <div
-            class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-3 rounded-xl backdrop-blur-sm hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-300 group"
-          >
-            <div class="flex items-center space-x-2 mb-2">
-              <div
-                class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
-              >
-                <i class="fas fa-signature text-white text-sm"></i>
-              </div>
-              <h3 class="text-base font-bold text-white flex items-center">
-                <i class="fas fa-pen-fancy mr-2 text-blue-300 text-xs"></i>
-                Digital Signature
-              </h3>
-            </div>
-
+            <!-- Agreement Checkbox -->
             <div
-              class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-4 md:gap-6 lg:gap-8"
+              class="medical-card bg-gradient-to-r from-red-600/25 to-rose-600/25 border-2 border-red-400/40 p-3 rounded-xl backdrop-blur-sm hover:shadow-xl hover:shadow-red-500/20 transition-all duration-300 group"
             >
-              <!-- Signature Upload -->
-              <div class="md:col-span-2 xl:col-span-3 2xl:col-span-5">
-                <label class="block text-base font-bold text-blue-100 mb-2">
-                  Signature <span class="text-red-400">*</span>
-                </label>
-
-                <div class="relative">
-                  <div
-                    v-if="!signaturePreview"
-                    class="w-full px-2 py-2 border-2 border-dashed border-blue-400/60 rounded-lg focus-within:border-blue-500 bg-blue-500/20 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/30 min-h-[40px] flex items-center justify-center hover:bg-blue-500/30"
-                  >
-                    <div class="text-center">
-                      <div class="mb-1">
-                        <i class="fas fa-signature text-blue-300 text-sm mb-1"></i>
-                        <p class="text-blue-100 text-xs">No signature</p>
-                      </div>
-                      <button
-                        type="button"
-                        @click="loadSignature"
-                        @keydown.enter="loadSignature"
-                        @keydown.space.prevent="loadSignature"
-                        class="px-2 py-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-semibold rounded-md hover:from-blue-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/50 focus:ring-2 focus:ring-blue-300 focus:ring-offset-2"
-                        aria-label="Upload digital signature file"
-                      >
-                        <i class="fas fa-download text-xs" aria-hidden="true"></i>
-                        Load Signature
-                      </button>
-                    </div>
+              <div class="flex items-start space-x-4">
+                <div class="flex-shrink-0 mt-1">
+                  <div class="relative">
+                    <input
+                      v-model="formData.agreement"
+                      type="checkbox"
+                      id="agreement"
+                      class="w-7 h-7 text-red-500 bg-white/15 border-2 border-red-300/40 rounded-lg focus:ring-red-400 focus:ring-2 backdrop-blur-sm transition-all duration-300"
+                      aria-required="true"
+                      aria-describedby="agreement-text"
+                      required
+                    />
+                    <div
+                      class="absolute inset-0 rounded-lg bg-gradient-to-r from-red-500/10 to-rose-500/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                    ></div>
                   </div>
-
-                  <div
-                    v-else
-                    class="w-full px-2 py-1.5 border-2 border-blue-400/60 rounded-lg bg-blue-500/20 backdrop-blur-sm transition-all duration-300 shadow-sm hover:shadow-md hover:bg-blue-500/30 min-h-[35px] flex items-center justify-center relative"
-                  >
-                    <div v-if="isImage(signaturePreview)" class="text-center">
-                      <img
-                        :src="signaturePreview"
-                        alt="Digital Signature"
-                        class="max-h-[25px] max-w-full object-contain mx-auto mb-1"
-                      />
-                      <p class="text-xs text-blue-100 truncate">
-                        {{ signatureFileName }}
-                      </p>
-                    </div>
-                    <div v-else class="text-center">
-                      <div
-                        class="w-5 h-5 bg-red-500/20 rounded-lg flex items-center justify-center mx-auto mb-1"
-                      >
-                        <i class="fas fa-file-pdf text-red-400 text-xs"></i>
-                      </div>
-                      <p class="text-xs text-blue-100 truncate">
-                        {{ signatureFileName }}
-                      </p>
-                    </div>
-
-                    <div class="absolute top-0.5 right-0.5 flex gap-0.5">
-                      <button
-                        type="button"
-                        @click="loadSignature"
-                        class="w-4 h-4 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-blue-600 transition-colors duration-200"
-                        title="Change signature"
-                      >
-                        <i class="fas fa-edit text-xs"></i>
-                      </button>
-                      <button
-                        type="button"
-                        @click="clearSignature"
-                        class="w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors duration-200"
-                        title="Remove signature"
-                      >
-                        <i class="fas fa-times text-xs"></i>
-                      </button>
-                    </div>
-                  </div>
-
-                  <input
-                    ref="signatureInput"
-                    type="file"
-                    accept="image/png,image/jpeg,image/jpg,application/pdf"
-                    @change="onSignatureChange"
-                    class="sr-only"
-                    aria-label="Upload digital signature file"
-                  />
                 </div>
-              </div>
-
-              <!-- Date -->
-              <div class="2xl:col-span-1">
-                <label class="block text-base font-bold text-blue-100 mb-2">
-                  Date <span class="text-red-400">*</span>
+                <label for="agreement" class="text-base text-blue-100 leading-relaxed flex-1">
+                  <span class="font-bold text-red-300 flex items-center gap-2">
+                    <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+                    I hereby confirm that:
+                  </span>
+                  <span id="agreement-text">
+                    I have read, understood, and agree to abide by all terms and conditions of the
+                    Muhimbili National Hospital Acceptable ICT Use Policy. I acknowledge that
+                    violation of this policy may result in disciplinary action or legal
+                    consequences.
+                  </span>
                 </label>
-                <div class="relative">
-                  <input
-                    id="signature-date"
-                    v-model="formData.date"
-                    type="date"
-                    class="medical-input w-full px-2 py-1.5 bg-blue-500/30 border-2 border-blue-400/60 rounded-lg focus:border-blue-500 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-blue-500/40 focus:bg-blue-500/50 focus:shadow-lg focus:shadow-blue-500/30 text-sm"
-                    aria-required="true"
-                    :max="maxFutureDate"
-                    required
-                  />
-                  <div
-                    class="absolute inset-0 rounded-xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                  ></div>
-                </div>
               </div>
             </div>
-          </div>
 
-          <!-- Agreement Checkbox -->
-          <div
-            class="medical-card bg-gradient-to-r from-red-600/25 to-rose-600/25 border-2 border-red-400/40 p-3 rounded-xl backdrop-blur-sm hover:shadow-xl hover:shadow-red-500/20 transition-all duration-300 group"
-          >
-            <div class="flex items-start space-x-4">
-              <div class="flex-shrink-0 mt-1">
-                <div class="relative">
-                  <input
-                    v-model="formData.agreement"
-                    type="checkbox"
-                    id="agreement"
-                    class="w-7 h-7 text-red-500 bg-white/15 border-2 border-red-300/40 rounded-lg focus:ring-red-400 focus:ring-2 backdrop-blur-sm transition-all duration-300"
-                    aria-required="true"
-                    aria-describedby="agreement-text"
-                    required
-                  />
-                  <div
-                    class="absolute inset-0 rounded-lg bg-gradient-to-r from-red-500/10 to-rose-500/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                  ></div>
-                </div>
+            <!-- Form Actions -->
+            <div class="border-t-2 border-blue-300/30 pt-3">
+              <div class="flex flex-col sm:flex-row justify-center gap-3">
+                <button
+                  type="submit"
+                  :disabled="!isFormValid || isSubmitting"
+                  class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-semibold flex items-center justify-center shadow-lg hover:shadow-xl hover:shadow-blue-500/25 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none border-2 border-blue-500/50 focus:ring-2 focus:ring-blue-300 focus:ring-offset-2"
+                  :aria-label="
+                    isSubmitting ? 'Submitting declaration form' : 'Submit declaration form'
+                  "
+                >
+                  <OrbitingDots v-if="isSubmitting" size="sm" class="mr-3" />
+                  <i v-else class="fas fa-file-signature mr-3" aria-hidden="true"></i>
+                  {{ isSubmitting ? 'Submitting...' : 'Submit Declaration' }}
+                </button>
               </div>
-              <label for="agreement" class="text-base text-blue-100 leading-relaxed flex-1">
-                <span class="font-bold text-red-300 flex items-center gap-2">
-                  <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
-                  I hereby confirm that:
-                </span>
-                <span id="agreement-text">
-                  I have read, understood, and agree to abide by all terms and conditions of the
-                  Muhimbili National Hospital Acceptable ICT Use Policy. I acknowledge that
-                  violation of this policy may result in disciplinary action or legal consequences.
-                </span>
-              </label>
             </div>
-          </div>
-
-          <!-- Form Actions -->
-          <div class="border-t-2 border-blue-300/30 pt-3">
-            <div class="flex flex-col sm:flex-row justify-center gap-3">
-              <button
-                type="submit"
-                :disabled="!isFormValid || isSubmitting"
-                class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-semibold flex items-center justify-center shadow-lg hover:shadow-xl hover:shadow-blue-500/25 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none border-2 border-blue-500/50 focus:ring-2 focus:ring-blue-300 focus:ring-offset-2"
-                :aria-label="
-                  isSubmitting ? 'Submitting declaration form' : 'Submit declaration form'
-                "
-              >
-                <OrbitingDots v-if="isSubmitting" size="sm" class="mr-3" />
-                <i v-else class="fas fa-file-signature mr-3" aria-hidden="true"></i>
-                {{ isSubmitting ? 'Submitting...' : 'Submit Declaration' }}
-              </button>
-            </div>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
 
@@ -1939,4 +1948,3 @@
     background: #a1a1a1;
   }
 </style>
-"
