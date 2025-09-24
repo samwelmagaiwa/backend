@@ -484,6 +484,20 @@ const routes = [
     }
   },
 
+  // Head of IT Dict Recommendations
+  {
+    path: '/head_of_it-dashboard/dict-recommendations',
+    name: 'HeadOfItDictRecommendations',
+    component: () =>
+      import(
+        /* webpackChunkName: "head-of-it" */ '../components/views/head-of-it/HeadOfItDictRecommendations.vue'
+      ),
+    meta: {
+      requiresAuth: true,
+      roles: [ROLES.HEAD_OF_IT]
+    }
+  },
+
   // Head of IT Process Request
   {
     path: '/head_of_it-dashboard/process-request/:id',

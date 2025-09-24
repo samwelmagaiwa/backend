@@ -725,8 +725,7 @@ class BothServiceFormService {
       console.error('❌ Error in headItApprove:', error)
       return {
         success: false,
-        error:
-          error.response?.data?.message || error.message || 'Failed to save Head IT approval',
+        error: error.response?.data?.message || error.message || 'Failed to save Head IT approval',
         errors: error.response?.data?.errors || null
       }
     }
@@ -763,8 +762,7 @@ class BothServiceFormService {
       console.error('❌ Error in headItReject:', error)
       return {
         success: false,
-        error:
-          error.response?.data?.message || error.message || 'Failed to save Head IT rejection',
+        error: error.response?.data?.message || error.message || 'Failed to save Head IT rejection',
         errors: error.response?.data?.errors || null
       }
     }

@@ -308,6 +308,111 @@ const headOfItService = {
         message: error.response?.data?.message || 'Network error while canceling task assignment'
       }
     }
+  },
+
+  /**
+   * Get ICT Director recommendations for Head of IT
+   */
+  async getDictRecommendations(params = {}) {
+    try {
+      console.log('🔄 HeadOfItService: Fetching DICT recommendations...', params)
+
+      const response = await axiosInstance.get('/head-of-it/dict-recommendations', {
+        params
+      })
+
+      if (response.data.success) {
+        console.log('✅ HeadOfItService: DICT recommendations loaded successfully')
+        return {
+          success: true,
+          data: response.data,
+          message: response.data.message
+        }
+      } else {
+        console.error(
+          '❌ HeadOfItService: Failed to load DICT recommendations:',
+          response.data.message
+        )
+        return {
+          success: false,
+          message: response.data.message || 'Failed to load DICT recommendations'
+        }
+      }
+    } catch (error) {
+      console.error('❌ HeadOfItService: Error fetching DICT recommendations:', error)
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Network error while loading DICT recommendations'
+      }
+    }
+  },
+
+  /**
+   * Get DICT recommendation statistics for Head of IT
+   */
+  async getDictRecommendationStats() {
+    try {
+      console.log('🔄 HeadOfItService: Fetching DICT recommendation statistics...')
+      const response = await axiosInstance.get('/head-of-it/dict-recommendations/stats')
+
+      if (response.data.success) {
+        console.log('✅ HeadOfItService: DICT recommendation statistics loaded successfully')
+        return {
+          success: true,
+          data: response.data.data,
+          message: response.data.message
+        }
+      } else {
+        console.error('❌ HeadOfItService: Failed to load statistics:', response.data.message)
+        return {
+          success: false,
+          message: response.data.message || 'Failed to load statistics'
+        }
+      }
+    } catch (error) {
+      console.error('❌ HeadOfItService: Error fetching statistics:', error)
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Network error while loading statistics'
+      }
+    }
+  },
+
+  /**
+   * Get detailed DICT recommendation for a specific request
+   */
+  async getDictRecommendationDetails(userAccessId) {
+    try {
+      console.log('🔄 HeadOfItService: Fetching DICT recommendation details for:', userAccessId)
+      const response = await axiosInstance.get(
+        `/head-of-it/dict-recommendations/${userAccessId}/details`
+      )
+
+      if (response.data.success) {
+        console.log('✅ HeadOfItService: DICT recommendation details loaded successfully')
+        return {
+          success: true,
+          data: response.data.data,
+          message: response.data.message
+        }
+      } else {
+        console.error(
+          '❌ HeadOfItService: Failed to load recommendation details:',
+          response.data.message
+        )
+        return {
+          success: false,
+          message: response.data.message || 'Failed to load recommendation details'
+        }
+      }
+    } catch (error) {
+      console.error('❌ HeadOfItService: Error fetching recommendation details:', error)
+      return {
+        success: false,
+        message:
+          error.response?.data?.message || 'Network error while loading recommendation details'
+      }
+    }
   }
 }
 

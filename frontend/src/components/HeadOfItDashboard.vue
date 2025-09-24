@@ -82,7 +82,7 @@
                       >
                         <i class="fas fa-layer-group text-white"></i>
                       </div>
-                      <span class="text-white font-medium text-sm">Access Requests</span>
+                      <span class="text-white font-medium text-sm">Recommendations Notebook</span>
                     </div>
                   </div>
 
@@ -140,8 +140,8 @@
     },
     methods: {
       navigateToRequests() {
-        console.log('Navigating to requests page...')
-        this.$router.push('/head_of_it-dashboard/combined-requests')
+        console.log('Navigating to recommendations notebook...')
+        this.$router.push('/head_of_it-dashboard/dict-recommendations')
       }
     }
   }

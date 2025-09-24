@@ -10,7 +10,7 @@
             ? 'p-1'
             : isDivisionalDirectorUser
               ? 'p-1'
-            : isHodApprovalEditable
+              : isHodApprovalEditable
                 ? 'p-1'
                 : 'p-1'
         ]"
@@ -60,6 +60,7 @@
             'relative z-10',
             isReviewMode ? 'review-mode-compact' : '',
             !isReviewMode && isDivisionalDirectorUser ? 'divisional-director-compact' : '',
+            !isReviewMode && isIctDirectorUser ? 'ict-director-compact' : '',
             !isReviewMode && isHodApprovalEditable ? 'hod-compact' : ''
           ]"
         >
@@ -207,8 +208,8 @@
                           : isIctDirectorUser
                             ? 'max-w-10 max-h-10'
                             : isHodApprovalEditable
-                          ? 'max-w-10 max-h-10'
-                          : 'max-w-12 max-h-12'
+                              ? 'max-w-10 max-h-10'
+                              : 'max-w-12 max-h-12'
                     "
                     class="object-contain"
                   />
@@ -396,7 +397,160 @@
                           ></div>
                         </div>
                       </div>
-                      <div class="md:col-span-2 lg:col-span-4">
+                    </div>
+                    
+                    <!-- Bottom row: Module Requested for (left), Module Selection (middle), and Signature (right) -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
+                      <!-- Module Requested for Section -->
+                      <div class="space-y-3">
+                        <div
+                          class="flex justify-center mb-3"
+                          :class="{
+                            'opacity-50': isReviewMode && !hasWellsoftRequest && !hasJeevaRequest
+                          }"
+                        >
+                          <div
+                            class="bg-white/10 rounded-lg p-5 border border-blue-300/30 backdrop-blur-sm max-w-72 ml-0"
+                          >
+                            <label
+                              class="block text-base font-bold text-blue-100 mb-3 text-center flex items-center justify-center gap-2"
+                            >
+                              <i class="fas fa-toggle-on mr-1 text-blue-300 text-xs"></i>
+                              Module Requested for
+                              <span class="text-red-400">*</span>
+                              <span
+                                v-if="isReviewMode && !hasWellsoftRequest && !hasJeevaRequest"
+                                class="text-xs px-2 py-1 bg-gray-500/30 rounded-full text-gray-300"
+                              >
+                                <i class="fas fa-lock text-xs mr-1"></i>
+                                Not Applicable
+                              </span>
+                            </label>
+                            <div class="flex items-center gap-6 justify-center">
+                              <label
+                                class="flex items-center cursor-pointer px-5 py-3 rounded transition-all border"
+                                :class="{
+                                  'hover:bg-blue-500/20': !isFormSectionReadOnly,
+                                  'bg-amber-500/20 border-amber-400/40 text-amber-200 shadow-md ring-1 ring-amber-400/30':
+                                    isFormSectionReadOnly && wellsoftRequestType === 'use',
+                                  'bg-white/5 border-white/10 text-blue-200/80':
+                                    isFormSectionReadOnly && wellsoftRequestType !== 'use',
+                                  'pointer-events-none':
+                                    isReviewMode && !hasWellsoftRequest && !hasJeevaRequest
+                                }"
+                              >
+                                <input
+                                  v-model="wellsoftRequestType"
+                                  type="radio"
+                                  value="use"
+                                  :disabled="
+                                    (isReviewMode && !hasWellsoftRequest && !hasJeevaRequest) ||
+                                    isFormSectionReadOnly
+                                  "
+                                  :class="[
+                                    'w-5 h-5 border-blue-300 focus:ring-blue-500 mr-3',
+                                    isFormSectionReadOnly
+                                      ? wellsoftRequestType === 'use'
+                                        ? 'text-amber-500 accent-amber-500'
+                                        : 'text-blue-400 accent-blue-400'
+                                      : 'text-blue-600'
+                                  ]"
+                                />
+                                <span
+                                  class="text-base font-medium flex items-center"
+                                  :class="{
+                                    'text-amber-200':
+                                      isFormSectionReadOnly && wellsoftRequestType === 'use',
+                                    'text-blue-100':
+                                      !isFormSectionReadOnly || wellsoftRequestType !== 'use'
+                                  }"
+                                >
+                                  <i
+                                    class="fas fa-plus-circle mr-2 text-sm"
+                                    :class="{
+                                      'text-amber-400':
+                                        isFormSectionReadOnly && wellsoftRequestType === 'use',
+                                      'text-green-400':
+                                        !isFormSectionReadOnly || wellsoftRequestType !== 'use'
+                                    }"
+                                  ></i>
+                                  Use
+                                </span>
+                              </label>
+                              <label
+                                class="flex items-center cursor-pointer px-5 py-3 rounded transition-all border"
+                                :class="{
+                                  'hover:bg-red-500/20': !isFormSectionReadOnly,
+                                  'bg-amber-500/20 border-amber-400/40 text-amber-200 shadow-md ring-1 ring-amber-400/30':
+                                    isFormSectionReadOnly && wellsoftRequestType === 'revoke',
+                                  'bg-white/5 border-white/10 text-blue-200/80':
+                                    isFormSectionReadOnly && wellsoftRequestType !== 'revoke',
+                                  'pointer-events-none':
+                                    isReviewMode && !hasWellsoftRequest && !hasJeevaRequest
+                                }"
+                              >
+                                <input
+                                  v-model="wellsoftRequestType"
+                                  type="radio"
+                                  value="revoke"
+                                  :disabled="
+                                    (isReviewMode && !hasWellsoftRequest && !hasJeevaRequest) ||
+                                    isFormSectionReadOnly
+                                  "
+                                  :class="[
+                                    'w-5 h-5 border-blue-300 focus:ring-blue-500 mr-3',
+                                    isFormSectionReadOnly
+                                      ? wellsoftRequestType === 'revoke'
+                                        ? 'text-amber-500 accent-amber-500'
+                                        : 'text-blue-400 accent-blue-400'
+                                      : 'text-blue-600'
+                                  ]"
+                                />
+                                <span
+                                  class="text-base font-medium flex items-center"
+                                  :class="{
+                                    'text-amber-200':
+                                      isFormSectionReadOnly && wellsoftRequestType === 'revoke',
+                                    'text-blue-100':
+                                      !isFormSectionReadOnly || wellsoftRequestType !== 'revoke'
+                                  }"
+                                >
+                                  <i
+                                    class="fas fa-minus-circle mr-2 text-sm"
+                                    :class="{
+                                      'text-amber-400':
+                                        isFormSectionReadOnly && wellsoftRequestType === 'revoke',
+                                      'text-red-400':
+                                        !isFormSectionReadOnly || wellsoftRequestType !== 'revoke'
+                                    }"
+                                  ></i>
+                                  Revoke
+                                </span>
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Module Selection Section (Middle) -->
+                      <div class="flex items-center justify-center">
+                        <div
+                          class="bg-white/10 rounded-lg border border-blue-300/30 p-4 text-center w-full"
+                          v-once
+                        >
+                          <div class="flex items-center justify-center space-x-2 mb-3">
+                            <i class="fas fa-info-circle text-blue-300 text-base"></i>
+                            <span class="text-base font-medium text-blue-100">Module Selection</span>
+                          </div>
+                          <p class="text-sm text-blue-200/80 leading-relaxed">
+                            Selected modules and purposes will be displayed in the review comments
+                            section for approval workflow.
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <!-- Signature Section -->
+                      <div>
                         <label class="block text-xs font-bold text-blue-100 mb-1 text-center">
                           Signature <span class="text-red-400">*</span>
                         </label>
@@ -541,473 +695,445 @@
                     </div>
                   </div>
 
-                  <!-- Module Request Section -->
-                  <div
-                    :class="[
-                      'medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 rounded-lg backdrop-blur-sm hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 group',
-                      isReviewMode && isIctDirectorUser
-                        ? 'p-0.5'
-                        : isDivisionalDirectorUser || isIctDirectorUser
-                          ? 'p-1'
-                          : isHodApprovalEditable
-                            ? 'p-1'
-                            : 'p-2'
-                    ]"
-                  >
-                    <div class="flex items-center space-x-2 mb-1">
-                      <div
-                        class="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
-                      >
-                        <i class="fas fa-desktop text-white text-sm"></i>
-                      </div>
-                      <h3 class="text-sm font-bold text-white flex items-center">
-                        <i class="fas fa-th-large mr-1 text-blue-300 text-xs"></i>
-                        Module Request
-                      </h3>
-                    </div>
 
-                    <!-- Module Requested for - Compact -->
-                    <div
-                      class="flex justify-center mb-3"
-                      :class="{
-                        'opacity-50': isReviewMode && !hasWellsoftRequest && !hasJeevaRequest
-                      }"
-                    >
+                  <!-- Previous Comments Section - Lazy Loaded -->
+                  <Suspense>
+                    <template #default>
                       <div
-                        class="bg-white/10 rounded-lg p-2 border border-blue-300/30 backdrop-blur-sm"
+                        v-if="hasPreviousComments"
+                        v-show="!loading"
+                        :class="[
+                          'medical-card bg-gradient-to-r from-amber-600/15 to-orange-600/15 border-2 border-amber-400/40 rounded-lg backdrop-blur-sm hover:shadow-lg hover:shadow-amber-500/20 transition-all duration-300 group mb-4',
+                          isReviewMode && isIctDirectorUser
+                            ? 'p-0.5'
+                            : isDivisionalDirectorUser || isIctDirectorUser
+                              ? 'p-1'
+                              : isHodApprovalEditable
+                                ? 'p-1.5'
+                                : 'p-1'
+                        ]"
                       >
-                        <label
-                          class="block text-base font-bold text-blue-100 mb-1 text-center flex items-center justify-center gap-2"
-                        >
-                          <i class="fas fa-toggle-on mr-1 text-blue-300 text-xs"></i>
-                          Module Requested for
-                          <span class="text-red-400">*</span>
-                          <span
-                            v-if="isReviewMode && !hasWellsoftRequest && !hasJeevaRequest"
-                            class="text-xs px-2 py-1 bg-gray-500/30 rounded-full text-gray-300"
-                          >
-                            <i class="fas fa-lock text-xs mr-1"></i>
-                            Not Applicable
-                          </span>
-                        </label>
-                        <div class="flex items-center gap-4 justify-center">
-                          <label
-                            class="flex items-center cursor-pointer p-2 rounded transition-all border"
-                            :class="{
-                              'hover:bg-blue-500/20': !isFormSectionReadOnly,
-                              'bg-amber-500/20 border-amber-400/40 text-amber-200 shadow-md ring-1 ring-amber-400/30':
-                                isFormSectionReadOnly && wellsoftRequestType === 'use',
-                              'bg-white/5 border-white/10 text-blue-200/80':
-                                isFormSectionReadOnly && wellsoftRequestType !== 'use',
-                              'pointer-events-none':
-                                isReviewMode && !hasWellsoftRequest && !hasJeevaRequest
-                            }"
-                          >
-                            <input
-                              v-model="wellsoftRequestType"
-                              type="radio"
-                              value="use"
-                              :disabled="
-                                (isReviewMode && !hasWellsoftRequest && !hasJeevaRequest) ||
-                                isFormSectionReadOnly
-                              "
-                              :class="[
-                                'w-4 h-4 border-blue-300 focus:ring-blue-500 mr-2',
-                                isFormSectionReadOnly
-                                  ? wellsoftRequestType === 'use'
-                                    ? 'text-amber-500 accent-amber-500'
-                                    : 'text-blue-400 accent-blue-400'
-                                  : 'text-blue-600'
-                              ]"
-                            />
-                            <span
-                              class="text-sm font-medium flex items-center"
-                              :class="{
-                                'text-amber-200':
-                                  isFormSectionReadOnly && wellsoftRequestType === 'use',
-                                'text-blue-100':
-                                  !isFormSectionReadOnly || wellsoftRequestType !== 'use'
-                              }"
+                        <div class="flex items-center justify-between mb-1">
+                          <div class="flex items-center space-x-2">
+                            <div
+                              class="w-5 h-5 bg-gradient-to-br from-amber-500 to-orange-600 rounded flex items-center justify-center shadow group-hover:scale-105 transition-transform duration-200 border border-amber-300/50"
                             >
-                              <i
-                                class="fas fa-plus-circle mr-1 text-xs"
-                                :class="{
-                                  'text-amber-400':
-                                    isFormSectionReadOnly && wellsoftRequestType === 'use',
-                                  'text-green-400':
-                                    !isFormSectionReadOnly || wellsoftRequestType !== 'use'
-                                }"
-                              ></i>
-                              Use
-                            </span>
-                          </label>
-                          <label
-                            class="flex items-center cursor-pointer p-2 rounded transition-all border"
-                            :class="{
-                              'hover:bg-red-500/20': !isFormSectionReadOnly,
-                              'bg-amber-500/20 border-amber-400/40 text-amber-200 shadow-md ring-1 ring-amber-400/30':
-                                isFormSectionReadOnly && wellsoftRequestType === 'revoke',
-                              'bg-white/5 border-white/10 text-blue-200/80':
-                                isFormSectionReadOnly && wellsoftRequestType !== 'revoke',
-                              'pointer-events-none':
-                                isReviewMode && !hasWellsoftRequest && !hasJeevaRequest
-                            }"
-                          >
-                            <input
-                              v-model="wellsoftRequestType"
-                              type="radio"
-                              value="revoke"
-                              :disabled="
-                                (isReviewMode && !hasWellsoftRequest && !hasJeevaRequest) ||
-                                isFormSectionReadOnly
-                              "
-                              :class="[
-                                'w-4 h-4 border-blue-300 focus:ring-blue-500 mr-2',
-                                isFormSectionReadOnly
-                                  ? wellsoftRequestType === 'revoke'
-                                    ? 'text-amber-500 accent-amber-500'
-                                    : 'text-blue-400 accent-blue-400'
-                                  : 'text-blue-600'
-                              ]"
-                            />
+                              <i class="fas fa-comments text-white text-xs"></i>
+                            </div>
                             <span
-                              class="text-sm font-medium flex items-center"
-                              :class="{
-                                'text-amber-200':
-                                  isFormSectionReadOnly && wellsoftRequestType === 'revoke',
-                                'text-blue-100':
-                                  !isFormSectionReadOnly || wellsoftRequestType !== 'revoke'
-                              }"
+                              class="text-xs px-2 py-0.5 bg-amber-500/30 rounded-full text-amber-200 font-medium"
                             >
-                              <i
-                                class="fas fa-minus-circle mr-1 text-xs"
-                                :class="{
-                                  'text-amber-400':
-                                    isFormSectionReadOnly && wellsoftRequestType === 'revoke',
-                                  'text-red-400':
-                                    !isFormSectionReadOnly || wellsoftRequestType !== 'revoke'
-                                }"
-                              ></i>
-                              Revoke
+                              {{ previousComments.length }}
                             </span>
-                          </label>
+                          </div>
+                          <h3 class="text-sm font-bold text-white flex items-center">
+                            <i class="fas fa-history mr-1 text-amber-300 text-xs"></i>
+                            Previous Comments
+                          </h3>
                         </div>
-                      </div>
-                    </div>
 
-                    <!-- Wellsoft selector -->
-                    <div class="mb-1" :class="{ 'opacity-50': isWellsoftReadonly }">
-                      <label
-                        class="block text-base font-bold text-blue-100 mb-1 flex items-center gap-2"
-                      >
-                        Wellsoft Modules <span class="text-red-400">*</span>
-                        <span
-                          v-if="isWellsoftReadonly"
-                          class="text-xs px-2 py-1 bg-gray-500/30 rounded-full text-gray-300"
-                        >
-                          <i class="fas fa-lock text-xs mr-1"></i>
-                          Not Requested
-                        </span>
-                      </label>
-                      <div class="flex items-center justify-between mb-1">
-                        <span
-                          class="text-sm transition-all duration-300"
-                          :class="{
-                            'font-bold text-amber-300 bg-amber-500/20 px-3 py-1.5 rounded-full border border-amber-400/30 backdrop-blur-sm shadow-lg':
-                              selectedWellsoft.length && isFormSectionReadOnly,
-                            'text-blue-200': !isFormSectionReadOnly
-                          }"
-                        >
-                          <i
-                            v-if="selectedWellsoft.length && isFormSectionReadOnly"
-                            class="fas fa-star text-amber-400 mr-1 text-xs"
-                          ></i>
-                          {{ selectedWellsoft.length }} modules selected
-                        </span>
-                        <div v-if="!isWellsoftReadonly" class="flex items-center gap-2 text-sm">
-                          <button
-                            type="button"
-                            class="px-3 py-1 bg-blue-500/20 text-blue-200 rounded-lg hover:bg-blue-500/30 transition-colors backdrop-blur-sm border border-blue-400/30"
-                            @click="selectAll('wellsoft')"
+                        <!-- Skeleton loader for initial load -->
+                        <div v-if="loading" class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-2">
+                          <!-- Skeleton for modules summary -->
+                          <div
+                            class="bg-white/5 rounded-lg border border-amber-300/20 animate-pulse"
                           >
-                            Select all
-                          </button>
-                          <button
-                            type="button"
-                            class="px-3 py-1 bg-white/10 text-blue-200 rounded-lg hover:bg-white/20 transition-colors backdrop-blur-sm border border-blue-400/30"
-                            @click="clearAll('wellsoft')"
+                            <div class="h-12 bg-amber-600/20 rounded-t-lg"></div>
+                            <div class="p-4 space-y-3">
+                              <div class="h-4 bg-white/10 rounded w-3/4"></div>
+                              <div class="h-4 bg-white/10 rounded w-1/2"></div>
+                              <div class="h-4 bg-white/10 rounded w-2/3"></div>
+                            </div>
+                          </div>
+                          <!-- Skeleton for comments table -->
+                          <div
+                            class="bg-white/5 rounded-lg border border-amber-300/20 animate-pulse"
                           >
-                            Clear
-                          </button>
+                            <div class="h-12 bg-amber-600/20 rounded-t-lg"></div>
+                            <div class="p-4 space-y-2">
+                              <div class="h-3 bg-white/10 rounded w-full"></div>
+                              <div class="h-3 bg-white/10 rounded w-5/6"></div>
+                              <div class="h-3 bg-white/10 rounded w-4/5"></div>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                      <div v-if="!isWellsoftReadonly" class="relative mb-1">
-                        <input
-                          v-model.trim="wellsoftQuery"
-                          class="medical-input w-full px-3 py-2 pl-8 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm text-sm"
-                          placeholder="Search Wellsoft modules"
-                        />
-                        <i
-                          class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-blue-300 text-xs"
-                        ></i>
-                      </div>
 
-                      <!-- Selected chips -->
-                      <div v-if="selectedWellsoft.length" class="flex flex-wrap gap-1 mb-1">
-                        <span
-                          v-for="m in selectedWellsoft"
-                          :key="'selW-' + m"
-                          class="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-sm backdrop-blur-sm border transition-all duration-300 transform"
-                          :class="{
-                            'font-bold text-amber-200 bg-gradient-to-r from-amber-500/25 to-amber-600/25 border-amber-400/40 shadow-lg hover:shadow-xl hover:scale-105 hover:from-amber-500/30 hover:to-amber-600/30':
-                              isFormSectionReadOnly,
-                            'text-blue-100 bg-blue-500/20 border-blue-400/30':
-                              !isFormSectionReadOnly
-                          }"
-                        >
-                          <i
-                            class="fas fa-check transition-colors duration-300"
-                            :class="{
-                              'text-amber-400': isFormSectionReadOnly,
-                              'text-blue-300': !isFormSectionReadOnly
-                            }"
-                          ></i>
-                          <span class="relative">
-                            {{ m }}
+                        <!-- Two-column layout: Modules Summary + Comments Table -->
+                        <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-1">
+                          <!-- Left: Selected Modules Summary -->
+                          <div class="lg:col-span-1">
                             <div
-                              v-if="isFormSectionReadOnly"
-                              class="absolute inset-0 rounded bg-gradient-to-r from-amber-500/10 to-amber-600/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                            ></div>
-                          </span>
-                          <button
-                            v-if="!isWellsoftReadonly"
-                            type="button"
-                            @click="toggleWellsoft(m)"
-                            class="ml-1 hover:text-blue-200 transition-colors"
-                          >
-                            <i class="fas fa-times"></i>
-                          </button>
-                        </span>
-                      </div>
+                              class="bg-white/10 rounded-lg border border-amber-300/30 backdrop-blur-sm overflow-hidden"
+                            >
+                              <!-- Header -->
+                              <div class="border-b border-amber-300/30 p-2" style="background-color: #000075;">
+                                <h4 class="text-xs font-bold text-white flex items-center">
+                                  <i class="fas fa-list-check mr-1 text-white text-xs"></i>
+                                  Selected Modules Summary
+                                </h4>
+                              </div>
 
-                      <!-- No modules message for readonly state -->
-                      <div
-                        v-if="isWellsoftReadonly && selectedWellsoft.length === 0"
-                        class="bg-gray-500/10 rounded-lg p-4 border border-gray-400/30 text-center"
-                      >
-                        <i class="fas fa-info-circle text-gray-400 mb-1 text-lg"></i>
-                        <p class="text-gray-300 text-sm">No Wellsoft modules requested</p>
-                      </div>
+                              <!-- Tabular Content -->
+                              <div class="p-2">
+                                <table class="w-full">
+                                  <thead>
+                                    <tr class="border-b border-amber-300/20">
+                                      <th
+                                        class="text-left py-1 px-2 text-xs font-bold text-blue-200 uppercase tracking-wide"
+                                      >
+                                        <i class="fas fa-laptop mr-1 text-xs"></i>Wellsoft
+                                      </th>
+                                      <th
+                                        class="text-left py-1 px-2 text-xs font-bold text-cyan-200 uppercase tracking-wide"
+                                      >
+                                        <i class="fas fa-box mr-1 text-xs"></i>Jeeva
+                                      </th>
+                                      <th
+                                        class="text-left py-1 px-2 text-xs font-bold text-green-200 uppercase tracking-wide"
+                                      >
+                                        <i class="fas fa-globe mr-1 text-xs"></i>Internet
+                                      </th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    <tr
+                                      class="align-top"
+                                      v-memo="[
+                                        hasWellsoftRequest,
+                                        hasJeevaRequest,
+                                        hasInternetRequest,
+                                        selectedWellsoft,
+                                        selectedJeeva,
+                                        internetPurposes
+                                      ]"
+                                    >
+                                      <!-- Wellsoft Modules Column -->
+                                      <td
+                                        class="py-2 px-2 border-r border-amber-300/20 vertical-align-top"
+                                      >
+                                        <div
+                                          v-if="!hasWellsoftRequest"
+                                          class="text-xs text-gray-400 italic"
+                                        >
+                                          Not Requested
+                                        </div>
+                                        <div
+                                          v-else-if="selectedWellsoft.length === 0"
+                                          class="text-xs text-gray-400 italic"
+                                        >
+                                          No modules selected
+                                        </div>
+                                        <div v-else class="space-y-0.5" v-memo="[selectedWellsoft]">
+                                          <template
+                                            v-for="module in selectedWellsoft.slice(0, 8)"
+                                            :key="'well-' + module"
+                                          >
+                                            <div class="flex items-center space-x-1.5">
+                                              <div
+                                                class="w-1 h-1 bg-blue-400 rounded-full flex-shrink-0"
+                                              ></div>
+                                              <span class="text-xs text-blue-100 font-medium">{{
+                                                module
+                                              }}</span>
+                                            </div>
+                                          </template>
+                                          <div
+                                            v-if="selectedWellsoft.length > 8"
+                                            class="text-xs text-blue-200/70 italic"
+                                          >
+                                            +{{ selectedWellsoft.length - 8 }} more
+                                          </div>
+                                        </div>
+                                      </td>
 
-                      <!-- Options grid -->
-                      <div
-                        v-if="!isWellsoftReadonly"
-                        class="bg-white/10 rounded-lg p-2 max-h-32 border border-blue-300/30 overflow-y-auto backdrop-blur-sm"
-                      >
-                        <div
-                          class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-1"
-                        >
-                          <label
-                            v-for="m in filteredWellsoft"
-                            :key="'optW-' + m"
-                            class="flex items-center p-1 hover:bg-blue-500/20 rounded-lg cursor-pointer transition-colors border border-blue-400/20"
-                          >
-                            <input
-                              type="checkbox"
-                              :checked="isSelected('wellsoft', m)"
-                              @change="toggleWellsoft(m)"
-                              class="w-4 h-4 text-blue-600 border-blue-300 rounded focus:ring-blue-500 mr-3 module-request-editable"
-                            />
-                            <span class="text-sm font-medium text-blue-100">{{ m }}</span>
-                          </label>
-                        </div>
-                      </div>
-                    </div>
+                                      <!-- Jeeva Modules Column -->
+                                      <td
+                                        class="py-2 px-2 border-r border-amber-300/20 vertical-align-top"
+                                      >
+                                        <div
+                                          v-if="!hasJeevaRequest"
+                                          class="text-xs text-gray-400 italic"
+                                        >
+                                          Not Requested
+                                        </div>
+                                        <div
+                                          v-else-if="selectedJeeva.length === 0"
+                                          class="text-xs text-gray-400 italic"
+                                        >
+                                          No modules selected
+                                        </div>
+                                        <div v-else class="space-y-0.5" v-memo="[selectedJeeva]">
+                                          <template
+                                            v-for="module in selectedJeeva.slice(0, 8)"
+                                            :key="'jeeva-' + module"
+                                          >
+                                            <div class="flex items-center space-x-1.5">
+                                              <div
+                                                class="w-1 h-1 bg-cyan-400 rounded-full flex-shrink-0"
+                                              ></div>
+                                              <span class="text-xs text-cyan-100 font-medium">{{
+                                                module
+                                              }}</span>
+                                            </div>
+                                          </template>
+                                          <div
+                                            v-if="selectedJeeva.length > 8"
+                                            class="text-xs text-cyan-200/70 italic"
+                                          >
+                                            +{{ selectedJeeva.length - 8 }} more
+                                          </div>
+                                        </div>
+                                      </td>
 
-                    <!-- Jeeva selector -->
-                    <div class="mb-1" :class="{ 'opacity-50': isJeevaReadonly }">
-                      <label
-                        class="block text-base font-bold text-blue-100 mb-1 flex items-center gap-2"
-                      >
-                        Jeeva Modules <span class="text-red-400">*</span>
-                        <span
-                          v-if="isJeevaReadonly"
-                          class="text-xs px-2 py-1 bg-gray-500/30 rounded-full text-gray-300"
-                        >
-                          <i class="fas fa-lock text-xs mr-1"></i>
-                          Not Requested
-                        </span>
-                      </label>
-                      <div class="flex items-center justify-between mb-1">
-                        <span
-                          class="text-sm transition-all duration-300"
-                          :class="{
-                            'font-bold text-amber-300 bg-amber-500/20 px-3 py-1.5 rounded-full border border-amber-400/30 backdrop-blur-sm shadow-lg':
-                              selectedJeeva.length && isFormSectionReadOnly,
-                            'text-blue-200': !isFormSectionReadOnly
-                          }"
-                        >
-                          <i
-                            v-if="selectedJeeva.length && isFormSectionReadOnly"
-                            class="fas fa-star text-amber-400 mr-1 text-xs"
-                          ></i>
-                          {{ selectedJeeva.length }} modules selected
-                        </span>
-                        <div v-if="!isJeevaReadonly" class="flex items-center gap-2 text-sm">
-                          <button
-                            type="button"
-                            class="px-3 py-1 bg-cyan-500/20 text-cyan-200 rounded-lg hover:bg-cyan-500/30 transition-colors backdrop-blur-sm border border-cyan-400/30"
-                            @click="selectAll('jeeva')"
-                          >
-                            Select all
-                          </button>
-                          <button
-                            type="button"
-                            class="px-3 py-1 bg-white/10 text-blue-200 rounded-lg hover:bg-white/20 transition-colors backdrop-blur-sm border border-blue-400/30"
-                            @click="clearAll('jeeva')"
-                          >
-                            Clear
-                          </button>
-                        </div>
-                      </div>
-                      <div v-if="!isJeevaReadonly" class="relative mb-1">
-                        <input
-                          v-model.trim="jeevaQuery"
-                          class="medical-input w-full px-3 py-2 pl-8 bg-white/15 border border-blue-300/30 rounded-lg focus:border-cyan-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm text-sm"
-                          placeholder="Search Jeeva modules"
-                        />
-                        <i
-                          class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-cyan-300 text-xs"
-                        ></i>
-                      </div>
+                                      <!-- Internet Purpose Column -->
+                                      <td class="py-2 px-2 vertical-align-top">
+                                        <div
+                                          v-if="!hasInternetRequest"
+                                          class="text-xs text-gray-400 italic"
+                                        >
+                                          Not Requested
+                                        </div>
+                                        <div
+                                          v-else-if="!filteredInternetPurposes.length"
+                                          class="text-xs text-gray-400 italic"
+                                        >
+                                          No purposes specified
+                                        </div>
+                                        <div
+                                          v-else
+                                          class="space-y-0.5"
+                                          v-memo="[filteredInternetPurposes]"
+                                        >
+                                          <template
+                                            v-for="(
+                                              purpose, index
+                                            ) in filteredInternetPurposes.slice(0, 4)"
+                                            :key="'purpose-' + index"
+                                          >
+                                            <div class="flex items-start space-x-1.5">
+                                              <div
+                                                class="w-3 h-3 bg-green-500/30 rounded-full flex items-center justify-center flex-shrink-0"
+                                              >
+                                                <span class="text-xs text-green-300 font-bold">{{
+                                                  index + 1
+                                                }}</span>
+                                              </div>
+                                              <span
+                                                class="text-xs text-green-100 font-medium leading-tight"
+                                                >{{ purpose }}</span
+                                              >
+                                            </div>
+                                          </template>
+                                          <div
+                                            v-if="filteredInternetPurposes.length > 4"
+                                            class="text-xs text-green-200/70 italic"
+                                          >
+                                            +{{ filteredInternetPurposes.length - 4 }} more
+                                          </div>
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                          </div>
 
-                      <div v-if="selectedJeeva.length" class="flex flex-wrap gap-1 mb-1">
-                        <span
-                          v-for="m in selectedJeeva"
-                          :key="'selJ-' + m"
-                          class="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-sm backdrop-blur-sm border transition-all duration-300 transform"
-                          :class="{
-                            'font-bold text-amber-200 bg-gradient-to-r from-amber-500/25 to-amber-600/25 border-amber-400/40 shadow-lg hover:shadow-xl hover:scale-105 hover:from-amber-500/30 hover:to-amber-600/30':
-                              isFormSectionReadOnly,
-                            'text-cyan-100 bg-cyan-500/20 border-cyan-400/30':
-                              !isFormSectionReadOnly
-                          }"
-                        >
-                          <i
-                            class="fas fa-check transition-colors duration-300"
-                            :class="{
-                              'text-amber-400': isFormSectionReadOnly,
-                              'text-cyan-300': !isFormSectionReadOnly
-                            }"
-                          ></i>
-                          <span class="relative">
-                            {{ m }}
+                          <!-- Right: Comments Table -->
+                          <div class="lg:col-span-1">
                             <div
-                              v-if="isFormSectionReadOnly"
-                              class="absolute inset-0 rounded bg-gradient-to-r from-amber-500/10 to-amber-600/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                            ></div>
-                          </span>
-                          <button
-                            v-if="!isJeevaReadonly"
-                            type="button"
-                            @click="toggleJeeva(m)"
-                            class="ml-1 hover:text-cyan-200 transition-colors"
-                          >
-                            <i class="fas fa-times"></i>
-                          </button>
-                        </span>
-                      </div>
+                              class="bg-white/10 rounded-lg border border-amber-300/30 backdrop-blur-sm overflow-hidden"
+                            >
+                              <!-- Table Header -->
+                              <div class="border-b border-amber-300/30 p-3" style="background-color: #000075;">
+                                <div
+                                  class="grid grid-cols-12 gap-3 text-xs font-bold text-white uppercase tracking-wide"
+                                >
+                                  <div class="col-span-2">Name</div>
+                                  <div class="col-span-2">Role</div>
+                                  <div class="col-span-4">Comments</div>
+                                  <div class="col-span-2">Status</div>
+                                  <div class="col-span-2">Date</div>
+                                </div>
+                              </div>
 
-                      <!-- No modules message for readonly state -->
-                      <div
-                        v-if="isJeevaReadonly && selectedJeeva.length === 0"
-                        class="bg-gray-500/10 rounded-lg p-4 border border-gray-400/30 text-center"
-                      >
-                        <i class="fas fa-info-circle text-gray-400 mb-1 text-lg"></i>
-                        <p class="text-gray-300 text-sm">No Jeeva modules requested</p>
-                      </div>
+                              <!-- Table Body with Virtual Scrolling -->
+                              <div class="max-h-48 overflow-y-auto custom-scrollbar">
+                                <!-- Show only visible comments for performance -->
+                                <template
+                                  v-for="(comment, index) in visibleComments"
+                                  :key="comment.stage + '-' + index"
+                                >
+                                  <div
+                                    :class="[
+                                      'grid grid-cols-12 gap-2 p-2 border-b border-amber-300/20 transition-none hover:bg-amber-500/10 items-start',
+                                      index === visibleComments.length - 1 ? 'border-b-0' : ''
+                                    ]"
+                                    v-memo="[
+                                      comment.name,
+                                      comment.stageName,
+                                      comment.comments,
+                                      comment.isApproved,
+                                      comment.isRejected,
+                                      comment.date
+                                    ]"
+                                  >
+                                    <!-- Name -->
+                                    <div class="col-span-2">
+                                      <div class="flex items-center space-x-1">
+                                        <div
+                                          :class="[
+                                            'w-4 h-4 rounded-full flex items-center justify-center text-xs flex-shrink-0',
+                                            comment.isApproved
+                                              ? 'bg-green-500/30 text-green-300'
+                                              : comment.isRejected
+                                                ? 'bg-red-500/30 text-red-300'
+                                                : 'bg-blue-500/30 text-blue-300'
+                                          ]"
+                                        >
+                                          <i
+                                            :class="[
+                                              'text-xs',
+                                              comment.isApproved
+                                                ? 'fas fa-check'
+                                                : comment.isRejected
+                                                  ? 'fas fa-times'
+                                                  : 'fas fa-clock'
+                                            ]"
+                                          ></i>
+                                        </div>
+                                        <div class="text-xs text-white font-medium truncate">
+                                          {{ comment.name || 'Name not available' }}
+                                        </div>
+                                      </div>
+                                    </div>
 
-                      <div
-                        v-if="!isJeevaReadonly"
-                        class="bg-white/10 rounded-lg p-3 border border-blue-300/30 backdrop-blur-sm"
-                      >
-                        <div
-                          class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-7 gap-3"
-                        >
-                          <label
-                            v-for="m in filteredJeeva"
-                            :key="'optJ-' + m"
-                            class="flex items-center p-2 hover:bg-cyan-500/20 rounded-lg cursor-pointer transition-colors border border-cyan-400/20"
-                          >
-                            <input
-                              type="checkbox"
-                              :checked="isSelected('jeeva', m)"
-                              @change="toggleJeeva(m)"
-                              class="w-4 h-4 text-cyan-600 border-cyan-300 rounded focus:ring-cyan-500 mr-3 module-request-editable"
-                            />
-                            <span class="text-sm font-medium text-cyan-100">{{ m }}</span>
-                          </label>
-                        </div>
-                      </div>
-                    </div>
+                                    <!-- Role -->
+                                    <div class="col-span-2">
+                                      <div class="text-xs text-amber-200 font-medium">
+                                        {{ comment.stageName }}
+                                      </div>
+                                    </div>
 
-                    <!-- Internet selector -->
-                    <div class="mb-1" :class="{ 'opacity-50': isInternetReadonly }">
-                      <label
-                        class="block text-base font-bold text-blue-100 mb-1 flex items-center gap-2"
-                      >
-                        Internet Purpose <span class="text-red-400">*</span>
-                        <span
-                          v-if="isInternetReadonly"
-                          class="text-xs px-2 py-1 bg-gray-500/30 rounded-full text-gray-300"
-                        >
-                          <i class="fas fa-lock text-xs mr-1"></i>
-                          Not Requested
-                        </span>
-                      </label>
+                                    <!-- Comments -->
+                                    <div class="col-span-4">
+                                      <div
+                                        :class="[
+                                          'p-1.5 rounded text-xs leading-tight border',
+                                          comment.isApproved
+                                            ? 'bg-green-900/20 border-green-400/30 text-green-100'
+                                            : comment.isRejected
+                                              ? 'bg-red-900/20 border-red-400/30 text-red-100'
+                                              : 'bg-blue-900/20 border-blue-400/30 text-blue-100'
+                                        ]"
+                                      >
+                                        {{ comment.comments }}
+                                      </div>
+                                    </div>
 
-                      <!-- No purposes message for readonly state -->
-                      <div
-                        v-if="isInternetReadonly && !internetPurposes.some((p) => p.trim())"
-                        class="bg-gray-500/10 rounded-lg p-4 border border-gray-400/30 text-center"
-                      >
-                        <i class="fas fa-info-circle text-gray-400 mb-1 text-lg"></i>
-                        <p class="text-gray-300 text-sm">No internet access purposes requested</p>
-                      </div>
+                                    <!-- Status -->
+                                    <div class="col-span-2">
+                                      <span
+                                        :class="[
+                                          'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium',
+                                          comment.isApproved
+                                            ? 'bg-green-600/30 text-green-200 border border-green-400/30'
+                                            : comment.isRejected
+                                              ? 'bg-red-600/30 text-red-200 border border-red-400/30'
+                                              : 'bg-blue-600/30 text-blue-200 border border-blue-400/30'
+                                        ]"
+                                      >
+                                        <i
+                                          :class="[
+                                            'mr-1 text-xs',
+                                            comment.isApproved
+                                              ? 'fas fa-check-circle'
+                                              : comment.isRejected
+                                                ? 'fas fa-times-circle'
+                                                : 'fas fa-clock'
+                                          ]"
+                                        ></i>
+                                        {{
+                                          comment.isApproved
+                                            ? 'OK'
+                                            : comment.isRejected
+                                              ? 'X'
+                                              : 'Rev'
+                                        }}
+                                      </span>
+                                    </div>
 
-                      <!-- Purpose inputs -->
-                      <div
-                        v-if="!isInternetReadonly || internetPurposes.some((p) => p.trim())"
-                        class="space-y-2"
-                      >
-                        <div
-                          v-for="(purpose, index) in internetPurposes"
-                          :key="index"
-                          class="flex items-center gap-2"
-                        >
-                          <span
-                            class="text-xs font-medium text-blue-300 w-5 h-5 bg-blue-500/20 rounded-full flex items-center justify-center border border-blue-400/30"
-                            >{{ index + 1 }}</span
-                          >
-                          <div class="flex-1 relative">
-                            <input
-                              v-model="internetPurposes[index]"
-                              type="text"
-                              :readonly="isInternetReadonly"
-                              class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 module-request-editable text-sm"
-                              :class="{ 'cursor-not-allowed': isInternetReadonly }"
-                              :placeholder="isInternetReadonly ? '' : `Purpose ${index + 1}`"
-                              :required="index === 0 && !isInternetReadonly"
-                            />
-                            <div
-                              v-if="!isInternetReadonly"
-                              class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/10 to-cyan-500/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                            ></div>
+                                    <!-- Date -->
+                                    <div class="col-span-2">
+                                      <div class="flex items-center text-xs text-gray-400">
+                                        <i
+                                          :class="[
+                                            'fas mr-1',
+                                            comment.hasSpecificDate
+                                              ? 'fa-calendar text-gray-400'
+                                              : 'fa-clock text-yellow-400'
+                                          ]"
+                                        ></i>
+                                        <div
+                                          v-if="comment.date"
+                                          :class="comment.hasSpecificDate ? '' : 'text-yellow-300'"
+                                        >
+                                          {{ formatCommentDate(comment.date) }}
+                                          <div
+                                            v-if="!comment.hasSpecificDate"
+                                            class="opacity-70 text-xs"
+                                          >
+                                            (approx.)
+                                          </div>
+                                        </div>
+                                        <div v-else class="text-yellow-300">
+                                          <i class="fas fa-exclamation-triangle mr-1"></i>
+                                          <div class="text-xs">Date unavailable</div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </template>
+                                <!-- Show count if comments are truncated -->
+                                <div
+                                  v-if="previousComments.length > maxVisibleComments"
+                                  class="p-2 text-center border-t border-amber-300/20"
+                                >
+                                  <span class="text-xs text-amber-300/70 italic">
+                                    Showing {{ maxVisibleComments }} of
+                                    {{ previousComments.length }} comments
+                                  </span>
+                                </div>
+                              </div>
+
+                              <!-- Read-only notice -->
+                              <div class="border-t border-amber-300/30 p-2" style="background-color: #000075;">
+                                <div
+                                  class="flex items-center justify-center text-xs text-white"
+                                >
+                                  <i class="fas fa-lock mr-1 text-xs"></i>
+                                  <span>Read-only</span>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
+                    </template>
+                    <template #fallback>
+                      <!-- Fallback skeleton for async loading -->
+                      <div
+                        class="bg-white/5 rounded-lg border border-amber-300/20 animate-pulse p-4"
+                      >
+                        <div class="h-6 bg-amber-600/20 rounded w-1/3 mb-4"></div>
+                        <div class="space-y-3">
+                          <div class="h-4 bg-white/10 rounded"></div>
+                          <div class="h-4 bg-white/10 rounded w-4/5"></div>
+                          <div class="h-4 bg-white/10 rounded w-3/5"></div>
+                        </div>
+                      </div>
+                    </template>
+                  </Suspense>
 
                   <!-- Approval Section -->
                   <div
@@ -2171,16 +2297,28 @@
                               <input
                                 v-model="form.implementation.headIT.name"
                                 type="text"
-                                :readonly="!isHeadItApprovalEditable || (isHeadItApprovalEditable && !!form.implementation.headIT.name)"
+                                :readonly="
+                                  !isHeadItApprovalEditable ||
+                                  (isHeadItApprovalEditable && !!form.implementation.headIT.name)
+                                "
                                 :placeholder="getApprovalNamePlaceholder('head_it')"
                                 class="medical-input w-full px-3 py-2 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm"
                                 :class="{
-                                  'cursor-not-allowed bg-gray-500/20': !isHeadItApprovalEditable || (isHeadItApprovalEditable && !!form.implementation.headIT.name),
-                                  'bg-white/15': !form.implementation.headIT.name && isHeadItApprovalEditable,
-                                  'bg-blue-500/20 border-blue-400/50': isHeadItApprovalEditable && !!form.implementation.headIT.name,
-                                  'font-bold text-yellow-300': isHeadItApprovalEditable && form.implementation.headIT.name
+                                  'cursor-not-allowed bg-gray-500/20':
+                                    !isHeadItApprovalEditable ||
+                                    (isHeadItApprovalEditable && !!form.implementation.headIT.name),
+                                  'bg-white/15':
+                                    !form.implementation.headIT.name && isHeadItApprovalEditable,
+                                  'bg-blue-500/20 border-blue-400/50':
+                                    isHeadItApprovalEditable && !!form.implementation.headIT.name,
+                                  'font-bold text-yellow-300':
+                                    isHeadItApprovalEditable && form.implementation.headIT.name
                                 }"
-                                :title="form.implementation.headIT.name ? 'Auto-populated from your account - cannot be modified' : getApprovalNameTitle('head_it')"
+                                :title="
+                                  form.implementation.headIT.name
+                                    ? 'Auto-populated from your account - cannot be modified'
+                                    : getApprovalNameTitle('head_it')
+                                "
                               />
                               <div
                                 class="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2"
@@ -2364,7 +2502,6 @@
                             </div>
                           </div>
                         </div>
-
                       </div>
 
                       <!-- ICT Officer granting access -->
@@ -2534,7 +2671,6 @@
 
                   <!-- Action Buttons (Review Mode Only) -->
                   <div v-if="isReviewMode && canApproveAtStage()" :class="actionButtonsClass">
-
                     <!-- Action Buttons -->
                     <div class="flex justify-between gap-4">
                       <!-- Approve Button - Left Side -->
@@ -3061,6 +3197,7 @@
   .divisional-director-compact {
     /* Reduce overall vertical spacing */
     line-height: 1.3 !important;
+    font-size: 1.125rem; /* 18px base font size - matching review-mode */
   }
 
   .divisional-director-compact .medical-card {
@@ -3089,6 +3226,8 @@
   .divisional-director-compact select {
     padding-top: 0.25rem !important;
     padding-bottom: 0.25rem !important;
+    font-size: 1.125rem !important; /* 18px for form inputs - matching review-mode */
+    line-height: 1.5;
   }
 
   .divisional-director-compact .grid {
@@ -3097,6 +3236,9 @@
 
   .divisional-director-compact label {
     margin-bottom: 0.125rem !important;
+    font-size: 1.25rem !important; /* 20px for labels - matching review-mode */
+    font-weight: 600 !important;
+    line-height: 1.5;
   }
 
   .divisional-director-compact .bg-white\/15 {
@@ -3124,10 +3266,14 @@
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
   }
 
+  .divisional-director-compact h1,
+  .divisional-director-compact h2,
   .divisional-director-compact h3,
   .divisional-director-compact h4,
   .divisional-director-compact h5 {
     margin-bottom: 0.25rem !important;
+    font-size: 1.5rem !important; /* 24px for headings - matching review-mode */
+    line-height: 1.4;
   }
 
   .divisional-director-compact .mb-1 {
@@ -3152,6 +3298,178 @@
 
   .divisional-director-compact .p-4 {
     padding: 0.5rem !important;
+  }
+  
+  /* Button styling for divisional director matching review-mode */
+  .divisional-director-compact button {
+    font-size: 1.125rem !important;
+    padding: 0.5rem 1rem !important;
+    font-weight: 600 !important;
+  }
+  
+  /* General text styling for divisional director matching review-mode */
+  .divisional-director-compact p,
+  .divisional-director-compact div,
+  .divisional-director-compact span {
+    font-size: 1.125rem; /* 18px for general text */
+    line-height: 1.6;
+  }
+  
+  /* Text size classes for divisional director matching review-mode */
+  .divisional-director-compact .text-xs {
+    font-size: 1rem !important;
+  }
+  
+  .divisional-director-compact .text-sm {
+    font-size: 1.125rem !important;
+  }
+  
+  .divisional-director-compact .text-base {
+    font-size: 1.25rem !important;
+  }
+  
+  .divisional-director-compact .text-lg {
+    font-size: 1.375rem !important;
+  }
+  
+  .divisional-director-compact .text-xl {
+    font-size: 1.5rem !important;
+  }
+
+  /* ICT Director compact layout - matching review-mode font sizes */
+  .ict-director-compact {
+    /* Base font size matching review-mode */
+    font-size: 1.125rem; /* 18px base font size - matching review-mode */
+    line-height: 1.6;
+  }
+  
+  .ict-director-compact .medical-card {
+    /* Compact card spacing */
+    margin-bottom: 0.5rem !important;
+    padding: 0.75rem !important;
+  }
+  
+  .ict-director-compact .space-y-1 > * + * {
+    margin-top: 0.25rem !important;
+  }
+  
+  .ict-director-compact .space-y-2 > * + * {
+    margin-top: 0.5rem !important;
+  }
+  
+  .ict-director-compact .space-y-3 > * + * {
+    margin-top: 0.75rem !important;
+  }
+  
+  .ict-director-compact .space-y-4 > * + * {
+    margin-top: 1rem !important;
+  }
+  
+  .ict-director-compact .grid {
+    gap: 0.75rem !important;
+  }
+  
+  /* Labels with large font size matching review-mode */
+  .ict-director-compact label,
+  .ict-director-compact .label {
+    font-size: 1.25rem !important; /* 20px for labels - matching review-mode */
+    font-weight: 600 !important;
+    line-height: 1.5;
+    margin-bottom: 0.5rem !important;
+  }
+  
+  /* Form inputs with large font size matching review-mode */
+  .ict-director-compact input,
+  .ict-director-compact textarea,
+  .ict-director-compact select {
+    font-size: 1.125rem !important; /* 18px for form inputs - matching review-mode */
+    line-height: 1.5;
+    padding: 0.875rem 1rem !important; /* Increase padding for better readability */
+  }
+  
+  /* Headings with large font size matching review-mode */
+  .ict-director-compact h1,
+  .ict-director-compact h2,
+  .ict-director-compact h3,
+  .ict-director-compact h4,
+  .ict-director-compact h5 {
+    font-size: 1.5rem !important; /* 24px for headings - matching review-mode */
+    line-height: 1.4;
+    margin-bottom: 0.75rem !important;
+  }
+  
+  /* Button styling for ICT director matching review-mode */
+  .ict-director-compact button {
+    font-size: 1.125rem !important;
+    padding: 0.875rem 1.5rem !important;
+    font-weight: 600 !important;
+  }
+  
+  /* General text styling for ICT director matching review-mode */
+  .ict-director-compact p,
+  .ict-director-compact div,
+  .ict-director-compact span {
+    font-size: 1.125rem; /* 18px for general text */
+    line-height: 1.6;
+  }
+  
+  /* Text size classes for ICT director matching review-mode */
+  .ict-director-compact .text-xs {
+    font-size: 1rem !important; /* Override small text to be readable */
+  }
+  
+  .ict-director-compact .text-sm {
+    font-size: 1.125rem !important; /* Override small text */
+  }
+  
+  .ict-director-compact .text-base {
+    font-size: 1.25rem !important; /* Larger base text */
+  }
+  
+  .ict-director-compact .text-lg {
+    font-size: 1.375rem !important; /* Even larger text */
+  }
+  
+  .ict-director-compact .text-xl {
+    font-size: 1.5rem !important; /* Extra large text */
+  }
+  
+  /* Padding and margin adjustments for ICT director */
+  .ict-director-compact .p-1 {
+    padding: 0.5rem !important;
+  }
+  
+  .ict-director-compact .p-2 {
+    padding: 0.75rem !important;
+  }
+  
+  .ict-director-compact .p-3 {
+    padding: 1rem !important;
+  }
+  
+  .ict-director-compact .p-4 {
+    padding: 1.25rem !important;
+  }
+  
+  .ict-director-compact .mb-1 {
+    margin-bottom: 0.5rem !important;
+  }
+  
+  .ict-director-compact .mb-2 {
+    margin-bottom: 0.75rem !important;
+  }
+  
+  .ict-director-compact .mb-3 {
+    margin-bottom: 1rem !important;
+  }
+  
+  .ict-director-compact .mb-4 {
+    margin-bottom: 1.25rem !important;
+  }
+  
+  .ict-director-compact .bg-white\/15,
+  .ict-director-compact .bg-white\/20 {
+    padding: 0.875rem !important;
   }
 
   /* HOD compact layout - Enhanced for minimal scrolling */
@@ -3277,6 +3595,30 @@
 
   .hod-compact section {
     width: 100% !important;
+  }
+
+  /* Table styling for modules summary */
+  .vertical-align-top {
+    vertical-align: top !important;
+  }
+
+  /* Custom scrollbar for modules summary table */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(251, 191, 36, 0.3);
+    border-radius: 3px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(251, 191, 36, 0.5);
   }
 </style>
 
@@ -3716,7 +4058,13 @@
         // Debouncing flag for approval button
         processing: false,
         // Divisional Director comments (editable for divisional director)
-        editableDivisionalDirectorComments: ''
+        editableDivisionalDirectorComments: '',
+        // Performance optimization caches
+        _requestTypesCache: null,
+        _filteredPurposesCache: null,
+        // Virtual scrolling configuration
+        maxVisibleComments: 50,
+        maxVisibleModules: 10
       }
     },
     computed: {
@@ -3728,7 +4076,9 @@
           return process.env.NODE_ENV === 'development'
         } catch {
           // Fallback if process.env is not available
-          return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+          return (
+            window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+          )
         }
       },
 
@@ -3755,6 +4105,28 @@
         const q = (this.jeevaQuery || '').toLowerCase()
         return !q ? this.jeevaModules : this.jeevaModules.filter((m) => m.toLowerCase().includes(q))
       },
+
+      // Cached filtered internet purposes for performance
+      filteredInternetPurposes() {
+        if (!Array.isArray(this.internetPurposes)) return []
+        const filtered = this.internetPurposes.filter((p) => p && p.trim())
+        // Cache result to prevent repeated filtering
+        if (this._filteredPurposesCache?.input === JSON.stringify(this.internetPurposes)) {
+          return this._filteredPurposesCache.result
+        }
+        this._filteredPurposesCache = {
+          input: JSON.stringify(this.internetPurposes),
+          result: filtered
+        }
+        return filtered
+      },
+
+      // Virtual scrolling for comments - only show a limited number for performance
+      visibleComments() {
+        if (!Array.isArray(this.previousComments)) return []
+        return this.previousComments.slice(0, this.maxVisibleComments)
+      },
+
       tomorrow() {
         const d = new Date()
         d.setDate(d.getDate() + 1)
@@ -3803,9 +4175,17 @@
         return hasData && hasPath && pathNotEmpty
       },
 
-      // Get request types from loaded data
+      // Get request types from loaded data (cached for performance)
       requestTypes() {
         if (!this.requestData) return []
+
+        // Cache based on request data reference to avoid repeated processing
+        const cacheKey = JSON.stringify(
+          this.requestData.request_types || this.requestData.request_type || []
+        )
+        if (this._requestTypesCache?.key === cacheKey) {
+          return this._requestTypesCache.value
+        }
 
         // Handle both array and object formats
         let types = this.requestData.request_types || this.requestData.request_type || []
@@ -3813,26 +4193,29 @@
           types = [types]
         }
 
+        // Cache the result
+        this._requestTypesCache = { key: cacheKey, value: types }
+
         if (this.isDevelopment) {
-          console.log('Request types:', types)
+          console.log('Request types (computed):', types)
         }
         return types
       },
 
-      // Check if specific request type is included
+      // Check if specific request type is included (optimized with direct checks)
       hasWellsoftRequest() {
-        return this.requestTypes.includes('wellsoft')
+        const types = this.requestTypes
+        return types.includes('wellsoft')
       },
 
       hasJeevaRequest() {
-        return this.requestTypes.includes('jeeva_access') || this.requestTypes.includes('jeeva')
+        const types = this.requestTypes
+        return types.includes('jeeva_access') || types.includes('jeeva')
       },
 
       hasInternetRequest() {
-        return (
-          this.requestTypes.includes('internet_access_request') ||
-          this.requestTypes.includes('internet')
-        )
+        const types = this.requestTypes
+        return types.includes('internet_access_request') || types.includes('internet')
       },
 
       // Determine if sections should be readonly based on review mode and request type
@@ -4216,6 +4599,266 @@
         }
 
         return divisionalComments?.trim() || null
+      },
+
+      // Get ICT Director comments from requestData for Head IT to view
+      ictDirectorComments() {
+        if (!this.requestData) return null
+
+        // Try multiple possible sources for ICT Director comments
+        const ictDirectorComments =
+          this.requestData.ict_director_comments ||
+          this.requestData.dict_comments ||
+          this.requestData.approvals?.directorICT?.comments ||
+          null
+
+        return ictDirectorComments?.trim() || null
+      },
+
+      // Get Head IT comments from requestData for ICT Officer to view
+      headItComments() {
+        if (!this.requestData) return null
+
+        // Try multiple possible sources for Head IT comments
+        const headItComments =
+          this.requestData.head_it_comments ||
+          this.requestData.implementation?.headIT?.comments ||
+          null
+
+        return headItComments?.trim() || null
+      },
+
+      // Get ICT Officer comments from requestData
+      ictOfficerComments() {
+        if (!this.requestData) return null
+
+        // Try multiple possible sources for ICT Officer comments
+        const ictOfficerComments =
+          this.requestData.ict_officer_comments ||
+          this.requestData.implementation?.ictOfficer?.comments ||
+          null
+
+        return ictOfficerComments?.trim() || null
+      },
+
+      // Collect all previous comments from completed stages in chronological order
+      previousComments() {
+        if (!this.requestData || !this.isReviewMode) return []
+
+        // Debug: Log available date fields in requestData
+        if (this.isDevelopment) {
+          console.log('🗓️ Available date fields in requestData:', {
+            all_keys: Object.keys(this.requestData),
+            date_fields: Object.keys(this.requestData).filter(
+              (key) =>
+                key.includes('date') ||
+                key.includes('approved') ||
+                key.includes('created') ||
+                key.includes('updated')
+            ),
+            approvals_structure: this.requestData.approvals,
+            implementation_structure: this.requestData.implementation,
+            hod_approved_at: this.requestData.hod_approved_at,
+            divisional_approved_at: this.requestData.divisional_approved_at,
+            dict_approved_at: this.requestData.dict_approved_at,
+            ict_director_approved_at: this.requestData.ict_director_approved_at,
+            head_it_approved_at: this.requestData.head_it_approved_at,
+            ict_officer_approved_at: this.requestData.ict_officer_approved_at,
+            updated_at: this.requestData.updated_at,
+            created_at: this.requestData.created_at
+          })
+        }
+
+        const comments = []
+        const currentRole = this.getUserRole()?.toLowerCase()
+
+        // Define the approval workflow stages in order
+        const stages = [
+          {
+            key: 'hod',
+            name: 'Head of Department',
+            icon: 'fa-user-tie',
+            color: 'blue',
+            getComments: () => this.hodComments,
+            getDate: () => {
+              const date =
+                this.requestData.hod_approved_at ||
+                this.requestData.approvals?.hod?.approved_at ||
+                this.requestData.approvals?.hod?.date ||
+                this.requestData.hod_date ||
+                this.requestData.updated_at ||
+                this.requestData.created_at
+              if (this.isDevelopment) {
+                console.log('🗓️ HOD Date:', {
+                  date,
+                  sources: {
+                    hod_approved_at: this.requestData.hod_approved_at,
+                    approval_approved_at: this.requestData.approvals?.hod?.approved_at,
+                    approval_date: this.requestData.approvals?.hod?.date,
+                    hod_date: this.requestData.hod_date,
+                    updated_at: this.requestData.updated_at,
+                    created_at: this.requestData.created_at
+                  }
+                })
+              }
+              return date
+            },
+            getName: () => this.requestData.hod_name || this.requestData.approvals?.hod?.name,
+            isCompleted: () => this.isStageCompleted('hod'),
+            getStatus: () =>
+              this.requestData.hod_status || (this.isStageCompleted('hod') ? 'approved' : 'pending')
+          },
+          {
+            key: 'divisional',
+            name: 'Divisional Director',
+            icon: 'fa-user-shield',
+            color: 'purple',
+            getComments: () => this.divisionalDirectorComments,
+            getDate: () => {
+              return (
+                this.requestData.divisional_approved_at ||
+                this.requestData.approvals?.divisionalDirector?.approved_at ||
+                this.requestData.approvals?.divisionalDirector?.date ||
+                this.requestData.divisional_date ||
+                this.requestData.updated_at ||
+                this.requestData.created_at
+              )
+            },
+            getName: () =>
+              this.requestData.divisional_director_name ||
+              this.requestData.approvals?.divisionalDirector?.name,
+            isCompleted: () => this.isStageCompleted('divisional'),
+            getStatus: () =>
+              this.requestData.divisional_status ||
+              (this.isStageCompleted('divisional') ? 'approved' : 'pending')
+          },
+          {
+            key: 'ict_director',
+            name: 'ICT Director',
+            icon: 'fa-user-cog',
+            color: 'teal',
+            getComments: () => this.ictDirectorComments,
+            getDate: () => {
+              return (
+                this.requestData.dict_approved_at ||
+                this.requestData.ict_director_approved_at ||
+                this.requestData.approvals?.directorICT?.approved_at ||
+                this.requestData.approvals?.directorICT?.date ||
+                this.requestData.dict_date ||
+                this.requestData.ict_director_date ||
+                this.requestData.updated_at ||
+                this.requestData.created_at
+              )
+            },
+            getName: () =>
+              this.requestData.dict_name || this.requestData.approvals?.directorICT?.name,
+            isCompleted: () => this.isStageCompleted('ict_director'),
+            getStatus: () =>
+              this.requestData.ict_director_status ||
+              this.requestData.dict_status ||
+              (this.isStageCompleted('ict_director') ? 'approved' : 'pending')
+          },
+          {
+            key: 'head_it',
+            name: 'Head of IT',
+            icon: 'fa-laptop-code',
+            color: 'indigo',
+            getComments: () => this.headItComments,
+            getDate: () => {
+              return (
+                this.requestData.head_it_approved_at ||
+                this.requestData.implementation?.headIT?.approved_at ||
+                this.requestData.implementation?.headIT?.date ||
+                this.requestData.head_it_date ||
+                this.requestData.updated_at ||
+                this.requestData.created_at
+              )
+            },
+            getName: () =>
+              this.requestData.head_it_name || this.requestData.implementation?.headIT?.name,
+            isCompleted: () => this.isStageCompleted('head_it'),
+            getStatus: () =>
+              this.requestData.head_it_status ||
+              (this.isStageCompleted('head_it') ? 'approved' : 'pending')
+          },
+          {
+            key: 'ict_officer',
+            name: 'ICT Officer',
+            icon: 'fa-tools',
+            color: 'green',
+            getComments: () => this.ictOfficerComments,
+            getDate: () => {
+              return (
+                this.requestData.ict_officer_approved_at ||
+                this.requestData.implementation?.ictOfficer?.approved_at ||
+                this.requestData.implementation?.ictOfficer?.date ||
+                this.requestData.ict_officer_date ||
+                this.requestData.updated_at ||
+                this.requestData.created_at
+              )
+            },
+            getName: () =>
+              this.requestData.ict_officer_name ||
+              this.requestData.implementation?.ictOfficer?.name,
+            isCompleted: () => this.isStageCompleted('ict_officer'),
+            getStatus: () =>
+              this.requestData.ict_officer_status ||
+              (this.isStageCompleted('ict_officer') ? 'approved' : 'pending')
+          }
+        ]
+
+        // Only show comments from stages that are completed and have comments
+        // Also exclude the current user's own stage to avoid showing their own comments
+        stages.forEach((stage) => {
+          // Skip if this is the current user's stage (they shouldn't see their own comments in "Previous Comments")
+          const isCurrentUserStage =
+            (currentRole === 'head_of_department' && stage.key === 'hod') ||
+            (currentRole === 'divisional_director' && stage.key === 'divisional') ||
+            (currentRole === 'ict_director' && stage.key === 'ict_director') ||
+            (currentRole === 'head_of_it' && stage.key === 'head_it') ||
+            (currentRole === 'ict_officer' && stage.key === 'ict_officer')
+
+          if (!isCurrentUserStage && stage.isCompleted()) {
+            const stageComments = stage.getComments()
+            if (stageComments) {
+              const status = stage.getStatus()
+              const stageDate = stage.getDate()
+              const fallbackDate = this.requestData.updated_at || this.requestData.created_at
+
+              comments.push({
+                stage: stage.key,
+                stageName: stage.name,
+                icon: stage.icon,
+                color: stage.color,
+                comments: stageComments,
+                date: stageDate || fallbackDate,
+                name: stage.getName(),
+                status: status,
+                isApproved: status === 'approved',
+                isRejected: status === 'rejected',
+                hasSpecificDate: !!stageDate
+              })
+            }
+          }
+        })
+
+        // Sort by date (earliest first to show chronological order)
+        // Use fallback dates if primary dates are not available
+        return comments.sort((a, b) => {
+          const dateA = a.date || this.requestData.updated_at || this.requestData.created_at
+          const dateB = b.date || this.requestData.updated_at || this.requestData.created_at
+
+          if (!dateA && !dateB) return 0
+          if (!dateA) return 1
+          if (!dateB) return -1
+
+          return new Date(dateA) - new Date(dateB)
+        })
+      },
+
+      // Check if there are any previous comments to show
+      hasPreviousComments() {
+        return this.previousComments.length > 0
       },
 
       // Check if approval buttons should be disabled due to missing signature
@@ -4631,12 +5274,12 @@
               userRole: this.getUserRole()
             })
           }
-          
+
           // Auto-populate Head IT name when section becomes editable
           if (isEditable && this.currentUser && this.currentUser.name) {
             const userRole = (this.getUserRole() || '').toLowerCase()
             const isHeadIt = ['head_it', 'head_of_it', 'ict_head', 'it_head'].includes(userRole)
-            
+
             if (isHeadIt && !this.form.implementation.headIT.name) {
               console.log('🎯 Auto-populating Head IT name:', this.currentUser.name)
               this.form.implementation.headIT.name = this.currentUser.name
@@ -4897,20 +5540,20 @@
           // Priority order for roles (highest to lowest)
           const rolePriority = [
             'head_of_it',
-            'head_it', 
+            'head_it',
             'ict_director',
             'divisional_director',
             'head_of_department',
             'ict_officer'
           ]
-          
+
           // Extract role names from the roles array
-          const userRoleNames = this.currentUser.roles.map(roleObj => {
+          const userRoleNames = this.currentUser.roles.map((roleObj) => {
             return typeof roleObj === 'string' ? roleObj : roleObj.name
           })
-          
+
           console.log('📦 User has multiple roles:', userRoleNames)
-          
+
           // Find highest priority role
           for (const priorityRole of rolePriority) {
             if (userRoleNames.includes(priorityRole)) {
@@ -4918,7 +5561,7 @@
               return priorityRole
             }
           }
-          
+
           // Fallback to first role if no priority match
           const firstRole = userRoleNames[0]
           console.log('📦 Using first role as fallback:', firstRole)
@@ -6711,6 +7354,36 @@
         }
       },
 
+      // Helper to format dates for comment display
+      formatCommentDate(dateValue) {
+        if (!dateValue) return 'Date not available'
+        try {
+          const date = new Date(dateValue)
+          if (isNaN(date.getTime())) {
+            // Try to parse it as a different format if the first attempt failed
+            const parsedDate = Date.parse(dateValue)
+            if (isNaN(parsedDate)) return 'Invalid date format'
+            return new Date(parsedDate).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })
+          }
+          return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          })
+        } catch (error) {
+          console.warn('Error formatting comment date:', dateValue, error)
+          return 'Date format error'
+        }
+      },
+
       // Trigger Head IT name population if the current user is Head IT
       triggerHeadItNamePopulationIfNeeded() {
         if (!this.currentUser || !this.currentUser.name || !this.isReviewMode) {
@@ -6749,36 +7422,39 @@
 
       // Debug method to check Head IT status
       debugHeadItStatus() {
-        console.log('\n=== HEAD IT DEBUG STATUS ===');
+        console.log('\n=== HEAD IT DEBUG STATUS ===')
         console.log('User Info:', {
           currentUser: this.currentUser,
           userName: this.currentUser?.name,
           userRole: this.getUserRole(),
           allRoles: this.currentUser?.roles
-        });
+        })
         console.log('Request Info:', {
           requestId: this.requestId,
           requestStatus: this.requestData?.status,
           currentApprovalStage: this.currentApprovalStage
-        });
+        })
         console.log('Form State:', {
           headItName: this.form.implementation.headIT.name,
           headItDate: this.form.implementation.headIT.date,
           headItSignature: this.form.implementation.headIT.signature,
           hasSignaturePreview: !!this.headITSignaturePreview
-        });
+        })
         console.log('Computed Properties:', {
           isReviewMode: this.isReviewMode,
           isHeadItApprovalEditable: this.isHeadItApprovalEditable,
           currentApprovalStage: this.currentApprovalStage
-        });
+        })
         console.log('Button Conditions:', {
           condition1_isReviewMode: this.isReviewMode,
           condition2_isHeadItApprovalEditable: this.isHeadItApprovalEditable,
           condition3_hasHeadItSignature: !!this.form.implementation.headIT.signature,
-          allConditionsMet: this.isReviewMode && this.isHeadItApprovalEditable && this.form.implementation.headIT.signature
-        });
-        console.log('=== END HEAD IT DEBUG ===\n');
+          allConditionsMet:
+            this.isReviewMode &&
+            this.isHeadItApprovalEditable &&
+            this.form.implementation.headIT.signature
+        })
+        console.log('=== END HEAD IT DEBUG ===\n')
       },
 
       // Determine viewer stage and rank helpers
@@ -7338,6 +8014,92 @@
       0.25
     ) !important; /* Slightly more opaque blue background */
     border-color: rgba(251, 191, 36, 0.5) !important; /* Amber border for emphasis */
+  }
+
+  /* Custom scrollbar for Previous Comments section */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(251, 191, 36, 0.6) rgba(59, 130, 246, 0.2);
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 10px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(251, 191, 36, 0.7), rgba(245, 158, 11, 0.8));
+    border-radius: 10px;
+    border: 2px solid rgba(59, 130, 246, 0.2);
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, rgba(251, 191, 36, 0.9), rgba(245, 158, 11, 1));
+  }
+
+  /* Timeline connector animation */
+  .timeline-connector {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .timeline-connector::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(251, 191, 36, 0.6) 20%,
+      rgba(251, 191, 36, 0.8) 50%,
+      rgba(251, 191, 36, 0.6) 80%,
+      transparent 100%
+    );
+    transform: translateX(-50%);
+    animation: timeline-glow 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes timeline-glow {
+    0% {
+      opacity: 0.6;
+      box-shadow: 0 0 5px rgba(251, 191, 36, 0.3);
+    }
+    100% {
+      opacity: 1;
+      box-shadow: 0 0 15px rgba(251, 191, 36, 0.5);
+    }
+  }
+
+  /* Previous Comments section animations */
+  .previous-comments-enter-active,
+  .previous-comments-leave-active {
+    transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+
+  .previous-comments-enter-from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  .previous-comments-leave-to {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  /* Comment item hover effects */
+  .comment-item:hover .comment-icon {
+    transform: scale(1.1) rotate(5deg);
+  }
+
+  .comment-item:hover .comment-content {
+    background-color: rgba(59, 130, 246, 0.05);
   }
 
   /* Responsive grid adjustments */

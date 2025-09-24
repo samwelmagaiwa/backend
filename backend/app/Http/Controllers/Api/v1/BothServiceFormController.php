@@ -220,7 +220,6 @@ class BothServiceFormController extends Controller
                 'hod_approved_by_name' => $currentUser->name,
                 'access_type' => $validated['access_type'],
                 'temporary_until' => $validated['access_type'] === 'temporary' ? $validated['temporary_until'] : null,
-                'status' => 'hod_approved',
                 'hod_status' => 'approved' // Set the new hod_status column
             ];
             
@@ -279,7 +278,7 @@ class BothServiceFormController extends Controller
                 'wellsoft_modules_count' => count($userAccess->wellsoft_modules_selected ?? []),
                 'jeeva_modules_count' => count($userAccess->jeeva_modules_selected ?? []),
                 'module_requested_for' => $userAccess->module_requested_for,
-                'status' => $userAccess->status
+                'calculated_status' => $userAccess->getCalculatedOverallStatus()
             ]);
             
             DB::commit();
@@ -292,7 +291,7 @@ class BothServiceFormController extends Controller
                 'message' => 'HOD approval updated successfully.',
                 'data' => [
                     'request_id' => $userAccess->id,
-                    'status' => $userAccess->status,
+                    'status' => $userAccess->getCalculatedOverallStatus(),
                     'access_rights' => [
                         'type' => $userAccess->access_type,
                         'temporary_until' => $userAccess->temporary_until,
@@ -408,7 +407,7 @@ class BothServiceFormController extends Controller
                 'access_type' => $userAccess->access_type ?? 'permanent',
                 'temporary_until' => $userAccess->temporary_until,
                 'request_type' => $userAccess->request_type ?? [],
-                'status' => $userAccess->status,
+                'status' => $userAccess->getCalculatedOverallStatus(),
                 
                 // Complete approval information with signature status indicators
                 'approvals' => [
@@ -549,7 +548,7 @@ class BothServiceFormController extends Controller
                 'access_type' => $userAccess->access_type ?? 'permanent',
                 'temporary_until' => $userAccess->temporary_until,
                 'request_type' => $userAccess->request_type ?? [],
-                'status' => $userAccess->status,
+                'status' => $userAccess->getCalculatedOverallStatus(),
                 
                 // Complete approval information with signature status indicators
                 'approvals' => [
@@ -615,7 +614,7 @@ class BothServiceFormController extends Controller
             Log::info('✅ Successfully retrieved both service form data', [
                 'id' => $id,
                 'user_id' => $currentUser->id,
-                'status' => $userAccess->status,
+                'calculated_status' => $userAccess->getCalculatedOverallStatus(),
                 'has_hod_signature' => !empty($userAccess->hod_signature_path),
                 'jeeva_modules_count' => $this->getJsonArrayCount($userAccess->jeeva_modules_selected),
                 'wellsoft_modules_count' => $this->getJsonArrayCount($userAccess->wellsoft_modules_selected)
@@ -653,7 +652,7 @@ class BothServiceFormController extends Controller
             // Build base query
             $query = UserAccess::with(['user', 'department']);
             
-            // Apply role-based filtering
+            // Apply role-based filtering using role-specific status columns
             if (array_intersect($userRoles, ['head_of_department']) && !array_intersect($userRoles, ['admin', 'super_admin'])) {
                 // HODs only see requests from their department
                 $hodDepartment = Department::where('hod_user_id', $currentUser->id)->first();
@@ -664,17 +663,39 @@ class BothServiceFormController extends Controller
                     $query->whereRaw('1 = 0');
                 }
                 
-                // HODs see requests pending their approval
-                $query->where('status', 'pending');
+                // HODs see requests pending their approval (hod_status is null or 'pending')
+                $query->where(function($q) {
+                    $q->whereNull('hod_status')
+                      ->orWhere('hod_status', 'pending');
+                });
             } else if (array_intersect($userRoles, ['divisional_director'])) {
                 // Divisional directors see HOD-approved requests
-                $query->where('status', 'hod_approved');
+                $query->where('hod_status', 'approved')
+                      ->where(function($q) {
+                          $q->whereNull('divisional_status')
+                            ->orWhere('divisional_status', 'pending');
+                      });
             } else if (array_intersect($userRoles, ['ict_director'])) {
                 // ICT directors see divisional-approved requests
-                $query->where('status', 'divisional_approved');
+                $query->where('divisional_status', 'approved')
+                      ->where(function($q) {
+                          $q->whereNull('ict_director_status')
+                            ->orWhere('ict_director_status', 'pending');
+                      });
+            } else if (array_intersect($userRoles, ['head_of_it'])) {
+                // Head of IT sees ICT director-approved requests
+                $query->where('ict_director_status', 'approved')
+                      ->where(function($q) {
+                          $q->whereNull('head_it_status')
+                            ->orWhere('head_it_status', 'pending');
+                      });
             } else if (array_intersect($userRoles, ['ict_officer'])) {
-                // ICT officers see director-approved requests
-                $query->where('status', 'ict_director_approved');
+                // ICT officers see head IT-approved requests
+                $query->where('head_it_status', 'approved')
+                      ->where(function($q) {
+                          $q->whereNull('ict_officer_status')
+                            ->orWhere('ict_officer_status', 'pending');
+                      });
             } else if (array_intersect($userRoles, ['admin', 'super_admin'])) {
                 // Admins see all requests
                 // No additional filtering
@@ -692,13 +713,19 @@ class BothServiceFormController extends Controller
                     'staff_name' => $request->staff_name,
                     'department' => $request->department?->name ?? '',
                     'request_type' => $request->request_type ?? [],
-                    'status' => $request->status,
+                    'status' => $request->getCalculatedOverallStatus(),
                     'created_at' => $request->created_at,
                     'wellsoft_modules_count' => $this->getJsonArrayCount($request->wellsoft_modules_selected),
                     'jeeva_modules_count' => $this->getJsonArrayCount($request->jeeva_modules_selected),
                     'has_hod_approval' => !empty($request->hod_approved_at),
                     'has_divisional_approval' => !empty($request->divisional_approved_at),
                     'has_ict_director_approval' => !empty($request->ict_director_approved_at),
+                    // Add role-specific status information
+                    'hod_status' => $request->hod_status ?? 'pending',
+                    'divisional_status' => $request->divisional_status ?? 'pending',
+                    'ict_director_status' => $request->ict_director_status ?? 'pending',
+                    'head_it_status' => $request->head_it_status ?? 'pending',
+                    'ict_officer_status' => $request->ict_officer_status ?? 'pending',
                 ];
             });
             
@@ -771,7 +798,7 @@ class BothServiceFormController extends Controller
             $userAccess = UserAccess::findOrFail($userAccessId);
             
             // Verify request is in correct status (must be HOD approved)
-            if ($userAccess->status !== 'hod_approved') {
+            if ($userAccess->hod_status !== 'approved') {
                 return response()->json([
                     'success' => false,
                     'message' => 'Request must be HOD approved before Divisional Director can approve it.'
@@ -833,7 +860,6 @@ class BothServiceFormController extends Controller
                 'divisional_director_signature_path' => $divisionalSignaturePath,
                 'divisional_approved_at' => $validated['approved_date'],
                 'divisional_director_comments' => $validated['comments'] ?? null,
-                'status' => 'divisional_approved',
                 'divisional_status' => 'approved' // Set the new divisional_status column
             ];
             
@@ -851,7 +877,7 @@ class BothServiceFormController extends Controller
                 'divisional_director_name' => $userAccess->divisional_director_name,
                 'divisional_director_signature_path' => $userAccess->divisional_director_signature_path,
                 'divisional_approved_at' => $userAccess->divisional_approved_at,
-                'status' => $userAccess->status
+                'calculated_status' => $userAccess->getCalculatedOverallStatus()
             ]);
             
             // Create notification for HOD about divisional director approval
@@ -902,7 +928,7 @@ class BothServiceFormController extends Controller
                 'message' => 'Divisional Director approval updated successfully.',
                 'data' => [
                     'request_id' => $userAccess->id,
-                    'status' => $userAccess->status,
+                    'status' => $userAccess->getCalculatedOverallStatus(),
                     'divisional_approval' => [
                         'name' => $userAccess->divisional_director_name,
                         'approved_at' => $userAccess->divisional_approved_at->format('Y-m-d H:i:s'),
@@ -984,7 +1010,7 @@ class BothServiceFormController extends Controller
             $userAccess = UserAccess::findOrFail($userAccessId);
             
             // Verify request is in correct status (must be HOD approved)
-            if ($userAccess->status !== 'hod_approved') {
+            if ($userAccess->hod_status !== 'approved') {
                 return response()->json([
                     'success' => false,
                     'message' => 'Request must be HOD approved before Divisional Director can reject it.'
@@ -998,7 +1024,6 @@ class BothServiceFormController extends Controller
                 'divisional_director_name' => $validated['divisional_director_name'],
                 'divisional_director_comments' => $validated['rejection_reason'],
                 'divisional_approved_at' => $validated['rejection_date'],
-                'status' => 'divisional_rejected',
                 'divisional_status' => 'rejected' // Set the new divisional_status column
             ];
             
@@ -1013,7 +1038,7 @@ class BothServiceFormController extends Controller
             Log::info('✅ User access record updated successfully for divisional rejection', [
                 'user_access_id' => $userAccess->id,
                 'divisional_director_name' => $userAccess->divisional_director_name,
-                'status' => $userAccess->status
+                'calculated_status' => $userAccess->getCalculatedOverallStatus()
             ]);
             
             // Create notification for HOD about divisional director rejection
@@ -1065,7 +1090,7 @@ class BothServiceFormController extends Controller
                 'message' => 'Request rejected by Divisional Director.',
                 'data' => [
                     'request_id' => $userAccess->id,
-                    'status' => $userAccess->status,
+                    'status' => $userAccess->getCalculatedOverallStatus(),
                     'divisional_rejection' => [
                         'name' => $userAccess->divisional_director_name,
                         'rejected_at' => $userAccess->divisional_approved_at->format('Y-m-d H:i:s'),
@@ -1155,7 +1180,7 @@ class BothServiceFormController extends Controller
             $userAccess = UserAccess::findOrFail($userAccessId);
             
             // Verify request is in correct status (must be Divisional approved)
-            if ($userAccess->status !== 'divisional_approved') {
+            if ($userAccess->divisional_status !== 'approved') {
                 return response()->json([
                     'success' => false,
                     'message' => 'Request must be Divisional Director approved before ICT Director can approve it.'
@@ -1217,7 +1242,6 @@ class BothServiceFormController extends Controller
                 'ict_director_signature_path' => $ictDirectorSignaturePath,
                 'ict_director_approved_at' => $validated['approved_date'],
                 'ict_director_comments' => $validated['comments'] ?? null,
-                'status' => 'ict_director_approved',
                 'ict_director_status' => 'approved' // Set the new ict_director_status column
             ];
             
@@ -1235,7 +1259,7 @@ class BothServiceFormController extends Controller
                 'ict_director_name' => $userAccess->ict_director_name,
                 'ict_director_signature_path' => $userAccess->ict_director_signature_path,
                 'ict_director_approved_at' => $userAccess->ict_director_approved_at,
-                'status' => $userAccess->status
+                'calculated_status' => $userAccess->getCalculatedOverallStatus()
             ]);
             
             // Create notification for Divisional Director about ICT director approval
@@ -1262,7 +1286,7 @@ class BothServiceFormController extends Controller
                 'message' => 'ICT Director approval updated successfully.',
                 'data' => [
                     'request_id' => $userAccess->id,
-                    'status' => $userAccess->status,
+                    'status' => $userAccess->getCalculatedOverallStatus(),
                     'ict_director_approval' => [
                         'name' => $userAccess->ict_director_name,
                         'approved_at' => $userAccess->ict_director_approved_at->format('Y-m-d H:i:s'),
@@ -1344,7 +1368,7 @@ class BothServiceFormController extends Controller
             $userAccess = UserAccess::findOrFail($userAccessId);
             
             // Verify request is in correct status (must be Divisional approved)
-            if ($userAccess->status !== 'divisional_approved') {
+            if ($userAccess->divisional_status !== 'approved') {
                 return response()->json([
                     'success' => false,
                     'message' => 'Request must be Divisional Director approved before ICT Director can reject it.'
@@ -1358,7 +1382,6 @@ class BothServiceFormController extends Controller
                 'ict_director_name' => $validated['ict_director_name'],
                 'ict_director_comments' => $validated['rejection_reason'],
                 'ict_director_approved_at' => $validated['rejection_date'],
-                'status' => 'ict_director_rejected',
                 'ict_director_status' => 'rejected' // Set the new ict_director_status column
             ];
             
@@ -1373,7 +1396,7 @@ class BothServiceFormController extends Controller
             Log::info('✅ User access record updated successfully for ICT Director rejection', [
                 'user_access_id' => $userAccess->id,
                 'ict_director_name' => $userAccess->ict_director_name,
-                'status' => $userAccess->status
+                'calculated_status' => $userAccess->getCalculatedOverallStatus()
             ]);
             
             // Create notification for Divisional Director about ICT director rejection
@@ -1398,7 +1421,7 @@ class BothServiceFormController extends Controller
                 'message' => 'Request rejected by ICT Director.',
                 'data' => [
                     'request_id' => $userAccess->id,
-                    'status' => $userAccess->status,
+                    'status' => $userAccess->getCalculatedOverallStatus(),
                     'ict_director_rejection' => [
                         'name' => $userAccess->ict_director_name,
                         'rejected_at' => $userAccess->ict_director_approved_at->format('Y-m-d H:i:s'),
@@ -1550,7 +1573,6 @@ class BothServiceFormController extends Controller
                 'head_it_signature_path' => $headItSignaturePath,
                 'head_it_approved_at' => $validated['approved_date'],
                 'head_it_comments' => $validated['comments'] ?? null,
-                'status' => 'head_it_approved',
                 'head_it_status' => 'approved',
                 'ict_officer_status' => 'pending' // Advance to ICT Officer for implementation
             ];
@@ -1569,7 +1591,7 @@ class BothServiceFormController extends Controller
                 'head_it_name' => $userAccess->head_it_name,
                 'head_it_signature_path' => $userAccess->head_it_signature_path,
                 'head_it_approved_at' => $userAccess->head_it_approved_at,
-                'status' => $userAccess->status
+                'calculated_status' => $userAccess->getCalculatedOverallStatus()
             ]);
             
             DB::commit();
@@ -1582,7 +1604,7 @@ class BothServiceFormController extends Controller
                 'message' => 'Request approved by Head of IT successfully.',
                 'data' => [
                     'request_id' => $userAccess->id,
-                    'status' => $userAccess->status,
+                    'status' => $userAccess->getCalculatedOverallStatus(),
                     'head_it_approval' => [
                         'name' => $userAccess->head_it_name,
                         'approved_at' => $userAccess->head_it_approved_at->format('Y-m-d H:i:s'),
@@ -1681,7 +1703,6 @@ class BothServiceFormController extends Controller
                 'head_it_name' => $validated['head_it_name'],
                 'head_it_approved_at' => $validated['rejection_date'],
                 'head_it_comments' => $validated['rejection_reason'],
-                'status' => 'head_it_rejected',
                 'head_it_status' => 'rejected'
             ];
             
@@ -1697,7 +1718,7 @@ class BothServiceFormController extends Controller
                 'user_access_id' => $userAccess->id,
                 'head_it_name' => $userAccess->head_it_name,
                 'head_it_approved_at' => $userAccess->head_it_approved_at,
-                'status' => $userAccess->status
+                'calculated_status' => $userAccess->getCalculatedOverallStatus()
             ]);
             
             DB::commit();
@@ -1710,7 +1731,7 @@ class BothServiceFormController extends Controller
                 'message' => 'Request rejected by Head of IT.',
                 'data' => [
                     'request_id' => $userAccess->id,
-                    'status' => $userAccess->status,
+                    'status' => $userAccess->getCalculatedOverallStatus(),
                     'head_it_rejection' => [
                         'name' => $userAccess->head_it_name,
                         'rejected_at' => $userAccess->head_it_approved_at->format('Y-m-d H:i:s'),

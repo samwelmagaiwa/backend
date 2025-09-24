@@ -447,4 +447,72 @@ class User extends Authenticatable
             return 'Busy';
         }
     }
+
+    /**
+     * ICT Task assignments assigned to this user (as ICT Officer)
+     */
+    public function assignedIctTasks()
+    {
+        return $this->hasMany(IctTaskAssignment::class, 'ict_officer_user_id');
+    }
+
+    /**
+     * ICT Task assignments created by this user (as Head of IT)
+     */
+    public function assignedTasksByHeadOfIt()
+    {
+        return $this->hasMany(IctTaskAssignment::class, 'assigned_by_user_id');
+    }
+
+    /**
+     * Current active ICT task assignments for this user
+     */
+    public function currentIctTasks()
+    {
+        return $this->hasMany(IctTaskAssignment::class, 'ict_officer_user_id')
+            ->whereIn('status', ['assigned', 'in_progress']);
+    }
+
+    /**
+     * Get user's current ICT task workload
+     */
+    public function getCurrentIctWorkload(): int
+    {
+        return $this->currentIctTasks()->count();
+    }
+
+    /**
+     * Check if ICT Officer is available for new ICT task assignments
+     */
+    public function isAvailableForIctTasks(): bool
+    {
+        if (!$this->isIctOfficer()) {
+            return false;
+        }
+
+        // Available if has less than 5 active ICT assignments
+        return $this->getCurrentIctWorkload() < 5;
+    }
+
+    /**
+     * Get ICT Officer availability status for ICT tasks
+     */
+    public function getIctTaskAvailabilityStatus(): string
+    {
+        if (!$this->isIctOfficer()) {
+            return 'Not ICT Officer';
+        }
+
+        $workload = $this->getCurrentIctWorkload();
+        
+        if ($workload === 0) {
+            return 'Available';
+        } elseif ($workload < 3) {
+            return 'Low Load';
+        } elseif ($workload < 5) {
+            return 'Moderate Load';
+        } else {
+            return 'High Load';
+        }
+    }
 }

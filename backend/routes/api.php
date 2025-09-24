@@ -22,6 +22,8 @@ use App\Http\Controllers\Api\v1\JeevaModuleRequestController;
 use App\Http\Controllers\Api\v1\AccessRightsApprovalController;
 use App\Http\Controllers\Api\v1\ImplementationWorkflowController;
 use App\Http\Controllers\Api\v1\HeadOfItController;
+use App\Http\Controllers\Api\v1\HeadOfItDictRecommendationsController;
+use App\Http\Controllers\Api\v1\IctOfficerController;
 use App\Http\Controllers\Api\HealthController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Api\SwaggerController;
@@ -588,6 +590,64 @@ Route::prefix('hod')->middleware('role:head_of_department,divisional_director,ic
             ->name('head-of-it.task-history');
         Route::post('tasks/{requestId}/cancel', [HeadOfItController::class, 'cancelTaskAssignment'])
             ->name('head-of-it.cancel-task');
+            
+        // Head of IT DICT Recommendations
+        Route::get('dict-recommendations', [\App\Http\Controllers\Api\v1\HeadOfItDictRecommendationsController::class, 'getDictRecommendations'])
+            ->middleware('role:head_of_it')
+            ->name('head-of-it.dict-recommendations.list');
+        Route::get('dict-recommendations/stats', [\App\Http\Controllers\Api\v1\HeadOfItDictRecommendationsController::class, 'getRecommendationStats'])
+            ->middleware('role:head_of_it')
+            ->name('head-of-it.dict-recommendations.stats');
+        Route::get('dict-recommendations/{userAccessId}/details', [\App\Http\Controllers\Api\v1\HeadOfItDictRecommendationsController::class, 'getRequestDetails'])
+            ->middleware('role:head_of_it')
+            ->name('head-of-it.dict-recommendations.details');
+            
+        // ========================================
+        // NEW ICT TASK ASSIGNMENT ROUTES (UserAccess system)
+        // ========================================
+        
+        // Get requests pending Head of IT approval (NEW system)
+        Route::get('ict-pending-requests', [HeadOfItController::class, 'getPendingIctRequests'])
+            ->name('head-of-it.ict-pending-requests');
+        
+        // Get available ICT Officers for task assignment
+        Route::get('available-ict-officers', [HeadOfItController::class, 'getAvailableIctOfficers'])
+            ->name('head-of-it.available-ict-officers');
+        
+        // Assign ICT task to officer
+        Route::post('assign-ict-task', [HeadOfItController::class, 'assignIctTask'])
+            ->name('head-of-it.assign-ict-task');
+        
+        // ICT task assignment management
+        Route::get('ict-tasks/{userAccessId}/history', [HeadOfItController::class, 'getIctTaskHistory'])
+            ->name('head-of-it.ict-task-history');
+        Route::post('ict-tasks/{userAccessId}/cancel', [HeadOfItController::class, 'cancelIctTaskAssignment'])
+            ->name('head-of-it.cancel-ict-task');
+    });
+
+    // ICT Officer routes (ICT Officer only)
+    Route::prefix('ict-officer')->middleware('role:ict_officer,admin')->group(function () {
+        // Dashboard
+        Route::get('dashboard', [\App\Http\Controllers\Api\v1\IctOfficerController::class, 'getDashboard'])
+            ->name('ict-officer.dashboard');
+        
+        // Task management
+        Route::get('tasks', [\App\Http\Controllers\Api\v1\IctOfficerController::class, 'getAssignedTasks'])
+            ->name('ict-officer.tasks');
+        Route::get('tasks/{assignmentId}', [\App\Http\Controllers\Api\v1\IctOfficerController::class, 'getTaskDetails'])
+            ->name('ict-officer.task-details');
+        
+        // Task actions
+        Route::post('tasks/{assignmentId}/start', [\App\Http\Controllers\Api\v1\IctOfficerController::class, 'startTask'])
+            ->name('ict-officer.start-task');
+        Route::post('tasks/{assignmentId}/progress', [\App\Http\Controllers\Api\v1\IctOfficerController::class, 'updateTaskProgress'])
+            ->name('ict-officer.update-progress');
+        Route::post('tasks/{assignmentId}/complete', [\App\Http\Controllers\Api\v1\IctOfficerController::class, 'completeTask'])
+            ->name('ict-officer.complete-task');
+        
+        // Statistics
+        Route::get('statistics', [\App\Http\Controllers\Api\v1\IctOfficerController::class, 'getTaskStatistics'])
+            ->name('ict-officer.statistics');
     });
 
     // ========================================

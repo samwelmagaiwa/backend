@@ -18,7 +18,6 @@ class UserCombinedAccessRequest extends UserAccess
         'department',
         'department_name',
         'request_type',
-        'request_types',
         'internet_purposes',
         'status',
         'created_at',
@@ -51,7 +50,6 @@ class UserCombinedAccessRequest extends UserAccess
         'divisional_approved_at' => 'datetime',
         'ict_director_approved_at' => 'datetime',
         'request_type' => 'array',
-        'request_types' => 'array',
         'internet_purposes' => 'array',
         
         // Additional casts for Head of IT workflow
@@ -77,32 +75,12 @@ class UserCombinedAccessRequest extends UserAccess
     }
 
     /**
-     * Get request types as array
+     * Get request types as array (accessor for request_types field)
+     * This provides compatibility while using request_type as the actual field
      */
-    public function getRequestTypesAttribute($value)
+    public function getRequestTypesAttribute()
     {
-        if (is_string($value)) {
-            return explode(',', $value);
-        }
-        
-        // Fallback to the request_type field if request_types is not set
-        if (!$value && $this->request_type) {
-            return is_array($this->request_type) ? $this->request_type : [$this->request_type];
-        }
-        
-        return $value ?? [];
-    }
-
-    /**
-     * Set request types - convert array to string for storage if needed
-     */
-    public function setRequestTypesAttribute($value)
-    {
-        if (is_array($value)) {
-            $this->attributes['request_types'] = implode(',', $value);
-        } else {
-            $this->attributes['request_types'] = $value;
-        }
+        return $this->getRequestTypesArray();
     }
 
     /**

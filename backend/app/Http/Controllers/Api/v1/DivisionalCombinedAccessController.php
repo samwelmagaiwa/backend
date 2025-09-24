@@ -47,19 +47,19 @@ class DivisionalCombinedAccessController extends Controller
             
             if (!empty($divisionalDepartmentIds)) {
                 $query->whereIn('department_id', $divisionalDepartmentIds);
+                // Count requests for logging (using separate simpler queries to avoid complex nested issues)
+                $totalRequestsCount = UserAccess::whereNotNull('request_type')->count();
+                $filteredRequestsCount = UserAccess::whereNotNull('request_type')
+                    ->whereIn('department_id', $divisionalDepartmentIds)
+                    ->count();
+                    
                 Log::info('Divisional Department Filter Applied', [
                     'user_id' => $currentUser->id,
                     'user_name' => $currentUser->name,
                     'user_email' => $currentUser->email,
                     'divisional_department_ids' => $divisionalDepartmentIds,
-                    'requests_before_dept_filter' => UserAccess::with(['user', 'department'])
-                        ->whereNotNull('request_type')
-                        ->where(function ($q) {
-                            $q->where('hod_status', 'approved')
-                                ->orWhere('divisional_status', 'approved')
-                                ->orWhere('divisional_status', 'rejected');
-                        })->count(),
-                    'requests_after_dept_filter' => (clone $query)->count()
+                    'requests_before_dept_filter' => $totalRequestsCount,
+                    'requests_after_dept_filter' => $filteredRequestsCount
                 ]);
             } else {
                 // If user is not Divisional Director of any department, show no requests

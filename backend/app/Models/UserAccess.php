@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Schema;
 
 class UserAccess extends Model
 {
@@ -33,7 +36,6 @@ class UserAccess extends Model
         'jeeva_modules_selected',
         'access_type',
         'temporary_until',
-        'status',
         'divisional_status',
         'hod_status',
         'ict_director_status',
@@ -159,6 +161,22 @@ class UserAccess extends Model
     {
         return $this->belongsToMany(JeevaModule::class, 'jeeva_modules_selected', 'user_access_id', 'module_id')
                     ->withTimestamps();
+    }
+
+    /**
+     * Get the ICT task assignments for this request.
+     */
+    public function ictTaskAssignments(): HasMany
+    {
+        return $this->hasMany(IctTaskAssignment::class);
+    }
+
+    /**
+     * Get the current active ICT task assignment.
+     */
+    public function currentIctTaskAssignment(): HasOne
+    {
+        return $this->hasOne(IctTaskAssignment::class)->latest();
     }
 
     /**
@@ -529,7 +547,10 @@ class UserAccess extends Model
      */
     public function scopeOfType($query, string $type)
     {
-        return $query->whereJsonContains('request_type', $type);
+        return $query->where(function($q) use ($type) {
+            $q->whereJsonContains('request_type', $type)
+              ->orWhere('request_type', 'LIKE', '%' . $type . '%');
+        });
     }
 
     /**
@@ -553,10 +574,11 @@ class UserAccess extends Model
      */
     public function getRequestTypeNameAttribute(): string
     {
-        if (is_array($this->request_type)) {
-            return implode(', ', array_map(fn($type) => self::REQUEST_TYPES[$type] ?? $type, $this->request_type));
+        $requestTypes = $this->getRequestTypesArray();
+        if (empty($requestTypes)) {
+            return 'N/A';
         }
-        return self::REQUEST_TYPES[$this->request_type] ?? $this->request_type;
+        return implode(', ', array_map(fn($type) => self::REQUEST_TYPES[$type] ?? $type, $requestTypes));
     }
 
     /**
@@ -683,10 +705,8 @@ class UserAccess extends Model
      */
     public function hasRequestType(string $type): bool
     {
-        if (is_array($this->request_type)) {
-            return in_array($type, $this->request_type);
-        }
-        return $this->request_type === $type;
+        $requestTypes = $this->getRequestTypesArray();
+        return in_array($type, $requestTypes);
     }
 
     /**
@@ -694,10 +714,21 @@ class UserAccess extends Model
      */
     public function getRequestTypesArray(): array
     {
+        if (empty($this->request_type)) {
+            return [];
+        }
+        
+        // If it's already an array (JSON decoded)
         if (is_array($this->request_type)) {
             return $this->request_type;
         }
-        return [$this->request_type];
+        
+        // If it's a comma-separated string
+        if (is_string($this->request_type)) {
+            return array_filter(array_map('trim', explode(',', $this->request_type)));
+        }
+        
+        return [];
     }
 
     /**
@@ -756,6 +787,195 @@ class UserAccess extends Model
         return !empty($this->internet_purposes);
     }
 
+    /**
+     * Get the stage status (pending/completed) for each approval stage
+     */
+    public function getDetailedApprovalProgress(): array
+    {
+        return [
+            'hod' => [
+                'stage_name' => 'HOD/BM',
+                'status' => !empty($this->hod_approved_at) ? 'completed' : 'pending',
+                'approved_at' => $this->hod_approved_at,
+                'approved_by' => $this->hod_name,
+                'has_signature' => !empty($this->hod_signature_path),
+                'order' => 1
+            ],
+            'divisional_director' => [
+                'stage_name' => 'Divisional Director',
+                'status' => !empty($this->divisional_approved_at) ? 'completed' : 
+                           (!empty($this->hod_approved_at) ? 'pending' : 'locked'),
+                'approved_at' => $this->divisional_approved_at,
+                'approved_by' => $this->divisional_director_name,
+                'has_signature' => !empty($this->divisional_director_signature_path),
+                'order' => 2
+            ],
+            'ict_director' => [
+                'stage_name' => 'Director of ICT',
+                'status' => !empty($this->ict_director_approved_at) ? 'completed' : 
+                           (!empty($this->divisional_approved_at) ? 'pending' : 'locked'),
+                'approved_at' => $this->ict_director_approved_at,
+                'approved_by' => $this->ict_director_name,
+                'has_signature' => !empty($this->ict_director_signature_path),
+                'order' => 3
+            ],
+            'head_it' => [
+                'stage_name' => 'Head of IT',
+                'status' => !empty($this->head_it_approved_at) ? 'completed' : 
+                           (!empty($this->ict_director_approved_at) ? 'pending' : 'locked'),
+                'approved_at' => $this->head_it_approved_at,
+                'approved_by' => $this->head_it_name,
+                'has_signature' => !empty($this->head_it_signature_path),
+                'order' => 4,
+                'section' => 'implementation'
+            ],
+            'ict_officer' => [
+                'stage_name' => 'ICT Officer',
+                'status' => !empty($this->ict_officer_implemented_at) ? 'completed' : 
+                           (!empty($this->head_it_approved_at) ? 'pending' : 'locked'),
+                'implemented_at' => $this->ict_officer_implemented_at,
+                'implemented_by' => $this->ict_officer_name,
+                'has_signature' => !empty($this->ict_officer_signature_path),
+                'order' => 5,
+                'section' => 'implementation'
+            ]
+        ];
+    }
+    
+    /**
+     * Update individual stage status based on approval action
+     */
+    public function updateStageStatus(string $stage, string $status): void
+    {
+        $statusColumn = $stage . '_status';
+        
+        if (in_array($statusColumn, ['hod_status', 'divisional_status', 'ict_director_status', 'head_it_status', 'ict_officer_status'])) {
+            $this->{$statusColumn} = $status;
+            
+            // Update the main status based on current workflow stage
+            $this->updateMainStatus();
+        }
+    }
+    
+    /**
+     * Calculate the overall status based on role-specific status columns
+     * This replaces the need for the general 'status' column
+     */
+    public function getCalculatedStatus(): string
+    {
+        // Check for rejections first (highest priority)
+        if ($this->hod_status === 'rejected') {
+            return 'hod_rejected';
+        }
+        if ($this->divisional_status === 'rejected') {
+            return 'divisional_rejected';
+        }
+        if ($this->ict_director_status === 'rejected') {
+            return 'ict_director_rejected';
+        }
+        if ($this->head_it_status === 'rejected') {
+            return 'head_it_rejected';
+        }
+        if ($this->ict_officer_status === 'rejected') {
+            return 'ict_officer_rejected';
+        }
+        
+        // Check completion status
+        if ($this->ict_officer_status === 'implemented') {
+            return 'implemented';
+        }
+        
+        // Check progress through approval stages
+        if ($this->head_it_status === 'approved') {
+            return 'head_it_approved'; // Pending ICT Officer
+        }
+        if ($this->ict_director_status === 'approved') {
+            return 'ict_director_approved'; // Pending Head IT
+        }
+        if ($this->divisional_status === 'approved') {
+            return 'divisional_approved'; // Pending ICT Director
+        }
+        if ($this->hod_status === 'approved') {
+            return 'hod_approved'; // Pending Divisional Director
+        }
+        
+        // Default to pending if no approvals yet
+        return 'pending';
+    }
+    
+    /**
+     * Get the status for display purposes (backwards compatibility)
+     */
+    public function getStatusAttribute(): string
+    {
+        // If status column exists, use it, otherwise calculate
+        if (isset($this->attributes['status'])) {
+            return $this->attributes['status'];
+        }
+        return $this->getCalculatedStatus();
+    }
+    
+    /**
+     * Check if request is in a specific calculated status
+     */
+    public function isInStatus(string $status): bool
+    {
+        return $this->getCalculatedStatus() === $status;
+    }
+    
+    /**
+     * Update the main status field based on the current workflow stage
+     * @deprecated Use getCalculatedStatus() instead
+     */
+    public function updateMainStatus(): void
+    {
+        // This method is deprecated - status will be calculated dynamically
+        $calculatedStatus = $this->getCalculatedStatus();
+        
+        // Only update if status column still exists
+        if (Schema::hasColumn('user_access', 'status')) {
+            $this->status = $calculatedStatus;
+        }
+    }
+    
+    /**
+     * Check if a specific stage can be acted upon (not locked)
+     */
+    public function canStageBeActedUpon(string $stage): bool
+    {
+        $progress = $this->getDetailedApprovalProgress();
+        
+        if (!isset($progress[$stage])) {
+            return false;
+        }
+        
+        return in_array($progress[$stage]['status'], ['pending', 'completed']);
+    }
+    
+    /**
+     * Get the next pending stage that needs action
+     */
+    public function getNextPendingStage(): ?string
+    {
+        $progress = $this->getDetailedApprovalProgress();
+        
+        foreach ($progress as $stageKey => $stage) {
+            if ($stage['status'] === 'pending') {
+                return $stageKey;
+            }
+        }
+        
+        return null; // All stages completed
+    }
+    
+    /**
+     * Check if all approval stages are completed
+     */
+    public function isFullyApproved(): bool
+    {
+        return $this->getCurrentWorkflowStage() === 'Implementation Complete';
+    }
+    
     /**
      * Get formatted access type
      */
