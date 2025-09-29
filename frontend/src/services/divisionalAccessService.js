@@ -497,6 +497,38 @@ class DivisionalAccessService {
 
     return services.map((service) => serviceMap[service] || service).join(', ')
   }
+
+  /**
+   * Get detailed timeline for a specific access request (Divisional Director view)
+   * @param {number} requestId - The request ID
+   * @returns {Promise<Object>} Response with timeline data
+   */
+  async getRequestTimeline(requestId) {
+    try {
+      console.log('🔄 DivisionalAccessService: Fetching request timeline:', requestId)
+
+      const response = await apiClient.get(
+        `/divisional/combined-access-requests/${requestId}/timeline`
+      )
+
+      if (response.data && response.data.success) {
+        console.log('✅ DivisionalAccessService: Request timeline loaded successfully')
+        return {
+          success: true,
+          data: response.data.data,
+          message: response.data.message
+        }
+      } else {
+        throw new Error(response.data?.message || 'Failed to load request timeline')
+      }
+    } catch (error) {
+      console.error('❌ DivisionalAccessService: Error fetching request timeline:', error)
+      return {
+        success: false,
+        error: error.response?.data?.message || error.message || 'Failed to load request timeline'
+      }
+    }
+  }
 }
 
 export default new DivisionalAccessService()

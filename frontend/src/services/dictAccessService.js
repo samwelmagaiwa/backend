@@ -230,6 +230,35 @@ const dictAccessService = {
         error: error.response?.data?.message || error.message || 'Failed to submit response'
       }
     }
+  },
+
+  /**
+   * Get detailed timeline for a specific access request (ICT Director view)
+   * @param {number} requestId - The request ID
+   * @returns {Promise<Object>}
+   */
+  async getRequestTimeline(requestId) {
+    try {
+      console.log('🔄 DictAccessService: Fetching request timeline:', requestId)
+      const response = await apiClient.get(`/dict/combined-access-requests/${requestId}/timeline`)
+
+      if (response.data && response.data.success) {
+        console.log('✅ DictAccessService: Request timeline loaded successfully')
+        return {
+          success: true,
+          data: response.data.data,
+          message: response.data.message
+        }
+      } else {
+        throw new Error(response.data?.message || 'Failed to load request timeline')
+      }
+    } catch (error) {
+      console.error('❌ DictAccessService: Error fetching request timeline:', error)
+      return {
+        success: false,
+        error: error.response?.data?.message || error.message || 'Failed to load request timeline'
+      }
+    }
   }
 }
 

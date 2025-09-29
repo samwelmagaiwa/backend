@@ -479,6 +479,36 @@ class CombinedAccessService {
 
     return services.map((service) => serviceMap[service] || service).join(', ')
   }
+
+  /**
+   * Get detailed timeline for a specific access request (Head of Department view)
+   * @param {number} requestId - The request ID
+   * @returns {Promise<Object>} Response with timeline data
+   */
+  async getRequestTimeline(requestId) {
+    try {
+      console.log('🔄 CombinedAccessService: Fetching request timeline:', requestId)
+
+      const response = await apiClient.get(`/hod/combined-access-requests/${requestId}/timeline`)
+
+      if (response.data && response.data.success) {
+        console.log('✅ CombinedAccessService: Request timeline loaded successfully')
+        return {
+          success: true,
+          data: response.data.data,
+          message: response.data.message
+        }
+      } else {
+        throw new Error(response.data?.message || 'Failed to load request timeline')
+      }
+    } catch (error) {
+      console.error('❌ CombinedAccessService: Error fetching request timeline:', error)
+      return {
+        success: false,
+        error: error.response?.data?.message || error.message || 'Failed to load request timeline'
+      }
+    }
+  }
 }
 
 export default new CombinedAccessService()

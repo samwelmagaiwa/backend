@@ -102,6 +102,7 @@
                 <tr
                   v-for="request in filteredRequests"
                   :key="request.id"
+                  :data-request-id="request.id"
                   :class="[
                     'border-t border-blue-300/20 hover:bg-blue-700/30 transition-colors duration-200',
                     isPendingStatus(request.status)
@@ -200,15 +201,56 @@
                   </td>
 
                   <!-- Actions -->
-                  <td class="px-4 py-3 text-center">
-                    <div class="flex flex-col items-center space-y-1">
+                  <td class="px-4 py-3 text-center relative">
+                    <div class="flex justify-center three-dot-menu">
+                      <!-- Three-dot menu button -->
                       <button
-                        @click="viewAndProcessRequest(request.id)"
-                        class="bg-blue-600 text-white text-base rounded hover:bg-blue-700 inline-block font-medium"
-                        :style="{ padding: '6px 12px', width: 'fit-content' }"
+                        @click="toggleDropdown(request.id)"
+                        class="three-dot-button p-2 text-white hover:bg-blue-600/40 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 hover:scale-105 active:scale-95"
+                        :class="{ 'bg-blue-600/40 shadow-lg': openDropdownId === request.id }"
+                        :aria-label="
+                          'Actions for request ' +
+                          (request.request_id || 'REQ-' + request.id.toString().padStart(6, '0'))
+                        "
                       >
-                        View & Process
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                          <path
+                            d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"
+                          />
+                        </svg>
                       </button>
+
+                      <!-- Dropdown menu -->
+                      <div
+                        v-show="openDropdownId === request.id"
+                        class="dropdown-menu fixed w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-[10001] py-1 min-w-max"
+                        :style="getDropdownPositionStyle(request.id)"
+                        @click.stop
+                      >
+                        <!-- Role-specific actions -->
+                        <template
+                          v-for="(action, index) in getAvailableActions(request)"
+                          :key="action.key"
+                        >
+                          <button
+                            @click.stop="executeAction(action.key, request)"
+                            :class="[
+                              'w-full text-left px-4 py-2 text-sm transition-all duration-200 flex items-center space-x-3 group focus:outline-none focus:ring-2 focus:ring-inset',
+                              getActionButtonClass(
+                                action.key,
+                                index,
+                                getAvailableActions(request).length
+                              )
+                            ]"
+                          >
+                            <i
+                              :class="[action.icon, getActionIconClass(action.key)]"
+                              class="w-4 h-4 flex-shrink-0 transition-colors duration-200"
+                            ></i>
+                            <span class="font-medium">{{ action.label }}</span>
+                          </button>
+                        </template>
+                      </div>
                     </div>
                   </td>
                 </tr>
@@ -252,6 +294,14 @@
         <p class="text-gray-600 text-base font-medium">Loading requests...</p>
       </div>
     </div>
+
+    <!-- Timeline Modal -->
+    <RequestTimeline
+      :show="showTimeline"
+      :request-id="selectedRequestId"
+      @close="closeTimeline"
+      @updated="handleTimelineUpdate"
+    />
   </div>
 </template>
 
@@ -259,15 +309,22 @@
   import Header from '@/components/header.vue'
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppFooter from '@/components/footer.vue'
+  import RequestTimeline from '@/components/common/RequestTimeline.vue'
   import headOfItService from '@/services/headOfItService'
   import statusUtils from '@/utils/statusUtils'
+  import { useAuth } from '@/composables/useAuth'
 
   export default {
     name: 'HeadOfItRequestList',
     components: {
       Header,
       ModernSidebar,
-      AppFooter
+      AppFooter,
+      RequestTimeline
+    },
+    setup() {
+      const { userRole } = useAuth()
+      return { userRole }
     },
     data() {
       return {
@@ -282,6 +339,11 @@
           total: 0
         },
         error: null,
+        // Dropdown state management
+        openDropdownId: null,
+        // Timeline modal state
+        showTimeline: false,
+        selectedRequestId: null,
         $statusUtils: statusUtils
       }
     },
@@ -341,12 +403,21 @@
       try {
         console.log('HeadOfItRequestList: Component mounted, initializing...')
         await this.fetchRequests()
+
+        // Add click listener to close dropdowns when clicking outside
+        document.addEventListener('click', this.closeAllDropdowns)
+
         console.log('HeadOfItRequestList: Component initialized successfully')
       } catch (error) {
         console.error('HeadOfItRequestList: Error during mount:', error)
         this.error = 'Failed to initialize component: ' + error.message
         this.isLoading = false
       }
+    },
+
+    beforeUnmount() {
+      // Clean up event listeners
+      document.removeEventListener('click', this.closeAllDropdowns)
     },
     methods: {
       async fetchRequests() {
@@ -462,6 +533,351 @@
         } catch {
           return 'Invalid Time'
         }
+      },
+
+      // Dropdown management methods
+      toggleDropdown(requestId) {
+        console.log(
+          'HeadOfItRequestList: Toggling dropdown for request:',
+          requestId,
+          'Current open:',
+          this.openDropdownId
+        )
+        if (this.openDropdownId === requestId) {
+          this.openDropdownId = null
+        } else {
+          this.openDropdownId = requestId
+        }
+      },
+
+      closeAllDropdowns(event) {
+        // Only close if clicking outside the dropdown menu or three-dot button
+        if (
+          event &&
+          (event.target.closest('.dropdown-menu') || event.target.closest('.three-dot-button'))
+        ) {
+          return
+        }
+        console.log('HeadOfItRequestList: Closing all dropdowns')
+        this.openDropdownId = null
+      },
+
+      // Role-specific actions logic for Head of IT
+      getAvailableActions(request) {
+        const actions = []
+        const userRole = this.userRole
+        const status = request.status
+
+        // Define role mappings
+        const ROLES = {
+          HEAD_OF_IT: 'head_of_it',
+          ICT_OFFICER: 'ict_officer',
+          ICT_DIRECTOR: 'ict_director',
+          DIVISIONAL_DIRECTOR: 'divisional_director',
+          HEAD_OF_DEPARTMENT: 'hod',
+          STAFF: 'staff'
+        }
+
+        // Head of IT specific actions (this component is for Head of IT dashboard)
+        if (userRole === ROLES.HEAD_OF_IT || !userRole) {
+          // Default to Head of IT if no role detected
+          // View & Process action (always available)
+          actions.push({
+            key: 'view_and_process',
+            label: 'View & Process',
+            icon: 'fas fa-eye'
+          })
+
+          // For approved requests, show assign and cancel task options
+          if (['head_of_it_approved', 'assigned_to_ict'].includes(status)) {
+            actions.push({
+              key: 'assign_task',
+              label: 'Assign Task',
+              icon: 'fas fa-user-plus'
+            })
+            actions.push({
+              key: 'cancel_task',
+              label: 'Cancel Task',
+              icon: 'fas fa-times-circle'
+            })
+          }
+
+          // View Progress for requests that are in progress or implemented
+          if (
+            [
+              'implementation_in_progress',
+              'implemented',
+              'completed',
+              'assigned_to_ict',
+              'head_of_it_approved'
+            ].includes(status)
+          ) {
+            actions.push({
+              key: 'view_progress',
+              label: 'View Progress',
+              icon: 'fas fa-chart-line'
+            })
+          }
+
+          // Always show view timeline
+          actions.push({
+            key: 'view_timeline',
+            label: 'View Timeline',
+            icon: 'fas fa-history'
+          })
+        }
+        // ICT Officer actions (if somehow an ICT Officer accesses this page)
+        else if (userRole === ROLES.ICT_OFFICER) {
+          actions.push({
+            key: 'view_and_process',
+            label: 'View Details',
+            icon: 'fas fa-eye'
+          })
+
+          // Only show for requests assigned to this officer
+          if (['assigned_to_ict', 'implementation_in_progress'].includes(status)) {
+            actions.push({
+              key: 'update_progress',
+              label: 'Update Progress',
+              icon: 'fas fa-edit'
+            })
+          }
+
+          actions.push({
+            key: 'view_timeline',
+            label: 'View Timeline',
+            icon: 'fas fa-history'
+          })
+        }
+        // Other roles (read-only access)
+        else {
+          actions.push({
+            key: 'view_and_process',
+            label: 'View Details',
+            icon: 'fas fa-eye'
+          })
+          actions.push({
+            key: 'view_timeline',
+            label: 'View Timeline',
+            icon: 'fas fa-history'
+          })
+        }
+
+        return actions
+      },
+
+      // Execute action based on key
+      executeAction(actionKey, request) {
+        console.log('HeadOfItRequestList: Executing action:', actionKey, 'for request:', request.id)
+        this.closeAllDropdowns()
+
+        switch (actionKey) {
+          case 'assign_task':
+            this.assignTask(request)
+            break
+          case 'cancel_task':
+            this.cancelTask(request)
+            break
+          case 'update_progress':
+            this.updateProgress(request)
+            break
+          case 'view_progress':
+            this.viewProgress(request)
+            break
+          case 'view_timeline':
+            this.viewTimeline(request)
+            break
+          case 'view_and_process':
+            this.viewAndProcessRequest(request.id)
+            break
+          default:
+            console.warn('Unknown action:', actionKey)
+        }
+      },
+
+      // Head of IT specific action methods
+      assignTask(request) {
+        console.log('Head of IT: Assigning task for request:', request.id)
+        // Navigate to ICT Officer selection page
+        this.$router.push(`/head_of_it-dashboard/select-ict-officer/${request.id}`)
+      },
+
+      cancelTask(request) {
+        console.log('Head of IT: Cancelling task for request:', request.id)
+        // Show confirmation dialog for task cancellation
+        const confirmed = confirm(
+          `Are you sure you want to cancel the task for Request ${request.request_id || 'REQ-' + request.id.toString().padStart(6, '0')}? This will stop the implementation process.`
+        )
+
+        if (confirmed) {
+          const reason = prompt('Please provide a reason for cancelling the task:')
+          if (reason && reason.trim() !== '') {
+            // Call API to cancel task (implementation would depend on your backend)
+            alert(
+              `Task cancelled for Request ${request.request_id || 'REQ-' + request.id.toString().padStart(6, '0')}. Reason: ${reason}`
+            )
+            // Refresh the requests list
+            this.fetchRequests()
+          } else {
+            alert('Cancellation reason is required')
+          }
+        }
+      },
+
+      updateProgress(request) {
+        console.log('Head of IT: Update progress for request:', request.id)
+        // This would typically open a modal or navigate to an update form
+        alert(
+          'Update Progress functionality would be implemented here. This might open a modal or dedicated page.'
+        )
+      },
+
+      viewTimeline(request) {
+        console.log('📅 HeadOfItRequestList: Opening timeline for request:', request.id)
+        this.selectedRequestId = request.id
+        this.showTimeline = true
+      },
+
+      closeTimeline() {
+        console.log('📅 HeadOfItRequestList: Closing timeline modal')
+        this.showTimeline = false
+        this.selectedRequestId = null
+      },
+
+      async handleTimelineUpdate() {
+        console.log('🔄 HeadOfItRequestList: Timeline updated, refreshing requests list...')
+        await this.fetchRequests()
+      },
+
+      viewProgress(request) {
+        console.log('👁️ HeadOfItRequestList: Viewing progress for request:', request.id)
+        // Navigate to progress view - using ICT dashboard route for consistency
+        this.$router.push(`/ict-dashboard/request-progress/${request.id}`)
+      },
+
+      // Helper method to determine if separator should be shown
+      shouldShowSeparator(currentAction, previousAction) {
+        // Add separator before destructive actions or different action groups
+        const destructiveActions = ['cancel_task']
+        const viewActions = ['view_timeline', 'view_and_process']
+
+        // Separate destructive actions
+        if (
+          destructiveActions.includes(currentAction.key) &&
+          !destructiveActions.includes(previousAction?.key)
+        ) {
+          return true
+        }
+
+        // Separate view actions from edit actions
+        if (
+          viewActions.includes(currentAction.key) &&
+          !viewActions.includes(previousAction?.key) &&
+          previousAction?.key !== 'view_and_process'
+        ) {
+          return true
+        }
+
+        return false
+      },
+
+      // Dynamic dropdown positioning to prevent cutoff issues
+      getDropdownPositionStyle(requestId) {
+        // Use requestId to find the button element and calculate position
+        const buttonElement = document.querySelector(
+          `[data-request-id="${requestId}"] .three-dot-button`
+        )
+
+        if (!buttonElement) {
+          // Fallback to basic positioning
+          return {
+            position: 'fixed',
+            top: 'auto',
+            left: 'auto',
+            right: '1rem',
+            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1)'
+          }
+        }
+
+        const buttonRect = buttonElement.getBoundingClientRect()
+        const viewportHeight = window.innerHeight
+        const viewportWidth = window.innerWidth
+        const dropdownWidth = 192 // 12rem = 192px
+        const dropdownHeight = 200 // Approximate dropdown height
+
+        let top = buttonRect.bottom + 8 // 8px margin from button
+        let left = buttonRect.right - dropdownWidth
+
+        // Adjust if dropdown would go off-screen vertically
+        if (top + dropdownHeight > viewportHeight) {
+          top = buttonRect.top - dropdownHeight - 8
+        }
+
+        // Adjust if dropdown would go off-screen horizontally
+        if (left < 16) {
+          left = buttonRect.left
+        }
+
+        // Ensure dropdown doesn't go off right edge
+        if (left + dropdownWidth > viewportWidth - 16) {
+          left = viewportWidth - dropdownWidth - 16
+        }
+
+        return {
+          position: 'fixed',
+          top: `${top}px`,
+          left: `${left}px`,
+          boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1)'
+        }
+      },
+
+      // Get distinct styling classes for each action type
+      getActionButtonClass(actionKey, index, totalActions) {
+        const baseClasses = {
+          view_and_process:
+            'bg-blue-50 text-blue-800 border-b border-blue-200 hover:bg-blue-100 focus:bg-blue-100 focus:ring-blue-500',
+          view_timeline:
+            'bg-indigo-50 text-indigo-800 border-b border-indigo-200 hover:bg-indigo-100 focus:bg-indigo-100 focus:ring-indigo-500',
+          assign_task:
+            'bg-green-50 text-green-800 border-b border-green-200 hover:bg-green-100 focus:bg-green-100 focus:ring-green-500',
+          view_progress:
+            'bg-orange-50 text-orange-800 border-b border-orange-200 hover:bg-orange-100 focus:bg-orange-100 focus:ring-orange-500',
+          update_progress:
+            'bg-purple-50 text-purple-800 border-b border-purple-200 hover:bg-purple-100 focus:bg-purple-100 focus:ring-purple-500',
+          cancel_task: 'bg-red-50 text-red-800 hover:bg-red-100 focus:bg-red-100 focus:ring-red-500'
+        }
+
+        let classes =
+          baseClasses[actionKey] ||
+          'bg-gray-50 text-gray-800 hover:bg-gray-100 focus:bg-gray-100 focus:ring-gray-500'
+
+        // Add rounded corners for first and last items
+        if (index === 0) {
+          classes += ' first:rounded-t-lg'
+        }
+        if (index === totalActions - 1) {
+          classes += ' last:rounded-b-lg'
+        }
+
+        return classes
+      },
+
+      // Get distinct icon colors for each action type
+      getActionIconClass(actionKey) {
+        const iconClasses = {
+          view_and_process: 'text-blue-600 group-hover:text-blue-700 group-focus:text-blue-700',
+          view_timeline: 'text-indigo-600 group-hover:text-indigo-700 group-focus:text-indigo-700',
+          assign_task: 'text-green-600 group-hover:text-green-700 group-focus:text-green-700',
+          view_progress: 'text-orange-600 group-hover:text-orange-700 group-focus:text-orange-700',
+          update_progress:
+            'text-purple-600 group-hover:text-purple-700 group-focus:text-purple-700',
+          cancel_task: 'text-red-600 group-hover:text-red-700 group-focus:text-red-700'
+        }
+
+        return (
+          iconClasses[actionKey] ||
+          'text-gray-600 group-hover:text-gray-700 group-focus:text-gray-700'
+        )
       }
     }
   }
@@ -470,5 +886,83 @@
 <style scoped>
   .sidebar-narrow {
     flex-shrink: 0;
+  }
+
+  /* Three-dot menu enhancements */
+  .three-dot-menu {
+    position: relative;
+  }
+
+  /* Ensure dropdown is always visible and properly positioned */
+  .dropdown-menu {
+    /* Position and z-index are now set dynamically via style binding */
+    min-width: 12rem;
+    max-width: 16rem;
+  }
+
+  /* Mobile responsive adjustments */
+  @media (max-width: 768px) {
+    .dropdown-menu {
+      min-width: 10rem;
+      max-width: 14rem;
+      right: 1rem !important;
+    }
+
+    /* Increase touch target size on mobile */
+    .three-dot-button {
+      padding: 12px !important;
+      min-width: 44px;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .dropdown-menu button {
+      padding: 12px 16px !important;
+      font-size: 16px !important;
+    }
+  }
+
+  /* Tablet adjustments */
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .dropdown-menu {
+      min-width: 11rem;
+      max-width: 15rem;
+    }
+  }
+
+  /* Animation for dropdown appearance */
+  .dropdown-menu {
+    animation: dropdownFadeIn 0.15s ease-out;
+    transform-origin: top right;
+  }
+
+  @keyframes dropdownFadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95) translateY(-5px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  /* Hover effects for better UX */
+  .dropdown-menu button:hover {
+    transform: translateX(2px);
+  }
+
+  /* High contrast focus states for accessibility */
+  .three-dot-button:focus {
+    outline: 2px solid #3b82f6 !important;
+    outline-offset: 2px;
+  }
+
+  .dropdown-menu button:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: -2px;
+    background-color: #f3f4f6;
   }
 </style>

@@ -41,6 +41,9 @@ class UserAccess extends Model
         'ict_director_status',
         'head_it_status',
         'ict_officer_status',
+        'ict_officer_user_id',
+        'ict_officer_assigned_at',
+        'ict_officer_started_at',
         'hod_comments',
         'hod_resubmission_notes',
         'resubmitted_at',
@@ -89,8 +92,21 @@ class UserAccess extends Model
         'divisional_approved_at' => 'datetime',
         'ict_director_approved_at' => 'datetime',
         'head_it_approved_at' => 'datetime',
+        'ict_officer_assigned_at' => 'datetime',
+        'ict_officer_started_at' => 'datetime',
         'ict_officer_implemented_at' => 'datetime',
         'cancelled_at' => 'datetime',
+    ];
+
+    /**
+     * The accessors to append to the model's array form.
+     */
+    protected $appends = [
+        'status',
+        'request_type_name',
+        'status_name',
+        'access_type_name',
+        'all_modules'
     ];
 
     // Removed custom accessors and mutators since we're using Laravel's built-in array casting

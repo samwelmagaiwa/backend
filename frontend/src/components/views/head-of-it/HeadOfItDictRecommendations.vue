@@ -31,37 +31,14 @@
         </div>
 
         <div class="max-w-full mx-auto relative z-10 px-4">
-          <!-- Header Section -->
-          <div class="medical-glass-card rounded-t-3xl p-6 mb-0 border-b border-blue-300/30">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center">
-                <router-link
-                  to="/head_of_it-dashboard"
-                  class="mr-4 p-2 rounded-lg bg-teal-600/20 hover:bg-teal-600/30 transition-colors"
-                >
-                  <i class="fas fa-arrow-left text-teal-300 hover:text-white"></i>
-                </router-link>
-                <div>
-                  <h2 class="text-2xl font-bold text-blue-100 tracking-wide drop-shadow-md">
-                    <i class="fas fa-book text-purple-400 mr-3"></i>
-                    Recommendations Notebook
-                  </h2>
-                  <p class="text-sm text-blue-300 mt-1">
-                    ICT Director Comments & Recommendations for Access Requests
-                  </p>
-                </div>
-              </div>
-              <div class="flex items-center space-x-4">
-                <button
-                  @click="refreshRecommendations"
-                  :disabled="loading"
-                  class="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <i class="fas fa-sync-alt mr-2" :class="{ 'animate-spin': loading }"></i>
-                  Refresh
-                </button>
-              </div>
-            </div>
+          <!-- Back Button Only -->
+          <div class="medical-glass-card rounded-t-3xl p-4 mb-0 border-b border-blue-300/30">
+            <router-link
+              to="/head_of_it-dashboard"
+              class="p-2 rounded-lg bg-teal-600/20 hover:bg-teal-600/30 transition-colors"
+            >
+              <i class="fas fa-arrow-left text-teal-300 hover:text-white"></i>
+            </router-link>
           </div>
 
           <!-- Search & Filter Controls -->
@@ -161,6 +138,17 @@
                     <i class="fas fa-times mr-1"></i>
                     Clear
                   </button>
+
+                  <!-- Refresh Button -->
+                  <button
+                    @click="refreshRecommendations"
+                    :disabled="loading"
+                    class="px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm flex items-center"
+                    title="Refresh recommendations list"
+                  >
+                    <i class="fas fa-sync-alt mr-2" :class="{ 'animate-spin': loading }"></i>
+                    Refresh
+                  </button>
                 </div>
               </div>
 
@@ -197,29 +185,6 @@
                     <i class="fas fa-times"></i>
                   </button>
                 </span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Results Summary -->
-          <div
-            v-if="!loading"
-            class="medical-glass-card rounded-none border-t-0 border-b border-blue-300/30"
-          >
-            <div class="px-4 py-2 bg-blue-600/10">
-              <div class="flex items-center justify-between text-base">
-                <div class="text-teal-300">
-                  <i class="fas fa-list-ul mr-1"></i>
-                  Showing {{ filteredRecommendations.length }} of
-                  {{ totalRecommendations }} recommendations
-                  <span v-if="hasActiveFilters" class="text-yellow-300 ml-2">
-                    <i class="fas fa-filter mr-1"></i>Filtered
-                  </span>
-                </div>
-                <div v-if="filteredRecommendations.length > 0" class="text-teal-300">
-                  <i class="fas fa-sort mr-1"></i>
-                  Sorted by date (newest first)
-                </div>
               </div>
             </div>
           </div>
@@ -778,8 +743,10 @@
         pending: 'Pending',
         pending_hod: 'Pending HOD',
         hod_approved: 'HOD Approved',
+        hod_rejected: 'HOD Rejected',
         pending_divisional: 'Pending Divisional',
         divisional_approved: 'Divisional Approved',
+        divisional_rejected: 'Divisional Rejected',
         pending_ict_director: 'Pending ICT Director',
         ict_director_approved: 'ICT Director Approved',
         ict_director_rejected: 'ICT Director Rejected',
@@ -787,9 +754,11 @@
         head_it_approved: 'Head IT Approved',
         head_it_rejected: 'Head IT Rejected',
         pending_ict_officer: 'Pending ICT Officer',
+        ict_officer_rejected: 'ICT Officer Rejected',
         implemented: 'Implemented',
         completed: 'Completed',
-        rejected: 'Rejected'
+        rejected: 'Rejected',
+        unknown: 'Status Unknown'
       }
 
       // Computed properties for filtering
@@ -950,7 +919,10 @@
       }
 
       const getStatusLabel = (status) => {
-        return statusLabels[status] || status
+        if (!status) return 'No Status'
+        return (
+          statusLabels[status] || status.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())
+        )
       }
 
       const getStatusClass = (status) => {
@@ -958,8 +930,10 @@
           pending: 'bg-yellow-600/30 text-yellow-200 border-yellow-400/30',
           pending_hod: 'bg-orange-600/30 text-orange-200 border-orange-400/30',
           hod_approved: 'bg-blue-600/30 text-blue-200 border-blue-400/30',
+          hod_rejected: 'bg-red-500/30 text-red-200 border-red-400/30',
           pending_divisional: 'bg-purple-600/30 text-purple-200 border-purple-400/30',
           divisional_approved: 'bg-green-600/30 text-green-200 border-green-400/30',
+          divisional_rejected: 'bg-red-600/30 text-red-200 border-red-400/30',
           pending_ict_director: 'bg-indigo-600/30 text-indigo-200 border-indigo-400/30',
           ict_director_approved: 'bg-teal-600/30 text-teal-200 border-teal-400/30',
           ict_director_rejected: 'bg-red-600/30 text-red-200 border-red-400/30',
@@ -967,9 +941,11 @@
           head_it_approved: 'bg-pink-600/30 text-pink-200 border-pink-400/30',
           head_it_rejected: 'bg-red-700/30 text-red-200 border-red-500/30',
           pending_ict_officer: 'bg-blue-700/30 text-blue-200 border-blue-500/30',
+          ict_officer_rejected: 'bg-red-800/30 text-red-200 border-red-600/30',
           implemented: 'bg-green-700/30 text-green-100 border-green-500/30',
           completed: 'bg-green-800/30 text-green-100 border-green-600/30',
-          rejected: 'bg-red-600/30 text-red-200 border-red-400/30'
+          rejected: 'bg-red-600/30 text-red-200 border-red-400/30',
+          unknown: 'bg-gray-600/30 text-gray-200 border-gray-400/30'
         }
         return statusClasses[status] || 'bg-gray-600/30 text-gray-200 border-gray-400/30'
       }

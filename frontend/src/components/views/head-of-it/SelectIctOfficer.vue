@@ -6,336 +6,434 @@
         <ModernSidebar />
       </div>
       <main
-        class="flex-1 p-6 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto"
+        class="flex-1 p-2 overflow-y-auto relative bg-blue-900"
+        style="
+          background: linear-gradient(
+            135deg,
+            #1e3a8a 0%,
+            #1e40af 25%,
+            #1d4ed8 50%,
+            #1e40af 75%,
+            #1e3a8a 100%
+          );
+        "
       >
-        <div class="max-w-7xl mx-auto">
-          <!-- Header -->
-          <div class="mb-6">
+        <!-- Medical Background Pattern -->
+        <div class="absolute inset-0 overflow-hidden">
+          <div class="absolute inset-0 opacity-5">
+            <div class="grid grid-cols-12 gap-8 h-full transform rotate-45">
+              <div
+                v-for="i in 48"
+                :key="i"
+                class="bg-white rounded-full w-2 h-2 animate-pulse"
+                :style="{ animationDelay: i * 0.1 + 's' }"
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="max-w-full mx-auto relative z-10 px-4">
+          <!-- Back Button Only -->
+          <div class="medical-glass-card rounded-t-3xl p-4 mb-0 border-b border-blue-300/30">
             <button
               @click="goBack"
-              class="mb-4 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition duration-200 flex items-center text-base"
+              class="p-2 rounded-lg bg-teal-600/20 hover:bg-teal-600/30 transition-colors"
             >
-              <i class="fas fa-arrow-left mr-2"></i>
-              Back to Processing
+              <i class="fas fa-arrow-left text-teal-300 hover:text-white"></i>
             </button>
-            <h1 class="text-3xl font-bold text-white">Select ICT Officer</h1>
-            <p class="text-blue-200 mt-2 text-lg">
-              Choose an ICT Officer to assign the task for Request ID:
-              <span class="font-semibold text-white">{{ requestId }}</span>
-            </p>
-          </div>
-
-          <!-- Request Info Card -->
-          <div v-if="requestInfo" class="medical-glass-card rounded-xl p-4 mb-6">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-4">
-                <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
-                  <i class="fas fa-user text-white text-xl"></i>
-                </div>
-                <div>
-                  <h3 class="text-white font-semibold text-lg">{{ requestInfo.staff_name }}</h3>
-                  <p class="text-blue-200 text-base">
-                    PF: {{ requestInfo.pf_number }} | Dept: {{ requestInfo.department }}
-                  </p>
-                </div>
-              </div>
-              <div class="text-right">
-                <p class="text-blue-200 text-sm">Requesting access to:</p>
-                <div class="flex gap-2 mt-1">
-                  <span
-                    v-if="hasService(requestInfo, 'jeeva')"
-                    class="px-2 py-1 rounded text-xs bg-blue-500 text-white"
-                    >Jeeva</span
-                  >
-                  <span
-                    v-if="hasService(requestInfo, 'wellsoft')"
-                    class="px-2 py-1 rounded text-xs bg-green-500 text-white"
-                    >Wellsoft</span
-                  >
-                  <span
-                    v-if="hasService(requestInfo, 'internet')"
-                    class="px-2 py-1 rounded text-xs bg-cyan-500 text-white"
-                    >Internet</span
-                  >
-                </div>
-              </div>
-            </div>
           </div>
 
           <!-- Error Display -->
           <div
             v-if="error"
-            class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6"
+            class="medical-glass-card rounded-none border-t-0 border-b border-blue-300/30"
           >
-            <h3 class="font-bold text-xl">Error</h3>
-            <p class="text-lg">{{ error }}</p>
-            <button
-              @click="fetchIctOfficers"
-              class="mt-2 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 text-base font-medium"
-            >
-              Retry
-            </button>
-          </div>
-
-          <!-- Search and Filter -->
-          <div class="medical-glass-card rounded-xl p-4 mb-6">
-            <div class="flex flex-col md:flex-row gap-4">
-              <div class="flex-1">
-                <input
-                  v-model="searchQuery"
-                  type="text"
-                  placeholder="Search by name, PF number, or phone number..."
-                  class="w-full px-4 py-3 bg-white/20 border border-blue-300/30 rounded-lg text-white placeholder-blue-200/60 text-base focus:outline-none focus:ring-2 focus:ring-blue-400"
-                />
-              </div>
-              <div class="flex gap-3">
-                <select
-                  v-model="statusFilter"
-                  class="px-4 py-3 bg-white/20 border border-blue-300/30 rounded-lg text-white text-base focus:outline-none focus:ring-2 focus:ring-blue-400"
-                >
-                  <option value="">All Officers</option>
-                  <option value="Available">Available</option>
-                  <option value="Assigned">Assigned</option>
-                  <option value="Busy">Busy</option>
-                  <option value="Completed">Completed</option>
-                </select>
-                <button
-                  @click="refreshOfficers"
-                  class="px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition duration-200 text-base font-medium"
-                >
-                  <i class="fas fa-sync mr-2"></i>
-                  Refresh
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Loading State -->
-          <div v-if="isLoading" class="text-center py-12">
-            <div
-              class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"
-            ></div>
-            <p class="text-white text-lg">Loading ICT Officers...</p>
-          </div>
-
-          <!-- ICT Officers Table -->
-          <div v-if="!isLoading" class="medical-glass-card rounded-xl overflow-hidden">
-            <div class="overflow-x-auto">
-              <table class="w-full min-w-full">
-                <thead class="bg-blue-800/50">
-                  <tr>
-                    <th class="px-6 py-4 text-left text-blue-100 text-base font-semibold">S/N</th>
-                    <th class="px-6 py-4 text-left text-blue-100 text-base font-semibold">
-                      Full Name
-                    </th>
-                    <th class="px-6 py-4 text-left text-blue-100 text-base font-semibold">
-                      PF Number
-                    </th>
-                    <th class="px-6 py-4 text-left text-blue-100 text-base font-semibold">
-                      Phone Number
-                    </th>
-                    <th class="px-6 py-4 text-left text-blue-100 text-base font-semibold">
-                      Status
-                    </th>
-                    <th class="px-6 py-4 text-center text-blue-100 text-base font-semibold">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-blue-300/20">
-                  <tr
-                    v-for="(officer, index) in filteredOfficers"
-                    :key="officer.id"
-                    class="hover:bg-blue-700/30 transition-colors duration-200"
-                  >
-                    <!-- S/N -->
-                    <td class="px-6 py-4 text-white text-base font-medium">
-                      {{ index + 1 }}
-                    </td>
-
-                    <!-- Full Name -->
-                    <td class="px-6 py-4">
-                      <div class="flex items-center space-x-3">
-                        <div
-                          class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center"
-                        >
-                          <span class="text-white font-bold text-sm">{{
-                            getInitials(officer.name)
-                          }}</span>
-                        </div>
-                        <div>
-                          <p class="text-white font-medium text-base">{{ officer.name }}</p>
-                          <p class="text-blue-300 text-sm">
-                            {{ officer.position || 'ICT Officer' }}
-                          </p>
-                        </div>
-                      </div>
-                    </td>
-
-                    <!-- PF Number -->
-                    <td class="px-6 py-4">
-                      <span class="text-white text-base font-mono">{{
-                        officer.pf_number || 'N/A'
-                      }}</span>
-                    </td>
-
-                    <!-- Phone Number -->
-                    <td class="px-6 py-4">
-                      <span class="text-white text-base">{{ officer.phone_number || 'N/A' }}</span>
-                    </td>
-
-                    <!-- Status -->
-                    <td class="px-6 py-4">
-                      <span
-                        :class="getStatusBadgeClass(officer.status)"
-                        class="px-3 py-1 rounded-full text-sm font-medium"
-                      >
-                        {{ officer.status || 'Available' }}
-                      </span>
-                    </td>
-
-                    <!-- Actions -->
-                    <td class="px-6 py-4">
-                      <div class="flex justify-center space-x-2">
-                        <button
-                          @click="confirmAssignTask(officer)"
-                          :disabled="officer.status === 'Busy' || isAssigning"
-                          class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200 text-sm font-medium"
-                        >
-                          <i class="fas fa-user-plus mr-1"></i>
-                          Assign Task
-                        </button>
-                        <button
-                          @click="viewProgress(officer)"
-                          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200 text-sm font-medium"
-                        >
-                          <i class="fas fa-eye mr-1"></i>
-                          View Progress
-                        </button>
-                        <button
-                          @click="cancelTask(officer)"
-                          :disabled="officer.status !== 'Assigned'"
-                          class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200 text-sm font-medium"
-                        >
-                          <i class="fas fa-times mr-1"></i>
-                          Cancel Task
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <!-- Empty State -->
-            <div v-if="filteredOfficers.length === 0" class="text-center py-12">
-              <div
-                class="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4"
-              >
-                <i class="fas fa-users text-blue-400 text-2xl"></i>
-              </div>
-              <h3 class="text-white text-xl font-medium mb-2">No ICT Officers Found</h3>
-              <p class="text-blue-300 text-base">
-                {{
-                  searchQuery || statusFilter
-                    ? 'No officers match your current filters.'
-                    : 'No ICT officers available at this time.'
-                }}
-              </p>
-            </div>
-
-            <!-- Table Footer -->
-            <div
-              v-if="filteredOfficers.length > 0"
-              class="bg-blue-800/30 px-6 py-3 border-t border-blue-300/20"
-            >
-              <p class="text-blue-300 text-base">
-                Showing {{ filteredOfficers.length }} of {{ ictOfficers.length }} officers
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Assignment Confirmation Modal -->
-        <div
-          v-if="showConfirmModal"
-          class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
-        >
-          <div
-            class="bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all duration-300 scale-100"
-          >
-            <div
-              class="bg-gradient-to-r from-orange-600 to-orange-700 px-6 py-4 text-center rounded-t-2xl"
-            >
-              <div
-                class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg"
-              >
-                <i class="fas fa-question text-orange-600 text-2xl"></i>
-              </div>
-              <h3 class="text-xl font-bold text-white">Confirm Assignment</h3>
-            </div>
-
-            <div class="px-6 py-6">
-              <p class="text-gray-700 text-lg mb-6 text-center">
-                Are you sure you want to assign this task to
-                <span class="font-semibold text-blue-600">{{ selectedOfficer?.name }}</span
-                >?
-              </p>
-
-              <div class="flex gap-3">
-                <button
-                  @click="assignTask"
-                  :disabled="isAssigning"
-                  class="flex-1 bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 disabled:opacity-50 transition duration-200 text-base font-medium flex items-center justify-center"
-                >
-                  <i v-if="isAssigning" class="fas fa-spinner fa-spin mr-2"></i>
-                  <i v-else class="fas fa-check mr-2"></i>
-                  {{ isAssigning ? 'Assigning...' : 'Yes, Assign' }}
-                </button>
-                <button
-                  @click="showConfirmModal = false"
-                  :disabled="isAssigning"
-                  class="flex-1 bg-gray-500 text-white py-3 px-4 rounded-lg hover:bg-gray-600 transition duration-200 text-base font-medium"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Success Modal -->
-        <div
-          v-if="showSuccessModal"
-          class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
-        >
-          <div
-            class="bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all duration-500 scale-100"
-          >
-            <div
-              class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4 text-center rounded-t-2xl"
-            >
-              <div
-                class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg"
-              >
-                <i class="fas fa-check text-green-600 text-2xl"></i>
-              </div>
-              <h3 class="text-2xl font-bold text-white">Task Assigned!</h3>
-            </div>
-
-            <div class="px-6 py-6 text-center">
-              <p class="text-gray-700 text-lg mb-6">
-                Task successfully assigned to
-                <span class="font-semibold text-blue-600">{{ assignedOfficer?.name }}</span
-                >.
-              </p>
-
+            <div class="p-4 bg-red-600/20 border border-red-400/30 rounded-lg">
+              <h3 class="font-bold text-xl text-red-300">Error</h3>
+              <p class="text-lg text-red-200">{{ error }}</p>
               <button
-                @click="goBackToRequests"
-                class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-lg"
+                @click="fetchIctOfficers"
+                class="mt-2 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 text-base font-medium"
               >
-                Back to Requests
+                Retry
               </button>
+            </div>
+          </div>
+
+          <!-- Search & Filter Controls -->
+          <div class="medical-glass-card rounded-none border-t-0 border-b border-blue-300/30">
+            <div class="p-4">
+              <div
+                class="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between"
+              >
+                <!-- Search Section -->
+                <div class="flex-1 max-w-xl">
+                  <div class="relative">
+                    <div
+                      class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                    >
+                      <i class="fas fa-search text-teal-300"></i>
+                    </div>
+                    <input
+                      v-model="searchQuery"
+                      type="text"
+                      placeholder="Search by name, PF number, or phone number..."
+                      class="w-full pl-10 pr-4 py-2.5 bg-white/10 border border-teal-300/30 rounded-lg focus:border-teal-400 focus:outline-none text-white placeholder-teal-200/60 backdrop-blur-sm transition-colors"
+                    />
+                    <button
+                      v-if="searchQuery"
+                      @click="clearSearch"
+                      class="absolute inset-y-0 right-0 pr-3 flex items-center text-teal-300 hover:text-white"
+                    >
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Filter Controls -->
+                <div class="flex flex-wrap gap-3 items-center">
+                  <!-- Status Filter -->
+                  <div class="relative">
+                    <select
+                      v-model="statusFilter"
+                      class="appearance-none bg-white/10 border border-teal-300/30 rounded-lg px-4 py-2.5 pr-10 text-white text-sm focus:border-teal-400 focus:outline-none backdrop-blur-sm cursor-pointer"
+                    >
+                      <option value="" class="bg-blue-900 text-white">All Officers</option>
+                      <option value="Available" class="bg-blue-900 text-white">Available</option>
+                      <option value="Assigned" class="bg-blue-900 text-white">Assigned</option>
+                      <option value="Busy" class="bg-blue-900 text-white">Busy</option>
+                      <option value="Completed" class="bg-blue-900 text-white">Completed</option>
+                    </select>
+                    <div
+                      class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none"
+                    >
+                      <i class="fas fa-chevron-down text-teal-300"></i>
+                    </div>
+                  </div>
+
+                  <!-- Clear Filters Button -->
+                  <button
+                    v-if="searchQuery || statusFilter"
+                    @click="clearAllFilters"
+                    class="px-3 py-2.5 bg-red-600/30 hover:bg-red-600/50 text-red-200 rounded-lg transition-colors border border-red-400/30 text-sm flex items-center"
+                    title="Clear all filters"
+                  >
+                    <i class="fas fa-times mr-1"></i>
+                    Clear
+                  </button>
+
+                  <!-- Refresh Button -->
+                  <button
+                    @click="refreshOfficers"
+                    :disabled="isLoading"
+                    class="px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm flex items-center"
+                    title="Refresh officers list"
+                  >
+                    <i class="fas fa-sync-alt mr-2" :class="{ 'animate-spin': isLoading }"></i>
+                    Refresh
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Main Content -->
+          <div class="medical-glass-card rounded-b-3xl overflow-hidden">
+            <div class="p-6">
+              <!-- Loading State -->
+              <div v-if="isLoading" class="text-center py-12">
+                <i class="fas fa-spinner fa-spin text-4xl text-teal-400 mb-4"></i>
+                <p class="text-white text-lg">Loading ICT Officers...</p>
+              </div>
+
+              <!-- ICT Officers Table -->
+              <div v-else class="overflow-hidden rounded-xl border border-blue-300/20">
+                <div class="overflow-x-auto">
+                  <table class="w-full">
+                    <!-- Table Header -->
+                    <thead
+                      class="bg-gradient-to-r from-blue-600/20 to-indigo-600/20 border-b border-blue-300/20"
+                    >
+                      <tr>
+                        <th
+                          class="px-6 py-4 text-left text-sm font-semibold text-blue-200 uppercase tracking-wider"
+                        >
+                          <i class="fas fa-hashtag mr-2"></i>S/N
+                        </th>
+                        <th
+                          class="px-6 py-4 text-left text-sm font-semibold text-blue-200 uppercase tracking-wider"
+                        >
+                          <i class="fas fa-user mr-2"></i>Full Name
+                        </th>
+                        <th
+                          class="px-6 py-4 text-left text-sm font-semibold text-blue-200 uppercase tracking-wider"
+                        >
+                          <i class="fas fa-id-card mr-2"></i>PF Number
+                        </th>
+                        <th
+                          class="px-6 py-4 text-left text-sm font-semibold text-blue-200 uppercase tracking-wider"
+                        >
+                          <i class="fas fa-phone mr-2"></i>Phone Number
+                        </th>
+                        <th
+                          class="px-6 py-4 text-left text-sm font-semibold text-blue-200 uppercase tracking-wider"
+                        >
+                          <i class="fas fa-info-circle mr-2"></i>Status
+                        </th>
+                        <th
+                          class="px-6 py-4 text-center text-sm font-semibold text-blue-200 uppercase tracking-wider"
+                        >
+                          <i class="fas fa-cogs mr-2"></i>Actions
+                        </th>
+                      </tr>
+                    </thead>
+
+                    <!-- Table Body -->
+                    <tbody class="divide-y divide-blue-300/10">
+                      <tr
+                        v-for="(officer, index) in filteredOfficers"
+                        :key="officer.id"
+                        :class="[
+                          'hover:bg-blue-600/10 transition-colors duration-200',
+                          index % 2 === 0 ? 'bg-blue-950/20' : 'bg-blue-950/10'
+                        ]"
+                      >
+                        <!-- S/N -->
+                        <td class="px-6 py-4 text-white text-base font-medium">
+                          {{ index + 1 }}
+                        </td>
+
+                        <!-- Full Name -->
+                        <td class="px-6 py-4">
+                          <div class="flex items-center space-x-3">
+                            <div
+                              class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center"
+                            >
+                              <span class="text-white font-bold text-sm">{{
+                                getInitials(officer.name)
+                              }}</span>
+                            </div>
+                            <div>
+                              <p class="text-white font-medium text-base">{{ officer.name }}</p>
+                              <p class="text-blue-300 text-sm">
+                                {{ officer.position || 'ICT Officer' }}
+                              </p>
+                            </div>
+                          </div>
+                        </td>
+
+                        <!-- PF Number -->
+                        <td class="px-6 py-4">
+                          <span class="text-white text-base font-mono">{{
+                            officer.pf_number || 'N/A'
+                          }}</span>
+                        </td>
+
+                        <!-- Phone Number -->
+                        <td class="px-6 py-4">
+                          <span class="text-white text-base">{{
+                            officer.phone_number || 'N/A'
+                          }}</span>
+                        </td>
+
+                        <!-- Status -->
+                        <td class="px-6 py-4">
+                          <span
+                            :class="getStatusBadgeClass(officer.status)"
+                            class="px-3 py-1 rounded-full text-sm font-medium"
+                          >
+                            {{ officer.status || 'Available' }}
+                          </span>
+                        </td>
+
+                        <!-- Actions -->
+                        <td class="px-6 py-4 text-center relative">
+                          <div class="flex justify-center three-dot-menu">
+                            <!-- Three-dot menu button -->
+                            <button
+                              @click="toggleDropdown(officer.id, $event)"
+                              class="three-dot-button p-2 text-white hover:bg-blue-600/40 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 hover:scale-105 active:scale-95"
+                              :class="{ 'bg-blue-600/40 shadow-lg': openDropdownId === officer.id }"
+                              :aria-label="'Actions for officer ' + officer.name"
+                              :ref="'button-' + officer.id"
+                            >
+                              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path
+                                  d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"
+                                />
+                              </svg>
+                            </button>
+
+                            <!-- Dropdown menu -->
+                            <div
+                              v-show="openDropdownId === officer.id"
+                              class="dropdown-menu fixed bg-white rounded-lg shadow-xl border border-gray-200 py-1 min-w-max"
+                              :style="{
+                                zIndex: 99999,
+                                minWidth: '12rem',
+                                maxWidth: '16rem',
+                                boxShadow:
+                                  '0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1)',
+                                position: 'fixed',
+                                top: dropdownPosition.top + 'px',
+                                left: dropdownPosition.left + 'px'
+                              }"
+                              @click.stop
+                            >
+                              <!-- Assign Task -->
+                              <button
+                                @click.stop="executeAction('assign_task', officer)"
+                                :disabled="officer.status === 'Busy' || isAssigning"
+                                class="w-full text-left px-4 py-2 text-sm bg-green-50 text-green-800 border-b border-green-200 hover:bg-green-100 focus:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset transition-all duration-200 flex items-center space-x-3 group disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500 first:rounded-t-lg"
+                              >
+                                <i
+                                  class="fas fa-user-plus text-green-600 group-hover:text-green-700 group-focus:text-green-700 w-4 h-4 flex-shrink-0 transition-colors duration-200"
+                                ></i>
+                                <span class="font-medium">Assign Task</span>
+                              </button>
+
+                              <!-- View Progress -->
+                              <button
+                                @click.stop="executeAction('view_progress', officer)"
+                                class="w-full text-left px-4 py-2 text-sm bg-blue-50 text-blue-800 border-b border-blue-200 hover:bg-blue-100 focus:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset transition-all duration-200 flex items-center space-x-3 group"
+                              >
+                                <i
+                                  class="fas fa-eye text-blue-600 group-hover:text-blue-700 group-focus:text-blue-700 w-4 h-4 flex-shrink-0 transition-colors duration-200"
+                                ></i>
+                                <span class="font-medium">View Progress</span>
+                              </button>
+
+                              <!-- Cancel Task -->
+                              <button
+                                @click.stop="executeAction('cancel_task', officer)"
+                                :disabled="officer.status !== 'Assigned'"
+                                class="w-full text-left px-4 py-2 text-sm bg-red-50 text-red-800 hover:bg-red-100 focus:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-inset transition-all duration-200 flex items-center space-x-3 group disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500 last:rounded-b-lg"
+                              >
+                                <i
+                                  class="fas fa-times text-red-600 group-hover:text-red-700 group-focus:text-red-700 w-4 h-4 flex-shrink-0 transition-colors duration-200"
+                                ></i>
+                                <span class="font-medium">Cancel Task</span>
+                              </button>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Empty State -->
+                <div v-if="filteredOfficers.length === 0" class="text-center py-12">
+                  <div
+                    class="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4"
+                  >
+                    <i class="fas fa-users text-blue-400 text-2xl"></i>
+                  </div>
+                  <h3 class="text-white text-xl font-medium mb-2">No ICT Officers Found</h3>
+                  <p class="text-blue-300 text-base">
+                    {{
+                      searchQuery || statusFilter
+                        ? 'No officers match your current filters.'
+                        : 'No ICT officers available at this time.'
+                    }}
+                  </p>
+                </div>
+
+                <!-- Table Footer -->
+                <div
+                  v-if="filteredOfficers.length > 0"
+                  class="bg-blue-800/30 px-6 py-3 border-t border-blue-300/20"
+                >
+                  <p class="text-blue-300 text-base">
+                    Showing {{ filteredOfficers.length }} of {{ ictOfficers.length }} officers
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Assignment Confirmation Modal -->
+          <div
+            v-if="showConfirmModal"
+            class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
+          >
+            <div
+              class="bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all duration-300 scale-100"
+            >
+              <div
+                class="px-6 py-4 text-center rounded-t-2xl"
+                style="background: linear-gradient(135deg, #0f52ba 0%, #1e3a8a 100%)"
+              >
+                <div
+                  class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg"
+                >
+                  <i class="fas fa-question text-2xl" style="color: #0f52ba"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white">Confirm Assignment</h3>
+              </div>
+
+              <div class="px-6 py-6">
+                <p class="text-gray-700 text-lg mb-6 text-center">
+                  Are you sure you want to assign this task to
+                  <span class="font-semibold text-blue-600">{{ selectedOfficer?.name }}</span
+                  >?
+                </p>
+
+                <div class="flex gap-3">
+                  <button
+                    @click="assignTask"
+                    :disabled="isAssigning"
+                    class="flex-1 bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 disabled:opacity-50 transition duration-200 text-base font-medium flex items-center justify-center"
+                  >
+                    <i v-if="isAssigning" class="fas fa-spinner fa-spin mr-2"></i>
+                    <i v-else class="fas fa-check mr-2"></i>
+                    {{ isAssigning ? 'Assigning...' : 'Yes, Assign' }}
+                  </button>
+                  <button
+                    @click="showConfirmModal = false"
+                    :disabled="isAssigning"
+                    class="flex-1 bg-gray-500 text-white py-3 px-4 rounded-lg hover:bg-gray-600 transition duration-200 text-base font-medium"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Success Modal -->
+          <div
+            v-if="showSuccessModal"
+            class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
+          >
+            <div
+              class="bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all duration-500 scale-100"
+            >
+              <div
+                class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4 text-center rounded-t-2xl"
+              >
+                <div
+                  class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg"
+                >
+                  <i class="fas fa-check text-green-600 text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-white">Task Assigned!</h3>
+              </div>
+
+              <div class="px-6 py-6 text-center">
+                <p class="text-gray-700 text-lg mb-6">
+                  Task successfully assigned to
+                  <span class="font-semibold text-blue-600">{{ assignedOfficer?.name }}</span
+                  >.
+                </p>
+
+                <button
+                  @click="goBackToRequests"
+                  class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-lg"
+                >
+                  Back to Requests
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -368,7 +466,10 @@
         showSuccessModal: false,
         selectedOfficer: null,
         assignedOfficer: null,
-        isAssigning: false
+        isAssigning: false,
+        // Dropdown state management
+        openDropdownId: null,
+        dropdownPosition: { top: 0, left: 0 }
       }
     },
     computed: {
@@ -413,6 +514,14 @@
       }
 
       await Promise.all([this.fetchRequestInfo(), this.fetchIctOfficers()])
+
+      // Add click listener to close dropdowns when clicking outside
+      document.addEventListener('click', this.closeAllDropdowns)
+    },
+
+    beforeUnmount() {
+      // Clean up event listeners
+      document.removeEventListener('click', this.closeAllDropdowns)
     },
     methods: {
       async fetchRequestInfo() {
@@ -546,11 +655,125 @@
       },
 
       goBack() {
-        this.$router.push(`/head_of_it-dashboard/process-request/${this.requestId}`)
+        this.$router.push(`/head_of_it-dashboard/both-service-form/${this.requestId}`)
       },
 
       goBackToRequests() {
         this.$router.push('/head_of_it-dashboard/combined-requests')
+      },
+
+      clearSearch() {
+        this.searchQuery = ''
+      },
+
+      clearAllFilters() {
+        this.searchQuery = ''
+        this.statusFilter = ''
+      },
+
+      // Dropdown management methods
+      toggleDropdown(officerId, event) {
+        console.log(
+          'SelectIctOfficer: Toggling dropdown for officer:',
+          officerId,
+          'Current open:',
+          this.openDropdownId
+        )
+        if (this.openDropdownId === officerId) {
+          this.openDropdownId = null
+        } else {
+          this.calculateDropdownPosition(event)
+          this.openDropdownId = officerId
+        }
+      },
+
+      calculateDropdownPosition(event) {
+        if (!event || !event.target) return
+
+        const button = event.target.closest('.three-dot-button')
+        if (!button) return
+
+        const rect = button.getBoundingClientRect()
+        const isMobile = window.innerWidth <= 768
+        const dropdownWidth = isMobile ? 160 : 192 // Smaller on mobile
+        const dropdownHeight = 120 // Approximate height for 3 items
+
+        // Calculate initial position
+        let top = rect.bottom + 8 // 8px margin below button
+        let left = rect.right - dropdownWidth // Align right edge with button
+
+        // Get viewport dimensions
+        const viewportWidth = window.innerWidth
+        const viewportHeight = window.innerHeight
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+
+        // Adjust for scroll position
+        top += scrollTop
+
+        // Adjust horizontal position if too far right or left
+        if (left < 10) {
+          left = 10
+        } else if (left + dropdownWidth > viewportWidth - 10) {
+          left = viewportWidth - dropdownWidth - 10
+        }
+
+        // For mobile, center the dropdown better
+        if (isMobile) {
+          left = Math.max(10, Math.min(left, viewportWidth - dropdownWidth - 10))
+        }
+
+        // Adjust vertical position if too far down
+        const bottomSpace = viewportHeight - (rect.bottom - scrollTop)
+        if (bottomSpace < dropdownHeight + 20) {
+          // Show above button instead
+          top = rect.top + scrollTop - dropdownHeight - 8
+        }
+
+        // Ensure dropdown doesn't go above viewport
+        if (top < scrollTop + 10) {
+          top = scrollTop + 10
+        }
+
+        console.log('Dropdown position calculated:', {
+          top,
+          left,
+          viewportWidth,
+          viewportHeight,
+          isMobile
+        })
+        this.dropdownPosition = { top, left }
+      },
+
+      closeAllDropdowns(event) {
+        // Only close if clicking outside the dropdown menu or three-dot button
+        if (
+          event &&
+          (event.target.closest('.dropdown-menu') || event.target.closest('.three-dot-button'))
+        ) {
+          return
+        }
+        console.log('SelectIctOfficer: Closing all dropdowns')
+        this.openDropdownId = null
+      },
+
+      // Execute action based on key
+      executeAction(actionKey, officer) {
+        console.log('SelectIctOfficer: Executing action:', actionKey, 'for officer:', officer.id)
+        this.closeAllDropdowns()
+
+        switch (actionKey) {
+          case 'assign_task':
+            this.confirmAssignTask(officer)
+            break
+          case 'view_progress':
+            this.viewProgress(officer)
+            break
+          case 'cancel_task':
+            this.cancelTask(officer)
+            break
+          default:
+            console.warn('Unknown action:', actionKey)
+        }
       }
     }
   }
@@ -571,6 +794,53 @@
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
 
+  /* Three-dot menu enhancements */
+  .three-dot-menu {
+    position: relative;
+  }
+
+  /* Ensure dropdown is always visible and properly positioned */
+  .dropdown-menu {
+    position: fixed !important;
+    z-index: 99999 !important;
+    min-width: 12rem !important;
+    max-width: 16rem !important;
+  }
+
+  /* Animation for dropdown appearance */
+  .dropdown-menu {
+    animation: dropdownFadeIn 0.15s ease-out;
+    transform-origin: top right;
+  }
+
+  @keyframes dropdownFadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95) translateY(-5px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  /* Hover effects for better UX */
+  .dropdown-menu button:hover {
+    transform: translateX(2px);
+  }
+
+  /* High contrast focus states for accessibility */
+  .three-dot-button:focus {
+    outline: 2px solid #3b82f6 !important;
+    outline-offset: 2px;
+  }
+
+  .dropdown-menu button:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: -2px;
+    background-color: #f3f4f6;
+  }
+
   /* Mobile Responsive */
   @media (max-width: 768px) {
     .overflow-x-auto {
@@ -584,6 +854,36 @@
     .px-6 {
       padding-left: 1rem;
       padding-right: 1rem;
+    }
+
+    /* Mobile dropdown adjustments */
+    .dropdown-menu {
+      min-width: 10rem !important;
+      max-width: 14rem !important;
+      /* Position will be handled by JavaScript for mobile */
+    }
+
+    /* Increase touch target size on mobile */
+    .three-dot-button {
+      padding: 12px !important;
+      min-width: 44px;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .dropdown-menu button {
+      padding: 12px 16px !important;
+      font-size: 16px !important;
+    }
+  }
+
+  /* Tablet adjustments */
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .dropdown-menu {
+      min-width: 11rem;
+      max-width: 15rem;
     }
   }
 </style>

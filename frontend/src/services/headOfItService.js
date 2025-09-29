@@ -28,15 +28,15 @@ axiosInstance.interceptors.request.use(
 
 const headOfItService = {
   /**
-   * Get requests pending approval by Head of IT
+   * Get all requests that have reached Head of IT stage (pending, approved, rejected)
    */
   async getPendingRequests() {
     try {
-      console.log('🔄 HeadOfItService: Fetching pending requests...')
-      const response = await axiosInstance.get('/head-of-it/pending-requests')
+      console.log('🔄 HeadOfItService: Fetching all requests...')
+      const response = await axiosInstance.get('/head-of-it/all-requests')
 
       if (response.data.success) {
-        console.log('✅ HeadOfItService: Pending requests loaded successfully')
+        console.log('✅ HeadOfItService: All requests loaded successfully')
         return {
           success: true,
           data: response.data.data,
@@ -411,6 +411,37 @@ const headOfItService = {
         success: false,
         message:
           error.response?.data?.message || 'Network error while loading recommendation details'
+      }
+    }
+  },
+
+  /**
+   * Get detailed timeline for a specific access request (Head of IT view)
+   */
+  async getRequestTimeline(requestId) {
+    try {
+      console.log('🔄 HeadOfItService: Fetching request timeline:', requestId)
+      const response = await axiosInstance.get(`/head-of-it/requests/${requestId}/timeline`)
+
+      if (response.data.success) {
+        console.log('✅ HeadOfItService: Request timeline loaded successfully')
+        return {
+          success: true,
+          data: response.data.data,
+          message: response.data.message
+        }
+      } else {
+        console.error('❌ HeadOfItService: Failed to load request timeline:', response.data.message)
+        return {
+          success: false,
+          message: response.data.message || 'Failed to load request timeline'
+        }
+      }
+    } catch (error) {
+      console.error('❌ HeadOfItService: Error fetching request timeline:', error)
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Network error while loading request timeline'
       }
     }
   }

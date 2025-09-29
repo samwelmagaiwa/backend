@@ -342,6 +342,33 @@ const routes = [
     }
   },
   {
+    path: '/ict-dashboard/access-requests',
+    name: 'IctAccessRequests',
+    component: () => import('../components/views/ict-officer/AccessRequests.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: [ROLES.ICT_OFFICER]
+    }
+  },
+  {
+    path: '/ict-dashboard/request-progress/:id',
+    name: 'IctRequestProgress',
+    component: () => import('../components/views/ict-officer/RequestProgress.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: [ROLES.ICT_OFFICER]
+    }
+  },
+  {
+    path: '/user-security-access/:id',
+    name: 'UserSecurityAccess',
+    component: () => import('../components/views/UserSecurityAccess.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: [ROLES.ICT_OFFICER, ROLES.STAFF] // ICT Officers can grant access, Staff can view read-only
+    }
+  },
+  {
     path: '/ict-approval/requests-simple',
     name: 'RequestsListSimple',
     component: () => import('../components/views/ict-approval/RequestsListSimple.vue'),
@@ -363,6 +390,15 @@ const routes = [
     path: '/debug/ict-requests',
     name: 'RequestsListDebug',
     component: () => import('../components/debug/RequestsListDebug.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: [ROLES.ICT_OFFICER]
+    }
+  },
+  {
+    path: '/debug/user-security-access-test',
+    name: 'UserSecurityAccessTest',
+    component: () => import('../components/debug/UserSecurityAccessTest.vue'),
     meta: {
       requiresAuth: true,
       roles: [ROLES.ICT_OFFICER]
@@ -491,20 +527,6 @@ const routes = [
     component: () =>
       import(
         /* webpackChunkName: "head-of-it" */ '../components/views/head-of-it/HeadOfItDictRecommendations.vue'
-      ),
-    meta: {
-      requiresAuth: true,
-      roles: [ROLES.HEAD_OF_IT]
-    }
-  },
-
-  // Head of IT Process Request
-  {
-    path: '/head_of_it-dashboard/process-request/:id',
-    name: 'HeadOfItProcessRequest',
-    component: () =>
-      import(
-        /* webpackChunkName: "head-of-it" */ '../components/views/head-of-it/ProcessRequest.vue'
       ),
     meta: {
       requiresAuth: true,

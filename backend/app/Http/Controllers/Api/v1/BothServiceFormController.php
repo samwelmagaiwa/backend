@@ -409,6 +409,28 @@ class BothServiceFormController extends Controller
                 'request_type' => $userAccess->request_type ?? [],
                 'status' => $userAccess->getCalculatedOverallStatus(),
                 
+                // Direct database status fields for easier access
+                'hod_status' => $userAccess->hod_status,
+                'divisional_status' => $userAccess->divisional_status,
+                'ict_director_status' => $userAccess->ict_director_status,
+                'head_it_status' => $userAccess->head_it_status,
+                'ict_officer_status' => $userAccess->ict_officer_status,
+                
+                // Flattened comment fields for easier access
+                'hod_comments' => $userAccess->hod_comments,
+                'divisional_comments' => $userAccess->divisional_director_comments,
+                'ict_director_comments' => $userAccess->ict_director_comments,
+                'head_it_comments' => $userAccess->head_it_comments,
+                'ict_officer_comments' => $userAccess->ict_officer_comments,
+                
+                // Flattened approval date fields for easier access
+                'hod_approved_at' => $userAccess->hod_approved_at,
+                'divisional_approved_at' => $userAccess->divisional_approved_at,
+                'ict_director_approved_at' => $userAccess->ict_director_approved_at,
+                'dict_approved_at' => $userAccess->dict_approved_at,
+                'head_it_approved_at' => $userAccess->head_it_approved_at,
+                'ict_officer_implemented_at' => $userAccess->ict_officer_implemented_at,
+                
                 // Complete approval information with signature status indicators
                 'approvals' => [
                     'hod' => array_merge([
@@ -448,6 +470,7 @@ class BothServiceFormController extends Controller
                         'signature' => $userAccess->head_it_signature_path,
                         'signature_url' => $userAccess->head_it_signature_path ? Storage::url($userAccess->head_it_signature_path) : null,
                         'date' => $userAccess->head_it_approved_at,
+                        'comments' => $userAccess->head_it_comments,
                         'has_signature' => !empty($userAccess->head_it_signature_path),
                         'is_approved' => !empty($userAccess->head_it_approved_at)
                     ], $this->formatSignatureStatus($userAccess->head_it_signature_path, $userAccess->head_it_approved_at, $userAccess->head_it_name)),
@@ -550,6 +573,28 @@ class BothServiceFormController extends Controller
                 'request_type' => $userAccess->request_type ?? [],
                 'status' => $userAccess->getCalculatedOverallStatus(),
                 
+                // Direct database status fields for easier access
+                'hod_status' => $userAccess->hod_status,
+                'divisional_status' => $userAccess->divisional_status,
+                'ict_director_status' => $userAccess->ict_director_status,
+                'head_it_status' => $userAccess->head_it_status,
+                'ict_officer_status' => $userAccess->ict_officer_status,
+                
+                // Flattened comment fields for easier access
+                'hod_comments' => $userAccess->hod_comments,
+                'divisional_comments' => $userAccess->divisional_director_comments,
+                'ict_director_comments' => $userAccess->ict_director_comments,
+                'head_it_comments' => $userAccess->head_it_comments,
+                'ict_officer_comments' => $userAccess->ict_officer_comments,
+                
+                // Flattened approval date fields for easier access
+                'hod_approved_at' => $userAccess->hod_approved_at,
+                'divisional_approved_at' => $userAccess->divisional_approved_at,
+                'ict_director_approved_at' => $userAccess->ict_director_approved_at,
+                'dict_approved_at' => $userAccess->dict_approved_at,
+                'head_it_approved_at' => $userAccess->head_it_approved_at,
+                'ict_officer_implemented_at' => $userAccess->ict_officer_implemented_at,
+                
                 // Complete approval information with signature status indicators
                 'approvals' => [
                     'hod' => array_merge([
@@ -589,6 +634,7 @@ class BothServiceFormController extends Controller
                         'signature' => $userAccess->head_it_signature_path,
                         'signature_url' => $userAccess->head_it_signature_path ? Storage::url($userAccess->head_it_signature_path) : null,
                         'date' => $userAccess->head_it_approved_at,
+                        'comments' => $userAccess->head_it_comments,
                         'has_signature' => !empty($userAccess->head_it_signature_path),
                         'is_approved' => !empty($userAccess->head_it_approved_at)
                     ], $this->formatSignatureStatus($userAccess->head_it_signature_path, $userAccess->head_it_approved_at, $userAccess->head_it_name)),

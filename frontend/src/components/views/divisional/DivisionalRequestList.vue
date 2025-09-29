@@ -167,31 +167,58 @@
                   </td>
 
                   <!-- Actions -->
-                  <td class="px-4 py-3 text-center">
-                    <div class="flex flex-col items-center space-y-1">
+                  <td class="px-4 py-3 text-center relative">
+                    <div class="flex justify-center three-dot-menu">
+                      <!-- Three-dot menu button -->
                       <button
-                        @click="viewAndProcessRequest(request.id)"
-                        class="bg-blue-600 text-white text-sm rounded hover:bg-blue-700 inline-block"
-                        :style="{ padding: '4px 8px', width: 'fit-content' }"
+                        @click.stop="toggleDropdown(request.id)"
+                        class="three-dot-button p-2 text-white hover:bg-blue-600/40 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 hover:scale-105 active:scale-95"
+                        :class="{ 'bg-blue-600/40 shadow-lg': openDropdownId === request.id }"
+                        :aria-label="
+                          'Actions for request ' +
+                          (request.request_id || 'REQ-' + request.id.toString().padStart(6, '0'))
+                        "
                       >
-                        View & Process
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                          <path
+                            d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"
+                          />
+                        </svg>
                       </button>
-                      <button
-                        v-if="canEdit(request)"
-                        @click="editRequest(request.id)"
-                        class="bg-amber-600 text-white text-sm rounded hover:bg-amber-700 inline-block"
-                        :style="{ padding: '4px 8px', width: 'fit-content' }"
+
+                      <!-- Dropdown menu -->
+                      <div
+                        v-show="openDropdownId === request.id"
+                        class="dropdown-menu absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-[9999] py-1 min-w-max"
+                        @click.stop="() => {}"
+                        style="
+                          box-shadow:
+                            0 10px 25px rgba(0, 0, 0, 0.15),
+                            0 4px 6px rgba(0, 0, 0, 0.1);
+                        "
                       >
-                        Edit
-                      </button>
-                      <button
-                        v-if="canCancel(request)"
-                        @click="cancelRequest(request.id)"
-                        class="bg-red-600 text-white text-sm rounded hover:bg-red-700 inline-block"
-                        :style="{ padding: '4px 8px', width: 'fit-content' }"
-                      >
-                        Cancel
-                      </button>
+                        <!-- Available actions -->
+                        <template
+                          v-for="(action, index) in getAvailableActions(request)"
+                          :key="action.key"
+                        >
+                          <button
+                            @click.stop="executeAction(action.key, request)"
+                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200 flex items-center space-x-3 group"
+                            :class="{
+                              'border-t border-gray-100':
+                                index > 0 &&
+                                shouldShowSeparator(action, getAvailableActions(request)[index - 1])
+                            }"
+                          >
+                            <i
+                              :class="action.icon"
+                              class="text-gray-400 group-hover:text-gray-600 w-4 h-4 flex-shrink-0 transition-colors duration-200"
+                            ></i>
+                            <span class="font-medium">{{ action.label }}</span>
+                          </button>
+                        </template>
+                      </div>
                     </div>
                   </td>
                 </tr>
@@ -235,6 +262,14 @@
         <p class="text-gray-600">Loading requests...</p>
       </div>
     </div>
+
+    <!-- Timeline Modal -->
+    <RequestTimeline
+      :show="showTimeline"
+      :request-id="selectedRequestId"
+      @close="closeTimeline"
+      @updated="handleTimelineUpdate"
+    />
   </div>
 </template>
 
@@ -242,15 +277,22 @@
   import Header from '@/components/header.vue'
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppFooter from '@/components/footer.vue'
+  import RequestTimeline from '@/components/common/RequestTimeline.vue'
   import divisionalAccessService from '@/services/divisionalAccessService'
   import statusUtils from '@/utils/statusUtils'
+  import { useAuth } from '@/composables/useAuth'
 
   export default {
     name: 'DivisionalRequestList',
     components: {
       Header,
       ModernSidebar,
-      AppFooter
+      AppFooter,
+      RequestTimeline
+    },
+    setup() {
+      const { userRole } = useAuth()
+      return { userRole }
     },
     data() {
       return {
@@ -265,6 +307,11 @@
           total: 0
         },
         error: null,
+        // Dropdown state management
+        openDropdownId: null,
+        // Timeline modal state
+        showTimeline: false,
+        selectedRequestId: null,
         // Add status utilities for consistent status handling
         $statusUtils: statusUtils
       }
@@ -308,12 +355,21 @@
       try {
         console.log('DivisionalRequestList: Component mounted, initializing...')
         await this.fetchRequests()
+
+        // Add click listener to close dropdowns when clicking outside
+        document.addEventListener('click', this.closeAllDropdowns)
+
         console.log('DivisionalRequestList: Component initialized successfully')
       } catch (error) {
         console.error('DivisionalRequestList: Error during mount:', error)
         this.error = 'Failed to initialize component: ' + error.message
         this.isLoading = false
       }
+    },
+
+    beforeUnmount() {
+      // Clean up event listeners
+      document.removeEventListener('click', this.closeAllDropdowns)
     },
     methods: {
       async fetchRequests() {
@@ -503,6 +559,161 @@
       getStatusText(status) {
         // Use centralized status utility with component name for debugging
         return this.$statusUtils.getStatusText(status, 'DivisionalRequestList')
+      },
+
+      // Dropdown management methods
+      toggleDropdown(requestId) {
+        console.log('Toggle dropdown for request:', requestId)
+        this.openDropdownId = this.openDropdownId === requestId ? null : requestId
+
+        if (this.openDropdownId === requestId) {
+          this.$nextTick(() => {
+            console.log('Dropdown opened for request:', requestId)
+          })
+        }
+      },
+
+      closeAllDropdowns(event) {
+        // Only close if clicking outside the dropdown
+        if (!event || !event.target.closest('.three-dot-menu')) {
+          console.log('Closing all dropdowns')
+          this.openDropdownId = null
+        }
+      },
+
+      // Available actions based on user role and request status
+      getAvailableActions(request) {
+        const actions = []
+        const status = request.status
+
+        // Main action: View & Process
+        actions.push({
+          key: 'view_and_process',
+          label: 'View & Process',
+          icon: 'fas fa-eye'
+        })
+
+        // Edit action for editable requests
+        if (this.canEdit(request)) {
+          actions.push({
+            key: 'edit_request',
+            label: 'Edit Request',
+            icon: 'fas fa-edit'
+          })
+        }
+
+        // Cancel action for cancellable requests
+        if (this.canCancel(request)) {
+          actions.push({
+            key: 'cancel_request',
+            label: 'Cancel Request',
+            icon: 'fas fa-times'
+          })
+        }
+
+        // View Progress for requests that are in progress or implemented
+        if (
+          [
+            'implementation_in_progress',
+            'implemented',
+            'completed',
+            'assigned_to_ict',
+            'divisional_approved',
+            'ict_director_approved',
+            'head_it_approved'
+          ].includes(status)
+        ) {
+          actions.push({
+            key: 'view_progress',
+            label: 'View Progress',
+            icon: 'fas fa-chart-line'
+          })
+        }
+
+        // Always show View Timeline
+        actions.push({
+          key: 'view_timeline',
+          label: 'View Timeline',
+          icon: 'fas fa-history'
+        })
+
+        return actions
+      },
+
+      // Execute action based on key
+      executeAction(actionKey, request) {
+        this.closeAllDropdowns()
+
+        switch (actionKey) {
+          case 'view_and_process':
+            this.viewAndProcessRequest(request.id)
+            break
+          case 'edit_request':
+            this.editRequest(request.id)
+            break
+          case 'cancel_request':
+            this.cancelRequest(request.id)
+            break
+          case 'view_progress':
+            this.viewProgress(request)
+            break
+          case 'view_timeline':
+            this.viewTimeline(request)
+            break
+          default:
+            console.warn('Unknown action:', actionKey)
+        }
+      },
+
+      // Timeline modal methods
+      viewTimeline(request) {
+        console.log('📅 DivisionalRequestList: Opening timeline for request:', request.id)
+        this.selectedRequestId = request.id
+        this.showTimeline = true
+      },
+
+      closeTimeline() {
+        console.log('📅 DivisionalRequestList: Closing timeline modal')
+        this.showTimeline = false
+        this.selectedRequestId = null
+      },
+
+      async handleTimelineUpdate() {
+        console.log('🔄 DivisionalRequestList: Timeline updated, refreshing requests list...')
+        await this.fetchRequests()
+      },
+
+      // View Progress method
+      viewProgress(request) {
+        console.log('👁️ DivisionalRequestList: Viewing progress for request:', request.id)
+        // Navigate to progress view - using ICT dashboard route for consistency
+        this.$router.push(`/ict-dashboard/request-progress/${request.id}`)
+      },
+
+      // Helper method to determine if separator should be shown
+      shouldShowSeparator(currentAction, previousAction) {
+        // Add separator before destructive actions or different action groups
+        const destructiveActions = ['cancel_request']
+        const viewActions = ['view_timeline', 'view_progress']
+
+        // Separate destructive actions
+        if (
+          destructiveActions.includes(currentAction.key) &&
+          !destructiveActions.includes(previousAction?.key)
+        ) {
+          return true
+        }
+
+        // Separate view actions from edit actions
+        if (
+          viewActions.includes(currentAction.key) &&
+          !viewActions.includes(previousAction?.key) &&
+          previousAction?.key !== 'view_and_process'
+        ) {
+          return true
+        }
+
+        return false
       }
     }
   }
@@ -521,5 +732,114 @@
 
   .sidebar-narrow :deep(.sidebar-collapsed) {
     width: 64px !important;
+  }
+
+  /* Three-dot menu enhancements */
+  .three-dot-menu {
+    position: relative;
+  }
+
+  /* Ensure dropdown is always visible and properly positioned */
+  .dropdown-menu {
+    position: absolute !important;
+    z-index: 9999 !important;
+    min-width: 12rem;
+    max-width: 16rem;
+    transform: translateX(-100%);
+  }
+
+  /* Fix for table cell positioning context */
+  .three-dot-menu {
+    position: relative;
+    z-index: 1;
+  }
+
+  .three-dot-menu .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    transform: translateX(0);
+  }
+
+  /* Mobile responsive adjustments */
+  @media (max-width: 768px) {
+    .dropdown-menu {
+      min-width: 10rem;
+      max-width: 14rem;
+      right: 1rem !important;
+    }
+
+    /* Increase touch target size on mobile */
+    .three-dot-button {
+      padding: 12px !important;
+      min-width: 44px;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .dropdown-menu button {
+      padding: 12px 16px !important;
+      font-size: 16px !important;
+    }
+  }
+
+  /* Tablet adjustments */
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .dropdown-menu {
+      min-width: 11rem;
+      max-width: 15rem;
+    }
+  }
+
+  /* Animation for dropdown appearance */
+  .dropdown-menu {
+    animation: dropdownFadeIn 0.15s ease-out;
+    transform-origin: top right;
+    /* Ensure dropdown appears above other elements */
+    box-shadow:
+      0 10px 25px rgba(0, 0, 0, 0.15),
+      0 4px 6px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  /* Ensure table cells allow overflow for dropdown */
+  .three-dot-menu {
+    position: relative;
+    z-index: 10;
+  }
+
+  /* Make sure table doesn't clip dropdown */
+  table {
+    position: relative;
+    z-index: 1;
+  }
+
+  @keyframes dropdownFadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95) translateY(-5px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  /* Hover effects for better UX */
+  .dropdown-menu button:hover {
+    transform: translateX(2px);
+  }
+
+  /* High contrast focus states for accessibility */
+  .three-dot-button:focus {
+    outline: 2px solid #3b82f6 !important;
+    outline-offset: 2px;
+  }
+
+  .dropdown-menu button:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: -2px;
+    background-color: #f3f4f6;
   }
 </style>

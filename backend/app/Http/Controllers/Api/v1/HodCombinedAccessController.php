@@ -480,6 +480,194 @@ class HodCombinedAccessController extends Controller
     }
 
     /**
+     * Get detailed timeline for a specific access request
+     */
+    public function getAccessRequestTimeline($id)
+    {
+        try {
+            // Authorize - only HODs can access this endpoint
+            Gate::authorize('isHod');
+            
+            $request = UserAccess::with([
+                'department', 
+                'requestType',
+                'ictTasks.assignedUser:id,name,email',
+                'ictTasks.approvedByUser:id,name,email'
+            ])->find($id);
+            
+            if (!$request) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Access request not found'
+                ], 404);
+            }
+            
+            // Check if the HOD has authorization to view this request
+            $user = Auth::user();
+            $userDepartments = Department::where('hod_id', $user->id)->pluck('id')->toArray();
+            
+            if (!in_array($request->department_id, $userDepartments)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You are not authorized to view this request timeline'
+                ], 403);
+            }
+            
+            // Build comprehensive timeline
+            $timeline = [
+                'request_info' => [
+                    'id' => $request->id,
+                    'request_id' => 'REQ-' . str_pad($request->id, 6, '0', STR_PAD_LEFT),
+                    'staff_name' => $request->staff_name,
+                    'pf_number' => $request->pf_number,
+                    'department' => $request->department?->name ?? 'N/A',
+                    'request_type' => $request->getRequestTypesArray(),
+                    'purpose' => $request->purpose,
+                    'current_status' => $request->status,
+                    'created_at' => $request->created_at,
+                ],
+                'approval_stages' => [],
+                'implementation' => null,
+                'cancellation' => null,
+                'ict_tasks' => []
+            ];
+            
+            // HOD Approval Stage
+            if ($request->hod_status) {
+                $timeline['approval_stages'][] = [
+                    'stage' => 'HOD Approval',
+                    'status' => $request->hod_status,
+                    'approver_name' => $request->hod_name ?? 'N/A',
+                    'comments' => $request->hod_comments ?? '',
+                    'timestamp' => $request->hod_approved_at,
+                    'order' => 1
+                ];
+            }
+            
+            // Divisional Director Approval Stage
+            if ($request->divisional_status) {
+                $timeline['approval_stages'][] = [
+                    'stage' => 'Divisional Director Approval',
+                    'status' => $request->divisional_status,
+                    'approver_name' => $request->divisional_name ?? 'N/A',
+                    'comments' => $request->divisional_comments ?? '',
+                    'timestamp' => $request->divisional_approved_at,
+                    'order' => 2
+                ];
+            }
+            
+            // ICT Director Approval Stage
+            if ($request->ict_director_status) {
+                $timeline['approval_stages'][] = [
+                    'stage' => 'ICT Director Approval',
+                    'status' => $request->ict_director_status,
+                    'approver_name' => $request->ict_director_name ?? 'N/A',
+                    'comments' => $request->ict_director_comments ?? '',
+                    'timestamp' => $request->ict_director_approved_at,
+                    'order' => 3
+                ];
+            }
+            
+            // Head of IT Approval Stage
+            if ($request->head_it_status) {
+                $timeline['approval_stages'][] = [
+                    'stage' => 'Head of IT Approval',
+                    'status' => $request->head_it_status,
+                    'approver_name' => $request->head_it_name ?? 'N/A',
+                    'comments' => $request->head_it_comments ?? '',
+                    'timestamp' => $request->head_it_approved_at,
+                    'order' => 4
+                ];
+            }
+            
+            // ICT Officer Final Processing
+            if ($request->ict_officer_status) {
+                $timeline['approval_stages'][] = [
+                    'stage' => 'ICT Officer Processing',
+                    'status' => $request->ict_officer_status,
+                    'approver_name' => $request->ict_officer_name ?? 'N/A',
+                    'comments' => $request->ict_officer_comments ?? '',
+                    'timestamp' => $request->ict_officer_approved_at,
+                    'order' => 5
+                ];
+            }
+            
+            // Implementation details
+            if ($request->status === 'implemented' || $request->status === 'completed') {
+                $timeline['implementation'] = [
+                    'implemented_at' => $request->implemented_at,
+                    'implemented_by' => $request->implemented_by ?? 'N/A',
+                    'implementation_notes' => $request->implementation_notes ?? '',
+                    'completion_date' => $request->status === 'completed' ? $request->completed_at : null
+                ];
+            }
+            
+            // Cancellation details
+            if ($request->status === 'cancelled') {
+                $timeline['cancellation'] = [
+                    'cancelled_at' => $request->cancelled_at,
+                    'cancelled_by' => $request->cancelled_by ?? 'N/A',
+                    'cancellation_reason' => $request->cancellation_reason ?? 'No reason provided'
+                ];
+            }
+            
+            // ICT Tasks details
+            if ($request->ictTasks->isNotEmpty()) {
+                foreach ($request->ictTasks as $task) {
+                    $timeline['ict_tasks'][] = [
+                        'id' => $task->id,
+                        'title' => $task->title,
+                        'description' => $task->description,
+                        'status' => $task->status,
+                        'priority' => $task->priority,
+                        'assigned_to' => $task->assignedUser ? [
+                            'id' => $task->assignedUser->id,
+                            'name' => $task->assignedUser->name,
+                            'email' => $task->assignedUser->email
+                        ] : null,
+                        'approved_by' => $task->approvedByUser ? [
+                            'id' => $task->approvedByUser->id,
+                            'name' => $task->approvedByUser->name,
+                            'email' => $task->approvedByUser->email
+                        ] : null,
+                        'due_date' => $task->due_date,
+                        'completed_at' => $task->completed_at,
+                        'created_at' => $task->created_at,
+                        'updated_at' => $task->updated_at
+                    ];
+                }
+            }
+            
+            // Sort approval stages by order
+            usort($timeline['approval_stages'], function($a, $b) {
+                return $a['order'] <=> $b['order'];
+            });
+            
+            Log::info('HOD: Access request timeline retrieved', [
+                'request_id' => $id,
+                'hod_id' => $user->id
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Timeline retrieved successfully',
+                'data' => $timeline
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('HOD: Error retrieving access request timeline', [
+                'request_id' => $id,
+                'error' => $e->getMessage()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve timeline'
+            ], 500);
+        }
+    }
+
+    /**
      * Get approval status for a specific role using new status columns
      */
     private function getApprovalStatus($request, $role): string

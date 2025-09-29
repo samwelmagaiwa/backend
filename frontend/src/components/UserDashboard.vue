@@ -119,12 +119,13 @@
                   </div>
                 </button>
 
-                <!-- Submit New Request Button - Red / Orange if pending -->
+                <!-- Submit New Request Button - Red / Orange if any pending -->
                 <button
                   @click="showFormSelector = true"
                   :class="[
                     'medical-button px-8 py-6 rounded-xl font-semibold transition-all duration-300 shadow-lg transform relative overflow-hidden group/btn',
-                    hasPendingBookingRequest && !isCheckingPendingRequests
+                    (hasPendingBookingRequest || hasPendingCombinedRequest) &&
+                    !isCheckingPendingRequests
                       ? 'bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white hover:shadow-xl hover:shadow-orange-500/30 hover:scale-105 active:scale-95'
                       : 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white hover:shadow-xl hover:shadow-red-500/30 hover:scale-105 active:scale-95',
                     isCheckingPendingRequests ? 'opacity-70 cursor-wait' : ''
@@ -135,7 +136,8 @@
                   <div
                     :class="[
                       'absolute inset-0 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300',
-                      hasPendingBookingRequest && !isCheckingPendingRequests
+                      (hasPendingBookingRequest || hasPendingCombinedRequest) &&
+                      !isCheckingPendingRequests
                         ? 'bg-gradient-to-r from-orange-500/20 to-orange-600/20'
                         : 'bg-gradient-to-r from-red-500/20 to-red-600/20'
                     ]"
@@ -143,7 +145,8 @@
                   <div
                     :class="[
                       'absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent to-transparent group-hover/btn:animate-pulse',
-                      hasPendingBookingRequest && !isCheckingPendingRequests
+                      (hasPendingBookingRequest || hasPendingCombinedRequest) &&
+                      !isCheckingPendingRequests
                         ? 'via-orange-300/60'
                         : 'via-red-300/60'
                     ]"
@@ -156,7 +159,8 @@
                     <div
                       :class="[
                         'w-8 h-8 rounded-lg flex items-center justify-center mr-3 group-hover/btn:scale-110 transition-transform duration-300',
-                        hasPendingBookingRequest && !isCheckingPendingRequests
+                        (hasPendingBookingRequest || hasPendingCombinedRequest) &&
+                        !isCheckingPendingRequests
                           ? 'bg-orange-400/40'
                           : 'bg-red-400/40'
                       ]"
@@ -166,14 +170,16 @@
                         class="fas fa-spinner fa-spin text-white text-lg drop-shadow-sm"
                       />
                       <i
-                        v-else-if="hasPendingBookingRequest"
+                        v-else-if="hasPendingBookingRequest || hasPendingCombinedRequest"
                         class="fas fa-eye text-white text-lg drop-shadow-sm"
                       />
                       <i v-else class="fas fa-plus text-white text-lg drop-shadow-sm" />
                     </div>
                     <span class="text-lg drop-shadow-sm">
                       <template v-if="isCheckingPendingRequests">Checking...</template>
-                      <template v-else-if="hasPendingBookingRequest">View Pending Request</template>
+                      <template v-else-if="hasPendingBookingRequest || hasPendingCombinedRequest"
+                        >View Pending Request</template
+                      >
                       <template v-else>Create New Application</template>
                     </span>
                   </div>
@@ -687,6 +693,8 @@
       const showFormSelector = ref(false)
       const hasPendingBookingRequest = ref(false)
       const pendingBookingInfo = ref(null)
+      const hasPendingCombinedRequest = ref(false)
+      const pendingCombinedInfo = ref(null)
       const isCheckingPendingRequests = ref(true)
 
       // Dashboard statistics state
@@ -776,13 +784,42 @@
         }
       }
 
+      // Check for pending combined access requests on mount
+      const checkPendingCombinedRequest = async () => {
+        try {
+          const result = await userCombinedAccessService.checkPendingRequests()
+
+          if (result.success && result.data) {
+            if (result.data.has_pending_request) {
+              hasPendingCombinedRequest.value = true
+              pendingCombinedInfo.value = result.data.pending_request
+            } else {
+              hasPendingCombinedRequest.value = false
+              pendingCombinedInfo.value = null
+            }
+          } else {
+            hasPendingCombinedRequest.value = false
+            pendingCombinedInfo.value = null
+          }
+        } catch (error) {
+          console.error('UserDashboard: Error checking pending combined requests:', error)
+          // On error, assume no pending request to allow normal functionality
+          hasPendingCombinedRequest.value = false
+          pendingCombinedInfo.value = null
+        }
+      }
+
       // Guard this route - only staff can access
       onMounted(async () => {
         console.log('UserDashboard mounted successfully')
         requireRole([ROLES.STAFF])
 
         // Fetch dashboard statistics and check for pending requests in parallel
-        await Promise.allSettled([fetchDashboardStats(), checkPendingBookingRequest()])
+        await Promise.allSettled([
+          fetchDashboardStats(),
+          checkPendingBookingRequest(),
+          checkPendingCombinedRequest()
+        ])
       })
 
       // Methods
@@ -799,44 +836,37 @@
       const selectCombinedForm = async () => {
         showFormSelector.value = false
 
-        try {
-          // Check for pending combined access requests
-          const result = await userCombinedAccessService.checkPendingRequests()
-
-          if (result.success && result.data.has_pending_request) {
-            // User has pending request, show notification and redirect to request status
-            notificationStore.show({
-              type: 'warning',
-              title: 'Access Request Restriction',
-              message: `You cannot submit a new request while you have a pending request (${result.data.pending_request?.request_id || 'N/A'}). Please wait for your current request to be processed.`,
-              duration: 8000,
-              persistent: true,
-              actions: [
-                {
-                  text: 'View Request Status',
-                  action: () => {
-                    router.push('/request-status')
-                  }
+        // Check if we have pending combined requests from state
+        if (hasPendingCombinedRequest.value && pendingCombinedInfo.value) {
+          // User has pending combined request, show notification and redirect to request status
+          notificationStore.show({
+            type: 'warning',
+            title: 'Combined Access Request Restriction',
+            message: `You cannot submit a new combined access request while you have a pending request (${pendingCombinedInfo.value.request_id || 'N/A'}). Please wait for your current request to be processed.`,
+            duration: 8000,
+            persistent: true,
+            actions: [
+              {
+                text: 'View Request Status',
+                action: () => {
+                  router.push('/request-status')
                 }
-              ]
-            })
-
-            // Redirect to request status with message
-            router.push({
-              path: '/request-status',
-              query: {
-                blocked: 'true',
-                message: 'You cannot submit a new request while you have a pending request.',
-                pending_request_id: result.data.pending_request?.request_id || 'N/A'
               }
-            })
-          } else {
-            // No pending requests, proceed to combined form
-            router.push('/user-combined-form')
-          }
-        } catch (error) {
-          console.error('Error checking pending requests:', error)
-          // On error, still allow navigation (fail-safe)
+            ]
+          })
+
+          // Redirect to request status with message
+          router.push({
+            path: '/request-status',
+            query: {
+              blocked: 'true',
+              message:
+                'You cannot submit a new combined access request while you have a pending request.',
+              pending_request_id: pendingCombinedInfo.value.request_id || 'N/A'
+            }
+          })
+        } else {
+          // No pending combined requests, proceed to combined form
           router.push('/user-combined-form')
         }
       }
@@ -891,6 +921,11 @@
         // Booking requests
         hasPendingBookingRequest,
         pendingBookingInfo,
+
+        // Combined access requests
+        hasPendingCombinedRequest,
+        pendingCombinedInfo,
+
         isCheckingPendingRequests,
 
         // Dashboard statistics
@@ -903,6 +938,7 @@
         selectCombinedForm,
         selectBookingService,
         checkPendingBookingRequest,
+        checkPendingCombinedRequest,
         fetchDashboardStats
       }
     }

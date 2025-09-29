@@ -407,38 +407,81 @@ class HeadOfItDictRecommendationsController extends Controller
      */
     private function determineCurrentStage($userAccess): string
     {
+        // Check for completed states first
         if ($userAccess->ict_officer_status === 'implemented') {
+            return 'implemented';
+        }
+        
+        if ($userAccess->ict_officer_status === 'completed') {
             return 'completed';
         }
         
-        if ($userAccess->hod_status === 'rejected' || 
-            $userAccess->divisional_status === 'rejected' ||
-            $userAccess->ict_director_status === 'rejected' ||
-            $userAccess->head_it_status === 'rejected' ||
-            $userAccess->ict_officer_status === 'rejected') {
-            return 'rejected';
+        // Check for rejection states
+        if ($userAccess->head_it_status === 'rejected') {
+            return 'head_it_rejected';
         }
         
-        if ($userAccess->head_it_status === 'approved' && ($userAccess->ict_officer_status === 'pending' || is_null($userAccess->ict_officer_status))) {
-            return 'pending_ict_officer';
+        if ($userAccess->ict_director_status === 'rejected') {
+            return 'ict_director_rejected';
         }
         
-        if ($userAccess->ict_director_status === 'approved' && ($userAccess->head_it_status === 'pending' || is_null($userAccess->head_it_status))) {
-            return 'pending_head_it';
+        if ($userAccess->divisional_status === 'rejected') {
+            return 'divisional_rejected';
         }
         
-        if ($userAccess->divisional_status === 'approved' && ($userAccess->ict_director_status === 'pending' || is_null($userAccess->ict_director_status))) {
-            return 'pending_ict_director';
+        if ($userAccess->hod_status === 'rejected') {
+            return 'hod_rejected';
         }
         
-        if ($userAccess->hod_status === 'approved' && ($userAccess->divisional_status === 'pending' || is_null($userAccess->divisional_status))) {
-            return 'pending_divisional';
+        if ($userAccess->ict_officer_status === 'rejected') {
+            return 'ict_officer_rejected';
         }
         
+        // Check for approved states and next pending states
+        if ($userAccess->head_it_status === 'approved') {
+            if ($userAccess->ict_officer_status === 'pending' || is_null($userAccess->ict_officer_status)) {
+                return 'pending_ict_officer';
+            }
+        }
+        
+        if ($userAccess->ict_director_status === 'approved') {
+            if ($userAccess->head_it_status === 'pending' || is_null($userAccess->head_it_status)) {
+                return 'pending_head_it';
+            }
+            if ($userAccess->head_it_status === 'approved') {
+                return 'head_it_approved';
+            }
+        }
+        
+        if ($userAccess->divisional_status === 'approved') {
+            if ($userAccess->ict_director_status === 'pending' || is_null($userAccess->ict_director_status)) {
+                return 'pending_ict_director';
+            }
+            if ($userAccess->ict_director_status === 'approved') {
+                return 'ict_director_approved';
+            }
+        }
+        
+        if ($userAccess->hod_status === 'approved') {
+            if ($userAccess->divisional_status === 'pending' || is_null($userAccess->divisional_status)) {
+                return 'pending_divisional';
+            }
+            if ($userAccess->divisional_status === 'approved') {
+                return 'divisional_approved';
+            }
+        }
+        
+        // Check for pending states
         if ($userAccess->hod_status === 'pending' || is_null($userAccess->hod_status)) {
             return 'pending_hod';
         }
         
-        return 'unknown';
+        // Handle edge cases with fallback to legacy status column if available
+        if (!empty($userAccess->status)) {
+            return $userAccess->status;
+        }
+        
+        // Last resort fallback
+        return 'pending';
     }
 }

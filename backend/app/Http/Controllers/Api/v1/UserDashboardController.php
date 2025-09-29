@@ -90,18 +90,18 @@ class UserDashboardController extends Controller
         try {
             $baseQuery = UserAccess::where('user_id', $userId);
             
-            // Get counts using new status columns
-            $pendingHodCount = $baseQuery->clone()->where('hod_status', 'pending')->count();
-            $pendingDivisionalCount = $baseQuery->clone()->where('divisional_status', 'pending')
+            // Get counts using new status columns (including 'in_progress' as pending)
+            $pendingHodCount = $baseQuery->clone()->whereIn('hod_status', ['pending', 'in_progress'])->count();
+            $pendingDivisionalCount = $baseQuery->clone()->whereIn('divisional_status', ['pending', 'in_progress'])
                 ->where('hod_status', 'approved')->count();
-            $pendingIctDirectorCount = $baseQuery->clone()->where('ict_director_status', 'pending')
+            $pendingIctDirectorCount = $baseQuery->clone()->whereIn('ict_director_status', ['pending', 'in_progress'])
                 ->where('hod_status', 'approved')
                 ->where('divisional_status', 'approved')->count();
-            $pendingHeadItCount = $baseQuery->clone()->where('head_it_status', 'pending')
+            $pendingHeadItCount = $baseQuery->clone()->whereIn('head_it_status', ['pending', 'in_progress'])
                 ->where('hod_status', 'approved')
                 ->where('divisional_status', 'approved')
                 ->where('ict_director_status', 'approved')->count();
-            $pendingIctOfficerCount = $baseQuery->clone()->where('ict_officer_status', 'pending')
+            $pendingIctOfficerCount = $baseQuery->clone()->whereIn('ict_officer_status', ['pending', 'in_progress'])
                 ->where('hod_status', 'approved')
                 ->where('divisional_status', 'approved')
                 ->where('ict_director_status', 'approved')
@@ -368,28 +368,28 @@ class UserDashboardController extends Controller
 
             $baseQuery = UserAccess::where('user_id', $user->id);
             
-            // Get detailed workflow stage statistics
+            // Get detailed workflow stage statistics (including 'in_progress' as pending)
             $stageStats = [
                 'hod' => [
-                    'pending' => $baseQuery->clone()->where('hod_status', 'pending')->count(),
+                    'pending' => $baseQuery->clone()->whereIn('hod_status', ['pending', 'in_progress'])->count(),
                     'approved' => $baseQuery->clone()->where('hod_status', 'approved')->count(),
                     'rejected' => $baseQuery->clone()->where('hod_status', 'rejected')->count(),
                 ],
                 'divisional' => [
-                    'pending' => $baseQuery->clone()->where('divisional_status', 'pending')
+                    'pending' => $baseQuery->clone()->whereIn('divisional_status', ['pending', 'in_progress'])
                         ->where('hod_status', 'approved')->count(),
                     'approved' => $baseQuery->clone()->where('divisional_status', 'approved')->count(),
                     'rejected' => $baseQuery->clone()->where('divisional_status', 'rejected')->count(),
                 ],
                 'ict_director' => [
-                    'pending' => $baseQuery->clone()->where('ict_director_status', 'pending')
+                    'pending' => $baseQuery->clone()->whereIn('ict_director_status', ['pending', 'in_progress'])
                         ->where('hod_status', 'approved')
                         ->where('divisional_status', 'approved')->count(),
                     'approved' => $baseQuery->clone()->where('ict_director_status', 'approved')->count(),
                     'rejected' => $baseQuery->clone()->where('ict_director_status', 'rejected')->count(),
                 ],
                 'head_it' => [
-                    'pending' => $baseQuery->clone()->where('head_it_status', 'pending')
+                    'pending' => $baseQuery->clone()->whereIn('head_it_status', ['pending', 'in_progress'])
                         ->where('hod_status', 'approved')
                         ->where('divisional_status', 'approved')
                         ->where('ict_director_status', 'approved')->count(),
@@ -397,7 +397,7 @@ class UserDashboardController extends Controller
                     'rejected' => $baseQuery->clone()->where('head_it_status', 'rejected')->count(),
                 ],
                 'ict_officer' => [
-                    'pending' => $baseQuery->clone()->where('ict_officer_status', 'pending')
+                    'pending' => $baseQuery->clone()->whereIn('ict_officer_status', ['pending', 'in_progress'])
                         ->where('hod_status', 'approved')
                         ->where('divisional_status', 'approved')
                         ->where('ict_director_status', 'approved')

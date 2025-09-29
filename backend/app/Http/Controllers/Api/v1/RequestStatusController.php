@@ -451,6 +451,13 @@ class RequestStatusController extends Controller
             'ict_officer_approved_by' => $accessRequest->ict_officer_approved_by,
             'ict_officer_approved_by_name' => $accessRequest->ict_officer_approved_by_name,
             'ict_officer_approval_comment' => $accessRequest->ict_officer_approval_comment,
+            
+            // Implementation Comments
+            'implementation_comments' => $accessRequest->implementation_comments,
+            'ict_implementation_comments' => $accessRequest->implementation_comments, // Alias for frontend compatibility
+            'ict_officer_comments' => $accessRequest->ict_officer_comments,
+            'ict_officer_name' => $accessRequest->ict_officer_name,
+            'ict_officer_implemented_at' => $accessRequest->ict_officer_implemented_at,
         ];
     }
 

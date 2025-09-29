@@ -27,17 +27,131 @@ class SwaggerController extends Controller
             'message' => 'SwaggerController is working!',
             'timestamp' => now()->toISOString(),
             'documentation_url' => url('/api/documentation'),
-            'api_docs_url' => url('/api/api-docs')
+            'api_docs_url' => url('/api/api-docs'),
+            'postman_collection_url' => url('/api/postman-collection')
         ]);
     }
 
     /**
-     * Generate API documentation JSON
+     * Generate Postman Collection JSON
      */
-    public function apiDocs()
+    public function postmanCollection()
     {
-        // Generate basic API documentation structure
-        $apiDoc = [
+        $apiDoc = $this->generateApiDocsStructure();
+        
+        $collection = [
+            'info' => [
+                'name' => $apiDoc['info']['title'],
+                'description' => $apiDoc['info']['description'],
+                'version' => $apiDoc['info']['version'],
+                'schema' => 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'
+            ],
+            'auth' => [
+                'type' => 'bearer',
+                'bearer' => [
+                    [
+                        'key' => 'token',
+                        'value' => '{{auth_token}}',
+                        'type' => 'string'
+                    ]
+                ]
+            ],
+            'variable' => [
+                [
+                    'key' => 'base_url',
+                    'value' => url('/api'),
+                    'type' => 'string'
+                ],
+                [
+                    'key' => 'auth_token',
+                    'value' => 'your-token-here',
+                    'type' => 'string'
+                ]
+            ],
+            'item' => []
+        ];
+
+        // Convert OpenAPI paths to Postman requests
+        foreach ($apiDoc['paths'] as $path => $methods) {
+            foreach ($methods as $method => $details) {
+                $item = [
+                    'name' => $details['summary'] ?? ucfirst($method) . ' ' . $path,
+                    'request' => [
+                        'method' => strtoupper($method),
+                        'header' => [
+                            [
+                                'key' => 'Content-Type',
+                                'value' => 'application/json',
+                                'type' => 'text'
+                            ]
+                        ],
+                        'url' => [
+                            'raw' => '{{base_url}}' . $path,
+                            'host' => ['{{base_url}}'],
+                            'path' => array_filter(explode('/', $path)),
+                            'variable' => []
+                        ],
+                        'description' => $details['description'] ?? ''
+                    ],
+                    'response' => []
+                ];
+
+                // Add path parameters
+                if (isset($details['parameters'])) {
+                    foreach ($details['parameters'] as $param) {
+                        if ($param['in'] === 'path') {
+                            $item['request']['url']['variable'][] = [
+                                'key' => $param['name'],
+                                'value' => 'example_value'
+                            ];
+                        } elseif ($param['in'] === 'query') {
+                            $item['request']['url']['query'][] = [
+                                'key' => $param['name'],
+                                'value' => $param['schema']['example'] ?? 'example_value',
+                                'disabled' => true
+                            ];
+                        }
+                    }
+                }
+
+                // Add request body
+                if (isset($details['requestBody'])) {
+                    $contentType = array_keys($details['requestBody']['content'])[0];
+                    $schema = $details['requestBody']['content'][$contentType]['schema'] ?? [];
+                    
+                    if ($contentType === 'application/json' && isset($schema['properties'])) {
+                        $body = [];
+                        foreach ($schema['properties'] as $prop => $propDetails) {
+                            $body[$prop] = $propDetails['example'] ?? 'example_value';
+                        }
+                        $item['request']['body'] = [
+                            'mode' => 'raw',
+                            'raw' => json_encode($body, JSON_PRETTY_PRINT),
+                            'options' => [
+                                'raw' => [
+                                    'language' => 'json'
+                                ]
+                            ]
+                        ];
+                    }
+                }
+
+                $collection['item'][] = $item;
+            }
+        }
+
+        return response()->json($collection, 200, [
+            'Content-Type' => 'application/json',
+            'Content-Disposition' => 'attachment; filename="user-access-api.postman_collection.json"'
+        ]);
+    }
+
+    /**
+     * Extract API documentation structure for reuse
+     */
+    private function generateApiDocsStructure()
+    {
+        return [
             'openapi' => '3.0.0',
             'info' => [
                 'title' => 'User Access Management API',
@@ -48,6 +162,16 @@ class SwaggerController extends Controller
                     'email' => 'admin@example.com'
                 ]
             ],
+            'paths' => $this->generatePaths()
+        ];
+    }
+
+    /**
+     * Generate API documentation JSON
+     */
+    public function apiDocs()
+    {
+        $apiDoc = array_merge($this->generateApiDocsStructure(), [
             'servers' => [
                 [
                     'url' => url('/api'),
@@ -74,17 +198,19 @@ class SwaggerController extends Controller
                 ['name' => 'Module Requests', 'description' => 'Wellsoft and Jeeva module access requests'],
                 ['name' => 'Device Booking', 'description' => 'ICT device booking and management'],
                 ['name' => 'ICT Approval', 'description' => 'ICT officer approval processes'],
+                ['name' => 'ICT Officer', 'description' => 'ICT Officer task management and implementation workflow'],
+                ['name' => 'Head of IT', 'description' => 'Head of IT approval and ICT Officer management'],
+                ['name' => 'User Access Workflow', 'description' => 'Complete user access workflow with multi-level approvals'],
                 ['name' => 'Admin', 'description' => 'Administrative functions (user and department management)'],
                 ['name' => 'HOD Workflow', 'description' => 'Head of Department approval workflow'],
                 ['name' => 'Divisional Workflow', 'description' => 'Divisional Director approval workflow'],
                 ['name' => 'ICT Director Workflow', 'description' => 'ICT Director approval workflow'],
                 ['name' => 'Profile', 'description' => 'User profile management and auto-population'],
-                ['name' => 'Notifications', 'description' => 'User notification management'],
+                ['name' => 'Notifications', 'description' => 'User notification and pending request management'],
                 ['name' => 'Utility', 'description' => 'Health checks and system utilities'],
                 ['name' => 'Dashboard', 'description' => 'Dashboard and statistics endpoints']
-            ],
-            'paths' => $this->generatePaths()
-        ];
+            ]
+        ]);
 
         return response()->json($apiDoc, 200, ['Content-Type' => 'application/json']);
     }
@@ -100,7 +226,12 @@ class SwaggerController extends Controller
             $this->getDeviceBookingPaths(),
             $this->getAdminPaths(),
             $this->getWorkflowPaths(),
+            $this->getIctOfficerPaths(),
+            $this->getHeadOfItPaths(),
+            $this->getUserAccessWorkflowPaths(),
+            $this->getModuleRequestPaths(),
             $this->getProfilePaths(),
+            $this->getNotificationPaths(),
             $this->getUtilityPaths()
         );
     }
@@ -744,7 +875,547 @@ class SwaggerController extends Controller
     }
 
     /**
-     * Generate basic Swagger UI HTML
+     * ICT Officer API paths
+     */
+    private function getIctOfficerPaths()
+    {
+        return [
+            '/ict-officer/dashboard' => [
+                'get' => [
+                    'tags' => ['ICT Officer'],
+                    'summary' => 'Get ICT Officer Dashboard',
+                    'description' => 'Retrieve dashboard data for ICT Officer with task statistics and assignments',
+                    'operationId' => 'getIctOfficerDashboard',
+                    'security' => [['sanctum' => []]],
+                    'responses' => [
+                        '200' => [
+                            'description' => 'Dashboard data retrieved successfully',
+                            'content' => [
+                                'application/json' => [
+                                    'schema' => [
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'success' => ['type' => 'boolean'],
+                                            'data' => [
+                                                'type' => 'object',
+                                                'properties' => [
+                                                    'officer_info' => ['type' => 'object'],
+                                                    'task_counts' => ['type' => 'object'],
+                                                    'recent_assignments' => ['type' => 'array']
+                                                ]
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ],
+                        '403' => ['description' => 'Unauthorized - ICT Officer access required']
+                    ]
+                ]
+            ],
+            '/ict-officer/access-requests' => [
+                'get' => [
+                    'tags' => ['ICT Officer'],
+                    'summary' => 'Get Access Requests for ICT Implementation',
+                    'description' => 'Retrieve access requests approved by Head of IT and available for ICT Officer implementation',
+                    'operationId' => 'getIctAccessRequests',
+                    'security' => [['sanctum' => []]],
+                    'parameters' => [
+                        [
+                            'name' => 'status',
+                            'in' => 'query',
+                            'description' => 'Filter by implementation status',
+                            'schema' => [
+                                'type' => 'string',
+                                'enum' => ['unassigned', 'assigned_to_ict', 'implementation_in_progress', 'completed']
+                            ]
+                        ]
+                    ],
+                    'responses' => [
+                        '200' => ['description' => 'Access requests retrieved successfully']
+                    ]
+                ]
+            ],
+            '/ict-officer/access-requests/{requestId}' => [
+                'get' => [
+                    'tags' => ['ICT Officer'],
+                    'summary' => 'Get Access Request Details',
+                    'description' => 'Get detailed information about a specific access request',
+                    'operationId' => 'getAccessRequestById',
+                    'security' => [['sanctum' => []]],
+                    'parameters' => [
+                        [
+                            'name' => 'requestId',
+                            'in' => 'path',
+                            'required' => true,
+                            'schema' => ['type' => 'integer']
+                        ]
+                    ],
+                    'responses' => [
+                        '200' => ['description' => 'Access request details retrieved successfully'],
+                        '404' => ['description' => 'Access request not found']
+                    ]
+                ]
+            ],
+            '/ict-officer/access-requests/{requestId}/assign' => [
+                'post' => [
+                    'tags' => ['ICT Officer'],
+                    'summary' => 'Assign Access Request to Self',
+                    'description' => 'ICT Officer takes ownership of an access request implementation',
+                    'operationId' => 'assignAccessRequestToSelf',
+                    'security' => [['sanctum' => []]],
+                    'parameters' => [
+                        [
+                            'name' => 'requestId',
+                            'in' => 'path',
+                            'required' => true,
+                            'schema' => ['type' => 'integer']
+                        ]
+                    ],
+                    'requestBody' => [
+                        'content' => [
+                            'application/json' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'properties' => [
+                                        'notes' => ['type' => 'string', 'maxLength' => 500, 'example' => 'Task self-assigned by ICT Officer']
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    'responses' => [
+                        '200' => ['description' => 'Access request assigned successfully'],
+                        '400' => ['description' => 'Request already assigned or invalid state']
+                    ]
+                ]
+            ],
+            '/ict-officer/access-requests/{requestId}/progress' => [
+                'put' => [
+                    'tags' => ['ICT Officer'],
+                    'summary' => 'Update Access Request Progress',
+                    'description' => 'Update implementation progress on an assigned access request',
+                    'operationId' => 'updateAccessRequestProgress',
+                    'security' => [['sanctum' => []]],
+                    'parameters' => [
+                        [
+                            'name' => 'requestId',
+                            'in' => 'path',
+                            'required' => true,
+                            'schema' => ['type' => 'integer']
+                        ]
+                    ],
+                    'requestBody' => [
+                        'required' => true,
+                        'content' => [
+                            'application/json' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'required' => ['status'],
+                                    'properties' => [
+                                        'status' => [
+                                            'type' => 'string',
+                                            'enum' => ['implementation_in_progress', 'completed'],
+                                            'example' => 'implementation_in_progress'
+                                        ],
+                                        'notes' => ['type' => 'string', 'maxLength' => 1000, 'example' => 'Implementation started successfully']
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    'responses' => [
+                        '200' => ['description' => 'Progress updated successfully'],
+                        '400' => ['description' => 'Invalid status or request state']
+                    ]
+                ]
+            ],
+            '/ict-officer/access-requests/{requestId}/timeline' => [
+                'get' => [
+                    'tags' => ['ICT Officer'],
+                    'summary' => 'Get Access Request Timeline',
+                    'description' => 'Get detailed timeline and history for an access request',
+                    'operationId' => 'getAccessRequestTimeline',
+                    'security' => [['sanctum' => []]],
+                    'parameters' => [
+                        [
+                            'name' => 'requestId',
+                            'in' => 'path',
+                            'required' => true,
+                            'schema' => ['type' => 'integer']
+                        ]
+                    ],
+                    'responses' => [
+                        '200' => ['description' => 'Timeline retrieved successfully'],
+                        '404' => ['description' => 'Access request not found']
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * Head of IT API paths
+     */
+    private function getHeadOfItPaths()
+    {
+        return [
+            '/head-of-it/all-requests' => [
+                'get' => [
+                    'tags' => ['Head of IT'],
+                    'summary' => 'Get All Requests for Head of IT',
+                    'description' => 'Retrieve all requests that have reached Head of IT approval stage',
+                    'operationId' => 'getHeadOfItAllRequests',
+                    'security' => [['sanctum' => []]],
+                    'parameters' => [
+                        [
+                            'name' => 'status',
+                            'in' => 'query',
+                            'description' => 'Filter by approval status',
+                            'schema' => [
+                                'type' => 'string',
+                                'enum' => ['pending', 'approved', 'rejected']
+                            ]
+                        ]
+                    ],
+                    'responses' => [
+                        '200' => ['description' => 'Requests retrieved successfully'],
+                        '403' => ['description' => 'Unauthorized - Head of IT access required']
+                    ]
+                ]
+            ],
+            '/head-of-it/requests/{id}/approve' => [
+                'post' => [
+                    'tags' => ['Head of IT'],
+                    'summary' => 'Approve Access Request',
+                    'description' => 'Approve an access request as Head of IT',
+                    'operationId' => 'approveAccessRequest',
+                    'security' => [['sanctum' => []]],
+                    'parameters' => [
+                        [
+                            'name' => 'id',
+                            'in' => 'path',
+                            'required' => true,
+                            'schema' => ['type' => 'integer']
+                        ]
+                    ],
+                    'requestBody' => [
+                        'required' => true,
+                        'content' => [
+                            'application/json' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'properties' => [
+                                        'comments' => ['type' => 'string', 'example' => 'Request approved for implementation'],
+                                        'signature' => ['type' => 'string', 'format' => 'binary']
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    'responses' => [
+                        '200' => ['description' => 'Request approved successfully'],
+                        '400' => ['description' => 'Invalid request state or data']
+                    ]
+                ]
+            ],
+            '/head-of-it/ict-officers' => [
+                'get' => [
+                    'tags' => ['Head of IT'],
+                    'summary' => 'Get Available ICT Officers',
+                    'description' => 'Retrieve list of available ICT Officers for task assignment',
+                    'operationId' => 'getAvailableIctOfficers',
+                    'security' => [['sanctum' => []]],
+                    'responses' => [
+                        '200' => [
+                            'description' => 'ICT Officers list retrieved successfully',
+                            'content' => [
+                                'application/json' => [
+                                    'schema' => [
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'success' => ['type' => 'boolean'],
+                                            'data' => [
+                                                'type' => 'array',
+                                                'items' => [
+                                                    'type' => 'object',
+                                                    'properties' => [
+                                                        'id' => ['type' => 'integer'],
+                                                        'name' => ['type' => 'string'],
+                                                        'email' => ['type' => 'string'],
+                                                        'workload' => ['type' => 'integer'],
+                                                        'availability_status' => ['type' => 'string']
+                                                    ]
+                                                ]
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * User Access Workflow API paths
+     */
+    private function getUserAccessWorkflowPaths()
+    {
+        return [
+            '/user-access-workflow' => [
+                'get' => [
+                    'tags' => ['User Access Workflow'],
+                    'summary' => 'Get User Access Workflow Requests',
+                    'description' => 'Retrieve paginated list of user access workflow requests',
+                    'operationId' => 'getUserAccessWorkflowRequests',
+                    'security' => [['sanctum' => []]],
+                    'parameters' => [
+                        [
+                            'name' => 'status',
+                            'in' => 'query',
+                            'description' => 'Filter by workflow status',
+                            'schema' => [
+                                'type' => 'string',
+                                'enum' => ['draft', 'hod_pending', 'divisional_pending', 'ict_director_pending', 'head_it_pending', 'implementation_pending', 'completed']
+                            ]
+                        ],
+                        [
+                            'name' => 'per_page',
+                            'in' => 'query',
+                            'description' => 'Items per page',
+                            'schema' => ['type' => 'integer', 'default' => 15]
+                        ]
+                    ],
+                    'responses' => [
+                        '200' => ['description' => 'Workflow requests retrieved successfully']
+                    ]
+                ],
+                'post' => [
+                    'tags' => ['User Access Workflow'],
+                    'summary' => 'Create User Access Workflow Request',
+                    'description' => 'Submit new user access workflow request with complete approval chain',
+                    'operationId' => 'createUserAccessWorkflowRequest',
+                    'security' => [['sanctum' => []]],
+                    'requestBody' => [
+                        'required' => true,
+                        'content' => [
+                            'multipart/form-data' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'required' => ['staff_name', 'pf_number', 'department_id', 'request_type'],
+                                    'properties' => [
+                                        'staff_name' => ['type' => 'string', 'example' => 'John Doe'],
+                                        'pf_number' => ['type' => 'string', 'example' => 'PF12345'],
+                                        'phone_number' => ['type' => 'string'],
+                                        'department_id' => ['type' => 'integer'],
+                                        'request_type' => [
+                                            'type' => 'array',
+                                            'items' => [
+                                                'type' => 'string',
+                                                'enum' => ['wellsoft_access', 'jeeva_access', 'internet_access_request']
+                                            ]
+                                        ],
+                                        'access_type' => ['type' => 'string', 'enum' => ['permanent', 'temporary']],
+                                        'temporary_until' => ['type' => 'string', 'format' => 'date'],
+                                        'internet_purposes' => ['type' => 'string'],
+                                        'wellsoft_modules_selected' => ['type' => 'array'],
+                                        'jeeva_modules_selected' => ['type' => 'array'],
+                                        'signature' => ['type' => 'string', 'format' => 'binary']
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    'responses' => [
+                        '201' => ['description' => 'Workflow request created successfully'],
+                        '422' => ['description' => 'Validation errors']
+                    ]
+                ]
+            ],
+            '/user-access-workflow/{userAccess}/approve/hod' => [
+                'post' => [
+                    'tags' => ['User Access Workflow'],
+                    'summary' => 'HOD Approval',
+                    'description' => 'Process Head of Department approval for access request',
+                    'operationId' => 'processHodApproval',
+                    'security' => [['sanctum' => []]],
+                    'parameters' => [
+                        [
+                            'name' => 'userAccess',
+                            'in' => 'path',
+                            'required' => true,
+                            'schema' => ['type' => 'integer']
+                        ]
+                    ],
+                    'requestBody' => [
+                        'required' => true,
+                        'content' => [
+                            'multipart/form-data' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'required' => ['action'],
+                                    'properties' => [
+                                        'action' => ['type' => 'string', 'enum' => ['approve', 'reject']],
+                                        'comments' => ['type' => 'string'],
+                                        'signature' => ['type' => 'string', 'format' => 'binary']
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    'responses' => [
+                        '200' => ['description' => 'HOD approval processed successfully'],
+                        '403' => ['description' => 'Unauthorized - HOD access required']
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * Module Request API paths
+     */
+    private function getModuleRequestPaths()
+    {
+        return [
+            '/module-requests' => [
+                'post' => [
+                    'tags' => ['Module Requests'],
+                    'summary' => 'Create Module Access Request',
+                    'description' => 'Submit request for access to specific Wellsoft or Jeeva modules',
+                    'operationId' => 'createModuleRequest',
+                    'security' => [['sanctum' => []]],
+                    'requestBody' => [
+                        'required' => true,
+                        'content' => [
+                            'application/json' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'required' => ['user_access_id', 'module_type', 'modules'],
+                                    'properties' => [
+                                        'user_access_id' => ['type' => 'integer', 'example' => 1],
+                                        'module_type' => ['type' => 'string', 'enum' => ['wellsoft', 'jeeva'], 'example' => 'wellsoft'],
+                                        'modules' => [
+                                            'type' => 'array',
+                                            'items' => ['type' => 'string'],
+                                            'example' => ['Patient Registration', 'Billing']
+                                        ],
+                                        'justification' => ['type' => 'string', 'example' => 'Required for patient management duties']
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    'responses' => [
+                        '201' => ['description' => 'Module request created successfully'],
+                        '422' => ['description' => 'Validation errors']
+                    ]
+                ]
+            ],
+            '/module-requests/modules' => [
+                'get' => [
+                    'tags' => ['Module Requests'],
+                    'summary' => 'Get Available Modules',
+                    'description' => 'Retrieve list of available modules for Wellsoft and Jeeva systems',
+                    'operationId' => 'getAvailableModules',
+                    'security' => [['sanctum' => []]],
+                    'parameters' => [
+                        [
+                            'name' => 'type',
+                            'in' => 'query',
+                            'description' => 'Filter by module type',
+                            'schema' => [
+                                'type' => 'string',
+                                'enum' => ['wellsoft', 'jeeva']
+                            ]
+                        ]
+                    ],
+                    'responses' => [
+                        '200' => [
+                            'description' => 'Available modules retrieved successfully',
+                            'content' => [
+                                'application/json' => [
+                                    'schema' => [
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'wellsoft_modules' => [
+                                                'type' => 'array',
+                                                'items' => ['type' => 'string']
+                                            ],
+                                            'jeeva_modules' => [
+                                                'type' => 'array',
+                                                'items' => ['type' => 'string']
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * Notification API paths
+     */
+    private function getNotificationPaths()
+    {
+        return [
+            '/notifications/pending-count' => [
+                'get' => [
+                    'tags' => ['Notifications'],
+                    'summary' => 'Get Pending Requests Count',
+                    'description' => 'Get count of pending requests for current user based on their role',
+                    'operationId' => 'getPendingRequestsCount',
+                    'security' => [['sanctum' => []]],
+                    'responses' => [
+                        '200' => [
+                            'description' => 'Pending count retrieved successfully',
+                            'content' => [
+                                'application/json' => [
+                                    'schema' => [
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'success' => ['type' => 'boolean'],
+                                            'data' => [
+                                                'type' => 'object',
+                                                'properties' => [
+                                                    'total_pending' => ['type' => 'integer', 'example' => 5],
+                                                    'by_status' => ['type' => 'object'],
+                                                    'requires_attention' => ['type' => 'boolean']
+                                                ]
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            '/notifications/breakdown' => [
+                'get' => [
+                    'tags' => ['Notifications'],
+                    'summary' => 'Get Detailed Notification Breakdown',
+                    'description' => 'Get detailed breakdown of pending requests across all roles (Admin only)',
+                    'operationId' => 'getPendingRequestsBreakdown',
+                    'security' => [['sanctum' => []]],
+                    'responses' => [
+                        '200' => ['description' => 'Notification breakdown retrieved successfully'],
+                        '403' => ['description' => 'Unauthorized - Admin access required']
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * Generate interactive Swagger UI with testing capabilities
      */
     private function generateBasicSwaggerUI()
     {
@@ -755,382 +1426,233 @@ class SwaggerController extends Controller
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Access Management API - Documentation</title>
+    <title>User Access Management API - Swagger UI</title>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.10.3/swagger-ui.css" />
     <style>
+        html {
+            box-sizing: border-box;
+            overflow: -moz-scrollbars-vertical;
+            overflow-y: scroll;
+        }
+        *, *:before, *:after {
+            box-sizing: inherit;
+        }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-            line-height: 1.6;
+            background: #fafafa;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
         }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            overflow: hidden;
+        .swagger-ui .topbar {
+            background-color: #1b1b1b;
         }
-        .header {
+        .swagger-ui .topbar .download-url-wrapper {
+            display: none;
+        }
+        .custom-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 30px;
+            padding: 20px;
             text-align: center;
+            margin-bottom: 0;
         }
-        .header h1 {
+        .custom-header h1 {
             margin: 0;
-            font-size: 2.5em;
+            font-size: 2em;
             font-weight: 300;
         }
-        .header p {
+        .custom-header p {
             margin: 10px 0 0 0;
             opacity: 0.9;
-            font-size: 1.1em;
         }
-        .content {
-            padding: 30px;
-        }
-        .endpoints {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-        .endpoint {
-            border: 1px solid #e1e5e9;
-            border-radius: 6px;
-            overflow: hidden;
-            transition: box-shadow 0.2s;
-        }
-        .endpoint:hover {
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        .endpoint-header {
-            padding: 15px;
-            font-weight: 600;
-            color: white;
-        }
-        .endpoint-body {
-            padding: 15px;
-            background: #f8f9fa;
-        }
-        .method-get { background: #28a745; }
-        .method-post { background: #007bff; }
-        .method-put { background: #ffc107; color: #212529; }
-        .method-delete { background: #dc3545; }
-        .code {
-            background: #f1f3f4;
-            padding: 10px;
-            border-radius: 4px;
-            font-family: "Monaco", "Menlo", monospace;
-            font-size: 0.9em;
-            margin: 10px 0;
-            overflow-x: auto;
-        }
-        .json-viewer {
-            background: #1e1e1e;
-            color: #d4d4d4;
+        .info-section {
+            background: white;
             padding: 20px;
-            border-radius: 6px;
-            font-family: "Monaco", "Menlo", monospace;
-            font-size: 0.9em;
-            overflow-x: auto;
-            margin: 20px 0;
+            margin: 0;
+            border-bottom: 1px solid #e8e8e8;
         }
-        .btn {
+        .info-section h3 {
+            color: #3b4151;
+            margin-top: 0;
+        }
+        .auth-info {
+            background: #f7f7f7;
+            border-left: 4px solid #61affe;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .endpoints-count {
+            background: #e8f5e8;
+            border-left: 4px solid #4caf50;
+            padding: 10px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .download-section {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .download-btn {
             display: inline-block;
-            padding: 10px 20px;
-            background: #007bff;
+            padding: 8px 16px;
+            background: #ff6c37;
             color: white;
             text-decoration: none;
             border-radius: 4px;
-            margin: 5px;
-            border: none;
-            cursor: pointer;
+            margin: 5px 5px 5px 0;
             font-size: 14px;
-            transition: background 0.2s;
         }
-        .btn:hover {
-            background: #0056b3;
+        .download-btn:hover {
+            background: #e55a2b;
+            color: white;
+            text-decoration: none;
         }
-        .btn-success { background: #28a745; }
-        .btn-success:hover { background: #218838; }
-        .test-section {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 6px;
+        /* Override Swagger UI styles */
+        .swagger-ui .info {
             margin: 20px 0;
         }
-        .alert {
-            padding: 15px;
-            border-radius: 4px;
-            margin: 15px 0;
-        }
-        .alert-info {
-            background: #d1ecf1;
-            border: 1px solid #bee5eb;
-            color: #0c5460;
-        }
-        .tab-content {
-            border: 1px solid #dee2e6;
-            border-top: none;
-            padding: 20px;
-        }
-        .nav-tabs {
-            border-bottom: 1px solid #dee2e6;
-            display: flex;
-            margin: 0;
-            padding: 0;
-            list-style: none;
-        }
-        .nav-tabs li {
-            margin-bottom: -1px;
-        }
-        .nav-tabs button {
-            padding: 10px 20px;
-            border: 1px solid transparent;
-            border-bottom: 1px solid #dee2e6;
-            background: #f8f9fa;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        .nav-tabs button.active {
-            background: white;
-            border-color: #dee2e6 #dee2e6 white;
-        }
-        .tab-pane {
-            display: none;
-        }
-        .tab-pane.active {
-            display: block;
+        .swagger-ui .scheme-container {
+            background: #fff;
+            box-shadow: none;
+            border: 1px solid #d3d3d3;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🚀 User Access Management API</h1>
-            <p>Complete API Documentation & Testing Interface</p>
-            <p><strong>Version:</strong> 1.0.0 | <strong>Status:</strong> <span id="api-status">Checking...</span></p>
+    <div class="custom-header">
+        <h1>🚀 User Access Management API</h1>
+        <p>Interactive API Documentation & Testing Interface</p>
+        <p>Version 1.0.0 | Laravel Backend API</p>
+    </div>
+    
+    <div class="info-section">
+        <h3>🚀 Getting Started</h3>
+        <p>This is an interactive API documentation where you can test all endpoints directly from your browser.</p>
+        
+        <div class="auth-info">
+            <strong>🔐 Authentication Required:</strong><br>
+            Most endpoints require authentication. Click the "Authorize" button below and enter your Bearer token:<br>
+            <code>Bearer your-access-token-here</code><br><br>
+            <strong>How to get a token:</strong> Use the <code>POST /login</code> endpoint with your credentials.
         </div>
         
-        <div class="content">
-            <div class="alert alert-info">
-                <strong>📚 Interactive API Documentation</strong><br>
-                This documentation provides comprehensive information about all available API endpoints. 
-                Use the testing interface below to explore and test the API endpoints directly.
-            </div>
-
-            <ul class="nav-tabs">
-                <li><button class="active" onclick="showTab(event, \'overview\');">Overview</button></li>
-                <li><button onclick="showTab(event, \'endpoints\');">Endpoints</button></li>
-                <li><button onclick="showTab(event, \'testing\');">API Testing</button></li>
-                <li><button onclick="showTab(event, \'schema\');">JSON Schema</button></li>
-            </ul>
-
-            <div id="overview" class="tab-pane active">
-                <h2>🔐 Authentication</h2>
-                <p>This API uses <strong>Laravel Sanctum</strong> for authentication. Include your token in the Authorization header:</p>
-                <div class="code">Authorization: Bearer {your-token-here}</div>
-                
-                <h3>Getting an Access Token</h3>
-                <div class="code">POST ' . url('/api/login') . '
-Content-Type: application/json
-
-{
-  "email": "user@example.com",
-  "password": "your-password"
-}</div>
-                
-                <h2>📋 Key Features</h2>
-                <ul>
-                    <li><strong>User Access Requests:</strong> Submit and manage access requests for Wellsoft, Jeeva, and Internet services</li>
-                    <li><strong>Device Booking:</strong> Reserve and manage ICT devices with approval workflows</li>
-                    <li><strong>Workflow Management:</strong> Multi-level approval processes with role-based access</li>
-                    <li><strong>Administrative Tools:</strong> User management, department administration, and system reporting</li>
-                </ul>
-            </div>
-
-            <div id="endpoints" class="tab-pane">
-                <h2>🌐 Available Endpoints</h2>
-                <div class="endpoints">
-                    <div class="endpoint">
-                        <div class="endpoint-header method-post">POST /api/login</div>
-                        <div class="endpoint-body">
-                            <strong>User Authentication</strong><br>
-                            Authenticate user and return access token
-                        </div>
-                    </div>
-                    <div class="endpoint">
-                        <div class="endpoint-header method-get">GET /api/user</div>
-                        <div class="endpoint-body">
-                            <strong>Current User Profile</strong><br>
-                            Get authenticated user information
-                        </div>
-                    </div>
-                    <div class="endpoint">
-                        <div class="endpoint-header method-get">GET /api/v1/user-access</div>
-                        <div class="endpoint-body">
-                            <strong>User Access Requests</strong><br>
-                            List paginated user access requests
-                        </div>
-                    </div>
-                    <div class="endpoint">
-                        <div class="endpoint-header method-post">POST /api/v1/user-access</div>
-                        <div class="endpoint-body">
-                            <strong>Create Access Request</strong><br>
-                            Submit new user access request with digital signature
-                        </div>
-                    </div>
-                    <div class="endpoint">
-                        <div class="endpoint-header method-get">GET /api/booking-service/bookings</div>
-                        <div class="endpoint-body">
-                            <strong>Device Bookings</strong><br>
-                            List device booking requests
-                        </div>
-                    </div>
-                    <div class="endpoint">
-                        <div class="endpoint-header method-get">GET /api/ict-approval/device-requests</div>
-                        <div class="endpoint-body">
-                            <strong>ICT Approval Queue</strong><br>
-                            Device requests pending ICT officer approval
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="testing" class="tab-pane">
-                <div class="test-section">
-                    <h2>🧪 API Testing Interface</h2>
-                    <p>Test the API endpoints directly from this interface:</p>
-                    
-                    <button class="btn" onclick="testConnection()">Test API Connection</button>
-                    <button class="btn btn-success" onclick="loadApiSchema()">Load Full API Schema</button>
-                    
-                    <div id="test-results" style="margin-top: 20px;"></div>
-                </div>
-            </div>
-
-            <div id="schema" class="tab-pane">
-                <h2>📄 OpenAPI 3.0 Schema</h2>
-                <p>Complete API specification in OpenAPI 3.0 format:</p>
-                <div id="json-schema" class="json-viewer">
-                    <div style="text-align: center; padding: 20px; color: #888;">
-                        Click "Load Schema" to view the complete API specification
-                    </div>
-                </div>
-                <button class="btn" onclick="loadSchemaDisplay()">Load Schema</button>
-                <a href="' . $apiDocsUrl . '" class="btn" target="_blank">View Raw JSON</a>
-            </div>
+        <div class="endpoints-count">
+            📊 Total Endpoints: 50+ endpoints across 16 categories including Authentication, User Access, Device Booking, and Workflow Management
         </div>
+        
+        <div class="download-section">
+            <strong>📦 Additional Resources:</strong><br>
+            <a href="' . url('/api/postman-collection') . '" class="download-btn" download="user-access-api.postman_collection.json">Download Postman Collection</a>
+            <a href="' . $apiDocsUrl . '" class="download-btn" target="_blank">View Raw OpenAPI JSON</a>
+        </div>
+        
+        <p><strong>Base URL:</strong> <code>' . url('/api') . '</code></p>
     </div>
 
+    <div id="swagger-ui"></div>
+
+    <script src="https://unpkg.com/swagger-ui-dist@5.10.3/swagger-ui-bundle.js"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@5.10.3/swagger-ui-standalone-preset.js"></script>
     <script>
-        // Tab functionality
-        function showTab(evt, tabName) {
-            var i, tabcontent, tablinks;
-            tabcontent = document.getElementsByClassName("tab-pane");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].classList.remove("active");
-            }
-            tablinks = document.querySelectorAll(".nav-tabs button");
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].classList.remove("active");
-            }
-            document.getElementById(tabName).classList.add("active");
-            evt.currentTarget.classList.add("active");
-        }
-
-        // API testing functions
-        function testConnection() {
-            const resultDiv = document.getElementById("test-results");
-            resultDiv.innerHTML = "<div style=\'padding: 10px; background: #fff3cd; border-radius: 4px;\'>Testing API connection...</div>";
+        window.onload = function() {
+            // Build Swagger UI
+            const ui = SwaggerUIBundle({
+                url: "' . $apiDocsUrl . '",
+                dom_id: "#swagger-ui",
+                deepLinking: true,
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                plugins: [
+                    SwaggerUIBundle.plugins.DownloadUrl
+                ],
+                layout: "StandaloneLayout",
+                requestInterceptor: (request) => {
+                    // Add custom headers if needed
+                    request.headers["Accept"] = "application/json";
+                    // Add CORS headers for local testing
+                    request.headers["X-Requested-With"] = "XMLHttpRequest";
+                    console.log("Making request to:", request.url);
+                    return request;
+                },
+                responseInterceptor: (response) => {
+                    // Log responses for debugging
+                    console.log("API Response:", {
+                        url: response.url,
+                        status: response.status,
+                        headers: response.headers
+                    });
+                    return response;
+                },
+                onComplete: () => {
+                    console.log("Swagger UI loaded successfully");
+                    
+                    // Hide the default Swagger topbar
+                    setTimeout(() => {
+                        const topbar = document.querySelector(".swagger-ui .topbar");
+                        if (topbar) {
+                            topbar.style.display = "none";
+                        }
+                    }, 1000);
+                },
+                tryItOutEnabled: true,
+                supportedSubmitMethods: ["get", "post", "put", "delete", "patch", "head", "options"],
+                validatorUrl: null, // Disable online validation
+                docExpansion: "list", // Can be "list", "full", or "none"
+                defaultModelsExpandDepth: 1,
+                defaultModelExpandDepth: 1,
+                displayOperationId: false,
+                displayRequestDuration: true,
+                filter: true, // Enable endpoint filtering
+                showExtensions: true,
+                showCommonExtensions: true,
+                persistAuthorization: true, // Keep authorization when page refreshes
+                syntaxHighlight: {
+                    activated: true,
+                    theme: "agate"
+                },
+                requestSnippetsEnabled: true,
+                requestSnippets: {
+                    generators: {
+                        "curl_bash": {
+                            title: "cURL (bash)",
+                            syntax: "bash"
+                        },
+                        "curl_powershell": {
+                            title: "cURL (PowerShell)",
+                            syntax: "powershell"
+                        },
+                        "curl_cmd": {
+                            title: "cURL (CMD)",
+                            syntax: "bash"
+                        }
+                    },
+                    defaultExpanded: false,
+                    languages: ["curl_bash", "curl_powershell", "curl_cmd"]
+                }
+            });
             
-            fetch("' . $apiDocsUrl . '")
-                .then(response => {
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                    return response.json();
-                })
-                .then(data => {
-                    resultDiv.innerHTML = `
-                        <div style="padding: 15px; background: #d4edda; border-radius: 4px; border: 1px solid #c3e6cb;">
-                            <h4 style="margin: 0 0 10px 0; color: #155724;">✅ API Connection Successful</h4>
-                            <p><strong>API Title:</strong> ${data.info.title}</p>
-                            <p><strong>Version:</strong> ${data.info.version}</p>
-                            <p><strong>Endpoints Available:</strong> ${Object.keys(data.paths).length}</p>
-                        </div>
-                    `;
-                    document.getElementById("api-status").textContent = "✅ Online";
-                    document.getElementById("api-status").style.color = "#28a745";
-                })
-                .catch(error => {
-                    resultDiv.innerHTML = `
-                        <div style="padding: 15px; background: #f8d7da; border-radius: 4px; border: 1px solid #f5c6cb;">
-                            <h4 style="margin: 0 0 10px 0; color: #721c24;">❌ API Connection Failed</h4>
-                            <p><strong>Error:</strong> ${error.message}</p>
-                        </div>
-                    `;
-                    document.getElementById("api-status").textContent = "❌ Offline";
-                    document.getElementById("api-status").style.color = "#dc3545";
-                });
-        }
-
-        function loadApiSchema() {
-            const resultDiv = document.getElementById("test-results");
-            resultDiv.innerHTML = "<div style=\'padding: 10px; background: #fff3cd; border-radius: 4px;\'>Loading complete API schema...</div>";
-            
-            fetch("' . $apiDocsUrl . '")
-                .then(response => response.json())
-                .then(data => {
-                    let endpointsList = "";
-                    for (const [path, methods] of Object.entries(data.paths)) {
-                        for (const [method, details] of Object.entries(methods)) {
-                            const methodClass = `method-${method.toLowerCase()}`;
-                            endpointsList += `
-                                <div style="margin: 5px 0; padding: 8px; border-radius: 4px; background: #f8f9fa;">
-                                    <span class="${methodClass}" style="padding: 2px 8px; border-radius: 3px; color: white; font-size: 12px; font-weight: bold;">${method.toUpperCase()}</span>
-                                    <code style="margin-left: 10px;">${path}</code>
-                                    <div style="font-size: 14px; margin-top: 5px; color: #666;">${details.summary || "No description"}</div>
-                                </div>
-                            `;
+            // Additional customization
+            setTimeout(() => {
+                // Add custom CSS for better mobile experience
+                const style = document.createElement("style");
+                style.textContent = `
+                    @media (max-width: 768px) {
+                        .swagger-ui .wrapper {
+                            padding: 0 10px;
+                        }
+                        .custom-header {
+                            padding: 15px;
+                        }
+                        .custom-header h1 {
+                            font-size: 1.5em;
                         }
                     }
-                    
-                    resultDiv.innerHTML = `
-                        <div style="padding: 15px; background: #d4edda; border-radius: 4px; border: 1px solid #c3e6cb;">
-                            <h4 style="margin: 0 0 15px 0; color: #155724;">📚 Complete API Schema Loaded</h4>
-                            <div style="max-height: 400px; overflow-y: auto;">${endpointsList}</div>
-                        </div>
-                    `;
-                })
-                .catch(error => {
-                    resultDiv.innerHTML = `
-                        <div style="padding: 15px; background: #f8d7da; border-radius: 4px;">
-                            <h4 style="margin: 0 0 10px 0; color: #721c24;">❌ Schema Loading Failed</h4>
-                            <p>Error: ${error.message}</p>
-                        </div>
-                    `;
-                });
-        }
-
-        function loadSchemaDisplay() {
-            const schemaDiv = document.getElementById("json-schema");
-            schemaDiv.innerHTML = "<div style=\'text-align: center; padding: 20px; color: #888;\'>Loading schema...</div>";
-            
-            fetch("' . $apiDocsUrl . '")
-                .then(response => response.json())
-                .then(data => {
-                    schemaDiv.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
-                })
-                .catch(error => {
-                    schemaDiv.innerHTML = `<div style="color: #e74c3c; text-align: center; padding: 20px;">Failed to load schema: ${error.message}</div>`;
-                });
-        }
-
-        // Auto-test connection on page load
-        window.onload = function() {
-            testConnection();
+                `;
+                document.head.appendChild(style);
+            }, 1500);
         };
     </script>
 </body>

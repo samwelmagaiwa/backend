@@ -123,6 +123,7 @@ export const ROLE_PERMISSIONS = {
   [ROLES.ICT_OFFICER]: {
     routes: [
       '/ict-dashboard',
+      '/ict-dashboard/access-requests',
       '/jeeva-access',
       '/wellsoft-access',
       '/internet-access',

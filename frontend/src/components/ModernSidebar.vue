@@ -240,17 +240,37 @@
               v-tooltip="isCollapsed ? item.displayName : ''"
             >
               <div
-                class="flex items-center justify-center responsive-icon-small transition-colors duration-200"
+                class="flex items-center justify-center responsive-icon-small transition-colors duration-200 relative"
                 :class="isCollapsed ? '' : 'mr-3'"
               >
                 <i :class="[item.icon, 'text-current']"></i>
+                <!-- Notification Badge for collapsed state -->
+                <div
+                  v-if="getNotificationCount(item.path) > 0 && isCollapsed"
+                  class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full min-w-[1rem] h-4 flex items-center justify-center px-1 shadow-lg border border-white notification-badge animate-pulse"
+                  style="z-index: 999 !important"
+                  :title="`Debug: ${getNotificationCount(item.path)} notifications for ${item.path}`"
+                >
+                  {{ getNotificationCount(item.path) }}
+                </div>
               </div>
               <span v-if="!isCollapsed" class="truncate uppercase tracking-wide">{{
                 item.displayName.toUpperCase()
               }}</span>
+              <!-- Notification Badge -->
+              <div
+                v-if="getNotificationCount(item.path) > 0 && !isCollapsed"
+                class="absolute right-3 top-1/2 transform -translate-y-1/2 bg-red-500 text-white text-xs font-bold rounded-full min-w-[1.25rem] h-5 flex items-center justify-center px-1 shadow-lg border-2 border-white notification-badge animate-pulse"
+                style="z-index: 999 !important"
+                :title="`Debug: ${getNotificationCount(item.path)} notifications for ${item.path}`"
+              >
+                {{ getNotificationCount(item.path) }}
+              </div>
               <!-- Active indicator -->
               <div
-                v-if="route.path === item.path && !isCollapsed"
+                v-if="
+                  route.path === item.path && !isCollapsed && getNotificationCount(item.path) === 0
+                "
                 class="absolute right-2 w-2 h-2 bg-blue-600 rounded-full shadow-sm active-indicator"
               ></div>
             </router-link>
@@ -306,17 +326,33 @@
               v-tooltip="isCollapsed ? item.displayName : ''"
             >
               <div
-                class="flex items-center justify-center responsive-icon-small transition-colors duration-200"
+                class="flex items-center justify-center responsive-icon-small transition-colors duration-200 relative"
                 :class="isCollapsed ? '' : 'mr-3'"
               >
                 <i :class="[item.icon, 'text-current']"></i>
+                <!-- Notification Badge for collapsed state -->
+                <div
+                  v-if="getNotificationCount(item.path) > 0 && isCollapsed"
+                  class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full min-w-[1rem] h-4 flex items-center justify-center px-1 shadow-lg border border-white notification-badge animate-pulse"
+                >
+                  {{ getNotificationCount(item.path) }}
+                </div>
               </div>
               <span v-if="!isCollapsed" class="truncate uppercase tracking-wide">{{
                 item.displayName.toUpperCase()
               }}</span>
+              <!-- Notification Badge -->
+              <div
+                v-if="getNotificationCount(item.path) > 0 && !isCollapsed"
+                class="absolute right-3 top-1/2 transform -translate-y-1/2 bg-red-500 text-white text-xs font-bold rounded-full min-w-[1.25rem] h-5 flex items-center justify-center px-1 shadow-lg border-2 border-white notification-badge animate-pulse"
+              >
+                {{ getNotificationCount(item.path) }}
+              </div>
               <!-- Active indicator -->
               <div
-                v-if="route.path === item.path && !isCollapsed"
+                v-if="
+                  route.path === item.path && !isCollapsed && getNotificationCount(item.path) === 0
+                "
                 class="absolute right-2 w-2 h-2 bg-blue-600 rounded-full shadow-sm active-indicator"
               ></div>
             </router-link>
@@ -376,17 +412,33 @@
               v-tooltip="isCollapsed ? item.displayName : ''"
             >
               <div
-                class="flex items-center justify-center responsive-icon-small transition-colors duration-200"
+                class="flex items-center justify-center responsive-icon-small transition-colors duration-200 relative"
                 :class="isCollapsed ? '' : 'mr-3'"
               >
                 <i :class="[item.icon, 'text-current']"></i>
+                <!-- Notification Badge for collapsed state -->
+                <div
+                  v-if="getNotificationCount(item.path) > 0 && isCollapsed"
+                  class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full min-w-[1rem] h-4 flex items-center justify-center px-1 shadow-lg border border-white notification-badge animate-pulse"
+                >
+                  {{ getNotificationCount(item.path) }}
+                </div>
               </div>
               <span v-if="!isCollapsed" class="truncate uppercase tracking-wide">{{
                 item.displayName.toUpperCase()
               }}</span>
+              <!-- Notification Badge -->
+              <div
+                v-if="getNotificationCount(item.path) > 0 && !isCollapsed"
+                class="absolute right-3 top-1/2 transform -translate-y-1/2 bg-red-500 text-white text-xs font-bold rounded-full min-w-[1.25rem] h-5 flex items-center justify-center px-1 shadow-lg border-2 border-white notification-badge animate-pulse"
+              >
+                {{ getNotificationCount(item.path) }}
+              </div>
               <!-- Active indicator -->
               <div
-                v-if="route.path === item.path && !isCollapsed"
+                v-if="
+                  route.path === item.path && !isCollapsed && getNotificationCount(item.path) === 0
+                "
                 class="absolute right-2 w-2 h-2 bg-blue-600 rounded-full shadow-sm active-indicator"
               ></div>
             </router-link>
@@ -442,17 +494,33 @@
               v-tooltip="isCollapsed ? item.displayName : ''"
             >
               <div
-                class="flex items-center justify-center responsive-icon-small transition-colors duration-200"
+                class="flex items-center justify-center responsive-icon-small transition-colors duration-200 relative"
                 :class="isCollapsed ? '' : 'mr-3'"
               >
                 <i :class="[item.icon, 'text-current']"></i>
+                <!-- Notification Badge for collapsed state -->
+                <div
+                  v-if="getNotificationCount(item.path) > 0 && isCollapsed"
+                  class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full min-w-[1rem] h-4 flex items-center justify-center px-1 shadow-lg border border-white notification-badge animate-pulse"
+                >
+                  {{ getNotificationCount(item.path) }}
+                </div>
               </div>
               <span v-if="!isCollapsed" class="truncate uppercase tracking-wide">{{
                 item.displayName.toUpperCase()
               }}</span>
+              <!-- Notification Badge -->
+              <div
+                v-if="getNotificationCount(item.path) > 0 && !isCollapsed"
+                class="absolute right-3 top-1/2 transform -translate-y-1/2 bg-red-500 text-white text-xs font-bold rounded-full min-w-[1.25rem] h-5 flex items-center justify-center px-1 shadow-lg border-2 border-white notification-badge animate-pulse"
+              >
+                {{ getNotificationCount(item.path) }}
+              </div>
               <!-- Active indicator -->
               <div
-                v-if="route.path === item.path && !isCollapsed"
+                v-if="
+                  route.path === item.path && !isCollapsed && getNotificationCount(item.path) === 0
+                "
                 class="absolute right-2 w-2 h-2 bg-blue-600 rounded-full shadow-sm active-indicator"
               ></div>
             </router-link>
@@ -893,6 +961,13 @@
             category: 'dashboard',
             description: 'ICT Officer panel'
           },
+          '/ict-dashboard/access-requests': {
+            name: 'IctAccessRequests',
+            displayName: 'Access Requests',
+            icon: 'fas fa-clipboard-check',
+            category: 'requests-management',
+            description: 'Access requests approved by Head of IT'
+          },
           '/head_of_it-dashboard': {
             name: 'HeadOfItDashboard',
             displayName: 'Dashboard',
@@ -1128,6 +1203,212 @@
         }
       }
 
+      // Notification badge functionality
+      const notificationCounts = ref({})
+
+      function getNotificationCount(routePath) {
+        const count = notificationCounts.value[routePath] || 0
+        if (count > 0) {
+          console.log(`🔍 getNotificationCount('${routePath}') returning:`, count)
+        }
+        return count
+      }
+
+      // Notification retry state
+      const notificationRetries = ref(0)
+      const maxNotificationRetries = 3
+      const isNotificationDisabled = ref(false)
+
+      async function fetchNotificationCounts(forceRefresh = false) {
+        // Skip if temporarily disabled due to repeated failures
+        if (isNotificationDisabled.value) {
+          console.log('🚫 Notification fetching temporarily disabled')
+          return
+        }
+
+        try {
+          const role = piniaAuthStore?.userRole || userRole?.value || stableUserRole?.value
+          console.log('🔄 fetchNotificationCounts called with role:', role)
+
+          if (!role) {
+            console.warn('No role found, skipping notification fetch')
+            return
+          }
+
+          // Import the universal notification service dynamically to avoid circular dependencies
+          const notificationService = (await import('@/services/notificationService')).default
+          console.log('📡 Calling notification service API...')
+
+          const result = await notificationService.getPendingRequestsCount(forceRefresh)
+          console.log('📊 API response:', result)
+
+          // Reset retry counter on successful fetch
+          notificationRetries.value = 0
+
+          // DEBUG: Log the API response details
+          console.log('🔍 NOTIFICATION DEBUG - API Response:', {
+            total_pending: result.total_pending,
+            requires_attention: result.requires_attention,
+            full_result: result,
+            timestamp: new Date().toISOString()
+          })
+          
+          if (result.total_pending > 0) {
+            // Get role-specific configuration to know which routes should show badges
+            const config = notificationService.getRoleNotificationConfig(role)
+            console.log('⚙️ Role config for', role, ':', config)
+
+            // Clear old counts
+            const oldCounts = { ...notificationCounts.value }
+            notificationCounts.value = {}
+
+            // Set badge count for relevant menu items
+            config.menuItems.forEach((menuPath) => {
+              notificationCounts.value[menuPath] = result.total_pending
+              console.log(`🎯 Setting badge count ${result.total_pending} for route: ${menuPath} (was: ${oldCounts[menuPath] || 0})`)
+            })
+
+            console.log('🔔 Notification badges updated:', {
+              role,
+              oldCounts,
+              newCount: result.total_pending,
+              routes: config.menuItems,
+              finalCounts: notificationCounts.value,
+              countChanged: JSON.stringify(oldCounts) !== JSON.stringify(notificationCounts.value)
+            })
+          } else {
+            // Clear all notification counts
+            const oldCounts = { ...notificationCounts.value }
+            notificationCounts.value = {}
+            console.log('🔕 No pending requests, clearing badges. Previous counts:', oldCounts)
+          }
+        } catch (error) {
+          console.error('❌ Failed to fetch notification counts:', error)
+
+          // Increment retry counter
+          notificationRetries.value++
+
+          // If we've exceeded max retries, disable notifications temporarily
+          if (notificationRetries.value >= maxNotificationRetries) {
+            console.warn(`⚠️ Disabling notifications after ${maxNotificationRetries} failures`)
+            isNotificationDisabled.value = true
+
+            // Re-enable after 5 minutes
+            setTimeout(
+              () => {
+                console.log('♾️ Re-enabling notification fetching')
+                isNotificationDisabled.value = false
+                notificationRetries.value = 0
+              },
+              5 * 60 * 1000
+            ) // 5 minutes
+          }
+
+          // Log detailed error info for debugging
+          console.error('Error details:', {
+            message: error.message,
+            code: error.code,
+            status: error.response?.status,
+            retries: notificationRetries.value,
+            disabled: isNotificationDisabled.value
+          })
+        }
+      }
+
+      // Fetch notification counts on mount and periodically
+      let notificationInterval = null
+
+      onMounted(() => {
+        console.log('🚀 Sidebar mounted, triggering initial notification fetch')
+
+        // Initial fetch with delay to ensure auth is ready
+        setTimeout(() => {
+          console.log('⏰ Delayed notification fetch triggered')
+          fetchNotificationCounts()
+        }, 2000)
+
+        // Update counts every 30 seconds
+        notificationInterval = setInterval(fetchNotificationCounts, 30000)
+
+        // Expose fetchNotificationCounts globally for other components to use
+        window.sidebarInstance = {
+          fetchNotificationCounts: (force = false) => {
+            console.log('🌍 🔔 GLOBAL SIDEBAR: Global sidebar notification refresh triggered:', {
+              force,
+              currentCounts: { ...notificationCounts.value },
+              timestamp: new Date().toISOString()
+            })
+            fetchNotificationCounts(force)
+          }
+        }
+
+        // Listen for global refresh events
+        const handleRefreshNotifications = (event) => {
+          console.log('📻 🔔 NOTIFICATION EVENT: Received global refresh-notifications event:', {
+            detail: event?.detail,
+            timestamp: new Date().toISOString(),
+            currentCounts: { ...notificationCounts.value }
+          })
+          fetchNotificationCounts(true) // force refresh
+        }
+        
+        const handleForceRefreshNotifications = (event) => {
+          console.log('🔥 🔔 NOTIFICATION EVENT: Received force-refresh-notifications event:', {
+            detail: event?.detail,
+            timestamp: new Date().toISOString(),
+            currentCounts: { ...notificationCounts.value }
+          })
+          // Clear any existing counts and force immediate refresh
+          const oldCounts = { ...notificationCounts.value }
+          notificationCounts.value = {}
+          console.log('🗑️ Cleared notification counts. Old counts:', oldCounts)
+          fetchNotificationCounts(true)
+        }
+        
+        if (window.addEventListener) {
+          window.addEventListener('refresh-notifications', handleRefreshNotifications)
+          window.addEventListener('force-refresh-notifications', handleForceRefreshNotifications)
+        }
+      })
+
+      // Clean up interval and global references on unmount
+      onUnmounted(() => {
+        if (notificationInterval) {
+          clearInterval(notificationInterval)
+        }
+
+        // Clean up global references
+        if (window.sidebarInstance) {
+          delete window.sidebarInstance
+        }
+
+        // Remove event listener
+        if (window.removeEventListener) {
+          window.removeEventListener('refresh-notifications', () => {
+            fetchNotificationCounts(true)
+          })
+        }
+      })
+
+      // Watch for route changes and refresh notifications when entering dashboard pages
+      watch(route, (newRoute, _oldRoute) => {
+        const dashboardRoutes = [
+          '/ict-dashboard/access-requests',
+          '/hod-dashboard/request-list',
+          '/divisional-dashboard/combined-requests',
+          '/dict-dashboard/combined-requests',
+          '/head_of_it-dashboard/combined-requests'
+        ]
+        
+        // If navigating to a dashboard route that shows notifications
+        if (dashboardRoutes.some(routePath => newRoute.path.startsWith(routePath))) {
+          console.log('🗺️ Route changed to dashboard page, refreshing notifications:', newRoute.path)
+          setTimeout(() => {
+            fetchNotificationCounts(true) // force refresh after navigation
+          }, 1000)
+        }
+      })
+      
       // Theme is automatically initialized by useTheme composable
 
       return {
@@ -1164,7 +1445,9 @@
         toggleSectionLocal,
         showHelp,
         getRoleDisplayName,
-        handleLogout
+        handleLogout,
+        getNotificationCount,
+        fetchNotificationCounts
       }
     },
     directives: {
@@ -1638,6 +1921,23 @@
   }
   .nav-item:nth-child(5) {
     animation-delay: 0.5s;
+  }
+
+  /* Notification Badge Styles */
+  .notification-badge {
+    z-index: 10;
+    font-size: 0.6rem;
+    line-height: 1;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    box-shadow:
+      0 2px 4px rgba(239, 68, 68, 0.4),
+      0 0 0 1px rgba(255, 255, 255, 0.8);
+    transition: transform 0.2s ease-in-out;
+  }
+
+  .notification-badge:hover {
+    transform: scale(1.1);
+    animation-play-state: paused;
   }
 
   /* Responsive design helpers */

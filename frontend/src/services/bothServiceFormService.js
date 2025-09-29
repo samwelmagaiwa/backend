@@ -769,6 +769,55 @@ class BothServiceFormService {
   }
 
   /**
+   * ICT Officer approves/implements a user access request
+   * @param {number} requestId - ID of the request to implement
+   * @param {Object} payload - Implementation data including signature and details
+   * @returns {Promise<Object>} Response with implementation result
+   */
+  async ictOfficerApprove(requestId, payload) {
+    try {
+      console.log('🔄 ICT Officer implementing request:', requestId, payload)
+
+      const fd = new FormData()
+
+      // Required ICT Officer fields
+      fd.append('ict_officer_name', payload.ict_officer_name || '')
+      fd.append('approved_date', payload.ict_officer_date || new Date().toISOString().slice(0, 10))
+      fd.append('comments', payload.ict_officer_comments || '')
+      fd.append('status', payload.ict_officer_status || 'implemented')
+
+      if (payload.ict_officer_signature) {
+        fd.append('ict_officer_signature', payload.ict_officer_signature)
+      } else {
+        throw new Error('ICT Officer signature file is required')
+      }
+
+      // POST to ICT Officer approve endpoint
+      const res = await apiClient.post(
+        `/both-service-form/module-requests/${requestId}/ict-officer-approve`,
+        fd,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      )
+
+      if (res.data?.success) {
+        console.log('✅ ICT Officer implementation saved successfully:', res.data)
+        return { success: true, data: res.data.data, message: res.data.message }
+      }
+      throw new Error(res.data?.message || 'Failed to save ICT Officer implementation')
+    } catch (error) {
+      console.error('❌ Error in ictOfficerApprove:', error)
+      return {
+        success: false,
+        error:
+          error.response?.data?.message ||
+          error.message ||
+          'Failed to save ICT Officer implementation',
+        errors: error.response?.data?.errors || null
+      }
+    }
+  }
+
+  /**
    * Validate form data before submission
    * @param {Object} formData - Form data to validate
    * @returns {Object} Validation result

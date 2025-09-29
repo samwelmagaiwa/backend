@@ -18,24 +18,32 @@ use Carbon\Carbon;
 class HeadOfItController extends Controller
 {
     /**
-     * Get requests pending Head of IT approval
+     * Get all requests that have reached Head of IT stage (pending, approved, rejected)
      */
-    public function getPendingRequests(Request $request)
+    public function getAllRequests(Request $request)
     {
         try {
-            Log::info('HeadOfItController: Getting pending requests for Head of IT');
+            Log::info('HeadOfItController: Getting all requests for Head of IT');
             
-            // Get requests that are approved by ICT Director and waiting for Head of IT approval
-            // Use granular status columns for more accurate filtering
+            // Get requests that are approved by ICT Director (all that have reached Head of IT stage)
+            // Include pending, approved, and rejected requests
             $query = UserCombinedAccessRequest::with(['user', 'department'])
                 ->where('ict_director_status', 'approved')
-                ->where(function($q) {
-                    $q->whereNull('head_it_status')
-                      ->orWhere('head_it_status', 'pending');
-                })
                 ->orderBy('ict_director_approved_at', 'asc'); // FIFO ordering
 
             $requests = $query->get()->map(function ($request) {
+                // Determine correct status for Head of IT view
+                $headItStatus = $request->head_it_status ?? 'pending';
+                $displayStatus = 'ict_director_approved'; // Default for pending Head of IT approval
+                
+                if ($headItStatus === 'approved') {
+                    $displayStatus = 'head_of_it_approved';
+                } elseif ($headItStatus === 'rejected') {
+                    $displayStatus = 'head_of_it_rejected';
+                } elseif ($request->status === 'assigned_to_ict' || $request->status === 'implementation_in_progress' || $request->status === 'completed') {
+                    $displayStatus = $request->status;
+                }
+                
                 return [
                     'id' => $request->id,
                     'request_id' => $request->request_id,
@@ -47,7 +55,8 @@ class HeadOfItController extends Controller
                         ? explode(',', $request->request_types) 
                         : $request->request_types,
                     'internet_purposes' => $request->internet_purposes,
-                    'status' => $request->status,
+                    'status' => $displayStatus,
+                    'head_it_status' => $headItStatus,
                     'created_at' => $request->created_at,
                     'hod_approved_at' => $request->hod_approved_at,
                     'divisional_approved_at' => $request->divisional_approved_at,
@@ -78,6 +87,15 @@ class HeadOfItController extends Controller
                 'error' => app()->environment('local') ? $e->getMessage() : 'Internal server error'
             ], 500);
         }
+    }
+
+    /**
+     * Get requests pending Head of IT approval (backward compatibility)
+     * This method now redirects to getAllRequests for compatibility
+     */
+    public function getPendingRequests(Request $request)
+    {
+        return $this->getAllRequests($request);
     }
 
     /**
@@ -307,20 +325,17 @@ class HeadOfItController extends Controller
             Log::info('HeadOfItController: Getting ICT officers list');
             
             // Get users with ICT Officer role
-            $ictOfficers = User::role('ict_officer')
-                ->with(['department', 'currentTaskAssignments'])
+            $ictOfficers = User::whereHas('roles', function($query) {
+                    $query->where('name', 'ict_officer');
+                })
+                ->with(['department'])
                 ->where('is_active', true)
                 ->get()
                 ->map(function ($officer) {
-                    // Determine officer status based on current assignments
-                    $activeAssignments = $officer->currentTaskAssignments()
-                        ->whereIn('status', ['assigned', 'in_progress'])
-                        ->count();
-                    
-                    $status = 'Available';
-                    if ($activeAssignments > 0) {
-                        $status = $activeAssignments >= 3 ? 'Busy' : 'Assigned';
-                    }
+                    // For now, set all ICT officers as available
+                    // TODO: Implement proper task assignment tracking
+                    $activeAssignments = 0; // Placeholder
+                    $status = 'Available'; // Default status
 
                     return [
                         'id' => $officer->id,
@@ -358,12 +373,12 @@ class HeadOfItController extends Controller
     }
 
     /**
-     * Assign a task to an ICT Officer
+     * Assign a task to an ICT Officer (Updated to use UserAccess)
      */
     public function assignTaskToIctOfficer(Request $request)
     {
         $request->validate([
-            'request_id' => 'required|exists:user_combined_access_requests,id',
+            'request_id' => 'required|exists:user_access,id',
             'ict_officer_id' => 'required|exists:users,id'
         ]);
 
@@ -375,11 +390,11 @@ class HeadOfItController extends Controller
                 'ict_officer_id' => $request->ict_officer_id
             ]);
             
-            $accessRequest = UserCombinedAccessRequest::findOrFail($request->request_id);
+            $accessRequest = \App\Models\UserAccess::findOrFail($request->request_id);
             $ictOfficer = User::findOrFail($request->ict_officer_id);
             
             // Verify ICT Officer role
-            if (!$ictOfficer->hasRole('ict_officer')) {
+            if (!$ictOfficer->isIctOfficer()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Selected user is not an ICT Officer'
@@ -387,15 +402,19 @@ class HeadOfItController extends Controller
             }
 
             // Check if request is approved by Head of IT
-            if ($accessRequest->status !== 'head_of_it_approved') {
+            if ($accessRequest->head_it_status !== 'approved') {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Request must be approved by Head of IT before assignment'
+                    'message' => 'Request must be approved by Head of IT before assignment',
+                    'debug' => [
+                        'head_it_status' => $accessRequest->head_it_status,
+                        'calculated_status' => $accessRequest->getCalculatedStatus()
+                    ]
                 ], 400);
             }
 
             // Check if task is already assigned
-            $existingAssignment = TaskAssignment::where('request_id', $request->request_id)
+            $existingAssignment = \App\Models\IctTaskAssignment::where('user_access_id', $request->request_id)
                 ->whereIn('status', ['assigned', 'in_progress'])
                 ->first();
 
@@ -406,51 +425,51 @@ class HeadOfItController extends Controller
                 ], 400);
             }
 
-            // Create task assignment
-            $taskAssignment = TaskAssignment::create([
-                'request_id' => $request->request_id,
-                'assigned_to' => $request->ict_officer_id,
-                'assigned_by' => Auth::id(),
-                'status' => 'assigned',
-                'assigned_at' => now(),
-                'priority' => 'normal',
-                'description' => 'Release access for ' . $accessRequest->staff_name,
-                'estimated_completion' => now()->addDays(3), // Default 3 days
-                'created_at' => now(),
-                'updated_at' => now()
+            // Create ICT task assignment
+            $ictTaskAssignment = \App\Models\IctTaskAssignment::create([
+                'user_access_id' => $request->request_id,
+                'ict_officer_user_id' => $request->ict_officer_id,
+                'assigned_by_user_id' => Auth::id(),
+                'status' => \App\Models\IctTaskAssignment::STATUS_ASSIGNED,
+                'assignment_notes' => 'ICT task assigned by Head of IT for ' . $accessRequest->staff_name,
+                'assigned_at' => now()
             ]);
 
-            // Update request status
+            // Update user access ICT Officer status to pending
             $accessRequest->update([
-                'status' => 'assigned_to_ict',
-                'assigned_ict_officer_id' => $request->ict_officer_id,
-                'task_assigned_at' => now()
+                'ict_officer_status' => 'pending'
             ]);
 
-            // Send notification to ICT Officer
-            $ictOfficer->notify(new TaskAssignedNotification($accessRequest, $taskAssignment));
+            // Send notification to ICT Officer (if notification class exists)
+            try {
+                $ictOfficer->notify(new \App\Notifications\IctTaskAssignedNotification($accessRequest, $ictTaskAssignment));
+            } catch (\Exception $notificationError) {
+                Log::warning('Failed to send ICT task notification', [
+                    'error' => $notificationError->getMessage()
+                ]);
+            }
 
             DB::commit();
 
-            Log::info('HeadOfItController: Task assigned successfully', [
+            Log::info('HeadOfItController: ICT task assigned successfully', [
                 'request_id' => $request->request_id,
                 'ict_officer_id' => $request->ict_officer_id,
-                'assignment_id' => $taskAssignment->id
+                'assignment_id' => $ictTaskAssignment->id
             ]);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Task assigned successfully to ' . $ictOfficer->name,
                 'data' => [
-                    'assignment_id' => $taskAssignment->id,
+                    'assignment_id' => $ictTaskAssignment->id,
                     'request_id' => $accessRequest->id,
                     'ict_officer' => [
                         'id' => $ictOfficer->id,
                         'name' => $ictOfficer->name,
                         'email' => $ictOfficer->email
                     ],
-                    'status' => $accessRequest->status,
-                    'assigned_at' => $taskAssignment->assigned_at
+                    'status' => $accessRequest->getCalculatedStatus(),
+                    'assigned_at' => $ictTaskAssignment->assigned_at
                 ]
             ]);
 
@@ -960,6 +979,162 @@ class HeadOfItController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to cancel ICT task assignment',
+                'error' => app()->environment('local') ? $e->getMessage() : 'Internal server error'
+            ], 500);
+        }
+    }
+
+    /**
+     * Get detailed timeline for a specific access request
+     */
+    public function getAccessRequestTimeline($requestId)
+    {
+        try {
+            $user = Auth::user();
+            
+            // Check if user has permission (Head of IT)
+            if (!$user->hasRole('head_of_it')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Access denied: User is not a Head of IT'
+                ], 403);
+            }
+
+            Log::info('HeadOfItController: Getting access request timeline', [
+                'user_id' => $user->id,
+                'request_id' => $requestId
+            ]);
+
+            // Find the access request with all related data
+            $request = \App\Models\UserAccess::with([
+                'department',
+                'user',
+                'ictTaskAssignments.ictOfficer',
+                'ictTaskAssignments.assignedBy'
+            ])
+            ->where('id', $requestId)
+            ->firstOrFail();
+
+            // Build comprehensive request data for timeline
+            $timelineData = [
+                'request' => [
+                    'id' => $request->id,
+                    'staff_name' => $request->staff_name,
+                    'pf_number' => $request->pf_number,
+                    'phone_number' => $request->phone_number,
+                    'department' => [
+                        'id' => $request->department->id ?? null,
+                        'name' => $request->department->name ?? 'Unknown Department'
+                    ],
+                    'signature_path' => $request->signature_path,
+                    
+                    // Request details
+                    'request_type' => $request->request_type,
+                    'request_type_name' => $request->request_type_name,
+                    'access_type' => $request->access_type,
+                    'access_type_name' => $request->access_type_name,
+                    'temporary_until' => $request->temporary_until,
+                    'internet_purposes' => $request->internet_purposes,
+                    'wellsoft_modules_selected' => $request->wellsoft_modules_selected,
+                    'jeeva_modules_selected' => $request->jeeva_modules_selected,
+                    
+                    // HOD approval stage
+                    'hod_status' => $request->hod_status,
+                    'hod_name' => $request->hod_name,
+                    'hod_comments' => $request->hod_comments,
+                    'hod_signature_path' => $request->hod_signature_path,
+                    'hod_approved_at' => $request->hod_approved_at,
+                    'hod_approved_by' => $request->hod_approved_by,
+                    'hod_approved_by_name' => $request->hod_approved_by_name,
+                    
+                    // Divisional Director approval stage
+                    'divisional_status' => $request->divisional_status,
+                    'divisional_director_name' => $request->divisional_director_name,
+                    'divisional_director_comments' => $request->divisional_director_comments,
+                    'divisional_director_signature_path' => $request->divisional_director_signature_path,
+                    'divisional_approved_at' => $request->divisional_approved_at,
+                    
+                    // ICT Director approval stage
+                    'ict_director_status' => $request->ict_director_status,
+                    'ict_director_name' => $request->ict_director_name,
+                    'ict_director_comments' => $request->ict_director_comments,
+                    'ict_director_signature_path' => $request->ict_director_signature_path,
+                    'ict_director_approved_at' => $request->ict_director_approved_at,
+                    'ict_director_rejection_reasons' => $request->ict_director_rejection_reasons,
+                    
+                    // Head of IT approval stage
+                    'head_it_status' => $request->head_it_status,
+                    'head_it_name' => $request->head_it_name,
+                    'head_it_comments' => $request->head_it_comments,
+                    'head_it_signature_path' => $request->head_it_signature_path,
+                    'head_it_approved_at' => $request->head_it_approved_at,
+                    
+                    // ICT Officer implementation stage
+                    'ict_officer_status' => $request->ict_officer_status,
+                    'ict_officer_name' => $request->ict_officer_name,
+                    'ict_officer_user_id' => $request->ict_officer_user_id,
+                    'ict_officer_assigned_at' => $request->ict_officer_assigned_at,
+                    'ict_officer_started_at' => $request->ict_officer_started_at,
+                    'ict_officer_implemented_at' => $request->ict_officer_implemented_at,
+                    'ict_officer_comments' => $request->ict_officer_comments,
+                    'ict_officer_signature_path' => $request->ict_officer_signature_path,
+                    'implementation_comments' => $request->implementation_comments,
+                    
+                    // Cancellation/rejection info
+                    'cancelled_at' => $request->cancelled_at,
+                    'cancelled_by' => $request->cancelled_by,
+                    'cancellation_reason' => $request->cancellation_reason,
+                    
+                    // Timestamps
+                    'created_at' => $request->created_at,
+                    'updated_at' => $request->updated_at
+                ],
+                
+                // ICT Task Assignment details (for more detailed implementation tracking)
+                'ict_assignments' => $request->ictTaskAssignments->map(function ($assignment) {
+                    return [
+                        'id' => $assignment->id,
+                        'status' => $assignment->status,
+                        'status_label' => $assignment->status_label,
+                        'ict_officer' => [
+                            'id' => $assignment->ictOfficer->id ?? null,
+                            'name' => $assignment->ictOfficer->name ?? 'Unknown Officer',
+                            'email' => $assignment->ictOfficer->email ?? null
+                        ],
+                        'assigned_by' => [
+                            'id' => $assignment->assignedBy->id ?? null,
+                            'name' => $assignment->assignedBy->name ?? 'System',
+                            'email' => $assignment->assignedBy->email ?? null
+                        ],
+                        'assigned_at' => $assignment->assigned_at,
+                        'started_at' => $assignment->started_at,
+                        'completed_at' => $assignment->completed_at,
+                        'assignment_notes' => $assignment->assignment_notes,
+                        'progress_notes' => $assignment->progress_notes,
+                        'completion_notes' => $assignment->completion_notes,
+                        'created_at' => $assignment->created_at,
+                        'updated_at' => $assignment->updated_at
+                    ];
+                })->values()
+            ];
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Access request timeline retrieved successfully',
+                'data' => $timelineData
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('HeadOfItController: Error getting access request timeline', [
+                'user_id' => Auth::id(),
+                'request_id' => $requestId,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve access request timeline',
                 'error' => app()->environment('local') ? $e->getMessage() : 'Internal server error'
             ], 500);
         }

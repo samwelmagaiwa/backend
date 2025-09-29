@@ -502,4 +502,176 @@ class DivisionalCombinedAccessController extends Controller
                 return 'pending';
         }
     }
+
+    /**
+     * Get detailed timeline for a specific access request
+     */
+    public function getAccessRequestTimeline($requestId)
+    {
+        try {
+            $user = Auth::user();
+            
+            // Check if user has permission (Divisional Director)
+            if (!$user->hasRole('divisional_director')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Access denied: User is not a Divisional Director'
+                ], 403);
+            }
+
+            Log::info('DivisionalCombinedAccess: Getting access request timeline', [
+                'user_id' => $user->id,
+                'request_id' => $requestId
+            ]);
+
+            // Find the access request with all related data
+            $request = UserAccess::with([
+                'department',
+                'user',
+                'ictTaskAssignments.ictOfficer',
+                'ictTaskAssignments.assignedBy'
+            ])
+            ->where('id', $requestId)
+            ->firstOrFail();
+
+            // DEPARTMENT AUTHORIZATION: Ensure Divisional Director can only access requests from their department(s)
+            $divisionalDepartmentIds = $user->departmentsAsDivisionalDirector()->pluck('id')->toArray();
+            
+            if (!empty($divisionalDepartmentIds) && !in_array($request->department_id, $divisionalDepartmentIds)) {
+                Log::warning('Divisional Timeline Access Denied: Request not from Divisional Director department', [
+                    'user_id' => $user->id,
+                    'request_department_id' => $request->department_id,
+                    'divisional_department_ids' => $divisionalDepartmentIds
+                ]);
+                
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Access denied. You can only view timelines for requests from your department.'
+                ], 403);
+            }
+
+            // Build comprehensive request data for timeline
+            $timelineData = [
+                'request' => [
+                    'id' => $request->id,
+                    'staff_name' => $request->staff_name,
+                    'pf_number' => $request->pf_number,
+                    'phone_number' => $request->phone_number,
+                    'department' => [
+                        'id' => $request->department->id ?? null,
+                        'name' => $request->department->name ?? 'Unknown Department'
+                    ],
+                    'signature_path' => $request->signature_path,
+                    
+                    // Request details
+                    'request_type' => $request->request_type,
+                    'request_type_name' => $request->request_type_name,
+                    'access_type' => $request->access_type,
+                    'access_type_name' => $request->access_type_name,
+                    'temporary_until' => $request->temporary_until,
+                    'internet_purposes' => $request->internet_purposes,
+                    'wellsoft_modules_selected' => $request->wellsoft_modules_selected,
+                    'jeeva_modules_selected' => $request->jeeva_modules_selected,
+                    
+                    // HOD approval stage
+                    'hod_status' => $request->hod_status,
+                    'hod_name' => $request->hod_name,
+                    'hod_comments' => $request->hod_comments,
+                    'hod_signature_path' => $request->hod_signature_path,
+                    'hod_approved_at' => $request->hod_approved_at,
+                    'hod_approved_by' => $request->hod_approved_by,
+                    'hod_approved_by_name' => $request->hod_approved_by_name,
+                    
+                    // Divisional Director approval stage
+                    'divisional_status' => $request->divisional_status,
+                    'divisional_director_name' => $request->divisional_director_name,
+                    'divisional_director_comments' => $request->divisional_director_comments,
+                    'divisional_director_signature_path' => $request->divisional_director_signature_path,
+                    'divisional_approved_at' => $request->divisional_approved_at,
+                    
+                    // ICT Director approval stage
+                    'ict_director_status' => $request->ict_director_status,
+                    'ict_director_name' => $request->ict_director_name,
+                    'ict_director_comments' => $request->ict_director_comments,
+                    'ict_director_signature_path' => $request->ict_director_signature_path,
+                    'ict_director_approved_at' => $request->ict_director_approved_at,
+                    'ict_director_rejection_reasons' => $request->ict_director_rejection_reasons,
+                    
+                    // Head of IT approval stage
+                    'head_it_status' => $request->head_it_status,
+                    'head_it_name' => $request->head_it_name,
+                    'head_it_comments' => $request->head_it_comments,
+                    'head_it_signature_path' => $request->head_it_signature_path,
+                    'head_it_approved_at' => $request->head_it_approved_at,
+                    
+                    // ICT Officer implementation stage
+                    'ict_officer_status' => $request->ict_officer_status,
+                    'ict_officer_name' => $request->ict_officer_name,
+                    'ict_officer_user_id' => $request->ict_officer_user_id,
+                    'ict_officer_assigned_at' => $request->ict_officer_assigned_at,
+                    'ict_officer_started_at' => $request->ict_officer_started_at,
+                    'ict_officer_implemented_at' => $request->ict_officer_implemented_at,
+                    'ict_officer_comments' => $request->ict_officer_comments,
+                    'ict_officer_signature_path' => $request->ict_officer_signature_path,
+                    'implementation_comments' => $request->implementation_comments,
+                    
+                    // Cancellation/rejection info
+                    'cancelled_at' => $request->cancelled_at,
+                    'cancelled_by' => $request->cancelled_by,
+                    'cancellation_reason' => $request->cancellation_reason,
+                    
+                    // Timestamps
+                    'created_at' => $request->created_at,
+                    'updated_at' => $request->updated_at
+                ],
+                
+                // ICT Task Assignment details (for more detailed implementation tracking)
+                'ict_assignments' => $request->ictTaskAssignments->map(function ($assignment) {
+                    return [
+                        'id' => $assignment->id,
+                        'status' => $assignment->status,
+                        'status_label' => $assignment->status_label,
+                        'ict_officer' => [
+                            'id' => $assignment->ictOfficer->id ?? null,
+                            'name' => $assignment->ictOfficer->name ?? 'Unknown Officer',
+                            'email' => $assignment->ictOfficer->email ?? null
+                        ],
+                        'assigned_by' => [
+                            'id' => $assignment->assignedBy->id ?? null,
+                            'name' => $assignment->assignedBy->name ?? 'System',
+                            'email' => $assignment->assignedBy->email ?? null
+                        ],
+                        'assigned_at' => $assignment->assigned_at,
+                        'started_at' => $assignment->started_at,
+                        'completed_at' => $assignment->completed_at,
+                        'assignment_notes' => $assignment->assignment_notes,
+                        'progress_notes' => $assignment->progress_notes,
+                        'completion_notes' => $assignment->completion_notes,
+                        'created_at' => $assignment->created_at,
+                        'updated_at' => $assignment->updated_at
+                    ];
+                })->values()
+            ];
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Access request timeline retrieved successfully',
+                'data' => $timelineData
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('DivisionalCombinedAccess: Error getting access request timeline', [
+                'user_id' => Auth::id(),
+                'request_id' => $requestId,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve access request timeline',
+                'error' => app()->environment('local') ? $e->getMessage() : 'Internal server error'
+            ], 500);
+        }
+    }
 }

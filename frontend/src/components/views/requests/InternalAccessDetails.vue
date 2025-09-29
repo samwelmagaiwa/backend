@@ -6,22 +6,22 @@
       <main
         class="flex-1 p-4 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative"
       >
-        <div class="max-w-6xl mx-auto">
+        <div class="max-w-7xl mx-auto">
           <!-- Header Section -->
-          <div class="medical-glass-card rounded-t-3xl p-4 mb-0 border-b border-blue-300/30">
+          <div class="medical-glass-card rounded-t-3xl p-2 mb-0 border-b border-blue-300/30">
             <div class="text-center">
-              <h1 class="text-xl font-bold text-white mb-2 tracking-wide drop-shadow-lg">
+              <h1 class="text-2xl font-bold text-white mb-1 tracking-wide drop-shadow-lg">
                 MUHIMBILI NATIONAL HOSPITAL
               </h1>
-              <div class="flex justify-center mb-2">
+              <div class="flex justify-center mb-1">
                 <div
-                  class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-lg inline-flex items-center gap-2"
+                  class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-1.5 rounded-full text-base font-bold shadow-lg inline-flex items-center gap-2"
                 >
-                  <i class="fas fa-clipboard-list text-sm"></i>
+                  <i class="fas fa-clipboard-list text-base"></i>
                   REQUEST DETAILS
                 </div>
               </div>
-              <h2 class="text-sm font-bold text-blue-100 tracking-wide drop-shadow-md mt-2">
+              <h2 class="text-base font-bold text-blue-100 tracking-wide drop-shadow-md mt-1">
                 Internal Access Management
               </h2>
             </div>
@@ -29,41 +29,41 @@
 
           <!-- Main Content -->
           <div class="medical-glass-card rounded-b-3xl overflow-hidden">
-            <div class="p-6 space-y-6">
+            <div class="p-4 space-y-4">
               <!-- Loading Message -->
               <div v-if="isLoading" class="text-center py-8">
                 <div
                   class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"
                 ></div>
-                <h2 class="text-white text-xl">Loading request details...</h2>
-                <p class="text-blue-300">
+                <h2 class="text-white text-2xl">Loading request details...</h2>
+                <p class="text-blue-300 text-lg">
                   ID: {{ formattedRequestId }}, Type: {{ formattedRequestType }}
                 </p>
               </div>
 
               <!-- Request Data -->
-              <div v-else-if="requestData" class="space-y-8">
+              <div v-else-if="requestData" class="space-y-6">
                 <!-- Approval Trail -->
                 <div
-                  class="bg-gradient-to-r from-blue-600/30 to-blue-700/30 border-2 border-blue-400/50 p-6 rounded-xl backdrop-blur-sm shadow-lg hover:shadow-blue-500/25 transition-all duration-300"
+                  class="bg-gradient-to-r from-blue-600/30 to-blue-700/30 border-2 border-blue-400/50 p-4 rounded-xl backdrop-blur-sm shadow-lg hover:shadow-blue-500/25 transition-all duration-300"
                 >
-                  <div class="flex items-center space-x-3 mb-6">
+                  <div class="flex items-center space-x-3 mb-4">
                     <div
                       class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md"
                     >
                       <i class="fas fa-route text-white text-sm"></i>
                     </div>
-                    <h3 class="text-lg font-bold text-white flex items-center">
+                    <h3 class="text-xl font-bold text-white flex items-center">
                       <i class="fas fa-clipboard-check mr-2 text-blue-300"></i>
                       Approval Trail
                     </h3>
                   </div>
 
                   <!-- Compact Cards for Booking Service -->
-                  <div v-if="isBookingService" class="space-y-4">
+                  <div v-if="isBookingService" class="space-y-2">
                     <!-- ICT Officer Status Card -->
                     <div
-                      class="bg-gradient-to-r from-blue-600/20 to-blue-700/20 border border-blue-400/40 rounded-lg p-4 backdrop-blur-sm hover:shadow-lg transition-all duration-300"
+                      class="bg-gradient-to-r from-blue-600/20 to-blue-700/20 border border-blue-400/40 rounded-lg p-3 backdrop-blur-sm hover:shadow-lg transition-all duration-300"
                     >
                       <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-3">
@@ -74,17 +74,17 @@
                             <i :class="getApprovalStepIcon('ict')" class="text-white text-sm"></i>
                           </div>
                           <div>
-                            <h4 class="text-white font-semibold text-sm">ICT Officer</h4>
+                            <h4 class="text-white font-semibold text-base">ICT Officer</h4>
                             <p
                               :class="getApprovalStatusTextClass('ict')"
-                              class="text-xs font-medium"
+                              class="text-sm font-medium"
                             >
                               {{ getApprovalStatusText('ict') }}
                             </p>
                           </div>
                         </div>
                         <div class="text-right">
-                          <p class="text-sm text-blue-300">
+                          <p class="text-base text-blue-300">
                             {{
                               requestData?.ict_approved_at
                                 ? formatDate(requestData.ict_approved_at)
@@ -103,14 +103,14 @@
                         (requestData?.ictNotes && requestData?.ictNotes.trim()) ||
                         (requestData?.ict_notes && requestData?.ict_notes.trim())
                       "
-                      class="mt-3"
+                      class="mt-2"
                     >
                       <div
                         :class="getIctCommentsCardClass()"
-                        class="rounded-lg p-4 backdrop-blur-sm border transition-all duration-300 hover:shadow-lg"
+                        class="rounded-lg p-3 backdrop-blur-sm border transition-all duration-300 hover:shadow-lg"
                       >
                         <!-- Compact Header -->
-                        <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center justify-between mb-2">
                           <div class="flex items-center space-x-2">
                             <div
                               :class="getIctCommentsIconBgClass()"
@@ -119,8 +119,8 @@
                               <i :class="getIctCommentsIcon()" class="text-white text-sm"></i>
                             </div>
                             <div>
-                              <h5 class="text-white font-semibold text-sm">ICT Comments</h5>
-                              <p class="text-xs opacity-75" :class="getIctCommentsTextColor()">
+                              <h5 class="text-white font-semibold text-base">ICT Comments</h5>
+                              <p class="text-sm opacity-75" :class="getIctCommentsTextColor()">
                                 {{
                                   requestData?.ictStatus === 'rejected'
                                     ? 'Rejection'
@@ -134,14 +134,14 @@
                           </div>
                           <div
                             :class="getIctCommentsStatusBadgeClass()"
-                            class="px-2 py-1 rounded text-sm font-semibold uppercase"
+                            class="px-3 py-1.5 rounded text-base font-semibold uppercase"
                           >
                             {{ requestData?.ictStatus }}
                           </div>
                         </div>
 
                         <!-- Comment Content -->
-                        <div class="mb-3">
+                        <div class="mb-2">
                           <p class="text-white text-base leading-relaxed">
                             {{ requestData?.ictNotes || requestData?.ict_notes }}
                           </p>
@@ -149,7 +149,7 @@
 
                         <!-- Footer -->
                         <div
-                          class="flex justify-between items-center text-xs"
+                          class="flex justify-between items-center text-sm"
                           :class="getIctCommentsTextColor()"
                         >
                           <div class="flex items-center space-x-1">
@@ -176,13 +176,13 @@
                   </div>
 
                   <!-- For Combined Access Requests: Full approval chain -->
-                  <div v-else class="space-y-6">
+                  <div v-else class="space-y-4">
                     <!-- Request Status Overview -->
-                    <div class="mb-6 p-4 bg-white/10 rounded-xl border border-emerald-300/30">
-                      <h4 class="text-sm font-bold text-blue-100 mb-3">
+                    <div class="mb-4 p-3 bg-white/10 rounded-xl border border-emerald-300/30">
+                      <h4 class="text-base font-bold text-blue-100 mb-2">
                         {{ formattedRequestType }} - Status Overview
                       </h4>
-                      <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
+                      <div class="grid grid-cols-1 md:grid-cols-5 gap-2">
                         <div class="text-center">
                           <div
                             :class="
@@ -205,7 +205,7 @@
                               class="text-white text-sm"
                             ></i>
                           </div>
-                          <p class="text-xs text-white">HOD</p>
+                          <p class="text-sm text-white">HOD</p>
                         </div>
                         <div class="text-center">
                           <div
@@ -229,7 +229,7 @@
                               class="text-white text-sm"
                             ></i>
                           </div>
-                          <p class="text-xs text-white">Divisional</p>
+                          <p class="text-sm text-white">Divisional</p>
                         </div>
                         <div class="text-center">
                           <div
@@ -253,7 +253,7 @@
                               class="text-white text-sm"
                             ></i>
                           </div>
-                          <p class="text-xs text-white">DICT</p>
+                          <p class="text-sm text-white">DICT</p>
                         </div>
                         <div class="text-center">
                           <div
@@ -277,7 +277,7 @@
                               class="text-white text-sm"
                             ></i>
                           </div>
-                          <p class="text-xs text-white">Head IT</p>
+                          <p class="text-sm text-white">Head IT</p>
                         </div>
                         <div class="text-center">
                           <div
@@ -301,46 +301,120 @@
                               class="text-white text-sm"
                             ></i>
                           </div>
-                          <p class="text-xs text-white">ICT Officer</p>
+                          <p class="text-sm text-white">ICT Officer</p>
                         </div>
                       </div>
                     </div>
 
-                    <!-- HOD Approval Card -->
-                    <div
-                      class="bg-gradient-to-r from-blue-600/20 to-blue-700/20 border border-blue-400/40 rounded-lg p-4 backdrop-blur-sm hover:shadow-lg transition-all duration-300"
-                    >
-                      <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-3">
-                          <div
-                            :class="getHODApprovalStepClass()"
-                            class="w-10 h-10 rounded-lg flex items-center justify-center shadow-md"
-                          >
-                            <i :class="getHODApprovalStepIcon()" class="text-white text-sm"></i>
+                    <!-- HOD Approval and ICT Officer Comments Row -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                      <!-- HOD Approval Card -->
+                      <div
+                        class="bg-gradient-to-r from-blue-600/20 to-blue-700/20 border border-blue-400/40 rounded-lg p-3 backdrop-blur-sm hover:shadow-lg transition-all duration-300 h-full flex flex-col"
+                      >
+                        <div class="flex items-center justify-between flex-1">
+                          <div class="flex items-center space-x-3">
+                            <div
+                              :class="getHODApprovalStepClass()"
+                              class="w-10 h-10 rounded-lg flex items-center justify-center shadow-md"
+                            >
+                              <i :class="getHODApprovalStepIcon()" class="text-white text-sm"></i>
+                            </div>
+                            <div>
+                              <h4 class="text-white font-semibold text-base">Head of Department</h4>
+                              <p
+                                :class="getHODApprovalStatusTextClass()"
+                                class="text-sm font-medium"
+                              >
+                                {{ getHODApprovalStatusText() }}
+                              </p>
+                            </div>
                           </div>
-                          <div>
-                            <h4 class="text-white font-semibold text-sm">Head of Department</h4>
-                            <p :class="getHODApprovalStatusTextClass()" class="text-xs font-medium">
-                              {{ getHODApprovalStatusText() }}
+                          <div class="text-right">
+                            <p class="text-base text-blue-300">
+                              {{
+                                requestData?.hodApproval?.approved_at ||
+                                requestData?.hod_approved_at ||
+                                requestData?.hod_rejected_at
+                                  ? formatDate(
+                                      requestData?.hodApproval?.approved_at ||
+                                        requestData?.hod_approved_at ||
+                                        requestData?.hod_rejected_at
+                                    )
+                                  : getHODApprovalStatus() === 'rejected'
+                                    ? 'Recently'
+                                    : 'Pending'
+                              }}
                             </p>
                           </div>
                         </div>
-                        <div class="text-right">
-                          <p class="text-sm text-blue-300">
-                            {{
-                              requestData?.hodApproval?.approved_at ||
-                              requestData?.hod_approved_at ||
-                              requestData?.hod_rejected_at
-                                ? formatDate(
-                                    requestData?.hodApproval?.approved_at ||
-                                      requestData?.hod_approved_at ||
-                                      requestData?.hod_rejected_at
-                                  )
-                                : getHODApprovalStatus() === 'rejected'
-                                  ? 'Recently'
-                                  : 'Pending'
-                            }}
-                          </p>
+                      </div>
+
+                      <!-- ICT Officer Comments Card -->
+                      <div
+                        class="bg-gradient-to-r from-teal-600/20 to-teal-700/20 border border-teal-400/40 rounded-lg p-3 backdrop-blur-sm hover:shadow-lg transition-all duration-300 h-full flex flex-col"
+                      >
+                        <div class="flex items-center justify-between mb-2">
+                          <div class="flex items-center space-x-3">
+                            <div
+                              :class="getCombinedIctOfficerStepClass()"
+                              class="w-10 h-10 rounded-lg flex items-center justify-center shadow-md"
+                            >
+                              <i
+                                :class="getCombinedIctOfficerStepIcon()"
+                                class="text-white text-sm"
+                              ></i>
+                            </div>
+                            <div>
+                              <h4 class="text-white font-semibold text-base">ICT Officer</h4>
+                              <p class="text-gray-300 text-xs" v-if="getCombinedIctOfficerName()">
+                                {{ getCombinedIctOfficerName() }}
+                              </p>
+                              <p
+                                :class="getCombinedIctOfficerStatusTextClass()"
+                                class="text-sm font-medium"
+                              >
+                                {{ getCombinedIctOfficerStatusText() }}
+                              </p>
+                            </div>
+                          </div>
+                          <div class="text-right">
+                            <p class="text-base text-teal-300">
+                              {{
+                                requestData?.ict_officer_approved_at ||
+                                requestData?.ict_officer_rejected_at
+                                  ? formatDate(
+                                      requestData?.ict_officer_approved_at ||
+                                        requestData?.ict_officer_rejected_at
+                                    )
+                                  : getCombinedIctOfficerStatus() === 'in_progress'
+                                    ? 'In Progress'
+                                    : 'Pending'
+                              }}
+                            </p>
+                          </div>
+                        </div>
+
+                        <!-- ICT Officer Comments Content -->
+                        <div class="flex-1 flex flex-col">
+                          <div
+                            v-if="getCombinedIctOfficerComment()"
+                            class="bg-teal-500/10 rounded-lg p-3 border border-teal-400/20 flex-1"
+                          >
+                            <p
+                              class="text-white text-lg leading-relaxed font-extrabold tracking-wide"
+                            >
+                              {{ getCombinedIctOfficerComment() }}
+                            </p>
+                          </div>
+                          <div
+                            v-else
+                            class="bg-gray-500/10 rounded-lg p-3 border border-gray-400/20 flex-1 flex items-center justify-center"
+                          >
+                            <p class="text-gray-300 text-sm italic font-bold">
+                              No comments available yet.
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -348,14 +422,14 @@
                     <!-- HOD Comments Card -->
                     <div
                       v-if="getHODComment() || getHODApprovalStatus() === 'rejected'"
-                      class="mt-3"
+                      class="mt-2"
                     >
                       <div
                         :class="getHODCommentsCardClass()"
-                        class="rounded-lg p-4 backdrop-blur-sm border transition-all duration-300 hover:shadow-lg"
+                        class="rounded-lg p-3 backdrop-blur-sm border transition-all duration-300 hover:shadow-lg"
                       >
                         <!-- Header -->
-                        <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center justify-between mb-2">
                           <div class="flex items-center space-x-2">
                             <div
                               :class="getHODCommentsIconBgClass()"
@@ -364,8 +438,8 @@
                               <i :class="getHODCommentsIcon()" class="text-white text-sm"></i>
                             </div>
                             <div>
-                              <h5 class="text-white font-semibold text-sm">HOD Comments</h5>
-                              <p class="text-xs opacity-75" :class="getHODCommentsTextColor()">
+                              <h5 class="text-white font-semibold text-base">HOD Comments</h5>
+                              <p class="text-sm opacity-75" :class="getHODCommentsTextColor()">
                                 {{
                                   getHODApprovalStatus() === 'rejected'
                                     ? 'Rejection Reason'
@@ -378,15 +452,15 @@
                           </div>
                           <div
                             :class="getHODCommentsStatusBadgeClass()"
-                            class="px-2 py-1 rounded text-sm font-semibold uppercase"
+                            class="px-3 py-1.5 rounded text-base font-semibold uppercase"
                           >
                             {{ getHODApprovalStatus() }}
                           </div>
                         </div>
 
                         <!-- Comment Content -->
-                        <div class="mb-3">
-                          <p class="text-white text-base leading-relaxed">
+                        <div class="mb-2">
+                          <p class="text-white text-lg leading-relaxed font-bold">
                             {{
                               getHODComment() ||
                               (getHODApprovalStatus() === 'rejected'
@@ -398,7 +472,7 @@
 
                         <!-- Footer -->
                         <div
-                          class="flex justify-between items-center text-xs"
+                          class="flex justify-between items-center text-sm"
                           :class="getHODCommentsTextColor()"
                         >
                           <div class="flex items-center space-x-1">
@@ -433,31 +507,31 @@
 
                 <!-- Basic Request Info -->
                 <div
-                  class="bg-gradient-to-r from-teal-600/25 to-blue-600/25 border-2 border-teal-400/40 p-6 rounded-2xl backdrop-blur-sm"
+                  class="bg-gradient-to-br from-blue-600/30 to-blue-700/30 border-2 border-blue-400/60 shadow-blue-500/25 p-4 rounded-2xl backdrop-blur-sm"
                 >
-                  <h3 class="text-xl font-bold text-white mb-4">Request Information</h3>
+                  <h3 class="text-2xl font-bold text-white mb-2">Request Information</h3>
                   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-white">
                     <div>
-                      <p class="text-blue-200 text-sm">Request ID:</p>
-                      <p class="font-semibold">{{ formattedRequestId }}</p>
+                      <p class="text-blue-200 text-base">Request ID:</p>
+                      <p class="font-semibold text-lg">{{ formattedRequestId }}</p>
                     </div>
                     <div>
-                      <p class="text-blue-200 text-sm">Request Type:</p>
-                      <p class="font-semibold">{{ formattedRequestType }}</p>
+                      <p class="text-blue-200 text-base">Request Type:</p>
+                      <p class="font-semibold text-lg">{{ formattedRequestType }}</p>
                     </div>
                     <div>
-                      <p class="text-blue-200 text-sm">Status:</p>
-                      <p class="font-semibold" :class="getCurrentStatusTextClass()">
+                      <p class="text-blue-200 text-base">Status:</p>
+                      <p class="font-semibold text-lg" :class="getCurrentStatusTextClass()">
                         {{ formattedCurrentStatus }}
                       </p>
                     </div>
                     <div>
-                      <p class="text-blue-200 text-sm">ICT Status:</p>
-                      <p class="font-semibold">{{ requestData?.ictStatus || 'Pending' }}</p>
+                      <p class="text-blue-200 text-base">ICT Status:</p>
+                      <p class="font-semibold text-lg">{{ requestData?.ictStatus || 'Pending' }}</p>
                     </div>
                     <!-- Return Status for Booking Service -->
                     <div v-if="isBookingService">
-                      <p class="text-blue-200 text-sm">Return Status:</p>
+                      <p class="text-blue-200 text-base">Return Status:</p>
                       <p class="font-semibold flex items-center gap-2">
                         <span
                           :class="
@@ -490,13 +564,13 @@
                 >
                   <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
                 </div>
-                <h2 class="text-white text-xl">Failed to Load Request</h2>
-                <p class="text-red-300">
+                <h2 class="text-white text-2xl">Failed to Load Request</h2>
+                <p class="text-red-300 text-lg">
                   Could not load request details for ID: {{ formattedRequestId }}
                 </p>
                 <button
                   @click="loadRequestData"
-                  class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  class="mt-4 px-6 py-3 bg-blue-600 text-white text-lg rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   Retry
                 </button>
@@ -718,9 +792,9 @@
       // ICT Comments UI/UX Methods (simplified versions)
       const getApprovalStepClass = (_step) => {
         const status = requestData.value?.ictStatus || 'pending'
-        if (status === 'approved') return 'bg-gradient-to-br from-blue-500 to-green-600'
-        if (status === 'rejected') return 'bg-gradient-to-br from-blue-500 to-red-600'
-        return 'bg-gradient-to-br from-blue-500 to-yellow-600'
+        if (status === 'approved') return 'bg-gradient-to-br from-blue-500 to-blue-600'
+        if (status === 'rejected') return 'bg-gradient-to-br from-blue-500 to-blue-600'
+        return 'bg-gradient-to-br from-blue-500 to-blue-600'
       }
 
       const getApprovalStepIcon = (_step) => {
@@ -753,9 +827,9 @@
 
       const getIctCommentsIconBgClass = () => {
         const status = requestData.value?.ictStatus || 'pending'
-        if (status === 'approved') return 'bg-gradient-to-br from-blue-500 to-green-600'
-        if (status === 'rejected') return 'bg-gradient-to-br from-blue-500 to-red-600'
-        return 'bg-gradient-to-br from-blue-500 to-yellow-600'
+        if (status === 'approved') return 'bg-gradient-to-br from-blue-500 to-blue-600'
+        if (status === 'rejected') return 'bg-gradient-to-br from-blue-500 to-blue-600'
+        return 'bg-gradient-to-br from-blue-500 to-blue-600'
       }
 
       const getIctCommentsIcon = () => {
@@ -853,9 +927,9 @@
 
       const getHODApprovalStepClass = () => {
         const status = getHODApprovalStatus()
-        if (status === 'approved') return 'bg-gradient-to-br from-blue-500 to-green-600'
-        if (status === 'rejected') return 'bg-gradient-to-br from-blue-500 to-red-600'
-        return 'bg-gradient-to-br from-blue-500 to-yellow-600'
+        if (status === 'approved') return 'bg-gradient-to-br from-blue-500 to-blue-600'
+        if (status === 'rejected') return 'bg-gradient-to-br from-blue-500 to-blue-600'
+        return 'bg-gradient-to-br from-blue-500 to-blue-600'
       }
 
       const getHODApprovalStepIcon = () => {
@@ -884,9 +958,9 @@
 
       const getHODCommentsIconBgClass = () => {
         const status = getHODApprovalStatus()
-        if (status === 'approved') return 'bg-gradient-to-br from-blue-500 to-green-600'
-        if (status === 'rejected') return 'bg-gradient-to-br from-blue-500 to-red-600'
-        return 'bg-gradient-to-br from-blue-500 to-yellow-600'
+        if (status === 'approved') return 'bg-gradient-to-br from-blue-500 to-blue-600'
+        if (status === 'rejected') return 'bg-gradient-to-br from-blue-500 to-blue-600'
+        return 'bg-gradient-to-br from-blue-500 to-blue-600'
       }
 
       const getHODCommentsIcon = () => {
@@ -905,6 +979,74 @@
         if (status === 'approved') return 'bg-green-600 text-green-100 border border-blue-400/50'
         if (status === 'rejected') return 'bg-red-600 text-red-100 border border-blue-400/50'
         return 'bg-yellow-600 text-yellow-100 border border-blue-400/50'
+      }
+
+      // ICT Officer Methods for Combined Requests
+      const getCombinedIctOfficerStatus = () => {
+        const status = getCombinedApprovalStatus('ict_officer')
+        // Check if the task is assigned but not completed
+        const isAssigned =
+          requestData.value?.ict_task_assigned_at &&
+          !requestData.value?.ict_officer_approved_at &&
+          !requestData.value?.ict_officer_rejected_at
+
+        if (isAssigned) {
+          return 'in_progress'
+        }
+        return status
+      }
+
+      const getCombinedIctOfficerStepClass = () => {
+        const status = getCombinedIctOfficerStatus()
+        if (status === 'approved') return 'bg-gradient-to-br from-blue-500 to-blue-600'
+        if (status === 'rejected') return 'bg-gradient-to-br from-blue-500 to-blue-600'
+        if (status === 'in_progress') return 'bg-gradient-to-br from-blue-500 to-blue-600'
+        return 'bg-gradient-to-br from-blue-500 to-blue-600'
+      }
+
+      const getCombinedIctOfficerStepIcon = () => {
+        const status = getCombinedIctOfficerStatus()
+        if (status === 'approved') return 'fas fa-check'
+        if (status === 'rejected') return 'fas fa-times'
+        if (status === 'in_progress') return 'fas fa-cogs'
+        return 'fas fa-clock'
+      }
+
+      const getCombinedIctOfficerStatusText = () => {
+        const status = getCombinedIctOfficerStatus()
+        if (status === 'in_progress') return 'In Progress'
+        return status.charAt(0).toUpperCase() + status.slice(1)
+      }
+
+      const getCombinedIctOfficerStatusTextClass = () => {
+        const status = getCombinedIctOfficerStatus()
+        if (status === 'approved') return 'text-green-400'
+        if (status === 'rejected') return 'text-red-400'
+        if (status === 'in_progress') return 'text-blue-400'
+        return 'text-yellow-400'
+      }
+
+      const getCombinedIctOfficerComment = () => {
+        // First check for implementation_comments data from the backend
+        return (
+          requestData.value?.implementation_comments ||
+          requestData.value?.implementation_comment ||
+          requestData.value?.ict_implementation_comments ||
+          requestData.value?.ict_officer_comments ||
+          requestData.value?.ict_officer_comment ||
+          requestData.value?.ict_implementation_details ||
+          ''
+        )
+      }
+
+      const getCombinedIctOfficerName = () => {
+        return (
+          requestData.value?.ict_officer_name ||
+          requestData.value?.assigned_ict_officer?.name ||
+          requestData.value?.assigned_ict_officer ||
+          requestData.value?.ict_officer ||
+          ''
+        )
       }
 
       // Combined Access Request Status Helper
@@ -1122,6 +1264,14 @@
         getHODCommentsStatusBadgeClass,
         // Combined Access Request Status
         getCombinedApprovalStatus,
+        // ICT Officer Methods
+        getCombinedIctOfficerStatus,
+        getCombinedIctOfficerStepClass,
+        getCombinedIctOfficerStepIcon,
+        getCombinedIctOfficerStatusText,
+        getCombinedIctOfficerStatusTextClass,
+        getCombinedIctOfficerComment,
+        getCombinedIctOfficerName,
         // Return status methods
         getReturnStatusBadgeClass,
         getReturnStatusIcon,

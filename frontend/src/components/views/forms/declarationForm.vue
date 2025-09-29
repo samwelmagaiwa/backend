@@ -187,20 +187,18 @@
                 </div>
               </div>
 
-              <div
-                class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-6 gap-4 md:gap-6 lg:gap-8"
-              >
+              <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 md:gap-6">
                 <!-- Full Name -->
-                <div class="md:col-span-2 xl:col-span-4 2xl:col-span-6">
+                <div class="">
                   <label
-                    class="block text-lg font-bold text-blue-100 mb-2 flex items-center justify-between"
+                    class="block text-base font-bold text-blue-100 mb-2 flex items-center justify-between"
                   >
                     <span>Full Name <span class="text-red-400">*</span></span>
                     <span
                       v-if="autoPopulated && formData.fullName && !isLoadingProfile"
-                      class="text-base text-green-300 font-medium bg-green-500/20 px-2 py-1 rounded-full border border-green-400/30 flex items-center gap-1"
+                      class="text-xs text-green-300 font-medium bg-green-500/20 px-1.5 py-0.5 rounded-full border border-green-400/30 flex items-center gap-1"
                     >
-                      <i class="fas fa-lock text-sm"></i>
+                      <i class="fas fa-lock text-xs"></i>
                       Protected
                     </span>
                   </label>
@@ -209,7 +207,7 @@
                       id="full-name"
                       v-model="formData.fullName"
                       type="text"
-                      class="medical-input w-full px-2 py-1.5 border-2 rounded-lg focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 text-base"
+                      class="medical-input w-full px-2 py-1.5 border-2 rounded-lg focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 text-sm"
                       :class="{
                         'bg-blue-500/30 border-blue-400/60 focus:border-blue-500 hover:bg-blue-500/40 focus:bg-blue-500/50 focus:shadow-lg focus:shadow-blue-500/30':
                           !autoPopulated || isLoadingProfile,
@@ -250,25 +248,25 @@
                   <p
                     id="full-name-help"
                     v-if="autoPopulated && formData.fullName && !isLoadingProfile"
-                    class="text-sm text-green-200/70 mt-1 italic flex items-center"
+                    class="text-xs text-green-200/70 mt-1 italic flex items-center"
                     role="status"
                   >
-                    <i class="fas fa-info-circle mr-1" aria-hidden="true"></i>
-                    This field is auto-populated from your profile and cannot be edited
+                    <i class="fas fa-info-circle mr-1 text-xs" aria-hidden="true"></i>
+                    Auto-populated, cannot be edited
                   </p>
                 </div>
 
                 <!-- PF Number -->
-                <div class="xl:col-span-2 2xl:col-span-2">
+                <div class="">
                   <label
-                    class="block text-lg font-bold text-blue-100 mb-2 flex items-center justify-between"
+                    class="block text-base font-bold text-blue-100 mb-2 flex items-center justify-between"
                   >
                     <span>PF Number <span class="text-red-400">*</span></span>
                     <span
                       v-if="autoPopulated && formData.pfNumber && !isLoadingProfile"
-                      class="text-base text-green-300 font-medium bg-green-500/20 px-2 py-1 rounded-full border border-green-400/30 flex items-center gap-1"
+                      class="text-xs text-green-300 font-medium bg-green-500/20 px-1.5 py-0.5 rounded-full border border-green-400/30 flex items-center gap-1"
                     >
-                      <i class="fas fa-lock text-sm"></i>
+                      <i class="fas fa-lock text-xs"></i>
                       Protected
                     </span>
                   </label>
@@ -277,7 +275,7 @@
                       id="pf-number"
                       v-model="formData.pfNumber"
                       type="text"
-                      class="medical-input w-full px-2 py-1.5 border-2 rounded-lg focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 text-base"
+                      class="medical-input w-full px-2 py-1.5 border-2 rounded-lg focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 text-sm"
                       :class="{
                         'bg-blue-500/30 border-blue-400/60 focus:border-blue-500 hover:bg-blue-500/40 focus:bg-blue-500/50 focus:shadow-lg focus:shadow-blue-500/30':
                           !autoPopulated || isLoadingProfile,
@@ -319,25 +317,25 @@
                   <p
                     id="pf-number-help"
                     v-if="autoPopulated && formData.pfNumber && !isLoadingProfile"
-                    class="text-sm text-green-200/70 mt-1 italic flex items-center"
+                    class="text-xs text-green-200/70 mt-1 italic flex items-center"
                     role="status"
                   >
-                    <i class="fas fa-info-circle mr-1" aria-hidden="true"></i>
-                    This field is auto-populated from your profile and cannot be edited
+                    <i class="fas fa-info-circle mr-1 text-xs" aria-hidden="true"></i>
+                    Auto-populated, cannot be edited
                   </p>
                 </div>
 
                 <!-- Department/Unit -->
-                <div class="xl:col-span-1 2xl:col-span-2">
+                <div class="">
                   <label
-                    class="block text-lg font-bold text-blue-100 mb-2 flex items-center justify-between"
+                    class="block text-base font-bold text-blue-100 mb-2 flex items-center justify-between"
                   >
                     <span>Department/Unit <span class="text-red-400">*</span></span>
                     <span
                       v-if="autoPopulated && formData.department && !isLoadingProfile"
-                      class="text-base text-green-300 font-medium bg-green-500/20 px-2 py-1 rounded-full border border-green-400/30 flex items-center gap-1"
+                      class="text-xs text-green-300 font-medium bg-green-500/20 px-1.5 py-0.5 rounded-full border border-green-400/30 flex items-center gap-1"
                     >
-                      <i class="fas fa-lock text-sm"></i>
+                      <i class="fas fa-lock text-xs"></i>
                       Protected
                     </span>
                   </label>
@@ -345,7 +343,7 @@
                     <select
                       id="department"
                       v-model="formData.department"
-                      class="medical-input w-full px-2 py-1.5 bg-blue-500/30 border-2 border-blue-400/60 rounded-lg focus:border-blue-500 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-blue-500/40 focus:bg-blue-500/50 focus:shadow-lg focus:shadow-blue-500/30 appearance-none text-base"
+                      class="medical-input w-full px-2 py-1.5 bg-blue-500/30 border-2 border-blue-400/60 rounded-lg focus:border-blue-500 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-blue-500/40 focus:bg-blue-500/50 focus:shadow-lg focus:shadow-blue-500/30 appearance-none text-sm"
                       :disabled="isLoadingProfile || (autoPopulated && formData.department)"
                       :readonly="autoPopulated && formData.department && !isLoadingProfile"
                       :aria-describedby="
@@ -378,17 +376,17 @@
                   <p
                     id="department-help"
                     v-if="autoPopulated && formData.department && !isLoadingProfile"
-                    class="text-sm text-green-200/70 mt-1 italic flex items-center"
+                    class="text-xs text-green-200/70 mt-1 italic flex items-center"
                     role="status"
                   >
-                    <i class="fas fa-info-circle mr-1" aria-hidden="true"></i>
-                    This field is auto-populated from your profile and cannot be edited
+                    <i class="fas fa-info-circle mr-1 text-xs" aria-hidden="true"></i>
+                    Auto-populated, cannot be edited
                   </p>
                 </div>
 
                 <!-- Job Title -->
-                <div class="xl:col-span-1 2xl:col-span-2">
-                  <label class="block text-lg font-bold text-blue-100 mb-2">
+                <div class="">
+                  <label class="block text-base font-bold text-blue-100 mb-2">
                     Job Title <span class="text-red-400">*</span>
                   </label>
                   <div class="relative">
@@ -396,7 +394,7 @@
                       id="job-title"
                       v-model="formData.jobTitle"
                       type="text"
-                      class="medical-input w-full px-2 py-1.5 bg-blue-500/30 border-2 border-blue-400/60 rounded-lg focus:border-blue-500 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-blue-500/40 focus:bg-blue-500/50 focus:shadow-lg focus:shadow-blue-500/30 text-base"
+                      class="medical-input w-full px-2 py-1.5 bg-blue-500/30 border-2 border-blue-400/60 rounded-lg focus:border-blue-500 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-blue-500/40 focus:bg-blue-500/50 focus:shadow-lg focus:shadow-blue-500/30 text-sm"
                       placeholder="Enter your job title"
                       aria-required="true"
                       autocomplete="organization-title"
@@ -457,64 +455,64 @@
 
             <!-- Signature Section -->
             <div
-              class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-3 rounded-xl backdrop-blur-sm hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-300 group"
+              class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-2 rounded-xl backdrop-blur-sm hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-300 group"
             >
-              <div class="flex items-center space-x-2 mb-2">
+              <div class="flex items-center space-x-2 mb-1">
                 <div
-                  class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
+                  class="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
                 >
-                  <i class="fas fa-signature text-white text-sm"></i>
+                  <i class="fas fa-signature text-white text-xs"></i>
                 </div>
-                <h3 class="text-base font-bold text-white flex items-center">
-                  <i class="fas fa-pen-fancy mr-2 text-blue-300 text-xs"></i>
+                <h3 class="text-sm font-bold text-white flex items-center">
+                  <i class="fas fa-pen-fancy mr-1 text-blue-300 text-xs"></i>
                   Digital Signature
                 </h3>
               </div>
 
               <div
-                class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-4 md:gap-6 lg:gap-8"
+                class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-2 md:gap-3"
               >
                 <!-- Signature Upload -->
                 <div class="md:col-span-2 xl:col-span-3 2xl:col-span-5">
-                  <label class="block text-base font-bold text-blue-100 mb-2">
+                  <label class="block text-sm font-bold text-blue-100 mb-1">
                     Signature <span class="text-red-400">*</span>
                   </label>
 
                   <div class="relative">
                     <div
                       v-if="!signaturePreview"
-                      class="w-full px-2 py-2 border-2 border-dashed border-blue-400/60 rounded-lg focus-within:border-blue-500 bg-blue-500/20 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/30 min-h-[40px] flex items-center justify-center hover:bg-blue-500/30"
+                      class="w-full px-2 py-1 border-2 border-dashed border-blue-400/60 rounded-lg focus-within:border-blue-500 bg-blue-500/20 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/30 min-h-[28px] flex items-center justify-center hover:bg-blue-500/30"
                     >
                       <div class="text-center">
-                        <div class="mb-1">
-                          <i class="fas fa-signature text-blue-300 text-sm mb-1"></i>
+                        <div class="flex items-center gap-2">
+                          <i class="fas fa-signature text-blue-300 text-xs"></i>
                           <p class="text-blue-100 text-xs">No signature</p>
+                          <button
+                            type="button"
+                            @click="loadSignature"
+                            @keydown.enter="loadSignature"
+                            @keydown.space.prevent="loadSignature"
+                            class="px-1.5 py-0.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-semibold rounded hover:from-blue-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 shadow hover:shadow-lg transform hover:scale-105 border border-blue-400/50 focus:ring-1 focus:ring-blue-300"
+                            aria-label="Upload digital signature file"
+                          >
+                            <i class="fas fa-download text-xs" aria-hidden="true"></i>
+                            Load
+                          </button>
                         </div>
-                        <button
-                          type="button"
-                          @click="loadSignature"
-                          @keydown.enter="loadSignature"
-                          @keydown.space.prevent="loadSignature"
-                          class="px-2 py-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-semibold rounded-md hover:from-blue-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/50 focus:ring-2 focus:ring-blue-300 focus:ring-offset-2"
-                          aria-label="Upload digital signature file"
-                        >
-                          <i class="fas fa-download text-xs" aria-hidden="true"></i>
-                          Load Signature
-                        </button>
                       </div>
                     </div>
 
                     <div
                       v-else
-                      class="w-full px-2 py-1.5 border-2 border-blue-400/60 rounded-lg bg-blue-500/20 backdrop-blur-sm transition-all duration-300 shadow-sm hover:shadow-md hover:bg-blue-500/30 min-h-[35px] flex items-center justify-center relative"
+                      class="w-full px-2 py-1 border-2 border-blue-400/60 rounded-lg bg-blue-500/20 backdrop-blur-sm transition-all duration-300 shadow-sm hover:shadow-md hover:bg-blue-500/30 min-h-[28px] flex items-center justify-center relative"
                     >
                       <div v-if="isImage(signaturePreview)" class="text-center">
                         <img
                           :src="signaturePreview"
                           alt="Digital Signature"
-                          class="max-h-[25px] max-w-full object-contain mx-auto mb-1"
+                          class="max-h-[20px] max-w-full object-contain mx-auto"
                         />
-                        <p class="text-xs text-blue-100 truncate">
+                        <p class="text-xs text-blue-100 truncate mt-0.5">
                           {{ signatureFileName }}
                         </p>
                       </div>
@@ -562,7 +560,7 @@
 
                 <!-- Date -->
                 <div class="2xl:col-span-1">
-                  <label class="block text-base font-bold text-blue-100 mb-2">
+                  <label class="block text-sm font-bold text-blue-100 mb-1">
                     Date <span class="text-red-400">*</span>
                   </label>
                   <div class="relative">
@@ -1856,7 +1854,17 @@
   }
 
   /* Responsive adjustments */
+  @media (max-width: 1024px) {
+    .lg\:grid-cols-4 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
   @media (max-width: 768px) {
+    .lg\:grid-cols-4 {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+
     .grid-cols-2 {
       grid-template-columns: repeat(1, minmax(0, 1fr));
     }
@@ -1907,8 +1915,8 @@
 
   /* Signature area hover effects */
   .border-dashed:hover {
-    border-color: #10b981;
-    background-color: #f0fdf4;
+    border-color: #3b82f6;
+    background-color: rgba(59, 130, 246, 0.1);
   }
 
   /* Protected field styles */

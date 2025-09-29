@@ -473,6 +473,32 @@
                                   ></i>
                                   Cancel
                                 </button>
+
+                                <!-- Separator for additional actions -->
+                                <div class="border-t border-gray-100 my-1"></div>
+
+                                <!-- View Progress action -->
+                                <button
+                                  @click="viewProgress(request)"
+                                  v-if="canViewProgress(request)"
+                                  class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-100 hover:text-orange-700 transition-all duration-200 font-medium"
+                                >
+                                  <i
+                                    class="fas fa-chart-line mr-3 text-orange-500 group-hover:text-orange-600"
+                                  ></i>
+                                  View Progress
+                                </button>
+
+                                <!-- View Timeline action -->
+                                <button
+                                  @click="viewTimeline(request)"
+                                  class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-indigo-100 hover:text-indigo-700 transition-all duration-200 font-medium"
+                                >
+                                  <i
+                                    class="fas fa-history mr-3 text-indigo-500 group-hover:text-indigo-600"
+                                  ></i>
+                                  View Timeline
+                                </button>
                               </div>
                             </div>
                           </div>
@@ -533,6 +559,14 @@
         <p class="text-gray-600">Loading requests...</p>
       </div>
     </div>
+
+    <!-- Timeline Modal -->
+    <RequestTimeline
+      :show="showTimeline"
+      :request-id="selectedRequestId"
+      @close="closeTimeline"
+      @updated="handleTimelineUpdate"
+    />
   </div>
 </template>
 
@@ -637,6 +671,7 @@
   import Header from '@/components/header.vue'
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppFooter from '@/components/footer.vue'
+  import RequestTimeline from '@/components/common/RequestTimeline.vue'
   import OrbitingDots from '@/components/common/OrbitingDots.vue'
   import combinedAccessService from '@/services/combinedAccessService'
   import statusUtils from '@/utils/statusUtils'
@@ -647,6 +682,7 @@
       Header,
       ModernSidebar,
       AppFooter,
+      RequestTimeline,
       OrbitingDots
     },
     setup() {
@@ -668,6 +704,9 @@
         },
         error: null,
         activeDropdown: null,
+        // Timeline modal state
+        showTimeline: false,
+        selectedRequestId: null,
         // Add status utilities for consistent status handling
         $statusUtils: statusUtils
       }
@@ -977,6 +1016,39 @@
       getStatusText(status) {
         // Use centralized status utility with component name for debugging
         return this.$statusUtils.getStatusText(status, 'HodRequestList')
+      },
+
+      // Timeline modal methods
+      viewTimeline(request) {
+        console.log('📅 HodRequestList: Opening timeline for request:', request.id)
+        this.activeDropdown = null
+        this.selectedRequestId = request.id
+        this.showTimeline = true
+      },
+
+      closeTimeline() {
+        console.log('📅 HodRequestList: Closing timeline modal')
+        this.showTimeline = false
+        this.selectedRequestId = null
+      },
+
+      async handleTimelineUpdate() {
+        console.log('🔄 HodRequestList: Timeline updated, refreshing requests list...')
+        await this.fetchRequests()
+      },
+
+      // View Progress method
+      viewProgress(request) {
+        console.log('👁️ HodRequestList: Viewing progress for request:', request.id)
+        this.activeDropdown = null
+        // Navigate to progress view - using ICT dashboard route for consistency
+        this.$router.push(`/ict-dashboard/request-progress/${request.id}`)
+      },
+
+      canViewProgress(request) {
+        // HOD can view progress for requests that are beyond the pending stage
+        const status = request.hod_status || request.status
+        return !['pending_hod', 'hod_rejected', 'cancelled'].includes(status)
       }
     }
   }

@@ -984,28 +984,28 @@ class UserAccessController extends Controller
             // Check for any pending requests using new status columns
             $pendingRequest = UserAccess::where('user_id', $user->id)
                 ->where(function($query) {
-                    $query->where('hod_status', 'pending')
+                    $query->whereIn('hod_status', ['pending', 'in_progress'])
                           ->orWhere(function($q) {
                               $q->where('hod_status', 'approved')
-                                ->where('divisional_status', 'pending');
+                                ->whereIn('divisional_status', ['pending', 'in_progress']);
                           })
                           ->orWhere(function($q) {
                               $q->where('hod_status', 'approved')
                                 ->where('divisional_status', 'approved')
-                                ->where('ict_director_status', 'pending');
+                                ->whereIn('ict_director_status', ['pending', 'in_progress']);
                           })
                           ->orWhere(function($q) {
                               $q->where('hod_status', 'approved')
                                 ->where('divisional_status', 'approved')
                                 ->where('ict_director_status', 'approved')
-                                ->where('head_it_status', 'pending');
+                                ->whereIn('head_it_status', ['pending', 'in_progress']);
                           })
                           ->orWhere(function($q) {
                               $q->where('hod_status', 'approved')
                                 ->where('divisional_status', 'approved')
                                 ->where('ict_director_status', 'approved')
                                 ->where('head_it_status', 'approved')
-                                ->where('ict_officer_status', 'pending');
+                                ->whereIn('ict_officer_status', ['pending', 'in_progress']);
                           });
                 })
                 ->first();

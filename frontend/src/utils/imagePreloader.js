@@ -4,6 +4,8 @@
  * to avoid unnecessary preloading warnings
  */
 
+import { devLog } from './devLogger.js'
+
 // Track preloaded images to avoid duplicates
 const preloadedImages = new Set()
 
@@ -25,12 +27,12 @@ export function preloadImage(src, alt = '') {
 
     img.onload = () => {
       preloadedImages.add(src)
-      console.log('✅ Image preloaded:', src)
+      devLog.debug('image', `✅ Image preloaded: ${src}`)
       resolve(img)
     }
 
     img.onerror = (error) => {
-      console.warn('❌ Failed to preload image:', src, error)
+      devLog.warn('❌ Failed to preload image:', src, error)
       reject(error)
     }
 
@@ -67,7 +69,7 @@ export function preloadImageWithLink(src, type = 'image/png') {
   document.head.appendChild(link)
   preloadedImages.add(src)
 
-  console.log('🔗 Image preloaded via link:', src)
+  devLog.debug('image', `🔗 Image preloaded via link: ${src}`)
 }
 
 /**
@@ -76,7 +78,7 @@ export function preloadImageWithLink(src, type = 'image/png') {
  * @param {string} userRole - User's role
  */
 export function preloadRoleBasedImages(userRole) {
-  console.log('🎯 Preloading images for role:', userRole)
+  devLog.debug('image', `🎯 Preloading images for role: ${userRole}`)
 
   const baseUrl = '/assets/images/'
 
@@ -86,34 +88,94 @@ export function preloadRoleBasedImages(userRole) {
     { src: `${baseUrl}ngao2.png`, alt: 'National Shield' }
   ]
 
-  // Role-specific image preloading
+  // Normalize role for consistent mapping (handles spaces, hyphens, camelCase, etc.)
+  const normalizedRole = (userRole || '').toLowerCase().replace(/[\s-]+/g, '_')
+  devLog.debug('role', `🔄 Normalized role: ${normalizedRole}`)
+
+  // Role-specific image preloading with normalized keys
   const roleImageMap = {
+    // Head of Department variants
     head_of_department: {
       priority: 'high',
-      images: commonImages, // HOD uses forms that need these images
+      images: commonImages,
       reason: 'HOD accesses request forms and approval pages'
     },
+    hod: {
+      priority: 'high',
+      images: commonImages,
+      reason: 'HOD accesses request forms and approval pages'
+    },
+    head_department: {
+      priority: 'high',
+      images: commonImages,
+      reason: 'Head Department accesses request forms and approval pages'
+    },
+    // Divisional Director variants
     divisional_director: {
       priority: 'high',
       images: commonImages,
       reason: 'Divisional Director accesses forms and approval pages'
     },
+    director_divisional: {
+      priority: 'high',
+      images: commonImages,
+      reason: 'Director Divisional accesses forms and approval pages'
+    },
+    // ICT Director variants
     ict_director: {
       priority: 'high',
       images: commonImages,
       reason: 'ICT Director accesses forms and approval pages'
     },
-
+    director_ict: {
+      priority: 'high',
+      images: commonImages,
+      reason: 'Director ICT accesses forms and approval pages'
+    },
+    dict: {
+      priority: 'high',
+      images: commonImages,
+      reason: 'DICT accesses forms and approval pages'
+    },
+    // Head IT variants
+    head_it: {
+      priority: 'high',
+      images: commonImages,
+      reason: 'Head IT accesses forms and approval pages'
+    },
+    head_of_it: {
+      priority: 'high',
+      images: commonImages,
+      reason: 'Head of IT accesses forms and approval pages'
+    },
+    ict_head: {
+      priority: 'high',
+      images: commonImages,
+      reason: 'ICT Head accesses forms and approval pages'
+    },
+    it_head: {
+      priority: 'high',
+      images: commonImages,
+      reason: 'IT Head accesses forms and approval pages'
+    },
+    // ICT Officer variants
     ict_officer: {
       priority: 'high',
       images: commonImages,
       reason: 'ICT Officer accesses approval and management pages'
     },
+    officer_ict: {
+      priority: 'high',
+      images: commonImages,
+      reason: 'Officer ICT accesses approval and management pages'
+    },
+    // Staff
     staff: {
       priority: 'medium',
       images: commonImages,
       reason: 'Staff accesses user forms and booking service'
     },
+    // Admin
     admin: {
       priority: 'low',
       images: [], // Admin rarely uses forms with these images
@@ -121,14 +183,14 @@ export function preloadRoleBasedImages(userRole) {
     }
   }
 
-  const roleConfig = roleImageMap[userRole]
+  const roleConfig = roleImageMap[normalizedRole]
 
   if (!roleConfig) {
-    console.warn('⚠️ Unknown role for image preloading:', userRole)
+    devLog.warn('⚠️ Unknown role for image preloading:', userRole)
     return
   }
 
-  console.log(`📋 Preloading strategy for ${userRole}:`, roleConfig.reason)
+  devLog.debug('image', `📋 Preloading strategy for ${userRole}: ${roleConfig.reason}`)
 
   // Preload images based on priority
   if (roleConfig.priority === 'high') {
@@ -174,7 +236,7 @@ export function preloadRouteBasedImages(routePath) {
   const needsImages = imageRoutes.some((route) => routePath.startsWith(route))
 
   if (needsImages) {
-    console.log('🖼️ Route requires images, preloading:', routePath)
+    devLog.debug('navigation', `🖼️ Route requires images, preloading: ${routePath}`)
     preloadImageWithLink(`${baseUrl}logo2.png`)
     preloadImageWithLink(`${baseUrl}ngao2.png`)
   }
@@ -192,7 +254,7 @@ export function cleanupPreloadedImages() {
     setTimeout(() => {
       if (link.parentNode) {
         link.parentNode.removeChild(link)
-        console.log('🧹 Cleaned up preload link:', link.href)
+        devLog.debug('cache', `🧹 Cleaned up preload link: ${link.href}`)
       }
     }, 5000) // 5 second delay
   })
@@ -204,7 +266,7 @@ export function cleanupPreloadedImages() {
  * @param {string} currentRoute - Current route path
  */
 export function initializeImagePreloading(userRole, currentRoute) {
-  console.log('🚀 Initializing smart image preloading')
+  devLog.debug('image', '🚀 Initializing smart image preloading')
 
   // Preload based on user role
   if (userRole) {

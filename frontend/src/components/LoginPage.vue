@@ -201,6 +201,7 @@
       const password = ref('')
       const rememberEmail = ref(true)
       const loading = ref(false)
+      const showSuccessSnackbar = ref(false)
 
       // API URL for display
       const apiUrl = process.env.VUE_APP_API_URL || 'http://localhost:8000/api'
@@ -268,6 +269,11 @@
 
         if (result.success) {
           console.log('✅ Login successful! Navigation should be handled by auth composable.')
+          // Show success snackbar briefly
+          showSuccessSnackbar.value = true
+          setTimeout(() => {
+            showSuccessSnackbar.value = false
+          }, 3000)
           // Clear password but keep email if remember is enabled
           password.value = ''
         } else {
@@ -343,7 +349,8 @@
         apiUrl,
         testConnection,
         testingConnection,
-        connectionStatus
+        connectionStatus,
+        showSuccessSnackbar
       }
     }
   }
