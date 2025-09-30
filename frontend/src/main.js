@@ -68,11 +68,29 @@ try {
       const { testSplitStatusParts } = await import('./utils/testWorkflowStatus')
       testSplitStatusParts()
     }
+    window.debugPageDisappearing = () => {
+      console.log('🔍 Debugging page disappearing issue...')
+      console.log('👤 Current user:', {
+        authenticated: !!localStorage.getItem('auth_token'),
+        userData: JSON.parse(localStorage.getItem('user_data') || 'null')
+      })
+      console.log('📍 Current route:', router.currentRoute.value)
+      console.log('🌐 Network status:', navigator.onLine)
+      console.log('📊 Memory usage:', performance.memory)
+      // Monitor for unexpected navigations
+      const originalPush = router.push
+      router.push = function (...args) {
+        console.log('📢 Router push detected:', args)
+        console.trace('Router push called from:')
+        return originalPush.apply(this, args)
+      }
+    }
     console.log('🛠️ Debug functions available:')
     console.log('  - window.debugStatus() - Test status utilities')
     console.log('  - window.testWorkflow() - Test workflow progression')
     console.log('  - window.testDivisionalApproved() - Test divisional approved case')
     console.log('  - window.testSplitColors() - Test split status colors')
+    console.log('  - window.debugPageDisappearing() - Debug page disappearing issue')
   }
 
   // Initialize sidebar state with Pinia immediately after mount

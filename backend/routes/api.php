@@ -34,15 +34,22 @@ Route::get('/', function () {
     return response()->json([
         'message' => 'Welcome to the User Access Management API',
         'version' => '1.0.0',
-        'documentation' => url('/api/documentation'),
-        'api_schema' => url('/api/api-docs'),
+        'total_endpoints' => '265+',
+        'comprehensive_docs' => url('/api-docs-modern'),
+        'api_schema_json' => url('/api/api-docs'),
+        'postman_collection' => url('/api/postman-collection'),
         'status' => 'active',
-        'endpoints' => [
+        'key_endpoints' => [
             'authentication' => url('/api/login'),
             'user_profile' => url('/api/user'),
             'user_access_requests' => url('/api/v1/user-access'),
             'device_bookings' => url('/api/booking-service/bookings'),
             'ict_approvals' => url('/api/ict-approval/device-requests')
+        ],
+        'instructions' => [
+            'visit_docs' => 'Go to /api-docs-modern for comprehensive API documentation with all 265+ endpoints',
+            'download_postman' => 'Download Postman collection from /api/postman-collection',
+            'json_schema' => 'Access raw OpenAPI JSON from /api/api-docs'
         ]
     ]);
 });

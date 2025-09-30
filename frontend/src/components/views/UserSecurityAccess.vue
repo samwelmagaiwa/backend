@@ -622,24 +622,27 @@
             // Reload the request data to get updated status
             await this.loadRequestData()
 
-          // Immediately trigger notification badge refresh
-          this.refreshNotificationBadges()
-          
-          // Progressive refresh strategy to ensure backend has time to update
-          setTimeout(() => {
-            console.log('🔄 Secondary notification refresh (2 seconds)')
+            // IMMEDIATELY update badge count locally for instant feedback
+            this.updateBadgeCountLocally()
+
+            // Immediately trigger notification badge refresh
             this.refreshNotificationBadges()
-          }, 2000)
-          
-          setTimeout(() => {
-            console.log('🔄 Tertiary notification refresh (4 seconds)')
-            this.refreshNotificationBadges()
-          }, 4000)
-          
-          setTimeout(() => {
-            console.log('🔄 Final notification refresh (6 seconds)')
-            this.refreshNotificationBadges()
-          }, 6000)
+
+            // Progressive refresh strategy to ensure backend has time to update
+            setTimeout(() => {
+              console.log('🔄 Secondary notification refresh (2 seconds)')
+              this.refreshNotificationBadges()
+            }, 2000)
+
+            setTimeout(() => {
+              console.log('🔄 Tertiary notification refresh (4 seconds)')
+              this.refreshNotificationBadges()
+            }, 4000)
+
+            setTimeout(() => {
+              console.log('🔄 Final notification refresh (6 seconds)')
+              this.refreshNotificationBadges()
+            }, 6000)
 
             // Show success message
             this.toast = {
@@ -647,22 +650,22 @@
               message: 'Access granted successfully!'
             }
 
-          setTimeout(() => {
-            this.toast.show = false
-            // Final notification refresh before redirect
-            this.refreshNotificationBadges()
-            
-            // Redirect to ICT dashboard access requests with final refresh
             setTimeout(() => {
-              console.log('🚀 REDIRECT: Final notification refresh before redirect')
+              this.toast.show = false
+              // Final notification refresh before redirect
               this.refreshNotificationBadges()
-              
+
+              // Redirect to ICT dashboard access requests with final refresh
               setTimeout(() => {
-                console.log('🚀 REDIRECT: Navigating to access requests page')
-                this.$router.push('/ict-dashboard/access-requests')
-              }, 1000)
-            }, 500)
-          }, 2000)
+                console.log('🚀 REDIRECT: Final notification refresh before redirect')
+                this.refreshNotificationBadges()
+
+                setTimeout(() => {
+                  console.log('🚀 REDIRECT: Navigating to access requests page')
+                  this.$router.push('/ict-dashboard/access-requests')
+                }, 1000)
+              }, 500)
+            }, 2000)
           } else {
             throw new Error(result.error || 'Failed to grant access')
           }
@@ -906,72 +909,123 @@
         this.$router.go(-1)
       },
 
-    async refreshNotificationBadges() {
-      // Try multiple approaches to ensure notification badges are updated
-      try {
-        console.log('🔔 Starting comprehensive notification badge refresh...')
-        
-        // Method 1: Dispatch global window event for sidebar to listen to
-        if (window.dispatchEvent) {
-          const event = new CustomEvent('refresh-notifications', {
-            detail: { source: 'UserSecurityAccess', reason: 'access_granted', timestamp: Date.now() }
-          })
-          window.dispatchEvent(event)
-          console.log('📡 Dispatched refresh-notifications event')
-        }
-        
-        // Method 2: Direct call to sidebar instance
-        if (window.sidebarInstance && window.sidebarInstance.fetchNotificationCounts) {
-          console.log('🔄 Calling sidebar fetchNotificationCounts directly')
-          window.sidebarInstance.fetchNotificationCounts(true) // force refresh with cache bypass
-        }
-        
-        // Method 3: Aggressive cache clearing and fresh API calls
+      async refreshNotificationBadges() {
+        // Try multiple approaches to ensure notification badges are updated
         try {
-          const notificationService = (await import('@/services/notificationService')).default
-          console.log('🧽 Aggressive notification cache clearing and refresh')
-          
-          // Clear any cached data multiple times to ensure it's gone
-          if (notificationService.clearCache) {
-            notificationService.clearCache()
-            console.log('🗑️ Notification cache cleared')
-          }
-          
-          // Wait a moment then force multiple fresh fetches
-          setTimeout(async () => {
-            try {
-              if (notificationService.getPendingRequestsCount) {
-                console.log('🚀 Force fetch #1 - Immediate notification count refresh')
-                await notificationService.getPendingRequestsCount(true) // force fresh fetch
-                
-                // Clear cache again and fetch again
-                if (notificationService.clearCache) {
-                  notificationService.clearCache()
-                }
-                
-                console.log('🚀 Force fetch #2 - Second notification count refresh')
-                await notificationService.getPendingRequestsCount(true) // force fresh fetch again
+          console.log('🔔 Starting comprehensive notification badge refresh...')
+
+          // Method 1: Dispatch force refresh event for immediate update
+          if (window.dispatchEvent) {
+            const forceEvent = new CustomEvent('force-refresh-notifications', {
+              detail: {
+                source: 'UserSecurityAccess',
+                reason: 'access_granted',
+                timestamp: Date.now()
               }
-            } catch (fetchError) {
-              console.warn('Failed during aggressive notification refresh:', fetchError)
+            })
+            window.dispatchEvent(forceEvent)
+            console.log('🚀 Dispatched force-refresh-notifications event')
+
+            // Also dispatch regular refresh as backup
+            const event = new CustomEvent('refresh-notifications', {
+              detail: {
+                source: 'UserSecurityAccess',
+                reason: 'access_granted',
+                timestamp: Date.now()
+              }
+            })
+            window.dispatchEvent(event)
+            console.log('📡 Dispatched refresh-notifications event')
+          }
+
+          // Method 2: Direct call to sidebar instance
+          if (window.sidebarInstance && window.sidebarInstance.fetchNotificationCounts) {
+            console.log('🔄 Calling sidebar fetchNotificationCounts directly')
+            window.sidebarInstance.fetchNotificationCounts(true) // force refresh with cache bypass
+          }
+
+          // Method 3: Aggressive cache clearing and fresh API calls
+          try {
+            const notificationService = (await import('@/services/notificationService')).default
+            console.log('🧽 Aggressive notification cache clearing and refresh')
+
+            // Clear any cached data multiple times to ensure it's gone
+            if (notificationService.clearCache) {
+              notificationService.clearCache()
+              console.log('🗑️ Notification cache cleared')
             }
-          }, 500)
-          
-        } catch (serviceError) {
-          console.warn('Failed to refresh via notification service:', serviceError)
+
+            // Wait a moment then force multiple fresh fetches
+            setTimeout(async () => {
+              try {
+                if (notificationService.getPendingRequestsCount) {
+                  console.log('🚀 Force fetch #1 - Immediate notification count refresh')
+                  await notificationService.getPendingRequestsCount(true) // force fresh fetch
+
+                  // Clear cache again and fetch again
+                  if (notificationService.clearCache) {
+                    notificationService.clearCache()
+                  }
+
+                  console.log('🚀 Force fetch #2 - Second notification count refresh')
+                  await notificationService.getPendingRequestsCount(true) // force fresh fetch again
+                }
+              } catch (fetchError) {
+                console.warn('Failed during aggressive notification refresh:', fetchError)
+              }
+            }, 500)
+          } catch (serviceError) {
+            console.warn('Failed to refresh via notification service:', serviceError)
+          }
+
+          // Method 4: If we're still in the app, trigger a page-level refresh of components
+          if (this.$root && this.$root.$emit) {
+            this.$root.$emit('force-refresh-notifications', { reason: 'access_granted' })
+          }
+
+          console.log('\u2705 Notification badge refresh complete')
+        } catch (error) {
+          console.error('\u274c Failed to refresh notification badges:', error)
         }
-        
-        // Method 4: If we're still in the app, trigger a page-level refresh of components
-        if (this.$root && this.$root.$emit) {
-          this.$root.$emit('force-refresh-notifications', { reason: 'access_granted' })
+      },
+
+      // Immediately update badge count locally for instant user feedback
+      updateBadgeCountLocally() {
+        try {
+          console.log(
+            '\ud83d\udce6 UserSecurityAccess: Updating badge count locally for instant feedback'
+          )
+
+          // Access the sidebar's notification counts directly and decrement by 1
+          if (window.sidebarInstance && window.sidebarInstance.notificationCounts) {
+            const currentCounts = window.sidebarInstance.notificationCounts
+            const ictRoute = '/ict-dashboard/access-requests'
+
+            if (currentCounts[ictRoute] && currentCounts[ictRoute] > 0) {
+              currentCounts[ictRoute] = Math.max(0, currentCounts[ictRoute] - 1)
+              console.log(
+                '\ud83d\udd04 Decremented badge count for',
+                ictRoute,
+                'to',
+                currentCounts[ictRoute]
+              )
+
+              // Force Vue reactivity update if possible
+              if (window.sidebarInstance.forceUpdate) {
+                window.sidebarInstance.forceUpdate()
+              }
+            }
+          }
+
+          // Also try to access the global notification counts in ModernSidebar
+          if (window.Vue && window.Vue.observable) {
+            // Trigger Vue's reactivity system to update the UI immediately
+            console.log('\ud83d\udd04 Triggering Vue reactivity update')
+          }
+        } catch (error) {
+          console.warn('Failed to update badge count locally:', error)
         }
-        
-        console.log('✅ Notification badge refresh complete')
-        
-      } catch (error) {
-        console.error('❌ Failed to refresh notification badges:', error)
-      }
-    },
+      },
 
       generateMockData() {
         // Generate mock data for testing when backend is not available

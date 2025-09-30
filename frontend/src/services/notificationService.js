@@ -204,7 +204,7 @@ const notificationService = {
       ict_officer: {
         routePattern: '/ict-dashboard',
         menuItems: ['/ict-dashboard/access-requests'],
-        description: 'Requests requiring implementation'
+        description: 'Requests requiring implementation (excludes implemented/completed)'
       },
       admin: {
         routePattern: '/admin-dashboard',

@@ -344,7 +344,9 @@
         // Timeline modal state
         showTimeline: false,
         selectedRequestId: null,
-        $statusUtils: statusUtils
+        $statusUtils: statusUtils,
+        // Session-based tracking for assigned tasks (with sessionStorage persistence)
+        assignedRequestsThisSession: new Set()
       }
     },
     computed: {
@@ -402,6 +404,10 @@
     async mounted() {
       try {
         console.log('HeadOfItRequestList: Component mounted, initializing...')
+
+        // Initialize session-based tracking from sessionStorage
+        this.initializeSessionTracking()
+
         await this.fetchRequests()
 
         // Add click listener to close dropdowns when clicking outside
@@ -420,6 +426,34 @@
       document.removeEventListener('click', this.closeAllDropdowns)
     },
     methods: {
+      // Initialize session tracking from sessionStorage
+      initializeSessionTracking() {
+        try {
+          const storedAssignedRequests = sessionStorage.getItem('headOfIt_assignedRequests')
+          if (storedAssignedRequests) {
+            const assignedIds = JSON.parse(storedAssignedRequests)
+            this.assignedRequestsThisSession = new Set(assignedIds)
+            console.log(
+              '📦 Restored assigned requests from session:',
+              Array.from(this.assignedRequestsThisSession)
+            )
+          }
+        } catch (error) {
+          console.error('⚠️ Failed to restore assigned requests from session:', error)
+          this.assignedRequestsThisSession = new Set()
+        }
+      },
+
+      // Persist session tracking to sessionStorage
+      persistSessionTracking() {
+        try {
+          const assignedIds = Array.from(this.assignedRequestsThisSession)
+          sessionStorage.setItem('headOfIt_assignedRequests', JSON.stringify(assignedIds))
+          console.log('💾 Persisted assigned requests to session:', assignedIds)
+        } catch (error) {
+          console.error('⚠️ Failed to persist assigned requests to session:', error)
+        }
+      },
       async fetchRequests() {
         console.log('🔄 HeadOfItRequestList: Starting to fetch requests...')
         this.isLoading = true
@@ -562,11 +596,88 @@
         this.openDropdownId = null
       },
 
+      // Helper method to check if task has been assigned to an ICT officer
+      isTaskAssigned(request) {
+        console.log('🔍 Checking task assignment for request:', request.id, {
+          status: request.status,
+          assigned_ict_officer_id: request.assigned_ict_officer_id,
+          ict_officer_id: request.ict_officer_id,
+          assigned_to_ict_officer: request.assigned_to_ict_officer,
+          ict_officer: request.ict_officer,
+          ict_officer_name: request.ict_officer_name,
+          assigned_officer: request.assigned_officer,
+          task_assigned_at: request.task_assigned_at,
+          fullRequest: request // Log the full request to see available fields
+        })
+
+        // Primary check: Status indicates assignment
+        const statusBasedAssignment = [
+          'assigned_to_ict',
+          'implementation_in_progress',
+          'implemented',
+          'completed'
+        ].includes(request.status)
+
+        // Secondary checks: Explicit officer assignment fields
+        const fieldBasedAssignment = !!(
+          request.assigned_ict_officer_id ||
+          request.ict_officer_id ||
+          request.assigned_to_ict_officer ||
+          request.ict_officer ||
+          request.ict_officer_name ||
+          request.assigned_officer ||
+          request.task_assigned_at ||
+          request.assignee ||
+          request.assignee_id ||
+          request.task_assignment ||
+          request.task_assignment_id
+        )
+
+        // Tertiary check: Look for any field containing 'officer' or 'assign'
+        const dynamicFieldCheck = Object.keys(request).some((key) => {
+          const lowerKey = key.toLowerCase()
+          return (
+            (lowerKey.includes('officer') || lowerKey.includes('assign')) &&
+            request[key] &&
+            request[key] !== null &&
+            request[key] !== ''
+          )
+        })
+
+        const isAssigned = statusBasedAssignment || fieldBasedAssignment || dynamicFieldCheck
+
+        console.log('📋 Task Assignment Result:', {
+          requestId: request.id,
+          statusBasedAssignment,
+          fieldBasedAssignment,
+          dynamicFieldCheck,
+          finalResult: isAssigned,
+          allRequestKeys: Object.keys(request)
+        })
+
+        return isAssigned
+      },
+
+      // Helper method to check if request is in read-only mode (already processed)
+      isReadOnlyMode(request) {
+        return !this.isPendingStatus(request.status)
+      },
+
       // Role-specific actions logic for Head of IT
       getAvailableActions(request) {
         const actions = []
         const userRole = this.userRole
         const status = request.status
+        const taskAssigned = this.isTaskAssigned(request)
+        const isReadOnly = this.isReadOnlyMode(request)
+
+        console.log('🔍 Dynamic Actions Debug:', {
+          requestId: request.id,
+          status,
+          taskAssigned,
+          isReadOnly,
+          isPending: this.isPendingStatus(status)
+        })
 
         // Define role mappings
         const ROLES = {
@@ -581,20 +692,165 @@
         // Head of IT specific actions (this component is for Head of IT dashboard)
         if (userRole === ROLES.HEAD_OF_IT || !userRole) {
           // Default to Head of IT if no role detected
-          // View & Process action (always available)
-          actions.push({
-            key: 'view_and_process',
-            label: 'View & Process',
-            icon: 'fas fa-eye'
+
+          // Dynamic View & Process / View Task button
+          if (this.isPendingStatus(status)) {
+            // For pending requests - show "View & Process" (editable mode)
+            actions.push({
+              key: 'view_and_process',
+              label: 'View & Process',
+              icon: 'fas fa-eye'
+            })
+          } else {
+            // For processed requests - show "View Task" (read-only mode)
+            actions.push({
+              key: 'view_and_process',
+              label: 'View Task',
+              icon: 'fas fa-eye'
+            })
+          }
+
+          // Dynamic Assign Task button - ONLY show for requests that:
+          // 1. Are approved by Head of IT (status = 'head_of_it_approved')
+          // 2. Have NOT progressed beyond approval (no assignment yet)
+          // 3. Are NOT in any assigned/progress/completed state
+          // EMERGENCY FIX: Multiple layers of checks to ensure button is hidden for assigned tasks
+
+          // Layer 1: Status-based check
+          const isExactlyApproved = status === 'head_of_it_approved'
+          const hasNotProgressed = ![
+            'assigned_to_ict',
+            'implementation_in_progress',
+            'implemented',
+            'completed'
+          ].includes(status)
+
+          // Layer 2: Field-based assignment detection
+          const hasAssignmentIndicators = taskAssigned
+
+          // Layer 3: Emergency override - if request has any officer/assignment fields, hide button
+          const emergencyCheck = !Object.keys(request).some((key) => {
+            const lowerKey = key.toLowerCase()
+            const value = request[key]
+            return (
+              (lowerKey.includes('officer') || lowerKey.includes('assign')) &&
+              value &&
+              value !== null &&
+              value !== '' &&
+              value !== 0
+            )
           })
 
-          // For approved requests, show assign and cancel task options
-          if (['head_of_it_approved', 'assigned_to_ict'].includes(status)) {
+          // Layer 4: Session tracking - hide button if already assigned in current session
+          const notAssignedThisSession = !this.assignedRequestsThisSession.has(request.id)
+
+          // ONLY show assign button if ALL conditions are met:
+          // 1. Status is exactly 'head_of_it_approved'
+          // 2. Status has not progressed beyond approval
+          // 3. No field-based assignment indicators
+          // 4. Emergency check passes (no officer/assignment fields found)
+          // 5. Not assigned in current session
+          const canAssignTask =
+            isExactlyApproved &&
+            hasNotProgressed &&
+            !hasAssignmentIndicators &&
+            emergencyCheck &&
+            notAssignedThisSession
+
+          console.log('🎯 Assign Task Button Logic (ULTRA EMERGENCY FIX):', {
+            requestId: request.id,
+            status,
+            // Layer 1: Status checks
+            isExactlyApproved,
+            hasNotProgressed,
+            // Layer 2: Field-based detection
+            hasAssignmentIndicators,
+            // Layer 3: Emergency override
+            emergencyCheck,
+            // Layer 4: Session tracking
+            notAssignedThisSession,
+            sessionTrackedIds: Array.from(this.assignedRequestsThisSession),
+            // Final result
+            canAssignTask,
+            decision: canAssignTask
+              ? '✅ SHOWING Assign Task button'
+              : '❌ HIDING Assign Task button',
+            failureReason: !canAssignTask
+              ? !isExactlyApproved
+                ? `Status '${status}' is not exactly 'head_of_it_approved'`
+                : !hasNotProgressed
+                  ? `Status '${status}' indicates task has progressed beyond approval`
+                  : hasAssignmentIndicators
+                    ? 'Field-based assignment indicators detected'
+                    : !emergencyCheck
+                      ? 'Emergency check failed - officer/assignment fields found'
+                      : !notAssignedThisSession
+                        ? 'Already assigned in current session'
+                        : 'Unknown reason'
+              : 'All checks passed - showing button'
+          })
+
+          if (canAssignTask) {
             actions.push({
               key: 'assign_task',
               label: 'Assign Task',
               icon: 'fas fa-user-plus'
             })
+          }
+
+          // Dynamic Cancel Task button - Apply same comprehensive checks as Assign Task button
+          // ONLY show cancel button if:
+          // 1. Status is exactly 'head_of_it_approved' (same as assign button)
+          // 2. Task has NOT been assigned/progressed (same multi-layer checks)
+          // 3. Not in completed/implemented state
+
+          // Use the same comprehensive logic as assign task button
+          const canCancelTask =
+            isExactlyApproved &&
+            hasNotProgressed &&
+            !hasAssignmentIndicators &&
+            emergencyCheck &&
+            notAssignedThisSession &&
+            !['completed', 'implemented'].includes(status)
+
+          console.log('🎯 Cancel Task Button Logic (ULTRA EMERGENCY FIX):', {
+            requestId: request.id,
+            status,
+            // Layer 1: Status checks
+            isExactlyApproved,
+            hasNotProgressed,
+            // Layer 2: Field-based detection
+            hasAssignmentIndicators,
+            // Layer 3: Emergency override
+            emergencyCheck,
+            // Layer 4: Session tracking
+            notAssignedThisSession,
+            // Layer 5: Not completed/implemented
+            notCompletedOrImplemented: !['completed', 'implemented'].includes(status),
+            sessionTrackedIds: Array.from(this.assignedRequestsThisSession),
+            // Final result
+            canCancelTask,
+            decision: canCancelTask
+              ? '✅ SHOWING Cancel Task button'
+              : '❌ HIDING Cancel Task button',
+            failureReason: !canCancelTask
+              ? !isExactlyApproved
+                ? `Status '${status}' is not exactly 'head_of_it_approved'`
+                : !hasNotProgressed
+                  ? `Status '${status}' indicates task has progressed beyond approval`
+                  : hasAssignmentIndicators
+                    ? 'Field-based assignment indicators detected'
+                    : !emergencyCheck
+                      ? 'Emergency check failed - officer/assignment fields found'
+                      : !notAssignedThisSession
+                        ? 'Already assigned in current session'
+                        : ['completed', 'implemented'].includes(status)
+                          ? 'Request is completed or implemented'
+                          : 'Unknown reason'
+              : 'All checks passed - showing button'
+          })
+
+          if (canCancelTask) {
             actions.push({
               key: 'cancel_task',
               label: 'Cancel Task',
@@ -602,15 +858,14 @@
             })
           }
 
-          // View Progress for requests that are in progress or implemented
+          // Dynamic View Progress button - only show if:
+          // 1. Task has been assigned to ICT officer
+          // 2. There's actual progress to view
           if (
-            [
-              'implementation_in_progress',
-              'implemented',
-              'completed',
-              'assigned_to_ict',
-              'head_of_it_approved'
-            ].includes(status)
+            taskAssigned &&
+            ['assigned_to_ict', 'implementation_in_progress', 'implemented', 'completed'].includes(
+              status
+            )
           ) {
             actions.push({
               key: 'view_progress',
@@ -619,7 +874,7 @@
             })
           }
 
-          // Always show view timeline
+          // Always show view timeline (universal action)
           actions.push({
             key: 'view_timeline',
             label: 'View Timeline',
@@ -697,13 +952,22 @@
 
       // Head of IT specific action methods
       assignTask(request) {
-        console.log('Head of IT: Assigning task for request:', request.id)
+        console.log('🚀 Head of IT: Assigning task for request:', request.id)
+
+        // Add to session tracking to prevent showing button again
+        this.assignedRequestsThisSession.add(request.id)
+        console.log('📝 Added request', request.id, 'to assigned requests session tracking')
+
+        // Persist to sessionStorage immediately
+        this.persistSessionTracking()
+
         // Navigate to ICT Officer selection page
         this.$router.push(`/head_of_it-dashboard/select-ict-officer/${request.id}`)
       },
 
-      cancelTask(request) {
+      async cancelTask(request) {
         console.log('Head of IT: Cancelling task for request:', request.id)
+
         // Show confirmation dialog for task cancellation
         const confirmed = confirm(
           `Are you sure you want to cancel the task for Request ${request.request_id || 'REQ-' + request.id.toString().padStart(6, '0')}? This will stop the implementation process.`
@@ -712,12 +976,34 @@
         if (confirmed) {
           const reason = prompt('Please provide a reason for cancelling the task:')
           if (reason && reason.trim() !== '') {
-            // Call API to cancel task (implementation would depend on your backend)
-            alert(
-              `Task cancelled for Request ${request.request_id || 'REQ-' + request.id.toString().padStart(6, '0')}. Reason: ${reason}`
-            )
-            // Refresh the requests list
-            this.fetchRequests()
+            try {
+              console.log('🔄 Canceling task assignment via API...')
+
+              // Call the actual headOfItService API to cancel task
+              const result = await headOfItService.cancelTaskAssignment(request.id, {
+                reason: reason.trim(),
+                cancelled_by: 'head_of_it',
+                cancelled_at: new Date().toISOString()
+              })
+
+              if (result.success) {
+                // Show success message
+                alert(
+                  `✅ Task cancelled successfully for Request ${request.request_id || 'REQ-' + request.id.toString().padStart(6, '0')}.\nReason: ${reason}`
+                )
+
+                // Refresh the requests list to show updated status
+                await this.fetchRequests()
+                console.log('✅ Task cancellation completed and list refreshed')
+              } else {
+                // Show error message from API
+                alert(`❌ Failed to cancel task: ${result.message}`)
+                console.error('❌ Task cancellation failed:', result.message)
+              }
+            } catch (error) {
+              console.error('❌ Error during task cancellation:', error)
+              alert(`❌ Error cancelling task: ${error.message || 'Network error occurred'}`)
+            }
           } else {
             alert('Cancellation reason is required')
           }

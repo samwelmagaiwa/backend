@@ -482,7 +482,7 @@
         requireRole([ROLES.ICT_OFFICER])
         await this.fetchAccessRequests()
         console.log('IctAccessRequests: Component initialized successfully')
-        
+
         // Refresh notification badges when component loads
         this.refreshNotificationBadge()
 
@@ -494,13 +494,19 @@
         this.isLoading = false
       }
     },
-    
+
     async activated() {
       // This is called when the component is activated (navigated to)
       // Useful for refreshing data and notifications
       console.log('IctAccessRequests: Component activated, refreshing data...')
       await this.fetchAccessRequests()
       this.refreshNotificationBadge()
+
+      // Ensure override is set on activation
+      setTimeout(() => {
+        const pendingCount = this.accessRequests.filter((r) => this.isUnassigned(r.status)).length
+        this.setPendingCountOverride(pendingCount)
+      }, 100)
     },
 
     beforeUnmount() {
@@ -522,14 +528,69 @@
             this.accessRequests = result.data || []
 
             // Calculate stats
+            const pendingForICT = this.accessRequests.filter((r) =>
+              this.isUnassigned(r.status)
+            ).length
             this.stats = {
-              unassigned: this.accessRequests.filter((r) => this.isUnassigned(r.status)).length,
+              unassigned: pendingForICT,
               assigned: this.accessRequests.filter((r) => r.status === 'assigned_to_ict').length,
               inProgress: this.accessRequests.filter(
                 (r) => r.status === 'implementation_in_progress'
               ).length,
               total: this.accessRequests.length
             }
+
+            // REAL-TIME BADGE FIX: Set global pending count override for sidebar
+            this.setPendingCountOverride(pendingForICT)
+
+            // DEBUG: Log all request statuses to compare with notification API
+            const statusCounts = {}
+            this.accessRequests.forEach((request) => {
+              const status = request.status || 'no_status'
+              statusCounts[status] = (statusCounts[status] || 0) + 1
+            })
+
+            const statusBreakdown = {
+              statusCounts,
+              totalRequests: this.accessRequests.length,
+              pendingForICT: this.accessRequests.filter((r) => this.isUnassigned(r.status)).length,
+              completedImplemented: this.accessRequests.filter((r) =>
+                ['completed', 'implemented'].includes(r.status)
+              ).length,
+              allStatuses: this.accessRequests.map((r) => ({
+                id: r.id,
+                status: r.status,
+                request_id: r.request_id
+              })),
+              message:
+                'Compare this with sidebar notification count - if badge shows count > 0 but pendingForICT = 0, backend issue exists'
+            }
+            console.log('📊 ACCESS REQUESTS STATUS BREAKDOWN:', statusBreakdown)
+
+            // ENHANCED DEBUG: Clearly identify if we should expect 0 badge count
+            if (statusBreakdown.pendingForICT === 0 && statusBreakdown.totalRequests > 0) {
+              console.log(
+                '🟢 SUCCESS: No pending requests detected, badge should show 0! Override set to:',
+                pendingForICT
+              )
+            } else if (statusBreakdown.pendingForICT > 0) {
+              console.log(
+                '🔴 PENDING DETECTED:',
+                statusBreakdown.pendingForICT,
+                'requests still need attention. Override set to:',
+                pendingForICT
+              )
+            } else {
+              console.log(
+                '⚪ NO REQUESTS: Empty state, badge should show 0. Override set to:',
+                pendingForICT
+              )
+            }
+
+            // DIAGNOSTIC: Auto-run notification comparison after data loads
+            setTimeout(() => {
+              this.diagnoseNotificationDiscrepancy()
+            }, 1000)
           } else {
             console.error('❌ IctAccessRequests: Failed to load requests:', result.message)
             this.error = result.message
@@ -673,6 +734,7 @@
           assigned_to_ict: 'bg-blue-500 text-blue-900',
           implementation_in_progress: 'bg-purple-500 text-purple-900',
           completed: 'bg-emerald-500 text-emerald-900',
+          implemented: 'bg-green-500 text-green-900', // Add styling for 'implemented' status
           cancelled: 'bg-red-500 text-red-900'
         }
         return statusClasses[status] || 'bg-gray-500 text-gray-900'
@@ -684,6 +746,7 @@
           assigned_to_ict: 'Assigned to ICT Officer',
           implementation_in_progress: 'Implementation in Progress',
           completed: 'Implementation Completed',
+          implemented: 'Access Granted', // Add mapping for 'implemented' status
           cancelled: 'Task Cancelled'
         }
         return (
@@ -736,10 +799,24 @@
         console.log('🔄 IctAccessRequests: Progress updated, refreshing data...')
         // Refresh the requests list
         await this.fetchAccessRequests()
-        // Refresh the notification badge
+        // Force immediate notification badge refresh
         this.refreshNotificationBadge()
         // Close both timeline and update progress
         this.closeTimeline()
+
+        // Additional delayed refresh to ensure backend sync
+        setTimeout(() => {
+          console.log('⏰ IctAccessRequests: Delayed refresh after progress update')
+          this.refreshNotificationBadge()
+        }, 3000)
+
+        // Extra refresh specifically for implemented/completed status changes
+        setTimeout(() => {
+          console.log(
+            '🔄 IctAccessRequests: Final refresh to ensure implemented/completed requests are excluded from badge count'
+          )
+          this.refreshNotificationBadge()
+        }, 5000)
       },
 
       canShowUpdateProgress(request) {
@@ -756,10 +833,10 @@
           !request.ict_officer_implemented_at &&
           request.ict_officer_status !== 'implemented' &&
           request.ict_officer_status !== 'rejected' &&
+          !['implemented', 'completed'].includes(request.status) && // Don't allow updates for completed requests
           (request.status === 'assigned_to_ict' || request.status === 'implementation_in_progress')
         )
       },
-
 
       // Dropdown functionality
       toggleDropdown(requestId, event) {
@@ -870,26 +947,143 @@
           return 'Invalid Time'
         }
       },
-      
+
       // Refresh notification badge in sidebar
       refreshNotificationBadge() {
         try {
           console.log('🔔 AccessRequests: Triggering notification badge refresh')
-          
-          // Method 1: Trigger global refresh event
+
+          // Method -1: Update our override count first
+          const currentPendingCount = this.accessRequests.filter((r) =>
+            this.isUnassigned(r.status)
+          ).length
+          this.setPendingCountOverride(currentPendingCount)
+
+          // Method 0: Clear notification service cache first
+          this.clearNotificationCache()
+
+          // Method 1: Trigger force refresh event for immediate update
           if (window.dispatchEvent) {
-            const event = new CustomEvent('refresh-notifications', {
-              detail: { source: 'AccessRequests', reason: 'request_updated' }
+            const event = new CustomEvent('force-refresh-notifications', {
+              detail: {
+                source: 'AccessRequests',
+                reason: 'request_updated',
+                timestamp: Date.now()
+              }
             })
             window.dispatchEvent(event)
+            console.log('🚀 AccessRequests: Dispatched force-refresh-notifications event')
           }
-          
-          // Method 2: Direct call to sidebar instance
+
+          // Method 2: Direct call to sidebar instance with force flag
           if (window.sidebarInstance && window.sidebarInstance.fetchNotificationCounts) {
+            console.log('📞 AccessRequests: Calling sidebar fetchNotificationCounts directly')
             window.sidebarInstance.fetchNotificationCounts(true) // force refresh
           }
         } catch (error) {
           console.warn('Failed to refresh notification badge:', error)
+        }
+      },
+
+      // Clear notification cache to ensure fresh data
+      clearNotificationCache() {
+        try {
+          // Import and clear notification service cache dynamically
+          import('@/services/notificationService').then((module) => {
+            module.default.clearCache()
+            console.log('🗑️ AccessRequests: Cleared notification service cache')
+          })
+        } catch (error) {
+          console.warn('Failed to clear notification cache:', error)
+        }
+      },
+
+      // Set global pending count override for accurate sidebar badge
+      setPendingCountOverride(count) {
+        try {
+          console.log('🎠 AccessRequests: Setting pending count override:', count)
+
+          // Method 1: Global window variable for sidebar to read
+          if (typeof window !== 'undefined') {
+            window.accessRequestsPendingCount = count
+          }
+
+          // Method 2: Custom event for real-time updates
+          if (window.dispatchEvent) {
+            const event = new CustomEvent('ict-access-requests-pending-count', {
+              detail: {
+                count,
+                source: 'AccessRequests',
+                timestamp: Date.now()
+              }
+            })
+            window.dispatchEvent(event)
+          }
+
+          // Method 3: Direct global sidebar method call
+          if (window.sidebarInstance && window.sidebarInstance.setNotificationCount) {
+            window.sidebarInstance.setNotificationCount('/ict-dashboard/access-requests', count)
+          }
+
+          console.log('📻 AccessRequests: Emitted pending count override event')
+        } catch (error) {
+          console.warn('Failed to set pending count override:', error)
+        }
+      },
+
+      // DIAGNOSTIC: Compare notification APIs to find discrepancy
+      async diagnoseNotificationDiscrepancy() {
+        try {
+          console.log('🔍 DIAGNOSTIC: Comparing notification APIs...')
+
+          // Get universal notification count
+          const notificationService = (await import('@/services/notificationService')).default
+          const universalResult = await notificationService.getPendingRequestsCount(true)
+
+          // Get ICT Officer specific count
+          const ictResult = await ictOfficerService.getPendingRequestsCount()
+
+          // Get current page data
+          const pageStatuses = this.accessRequests.map((r) => ({
+            id: r.id,
+            status: r.status,
+            request_id: r.request_id || `REQ-${r.id.toString().padStart(6, '0')}`
+          }))
+
+          console.log('🔴 NOTIFICATION API COMPARISON:', {
+            universal_api: {
+              endpoint: '/notifications/pending-count',
+              count: universalResult.total_pending,
+              full_response: universalResult
+            },
+            ict_specific_api: {
+              endpoint: '/ict-officer/pending-count',
+              count: ictResult.total_pending || ictResult,
+              full_response: ictResult
+            },
+            page_data: {
+              total_requests: this.accessRequests.length,
+              pending_requests: this.accessRequests.filter((r) => this.isUnassigned(r.status))
+                .length,
+              completed_requests: this.accessRequests.filter((r) =>
+                ['completed', 'implemented'].includes(r.status)
+              ).length,
+              all_statuses: pageStatuses
+            },
+            analysis: {
+              universal_vs_ict:
+                universalResult.total_pending === (ictResult.total_pending || ictResult)
+                  ? 'MATCH'
+                  : 'MISMATCH',
+              badge_vs_page:
+                universalResult.total_pending ===
+                this.accessRequests.filter((r) => this.isUnassigned(r.status)).length
+                  ? 'CONSISTENT'
+                  : 'INCONSISTENT'
+            }
+          })
+        } catch (error) {
+          console.error('🚫 DIAGNOSTIC ERROR:', error)
         }
       }
     }

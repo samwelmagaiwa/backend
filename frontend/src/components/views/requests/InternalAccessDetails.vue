@@ -6,7 +6,7 @@
       <main
         class="flex-1 p-4 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative"
       >
-        <div class="max-w-7xl mx-auto">
+        <div class="max-w-full mx-auto px-4">
           <!-- Header Section -->
           <div class="medical-glass-card rounded-t-3xl p-2 mb-0 border-b border-blue-300/30">
             <div class="text-center">

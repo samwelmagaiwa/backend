@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Swagger URLs</title>
+</head>
+<body>
+    <h1>Debug Swagger Documentation URLs</h1>
+    
+    <h2>Test URLs:</h2>
+    <ul>
+        <li><a href="/api/api-docs" target="_blank">Comprehensive JSON (/api/api-docs)</a></li>
+        <li><a href="/api-docs-modern" target="_blank">Modern Swagger UI (/api-docs-modern)</a></li>
+        <li><a href="/api/postman-collection" target="_blank">Postman Collection</a></li>
+    </ul>
+    
+    <h2>Test Comprehensive Endpoint Loading</h2>
+    <div id="endpoint-count"></div>
+    <div id="sample-endpoints"></div>
+    
+    <script>
+        // Test loading the comprehensive JSON
+        fetch('/api/api-docs')
+            .then(response => response.json())
+            .then(data => {
+                const paths = Object.keys(data.paths);
+                document.getElementById('endpoint-count').innerHTML = 
+                    `<strong>Total Paths Found: ${paths.length}</strong>`;
+                
+                const samplePaths = paths.slice(0, 20);
+                document.getElementById('sample-endpoints').innerHTML = 
+                    '<h3>Sample Paths:</h3><ul>' + 
+                    samplePaths.map(path => `<li>${path}</li>`).join('') + 
+                    '</ul>';
+                    
+                console.log('All paths:', paths);
+                console.log('Looking for onboarding paths:', paths.filter(p => p.includes('onboarding')));
+                console.log('Looking for declaration paths:', paths.filter(p => p.includes('declaration')));
+                console.log('Looking for user-roles paths:', paths.filter(p => p.includes('user-roles')));
+            })
+            .catch(error => {
+                console.error('Error loading API docs:', error);
+                document.getElementById('endpoint-count').innerHTML = 
+                    '<strong style="color: red;">Error loading API docs: ' + error.message + '</strong>';
+            });
+    </script>
+</body>
+</html>

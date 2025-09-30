@@ -264,7 +264,7 @@
   export default {
     name: 'MobileHamburgerMenu',
     setup() {
-      const { currentUser, userRole } = useAuth()
+      const { user: currentUser, userRole } = useAuth()
       const isMenuOpen = ref(false)
 
       const showUserDashboard = computed(() => {

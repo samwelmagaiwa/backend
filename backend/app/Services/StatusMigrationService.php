@@ -305,10 +305,11 @@ class StatusMigrationService
 
     /**
      * Get workflow completion percentage
+     * Total workflow steps: Staff/User->HOD->Divisional->DICT->Head IT->ICT Officer (6 steps total, 5 approval steps)
      */
     public function getWorkflowProgress(array $statusColumns): int
     {
-        $totalSteps = 5;
+        $totalSteps = 5; // 5 approval steps (HOD, Divisional, DICT, Head IT, ICT Officer)
         $completedSteps = 0;
 
         if (($statusColumns['hod_status'] ?? 'pending') === 'approved') $completedSteps++;

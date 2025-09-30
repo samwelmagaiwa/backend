@@ -5,9 +5,9 @@ return [
     'documentations' => [
         'default' => [
             'api' => [
-                'title' => 'User Access Management API',
+                'title' => 'MNH API Documentation',
                 'version' => '1.0.0',
-                'description' => 'Laravel API for User Access Management, Module Requests, Device Booking and Workflow Approvals',
+                'description' => 'Modern API documentation for authentication, user management, departments, roles, onboarding, declarations, booking services, and combined service forms.',
             ],
 
             'routes' => [
@@ -26,6 +26,11 @@ return [
                 * Edit to set path where swagger ui assets should be stored
                 */
                 'swagger_ui_assets_path' => env('L5_SWAGGER_UI_ASSETS_PATH', 'vendor/swagger-api/swagger-ui/dist/'),
+                
+                /*
+                 * Custom assets path for modern design
+                 */
+                'custom_assets_path' => env('L5_SWAGGER_CUSTOM_ASSETS_PATH', 'swagger-assets/'),
 
                 /*
                  * File name of the generated json documentation file
@@ -283,7 +288,7 @@ return [
                  * 'full' (expands the tags and operations),
                  * 'none' (expands nothing).
                  */
-                'doc_expansion' => env('L5_SWAGGER_UI_DOC_EXPANSION', 'none'),
+                'doc_expansion' => env('L5_SWAGGER_UI_DOC_EXPANSION', 'list'),
 
                 /**
                  * If set, enables filtering. The top bar will show an edit box that
@@ -294,6 +299,11 @@ return [
                  * the tag.
                  */
                 'filter' => env('L5_SWAGGER_UI_FILTERS', true), // true | false
+                
+                /*
+                 * Enable modern theme by default
+                 */
+                'modern_theme' => env('L5_SWAGGER_MODERN_THEME', true),
             ],
 
             'authorization' => [

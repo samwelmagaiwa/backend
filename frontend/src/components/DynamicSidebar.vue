@@ -601,7 +601,7 @@
     emits: ['update:collapsed'],
     setup(props, { emit }) {
       const router = useRouter()
-      const { currentUser, userRole, logout, isAuthenticated, isLoading } = useAuth()
+      const { user: currentUser, userRole, logout, isAuthenticated, isLoading } = useAuth()
 
       // Stable role tracking to prevent flickering
       const stableUserRole = ref(null)

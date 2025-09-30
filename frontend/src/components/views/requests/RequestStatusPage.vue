@@ -25,11 +25,11 @@
           <div class="medical-glass-card rounded-t-3xl p-6 mb-0 border-b border-blue-300/30">
             <div class="flex justify-between items-center">
               <div class="text-center flex-1">
-                <h1 class="text-2xl font-bold text-white mb-2 tracking-wide drop-shadow-lg">
+                <h1 class="text-5xl font-bold text-white mb-3 tracking-wide drop-shadow-lg">
                   <i class="fas fa-clipboard-check mr-3 text-blue-300"></i>
                   REQUEST STATUS & TRACKING
                 </h1>
-                <p class="text-blue-100/80 text-sm">
+                <p class="text-blue-100/80 text-3xl">
                   Track your submitted requests and view approval status
                 </p>
               </div>
@@ -199,22 +199,22 @@
                       <i class="fas fa-list-alt text-white text-xl"></i>
                     </div>
                     <div>
-                      <h3 class="text-xl font-bold text-white">My Requests</h3>
-                      <p class="text-blue-100/80 text-sm">View all your submitted requests</p>
+                      <h3 class="text-3xl font-bold text-white">My Requests</h3>
+                      <p class="text-blue-100/80 text-xl">View all your submitted requests</p>
                     </div>
                   </div>
                   <div class="flex items-center space-x-3">
                     <button
                       @click="refreshRequests"
                       :disabled="loading"
-                      class="px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-lg text-blue-300 text-sm font-medium transition-colors"
+                      class="px-6 py-3 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-lg text-blue-300 text-lg font-medium transition-colors"
                     >
                       <OrbitingDots v-if="loading" size="xs" class="mr-2" />
                       <i v-else class="fas fa-sync-alt mr-2"></i>
                       Refresh
                     </button>
-                    <div class="bg-blue-500/20 px-3 py-1 rounded-full border border-blue-400/30">
-                      <span class="text-blue-300 text-sm font-medium">
+                    <div class="bg-blue-500/20 px-4 py-2 rounded-full border border-blue-400/30">
+                      <span class="text-blue-300 text-lg font-medium">
                         Total: {{ totalRequests }}
                       </span>
                     </div>
@@ -256,31 +256,39 @@
                     <table class="w-full">
                       <thead>
                         <tr class="border-b border-blue-400/30">
-                          <th class="text-left py-3 px-4 text-blue-200 font-semibold text-sm">
+                          <th class="text-left py-4 px-4 text-blue-200 font-semibold text-lg">
                             Request ID
                           </th>
-                          <th class="text-left py-3 px-4 text-blue-200 font-semibold text-sm">
+                          <th class="text-left py-4 px-4 text-blue-200 font-semibold text-lg">
                             Type
                           </th>
-                          <th class="text-left py-3 px-4 text-blue-200 font-semibold text-sm">
+                          <th class="text-left py-4 px-4 text-blue-200 font-semibold text-lg">
                             Services
                           </th>
-                          <th class="text-left py-3 px-4 text-blue-200 font-semibold text-sm">
-                            Status
+                          <th class="text-left py-4 px-4 font-semibold text-lg">
+                            <div class="flex items-center space-x-2">
+                              <span 
+                                :class="hasImplementedOrApproved ? 'text-green-400' : 'text-blue-200'"
+                              >
+                                Status
+                              </span>
+                              <i v-if="hasImplementedOrApproved" 
+                                 class="fas fa-check-circle text-green-400 text-sm"></i>
+                            </div>
                           </th>
-                          <th class="text-left py-3 px-4 text-blue-200 font-semibold text-sm">
+                          <th class="text-left py-4 px-4 text-blue-200 font-semibold text-lg">
                             Current Step
                           </th>
-                          <th class="text-left py-3 px-4 text-blue-200 font-semibold text-sm">
+                          <th class="text-left py-4 px-4 text-blue-200 font-semibold text-lg">
                             Submitted
                           </th>
-                          <th class="text-left py-3 px-4 text-blue-200 font-semibold text-sm">
+                          <th class="text-left py-4 px-4 text-blue-200 font-semibold text-lg">
                             Device Status
                           </th>
-                          <th class="text-left py-3 px-4 text-blue-200 font-semibold text-sm">
+                          <th class="text-left py-4 px-4 text-blue-200 font-semibold text-lg">
                             Return Status
                           </th>
-                          <th class="text-left py-3 px-4 text-blue-200 font-semibold text-sm">
+                          <th class="text-left py-4 px-4 text-blue-200 font-semibold text-lg">
                             Actions
                           </th>
                         </tr>
@@ -291,73 +299,75 @@
                           :key="request.id"
                           class="border-b border-blue-400/20 hover:bg-blue-500/10 transition-colors"
                         >
-                          <td class="py-4 px-4">
-                            <div class="font-medium text-white">
+                          <td class="py-5 px-4">
+                            <div class="font-medium text-white text-lg">
                               {{ formatRequestId(request.id) }}
                             </div>
-                            <div class="text-blue-300 text-xs mt-1">
+                            <div class="text-blue-300 text-base mt-1">
                               {{ getRequestTypeLabel(request) }}
                             </div>
                           </td>
-                          <td class="py-4 px-4">
+                          <td class="py-5 px-4">
                             <div class="flex items-center space-x-2">
                               <i
                                 :class="getRequestTypeIcon(request.type)"
-                                class="text-blue-400"
+                                class="text-blue-400 text-lg"
                               ></i>
-                              <span class="text-white text-sm">{{
+                              <span class="text-white text-lg">{{
                                 getRequestTypeName(request.type)
                               }}</span>
                             </div>
                           </td>
-                          <td class="py-4 px-4">
+                          <td class="py-5 px-4">
                             <div class="flex flex-wrap gap-1">
                               <span
                                 v-for="service in request.services"
                                 :key="service"
-                                class="px-2 py-1 bg-blue-500/20 text-blue-300 text-xs rounded-full border border-blue-400/30"
+                                class="px-3 py-1 bg-blue-500/20 text-blue-300 text-base rounded-full border border-blue-400/30"
                               >
                                 {{ service }}
                               </span>
                             </div>
                           </td>
-                          <td class="py-4 px-4">
+                          <td class="py-5 px-4">
                             <div class="flex items-center space-x-2">
                               <div
-                                class="w-2 h-2 rounded-full"
+                                class="w-3 h-3 rounded-full"
                                 :class="getStatusColor(request.status)"
                               ></div>
                               <span
-                                class="text-sm font-medium"
+                                class="text-lg font-medium flex items-center space-x-2"
                                 :class="getStatusTextColor(request.status)"
                               >
-                                {{ getStatusText(request.status) }}
+                                <span>{{ getStatusText(request.status) }}</span>
+                                <i v-if="request.status === 'implemented' || request.status === 'approved'" 
+                                   class="fas fa-check-circle text-green-400 text-sm"></i>
                               </span>
                             </div>
                           </td>
-                          <td class="py-4 px-4">
-                            <div class="text-white text-sm">
+                          <td class="py-5 px-4">
+                            <div class="text-white text-lg">
                               {{ getCurrentStepText(request.current_step, request.type) }}
                             </div>
-                            <div class="text-blue-300 text-xs">
+                            <div class="text-blue-300 text-base">
                               <span v-if="request.current_step === 0"
                                 >Waiting from another user</span
                               >
                               <span v-else-if="request.type === 'booking_service'"
                                 >Step {{ request.current_step }} of 3</span
                               >
-                              <span v-else>Step {{ request.current_step }} of 7</span>
+                              <span v-else>Step {{ request.current_step }} of 6</span>
                             </div>
                           </td>
-                          <td class="py-4 px-4">
-                            <div class="text-white text-sm">
+                          <td class="py-5 px-4">
+                            <div class="text-white text-lg">
                               {{ formatDate(request.created_at) }}
                             </div>
-                            <div class="text-blue-300 text-xs">
+                            <div class="text-blue-300 text-base">
                               {{ formatTime(request.created_at) }}
                             </div>
                           </td>
-                          <td class="py-4 px-4">
+                          <td class="py-5 px-4">
                             <div
                               v-if="
                                 request.type === 'booking_service' && request.device_availability
@@ -367,23 +377,23 @@
                                 v-if="request.device_availability.is_available"
                                 class="flex items-center space-x-2"
                               >
-                                <div class="w-2 h-2 rounded-full bg-green-500"></div>
-                                <span class="text-green-300 text-xs font-medium">Available</span>
+                                <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                                <span class="text-green-300 text-base font-medium">Available</span>
                               </div>
                               <div
                                 v-else-if="request.device_availability.status === 'out_of_stock'"
                                 class="space-y-1"
                               >
                                 <div class="flex items-center space-x-2">
-                                  <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
-                                  <span class="text-yellow-300 text-xs font-medium">In Use</span>
+                                  <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                                  <span class="text-yellow-300 text-base font-medium">In Use</span>
                                 </div>
                                 <div
                                   v-if="
                                     request.device_availability.current_users &&
                                     request.device_availability.current_users.length > 0
                                   "
-                                  class="text-xs text-blue-200"
+                                  class="text-base text-blue-200"
                                 >
                                   By:
                                   {{
@@ -394,67 +404,67 @@
                                 </div>
                                 <div
                                   v-if="request.device_availability.nearest_return"
-                                  class="text-xs text-orange-300"
+                                  class="text-base text-orange-300"
                                 >
                                   Available:
                                   {{ request.device_availability.nearest_return.relative_time }}
                                 </div>
                                 <div
                                   v-if="request.device_availability.nearest_return"
-                                  class="text-sm text-blue-300"
+                                  class="text-lg text-blue-300"
                                 >
                                   {{ request.device_availability.nearest_return.date_time }}
                                 </div>
                               </div>
                               <div v-else class="flex items-center space-x-2">
-                                <div class="w-2 h-2 rounded-full bg-red-500"></div>
-                                <span class="text-red-300 text-xs font-medium">Unavailable</span>
+                                <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                                <span class="text-red-300 text-base font-medium">Unavailable</span>
                               </div>
                             </div>
-                            <div v-else class="text-gray-400 text-xs">N/A</div>
+                            <div v-else class="text-gray-400 text-base">N/A</div>
                           </td>
-                          <td class="py-4 px-4">
+                          <td class="py-5 px-4">
                             <div v-if="request.type === 'booking_service'">
                               <div class="flex items-center space-x-2">
                                 <div
-                                  class="w-2 h-2 rounded-full"
+                                  class="w-3 h-3 rounded-full"
                                   :class="getReturnStatusColor(request.return_status)"
                                 ></div>
                                 <span
-                                  class="text-xs font-medium"
+                                  class="text-base font-medium"
                                   :class="getReturnStatusTextColor(request.return_status)"
                                 >
                                   {{ getReturnStatusText(request.return_status) }}
                                 </span>
                               </div>
                             </div>
-                            <div v-else class="text-gray-400 text-xs">N/A</div>
+                            <div v-else class="text-gray-400 text-base">N/A</div>
                           </td>
-                          <td class="py-4 px-4">
-                            <div class="flex space-x-2">
+                          <td class="py-5 px-4">
+                            <div class="flex space-x-3">
                               <button
                                 @click="viewRequestDetails(request)"
-                                class="px-3 py-1 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-lg text-blue-300 text-sm font-medium transition-colors flex items-center"
+                                class="px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-lg text-blue-300 text-lg font-medium transition-colors flex items-center"
                               >
-                                <i class="fas fa-eye mr-1"></i>
+                                <i class="fas fa-eye mr-2"></i>
                                 View
                               </button>
 
                               <button
                                 v-if="canEditRequest(request)"
                                 @click="editRequest(request)"
-                                class="px-3 py-1 bg-green-500/20 hover:bg-green-500/30 border border-green-400/30 rounded-lg text-green-300 text-sm font-medium transition-colors flex items-center"
+                                class="px-4 py-2 bg-green-500/20 hover:bg-green-500/30 border border-green-400/30 rounded-lg text-green-300 text-lg font-medium transition-colors flex items-center"
                               >
-                                <i class="fas fa-edit mr-1"></i>
+                                <i class="fas fa-edit mr-2"></i>
                                 Edit
                               </button>
 
                               <button
                                 v-if="canCancelRequest(request)"
                                 @click="cancelRequest(request)"
-                                class="px-3 py-1 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 rounded-lg text-red-300 text-sm font-medium transition-colors flex items-center"
+                                class="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 rounded-lg text-red-300 text-lg font-medium transition-colors flex items-center"
                               >
-                                <i class="fas fa-times mr-1"></i>
+                                <i class="fas fa-times mr-2"></i>
                                 Cancel
                               </button>
                             </div>
@@ -480,10 +490,12 @@
                             :class="getStatusColor(request.status)"
                           ></div>
                           <span
-                            class="text-sm font-medium"
+                            class="text-sm font-medium flex items-center space-x-1"
                             :class="getStatusTextColor(request.status)"
                           >
-                            {{ getStatusText(request.status) }}
+                            <span>{{ getStatusText(request.status) }}</span>
+                            <i v-if="request.status === 'implemented' || request.status === 'approved'" 
+                               class="fas fa-check-circle text-green-400 text-xs"></i>
                           </span>
                         </div>
                       </div>
@@ -515,7 +527,7 @@
                             <span v-else-if="request.type === 'booking_service'"
                               >(Step {{ request.current_step }} of 3)</span
                             >
-                            <span v-else>(Step {{ request.current_step }} of 7)</span>
+                            <span v-else>(Step {{ request.current_step }} of 6)</span>
                           </span>
                         </div>
 
@@ -641,7 +653,7 @@
 </template>
 
 <script>
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, computed } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppHeader from '@/components/AppHeader.vue'
@@ -688,15 +700,14 @@
       const perPage = ref(15)
       const lastPage = ref(1)
 
-      // Standard approval steps (for access requests)
+      // Standard approval steps (for access requests) - Updated to 6 steps
       const approvalSteps = [
         { id: 1, label: 'User Info', description: 'Submit your access request' },
         { id: 2, label: 'HOD Review', description: 'Head of Department review' },
         { id: 3, label: 'Divisional Director', description: 'Divisional Director approval' },
         { id: 4, label: 'DICT Review', description: 'DICT verification process' },
-        { id: 5, label: 'HOD (IT)', description: 'IT Head assessment' },
-        { id: 6, label: 'ICT Officer', description: 'ICT Officer processing' },
-        { id: 7, label: 'Approved', description: 'Final approval granted' }
+        { id: 5, label: 'Head IT', description: 'Head IT assessment' },
+        { id: 6, label: 'ICT Officer', description: 'ICT Officer processing and final approval' }
       ]
 
       // Booking service specific steps (only 3 steps)
@@ -1139,7 +1150,7 @@
       }
 
       const getStepStatusClass = (stepId, currentStep, status) => {
-        if (stepId < currentStep || (status === 'approved' && stepId <= 7)) {
+        if (stepId < currentStep || (status === 'approved' && stepId <= 6)) {
           return 'bg-green-500'
         } else if (stepId === currentStep && status === 'pending') {
           return 'bg-blue-500'
@@ -1151,7 +1162,7 @@
       }
 
       const getStepTextClass = (stepId, currentStep, status) => {
-        if (stepId < currentStep || (status === 'approved' && stepId <= 7)) {
+        if (stepId < currentStep || (status === 'approved' && stepId <= 6)) {
           return 'text-green-700'
         } else if (stepId === currentStep) {
           return status === 'rejected' ? 'text-red-700' : 'text-blue-700'
@@ -1218,6 +1229,13 @@
         return baseType
       }
 
+      // Check if there are any implemented or approved requests
+      const hasImplementedOrApproved = computed(() => {
+        return requests.value.some(request => 
+          request.status === 'implemented' || request.status === 'approved'
+        )
+      })
+
       return {
         loading,
         requests,
@@ -1264,7 +1282,8 @@
         getReturnStatusColor,
         getReturnStatusTextColor,
         formatRequestId,
-        getRequestTypeLabel
+        getRequestTypeLabel,
+        hasImplementedOrApproved
       }
     }
   }

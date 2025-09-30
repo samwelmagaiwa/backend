@@ -743,7 +743,7 @@
     setup() {
       const router = useRouter()
       const route = useRoute()
-      const { currentUser, userRole, logout, isAuthenticated, isLoading } = useAuth()
+      const { user: currentUser, userRole, logout, isAuthenticated, isLoading } = useAuth()
       const {
         isCollapsed,
         expandedSections,
@@ -1252,8 +1252,73 @@
             full_result: result,
             timestamp: new Date().toISOString()
           })
-          
-          if (result.total_pending > 0) {
+
+          // ICT Officer specific: cross-check with role-specific API and in-page override
+          let finalPendingCount = result.total_pending || 0
+          let ictSpecificCount = null
+          let pageOverrideCount = null
+
+          if (role === 'ict_officer') {
+            try {
+              const ictOfficerService = (await import('@/services/ictOfficerService')).default
+              const ictResp = await ictOfficerService.getPendingRequestsCount()
+              ictSpecificCount =
+                typeof ictResp === 'object' ? (ictResp.total_pending ?? null) : ictResp
+            } catch (e) {
+              console.warn('⚠️ Failed to fetch ICT-specific pending count:', e?.message || e)
+            }
+
+            try {
+              // AccessRequests page can set this for real-time accuracy
+              if (
+                typeof window !== 'undefined' &&
+                typeof window.accessRequestsPendingCount === 'number'
+              ) {
+                pageOverrideCount = window.accessRequestsPendingCount
+              }
+            } catch (e) {
+              console.warn('⚠️ Failed to read page override count:', e?.message || e)
+            }
+
+            // Decide final count with precedence: pageOverride -> ictSpecific -> universal
+            finalPendingCount =
+              (typeof pageOverrideCount === 'number' ? pageOverrideCount : null) ??
+              (typeof ictSpecificCount === 'number' ? ictSpecificCount : null) ??
+              finalPendingCount
+
+            console.log('🧮 ICT Badge Count Reconciliation:', {
+              universal: result.total_pending,
+              ictSpecific: ictSpecificCount,
+              pageOverride: pageOverrideCount,
+              chosen: finalPendingCount
+            })
+          }
+
+          // EXTENDED DEBUG: Log breakdown if available to see what's being counted
+          if (result.breakdown || result.details) {
+            console.log('📊 NOTIFICATION BREAKDOWN DEBUG:', {
+              breakdown: result.breakdown,
+              details: result.details,
+              role,
+              endpoint_called: '/notifications/pending-count'
+            })
+          }
+
+          // ULTRA DEBUG: Only warn if, after reconciliation, we still have >0 pending
+          const warnAfter =
+            role === 'ict_officer' ? finalPendingCount > 0 : result.total_pending > 0
+          if (warnAfter) {
+            console.warn('⚠️ NOTIFICATION ISSUE DETECTED:', {
+              message: 'Badge showing pending count but requests may be completed',
+              pending_count: role === 'ict_officer' ? finalPendingCount : result.total_pending,
+              user_role: role,
+              timestamp: new Date().toISOString(),
+              suggestion:
+                'Check backend /notifications/pending-count API - may be counting completed/implemented requests'
+            })
+          }
+
+          if (finalPendingCount > 0) {
             // Get role-specific configuration to know which routes should show badges
             const config = notificationService.getRoleNotificationConfig(role)
             console.log('⚙️ Role config for', role, ':', config)
@@ -1264,14 +1329,26 @@
 
             // Set badge count for relevant menu items
             config.menuItems.forEach((menuPath) => {
-              notificationCounts.value[menuPath] = result.total_pending
-              console.log(`🎯 Setting badge count ${result.total_pending} for route: ${menuPath} (was: ${oldCounts[menuPath] || 0})`)
+              // If we have a page override for this specific route, prefer it
+              let routeCount = finalPendingCount
+              if (
+                role === 'ict_officer' &&
+                menuPath === '/ict-dashboard/access-requests' &&
+                typeof window !== 'undefined' &&
+                typeof window.accessRequestsPendingCount === 'number'
+              ) {
+                routeCount = window.accessRequestsPendingCount
+              }
+              notificationCounts.value[menuPath] = routeCount
+              console.log(
+                `🎯 Setting badge count ${routeCount} for route: ${menuPath} (was: ${oldCounts[menuPath] || 0})`
+              )
             })
 
             console.log('🔔 Notification badges updated:', {
               role,
               oldCounts,
-              newCount: result.total_pending,
+              newCount: finalPendingCount,
               routes: config.menuItems,
               finalCounts: notificationCounts.value,
               countChanged: JSON.stringify(oldCounts) !== JSON.stringify(notificationCounts.value)
@@ -1339,6 +1416,20 @@
               timestamp: new Date().toISOString()
             })
             fetchNotificationCounts(force)
+          },
+          setNotificationCount: (routePath, count) => {
+            try {
+              if (typeof count === 'number' && routePath) {
+                console.log('🌍 🔔 GLOBAL SIDEBAR: Forcing notification count set:', {
+                  routePath,
+                  count,
+                  prev: notificationCounts.value[routePath] || 0
+                })
+                notificationCounts.value[routePath] = count
+              }
+            } catch (e) {
+              console.warn('Failed to set notification count globally:', e?.message || e)
+            }
           }
         }
 
@@ -1351,7 +1442,16 @@
           })
           fetchNotificationCounts(true) // force refresh
         }
-        
+
+        // Listen for ICT AccessRequests page pending-count override
+        const handleIctPendingCount = (event) => {
+          const count = event?.detail?.count
+          if (typeof count === 'number') {
+            console.log('🛰️ ICT AccessRequests pending count override received:', count)
+            notificationCounts.value['/ict-dashboard/access-requests'] = count
+          }
+        }
+
         const handleForceRefreshNotifications = (event) => {
           console.log('🔥 🔔 NOTIFICATION EVENT: Received force-refresh-notifications event:', {
             detail: event?.detail,
@@ -1364,10 +1464,11 @@
           console.log('🗑️ Cleared notification counts. Old counts:', oldCounts)
           fetchNotificationCounts(true)
         }
-        
+
         if (window.addEventListener) {
           window.addEventListener('refresh-notifications', handleRefreshNotifications)
           window.addEventListener('force-refresh-notifications', handleForceRefreshNotifications)
+          window.addEventListener('ict-access-requests-pending-count', handleIctPendingCount)
         }
       })
 
@@ -1399,16 +1500,19 @@
           '/dict-dashboard/combined-requests',
           '/head_of_it-dashboard/combined-requests'
         ]
-        
+
         // If navigating to a dashboard route that shows notifications
-        if (dashboardRoutes.some(routePath => newRoute.path.startsWith(routePath))) {
-          console.log('🗺️ Route changed to dashboard page, refreshing notifications:', newRoute.path)
+        if (dashboardRoutes.some((routePath) => newRoute.path.startsWith(routePath))) {
+          console.log(
+            '🗺️ Route changed to dashboard page, refreshing notifications:',
+            newRoute.path
+          )
           setTimeout(() => {
             fetchNotificationCounts(true) // force refresh after navigation
           }, 1000)
         }
       })
-      
+
       // Theme is automatically initialized by useTheme composable
 
       return {

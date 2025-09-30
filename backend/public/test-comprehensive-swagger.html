@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Comprehensive Swagger Loading</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 2rem; background: #f8fafc; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .test-section { margin: 1.5rem 0; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 6px; }
+        .success { border-color: #10b981; background: #ecfdf5; }
+        .error { border-color: #ef4444; background: #fef2f2; }
+        .info { border-color: #3b82f6; background: #eff6ff; }
+        .loading { color: #6b7280; }
+        code { background: #f1f5f9; padding: 0.25rem 0.5rem; border-radius: 4px; font-family: 'Monaco', monospace; }
+        button { background: #3b82f6; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #2563eb; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Comprehensive Swagger API Test</h1>
+        <p>This test verifies that the comprehensive API docs with all 265+ endpoints are loading correctly.</p>
+        
+        <div class="test-section info">
+            <h3>📋 Test Status</h3>
+            <div id="testStatus">🔄 Initializing tests...</div>
+        </div>
+        
+        <div class="test-section" id="apiTest">
+            <h3>🌐 API Endpoint Test</h3>
+            <p>Testing: <code>/api/api-docs</code></p>
+            <div id="apiResult" class="loading">Loading...</div>
+        </div>
+        
+        <div class="test-section" id="swaggerTest">
+            <h3>📚 Swagger UI Integration Test</h3>
+            <p>Testing: <code>/api-docs-modern</code></p>
+            <div id="swaggerResult" class="loading">Not tested yet</div>
+            <button onclick="testSwaggerUI()">Test Swagger UI</button>
+        </div>
+        
+        <div class="test-section" id="recommendationSection" style="display: none;">
+            <h3>💡 Recommendations</h3>
+            <div id="recommendations"></div>
+        </div>
+        
+        <div class="test-section info">
+            <h3>🔗 Quick Actions</h3>
+            <p>
+                <a href="/api/api-docs" target="_blank" style="color: #3b82f6;">View JSON Docs</a> | 
+                <a href="/api-docs-modern" target="_blank" style="color: #3b82f6;">Open Modern UI</a> | 
+                <a href="/debug-swagger-urls" target="_blank" style="color: #3b82f6;">Debug URLs</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        let testResults = {};
+        
+        async function runTests() {
+            updateStatus('🔄 Running comprehensive API tests...');
+            
+            // Test 1: API Endpoint
+            await testApiEndpoint();
+            
+            // Test 2: Swagger UI (manual)
+            document.getElementById('swaggerResult').innerHTML = 'Click "Test Swagger UI" button to test';
+            
+            // Show results
+            showRecommendations();
+            updateStatus('✅ Tests completed. Check results below.');
+        }
+        
+        async function testApiEndpoint() {
+            const apiResult = document.getElementById('apiResult');
+            const apiTest = document.getElementById('apiTest');
+            
+            try {
+                const response = await fetch('/api/api-docs');
+                const data = await response.json();
+                
+                if (response.ok && data.paths) {
+                    const pathCount = Object.keys(data.paths).length;
+                    testResults.api = { success: true, pathCount };
+                    
+                    apiResult.innerHTML = `
+                        ✅ <strong>Success!</strong><br>
+                        • Status: ${response.status}<br>
+                        • Paths found: <strong>${pathCount}</strong><br>
+                        • Has comprehensive data: ${pathCount >= 50 ? 'Yes' : 'No'}
+                    `;
+                    apiTest.classList.add('success');
+                } else {
+                    throw new Error('Invalid response format');
+                }
+            } catch (error) {
+                testResults.api = { success: false, error: error.message };
+                apiResult.innerHTML = `❌ <strong>Failed:</strong> ${error.message}`;
+                apiTest.classList.add('error');
+            }
+        }
+        
+        async function testSwaggerUI() {
+            const swaggerResult = document.getElementById('swaggerResult');
+            const swaggerTest = document.getElementById('swaggerTest');
+            
+            swaggerResult.innerHTML = '🔄 Opening Swagger UI in new tab...';
+            
+            // Open Swagger UI in new tab
+            const swaggerWindow = window.open('/api-docs-modern', '_blank');
+            
+            // Give user instructions
+            setTimeout(() => {
+                swaggerResult.innerHTML = `
+                    📋 <strong>Manual Check Required:</strong><br>
+                    • Swagger UI should be open in a new tab<br>
+                    • Check browser console for logs<br>
+                    • Look for "Total endpoints loaded" message<br>
+                    • Expected: 50+ endpoints<br>
+                    • Verify onboarding, declaration, user-roles sections are visible<br><br>
+                    <button onclick="markSwaggerSuccess()">✅ Looks Good</button>
+                    <button onclick="markSwaggerFailed()">❌ Still Issues</button>
+                `;
+                swaggerTest.classList.add('info');
+            }, 2000);
+        }
+        
+        function markSwaggerSuccess() {
+            testResults.swagger = { success: true };
+            document.getElementById('swaggerResult').innerHTML = '✅ <strong>Swagger UI working correctly!</strong>';
+            document.getElementById('swaggerTest').classList.remove('info');
+            document.getElementById('swaggerTest').classList.add('success');
+            showRecommendations();
+        }
+        
+        function markSwaggerFailed() {
+            testResults.swagger = { success: false };
+            document.getElementById('swaggerResult').innerHTML = '❌ <strong>Swagger UI still has issues</strong>';
+            document.getElementById('swaggerTest').classList.remove('info');
+            document.getElementById('swaggerTest').classList.add('error');
+            showRecommendations();
+        }
+        
+        function showRecommendations() {
+            const recSection = document.getElementById('recommendationSection');
+            const recDiv = document.getElementById('recommendations');
+            
+            let recommendations = [];
+            
+            if (testResults.api && testResults.api.success) {
+                if (testResults.api.pathCount >= 50) {
+                    recommendations.push('✅ API endpoint is working correctly with comprehensive data');
+                } else {
+                    recommendations.push('⚠️ API endpoint has limited data. Check SwaggerController configuration.');
+                }
+            } else {
+                recommendations.push('❌ Fix API endpoint issues first');
+            }
+            
+            if (testResults.swagger) {
+                if (testResults.swagger.success) {
+                    recommendations.push('✅ Swagger UI is now loading comprehensive documentation');
+                    recommendations.push('🎉 Issue resolved! Clear browser cache if needed.');
+                } else {
+                    recommendations.push('❌ Clear browser cache completely (Ctrl+Shift+Delete)');
+                    recommendations.push('🔧 Check browser console for JavaScript errors');
+                    recommendations.push('🔄 Try opening /api-docs-modern in incognito mode');
+                }
+            }
+            
+            recDiv.innerHTML = recommendations.map(r => `<p>${r}</p>`).join('');
+            recSection.style.display = 'block';
+        }
+        
+        function updateStatus(message) {
+            document.getElementById('testStatus').innerHTML = message;
+        }
+        
+        // Run tests on page load
+        document.addEventListener('DOMContentLoaded', runTests);
+    </script>
+</body>
+</html>

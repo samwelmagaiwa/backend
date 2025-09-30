@@ -803,12 +803,27 @@ router.onError((error) => {
   // Handle component loading errors
   if (error.message && error.message.includes('Loading chunk')) {
     console.error('Chunk loading failed, reloading page...')
+    // Don't reload if we're on the both-service-form route - just log the error
+    const currentPath = router.currentRoute.value.path
+    if (currentPath.includes('/both-service-form/')) {
+      console.error(
+        '⚠️ Chunk loading failed on both-service-form, but preventing reload to avoid disappearing page'
+      )
+      return
+    }
     window.location.reload()
   }
 
   // Handle __vccOpts errors
   if (error.message && error.message.includes('__vccOpts')) {
     console.error('Component compilation error, attempting recovery...')
+    const currentPath = router.currentRoute.value.path
+    if (currentPath.includes('/both-service-form/')) {
+      console.error(
+        '⚠️ Component compilation error on both-service-form, but preventing navigation to avoid disappearing page'
+      )
+      return
+    }
     // Try to navigate to a safe route
     router.push('/').catch(() => {
       window.location.href = '/'

@@ -367,6 +367,9 @@
             // Show success message
             this.showSuccessMessage()
 
+            // Force immediate badge refresh for ICT Officers
+            this.refreshNotificationBadge()
+
             // Emit events
             this.$emit('updated')
             this.$emit('close')
@@ -443,6 +446,86 @@
             return 'Rejected'
           default:
             return 'Unknown'
+        }
+      },
+
+      // Force refresh notification badge in sidebar
+      refreshNotificationBadge() {
+        try {
+          console.log(
+            '🔔 UpdateProgress: Triggering notification badge refresh after status update'
+          )
+
+          // Method 0: Clear notification service cache first
+          this.clearNotificationCache()
+
+          // Method 1: Trigger global refresh event with force flag
+          if (window.dispatchEvent) {
+            const event = new CustomEvent('force-refresh-notifications', {
+              detail: {
+                source: 'UpdateProgress',
+                reason: 'implementation_status_updated',
+                requestId: this.requestId,
+                newStatus: this.selectedStatus,
+                timestamp: Date.now()
+              }
+            })
+            window.dispatchEvent(event)
+            console.log('🚀 UpdateProgress: Dispatched force-refresh-notifications event')
+          }
+
+          // Method 2: Direct call to sidebar instance with force refresh
+          if (window.sidebarInstance && window.sidebarInstance.fetchNotificationCounts) {
+            console.log('📞 UpdateProgress: Calling sidebar fetchNotificationCounts directly')
+            window.sidebarInstance.fetchNotificationCounts(true) // force refresh
+          }
+
+          // Method 3: Add a slight delay then refresh again to ensure backend has processed the change
+          setTimeout(() => {
+            console.log('⏰ UpdateProgress: Delayed badge refresh to ensure backend sync')
+            this.clearNotificationCache() // Clear cache again before delayed refresh
+            if (window.dispatchEvent) {
+              const delayedEvent = new CustomEvent('refresh-notifications', {
+                detail: {
+                  source: 'UpdateProgress_delayed',
+                  reason: 'delayed_refresh',
+                  requestId: this.requestId
+                }
+              })
+              window.dispatchEvent(delayedEvent)
+            }
+            if (window.sidebarInstance && window.sidebarInstance.fetchNotificationCounts) {
+              window.sidebarInstance.fetchNotificationCounts(true)
+            }
+          }, 2000) // 2 second delay to allow backend processing
+
+          // Method 4: Extra delayed refresh for implemented/completed status changes
+          if (['implemented', 'completed'].includes(this.selectedStatus)) {
+            setTimeout(() => {
+              console.log(
+                '🔄 UpdateProgress: Final refresh for completed status to ensure badge decrement'
+              )
+              this.clearNotificationCache()
+              if (window.sidebarInstance && window.sidebarInstance.fetchNotificationCounts) {
+                window.sidebarInstance.fetchNotificationCounts(true)
+              }
+            }, 5000) // 5 second delay for completed status changes
+          }
+        } catch (error) {
+          console.warn('UpdateProgress: Failed to refresh notification badge:', error)
+        }
+      },
+
+      // Clear notification cache to ensure fresh data
+      clearNotificationCache() {
+        try {
+          // Import and clear notification service cache dynamically
+          import('@/services/notificationService').then((module) => {
+            module.default.clearCache()
+            console.log('🗑️ UpdateProgress: Cleared notification service cache')
+          })
+        } catch (error) {
+          console.warn('UpdateProgress: Failed to clear notification cache:', error)
         }
       }
     }

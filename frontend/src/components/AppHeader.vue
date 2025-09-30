@@ -468,7 +468,7 @@
   export default {
     name: 'AppHeader',
     setup() {
-      const { currentUser, logout: authLogout } = useAuth()
+      const { user: currentUser, logout: authLogout } = useAuth()
       const router = useRouter()
 
       // Reactive state

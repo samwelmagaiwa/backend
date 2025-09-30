@@ -591,7 +591,7 @@ class RequestStatusController extends Controller
             return $this->getCurrentStepFromColumns($accessRequest);
         }
         
-        // Fallback to legacy status mapping
+        // Updated to 6-step workflow mapping
         $stepMap = [
             'pending' => 2, // HOD Review
             'pending_hod' => 2, // HOD Review
@@ -607,8 +607,8 @@ class RequestStatusController extends Controller
             'head_it_approved' => 6, // ICT Officer Implementation
             'pending_ict_officer' => 6, // ICT Officer Implementation
             'head_it_rejected' => 5, // Stopped at Head IT Review
-            'implemented' => 7, // Completed
-            'approved' => 7, // Completed
+            'implemented' => 6, // Completed at ICT Officer level
+            'approved' => 6, // Completed at ICT Officer level
             'rejected' => 2, // Stopped at current step
             'in_review' => 3, // Divisional Director
         ];
@@ -628,8 +628,8 @@ class RequestStatusController extends Controller
         if ($accessRequest->head_it_status === 'rejected') return 5;
         if ($accessRequest->ict_officer_status === 'rejected') return 6;
         
-        // Check workflow progression
-        if ($accessRequest->ict_officer_status === 'implemented') return 7; // Complete
+        // Check workflow progression - Updated to 6-step workflow
+        if ($accessRequest->ict_officer_status === 'implemented') return 6; // Complete at ICT Officer
         if ($accessRequest->head_it_status === 'approved') return 6; // ICT Officer Implementation
         if ($accessRequest->ict_director_status === 'approved') return 5; // Head IT Review
         if ($accessRequest->divisional_status === 'approved') return 4; // ICT Director Review

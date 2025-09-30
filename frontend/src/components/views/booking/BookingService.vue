@@ -58,13 +58,13 @@
               <!-- Center Content -->
               <div class="text-center flex-1">
                 <h1
-                  class="text-2xl font-bold text-white mb-2 tracking-wide drop-shadow-lg animate-fade-in"
+                  class="text-3xl font-bold text-white mb-2 tracking-wide drop-shadow-lg animate-fade-in"
                 >
                   MUHIMBILI NATIONAL HOSPITAL
                 </h1>
                 <div class="relative inline-block mb-2">
                   <div
-                    class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2 rounded-full text-base font-bold shadow-2xl transform hover:scale-105 transition-all duration-300 border-2 border-blue-400/60"
+                    class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2 rounded-full text-lg font-bold shadow-2xl transform hover:scale-105 transition-all duration-300 border-2 border-blue-400/60"
                   >
                     <span class="relative z-10 flex items-center gap-2">
                       <i class="fas fa-calendar-check"></i>
@@ -76,7 +76,7 @@
                   </div>
                 </div>
                 <h2
-                  class="text-lg font-bold text-blue-100 tracking-wide drop-shadow-md animate-fade-in-delay"
+                  class="text-xl font-bold text-blue-100 tracking-wide drop-shadow-md animate-fade-in-delay"
                 >
                   ICT EQUIPMENT RESERVATION SYSTEM
                 </h2>
@@ -111,11 +111,11 @@
                 >
                   <i class="fas fa-spinner fa-spin text-white text-2xl"></i>
                 </div>
-                <h3 class="text-xl font-bold text-white">Checking Your Requests...</h3>
-                <p class="text-blue-200 text-sm">
+                <h3 class="text-2xl font-bold text-white">Checking Your Requests...</h3>
+                <p class="text-blue-200 text-base">
                   Verifying if you have any pending booking requests
                 </p>
-                <p class="text-blue-300/70 text-xs mt-2 italic">This may take a few seconds...</p>
+                <p class="text-blue-300/70 text-sm mt-2 italic">This may take a few seconds...</p>
               </div>
             </div>
           </div>
@@ -136,7 +136,7 @@
                   >
                     <i class="fas fa-calendar-alt text-white text-lg"></i>
                   </div>
-                  <h3 class="text-lg font-bold text-white flex items-center">
+                  <h3 class="text-xl font-bold text-white flex items-center">
                     <i class="fas fa-info-circle mr-2 text-blue-300"></i>
                     Booking Information
                   </h3>
@@ -147,7 +147,7 @@
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <!-- Name of Borrower -->
                     <div class="group">
-                      <label class="block text-base font-bold text-blue-100 mb-1 flex items-center">
+                      <label class="block text-lg font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-user mr-2 text-blue-300"></i>
                         Name of Borrower
                         <span class="text-red-400 ml-1">*</span>
@@ -173,12 +173,12 @@
                       </div>
                       <div
                         v-if="errors.borrowerName"
-                        class="text-red-400 text-xs mt-1 flex items-center"
+                        class="text-red-400 text-sm mt-1 flex items-center"
                       >
                         <i class="fas fa-exclamation-circle mr-1"></i>
                         {{ errors.borrowerName }}
                       </div>
-                      <p class="text-xs text-blue-200/60 mt-1 italic flex items-center">
+                      <p class="text-sm text-blue-200/60 mt-1 italic flex items-center">
                         <i class="fas fa-info-circle mr-1"></i>
                         Automatically filled from your account information
                       </p>
@@ -186,7 +186,7 @@
 
                     <!-- Booking Date -->
                     <div class="group">
-                      <label class="block text-base font-bold text-blue-100 mb-1 flex items-center">
+                      <label class="block text-lg font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-calendar mr-2 text-blue-300"></i>
                         Booking Date <span class="text-red-400 ml-1">*</span>
                       </label>
@@ -205,7 +205,7 @@
                       </div>
                       <div
                         v-if="errors.bookingDate"
-                        class="text-red-400 text-xs mt-1 flex items-center"
+                        class="text-red-400 text-sm mt-1 flex items-center"
                       >
                         <i class="fas fa-exclamation-circle mr-1"></i>
                         {{ errors.bookingDate }}
@@ -217,7 +217,7 @@
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <!-- Type of Device -->
                     <div class="group">
-                      <label class="block text-base font-bold text-blue-100 mb-1 flex items-center">
+                      <label class="block text-lg font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-laptop mr-2 text-blue-300"></i>
                         Type of Device Borrowed
                         <span class="text-red-400 ml-1">*</span>
@@ -267,7 +267,7 @@
                       </div>
                       <div
                         v-if="errors.deviceType"
-                        class="text-red-400 text-xs mt-1 flex items-center"
+                        class="text-red-400 text-sm mt-1 flex items-center"
                       >
                         <i class="fas fa-exclamation-circle mr-1"></i>
                         {{ errors.deviceType }}
@@ -276,7 +276,7 @@
 
                     <!-- Department -->
                     <div class="group">
-                      <label class="block text-base font-bold text-blue-100 mb-1 flex items-center">
+                      <label class="block text-lg font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-building mr-2 text-blue-300"></i>
                         Department <span class="text-red-400 ml-1">*</span>
                       </label>
@@ -307,7 +307,7 @@
                       </div>
                       <div
                         v-if="errors.department"
-                        class="text-red-400 text-xs mt-1 flex items-center"
+                        class="text-red-400 text-sm mt-1 flex items-center"
                       >
                         <i class="fas fa-exclamation-circle mr-1"></i>
                         {{ errors.department }}
@@ -327,14 +327,14 @@
                         <i class="fas fa-exclamation-triangle text-white text-sm"></i>
                       </div>
                       <div class="flex-1">
-                        <h4 class="text-sm font-bold text-yellow-100 mb-1 flex items-center">
+                        <h4 class="text-base font-bold text-yellow-100 mb-1 flex items-center">
                           <i class="fas fa-info-circle mr-2"></i>
                           Device Availability Notice
                         </h4>
-                        <p class="text-sm text-yellow-200 leading-relaxed">
+                        <p class="text-base text-yellow-200 leading-relaxed">
                           {{ deviceAvailabilityInfo.message }}
                         </p>
-                        <p class="text-xs text-yellow-300/80 mt-2 italic">
+                        <p class="text-sm text-yellow-300/80 mt-2 italic">
                           <i class="fas fa-lightbulb mr-1"></i>
                           You can still submit your request, and it will be processed when the
                           device becomes available.
@@ -348,7 +348,7 @@
                     v-if="formData.deviceInventoryId === 'others'"
                     class="group animate-slide-down"
                   >
-                    <label class="block text-base font-bold text-blue-100 mb-1 flex items-center">
+                    <label class="block text-lg font-bold text-blue-100 mb-1 flex items-center">
                       <i class="fas fa-edit mr-2 text-blue-300"></i>
                       Specify Device <span class="text-red-400 ml-1">*</span>
                     </label>
@@ -367,7 +367,7 @@
                     </div>
                     <div
                       v-if="errors.customDevice"
-                      class="text-red-400 text-xs mt-1 flex items-center"
+                      class="text-red-400 text-sm mt-1 flex items-center"
                     >
                       <i class="fas fa-exclamation-circle mr-1"></i>
                       {{ errors.customDevice }}
@@ -378,7 +378,7 @@
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <!-- Phone Number -->
                     <div class="group">
-                      <label class="block text-base font-bold text-blue-100 mb-1 flex items-center">
+                      <label class="block text-lg font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-phone mr-2 text-blue-300"></i>
                         Phone Number <span class="text-red-400 ml-1">*</span>
                       </label>
@@ -403,12 +403,12 @@
                       </div>
                       <div
                         v-if="errors.phoneNumber"
-                        class="text-red-400 text-xs mt-1 flex items-center"
+                        class="text-red-400 text-sm mt-1 flex items-center"
                       >
                         <i class="fas fa-exclamation-circle mr-1"></i>
                         {{ errors.phoneNumber }}
                       </div>
-                      <p class="text-xs text-blue-200/60 mt-1 italic flex items-center">
+                      <p class="text-sm text-blue-200/60 mt-1 italic flex items-center">
                         <i class="fas fa-info-circle mr-1"></i>
                         Automatically filled from your account information
                       </p>
@@ -416,7 +416,7 @@
 
                     <!-- Date of Collection -->
                     <div class="group">
-                      <label class="block text-base font-bold text-blue-100 mb-1 flex items-center">
+                      <label class="block text-lg font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-calendar-plus mr-2 text-blue-300"></i>
                         Date of returning
                         <span class="text-red-400 ml-1">*</span>
@@ -436,7 +436,7 @@
                       </div>
                       <div
                         v-if="errors.collectionDate"
-                        class="text-red-400 text-xs mt-1 flex items-center"
+                        class="text-red-400 text-sm mt-1 flex items-center"
                       >
                         <i class="fas fa-exclamation-circle mr-1"></i>
                         {{ errors.collectionDate }}
@@ -447,7 +447,7 @@
                   <!-- Return Time -->
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div class="group">
-                      <label class="block text-base font-bold text-blue-100 mb-1 flex items-center">
+                      <label class="block text-lg font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-clock mr-2 text-blue-300"></i>
                         Return Time <span class="text-red-400 ml-1">*</span>
                       </label>
@@ -473,12 +473,12 @@
                       </div>
                       <div
                         v-if="errors.returnTime"
-                        class="text-red-400 text-xs mt-1 flex items-center"
+                        class="text-red-400 text-sm mt-1 flex items-center"
                       >
                         <i class="fas fa-exclamation-circle mr-1"></i>
                         {{ errors.returnTime }}
                       </div>
-                      <p class="text-xs text-blue-200/60 mt-1 italic flex items-center">
+                      <p class="text-sm text-blue-200/60 mt-1 italic flex items-center">
                         <i class="fas fa-info-circle mr-1"></i>
                         Select the time when you plan to return the device
                       </p>
@@ -495,13 +495,13 @@
                         >
                           <i class="fas fa-signature text-white text-sm"></i>
                         </div>
-                        <h3 class="text-sm font-bold text-white">Digital Signature</h3>
+                        <h3 class="text-base font-bold text-white">Digital Signature</h3>
                       </div>
 
-                      <label class="block text-base font-bold text-blue-100 mb-1 flex items-center">
+                      <label class="block text-lg font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-signature mr-2 text-blue-300"></i>
                         Signature <span class="text-red-400 ml-1">*</span>
-                        <span class="ml-2 text-sm text-blue-300/70 font-normal"
+                        <span class="ml-2 text-base text-blue-300/70 font-normal"
                           >(PNG, JPG, JPEG)</span
                         >
                       </label>
@@ -527,7 +527,7 @@
                           <div v-else class="w-full h-full flex items-center justify-center">
                             <div class="flex items-center">
                               <i class="fas fa-signature text-blue-400/50 text-sm mr-1"></i>
-                              <p class="text-xs text-blue-400 italic">Signature</p>
+                              <p class="text-sm text-blue-400 italic">Signature</p>
                             </div>
                           </div>
 
@@ -576,13 +576,13 @@
                             </span>
                           </button>
 
-                          <p class="text-xs text-blue-200/70 italic">Max: 2MB</p>
+                          <p class="text-sm text-blue-200/70 italic">Max: 2MB</p>
                         </div>
                       </div>
 
                       <div
                         v-if="errors.signature"
-                        class="text-red-500 text-xs mt-1 flex items-center"
+                        class="text-red-500 text-sm mt-1 flex items-center"
                       >
                         <i class="fas fa-exclamation-circle mr-1"></i>
                         {{ errors.signature }}
@@ -591,7 +591,7 @@
 
                     <!-- Reason for Borrowing Section (Right) -->
                     <div class="group">
-                      <label class="block text-base font-bold text-blue-100 mb-1 flex items-center">
+                      <label class="block text-lg font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-comment-alt mr-2 text-blue-300"></i>
                         Reason for Borrowing
                         <span class="text-red-400 ml-1">*</span>
@@ -610,14 +610,14 @@
                           class="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/10 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
                         ></div>
                       </div>
-                      <div v-if="errors.reason" class="text-red-400 text-xs mt-1 flex items-center">
+                      <div v-if="errors.reason" class="text-red-400 text-sm mt-1 flex items-center">
                         <i class="fas fa-exclamation-circle mr-1"></i>
                         {{ errors.reason }}
                       </div>
                       <div class="flex justify-between items-center mt-0.5">
-                        <p class="text-xs text-blue-200/60 italic">Min 10 chars</p>
+                        <p class="text-sm text-blue-200/60 italic">Min 10 chars</p>
                         <p
-                          class="text-xs"
+                          class="text-sm"
                           :class="
                             formData.reason.length >= 10 ? 'text-green-400' : 'text-yellow-400'
                           "
@@ -703,14 +703,14 @@
 
             <!-- Success Title -->
             <h3
-              class="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-3 animate-slide-up"
+              class="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-3 animate-slide-up"
             >
               🎉 Booking Submitted Successfully!
             </h3>
 
             <!-- Success Message -->
             <p
-              class="text-gray-600 mb-6 leading-relaxed animate-slide-up"
+              class="text-lg text-gray-600 mb-6 leading-relaxed animate-slide-up"
               style="animation-delay: 0.2s"
             >
               Your device booking request has been submitted and is now under review by our ICT
@@ -732,7 +732,7 @@
               >
                 <i class="fas fa-clipboard-list text-white text-sm"></i>
               </div>
-              <h4 class="text-lg font-bold text-blue-800">📋 Booking Details</h4>
+              <h4 class="text-xl font-bold text-blue-800">📋 Booking Details</h4>
             </div>
 
             <!-- Details Grid -->
@@ -747,8 +747,8 @@
                   <i class="fas fa-laptop text-white text-sm"></i>
                 </div>
                 <div class="flex-1">
-                  <p class="text-xs font-medium text-blue-600 uppercase tracking-wide">Device</p>
-                  <p class="text-sm font-bold text-gray-800">{{ getDeviceDisplayName() }}</p>
+                  <p class="text-sm font-medium text-blue-600 uppercase tracking-wide">Device</p>
+                  <p class="text-base font-bold text-gray-800">{{ getDeviceDisplayName() }}</p>
                 </div>
               </div>
 
@@ -762,8 +762,8 @@
                   <i class="fas fa-user text-white text-sm"></i>
                 </div>
                 <div class="flex-1">
-                  <p class="text-xs font-medium text-blue-600 uppercase tracking-wide">Borrower</p>
-                  <p class="text-sm font-bold text-gray-800">{{ formData.borrowerName }}</p>
+                  <p class="text-sm font-medium text-blue-600 uppercase tracking-wide">Borrower</p>
+                  <p class="text-base font-bold text-gray-800">{{ formData.borrowerName }}</p>
                 </div>
               </div>
 
@@ -777,10 +777,10 @@
                   <i class="fas fa-calendar-check text-white text-sm"></i>
                 </div>
                 <div class="flex-1">
-                  <p class="text-xs font-medium text-blue-600 uppercase tracking-wide">
+                  <p class="text-sm font-medium text-blue-600 uppercase tracking-wide">
                     Return Date
                   </p>
-                  <p class="text-sm font-bold text-gray-800">
+                  <p class="text-base font-bold text-gray-800">
                     {{ formatDisplayDate(formData.collectionDate) }}
                   </p>
                 </div>
@@ -790,7 +790,7 @@
             <!-- Status Badge -->
             <div class="mt-4 text-center">
               <span
-                class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-sm font-bold rounded-full shadow-lg animate-pulse"
+                class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-base font-bold rounded-full shadow-lg animate-pulse"
               >
                 <i class="fas fa-clock mr-2"></i>
                 PENDING REVIEW
@@ -801,7 +801,7 @@
           <!-- Action Button -->
           <button
             @click="closeSuccessModal"
-            class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-4 px-6 rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-300/50 animate-slide-up border-2 border-blue-500/30"
+            class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-4 px-6 rounded-2xl font-bold text-xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-300/50 animate-slide-up border-2 border-blue-500/30"
             style="animation-delay: 0.6s"
           >
             <i class="fas fa-home mr-3 text-lg"></i>
@@ -863,14 +863,14 @@
 
             <!-- Warning Title -->
             <h3
-              class="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-3 animate-slide-up"
+              class="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-3 animate-slide-up"
             >
               ⚠️ Pending Request Found
             </h3>
 
             <!-- Warning Message -->
             <p
-              class="text-gray-600 mb-6 leading-relaxed animate-slide-up"
+              class="text-lg text-gray-600 mb-6 leading-relaxed animate-slide-up"
               style="animation-delay: 0.2s"
             >
               You already have a pending booking request. Please wait for it to be processed before
@@ -892,7 +892,7 @@
               >
                 <i class="fas fa-clipboard-list text-white text-sm"></i>
               </div>
-              <h4 class="text-lg font-bold text-orange-800">📋 Your Pending Request</h4>
+              <h4 class="text-xl font-bold text-orange-800">📋 Your Pending Request</h4>
             </div>
 
             <!-- Details Grid -->
@@ -907,8 +907,8 @@
                   <i class="fas fa-laptop text-white text-sm"></i>
                 </div>
                 <div class="flex-1">
-                  <p class="text-xs font-medium text-orange-600 uppercase tracking-wide">Device</p>
-                  <p class="text-sm font-bold text-gray-800">
+                  <p class="text-sm font-medium text-orange-600 uppercase tracking-wide">Device</p>
+                  <p class="text-base font-bold text-gray-800">
                     {{ pendingRequestInfo.device_name }}
                   </p>
                 </div>
@@ -924,10 +924,10 @@
                   <i class="fas fa-calendar text-white text-sm"></i>
                 </div>
                 <div class="flex-1">
-                  <p class="text-xs font-medium text-orange-600 uppercase tracking-wide">
+                  <p class="text-sm font-medium text-orange-600 uppercase tracking-wide">
                     Booking Date
                   </p>
-                  <p class="text-sm font-bold text-gray-800">
+                  <p class="text-base font-bold text-gray-800">
                     {{ formatDisplayDate(pendingRequestInfo.booking_date) }}
                   </p>
                 </div>
@@ -943,8 +943,8 @@
                   <i class="fas fa-clock text-white text-sm"></i>
                 </div>
                 <div class="flex-1">
-                  <p class="text-xs font-medium text-orange-600 uppercase tracking-wide">Status</p>
-                  <p class="text-sm font-bold text-gray-800 capitalize">
+                  <p class="text-sm font-medium text-orange-600 uppercase tracking-wide">Status</p>
+                  <p class="text-base font-bold text-gray-800 capitalize">
                     {{ pendingRequestInfo.status }} / {{ pendingRequestInfo.ict_approve }}
                   </p>
                 </div>
@@ -954,7 +954,7 @@
             <!-- Status Badge -->
             <div class="mt-4 text-center">
               <span
-                class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-orange-400 to-yellow-500 text-white text-sm font-bold rounded-full shadow-lg animate-pulse"
+                class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-orange-400 to-yellow-500 text-white text-base font-bold rounded-full shadow-lg animate-pulse"
               >
                 <i class="fas fa-hourglass-half mr-2"></i>
                 AWAITING APPROVAL
@@ -966,7 +966,7 @@
           <div class="flex gap-3">
             <button
               @click="viewPendingRequest"
-              class="flex-1 bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white py-4 px-6 rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-orange-300/50 animate-slide-up border-2 border-orange-500/30"
+              class="flex-1 bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white py-4 px-6 rounded-2xl font-bold text-xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-orange-300/50 animate-slide-up border-2 border-orange-500/30"
               style="animation-delay: 0.6s"
             >
               <i class="fas fa-eye mr-3 text-lg"></i>
@@ -975,7 +975,7 @@
 
             <button
               @click="closePendingRequestModal"
-              class="flex-1 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white py-4 px-6 rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-gray-300/50 animate-slide-up border-2 border-gray-500/30"
+              class="flex-1 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white py-4 px-6 rounded-2xl font-bold text-xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-gray-300/50 animate-slide-up border-2 border-gray-500/30"
               style="animation-delay: 0.8s"
             >
               <i class="fas fa-arrow-left mr-3 text-lg"></i>

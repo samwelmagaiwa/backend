@@ -725,15 +725,15 @@
                         <span
                           class="text-xs px-2 py-0.5 bg-amber-500/30 rounded-full text-amber-200 font-medium"
                         >
-                          {{ previousComments.length || 0 }}
+                          {{ (previousComments && previousComments.length) || 0 }}
                           <!-- DEBUG: Force previousComments execution -->
                           {{
                             console.log(
                               'TEMPLATE DEBUG - previousComments length:',
-                              previousComments.length
+                              previousComments && previousComments.length
                             ) || ''
-                          }}
-                        </span>
+                          }}</span
+                        >
                       </div>
                       <h3 class="text-xs font-bold text-white flex items-center">
                         <i class="fas fa-history mr-1 text-amber-300 text-xs"></i>
@@ -1089,7 +1089,9 @@
 
                             <!-- Show count if comments are truncated -->
                             <div
-                              v-if="previousComments.length > maxVisibleComments"
+                              v-if="
+                                previousComments && previousComments.length > maxVisibleComments
+                              "
                               class="p-2 text-center border-t border-amber-300/20"
                             >
                               <span class="text-xs text-amber-300/70 italic">
@@ -2557,7 +2559,9 @@
                             >
                             <div class="relative">
                               <div
-                                v-if="!ictOfficerSignaturePreview && !isImplementationAlreadyCompleted"
+                                v-if="
+                                  !ictOfficerSignaturePreview && !isImplementationAlreadyCompleted
+                                "
                                 class="w-full px-2 py-1 border-2 border-dashed border-blue-300/40 rounded-lg focus-within:border-blue-400 bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 min-h-[20px] flex items-center justify-center hover:bg-white/20"
                               >
                                 <div class="text-center">
@@ -2568,7 +2572,7 @@
                                   <button
                                     v-if="
                                       (isIctOfficerApprovalEditable ||
-                                      currentUser?.role === 'ict_officer') &&
+                                        currentUser?.role === 'ict_officer') &&
                                       !isImplementationAlreadyCompleted
                                     "
                                     type="button"
@@ -2583,19 +2587,23 @@
 
                               <!-- Show existing signature when implementation is completed -->
                               <div
-                                v-else-if="isImplementationAlreadyCompleted && !ictOfficerSignaturePreview && requestData?.ict_officer_signature_path"
+                                v-else-if="
+                                  isImplementationAlreadyCompleted &&
+                                  !ictOfficerSignaturePreview &&
+                                  requestData?.ict_officer_signature_path
+                                "
                                 class="w-full px-3 py-2 border-2 border-green-300/40 rounded-xl bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-green-500/20 min-h-[35px] flex items-center justify-center relative"
                               >
                                 <div class="text-center">
-                                  <div class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center mx-auto mb-1">
+                                  <div
+                                    class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center mx-auto mb-1"
+                                  >
                                     <i class="fas fa-check-circle text-green-400 text-lg"></i>
                                   </div>
                                   <p class="text-xs text-green-200 font-semibold">
                                     Implementation Completed
                                   </p>
-                                  <p class="text-xs text-blue-100 opacity-80">
-                                    Signature on file
-                                  </p>
+                                  <p class="text-xs text-blue-100 opacity-80">Signature on file</p>
                                 </div>
                               </div>
 
@@ -2628,7 +2636,7 @@
                                 <div
                                   v-if="
                                     (isIctOfficerApprovalEditable ||
-                                    currentUser?.role === 'ict_officer') &&
+                                      currentUser?.role === 'ict_officer') &&
                                     !isImplementationAlreadyCompleted
                                   "
                                   class="absolute top-2 right-2 flex gap-1"
@@ -3839,275 +3847,17 @@
 <script>
   /* eslint-disable vue/no-parsing-error */
   /* eslint-disable no-unused-vars */
-  // Wellsoft panel (key fields)
-  const _WellsoftPanel = {
-    props: {
-      modelValue: {
-        type: Object,
-        default: () => ({})
-      },
-      reviewMode: {
-        type: Boolean,
-        default: false
-      }
-    },
-    emits: ['update:modelValue'],
-    template: `<div class="space-y-3">
-    <div v-if="!reviewMode">
-      <label class="label">Action Requested<span class="text-red-500">*</span></label>
-      <div class="flex gap-3">
-        <label class="inline-flex items-center gap-2 text-sm"><input type="radio" value="use" :checked="modelValue?.requestType==='use'" @change="$emit('update:modelValue', { ...modelValue, requestType: 'use' })"/> Use</label>
-        <label class="inline-flex items-center gap-2 text-sm"><input type="radio" value="revoke" :checked="modelValue?.requestType==='revoke'" @change="$emit('update:modelValue', { ...modelValue, requestType: 'revoke' })"/> Revoke</label>
-      </div>
-    </div>
-    <div v-if="!reviewMode" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-      <div>
-        <label class="label">HoD/BM Name<span class="text-red-500">*</span></label>
-        <input class="input" :value="modelValue?.approvals?.hodName||''" @input="$emit('update:modelValue', { ...modelValue, approvals: { ...(modelValue?.approvals||{}), hodName: $event.target.value } })"/>
-      </div>
-      <div>
-        <label class="label">Signature<span class="text-red-500">*</span></label>
-        <input class="input" :value="modelValue?.approvals?.hodSignature||''" @input="$emit('update:modelValue', { ...modelValue, approvals: { ...(modelValue?.approvals||{}), hodSignature: $event.target.value } })"/>
-      </div>
-      <div>
-        <label class="label">Date<span class="text-red-500">*</span></label>
-        <input type="date" class="input" :value="modelValue?.approvals?.hodDate||''" @input="$emit('update:modelValue', { ...modelValue, approvals: { ...(modelValue?.approvals||{}), hodDate: $event.target.value } })"/>
-      </div>
-    </div>
-    <div v-if="!reviewMode">
-      <label class="label">Comments<span class="text-red-500">*</span></label>
-<textarea class="input" rows="3" :value="modelValue?.notes || ''" @input="$emit('update:modelValue', { ...modelValue, notes: $event.target.value })"></textarea>
-    </div>
-  </div>`
-  }
 
-  // Jeeva panel (attractive UI mirroring Jeeva form)
-  const _JeevaPanel = {
-    props: {
-      modelValue: {
-        type: Object,
-        default: () => ({})
-      },
-      reviewMode: {
-        type: Boolean,
-        default: false
-      }
-    },
-    emits: ['update:modelValue'],
-    data() {
-      return {
-        open: false,
-        focusIndex: 0,
-        options: ['Use', 'Revoke', 'Access Rights', 'Approval', 'Comments', 'For Implementation']
-      }
-    },
-    methods: {
-      isSelected(label) {
-        const sel = this.modelValue?.selections || []
-        return sel.includes(label)
-      },
-      toggle(label) {
-        // enforce mutual exclusivity between Use and Revoke
-        let sel = [...(this.modelValue?.selections || [])]
-        if (label === 'Use') sel = sel.filter((v) => v !== 'Revoke')
-        if (label === 'Revoke') sel = sel.filter((v) => v !== 'Use')
-        if (sel.includes(label)) sel = sel.filter((v) => v !== label)
-        else sel.push(label)
-        this.$emit('update:modelValue', {
-          ...(this.modelValue || {}),
-          selections: sel
-        })
-      },
-      close() {
-        this.open = false
-      },
-      onKeydown(e) {
-        if (!this.open && (e.key === 'Enter' || e.key === ' ')) {
-          e.preventDefault()
-          this.open = true
-          return
-        }
-        if (!this.open) return
-        if (e.key === 'Escape') {
-          e.preventDefault()
-          this.open = false
-          return
-        }
-        const max = this.options.length - 1
-        if (e.key === 'ArrowDown') {
-          e.preventDefault()
-          this.focusIndex = Math.min(max, this.focusIndex + 1)
-        }
-        if (e.key === 'ArrowUp') {
-          e.preventDefault()
-          this.focusIndex = Math.max(0, this.focusIndex - 1)
-        }
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault()
-          this.toggle(this.options[this.focusIndex])
-        }
-      }
-    },
-    template: `<div class="space-y-4">
-    <!-- Multi-select dropdown trigger with chips -->
-    <div>
-      <label class="label m-0" id="jeeva-modules-label">Module Requested for <span class="text-red-500">*</span></label>
-      <div class="relative" @keydown.prevent.stop="onKeydown" tabindex="0" aria-labelledby="jeeva-modules-label">
-        <div class="input flex items-center flex-wrap gap-1 cursor-pointer" @click="open = !open" :aria-expanded="open.toString()" role="combobox" aria-controls="jeeva-options" aria-multiselectable="true">
-          <template v-if="(modelValue?.selections||[]).length">
-            <span v-for="s in modelValue.selections" :key="'chip-'+s" class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-indigo-100 text-indigo-800 text-xs">
-              {{ s }} <i class="fas fa-times opacity-70" @click.stop="toggle(s)"></i>
-            </span>
-          </template>
-          <span v-else class="text-gray-400 text-sm">Select items…</span>
-          <i class="fas fa-chevron-down ml-auto text-gray-400"></i>
-        </div>
-        <div v-show="open" class="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg p-2" id="jeeva-options" role="listbox" :aria-activedescendant="'opt-'+focusIndex">
-          <button
-            v-for="(opt,idx) in options"
-            :key="'opt-'+opt"
-            :id="'opt-'+idx"
-            class="option-tile w-full justify-start"
-            :class="isSelected(opt) ? 'option-tile-active' : ''"
-            role="option"
-            :aria-selected="isSelected(opt) ? 'true' : 'false'"
-            @click.stop="toggle(opt)"
-            @mouseenter="focusIndex = idx"
-          >
-            <i :class="['fas', isSelected(opt) ? 'fa-check-circle text-indigo-700' : 'fa-circle text-gray-300']"></i>
-            <span class="truncate">{{ opt }}</span>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Conditional sections based on selections -->
-    <div v-if="(isSelected('Use') || isSelected('Revoke')) && !reviewMode">
-      <label class="label">Action Requested<span class="text-red-500">*</span></label>
-      <div class="flex gap-3 mt-1">
-        <label class="inline-flex items-center gap-2 text-sm px-2 py-1 rounded-md border border-gray-200 hover:bg-indigo-50">
-          <input type="radio" value="use" :checked="modelValue?.requestType==='use'" @change="$emit('update:modelValue', { ...modelValue, requestType: 'use' })"/> Use
-        </label>
-        <label class="inline-flex items-center gap-2 text-sm px-2 py-1 rounded-md border border-gray-200 hover:bg-indigo-50">
-          <input type="radio" value="revoke" :checked="modelValue?.requestType==='revoke'" @change="$emit('update:modelValue', { ...modelValue, requestType: 'revoke' })"/> Revoke
-        </label>
-      </div>
-    </div>
-
-
-    <div v-if="isSelected('Approval') && !reviewMode" class="space-y-4">
-      <label class="label">Approval</label>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        <div class="bg-indigo-50 rounded-lg p-3">
-          <h5 class="font-semibold text-indigo-800 text-xs mb-1 text-center">HoD / BM</h5>
-          <input class="input mb-1" placeholder="Name*" :value="modelValue?.approvals?.hod?.name||''" @input="$emit('update:modelValue', { ...modelValue, approvals: { ...(modelValue?.approvals||{}), hod: { ...(modelValue?.approvals?.hod||{}), name: $event.target.value } } })"/>
-          <input class="input mb-1" placeholder="Signature*" :value="modelValue?.approvals?.hod?.signature||''" @input="$emit('update:modelValue', { ...modelValue, approvals: { ...(modelValue?.approvals||{}), hod: { ...(modelValue?.approvals?.hod||{}), signature: $event.target.value } } })"/>
-          <input type="date" class="input" placeholder="Date*" :value="modelValue?.approvals?.hod?.date||''" @input="$emit('update:modelValue', { ...modelValue, approvals: { ...(modelValue?.approvals||{}), hod: { ...(modelValue?.approvals?.hod||{}), date: $event.target.value } } })"/>
-        </div>
-        <div class="bg-indigo-50 rounded-lg p-3">
-          <h5 class="font-semibold text-indigo-800 text-xs mb-1 text-center">Divisional Director</h5>
-          <input class="input mb-1" placeholder="Name*" :value="modelValue?.approvals?.divisionalDirector?.name||''" @input="$emit('update:modelValue', { ...modelValue, approvals: { ...(modelValue?.approvals||{}), divisionalDirector: { ...(modelValue?.approvals?.divisionalDirector||{}), name: $event.target.value } } })"/>
-          <input class="input mb-1" placeholder="Signature*" :value="modelValue?.approvals?.divisionalDirector?.signature||''" @input="$emit('update:modelValue', { ...modelValue, approvals: { ...(modelValue?.approvals||{}), divisionalDirector: { ...(modelValue?.approvals?.divisionalDirector||{}), signature: $event.target.value } } })"/>
-          <input type="date" class="input" placeholder="Date*" :value="modelValue?.approvals?.divisionalDirector?.date||''" @input="$emit('update:modelValue', { ...modelValue, approvals: { ...(modelValue?.approvals||{}), divisionalDirector: { ...(modelValue?.approvals?.divisionalDirector||{}), date: $event.target.value } } })"/>
-        </div>
-        <div class="bg-indigo-50 rounded-lg p-3">
-          <h5 class="font-semibold text-indigo-800 text-xs mb-1 text-center">Director of ICT</h5>
-          <input class="input mb-1" placeholder="Name*" :value="modelValue?.approvals?.directorICT?.name||''" @input="$emit('update:modelValue', { ...modelValue, approvals: { ...(modelValue?.approvals||{}), directorICT: { ...(modelValue?.approvals?.directorICT||{}), name: $event.target.value } } })"/>
-          <input class="input mb-1" placeholder="Signature*" :value="modelValue?.approvals?.directorICT?.signature||''" @input="$emit('update:modelValue', { ...modelValue, approvals: { ...(modelValue?.approvals||{}), directorICT: { ...(modelValue?.approvals?.directorICT||{}), signature: $event.target.value } } })"/>
-          <input type="date" class="input" placeholder="Date*" :value="modelValue?.approvals?.directorICT?.date||''" @input="$emit('update:modelValue', { ...modelValue, approvals: { ...(modelValue?.approvals||{}), directorICT: { ...(modelValue?.approvals?.directorICT||{}), date: $event.target.value } } })"/>
-        </div>
-      </div>
-    </div>
-
-    <div v-if="isSelected('Comments') && !reviewMode">
-      <label class="label">Comments<span class="text-red-500">*</span></label>
-      <textarea rows="3" class="input" placeholder="Comments*" :value="modelValue?.comments||''" @input="$emit('update:modelValue', { ...modelValue, comments: $event.target.value })"></textarea>
-    </div>
-
-    <div v-if="isSelected('For Implementation')" class="space-y-3">
-      <label class="label">For Implementation</label>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div class="bg-emerald-50 rounded-lg p-3">
-          <h5 class="font-semibold text-emerald-800 text-xs mb-1 text-center">Head of IT</h5>
-          <input class="input mb-1" placeholder="Name*" :value="modelValue?.implementation?.headIT?.name||''" @input="$emit('update:modelValue', { ...modelValue, implementation: { ...(modelValue?.implementation||{}), headIT: { ...(modelValue?.implementation?.headIT||{}), name: $event.target.value } } })"/>
-          <input class="input mb-1" placeholder="Signature*" :value="modelValue?.implementation?.headIT?.signature||''" @input="$emit('update:modelValue', { ...modelValue, implementation: { ...(modelValue?.implementation||{}), headIT: { ...(modelValue?.implementation?.headIT||{}), signature: $event.target.value } } })"/>
-          <input type="date" class="input" placeholder="Date*" :value="modelValue?.implementation?.headIT?.date||''" @input="$emit('update:modelValue', { ...modelValue, implementation: { ...(modelValue?.implementation||{}), headIT: { ...(modelValue?.implementation?.headIT||{}), date: $event.target.value } } })"/>
-        </div>
-        <div class="bg-emerald-50 rounded-lg p-3">
-          <h5 class="font-semibold text-emerald-800 text-xs mb-1 text-center">ICT Officer granting access</h5>
-          <input class="input mb-1" placeholder="Name*" :value="modelValue?.implementation?.ictOfficer?.name||''" @input="$emit('update:modelValue', { ...modelValue, implementation: { ...(modelValue?.implementation||{}), ictOfficer: { ...(modelValue?.implementation?.ictOfficer||{}), name: $event.target.value } } })"/>
-          <input class="input mb-1" placeholder="Signature*" :value="modelValue?.implementation?.ictOfficer?.signature||''" @input="$emit('update:modelValue', { ...modelValue, implementation: { ...(modelValue?.implementation||{}), ictOfficer: { ...(modelValue?.implementation?.ictOfficer||{}), signature: $event.target.value } } })"/>
-          <input type="date" class="input" placeholder="Date*" :value="modelValue?.implementation?.ictOfficer?.date||''" @input="$emit('update:modelValue', { ...modelValue, implementation: { ...(modelValue?.implementation||{}), ictOfficer: { ...(modelValue?.implementation?.ictOfficer||{}), date: $event.target.value } } })"/>
-        </div>
-      </div>
-    </div>
-  </div>`
-  }
-
-  // Internet panel (key fields)
-  const _InternetPanel = {
-    props: {
-      modelValue: {
-        type: Object,
-        default: () => ({})
-      }
-    },
-    emits: ['update:modelValue'],
-    template: `<div class="space-y-3">
-    <div>
-      <label class="label">Approval - HoD Certification<span class="text-red-500">*</span></label>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        <input class="input" placeholder="HOD Name*" :value="modelValue?.hodName||''" @input="$emit('update:modelValue', { ...modelValue, hodName: $event.target.value })"/>
-        <input class="input" placeholder="Signature*" :value="modelValue?.hodSignature||''" @input="$emit('update:modelValue', { ...modelValue, hodSignature: $event.target.value })"/>
-        <input type="date" class="input" placeholder="Date*" :value="modelValue?.hodDate||''" @input="$emit('update:modelValue', { ...modelValue, hodDate: $event.target.value })"/>
-      </div>
-    </div>
-    <div>
-      <label class="label">Director's Decision<span class="text-red-500">*</span></label>
-      <div class="flex gap-3">
-        <label class="inline-flex items-center gap-2 text-sm"><input type="radio" value="approve" :checked="modelValue?.directorDecision==='approve'" @change="$emit('update:modelValue', { ...modelValue, directorDecision: 'approve' })"/> Approve</label>
-        <label class="inline-flex items-center gap-2 text-sm"><input type="radio" value="disapprove" :checked="modelValue?.directorDecision==='disapprove'" @change="$emit('update:modelValue', { ...modelValue, directorDecision: 'disapprove' })"/> Disapprove</label>
-      </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-2">
-        <input class="input" placeholder="Director Name*" :value="modelValue?.directorName||''" @input="$emit('update:modelValue', { ...modelValue, directorName: $event.target.value })"/>
-        <input class="input" placeholder="Signature*" :value="modelValue?.directorSignature||''" @input="$emit('update:modelValue', { ...modelValue, directorSignature: $event.target.value })"/>
-        <input type="date" class="input" placeholder="Date*" :value="modelValue?.directorDate||''" @input="$emit('update:modelValue', { ...modelValue, directorDate: $event.target.value })"/>
-      </div>
-    </div>
-    <div>
-      <label class="label">IT Department<span class="text-red-500">*</span></label>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <input class="input" placeholder="Person Name*" :value="modelValue?.personName||''" @input="$emit('update:modelValue', { ...modelValue, personName: $event.target.value })"/>
-        <input class="input" placeholder="Access Level*" :value="modelValue?.accessLevel||''" @input="$emit('update:modelValue', { ...modelValue, accessLevel: $event.target.value })"/>
-        <input class="input" placeholder="IT Officer Signature*" :value="modelValue?.itSignature||''" @input="$emit('update:modelValue', { ...modelValue, itSignature: $event.target.value })"/>
-        <input type="date" class="input" placeholder="Date*" :value="modelValue?.itDate||''" @input="$emit('update:modelValue', { ...modelValue, itDate: $event.target.value })"/>
-      </div>
-      <div class="mt-2">
-        <textarea rows="2" class="input" placeholder="DICT comments*" :value="modelValue?.itComments||''" @input="$emit('update:modelValue', { ...modelValue, itComments: $event.target.value })"></textarea>
-      </div>
-    </div>
-    <div>
-      <label class="label">Executive Director Final<span class="text-red-500">*</span></label>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <input class="input" placeholder="Signature*" :value="modelValue?.execSignature||''" @input="$emit('update:modelValue', { ...modelValue, execSignature: $event.target.value })"/>
-        <input type="date" class="input" placeholder="Date*" :value="modelValue?.execDate||''" @input="$emit('update:modelValue', { ...modelValue, execDate: $event.target.value })"/>
-      </div>
-    </div>
-  </div>
-  `
-  }
-
-  // import { ref } from 'vue' // Removed unused import
+  // Import required services
   import Header from '@/components/header.vue'
   import ModernSidebar from '@/components/ModernSidebar.vue'
-  import OrbitingDots from '@/components/common/OrbitingDots.vue'
+  import OrbitingDots from '@/components/OrbitingDots.vue'
   import AppFooter from '@/components/footer.vue'
-  import combinedAccessService from '@/services/combinedAccessService.js'
-  import bothServiceFormService from '@/services/bothServiceFormService.js'
-  import authService from '@/services/authService.js'
-  import ictOfficerService from '@/services/ictOfficerService.js'
+  import authService from '@/services/authService'
+  import combinedAccessService from '@/services/combinedAccessService'
+  import ictOfficerService from '@/services/ictOfficerService'
+  import bothServiceFormService from '@/services/bothServiceFormService'
   import { useAuthStore } from '@/stores/auth'
-  import { devLog, componentLoggers } from '@/utils/devLogger.js'
 
   export default {
     name: 'BothServiceForm',
@@ -4117,14 +3867,21 @@
       OrbitingDots,
       AppFooter
     },
-    setup() {
-      // Initialize auth store
-      const authStore = useAuthStore()
-
-      return {
-        authStore
+    inject: {
+      authStore: {
+        from: 'authStore',
+        default: () => useAuthStore()
       }
     },
+
+    // Props for component
+    props: {
+      requestId: {
+        type: [String, Number],
+        default: null
+      }
+    },
+
     data() {
       return {
         // Signature handling
@@ -4300,12 +4057,12 @@
 
       // Review mode check
       isReviewMode() {
-        return this.$route.params.id != null || this.$route.query.id != null
+        return this.getRequestId != null
       },
 
-      // Request ID from route or query parameters
-      requestId() {
-        return this.$route.params.id || this.$route.query.id || null
+      // Get effective request ID (prop takes priority over route params)
+      getRequestId() {
+        return this.requestId || this.$route.params.id || this.$route.query.id || null
       },
 
       currentTab() {
@@ -4720,7 +4477,7 @@
           this.requestData?.status !== 'implemented' &&
           this.requestData?.status !== 'approved' &&
           this.requestData?.status !== 'completed' &&
-          !this.getValidIctOfficerDate()
+          !this.getValidIctOfficerDate
 
         // Allow editing if user is ICT Officer and:
         // 1. Access has not yet been implemented/granted AND
@@ -4735,7 +4492,7 @@
           currentStage: this.currentApprovalStage,
           status: status,
           isReviewMode: this.isReviewMode,
-          requestId: this.requestId,
+          requestId: this.getRequestId,
           '=== USER DATA ===': '---',
           currentUserId: currentUserId,
           'currentUser exists': !!this.currentUser,
@@ -4890,7 +4647,7 @@
             ict_officer: !!(
               (this.requestData.ict_officer_status === 'implemented' ||
                 this.requestData.ict_officer_status === 'approved') &&
-              this.getValidIctOfficerDate()
+              this.getValidIctOfficerDate
             )
           }
 
@@ -5278,7 +5035,7 @@
 
       // Check if there are any previous comments to show
       hasPreviousComments() {
-        return this.previousComments.length > 0
+        return this.previousComments && this.previousComments.length > 0
       },
 
       // Check if the request is fully completed/approved (all stages done)
@@ -5578,17 +5335,18 @@
       // Check if the implementation is already completed
       isImplementationAlreadyCompleted() {
         if (!this.requestData) return false
-        
+
         // Check multiple indicators of completion
-        const hasImplementationDate = !!this.getValidIctOfficerDate()
-        const hasImplementedStatus = this.requestData?.ict_officer_status === 'implemented' || 
-                                     this.requestData?.status === 'implemented' ||
-                                     this.requestData?.status === 'approved' ||
-                                     this.requestData?.status === 'completed'
+        const hasImplementationDate = !!this.getValidIctOfficerDate
+        const hasImplementedStatus =
+          this.requestData?.ict_officer_status === 'implemented' ||
+          this.requestData?.status === 'implemented' ||
+          this.requestData?.status === 'approved' ||
+          this.requestData?.status === 'completed'
         const hasSignaturePath = !!this.requestData?.ict_officer_signature_path
-        
+
         const isCompleted = hasImplementationDate || hasImplementedStatus || hasSignaturePath
-        
+
         // Debug logging for development
         if (this.isDevelopment && this.isReviewMode) {
           console.log('🔍 Implementation completion check:', {
@@ -5601,72 +5359,80 @@
             status: this.requestData?.status
           })
         }
-        
+
         return isCompleted
       }
     },
     async mounted() {
       console.log('🚀 Component mounted - starting user authentication...')
 
-      // Try to get current user from multiple sources
-      await this.getCurrentUser()
-      console.log('🔍 After getCurrentUser:', {
-        hasCurrentUser: !!this.currentUser,
-        userName: this.currentUser?.name,
-        userRole: this.currentUser?.role || this.currentUser?.user_role
-      })
-
-      // Fallback to localStorage if API fails
-      if (!this.currentUser || !this.currentUser.name) {
-        console.log('🔄 API failed, trying localStorage fallback...')
-        this.tryGetUserFromLocalStorage()
-        console.log('🔍 After localStorage:', {
-          hasCurrentUser: !!this.currentUser,
-          userName: this.currentUser?.name
-        })
-      }
-
-      // Fallback to Pinia store
-      if (!this.currentUser || !this.currentUser.name) {
-        console.log('🔄 localStorage failed, trying Pinia store fallback...')
-        this.tryGetUserFromStore()
-        console.log('🔍 After Pinia store:', {
+      // Prevent page disappearing by catching errors
+      try {
+        // Try to get current user from multiple sources
+        await this.getCurrentUser()
+        console.log('🔍 After getCurrentUser:', {
           hasCurrentUser: !!this.currentUser,
           userName: this.currentUser?.name,
-          userRole: this.getUserRole()
+          userRole: this.currentUser?.role || this.currentUser?.user_role
         })
-      }
 
-      // Final check
-      if (!this.currentUser || !this.currentUser.name) {
-        console.error('❌ CRITICAL: Unable to load user from any source!')
-        console.error('❌ This will cause role detection to fail')
-      } else {
-        console.log('✅ User successfully loaded:', this.currentUser.name)
-        console.log('✅ Detected user role:', this.getUserRole())
-      }
-
-      if (this.isReviewMode && this.requestId) {
-        await this.loadRequestData()
-
-        // Debug: Check signature indicators after data loads (development only)
-        if (this.isDevelopment) {
-          setTimeout(() => {
-            console.log('\u23f0 5-second debug check after mount:', {
-              shouldShowHodSignedIndicator: this.shouldShowHodSignedIndicator,
-              shouldShowHodNoSignatureIndicator: this.shouldShowHodNoSignatureIndicator,
-              hasStageSigned_hod: this.hasStageSigned('hod'),
-              viewerAfter_hod: this.viewerAfter('hod'),
-              isReviewMode: this.isReviewMode,
-              currentUser: this.currentUser,
-              userRole: this.getUserRole(),
-              viewerStage: this.viewerStage(),
-              viewerRank: this.viewerRank(),
-              requestStatus: this.requestData?.status,
-              requestId: this.requestId
-            })
-          }, 5000)
+        // Fallback to localStorage if API fails
+        if (!this.currentUser || !this.currentUser.name) {
+          console.log('🔄 API failed, trying localStorage fallback...')
+          this.tryGetUserFromLocalStorage()
+          console.log('🔍 After localStorage:', {
+            hasCurrentUser: !!this.currentUser,
+            userName: this.currentUser?.name
+          })
         }
+
+        // Fallback to Pinia store
+        if (!this.currentUser || !this.currentUser.name) {
+          console.log('🔄 localStorage failed, trying Pinia store fallback...')
+          this.tryGetUserFromStore()
+          console.log('🔍 After Pinia store:', {
+            hasCurrentUser: !!this.currentUser,
+            userName: this.currentUser?.name,
+            userRole: this.getUserRole()
+          })
+        }
+
+        // Final check
+        if (!this.currentUser || !this.currentUser.name) {
+          console.error('❌ CRITICAL: Unable to load user from any source!')
+          console.error('❌ This will cause role detection to fail')
+        } else {
+          console.log('✅ User successfully loaded:', this.currentUser.name)
+          console.log('✅ Detected user role:', this.getUserRole())
+        }
+
+        if (this.isReviewMode && this.getRequestId) {
+          await this.loadRequestData()
+
+          // Debug: Check signature indicators after data loads (development only)
+          if (this.isDevelopment) {
+            setTimeout(() => {
+              console.log('\u23f0 5-second debug check after mount:', {
+                shouldShowHodSignedIndicator: this.shouldShowHodSignedIndicator,
+                shouldShowHodNoSignatureIndicator: this.shouldShowHodNoSignatureIndicator,
+                hasStageSigned_hod: this.hasStageSigned('hod'),
+                viewerAfter_hod: this.viewerAfter('hod'),
+                isReviewMode: this.isReviewMode,
+                currentUser: this.currentUser,
+                userRole: this.getUserRole(),
+                viewerStage: this.viewerStage(),
+                viewerRank: this.viewerRank(),
+                requestStatus: this.requestData?.status,
+                requestId: this.getRequestId
+              })
+            }, 5000)
+          }
+        }
+      } catch (error) {
+        console.error('❌ Component mount error:', error)
+        // Don't let mount errors cause page to disappear
+        // Just log the error and continue with basic functionality
+        this.error = 'Failed to fully initialize component, but continuing...'
       }
     },
     watch: {
@@ -6403,7 +6169,7 @@
           this.error = null
 
           // Load request data for review mode
-          console.log('💾 Loading request data for ID:', this.requestId)
+          console.log('💾 Loading request data for ID:', this.getRequestId)
           console.log('💾 API call starting...')
 
           // Always try combined API first to get complete request data with signatures
@@ -6413,14 +6179,14 @@
 
           console.log('💾 Trying combined API service first for complete data...')
           try {
-            response = await combinedAccessService.getRequestById(this.requestId)
+            response = await combinedAccessService.getRequestById(this.getRequestId)
             console.log('💾 Combined API response received')
           } catch (error) {
             console.warn('💾 Combined API failed, trying role-specific API:', error)
 
             if (['ict_officer', 'officer_ict'].includes(userRole)) {
               console.log('💾 Using ICT Officer API service as fallback')
-              response = await ictOfficerService.getAccessRequestById(this.requestId)
+              response = await ictOfficerService.getAccessRequestById(this.getRequestId)
             } else {
               console.error('💾 No fallback API available')
               throw error
@@ -6740,10 +6506,24 @@
         } catch (error) {
           console.error('Error loading request data:', error)
           this.error = `Failed to load request data: ${error.message}`
-          this.toast = {
-            show: true,
-            message: 'Error loading request data'
+
+          // For ICT Officers, try to continue with minimal functionality instead of failing completely
+          const userRole = (this.getUserRole() || '').toLowerCase()
+          if (['ict_officer', 'officer_ict'].includes(userRole)) {
+            console.log(
+              '🛡️ ICT Officer detected - attempting graceful degradation instead of complete failure'
+            )
+            this.toast = {
+              show: true,
+              message: 'Some data could not be loaded, but you can still view the form.'
+            }
+          } else {
+            this.toast = {
+              show: true,
+              message: 'Error loading request data'
+            }
           }
+
           setTimeout(() => (this.toast.show = false), 3000)
         } finally {
           this.loading = false
@@ -6927,7 +6707,7 @@
 
         // Add timeout to prevent hanging requests
         const approvalPromise = bothServiceFormService.hodApproveModuleRequest(
-          this.requestId,
+          this.getRequestId,
           payload
         )
         const timeoutPromise = new Promise((_, reject) =>
@@ -6995,7 +6775,7 @@
 
         // Add timeout to prevent hanging requests
         const approvalPromise = bothServiceFormService.divisionalDirectorApprove(
-          this.requestId,
+          this.getRequestId,
           payload
         )
         const timeoutPromise = new Promise((_, reject) =>
@@ -7113,7 +6893,7 @@
         }
 
         // Use the both service form service for approval (consistent with HOD/Divisional)
-        const result = await bothServiceFormService.ictDirectorApprove(this.requestId, payload)
+        const result = await bothServiceFormService.ictDirectorApprove(this.getRequestId, payload)
 
         if (result.success) {
           this.toast = {
@@ -7227,7 +7007,7 @@
         }
 
         // Use the both service form service for Head IT approval
-        const result = await bothServiceFormService.headItApprove(this.requestId, payload)
+        const result = await bothServiceFormService.headItApprove(this.getRequestId, payload)
 
         if (result.success) {
           // Show success card with ICT Officer selection option
@@ -7271,8 +7051,8 @@
       // Navigate to ICT Officer selection page
       navigateToSelectIctOfficer() {
         try {
-          console.log('Navigating to ICT Officer selection for request:', this.requestId)
-          this.$router.push(`/head_of_it-dashboard/select-ict-officer/${this.requestId}`)
+          console.log('Navigating to ICT Officer selection for request:', this.getRequestId)
+          this.$router.push(`/head_of_it-dashboard/select-ict-officer/${this.getRequestId}`)
         } catch (error) {
           console.error('Error navigating to ICT Officer selection:', error)
           // Fallback: show error message and navigate back
@@ -7337,34 +7117,34 @@
           const stage = this.currentApprovalStage
           const userRole = (this.getUserRole() || '').toLowerCase()
 
-          console.log('Rejecting request:', this.requestId, 'with reason:', this.rejectionReason)
+          console.log('Rejecting request:', this.getRequestId, 'with reason:', this.rejectionReason)
 
           let result
 
           if (stage === 'hod' && ['head_of_department', 'hod'].includes(userRole)) {
             // HOD rejection using the existing API
-            result = await combinedAccessService.updateHodApproval(this.requestId, {
+            result = await combinedAccessService.updateHodApproval(this.getRequestId, {
               status: 'rejected',
               comments: this.rejectionReason
             })
           } else if (stage === 'divisional' && ['divisional_director'].includes(userRole)) {
             // Divisional Director rejection using new API
             const currentUserName = this.currentUser?.name || ''
-            result = await bothServiceFormService.divisionalDirectorReject(this.requestId, {
+            result = await bothServiceFormService.divisionalDirectorReject(this.getRequestId, {
               divisionalDirectorName: currentUserName,
               rejectionReason: this.rejectionReason,
               rejectionDate: new Date().toISOString().slice(0, 10)
             })
           } else if (stage === 'ict_director' && ['ict_director', 'dict'].includes(userRole)) {
             // ICT Director rejection using both service form service
-            result = await bothServiceFormService.ictDirectorReject(this.requestId, {
+            result = await bothServiceFormService.ictDirectorReject(this.getRequestId, {
               ictDirectorName: this.currentUser?.name || '',
               rejectionReason: this.rejectionReason,
               rejectionDate: new Date().toISOString().slice(0, 10)
             })
           } else if (stage === 'head_it' && ['head_it', 'head_of_it'].includes(userRole)) {
             // Head IT rejection using both service form service
-            result = await bothServiceFormService.headItReject(this.requestId, {
+            result = await bothServiceFormService.headItReject(this.getRequestId, {
               headItName: this.currentUser?.name || '',
               rejectionReason: this.rejectionReason,
               rejectionDate: new Date().toISOString().slice(0, 10)
@@ -7419,7 +7199,7 @@
         this.processing = true
 
         try {
-          console.log('🚀 ICT Officer approving implementation for request:', this.requestId)
+          console.log('🚀 ICT Officer approving implementation for request:', this.getRequestId)
 
           console.log('Submitting ICT Officer implementation via form submission...')
 
@@ -7468,7 +7248,7 @@
         this.$router.push({
           name: 'UserSecurityAccess',
           params: {
-            id: this.requestId
+            id: this.getRequestId
           },
           query: {
             role: 'ict_officer'
@@ -7497,18 +7277,18 @@
 
       goToRequestDetails() {
         try {
-          console.log('Navigating to request details for ID:', this.requestId)
+          console.log('Navigating to request details for ID:', this.getRequestId)
           this.$router.push({
             path: '/request-details',
             query: {
-              id: this.requestId,
+              id: this.getRequestId,
               type: 'combined_access'
             }
           })
         } catch (error) {
           console.error('Error navigating to request details:', error)
           // Fallback navigation
-          this.$router.push(`/request-details?id=${this.requestId}&type=combined_access`)
+          this.$router.push(`/request-details?id=${this.getRequestId}&type=combined_access`)
         }
       },
 
@@ -8042,7 +7822,7 @@
           allRoles: this.currentUser?.roles
         })
         console.log('Request Info:', {
-          requestId: this.requestId,
+          requestId: this.getRequestId,
           requestStatus: this.requestData?.status,
           currentApprovalStage: this.currentApprovalStage
         })
