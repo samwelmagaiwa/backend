@@ -80,6 +80,7 @@ class UserRoleController extends Controller
                         return [
                             'id' => $role->id,
                             'name' => $role->name,
+                            'display_name' => $role->getDisplayName(),
                             'description' => $role->description,
                             'assigned_at' => $role->pivot->assigned_at,
                             'assigned_by' => $role->pivot->assigned_by,

@@ -113,7 +113,7 @@ class AdminUserController extends Controller
                         return [
                             'id' => $role->id,
                             'name' => $role->name,
-                            'display_name' => ucwords(str_replace('_', ' ', $role->name)),
+                            'display_name' => $role->getDisplayName(),
                             'assigned_at' => $role->pivot->assigned_at,
                         ];
                     }),
@@ -679,13 +679,13 @@ class AdminUserController extends Controller
         try {
             $roles = Role::orderBy('sort_order')
                 ->orderBy('name')
-                ->get(['id', 'name', 'description', 'is_system_role']);
+                ->get(['id', 'name', 'display_name', 'description', 'is_system_role']);
 
             $transformedRoles = $roles->map(function ($role) {
                 return [
                     'id' => $role->id,
                     'name' => $role->name,
-                    'display_name' => ucwords(str_replace('_', ' ', $role->name)),
+                    'display_name' => $role->getDisplayName(),
                     'description' => $role->description,
                     'is_system_role' => $role->is_system_role
                 ];
@@ -754,13 +754,13 @@ class AdminUserController extends Controller
             // Get roles
             $roles = Role::orderBy('sort_order')
                 ->orderBy('name')
-                ->get(['id', 'name', 'description', 'is_system_role']);
+                ->get(['id', 'name', 'display_name', 'description', 'is_system_role']);
 
             $transformedRoles = $roles->map(function ($role) {
                 return [
                     'id' => $role->id,
                     'name' => $role->name,
-                    'display_name' => ucwords(str_replace('_', ' ', $role->name)),
+                    'display_name' => $role->getDisplayName(),
                     'description' => $role->description,
                     'is_system_role' => $role->is_system_role
                 ];

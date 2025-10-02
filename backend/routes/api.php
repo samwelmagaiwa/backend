@@ -406,13 +406,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Module request data routes
         Route::get('/module-requests/{userAccessId}', [BothServiceFormController::class, 'getModuleRequestData'])
-            ->middleware('both.service.role:hod,divisional_director,dict,head_of_it,ict_officer')
+            ->middleware('both.service.role:hod,divisional_director,ict_director,head_of_it,ict_officer')
             ->name('both-service-form.module-requests.show');
         Route::get('/module-requests', [BothServiceFormController::class, 'getPendingModuleRequests'])
-            ->middleware('both.service.role:hod,divisional_director,dict,head_of_it,ict_officer')
+            ->middleware('both.service.role:hod,divisional_director,ict_director,head_of_it,ict_officer')
             ->name('both-service-form.module-requests.pending');
         Route::get('/module-requests-statistics', [BothServiceFormController::class, 'getModuleRequestStatistics'])
-            ->middleware('both.service.role:hod,divisional_director,dict,head_of_it,ict_officer')
+            ->middleware('both.service.role:hod,divisional_director,ict_director,head_of_it,ict_officer')
             ->name('both-service-form.module-requests.statistics');
 
         // HOD approval with access rights validation
@@ -434,10 +434,10 @@ Route::middleware('auth:sanctum')->group(function () {
         
         // ICT Director approval routes
         Route::post('/module-requests/{userAccessId}/ict-director-approve', [BothServiceFormController::class, 'approveIctDirector'])
-            ->middleware('both.service.role:dict,ict_director')
+            ->middleware('both.service.role:ict_director')
             ->name('both-service-form.module-requests.ict-director-approve');
         Route::post('/module-requests/{userAccessId}/ict-director-reject', [BothServiceFormController::class, 'rejectIctDirector'])
-            ->middleware('both.service.role:dict,ict_director')
+            ->middleware('both.service.role:ict_director')
             ->name('both-service-form.module-requests.ict-director-reject');
         
         // Head of IT approval routes
@@ -460,7 +460,7 @@ Route::middleware('auth:sanctum')->group(function () {
             ->middleware('both.service.role:divisional_director')
             ->name('both-service-form.approve.divisional-director');
         Route::post('/{id}/approve/dict', [BothServiceFormController::class, 'approveAsDICT'])
-            ->middleware('both.service.role:dict')
+            ->middleware('both.service.role:ict_director')
             ->name('both-service-form.approve.dict');
         Route::post('/{id}/approve/hod-it', [BothServiceFormController::class, 'approveAsHODIT'])
             ->middleware('both.service.role:head_of_it')
@@ -562,35 +562,35 @@ Route::prefix('hod')->middleware('role:head_of_department,divisional_director,ic
         Route::get('combined-access-requests/{id}/timeline', [DivisionalCombinedAccessController::class, 'getAccessRequestTimeline'])
             ->name('divisional.combined-access-requests.timeline');
             
-        // Divisional Director Dict Recommendations
-        Route::get('dict-recommendations', [\App\Http\Controllers\Api\v1\DivisionalDictRecommendationsController::class, 'getDictRecommendations'])
+        // Divisional Director ICT Director Recommendations
+        Route::get('ict-director-recommendations', [\App\Http\Controllers\Api\v1\DivisionalDictRecommendationsController::class, 'getDictRecommendations'])
             ->middleware('role:divisional_director')
-            ->name('divisional.dict-recommendations.list');
-        Route::get('dict-recommendations/stats', [\App\Http\Controllers\Api\v1\DivisionalDictRecommendationsController::class, 'getRecommendationStats'])
+            ->name('divisional.ict-director-recommendations.list');
+        Route::get('ict-director-recommendations/stats', [\App\Http\Controllers\Api\v1\DivisionalDictRecommendationsController::class, 'getRecommendationStats'])
             ->middleware('role:divisional_director')
-            ->name('divisional.dict-recommendations.stats');
-        Route::get('dict-recommendations/{userAccessId}/details', [\App\Http\Controllers\Api\v1\DivisionalDictRecommendationsController::class, 'getRequestDetails'])
+            ->name('divisional.ict-director-recommendations.stats');
+        Route::get('ict-director-recommendations/{userAccessId}/details', [\App\Http\Controllers\Api\v1\DivisionalDictRecommendationsController::class, 'getRequestDetails'])
             ->middleware('role:divisional_director')
-            ->name('divisional.dict-recommendations.details');
-        Route::post('dict-recommendations/{userAccessId}/respond', [\App\Http\Controllers\Api\v1\DivisionalDictRecommendationsController::class, 'submitResponse'])
+            ->name('divisional.ict-director-recommendations.details');
+        Route::post('ict-director-recommendations/{userAccessId}/respond', [\App\Http\Controllers\Api\v1\DivisionalDictRecommendationsController::class, 'submitResponse'])
             ->middleware('role:divisional_director')
-            ->name('divisional.dict-recommendations.respond');
+            ->name('divisional.ict-director-recommendations.respond');
     });
 
     // ICT Director Combined Access Request routes (ICT Director and Head of IT)
-    Route::prefix('dict')->middleware('role:ict_director,head_of_it,admin')->group(function () {
+    Route::prefix('ict-director')->middleware('role:ict_director,head_of_it,admin')->group(function () {
         Route::get('combined-access-requests', [\App\Http\Controllers\Api\v1\DictCombinedAccessController::class, 'index'])
-            ->name('dict.combined-access-requests.index');
+            ->name('ict-director.combined-access-requests.index');
         Route::get('combined-access-requests/statistics', [\App\Http\Controllers\Api\v1\DictCombinedAccessController::class, 'statistics'])
-            ->name('dict.combined-access-requests.statistics');
+            ->name('ict-director.combined-access-requests.statistics');
         Route::get('combined-access-requests/{id}', [\App\Http\Controllers\Api\v1\DictCombinedAccessController::class, 'show'])
-            ->name('dict.combined-access-requests.show');
+            ->name('ict-director.combined-access-requests.show');
         Route::post('combined-access-requests/{id}/approve', [\App\Http\Controllers\Api\v1\DictCombinedAccessController::class, 'updateApproval'])
-            ->name('dict.combined-access-requests.approve');
+            ->name('ict-director.combined-access-requests.approve');
         Route::post('combined-access-requests/{id}/cancel', [\App\Http\Controllers\Api\v1\DictCombinedAccessController::class, 'cancel'])
-            ->name('dict.combined-access-requests.cancel');
+            ->name('ict-director.combined-access-requests.cancel');
         Route::get('combined-access-requests/{id}/timeline', [\App\Http\Controllers\Api\v1\DictCombinedAccessController::class, 'getAccessRequestTimeline'])
-            ->name('dict.combined-access-requests.timeline');
+            ->name('ict-director.combined-access-requests.timeline');
     });
 
     // Head of IT routes (Head of IT only)
@@ -627,16 +627,16 @@ Route::prefix('hod')->middleware('role:head_of_department,divisional_director,ic
         Route::post('tasks/{requestId}/cancel', [HeadOfItController::class, 'cancelTaskAssignment'])
             ->name('head-of-it.cancel-task');
             
-        // Head of IT DICT Recommendations
-        Route::get('dict-recommendations', [\App\Http\Controllers\Api\v1\HeadOfItDictRecommendationsController::class, 'getDictRecommendations'])
+        // Head of IT ICT Director Recommendations
+        Route::get('ict-director-recommendations', [\App\Http\Controllers\Api\v1\HeadOfItDictRecommendationsController::class, 'getDictRecommendations'])
             ->middleware('role:head_of_it')
-            ->name('head-of-it.dict-recommendations.list');
-        Route::get('dict-recommendations/stats', [\App\Http\Controllers\Api\v1\HeadOfItDictRecommendationsController::class, 'getRecommendationStats'])
+            ->name('head-of-it.ict-director-recommendations.list');
+        Route::get('ict-director-recommendations/stats', [\App\Http\Controllers\Api\v1\HeadOfItDictRecommendationsController::class, 'getRecommendationStats'])
             ->middleware('role:head_of_it')
-            ->name('head-of-it.dict-recommendations.stats');
-        Route::get('dict-recommendations/{userAccessId}/details', [\App\Http\Controllers\Api\v1\HeadOfItDictRecommendationsController::class, 'getRequestDetails'])
+            ->name('head-of-it.ict-director-recommendations.stats');
+        Route::get('ict-director-recommendations/{userAccessId}/details', [\App\Http\Controllers\Api\v1\HeadOfItDictRecommendationsController::class, 'getRequestDetails'])
             ->middleware('role:head_of_it')
-            ->name('head-of-it.dict-recommendations.details');
+            ->name('head-of-it.ict-director-recommendations.details');
             
         // ========================================
         // NEW ICT TASK ASSIGNMENT ROUTES (UserAccess system)

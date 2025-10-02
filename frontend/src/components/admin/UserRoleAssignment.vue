@@ -152,6 +152,7 @@
                       <span>{{ loading ? 'Loading...' : 'Refresh' }}</span>
                     </button>
                     <button
+                      v-if="isDevelopment"
                       @click="debugFilterData"
                       class="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-yellow-600 hover:to-yellow-700 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center space-x-2"
                     >
@@ -424,11 +425,11 @@
       @click="closeCreateUserModal"
     >
       <div
-        class="bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+        class="bg-blue-900 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto"
         @click.stop
       >
         <!-- Modal Header -->
-        <div class="bg-red-800 p-6 rounded-t-2xl border-b border-blue-500/30">
+        <div class="bg-blue-800 p-6 rounded-t-2xl border-b border-blue-500/30">
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-4">
               <div class="w-12 h-12 bg-blue-500/30 rounded-xl flex items-center justify-center">
@@ -474,11 +475,16 @@
                   <input
                     v-model="newUser.email"
                     type="email"
-                    class="medical-input w-full px-5 py-4 text-lg bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm"
+                    :class="[
+                      'medical-input w-full px-5 py-4 text-lg bg-white/15 border-2 rounded-xl focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm',
+                      userFormErrors.email ? 'border-red-400/70 focus:border-red-400' : 'border-blue-300/30 focus:border-blue-400'
+                    ]"
                     placeholder="user@example.com"
                     required
                   />
-                  <p v-if="userFormErrors.email" class="text-red-400 text-xs mt-1">{{ userFormErrors.email }}</p>
+                  <p v-if="userFormErrors.email" class="text-red-300 text-sm mt-2 font-semibold bg-red-900/30 px-3 py-2 rounded-lg border border-red-400/30">
+                    <i class="fas fa-exclamation-circle mr-2"></i>{{ Array.isArray(userFormErrors.email) ? userFormErrors.email[0] : userFormErrors.email }}
+                  </p>
                 </div>
                 <div>
                   <label class="block text-lg font-bold text-blue-100 mb-3">Phone Number *</label>
@@ -496,10 +502,15 @@
                   <input
                     v-model="newUser.pf_number"
                     type="text"
-                    class="medical-input w-full px-5 py-4 text-lg bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm"
+                    :class="[
+                      'medical-input w-full px-5 py-4 text-lg bg-white/15 border-2 rounded-xl focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm',
+                      userFormErrors.pf_number ? 'border-red-400/70 focus:border-red-400' : 'border-blue-300/30 focus:border-blue-400'
+                    ]"
                     placeholder="Enter PF number (optional)"
                   />
-                  <p v-if="userFormErrors.pf_number" class="text-red-400 text-xs mt-1">{{ userFormErrors.pf_number }}</p>
+                  <p v-if="userFormErrors.pf_number" class="text-red-300 text-sm mt-2 font-semibold bg-red-900/30 px-3 py-2 rounded-lg border border-red-400/30">
+                    <i class="fas fa-exclamation-circle mr-2"></i>{{ Array.isArray(userFormErrors.pf_number) ? userFormErrors.pf_number[0] : userFormErrors.pf_number }}
+                  </p>
                 </div>
                 <div>
                   <label class="block text-lg font-bold text-blue-100 mb-3">Password *</label>
@@ -648,7 +659,7 @@
         @click.stop
       >
         <!-- Modal Header -->
-        <div class="bg-red-800 p-8 rounded-t-2xl border-b border-blue-500/30">
+        <div class="bg-blue-800 p-8 rounded-t-2xl border-b border-blue-500/30">
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-6">
               <div class="w-16 h-16 bg-blue-500/30 rounded-xl flex items-center justify-center">
@@ -965,11 +976,11 @@
       @click="closeRoleHistoryModal"
     >
       <div
-        class="bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+        class="bg-blue-900 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto"
         @click.stop
       >
         <!-- Modal Header -->
-        <div class="bg-gradient-to-r from-red-600 to-red-700 p-6 rounded-t-2xl border-b border-red-500/30">
+        <div class="bg-blue-800 p-6 rounded-t-2xl border-b border-blue-500/30">
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-4">
               <div class="w-12 h-12 bg-red-500/30 rounded-xl flex items-center justify-center">
@@ -1211,6 +1222,9 @@
       const showSnackbar = ref(false)
       const snackbarMessage = ref('')
       const snackbarColor = ref('success')
+      
+      // Environment check
+      const isDevelopment = computed(() => process.env.NODE_ENV === 'development')
 
       // Computed properties
       const filteredUsers = computed(() => {
@@ -1220,12 +1234,14 @@
           return []
         }
 
-        console.log('Total users loaded:', users.value.length)
-        if (users.value.length > 0) {
-          console.log('Sample user structure:', {
-            name: users.value[0].name,
-            roles: users.value[0].roles
-          })
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Total users loaded:', users.value.length)
+          if (users.value.length > 0) {
+            console.log('Sample user structure:', {
+              name: users.value[0].name,
+              roles: users.value[0].roles
+            })
+          }
         }
         
         let filtered = [...users.value]
@@ -1243,14 +1259,16 @@
 
         // Apply role filter
         if (filterRole.value) {
-          console.log('Filtering by role:', filterRole.value)
-          console.log('Available users before role filter:', filtered.length)
-          console.log('Sample user roles:', filtered.length > 0 ? filtered[0].roles : 'No users')
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Filtering by role:', filterRole.value)
+            console.log('Available users before role filter:', filtered.length)
+            console.log('Sample user roles:', filtered.length > 0 ? filtered[0].roles : 'No users')
+          }
           
           filtered = filtered.filter((user) => {
             const hasRole = user.roles && Array.isArray(user.roles) && user.roles.some((role) => {
               const matches = role.name === filterRole.value
-              if (user.roles.length > 0) {
+              if (process.env.NODE_ENV === 'development' && user.roles.length > 0) {
                 console.log(`User ${user.name} has roles:`, user.roles.map(r => r.name), `Looking for: ${filterRole.value}, Match: ${matches}`)
               }
               return matches
@@ -1258,7 +1276,9 @@
             return hasRole
           })
           
-          console.log('Users after role filter:', filtered.length)
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Users after role filter:', filtered.length)
+          }
         }
 
         // Apply department filter
@@ -1332,11 +1352,15 @@
 
       const fetchUsers = async () => {
         try {
+        if (process.env.NODE_ENV === 'development') {
           console.log('Fetching users...')
-          const response = await adminUserService.getAllUsers()
-          
-          // Ensure we have a proper response structure
+        }
+        const response = await adminUserService.getAllUsers()
+        
+        // Ensure we have a proper response structure
+        if (process.env.NODE_ENV === 'development') {
           console.log('Raw user response structure:', response)
+        }
           if (response && response.success && response.data) {
             // Handle success response structure
             if (Array.isArray(response.data.users)) {
@@ -1364,12 +1388,14 @@
             users.value = []
           }
           
+        if (process.env.NODE_ENV === 'development') {
           console.log('Fetched users successfully:', users.value.length)
           console.log('All users fetched:', users.value.map(u => ({
             name: u.name,
             email: u.email,
             roles: u.roles ? u.roles.map(r => r.name) : []
           })))
+        }
         } catch (error) {
           console.error('Error fetching users:', error)
           // Always ensure users.value is an array
@@ -1395,7 +1421,9 @@
             department_distribution: [],
             hod_users: 0
           }
+        if (process.env.NODE_ENV === 'development') {
           console.log('Fetched user statistics')
+        }
         } catch (error) {
           console.error('Error fetching user statistics:', error)
           // Set default values but don't throw
@@ -1413,25 +1441,27 @@
       }
       
       const debugFilterData = () => {
-        console.log('=== DEBUG FILTER DATA ===')
-        console.log('Total users loaded:', users.value.length)
-        console.log('Available roles:', availableRoles.value.map(r => ({ id: r.id, name: r.name, display: r.display_name })))
-        console.log('Current filter role:', filterRole.value)
-        console.log('Users with super_admin role:')
-        users.value.forEach(user => {
-          if (user.roles && user.roles.some(role => role.name === 'super_admin')) {
-            console.log(`  - ${user.name} (${user.email}) has roles:`, user.roles.map(r => r.name))
-          }
-        })
-        console.log('Users with any roles:')
-        users.value.forEach(user => {
-          if (user.roles && user.roles.length > 0) {
-            console.log(`  - ${user.name} has roles:`, user.roles.map(r => r.name))
-          } else {
-            console.log(`  - ${user.name} has NO roles`)
-          }
-        })
-        console.log('==========================')
+        if (process.env.NODE_ENV === 'development') {
+          console.log('=== DEBUG FILTER DATA ===')
+          console.log('Total users loaded:', users.value.length)
+          console.log('Available roles:', availableRoles.value.map(r => ({ id: r.id, name: r.name, display: r.display_name })))
+          console.log('Current filter role:', filterRole.value)
+          console.log('Users with super_admin role:')
+          users.value.forEach(user => {
+            if (user.roles && user.roles.some(role => role.name === 'super_admin')) {
+              console.log(`  - ${user.name} (${user.email}) has roles:`, user.roles.map(r => r.name))
+            }
+          })
+          console.log('Users with any roles:')
+          users.value.forEach(user => {
+            if (user.roles && user.roles.length > 0) {
+              console.log(`  - ${user.name} has roles:`, user.roles.map(r => r.name))
+            } else {
+              console.log(`  - ${user.name} has NO roles`)
+            }
+          })
+          console.log('==========================')
+        }
       }
 
       const debouncedSearch = debounce(() => {
@@ -1605,6 +1635,27 @@
           // Handle validation errors
           if (error.response?.status === 422 && error.response.data?.errors) {
             userFormErrors.value = error.response.data.errors
+            
+            // Show specific user-friendly messages for common validation errors
+            const errors = error.response.data.errors
+            let friendlyMessage = ''
+            
+            if (errors.email && errors.email.includes('This email address is already registered.')) {
+              friendlyMessage = `❌ User with email "${newUser.value.email}" already exists. Please use a different email address.`
+            } else if (errors.pf_number && errors.pf_number.includes('This PF number is already registered.')) {
+              friendlyMessage = `❌ User with PF Number "${newUser.value.pf_number}" already exists. Please use a different PF number.`
+            } else if (errors.email || errors.pf_number) {
+              // General duplicate user message
+              friendlyMessage = '❌ A user with this email or PF number already exists. Please check your details and try again.'
+            } else {
+              // Other validation errors
+              const firstError = Object.values(errors)[0]
+              friendlyMessage = Array.isArray(firstError) ? firstError[0] : firstError
+            }
+            
+            if (friendlyMessage) {
+              showErrorMessage(friendlyMessage)
+            }
           } else {
             showErrorMessage(error.message || 'Failed to create user')
           }
@@ -1684,27 +1735,36 @@
         snackbarMessage.value = message
         snackbarColor.value = 'error'
         showSnackbar.value = true
+        // Show error messages longer for better visibility
         setTimeout(() => {
           showSnackbar.value = false
-        }, 5000)
+        }, 8000)
       }
 
       // Fetch roles function
       const fetchRoles = async () => {
         loadingRoles.value = true
         try {
+        if (process.env.NODE_ENV === 'development') {
           console.log('Fetching roles...')
-          const response = await adminUserService.getRoles()
+        }
+        const response = await adminUserService.getRoles()
+        if (process.env.NODE_ENV === 'development') {
           console.log('Raw response:', response)
-          
-          if (response && response.success && response.data) {
-            availableRoles.value = Array.isArray(response.data) ? response.data : []
+        }
+        
+        if (response && response.success && response.data) {
+          availableRoles.value = Array.isArray(response.data) ? response.data : []
+          if (process.env.NODE_ENV === 'development') {
             console.log('Fetched roles successfully for filters:', availableRoles.value.length, 'roles loaded')
             console.log('Available roles for filters:', availableRoles.value.map(r => r.display_name || r.name))
-          } else {
-            console.warn('Invalid response structure:', response)
-            availableRoles.value = []
           }
+        } else {
+          if (process.env.NODE_ENV === 'development') {
+            console.warn('Invalid response structure:', response)
+          }
+          availableRoles.value = []
+        }
         } catch (error) {
           console.error('Error fetching roles:', error)
           console.error('Error details:', {
@@ -1722,22 +1782,32 @@
       // Fetch departments function
       const fetchDepartments = async () => {
         try {
+        if (process.env.NODE_ENV === 'development') {
           console.log('Fetching departments...')
-          const response = await adminUserService.getDepartments()
+        }
+        const response = await adminUserService.getDepartments()
+        if (process.env.NODE_ENV === 'development') {
           console.log('Raw departments response:', response)
-          
-          if (response && response.success && response.data) {
-            availableDepartments.value = Array.isArray(response.data) ? response.data : []
+        }
+        
+        if (response && response.success && response.data) {
+          availableDepartments.value = Array.isArray(response.data) ? response.data : []
+          if (process.env.NODE_ENV === 'development') {
             console.log('Fetched departments successfully for filters:', availableDepartments.value.length, 'departments loaded')
             console.log('Available departments for filters:', availableDepartments.value.map(d => d.display_name || d.name))
-          } else if (response && response.data) {
-            // Fallback for different response structure
-            availableDepartments.value = Array.isArray(response.data) ? response.data : []
+          }
+        } else if (response && response.data) {
+          // Fallback for different response structure
+          availableDepartments.value = Array.isArray(response.data) ? response.data : []
+          if (process.env.NODE_ENV === 'development') {
             console.log('Fetched departments with fallback structure:', availableDepartments.value.length)
-          } else {
-            availableDepartments.value = []
+          }
+        } else {
+          availableDepartments.value = []
+          if (process.env.NODE_ENV === 'development') {
             console.log('No departments data received')
           }
+        }
         } catch (error) {
           console.error('Error fetching departments:', error)
           availableDepartments.value = []
@@ -1748,14 +1818,18 @@
       // Role assignment and history methods
       const openAssignRolesDialog = async (user) => {
         try {
+        if (process.env.NODE_ENV === 'development') {
           console.log('Opening assign roles dialog for user:', user.name)
-          selectedUser.value = user
-          userRoleAssignment.value.selectedRoles = user.roles ? user.roles.map(role => role.id) : []
-          roleAssignmentErrors.value = {}
-          showAssignRolesModal.value = true
-          
-          // Always fetch roles to ensure we have the latest data
+        }
+        selectedUser.value = user
+        userRoleAssignment.value.selectedRoles = user.roles ? user.roles.map(role => role.id) : []
+        roleAssignmentErrors.value = {}
+        showAssignRolesModal.value = true
+        
+        // Always fetch roles to ensure we have the latest data
+        if (process.env.NODE_ENV === 'development') {
           console.log('Current availableRoles length:', availableRoles.value.length)
+        }
           await fetchRoles()
           
           if (availableDepartments.value.length === 0) {
@@ -1809,6 +1883,9 @@
         assigningRoles.value = true
         roleAssignmentErrors.value = {}
         
+        // Store current filter state to potentially clear it
+        const currentRoleFilter = filterRole.value
+        
         try {
           const response = await adminUserService.assignUserRoles(
             selectedUser.value.id,
@@ -1816,12 +1893,38 @@
           )
           
           if (response.success) {
-            console.log('Role assignment successful:', response)
+            if (isDevelopment.value) {
+              console.log('Role assignment successful:', response)
+            }
+            
             showSuccessMessage('Roles updated successfully!')
             closeAssignRolesModal()
-            console.log('Refreshing data after role assignment...')
+            
+            if (isDevelopment.value) {
+              console.log('Refreshing data after role assignment...')
+            }
+            
+            // If there's a role filter active, check if the user would still be visible
+            // If not, temporarily clear the filter to ensure user visibility
+            const userNewRoles = userRoleAssignment.value.selectedRoles
+            const userHasFilteredRole = currentRoleFilter && userNewRoles.length > 0 && 
+              availableRoles.value.some(role => 
+                role.id && userNewRoles.includes(role.id) && role.name === currentRoleFilter
+              )
+              
+            if (currentRoleFilter && !userHasFilteredRole) {
+              // Clear the role filter temporarily so user remains visible
+              filterRole.value = ''
+              if (isDevelopment.value) {
+                console.log('Cleared role filter to maintain user visibility after role change')
+              }
+            }
+            
             await refreshData() // Refresh user list to show updated roles
-            console.log('Data refresh completed')
+            
+            if (isDevelopment.value) {
+              console.log('Data refresh completed')
+            }
           } else {
             throw new Error(response.message || 'Failed to assign roles')
           }
@@ -1887,6 +1990,7 @@
         // Computed
         filteredUsers,
         groupedPermissions,
+        isDevelopment,
 
         // Methods
         refreshData,

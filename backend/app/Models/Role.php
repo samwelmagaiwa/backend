@@ -13,6 +13,7 @@ class Role extends Model
 
     protected $fillable = [
         'name',
+        'display_name',
         'description',
         'permissions',
         'is_system_role',
@@ -87,12 +88,20 @@ class Role extends Model
     }
 
     /**
-     * Get role display name with user count
+     * Get role display name with user count for admin UI
      */
-    public function getDisplayNameAttribute(): string
+    public function getDisplayNameWithUserCount(): string
     {
         $userCount = $this->users()->count();
-        return "{$this->name} ({$userCount} users)";
+        return "{$this->getDisplayName()} ({$userCount} users)";
+    }
+    
+    /**
+     * Get human-readable display name
+     */
+    public function getDisplayName(): string
+    {
+        return $this->display_name ?: ucwords(str_replace('_', ' ', $this->name));
     }
 
     /**
@@ -111,7 +120,6 @@ class Role extends Model
         $hierarchy = [
             'admin' => 100,
             'ict_director' => 90,
-            'dict' => 90, // Legacy support
             'divisional_director' => 80,
             'head_of_department' => 70,
             'head_of_it' => 65,
