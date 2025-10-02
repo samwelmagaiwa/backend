@@ -2,6 +2,7 @@
   <div>
     <!-- Simple Loading Banner Component -->
     <SimpleLoadingBanner
+      ref="loadingBanner"
       v-if="isLoadingProfile"
       :show="isLoadingProfile"
       :auto-start="true"
@@ -813,7 +814,20 @@
        */
       onLoadingComplete() {
         console.log('🎉 Loading banner animation completed')
-        // The loading banner will automatically hide when isLoadingProfile becomes false
+        // Loading banner has finished its fade-out animation
+      },
+
+      /**
+       * Trigger loading completion on the banner
+       */
+      completeLoadingBanner() {
+        // Find the SimpleLoadingBanner component and call its completeLoading method
+        this.$nextTick(() => {
+          const loadingBanner = this.$refs.loadingBanner
+          if (loadingBanner && loadingBanner.completeLoading) {
+            loadingBanner.completeLoading()
+          }
+        })
       },
 
       /**
@@ -876,7 +890,13 @@
             'error'
           )
         } finally {
-          this.isLoadingProfile = false
+          // Trigger the loading banner completion animation before hiding
+          this.completeLoadingBanner()
+          // isLoadingProfile will be set to false after the animation completes
+          // The loading banner will emit 'loading-complete' event when done
+          setTimeout(() => {
+            this.isLoadingProfile = false
+          }, 400) // Slightly longer than the 300ms fade-out animation
         }
       },
 
@@ -1363,17 +1383,19 @@
           console.warn('⚠️ No user data found in localStorage')
         }
 
-        // Check if token is expired (basic check)
-        try {
-          const tokenData = JSON.parse(atob(token.split('.')[1]))
-          const now = Math.floor(Date.now() / 1000)
+        // For Laravel Sanctum, we can't decode the token like JWT
+        // The token expiry is handled server-side
+        // We can only check if the token exists and is not empty
+        if (token.trim().length === 0) {
+          console.error('❌ Authentication token is empty')
+          return false
+        }
 
-          if (tokenData.exp && tokenData.exp < now) {
-            console.error('❌ Authentication token has expired')
-            return false
-          }
-        } catch (error) {
-          console.warn('⚠️ Could not decode token for expiry check:', error.message)
+        // Optional: Check if token looks valid (basic format check)
+        // Sanctum tokens are typically long random strings
+        if (token.length < 10) {
+          console.warn('⚠️ Authentication token appears to be too short')
+          return false
         }
 
         return true

@@ -291,6 +291,51 @@
                           </p>
                         </div>
                       </div>
+                      
+                      <!-- Three-dot menu -->
+                      <div class="relative" data-dropdown-menu>
+                        <button
+                          @click.stop="toggleUserMenu(user.id)"
+                          class="w-8 h-8 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110 group/menu"
+                          :class="{ 'bg-white/20': openMenuId === user.id }"
+                        >
+                          <i class="fas fa-ellipsis-v text-white text-sm group-hover/menu:scale-110 transition-transform duration-200"></i>
+                        </button>
+                        
+                        <!-- Dropdown menu -->
+                        <div
+                          v-if="openMenuId === user.id"
+                          class="absolute right-0 top-10 w-48 bg-blue-900/95 backdrop-blur-lg border border-blue-400/30 rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+                        >
+                          <!-- Delete User -->
+                          <button
+                            @click.stop="confirmDeleteUser(user)"
+                            class="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-red-500/20 transition-colors duration-200 text-white group/item"
+                          >
+                            <div class="w-8 h-8 bg-red-500/30 rounded-lg flex items-center justify-center group-hover/item:bg-red-500/50 transition-colors duration-200">
+                              <i class="fas fa-user-times text-red-300 text-sm group-hover/item:text-red-200"></i>
+                            </div>
+                            <div class="flex-1">
+                              <div class="font-medium text-sm">Delete User</div>
+                              <div class="text-xs text-gray-300 group-hover/item:text-gray-200">Remove user permanently</div>
+                            </div>
+                          </button>
+                          
+                          <!-- Delete Role -->
+                          <button
+                            @click.stop="confirmDeleteUserRole(user)"
+                            class="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-orange-500/20 transition-colors duration-200 text-white group/item border-t border-blue-400/20"
+                          >
+                            <div class="w-8 h-8 bg-orange-500/30 rounded-lg flex items-center justify-center group-hover/item:bg-orange-500/50 transition-colors duration-200">
+                              <i class="fas fa-shield-alt text-orange-300 text-sm group-hover/item:text-orange-200"></i>
+                            </div>
+                            <div class="flex-1">
+                              <div class="font-medium text-sm">Delete Roles</div>
+                              <div class="text-xs text-gray-300 group-hover/item:text-gray-200">Remove all user roles</div>
+                            </div>
+                          </button>
+                        </div>
+                      </div>
                     </div>
 
                     <!-- Current Roles -->
@@ -1132,6 +1177,191 @@
         </div>
       </div>
     </div>
+    
+    <!-- Delete User Confirmation Modal -->
+    <div
+      v-if="showDeleteUserModal && userToDelete"
+      class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      @click="closeDeleteUserModal"
+    >
+      <div
+        class="bg-red-900/95 rounded-2xl shadow-2xl w-full max-w-md border border-red-400/30"
+        @click.stop
+      >
+        <!-- Modal Header -->
+        <div class="bg-red-800/70 p-6 rounded-t-2xl border-b border-red-400/30">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+              <div class="w-12 h-12 bg-red-500/30 rounded-xl flex items-center justify-center">
+                <i class="fas fa-exclamation-triangle text-red-200 text-xl"></i>
+              </div>
+              <div>
+                <h2 class="text-xl font-bold text-white">Confirm Delete User</h2>
+                <p class="text-red-100 text-sm">This action cannot be undone</p>
+              </div>
+            </div>
+            <button
+              @click="closeDeleteUserModal"
+              class="w-8 h-8 bg-white/10 hover:bg-white/20 rounded-lg transition-colors duration-200 flex items-center justify-center"
+            >
+              <i class="fas fa-times text-white text-sm"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="p-6">
+          <div class="mb-6">
+            <div class="flex items-center space-x-4 mb-4">
+              <div class="w-12 h-12 bg-gradient-to-br from-teal-500 to-blue-600 rounded-full flex items-center justify-center">
+                <span class="text-white font-bold text-sm">{{ getInitials(userToDelete.name) }}</span>
+              </div>
+              <div>
+                <h3 class="font-bold text-white">{{ userToDelete.name }}</h3>
+                <p class="text-red-200 text-sm">{{ userToDelete.email }}</p>
+              </div>
+            </div>
+            
+            <div class="bg-red-500/20 border border-red-400/30 rounded-lg p-4 mb-4">
+              <div class="flex items-start space-x-3">
+                <i class="fas fa-exclamation-triangle text-red-300 text-lg mt-0.5"></i>
+                <div>
+                  <h4 class="font-semibold text-red-100 mb-2">Warning: Permanent Deletion</h4>
+                  <p class="text-red-200 text-sm leading-relaxed">
+                    You are about to permanently delete this user account. This will:
+                  </p>
+                  <ul class="text-red-200 text-sm mt-2 space-y-1 list-disc list-inside pl-4">
+                    <li>Remove the user from the system completely</li>
+                    <li>Delete all associated role assignments</li>
+                    <li>Remove access to all applications</li>
+                    <li>Cannot be recovered once deleted</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="flex justify-end space-x-3">
+            <button
+              @click="closeDeleteUserModal"
+              class="px-4 py-2 bg-gray-600 text-white rounded-lg font-medium hover:bg-gray-700 transition-colors duration-200 flex items-center space-x-2"
+            >
+              <i class="fas fa-times text-sm"></i>
+              <span>Cancel</span>
+            </button>
+            <button
+              @click="deleteUser"
+              :disabled="deletingUser"
+              class="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+            >
+              <i :class="deletingUser ? 'fas fa-spinner fa-spin text-sm' : 'fas fa-trash text-sm'"></i>
+              <span>{{ deletingUser ? 'Deleting...' : 'Delete User' }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Delete User Roles Confirmation Modal -->
+    <div
+      v-if="showDeleteRoleModal && userToRemoveRoles"
+      class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      @click="closeDeleteRoleModal"
+    >
+      <div
+        class="bg-orange-900/95 rounded-2xl shadow-2xl w-full max-w-md border border-orange-400/30"
+        @click.stop
+      >
+        <!-- Modal Header -->
+        <div class="bg-orange-800/70 p-6 rounded-t-2xl border-b border-orange-400/30">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+              <div class="w-12 h-12 bg-orange-500/30 rounded-xl flex items-center justify-center">
+                <i class="fas fa-shield-alt text-orange-200 text-xl"></i>
+              </div>
+              <div>
+                <h2 class="text-xl font-bold text-white">Remove All Roles</h2>
+                <p class="text-orange-100 text-sm">Remove all role assignments</p>
+              </div>
+            </div>
+            <button
+              @click="closeDeleteRoleModal"
+              class="w-8 h-8 bg-white/10 hover:bg-white/20 rounded-lg transition-colors duration-200 flex items-center justify-center"
+            >
+              <i class="fas fa-times text-white text-sm"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="p-6">
+          <div class="mb-6">
+            <div class="flex items-center space-x-4 mb-4">
+              <div class="w-12 h-12 bg-gradient-to-br from-teal-500 to-blue-600 rounded-full flex items-center justify-center">
+                <span class="text-white font-bold text-sm">{{ getInitials(userToRemoveRoles.name) }}</span>
+              </div>
+              <div>
+                <h3 class="font-bold text-white">{{ userToRemoveRoles.name }}</h3>
+                <p class="text-orange-200 text-sm">{{ userToRemoveRoles.email }}</p>
+              </div>
+            </div>
+            
+            <!-- Current Roles -->
+            <div class="mb-4" v-if="userToRemoveRoles.roles && userToRemoveRoles.roles.length > 0">
+              <h4 class="text-sm font-semibold text-orange-100 mb-2">Current Roles to be Removed:</h4>
+              <div class="flex flex-wrap gap-2">
+                <span
+                  v-for="role in userToRemoveRoles.roles"
+                  :key="role.id"
+                  :class="[
+                    'px-3 py-1 rounded-lg text-sm font-medium border',
+                    getRoleColorClasses(role.name)
+                  ]"
+                >
+                  {{ role.display_name }}
+                </span>
+              </div>
+            </div>
+            
+            <div class="bg-orange-500/20 border border-orange-400/30 rounded-lg p-4 mb-4">
+              <div class="flex items-start space-x-3">
+                <i class="fas fa-info-circle text-orange-300 text-lg mt-0.5"></i>
+                <div>
+                  <h4 class="font-semibold text-orange-100 mb-2">Role Removal</h4>
+                  <p class="text-orange-200 text-sm leading-relaxed">
+                    This will remove all role assignments from this user. The user will:
+                  </p>
+                  <ul class="text-orange-200 text-sm mt-2 space-y-1 list-disc list-inside pl-4">
+                    <li>Lose access to role-specific features</li>
+                    <li>Need new roles assigned to regain access</li>
+                    <li>Still exist as a user in the system</li>
+                    <li>Can be assigned new roles later</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="flex justify-end space-x-3">
+            <button
+              @click="closeDeleteRoleModal"
+              class="px-4 py-2 bg-gray-600 text-white rounded-lg font-medium hover:bg-gray-700 transition-colors duration-200 flex items-center space-x-2"
+            >
+              <i class="fas fa-times text-sm"></i>
+              <span>Cancel</span>
+            </button>
+            <button
+              @click="deleteUserRoles"
+              :disabled="deletingRoles"
+              class="px-4 py-2 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+            >
+              <i :class="deletingRoles ? 'fas fa-spinner fa-spin text-sm' : 'fas fa-shield-alt text-sm'"></i>
+              <span>{{ deletingRoles ? 'Removing...' : 'Remove All Roles' }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -1222,6 +1452,17 @@
       const showSnackbar = ref(false)
       const snackbarMessage = ref('')
       const snackbarColor = ref('success')
+      
+      // Three-dot menu state
+      const openMenuId = ref(null)
+      
+      // Delete confirmation modals
+      const showDeleteUserModal = ref(false)
+      const showDeleteRoleModal = ref(false)
+      const userToDelete = ref(null)
+      const userToRemoveRoles = ref(null)
+      const deletingUser = ref(false)
+      const deletingRoles = ref(false)
       
       // Environment check
       const isDevelopment = computed(() => process.env.NODE_ENV === 'development')
@@ -1942,9 +2183,114 @@
         }
       }
 
+      // Three-dot menu methods
+      const toggleUserMenu = (userId) => {
+        if (openMenuId.value === userId) {
+          openMenuId.value = null
+        } else {
+          openMenuId.value = userId
+        }
+      }
+
+      // Close menu when clicking outside
+      const closeAllMenus = (event) => {
+        // If called without event (direct call), close immediately
+        if (!event) {
+          openMenuId.value = null
+          return
+        }
+        
+        // Check if click is outside any dropdown menu
+        const isClickInsideDropdown = event.target.closest('[data-dropdown-menu]')
+        
+        if (!isClickInsideDropdown) {
+          openMenuId.value = null
+        }
+      }
+
+      // Delete user confirmation
+      const confirmDeleteUser = (user) => {
+        userToDelete.value = user
+        showDeleteUserModal.value = true
+        closeAllMenus()
+      }
+
+      // Delete user roles confirmation
+      const confirmDeleteUserRole = (user) => {
+        userToRemoveRoles.value = user
+        showDeleteRoleModal.value = true
+        closeAllMenus()
+      }
+
+      // Close delete modals
+      const closeDeleteUserModal = () => {
+        showDeleteUserModal.value = false
+        userToDelete.value = null
+      }
+
+      const closeDeleteRoleModal = () => {
+        showDeleteRoleModal.value = false
+        userToRemoveRoles.value = null
+      }
+
+      // Delete user permanently
+      const deleteUser = async () => {
+        if (!userToDelete.value) return
+        
+        deletingUser.value = true
+        
+        try {
+          const response = await adminUserService.deleteUser(userToDelete.value.id)
+          
+          if (response.success) {
+            showSuccessMessage(`User "${userToDelete.value.name}" has been deleted successfully`)
+            closeDeleteUserModal()
+            await refreshData() // Refresh the user list
+          } else {
+            throw new Error(response.message || 'Failed to delete user')
+          }
+        } catch (error) {
+          console.error('Error deleting user:', error)
+          showErrorMessage(error.message || 'Failed to delete user')
+        } finally {
+          deletingUser.value = false
+        }
+      }
+
+      // Remove all roles from user
+      const deleteUserRoles = async () => {
+        if (!userToRemoveRoles.value) return
+        
+        deletingRoles.value = true
+        
+        try {
+          // Call the assign roles method with empty array to remove all roles
+          const response = await adminUserService.assignUserRoles(
+            userToRemoveRoles.value.id,
+            [] // Empty array removes all roles
+          )
+          
+          if (response.success) {
+            showSuccessMessage(`All roles have been removed from "${userToRemoveRoles.value.name}"`)
+            closeDeleteRoleModal()
+            await refreshData() // Refresh the user list
+          } else {
+            throw new Error(response.message || 'Failed to remove user roles')
+          }
+        } catch (error) {
+          console.error('Error removing user roles:', error)
+          showErrorMessage(error.message || 'Failed to remove user roles')
+        } finally {
+          deletingRoles.value = false
+        }
+      }
+
       // Initialize data on mount
       onMounted(() => {
         initializeData()
+        
+        // Add click listener to close menus when clicking outside
+        document.addEventListener('click', closeAllMenus)
       })
 
       return {
@@ -1967,6 +2313,8 @@
         showCreateRoleModal,
         showAssignRolesModal,
         showRoleHistoryModal,
+        showDeleteUserModal,
+        showDeleteRoleModal,
         creatingUser,
         creatingRole,
         assigningRoles,
@@ -1975,6 +2323,8 @@
         loadingRoles,
         showPassword,
         showConfirmPassword,
+        deletingUser,
+        deletingRoles,
 
         // Form data
         newUser,
@@ -1986,6 +2336,9 @@
         userRoleAssignment,
         roleHistory,
         roleAssignmentErrors,
+        userToDelete,
+        userToRemoveRoles,
+        openMenuId,
 
         // Computed
         filteredUsers,
@@ -2019,7 +2372,17 @@
         selectAllPermissions,
         clearAllPermissions,
         showSuccessMessage,
-        showErrorMessage
+        showErrorMessage,
+        
+        // Three-dot menu methods
+        toggleUserMenu,
+        closeAllMenus,
+        confirmDeleteUser,
+        confirmDeleteUserRole,
+        closeDeleteUserModal,
+        closeDeleteRoleModal,
+        deleteUser,
+        deleteUserRoles
       }
     }
   }

@@ -48,9 +48,8 @@ class AdminUserController extends Controller
                 ], 422);
             }
 
-            // Build query
-            $query = User::with(['roles', 'department', 'departmentsAsHOD', 'onboarding'])
-                ->where('id', '!=', $request->user()->id); // Exclude current admin
+            // Build query - Include ALL users including current admin
+            $query = User::with(['roles', 'department', 'departmentsAsHOD', 'onboarding']);
 
             // Apply search filter
             if ($request->has('search') && $request->search) {

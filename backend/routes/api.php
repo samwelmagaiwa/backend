@@ -156,7 +156,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 return [
                     'id' => $role->id,
                     'name' => $role->name,
-                    'display_name' => ucwords(str_replace('_', ' ', $role->name))
+                    'display_name' => $role->getDisplayName()
                 ];
             }),
             'display_roles' => $user->getDisplayRoleNames(),

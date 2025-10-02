@@ -23,8 +23,8 @@ class AssignRoleRequest extends FormRequest
         return [
             'role_ids' => [
                 'required',
-                'array',
-                'min:1'
+                'array'
+                // Removed 'min:1' to allow empty arrays for removing all roles
             ],
             'role_ids.*' => [
                 'integer',
@@ -39,9 +39,8 @@ class AssignRoleRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'role_ids.required' => 'At least one role must be selected.',
+            'role_ids.required' => 'Role IDs must be provided (can be empty array to remove all roles).',
             'role_ids.array' => 'Role IDs must be provided as an array.',
-            'role_ids.min' => 'At least one role must be selected.',
             'role_ids.*.integer' => 'Each role ID must be a valid integer.',
             'role_ids.*.exists' => 'One or more selected roles do not exist.',
         ];

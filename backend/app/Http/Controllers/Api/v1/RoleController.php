@@ -61,7 +61,7 @@ class RoleController extends Controller
                 return [
                     'id' => $role->id,
                     'name' => $role->name,
-                    'display_name' => ucwords(str_replace('_', ' ', $role->name)),
+                    'display_name' => $role->getDisplayName(),
                     'description' => $role->description,
                     'permissions' => $role->permissions ?? [],
                     'users_count' => $role->users_count,
@@ -123,6 +123,7 @@ class RoleController extends Controller
             // Create the role
             $role = Role::create([
                 'name' => $validated['name'],
+                'display_name' => $validated['display_name'],
                 'description' => $validated['description'] ?? null,
                 'permissions' => $this->convertPermissionIds($validated['permissions'] ?? []),
                 'is_system_role' => $validated['is_system_role'] ?? false,
@@ -145,7 +146,7 @@ class RoleController extends Controller
                 'data' => [
                     'id' => $role->id,
                     'name' => $role->name,
-                    'display_name' => ucwords(str_replace('_', ' ', $role->name)),
+                    'display_name' => $role->display_name,
                     'description' => $role->description,
                     'permissions' => $role->permissions,
                     'is_system_role' => $role->is_system_role,
@@ -181,7 +182,7 @@ class RoleController extends Controller
                 'data' => [
                     'id' => $role->id,
                     'name' => $role->name,
-                    'display_name' => ucwords(str_replace('_', ' ', $role->name)),
+                    'display_name' => $role->getDisplayName(),
                     'description' => $role->description,
                     'permissions' => $role->permissions ?? [],
                     'users_count' => $role->users()->count(),
@@ -259,6 +260,7 @@ class RoleController extends Controller
             // Update the role
             $role->update([
                 'name' => $validated['name'],
+                'display_name' => $validated['display_name'],
                 'description' => $validated['description'] ?? $role->description,
                 'permissions' => $this->convertPermissionIds($validated['permissions'] ?? []),
                 'is_deletable' => $validated['is_deletable'] ?? $role->is_deletable,
@@ -280,7 +282,7 @@ class RoleController extends Controller
                 'data' => [
                     'id' => $role->id,
                     'name' => $role->name,
-                    'display_name' => ucwords(str_replace('_', ' ', $role->name)),
+                    'display_name' => $role->getDisplayName(),
                     'description' => $role->description,
                     'permissions' => $role->permissions,
                     'is_system_role' => $role->is_system_role,

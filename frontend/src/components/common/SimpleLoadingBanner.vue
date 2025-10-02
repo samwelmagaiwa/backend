@@ -172,16 +172,20 @@
   /* Main loading banner container */
   .loading-banner {
     position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
     z-index: 9999;
     display: flex;
     align-items: center;
     justify-content: center;
+    background: rgba(30, 58, 138, 0.85); /* Semi-transparent blue overlay */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     opacity: 1;
     transition: opacity 0.3s ease-out;
-    pointer-events: none;
+    pointer-events: auto;
   }
 
   /* Fade out animation */
@@ -202,6 +206,11 @@
     z-index: 2;
     border-radius: 50%;
     padding: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
   }
 
   /* Hospital logo styling */
