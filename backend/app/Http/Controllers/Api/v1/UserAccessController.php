@@ -1284,4 +1284,265 @@ class UserAccessController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Get Jeeva users with their access details.
+     */
+    public function getJeevaUsers(Request $request): JsonResponse
+    {
+        try {
+            return $this->getFilteredUsers($request, 'jeeva_access', 'Jeeva users');
+        } catch (\Exception $e) {
+            Log::error('Error retrieving Jeeva users: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve Jeeva users.',
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
+            ], 500);
+        }
+    }
+
+    /**
+     * Get Wellsoft users with their access details.
+     */
+    public function getWellsoftUsers(Request $request): JsonResponse
+    {
+        try {
+            return $this->getFilteredUsers($request, 'wellsoft', 'Wellsoft users');
+        } catch (\Exception $e) {
+            Log::error('Error retrieving Wellsoft users: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve Wellsoft users.',
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
+            ], 500);
+        }
+    }
+
+    /**
+     * Get Internet users with their access details.
+     */
+    public function getInternetUsers(Request $request): JsonResponse
+    {
+        try {
+            return $this->getFilteredUsers($request, 'internet_access_request', 'Internet users');
+        } catch (\Exception $e) {
+            Log::error('Error retrieving Internet users: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve Internet users.',
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
+            ], 500);
+        }
+    }
+
+    /**
+     * Helper method to get filtered users by request type.
+     */
+    private function getFilteredUsers(Request $request, string $requestType, string $userTypeName): JsonResponse
+    {
+        $query = UserAccess::with(['user', 'department'])
+            ->whereJsonContains('request_type', $requestType);
+
+        // Apply search filter
+        if ($request->has('search') && $request->search !== '') {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('pf_number', 'like', "%{$search}%")
+                  ->orWhere('staff_name', 'like', "%{$search}%")
+                  ->orWhere('phone_number', 'like', "%{$search}%")
+                  ->orWhereHas('department', function ($dept) use ($search) {
+                      $dept->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // Apply status filter
+        if ($request->has('status') && $request->status !== '') {
+            $statusFilter = $request->status;
+            
+            switch ($statusFilter) {
+                case 'pending':
+                    $query->where(function($q) {
+                        $q->where('hod_status', 'pending')
+                          ->orWhere(function($q2) {
+                              $q2->where('hod_status', 'approved')
+                                 ->where('divisional_status', 'pending');
+                          })
+                          ->orWhere(function($q3) {
+                              $q3->where('hod_status', 'approved')
+                                 ->where('divisional_status', 'approved')
+                                 ->where('ict_director_status', 'pending');
+                          })
+                          ->orWhere(function($q4) {
+                              $q4->where('hod_status', 'approved')
+                                 ->where('divisional_status', 'approved')
+                                 ->where('ict_director_status', 'approved')
+                                 ->where('head_it_status', 'pending');
+                          })
+                          ->orWhere(function($q5) {
+                              $q5->where('hod_status', 'approved')
+                                 ->where('divisional_status', 'approved')
+                                 ->where('ict_director_status', 'approved')
+                                 ->where('head_it_status', 'approved')
+                                 ->where('ict_officer_status', 'pending');
+                          });
+                    });
+                    break;
+                case 'approved':
+                case 'completed':
+                case 'implemented':
+                    $query->where('ict_officer_status', 'implemented');
+                    break;
+                case 'rejected':
+                    $query->where(function($q) {
+                        $q->where('hod_status', 'rejected')
+                          ->orWhere('divisional_status', 'rejected')
+                          ->orWhere('ict_director_status', 'rejected')
+                          ->orWhere('head_it_status', 'rejected');
+                    });
+                    break;
+            }
+        }
+
+        // Sort by created_at desc by default
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortOrder = $request->get('sort_order', 'desc');
+        $query->orderBy($sortBy, $sortOrder);
+
+        // Paginate results
+        $perPage = min($request->get('perPage', $request->get('per_page', 15)), 100);
+        $users = $query->paginate($perPage);
+
+        // Transform the data to match the expected format
+        $transformedData = $users->getCollection()->map(function ($userAccess) use ($requestType) {
+            return $this->transformUserAccessData($userAccess, $requestType);
+        });
+
+        return response()->json([
+            'success' => true,
+            'items' => $transformedData,
+            'total' => $users->total(),
+            'per_page' => $users->perPage(),
+            'current_page' => $users->currentPage(),
+            'last_page' => $users->lastPage(),
+            'message' => "{$userTypeName} retrieved successfully."
+        ]);
+    }
+
+    /**
+     * Transform user access data to match the expected frontend format.
+     */
+    private function transformUserAccessData($userAccess, string $requestType): array
+    {
+        $data = [
+            'id' => $userAccess->id,
+            'pfNumber' => $userAccess->pf_number,
+            'staffName' => $userAccess->staff_name,
+            'employeeFullName' => $userAccess->staff_name, // Alias for internet users
+            'department' => $userAccess->department ? $userAccess->department->name : 'N/A',
+            'signature' => $userAccess->signature_path ? 'Available' : 'N/A',
+            'date' => $userAccess->created_at ? $userAccess->created_at->format('Y-m-d') : 'N/A',
+            'requestType' => $requestType,
+            'accessType' => $userAccess->access_type ?? 'permanent',
+            'status' => $this->getDisplayStatus($userAccess),
+        ];
+
+        // Add temporary date if applicable
+        if ($userAccess->temporary_until) {
+            $data['tempDate'] = [
+                'day' => date('d', strtotime($userAccess->temporary_until)),
+                'month' => date('m', strtotime($userAccess->temporary_until)),
+                'year' => date('Y', strtotime($userAccess->temporary_until))
+            ];
+        } else {
+            $data['tempDate'] = null;
+        }
+
+        // Add modules based on request type
+        switch ($requestType) {
+            case 'jeeva_access':
+                $data['selectedModules'] = $userAccess->jeeva_modules_selected ?? $userAccess->jeeva_modules ?? [];
+                break;
+            case 'wellsoft':
+                $data['selectedModules'] = $userAccess->wellsoft_modules_selected ?? $userAccess->wellsoft_modules ?? [];
+                break;
+            case 'internet_access_request':
+                $data['internetPurposes'] = $userAccess->internet_purposes ?? $userAccess->purpose ?? [];
+                $data['designation'] = 'Staff'; // Default designation
+                break;
+        }
+
+        // Add approval information
+        $data['approvals'] = [
+            'userHod' => ['name' => $userAccess->hod_name ?? 'N/A'],
+            'hod' => ['comment' => $userAccess->hod_comments ?? 'N/A'],
+            'divisionalDirector' => ['name' => $userAccess->divisional_director_name ?? 'N/A'],
+            'directorICT' => ['name' => $userAccess->ict_director_name ?? 'N/A']
+        ];
+
+        // Add implementation information
+        $data['implementation'] = [
+            'hod(IT)' => ['name' => $userAccess->head_it_name ?? 'N/A'],
+            'ICT' => ['name' => $userAccess->ict_officer_name ?? 'N/A']
+        ];
+
+        // Add direct access to specific fields for table columns
+        // Show appropriate status for ICT officer based on workflow stage
+        if ($userAccess->ict_officer_status === 'implemented' && $userAccess->ict_officer_name) {
+            $data['ict_officer_name'] = $userAccess->ict_officer_name;
+        } elseif ($userAccess->ict_officer_status === 'pending' && $userAccess->ict_officer_name) {
+            $data['ict_officer_name'] = $userAccess->ict_officer_name . ' (In Progress)';
+        } elseif (in_array($userAccess->head_it_status, ['pending', 'approved']) && 
+                  $userAccess->ict_officer_status === 'pending') {
+            $data['ict_officer_name'] = 'Pending Assignment';
+        } else {
+            $data['ict_officer_name'] = $userAccess->ict_officer_name ?? 'Not Assigned';
+        }
+        
+        $data['head_it_name'] = $userAccess->head_it_name ?? 'N/A';
+        $data['hod_name'] = $userAccess->hod_name ?? 'N/A';
+        $data['divisional_director_name'] = $userAccess->divisional_director_name ?? 'N/A';
+        $data['ict_director_name'] = $userAccess->ict_director_name ?? 'N/A';
+        $data['hod_comments'] = $userAccess->hod_comments ?? 'N/A';
+
+        return $data;
+    }
+
+    /**
+     * Get display status for user access record.
+     */
+    private function getDisplayStatus($userAccess): string
+    {
+        if ($userAccess->ict_officer_status === 'implemented') {
+            return 'Completed';
+        }
+
+        if (in_array('rejected', [
+            $userAccess->hod_status,
+            $userAccess->divisional_status,
+            $userAccess->ict_director_status,
+            $userAccess->head_it_status
+        ])) {
+            return 'Rejected';
+        }
+
+        // Determine current pending stage
+        if ($userAccess->hod_status === 'pending') {
+            return 'Pending HOD Approval';
+        } elseif ($userAccess->hod_status === 'approved' && $userAccess->divisional_status === 'pending') {
+            return 'Pending Divisional Approval';
+        } elseif ($userAccess->divisional_status === 'approved' && $userAccess->ict_director_status === 'pending') {
+            return 'Pending ICT Director Approval';
+        } elseif ($userAccess->ict_director_status === 'approved' && $userAccess->head_it_status === 'pending') {
+            return 'Pending Head of IT Approval';
+        } elseif ($userAccess->head_it_status === 'approved' && $userAccess->ict_officer_status === 'pending') {
+            return 'Pending ICT Officer Implementation';
+        }
+
+        return 'Pending';
+    }
 }

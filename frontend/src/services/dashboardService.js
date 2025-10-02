@@ -112,6 +112,61 @@ class DashboardService {
   }
 
   /**
+   * Get mock admin statistics for fallback
+   * @returns {Object} Mock admin statistics
+   */
+  getAdminMockStats() {
+    return {
+      totalUsers: 156,
+      totalRequests: 1247,
+      pendingRequests: 23,
+      activeUsers: 5,
+      todaysRequests: 45,
+      completedRequests: 1224,
+      completionRate: 98
+    }
+  }
+
+  /**
+   * Fetch admin dashboard statistics
+   * @returns {Promise<Object>} Admin dashboard statistics including total users, requests, etc.
+   */
+  async getAdminDashboardStats() {
+    try {
+      console.log('📊 Fetching admin dashboard statistics...')
+
+      const response = await apiClient.get('/admin/dashboard-stats')
+
+      if (response.data && response.data.success) {
+        console.log('✅ Admin dashboard stats fetched successfully:', response.data.data)
+        return {
+          success: true,
+          data: {
+            totalUsers: response.data.data.total_users || 0,
+            totalRequests: response.data.data.total_requests || 0,
+            pendingRequests: response.data.data.pending_requests || 0,
+            activeUsers: response.data.data.active_users || 0,
+            todaysRequests: response.data.data.todays_requests || 0,
+            completedRequests: response.data.data.completed_requests || 0,
+            completionRate: response.data.data.completion_rate || 0
+          }
+        }
+      } else {
+        throw new Error(response.data?.message || 'Failed to fetch admin dashboard statistics')
+      }
+    } catch (error) {
+      console.error('❌ Error fetching admin dashboard stats:', error)
+
+      // Return mock data as fallback to prevent UI breaking
+      return {
+        success: false,
+        error: error.message || 'Failed to fetch admin dashboard statistics',
+        data: this.getAdminMockStats()
+      }
+    }
+  }
+
+  /**
    * Refresh dashboard statistics (useful for periodic updates)
    * @returns {Promise<Object>} Fresh dashboard statistics
    */

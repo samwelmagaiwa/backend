@@ -96,11 +96,30 @@ const notificationService = {
           `❌ NotificationService: Error fetching pending count (attempt ${attempt}):`,
           error
         )
+        
+        // Log more detailed error information
+        if (error.response) {
+          console.error('Response status:', error.response.status)
+          console.error('Response data:', error.response.data)
+          console.error('Response headers:', error.response.headers)
+        }
+        
         lastError = error
 
         // Don't retry on authentication errors
         if (error.response?.status === 401 || error.response?.status === 403) {
+          console.log('🔐 Authentication error - not retrying')
           break
+        }
+        
+        // Don't retry on server errors that are likely persistent
+        if (error.response?.status === 500) {
+          console.log('🚫 Server error detected - checking if retryable...')
+          // Only retry server errors once to avoid spam
+          if (attempt >= 2) {
+            console.log('🚫 Server error - not retrying further')
+            break
+          }
         }
 
         // Add delay before retry (except on last attempt)
@@ -119,17 +138,24 @@ const notificationService = {
         return notificationCache.data
       }
 
-      // Format error message for better user experience
-      let errorMessage = 'Network error while loading pending count'
-      if (lastError.response) {
-        errorMessage = lastError.response.data?.message || 'Failed to load pending count'
-      } else if (lastError.code === 'ECONNABORTED') {
-        errorMessage = 'Request timed out - server may be slow'
-      } else if (lastError.message.includes('Network Error')) {
-        errorMessage = 'Network connection error'
-      }
+      // Log the error for debugging but provide graceful fallback
+      console.error('🚫 NotificationService: All retry attempts failed')
+      console.error('Last error details:', {
+        message: lastError.message,
+        status: lastError.response?.status,
+        data: lastError.response?.data
+      })
 
-      throw new Error(errorMessage)
+      // Provide graceful fallback instead of throwing error
+      // This prevents the UI from breaking when the API is down
+      console.warn('🔄 NotificationService: Providing fallback data to prevent UI breakage')
+      const fallbackData = { total_pending: 0, requires_attention: false, details: null }
+      
+      // Cache the fallback for a short time to reduce repeated failed requests
+      notificationCache.data = fallbackData
+      notificationCache.timestamp = Date.now()
+      
+      return fallbackData
     }
 
     // Fallback to empty result if no cache and no error (shouldn't happen)

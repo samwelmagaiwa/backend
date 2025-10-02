@@ -46,7 +46,7 @@ class Department extends Model
      */
     public function userAccessRequests(): HasMany
     {
-        return $this->hasMany(UserAccess::class);
+        return $this->hasMany(UserAccess::class, 'department_id');
     }
 
     /**

@@ -87,7 +87,7 @@
                 <h2
                   class="text-2xl font-bold text-blue-100 tracking-wide drop-shadow-md animate-fade-in-delay"
                 >
-                  {{ isReviewMode ? 'REQUEST REVIEW - ' + requestId : 'ACCESS REQUEST FORM' }}
+                  {{ isReviewMode ? 'REQUEST REVIEW - ' + (requestId || $route.params.id || 'N/A') : 'ACCESS REQUEST FORM' }}
                 </h2>
               </div>
 

@@ -74,7 +74,6 @@ class UserRoleController extends Controller
                     'name' => $user->name,
                     'email' => $user->email,
                     'pf_number' => $user->pf_number,
-                    'staff_name' => $user->staff_name,
                     'phone' => $user->phone,
                     'created_at' => $user->created_at,
                     'roles' => $user->roles->map(function ($role) {

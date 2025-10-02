@@ -195,31 +195,58 @@
               <!-- Layer 1: Base Card -->
               <div
                 class="absolute inset-0 rounded-2xl border-2 backdrop-blur-sm"
-                style="background: linear-gradient(135deg, rgba(255, 0, 0, 0.2) 0%, rgba(255, 0, 0, 0.3) 100%); border-color: rgba(255, 0, 0, 0.4)"
+                style="
+                  background: linear-gradient(
+                    135deg,
+                    rgba(255, 0, 0, 0.2) 0%,
+                    rgba(255, 0, 0, 0.3) 100%
+                  );
+                  border-color: rgba(255, 0, 0, 0.4);
+                "
               ></div>
 
               <!-- Layer 2: Animated Background Gradients -->
               <div
                 class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                style="background: linear-gradient(135deg, rgba(255, 0, 0, 0.1) 0%, transparent 50%, rgba(255, 0, 0, 0.2) 100%)"
+                style="
+                  background: linear-gradient(
+                    135deg,
+                    rgba(255, 0, 0, 0.1) 0%,
+                    transparent 50%,
+                    rgba(255, 0, 0, 0.2) 100%
+                  );
+                "
               ></div>
               <div
                 class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700"
-                style="background: linear-gradient(225deg, transparent 0%, rgba(255, 0, 0, 0.05) 50%, transparent 100%)"
+                style="
+                  background: linear-gradient(
+                    225deg,
+                    transparent 0%,
+                    rgba(255, 0, 0, 0.05) 50%,
+                    transparent 100%
+                  );
+                "
               ></div>
 
               <!-- Layer 3: Floating Orbs -->
               <div
                 class="absolute top-0 right-0 w-32 h-32 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-1000 animate-pulse"
-                style="background: radial-gradient(circle, rgba(255, 0, 0, 0.25) 0%, transparent 70%)"
+                style="
+                  background: radial-gradient(circle, rgba(255, 0, 0, 0.25) 0%, transparent 70%);
+                "
               ></div>
               <div
                 class="absolute bottom-0 left-0 w-24 h-24 rounded-full blur-xl group-hover:scale-125 transition-transform duration-800"
-                style="background: radial-gradient(circle, rgba(255, 0, 0, 0.2) 0%, transparent 70%)"
+                style="
+                  background: radial-gradient(circle, rgba(255, 0, 0, 0.2) 0%, transparent 70%);
+                "
               ></div>
               <div
                 class="absolute top-1/2 left-1/2 w-16 h-16 rounded-full blur-lg transform -translate-x-1/2 -translate-y-1/2 group-hover:scale-200 transition-transform duration-1200 opacity-0 group-hover:opacity-100"
-                style="background: radial-gradient(circle, rgba(255, 0, 0, 0.15) 0%, transparent 70%)"
+                style="
+                  background: radial-gradient(circle, rgba(255, 0, 0, 0.15) 0%, transparent 70%);
+                "
               ></div>
 
               <!-- Layer 4: Shine Effect -->
@@ -242,7 +269,10 @@
                   <div class="relative">
                     <div
                       class="w-14 h-14 rounded-xl flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300 border relative overflow-hidden"
-                      style="background: linear-gradient(135deg, #FF0000 0%, #FF0000 100%); border-color: rgba(255, 0, 0, 0.5)"
+                      style="
+                        background: linear-gradient(135deg, #ff0000 0%, #ff0000 100%);
+                        border-color: rgba(255, 0, 0, 0.5);
+                      "
                     >
                       <!-- Icon background layers -->
                       <div
@@ -250,7 +280,13 @@
                       ></div>
                       <div
                         class="absolute inset-0 bg-gradient-to-tl from-red-400/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                        style="background: linear-gradient(135deg, transparent 0%, rgba(255, 0, 0, 0.3) 100%)"
+                        style="
+                          background: linear-gradient(
+                            135deg,
+                            transparent 0%,
+                            rgba(255, 0, 0, 0.3) 100%
+                          );
+                        "
                       ></div>
                       <i class="fas fa-clock text-white text-xl relative z-10 drop-shadow-lg" />
                       <!-- Pulsing dot -->
@@ -258,7 +294,10 @@
                         class="absolute top-1 right-1 w-3 h-3 rounded-full animate-ping opacity-75"
                         style="background-color: rgba(255, 0, 0, 0.8)"
                       ></div>
-                      <div class="absolute top-1 right-1 w-3 h-3 rounded-full" style="background-color: rgba(255, 0, 0, 0.6)"></div>
+                      <div
+                        class="absolute top-1 right-1 w-3 h-3 rounded-full"
+                        style="background-color: rgba(255, 0, 0, 0.6)"
+                      ></div>
                     </div>
                     <!-- Icon shadow -->
                     <div
@@ -271,10 +310,17 @@
                   <div class="relative">
                     <div
                       class="flex items-center space-x-2 px-4 py-2 rounded-full border backdrop-blur-sm transition-colors duration-300"
-                      style="background-color: rgba(255, 0, 0, 0.3); border-color: rgba(255, 0, 0, 0.4)"
+                      style="
+                        background-color: rgba(255, 0, 0, 0.3);
+                        border-color: rgba(255, 0, 0, 0.4);
+                      "
                     >
-                      <div class="w-2 h-2 rounded-full animate-pulse" style="background-color: rgba(255, 0, 0, 0.8)"></div>
-                      <span class="text-xs font-medium tracking-wide"
+                      <div
+                        class="w-2 h-2 rounded-full animate-pulse"
+                        style="background-color: rgba(255, 0, 0, 0.8)"
+                      ></div>
+                      <span
+                        class="text-xs font-medium tracking-wide"
                         style="color: rgba(255, 255, 255, 0.9)"
                         >Processing</span
                       >
@@ -298,7 +344,7 @@
                 <div class="relative mb-6">
                   <div
                     class="text-6xl font-bold drop-shadow-lg relative group-hover:scale-105 transition-transform duration-300"
-                    style="color: #FFFFFF"
+                    style="color: #ffffff"
                   >
                     <span v-if="isLoadingStats" class="animate-pulse">--</span>
                     <span v-else>{{ dashboardStats.underReview }}</span>
@@ -327,11 +373,14 @@
                 <div class="relative">
                   <div
                     class="w-full rounded-full h-3 overflow-hidden border"
-                    style="background-color: rgba(255, 0, 0, 0.3); border-color: rgba(255, 0, 0, 0.3)"
+                    style="
+                      background-color: rgba(255, 0, 0, 0.3);
+                      border-color: rgba(255, 0, 0, 0.3);
+                    "
                   >
                     <div
                       class="h-full rounded-full relative overflow-hidden group-hover:shadow-lg transition-shadow duration-300"
-                      style="background: linear-gradient(90deg, #FF0000 0%, #FF0000 100%)"
+                      style="background: linear-gradient(90deg, #ff0000 0%, #ff0000 100%)"
                       :style="`width: ${dashboardStats.processingPercentage}%`"
                     >
                       <!-- Progress shine effect -->
@@ -359,31 +408,58 @@
               <!-- Layer 1: Base Card -->
               <div
                 class="absolute inset-0 rounded-2xl border-2 backdrop-blur-sm"
-                style="background: linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(29, 78, 216, 0.3) 100%); border-color: rgba(37, 99, 235, 0.4)"
+                style="
+                  background: linear-gradient(
+                    135deg,
+                    rgba(37, 99, 235, 0.2) 0%,
+                    rgba(29, 78, 216, 0.3) 100%
+                  );
+                  border-color: rgba(37, 99, 235, 0.4);
+                "
               ></div>
 
               <!-- Layer 2: Animated Background Gradients -->
               <div
                 class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                style="background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, transparent 50%, rgba(29, 78, 216, 0.2) 100%)"
+                style="
+                  background: linear-gradient(
+                    135deg,
+                    rgba(37, 99, 235, 0.1) 0%,
+                    transparent 50%,
+                    rgba(29, 78, 216, 0.2) 100%
+                  );
+                "
               ></div>
               <div
                 class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700"
-                style="background: linear-gradient(225deg, transparent 0%, rgba(37, 99, 235, 0.05) 50%, transparent 100%)"
+                style="
+                  background: linear-gradient(
+                    225deg,
+                    transparent 0%,
+                    rgba(37, 99, 235, 0.05) 50%,
+                    transparent 100%
+                  );
+                "
               ></div>
 
               <!-- Layer 3: Floating Orbs -->
               <div
                 class="absolute top-0 right-0 w-32 h-32 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-1000 animate-pulse"
-                style="background: radial-gradient(circle, rgba(37, 99, 235, 0.25) 0%, transparent 70%)"
+                style="
+                  background: radial-gradient(circle, rgba(37, 99, 235, 0.25) 0%, transparent 70%);
+                "
               ></div>
               <div
                 class="absolute bottom-0 left-0 w-24 h-24 rounded-full blur-xl group-hover:scale-125 transition-transform duration-800"
-                style="background: radial-gradient(circle, rgba(37, 99, 235, 0.2) 0%, transparent 70%)"
+                style="
+                  background: radial-gradient(circle, rgba(37, 99, 235, 0.2) 0%, transparent 70%);
+                "
               ></div>
               <div
                 class="absolute top-1/2 left-1/2 w-16 h-16 rounded-full blur-lg transform -translate-x-1/2 -translate-y-1/2 group-hover:scale-200 transition-transform duration-1200 opacity-0 group-hover:opacity-100"
-                style="background: radial-gradient(circle, rgba(37, 99, 235, 0.15) 0%, transparent 70%)"
+                style="
+                  background: radial-gradient(circle, rgba(37, 99, 235, 0.15) 0%, transparent 70%);
+                "
               ></div>
 
               <!-- Layer 4: Shine Effect -->
@@ -406,7 +482,14 @@
                   <div class="relative">
                     <div
                       class="w-14 h-14 rounded-xl flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300 border relative overflow-hidden"
-                      style="background: linear-gradient(135deg, rgb(37, 99, 235) 0%, rgb(29, 78, 216) 100%); border-color: rgba(37, 99, 235, 0.5)"
+                      style="
+                        background: linear-gradient(
+                          135deg,
+                          rgb(37, 99, 235) 0%,
+                          rgb(29, 78, 216) 100%
+                        );
+                        border-color: rgba(37, 99, 235, 0.5);
+                      "
                     >
                       <!-- Icon background layers -->
                       <div
@@ -414,7 +497,13 @@
                       ></div>
                       <div
                         class="absolute inset-0 bg-gradient-to-tl from-blue-400/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                        style="background: linear-gradient(135deg, transparent 0%, rgba(37, 99, 235, 0.3) 100%)"
+                        style="
+                          background: linear-gradient(
+                            135deg,
+                            transparent 0%,
+                            rgba(37, 99, 235, 0.3) 100%
+                          );
+                        "
                       ></div>
                       <i
                         class="fas fa-check-circle text-white text-xl relative z-10 drop-shadow-lg"
@@ -424,7 +513,10 @@
                         class="absolute top-1 right-1 w-3 h-3 rounded-full animate-ping opacity-75"
                         style="background-color: rgba(37, 99, 235, 0.8)"
                       ></div>
-                      <div class="absolute top-1 right-1 w-3 h-3 rounded-full" style="background-color: rgba(37, 99, 235, 0.6)"></div>
+                      <div
+                        class="absolute top-1 right-1 w-3 h-3 rounded-full"
+                        style="background-color: rgba(37, 99, 235, 0.6)"
+                      ></div>
                     </div>
                     <!-- Icon shadow -->
                     <div
@@ -437,10 +529,17 @@
                   <div class="relative">
                     <div
                       class="flex items-center space-x-2 px-4 py-2 rounded-full border backdrop-blur-sm transition-colors duration-300"
-                      style="background-color: rgba(37, 99, 235, 0.3); border-color: rgba(37, 99, 235, 0.4)"
+                      style="
+                        background-color: rgba(37, 99, 235, 0.3);
+                        border-color: rgba(37, 99, 235, 0.4);
+                      "
                     >
-                      <div class="w-2 h-2 rounded-full animate-pulse" style="background-color: rgba(37, 99, 235, 0.8)"></div>
-                      <span class="text-xs font-medium tracking-wide"
+                      <div
+                        class="w-2 h-2 rounded-full animate-pulse"
+                        style="background-color: rgba(37, 99, 235, 0.8)"
+                      ></div>
+                      <span
+                        class="text-xs font-medium tracking-wide"
                         style="color: rgba(255, 255, 255, 0.9)"
                         >Completed</span
                       >
@@ -464,7 +563,7 @@
                 <div class="relative mb-6">
                   <div
                     class="text-6xl font-bold drop-shadow-lg relative group-hover:scale-105 transition-transform duration-300"
-                    style="color: #FFFFFF"
+                    style="color: #ffffff"
                   >
                     <span v-if="isLoadingStats" class="animate-pulse">--</span>
                     <span v-else>{{ dashboardStats.grantedAccess }}</span>
@@ -493,11 +592,20 @@
                 <div class="relative">
                   <div
                     class="w-full rounded-full h-3 overflow-hidden border"
-                    style="background-color: rgba(37, 99, 235, 0.3); border-color: rgba(37, 99, 235, 0.3)"
+                    style="
+                      background-color: rgba(37, 99, 235, 0.3);
+                      border-color: rgba(37, 99, 235, 0.3);
+                    "
                   >
                     <div
                       class="h-full rounded-full relative overflow-hidden group-hover:shadow-lg transition-shadow duration-300"
-                      style="background: linear-gradient(90deg, rgb(37, 99, 235) 0%, rgb(29, 78, 216) 100%)"
+                      style="
+                        background: linear-gradient(
+                          90deg,
+                          rgb(37, 99, 235) 0%,
+                          rgb(29, 78, 216) 100%
+                        );
+                      "
                       :style="`width: ${dashboardStats.completedPercentage}%`"
                     >
                       <!-- Progress shine effect -->
@@ -525,31 +633,58 @@
               <!-- Layer 1: Base Card -->
               <div
                 class="absolute inset-0 rounded-2xl border-2 backdrop-blur-sm"
-                style="background: linear-gradient(135deg, rgba(220, 38, 38, 0.2) 0%, rgba(185, 28, 28, 0.3) 100%); border-color: rgba(220, 38, 38, 0.4)"
+                style="
+                  background: linear-gradient(
+                    135deg,
+                    rgba(220, 38, 38, 0.2) 0%,
+                    rgba(185, 28, 28, 0.3) 100%
+                  );
+                  border-color: rgba(220, 38, 38, 0.4);
+                "
               ></div>
 
               <!-- Layer 2: Animated Background Gradients -->
               <div
                 class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                style="background: linear-gradient(135deg, rgba(220, 38, 38, 0.1) 0%, transparent 50%, rgba(185, 28, 28, 0.2) 100%)"
+                style="
+                  background: linear-gradient(
+                    135deg,
+                    rgba(220, 38, 38, 0.1) 0%,
+                    transparent 50%,
+                    rgba(185, 28, 28, 0.2) 100%
+                  );
+                "
               ></div>
               <div
                 class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700"
-                style="background: linear-gradient(225deg, transparent 0%, rgba(220, 38, 38, 0.05) 50%, transparent 100%)"
+                style="
+                  background: linear-gradient(
+                    225deg,
+                    transparent 0%,
+                    rgba(220, 38, 38, 0.05) 50%,
+                    transparent 100%
+                  );
+                "
               ></div>
 
               <!-- Layer 3: Floating Orbs -->
               <div
                 class="absolute top-0 right-0 w-32 h-32 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-1000 animate-pulse"
-                style="background: radial-gradient(circle, rgba(220, 38, 38, 0.25) 0%, transparent 70%)"
+                style="
+                  background: radial-gradient(circle, rgba(220, 38, 38, 0.25) 0%, transparent 70%);
+                "
               ></div>
               <div
                 class="absolute bottom-0 left-0 w-24 h-24 rounded-full blur-xl group-hover:scale-125 transition-transform duration-800"
-                style="background: radial-gradient(circle, rgba(220, 38, 38, 0.2) 0%, transparent 70%)"
+                style="
+                  background: radial-gradient(circle, rgba(220, 38, 38, 0.2) 0%, transparent 70%);
+                "
               ></div>
               <div
                 class="absolute top-1/2 left-1/2 w-16 h-16 rounded-full blur-lg transform -translate-x-1/2 -translate-y-1/2 group-hover:scale-200 transition-transform duration-1200 opacity-0 group-hover:opacity-100"
-                style="background: radial-gradient(circle, rgba(220, 38, 38, 0.15) 0%, transparent 70%)"
+                style="
+                  background: radial-gradient(circle, rgba(220, 38, 38, 0.15) 0%, transparent 70%);
+                "
               ></div>
 
               <!-- Layer 4: Shine Effect -->
@@ -572,7 +707,14 @@
                   <div class="relative">
                     <div
                       class="w-14 h-14 rounded-xl flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300 border relative overflow-hidden"
-                      style="background: linear-gradient(135deg, rgb(220, 38, 38) 0%, rgb(185, 28, 28) 100%); border-color: rgba(220, 38, 38, 0.5)"
+                      style="
+                        background: linear-gradient(
+                          135deg,
+                          rgb(220, 38, 38) 0%,
+                          rgb(185, 28, 28) 100%
+                        );
+                        border-color: rgba(220, 38, 38, 0.5);
+                      "
                     >
                       <!-- Icon background layers -->
                       <div
@@ -580,7 +722,13 @@
                       ></div>
                       <div
                         class="absolute inset-0 bg-gradient-to-tl from-red-400/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                        style="background: linear-gradient(135deg, transparent 0%, rgba(220, 38, 38, 0.3) 100%)"
+                        style="
+                          background: linear-gradient(
+                            135deg,
+                            transparent 0%,
+                            rgba(220, 38, 38, 0.3) 100%
+                          );
+                        "
                       ></div>
                       <i class="fas fa-edit text-white text-xl relative z-10 drop-shadow-lg" />
                       <!-- Revision indicator -->
@@ -588,7 +736,10 @@
                         class="absolute top-1 right-1 w-3 h-3 rounded-full animate-ping opacity-75"
                         style="background-color: rgba(220, 38, 38, 0.8)"
                       ></div>
-                      <div class="absolute top-1 right-1 w-3 h-3 rounded-full" style="background-color: rgba(220, 38, 38, 0.6)"></div>
+                      <div
+                        class="absolute top-1 right-1 w-3 h-3 rounded-full"
+                        style="background-color: rgba(220, 38, 38, 0.6)"
+                      ></div>
                     </div>
                     <!-- Icon shadow -->
                     <div
@@ -601,10 +752,17 @@
                   <div class="relative">
                     <div
                       class="flex items-center space-x-2 px-4 py-2 rounded-full border backdrop-blur-sm transition-colors duration-300"
-                      style="background-color: rgba(220, 38, 38, 0.3); border-color: rgba(220, 38, 38, 0.4)"
+                      style="
+                        background-color: rgba(220, 38, 38, 0.3);
+                        border-color: rgba(220, 38, 38, 0.4);
+                      "
                     >
-                      <div class="w-2 h-2 rounded-full animate-pulse" style="background-color: rgba(220, 38, 38, 0.8)"></div>
-                      <span class="text-xs font-medium tracking-wide"
+                      <div
+                        class="w-2 h-2 rounded-full animate-pulse"
+                        style="background-color: rgba(220, 38, 38, 0.8)"
+                      ></div>
+                      <span
+                        class="text-xs font-medium tracking-wide"
                         style="color: rgba(255, 255, 255, 0.9)"
                         >Reviewed</span
                       >
@@ -628,7 +786,7 @@
                 <div class="relative mb-6">
                   <div
                     class="text-6xl font-bold drop-shadow-lg relative group-hover:scale-105 transition-transform duration-300"
-                    style="color: #FFFFFF"
+                    style="color: #ffffff"
                   >
                     <span v-if="isLoadingStats" class="animate-pulse">--</span>
                     <span v-else>{{ dashboardStats.needsRevision }}</span>
@@ -657,11 +815,20 @@
                 <div class="relative">
                   <div
                     class="w-full rounded-full h-3 overflow-hidden border"
-                    style="background-color: rgba(220, 38, 38, 0.3); border-color: rgba(220, 38, 38, 0.3)"
+                    style="
+                      background-color: rgba(220, 38, 38, 0.3);
+                      border-color: rgba(220, 38, 38, 0.3);
+                    "
                   >
                     <div
                       class="h-full rounded-full relative overflow-hidden group-hover:shadow-lg transition-shadow duration-300"
-                      style="background: linear-gradient(90deg, rgb(220, 38, 38) 0%, rgb(185, 28, 28) 100%)"
+                      style="
+                        background: linear-gradient(
+                          90deg,
+                          rgb(220, 38, 38) 0%,
+                          rgb(185, 28, 28) 100%
+                        );
+                      "
                       :style="`width: ${dashboardStats.revisionPercentage}%`"
                     >
                       <!-- Progress shine effect -->

@@ -239,17 +239,6 @@
                   </div>
                 </button>
 
-                <!-- Debug Info (Temporary - Remove after testing) -->
-                <div
-                  v-if="isDevelopment"
-                  class="px-4 py-2 text-xs text-gray-500 border-t border-gray-200"
-                >
-                  Debug: Role = "{{
-                    safeCurrentUser.role || safeCurrentUser.role_name || 'undefined'
-                  }}" | Roles = {{ safeCurrentUser.roles || '[]' }} | Is Admin =
-                  {{ isAdmin ? 'YES' : 'NO' }}
-                </div>
-
                 <!-- Divider -->
                 <div class="border-t border-gray-200 my-2"></div>
 

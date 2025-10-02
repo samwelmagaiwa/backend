@@ -28,7 +28,6 @@ class User extends Authenticatable
         'phone',
         'password',
         'pf_number',
-        'staff_name',
         'department_id',
         'is_active',
     ];

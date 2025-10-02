@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test User Access Endpoints</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .result { margin: 10px 0; padding: 10px; border: 1px solid #ddd; background: #f9f9f9; }
+        .error { background: #fee; border-color: #f00; }
+        .success { background: #efe; border-color: #0f0; }
+        button { margin: 5px; padding: 10px 15px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>User Access Endpoints Test</h1>
+    
+    <p>This page tests the new endpoints for filtered user access data.</p>
+    
+    <button onclick="testEndpoint('/api/jeeva-users')">Test Jeeva Users</button>
+    <button onclick="testEndpoint('/api/wellsoft-users')">Test Wellsoft Users</button>
+    <button onclick="testEndpoint('/api/internet-users')">Test Internet Users</button>
+    
+    <div id="results"></div>
+
+    <script>
+        async function testEndpoint(path) {
+            const resultsDiv = document.getElementById('results');
+            
+            try {
+                const response = await fetch(`http://localhost:8000${path}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        // Note: In real usage, you would need the Authorization header
+                        // 'Authorization': 'Bearer YOUR_TOKEN_HERE'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                const resultHtml = `
+                    <div class="result ${response.ok ? 'success' : 'error'}">
+                        <h3>Test: ${path}</h3>
+                        <p><strong>Status:</strong> ${response.status} ${response.statusText}</p>
+                        <p><strong>Response:</strong></p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+                
+                resultsDiv.innerHTML = resultHtml + resultsDiv.innerHTML;
+                
+            } catch (error) {
+                const resultHtml = `
+                    <div class="result error">
+                        <h3>Test: ${path}</h3>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                    </div>
+                `;
+                
+                resultsDiv.innerHTML = resultHtml + resultsDiv.innerHTML;
+            }
+        }
+    </script>
+</body>
+</html>

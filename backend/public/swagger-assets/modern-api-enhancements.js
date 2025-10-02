@@ -21,9 +21,6 @@
     });
 
     function initializeEnhancements() {
-        // Add method statistics
-        addMethodStatistics();
-        
         // Enhance search functionality
         enhanceSearch();
         
@@ -56,11 +53,11 @@
         setTimeout(() => {
             // Use comprehensive API statistics from our complete analysis
             const methodCounts = {
-                GET: 144,
-                POST: 94,
-                PUT: 14,
-                PATCH: 4,
-                DELETE: 9
+                GET: 181,
+                POST: 108,
+                PUT: 23,
+                PATCH: 5,
+                DELETE: 19
             };
 
             // Create statistics panel

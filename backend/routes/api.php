@@ -24,6 +24,7 @@ use App\Http\Controllers\Api\v1\ImplementationWorkflowController;
 use App\Http\Controllers\Api\v1\HeadOfItController;
 use App\Http\Controllers\Api\v1\HeadOfItDictRecommendationsController;
 use App\Http\Controllers\Api\v1\IctOfficerController;
+use App\Http\Controllers\Api\v1\RoleController;
 use App\Http\Controllers\Api\HealthController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Api\SwaggerController;
@@ -195,7 +196,10 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // Admin routes (Admin only)
-    Route::prefix('admin')->group(function () {
+    Route::prefix('admin')->middleware('role:admin,super_admin')->group(function () {
+        // Admin dashboard
+        Route::get('/dashboard-stats', [AdminUserController::class, 'getDashboardStats'])->name('admin.dashboard-stats');
+        
         // Legacy admin routes
         Route::post('/users/reset-onboarding', [AdminController::class, 'resetUserOnboarding'])->name('admin.users.reset-onboarding');
         Route::post('/users/bulk-reset-onboarding', [AdminController::class, 'bulkResetOnboarding'])->name('admin.users.bulk-reset-onboarding');
@@ -228,6 +232,18 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::delete('/{department}', [AdminDepartmentController::class, 'destroy'])->name('admin.departments.destroy');
             Route::patch('/{department}/toggle-status', [AdminDepartmentController::class, 'toggleStatus'])->name('admin.departments.toggle-status');
         });
+
+        // Role management routes
+        Route::prefix('roles')->group(function () {
+            Route::get('/', [RoleController::class, 'index'])->name('admin.roles.index');
+            Route::post('/', [RoleController::class, 'store'])->name('admin.roles.store');
+            Route::get('/{role}', [RoleController::class, 'show'])->name('admin.roles.show');
+            Route::put('/{role}', [RoleController::class, 'update'])->name('admin.roles.update');
+            Route::delete('/{role}', [RoleController::class, 'destroy'])->name('admin.roles.destroy');
+        });
+
+        // Permission management routes
+        Route::get('/permissions', [RoleController::class, 'getPermissions'])->name('admin.permissions.index');
 
         // Legacy user management routes (keep for backward compatibility)
         Route::prefix('user-management')->group(function () {
@@ -813,4 +829,15 @@ Route::prefix('hod')->middleware('role:head_of_department,divisional_director,ic
         Route::patch('/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
         Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
     });
+
+    // Filtered User Access routes (for admin user management)
+    Route::get('/jeeva-users', [UserAccessController::class, 'getJeevaUsers'])
+        ->middleware('role:admin')
+        ->name('admin.jeeva-users');
+    Route::get('/wellsoft-users', [UserAccessController::class, 'getWellsoftUsers'])
+        ->middleware('role:admin')
+        ->name('admin.wellsoft-users');
+    Route::get('/internet-users', [UserAccessController::class, 'getInternetUsers'])
+        ->middleware('role:admin')
+        ->name('admin.internet-users');
 });

@@ -177,7 +177,7 @@
                 <h2
                   class="text-sm font-bold text-blue-100 tracking-wide drop-shadow-md animate-fade-in-delay"
                 >
-                  {{ isReviewMode ? 'REQUEST REVIEW - ' + requestId : 'UNIFIED SERVICES FORM' }}
+                  {{ isReviewMode ? 'REQUEST REVIEW - ' + getRequestId : 'UNIFIED SERVICES FORM' }}
                 </h2>
               </div>
 
@@ -2588,22 +2588,47 @@
                               <!-- Show existing signature when implementation is completed -->
                               <div
                                 v-else-if="
-                                  isImplementationAlreadyCompleted &&
-                                  !ictOfficerSignaturePreview &&
-                                  requestData?.ict_officer_signature_path
+                                  shouldShowIctOfficerSignedIndicator
                                 "
                                 class="w-full px-3 py-2 border-2 border-green-300/40 rounded-xl bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-green-500/20 min-h-[35px] flex items-center justify-center relative"
                               >
                                 <div class="text-center">
-                                  <div
-                                    class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center mx-auto mb-1"
-                                  >
-                                    <i class="fas fa-check-circle text-green-400 text-lg"></i>
+                                  <div class="flex items-center justify-center space-x-2 mb-1">
+                                    <div
+                                      class="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center"
+                                    >
+                                      <i class="fas fa-check text-green-400 text-sm"></i>
+                                    </div>
+                                    <span class="text-green-400 font-semibold text-sm">Signed</span>
                                   </div>
-                                  <p class="text-xs text-green-200 font-semibold">
-                                    Implementation Completed
+                                  <p class="text-xs text-green-200/80">
+                                    Implementation completed
                                   </p>
-                                  <p class="text-xs text-blue-100 opacity-80">Signature on file</p>
+                                  <p class="text-xs text-blue-100 opacity-80">
+                                    {{ getSignatureFileName(requestData.ict_officer_signature_path) }}
+                                  </p>
+                                </div>
+                                <!-- Optional: Show signature preview icon -->
+                                <div class="absolute top-2 right-2">
+                                  <div
+                                    class="w-6 h-6 bg-green-500/30 rounded-full flex items-center justify-center"
+                                  >
+                                    <i
+                                      class="fas fa-signature text-green-400 text-xs"
+                                      title="Signature on file"
+                                    ></i>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <!-- Show no signature indicator (development fallback) -->
+                              <div
+                                v-else-if="shouldShowIctOfficerNoSignatureIndicator"
+                                class="w-full px-2 py-1 border-2 border-dashed border-red-300/40 rounded-lg bg-red-500/10 backdrop-blur-sm transition-all duration-300 shadow-lg min-h-[20px] flex items-center justify-center"
+                              >
+                                <div class="text-center">
+                                  <i class="fas fa-times text-red-400 text-sm mb-0.5"></i>
+                                  <p class="text-red-300 text-xs">No signature</p>
                                 </div>
                               </div>
 
@@ -5242,10 +5267,93 @@
         )
       },
       shouldShowHeadITSignedIndicator() {
-        return this.isReviewMode && this.viewerAfter('head_it') && this.hasStageSigned('head_it')
+        const baseResult = this.isReviewMode && this.viewerAfter('head_it') && this.hasStageSigned('head_it')
+        
+        // Explicit fallback: if user is Head of IT and head_it_signature_path exists, show signed
+        const isHeadOfIt = this.getUserRole()?.toLowerCase() === 'head_of_it' || 
+                           this.getUserRole()?.toLowerCase() === 'head_it'
+        const headItSignatureExists = !!this.requestData?.head_it_signature_path
+        const fallbackResult = this.isReviewMode && isHeadOfIt && headItSignatureExists
+        
+        const result = baseResult || fallbackResult
+        
+        if (this.isDevelopment) {
+          console.log('🟢 shouldShowHeadITSignedIndicator:', {
+            isReviewMode: this.isReviewMode,
+            viewerAfter_head_it: this.viewerAfter('head_it'),
+            hasStageSigned_head_it: this.hasStageSigned('head_it'),
+            isHeadOfIt,
+            headItSignatureExists,
+            head_it_signature_path: this.requestData?.head_it_signature_path,
+            baseResult,
+            fallbackResult,
+            result
+          })
+        }
+        return result
       },
       shouldShowHeadITNoSignatureIndicator() {
-        return this.isReviewMode && this.viewerAfter('head_it') && !this.hasStageSigned('head_it')
+        // Don't show no signature if we should show signed indicator
+        const shouldShowSigned = this.shouldShowHeadITSignedIndicator
+        const baseResult = this.isReviewMode && this.viewerAfter('head_it') && !this.hasStageSigned('head_it')
+        const result = baseResult && !shouldShowSigned
+        
+        if (this.isDevelopment) {
+          console.log('🔴 shouldShowHeadITNoSignatureIndicator:', {
+            isReviewMode: this.isReviewMode,
+            viewerAfter_head_it: this.viewerAfter('head_it'),
+            hasStageSigned_head_it: this.hasStageSigned('head_it'),
+            shouldShowSigned,
+            baseResult,
+            result
+          })
+        }
+        return result
+      },
+      
+      // ICT Officer signature visibility indicators
+      shouldShowIctOfficerSignedIndicator() {
+        const baseResult = this.isReviewMode && this.viewerAfter('ict_officer') && this.hasStageSigned('ict_officer')
+        
+        // Explicit fallback: if user is ICT Officer and ict_officer_signature_path exists, show signed
+        const isIctOfficer = this.getUserRole()?.toLowerCase() === 'ict_officer'
+        const ictOfficerSignatureExists = !!this.requestData?.ict_officer_signature_path
+        const fallbackResult = this.isReviewMode && isIctOfficer && ictOfficerSignatureExists
+        
+        const result = baseResult || fallbackResult
+        
+        if (this.isDevelopment) {
+          console.log('🟢 shouldShowIctOfficerSignedIndicator:', {
+            isReviewMode: this.isReviewMode,
+            viewerAfter_ict_officer: this.viewerAfter('ict_officer'),
+            hasStageSigned_ict_officer: this.hasStageSigned('ict_officer'),
+            isIctOfficer,
+            ictOfficerSignatureExists,
+            ict_officer_signature_path: this.requestData?.ict_officer_signature_path,
+            baseResult,
+            fallbackResult,
+            result
+          })
+        }
+        return result
+      },
+      shouldShowIctOfficerNoSignatureIndicator() {
+        // Don't show no signature if we should show signed indicator
+        const shouldShowSigned = this.shouldShowIctOfficerSignedIndicator
+        const baseResult = this.isReviewMode && this.viewerAfter('ict_officer') && !this.hasStageSigned('ict_officer')
+        const result = baseResult && !shouldShowSigned
+        
+        if (this.isDevelopment) {
+          console.log('🔴 shouldShowIctOfficerNoSignatureIndicator:', {
+            isReviewMode: this.isReviewMode,
+            viewerAfter_ict_officer: this.viewerAfter('ict_officer'),
+            hasStageSigned_ict_officer: this.hasStageSigned('ict_officer'),
+            shouldShowSigned,
+            baseResult,
+            result
+          })
+        }
+        return result
       },
 
       // UI class helpers to simplify template conditions
@@ -7885,12 +7993,14 @@
       viewerAfter(stage) {
         const targetRank = this.rankForStage(stage)
         const myRank = this.viewerRank()
-        const result = targetRank > 0 && myRank > targetRank
+        // Allow viewers at the same rank or higher to see signature status
+        const result = targetRank > 0 && myRank >= targetRank
         console.log(`🔍 viewerAfter(${stage}):`, {
           targetRank,
           myRank,
           viewerStage: this.viewerStage(),
-          result
+          result,
+          note: 'Changed from myRank > targetRank to myRank >= targetRank to allow same-rank access'
         })
         return result
       },

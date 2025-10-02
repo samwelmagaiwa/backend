@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\v1;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\UserOnboarding;
+use App\Models\UserAccessRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -63,10 +64,12 @@ class AdminController extends Controller
                 });
             }
 
-            // Exclude super admin users from the list
-            $query->whereDoesntHave('roles', function ($q) {
-                $q->where('name', 'super_admin');
-            });
+            // Only exclude super admin users if current user is not super admin
+            if (!$request->user()->hasRole('super_admin')) {
+                $query->whereDoesntHave('roles', function ($q) {
+                    $q->where('name', 'super_admin');
+                });
+            }
 
             // Pagination
             $perPage = $request->get('per_page', 20);
@@ -394,37 +397,56 @@ class AdminController extends Controller
                 ], 403);
             }
 
-            // Get total users (excluding super admins)
-            $totalUsers = User::whereDoesntHave('roles', function ($q) {
-                $q->where('name', 'super_admin');
-            })->count();
-
-            // Get users with onboarding records
-            $usersWithOnboarding = User::whereHas('onboarding')
-                ->whereDoesntHave('roles', function ($q) {
+            // Get total users (excluding super admins only if current user is not super admin)
+            $totalUsersQuery = User::query();
+            if (!$request->user()->hasRole('super_admin')) {
+                $totalUsersQuery->whereDoesntHave('roles', function ($q) {
                     $q->where('name', 'super_admin');
-                })->count();
+                });
+            }
+            $totalUsers = $totalUsersQuery->count();
+
+            // Get users with onboarding records (excluding super admins only if current user is not super admin)
+            $usersWithOnboardingQuery = User::whereHas('onboarding');
+            if (!$request->user()->hasRole('super_admin')) {
+                $usersWithOnboardingQuery->whereDoesntHave('roles', function ($q) {
+                    $q->where('name', 'super_admin');
+                });
+            }
+            $usersWithOnboarding = $usersWithOnboardingQuery->count();
 
             // Get completed onboarding count
-            $completedOnboarding = User::whereHas('onboarding', function ($q) {
+            $completedOnboardingQuery = User::whereHas('onboarding', function ($q) {
                 $q->where('completed', true);
-            })->whereDoesntHave('roles', function ($q) {
-                $q->where('name', 'super_admin');
-            })->count();
+            });
+            if (!$request->user()->hasRole('super_admin')) {
+                $completedOnboardingQuery->whereDoesntHave('roles', function ($q) {
+                    $q->where('name', 'super_admin');
+                });
+            }
+            $completedOnboarding = $completedOnboardingQuery->count();
 
             // Get users who accepted terms
-            $termsAccepted = User::whereHas('onboarding', function ($q) {
+            $termsAcceptedQuery = User::whereHas('onboarding', function ($q) {
                 $q->where('terms_accepted', true);
-            })->whereDoesntHave('roles', function ($q) {
-                $q->where('name', 'super_admin');
-            })->count();
+            });
+            if (!$request->user()->hasRole('super_admin')) {
+                $termsAcceptedQuery->whereDoesntHave('roles', function ($q) {
+                    $q->where('name', 'super_admin');
+                });
+            }
+            $termsAccepted = $termsAcceptedQuery->count();
 
             // Get users who accepted ICT policy
-            $ictPolicyAccepted = User::whereHas('onboarding', function ($q) {
+            $ictPolicyAcceptedQuery = User::whereHas('onboarding', function ($q) {
                 $q->where('ict_policy_accepted', true);
-            })->whereDoesntHave('roles', function ($q) {
-                $q->where('name', 'super_admin');
-            })->count();
+            });
+            if (!$request->user()->hasRole('super_admin')) {
+                $ictPolicyAcceptedQuery->whereDoesntHave('roles', function ($q) {
+                    $q->where('name', 'super_admin');
+                });
+            }
+            $ictPolicyAccepted = $ictPolicyAcceptedQuery->count();
 
             // Get users who submitted declaration
             $declarationSubmitted = User::whereHas('onboarding', function ($q) {
@@ -641,6 +663,106 @@ class AdminController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to perform bulk onboarding reset'
+            ], 500);
+        }
+    }
+
+    /**
+     * Get dashboard statistics for admin dashboard
+     */
+    public function getDashboardStats(Request $request)
+    {
+        try {
+            // Check if current user is admin
+            $currentUser = $request->user();
+            if (!$currentUser || !$currentUser->hasAdminPrivileges()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized. Admin access required.'
+                ], 403);
+            }
+
+            Log::info('Admin dashboard stats requested', [
+                'admin_id' => $currentUser->id,
+                'admin_name' => $currentUser->name
+            ]);
+
+            // Get total users (excluding super admins only if current user is not super admin)
+            $totalUsersQuery = User::query();
+            if (!$request->user()->hasRole('super_admin')) {
+                $totalUsersQuery->whereDoesntHave('roles', function ($q) {
+                    $q->where('name', 'super_admin');
+                });
+            }
+            $totalUsers = $totalUsersQuery->count();
+
+            // Get total requests from UserAccessRequest table
+            $totalRequests = UserAccessRequest::count();
+
+            // Get pending requests (submitted but not completed)
+            $pendingRequests = UserAccessRequest::whereIn('status', [
+                'pending',
+                'under_review',
+                'approved_dict',
+                'approved_divisional_head',
+                'approved_head_of_ict',
+                'waiting_ict_officer',
+                'under_implementation'
+            ])->count();
+
+            // Get active users (users who logged in recently, e.g., within last 30 days)
+            $activeUsers = User::where('updated_at', '>=', now()->subDays(30))
+                ->whereDoesntHave('roles', function ($q) {
+                    $q->where('name', 'super_admin');
+                })->count();
+
+            // Get today's requests
+            $todaysRequests = UserAccessRequest::whereDate('created_at', today())->count();
+
+            // Get completed requests
+            $completedRequests = UserAccessRequest::whereIn('status', [
+                'approved',
+                'implemented',
+                'completed'
+            ])->count();
+
+            // Calculate completion rate
+            $completionRate = $totalRequests > 0 
+                ? round(($completedRequests / $totalRequests) * 100, 1) 
+                : 0;
+
+            $stats = [
+                'total_users' => $totalUsers,
+                'total_requests' => $totalRequests,
+                'pending_requests' => $pendingRequests,
+                'active_users' => $activeUsers,
+                'todays_requests' => $todaysRequests,
+                'completed_requests' => $completedRequests,
+                'completion_rate' => $completionRate,
+                'generated_at' => now()->toISOString()
+            ];
+
+            Log::info('Admin dashboard stats generated successfully', [
+                'admin_id' => $currentUser->id,
+                'stats' => Arr::except($stats, ['generated_at'])
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Dashboard statistics retrieved successfully',
+                'data' => $stats
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error retrieving dashboard statistics', [
+                'admin_id' => $request->user()?->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve dashboard statistics'
             ], 500);
         }
     }

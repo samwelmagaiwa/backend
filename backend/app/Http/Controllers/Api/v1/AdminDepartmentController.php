@@ -58,7 +58,7 @@ class AdminDepartmentController extends Controller
                 'users as users_count',
                 'userAccessRequests as total_requests_count',
                 'userAccessRequests as pending_requests_count' => function ($q) {
-                    $q->where('status', 'pending');
+                    $q->where('hod_status', 'pending');
                 }
             ]);
 
@@ -295,7 +295,7 @@ class AdminDepartmentController extends Controller
                 'users as users_count',
                 'userAccessRequests as total_requests_count',
                 'userAccessRequests as pending_requests_count' => function ($q) {
-                    $q->where('status', 'pending');
+                    $q->where('hod_status', 'pending');
                 }
             ]);
 

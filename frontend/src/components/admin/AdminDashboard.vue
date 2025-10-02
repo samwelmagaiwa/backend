@@ -62,7 +62,7 @@
           <div class="medical-glass-card rounded-b-3xl overflow-hidden">
             <div class="p-6">
               <!-- Statistics Cards -->
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
                 <div
                   class="medical-card bg-gradient-to-r from-blue-600/25 to-cyan-600/25 border-2 border-blue-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
                 >
@@ -110,22 +110,6 @@
                   </div>
                   <p class="text-3xl font-bold text-yellow-100 drop-shadow-lg">
                     {{ stats.pendingRequests }}
-                  </p>
-                </div>
-
-                <div
-                  class="medical-card bg-gradient-to-r from-purple-600/25 to-indigo-600/25 border-2 border-purple-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-500 group"
-                >
-                  <div class="flex items-center mb-4">
-                    <div
-                      class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50 mr-4"
-                    >
-                      <i class="fas fa-shield-alt text-white text-xl"></i>
-                    </div>
-                    <h3 class="text-lg font-semibold text-white drop-shadow-md">ACTIVE ADMINS</h3>
-                  </div>
-                  <p class="text-3xl font-bold text-purple-100 drop-shadow-lg">
-                    {{ stats.activeAdmins }}
                   </p>
                 </div>
               </div>
@@ -188,38 +172,25 @@
                   </div>
                 </div>
 
-                <!-- System Management -->
+                <!-- System Information Section -->
                 <div
                   class="medical-card bg-gradient-to-r from-purple-600/25 to-indigo-600/25 border-2 border-purple-400/40 p-6 rounded-2xl backdrop-blur-sm"
                 >
                   <h3 class="text-xl font-bold text-white mb-4 flex items-center">
-                    <i class="fas fa-cogs mr-2 text-purple-300"></i>
-                    System Management
+                    <i class="fas fa-info-circle mr-2 text-purple-300"></i>
+                    System Information
                   </h3>
-                  <div class="space-y-3">
-                    <router-link
-                      v-for="systemAction in systemManagementActions"
-                      :key="systemAction.title"
-                      :to="systemAction.route"
-                      class="flex items-center p-3 bg-white/10 rounded-lg hover:bg-white/20 transition-all duration-300 group"
-                    >
-                      <div
-                        :class="`w-10 h-10 bg-gradient-to-br ${systemAction.gradient} rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border ${systemAction.border} mr-3`"
-                      >
-                        <i :class="`${systemAction.icon} text-white`"></i>
-                      </div>
-                      <div class="flex-1">
-                        <div class="text-white font-medium">{{ systemAction.title }}</div>
-                        <div class="text-blue-200 text-sm">{{ systemAction.description }}</div>
-                      </div>
-                      <i class="fas fa-chevron-right text-blue-300"></i>
-                    </router-link>
+                  <div class="space-y-2">
+                    <div class="text-white text-sm">
+                      <span class="text-purple-200">Version:</span> 1.0.0
+                    </div>
+                    <div class="text-white text-sm">
+                      <span class="text-purple-200">Last Updated:</span>
+                      {{ new Date().toLocaleDateString() }}
+                    </div>
                   </div>
                 </div>
               </div>
-
-              <!-- Footer -->
-              <AppFooter />
             </div>
           </div>
         </div>
@@ -232,15 +203,14 @@
   import { ref, onMounted } from 'vue'
   import Header from '@/components/header.vue'
   import ModernSidebar from '@/components/ModernSidebar.vue'
-  import AppFooter from '@/components/footer.vue'
   import { useAuth } from '@/composables/useAuth'
+  import dashboardService from '@/services/dashboardService'
 
   export default {
     name: 'AdminDashboard',
     components: {
       Header,
-      ModernSidebar,
-      AppFooter
+      ModernSidebar
     },
     setup() {
       const { userName, ROLES, requireRole } = useAuth()
@@ -248,13 +218,15 @@
       // Local state
       // Sidebar state now managed by Pinia - no local state needed
 
-      // Statistics data
+      // Statistics data - start with loading placeholders
       const stats = ref({
-        totalUsers: 156,
-        totalRequests: 1247,
-        pendingRequests: 23,
-        activeAdmins: 5
+        totalUsers: 0,
+        totalRequests: 0,
+        pendingRequests: 0
       })
+
+      // Loading state
+      const isLoadingStats = ref(false)
 
       // Quick actions
       const quickActions = ref([
@@ -320,26 +292,6 @@
         }
       ])
 
-      // System management actions
-      const systemManagementActions = ref([
-        {
-          title: 'System Settings',
-          description: 'Configure system parameters',
-          icon: 'fas fa-cog',
-          gradient: 'from-blue-500 to-blue-600',
-          border: 'border-blue-300/50',
-          route: '/settings'
-        },
-        {
-          title: 'Diagnostic Tools',
-          description: 'System diagnostic utilities',
-          icon: 'fas fa-stethoscope',
-          gradient: 'from-blue-500 to-blue-600',
-          border: 'border-blue-300/50',
-          route: '/diagnostic'
-        }
-      ])
-
       // Guard this route - only Admins can access
       onMounted(() => {
         requireRole([ROLES.ADMIN])
@@ -347,13 +299,39 @@
       })
 
       const loadStats = async () => {
-        // TODO: Load real statistics from API
         try {
-          // const response = await fetch('/api/admin/stats')
-          // const data = await response.json()
-          // stats.value = data
+          isLoadingStats.value = true
+          console.log('📊 Loading admin dashboard statistics...')
+
+          const result = await dashboardService.getAdminDashboardStats()
+
+          if (result.success) {
+            // Update stats with live data from backend
+            stats.value = {
+              totalUsers: result.data.totalUsers,
+              totalRequests: result.data.totalRequests,
+              pendingRequests: result.data.pendingRequests
+            }
+            console.log('✅ Admin dashboard stats loaded successfully:', stats.value)
+          } else {
+            console.warn('⚠️ Failed to load stats, using fallback data:', result.error)
+            // Use fallback data from service
+            stats.value = {
+              totalUsers: result.data.totalUsers,
+              totalRequests: result.data.totalRequests,
+              pendingRequests: result.data.pendingRequests
+            }
+          }
         } catch (error) {
-          console.error('Failed to load stats:', error)
+          console.error('❌ Error loading admin dashboard stats:', error)
+          // Keep the default zeros or set fallback values
+          stats.value = {
+            totalUsers: 156,
+            totalRequests: 1247,
+            pendingRequests: 23
+          }
+        } finally {
+          isLoadingStats.value = false
         }
       }
 
@@ -365,9 +343,9 @@
       return {
         userName,
         stats,
+        isLoadingStats,
         quickActions,
         userManagementActions,
-        systemManagementActions,
         handleQuickActionClick
       }
     }

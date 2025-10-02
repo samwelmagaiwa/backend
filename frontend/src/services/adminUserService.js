@@ -142,6 +142,97 @@ export const adminUserService = {
       console.error('Error validating user data:', error)
       throw error
     }
+  },
+
+  /**
+   * Get all permissions
+   */
+  async getPermissions() {
+    try {
+      const response = await apiClient.get('/admin/permissions')
+      return response.data
+    } catch (error) {
+      console.error('Error fetching permissions:', error)
+      throw error
+    }
+  },
+
+  /**
+   * Create a new role
+   */
+  async createRole(roleData) {
+    try {
+      const response = await apiClient.post('/admin/roles', roleData)
+      return response.data
+    } catch (error) {
+      console.error('Error creating role:', error)
+      throw error
+    }
+  },
+
+  /**
+   * Update an existing role
+   */
+  async updateRole(roleId, roleData) {
+    try {
+      const response = await apiClient.put(`/admin/roles/${roleId}`, roleData)
+      return response.data
+    } catch (error) {
+      console.error('Error updating role:', error)
+      throw error
+    }
+  },
+
+  /**
+   * Delete a role
+   */
+  async deleteRole(roleId) {
+    try {
+      const response = await apiClient.delete(`/admin/roles/${roleId}`)
+      return response.data
+    } catch (error) {
+      console.error('Error deleting role:', error)
+      throw error
+    }
+  },
+
+  /**
+   * Assign roles to a user
+   */
+  async assignUserRoles(userId, roleIds) {
+    try {
+      const response = await apiClient.post(`/user-roles/${userId}/assign`, { role_ids: roleIds })
+      return response.data
+    } catch (error) {
+      console.error('Error assigning roles:', error)
+      throw error
+    }
+  },
+
+  /**
+   * Get user role history
+   */
+  async getUserRoleHistory(userId, params = {}) {
+    try {
+      const response = await apiClient.get(`/user-roles/${userId}/history`, { params })
+      return response.data
+    } catch (error) {
+      console.error('Error fetching user role history:', error)
+      throw error
+    }
+  },
+
+  /**
+   * Remove a specific role from a user
+   */
+  async removeUserRole(userId, roleId) {
+    try {
+      const response = await apiClient.delete(`/user-roles/${userId}/roles/${roleId}`)
+      return response.data
+    } catch (error) {
+      console.error('Error removing role:', error)
+      throw error
+    }
   }
 }
 

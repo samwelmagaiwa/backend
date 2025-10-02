@@ -17,7 +17,8 @@
         :key="`dot-${index}`"
         :class="`dot ${dot.color}`"
         :style="{
-          transform: `rotate(${rotation + index * dotSpacing}deg) translateX(${orbitRadius}px)`
+          left: `${50 + Math.cos((rotation + index * dotSpacing) * Math.PI / 180) * (orbitRadius / currentContainerSize * 100)}%`,
+          top: `${50 + Math.sin((rotation + index * dotSpacing) * Math.PI / 180) * (orbitRadius / currentContainerSize * 100)}%`
         }"
       ></div>
     </div>
@@ -29,7 +30,7 @@
     name: 'OrbitingDots',
 
     props: {
-      // Size options: 'xs', 'sm', 'md', 'lg'
+      // Size options: 'xs', 'sm', 'md', 'lg', 'xl', '2xl'
       size: {
         type: String,
         default: 'sm'
@@ -56,16 +57,16 @@
         rotationInterval: null,
         updateFrequency: 50, // milliseconds between updates
 
-        // 8 small dots with logo colors
+        // 24 dots with logo colors in repeating pattern
         dots: [
-          { color: 'logo-red' },
-          { color: 'logo-gold' },
-          { color: 'logo-white' },
-          { color: 'logo-red' },
-          { color: 'logo-gold' },
-          { color: 'logo-white' },
-          { color: 'logo-red' },
-          { color: 'logo-gold' }
+          { color: 'logo-red' }, { color: 'logo-gold' }, { color: 'logo-white' },
+          { color: 'logo-red' }, { color: 'logo-gold' }, { color: 'logo-white' },
+          { color: 'logo-red' }, { color: 'logo-gold' }, { color: 'logo-white' },
+          { color: 'logo-red' }, { color: 'logo-gold' }, { color: 'logo-white' },
+          { color: 'logo-red' }, { color: 'logo-gold' }, { color: 'logo-white' },
+          { color: 'logo-red' }, { color: 'logo-gold' }, { color: 'logo-white' },
+          { color: 'logo-red' }, { color: 'logo-gold' }, { color: 'logo-white' },
+          { color: 'logo-red' }, { color: 'logo-gold' }, { color: 'logo-white' }
         ]
       }
     },
@@ -103,8 +104,26 @@
             return 12
           case 'lg':
             return 16
+          case 'xl':
+            return 24
+          case '2xl':
+            return 45
           default:
             return 8
+        }
+      },
+
+      currentContainerSize() {
+        if (this.customWidth) return this.customWidth
+        
+        switch (this.size) {
+          case 'xs': return 16
+          case 'sm': return 20
+          case 'md': return 28
+          case 'lg': return 36
+          case 'xl': return 64
+          case '2xl': return 120
+          default: return 20
         }
       }
     },
@@ -165,6 +184,14 @@
     width: 36px;
     height: 36px;
   }
+  .size-xl {
+    width: 64px;
+    height: 64px;
+  }
+  .size-2xl {
+    width: 120px;
+    height: 120px;
+  }
 
   .center-logo {
     position: relative;
@@ -174,18 +201,23 @@
     justify-content: center;
   }
 
-  .logo-img {
+.logo-img {
     width: 50%;
     height: 50%;
     object-fit: contain;
     opacity: 0.8;
   }
+  
+  /* Larger logo for 2xl size */
+  .size-2xl .logo-img {
+    width: 60%;
+    height: 60%;
+  }
 
   .orbit {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     pointer-events: none;
@@ -193,10 +225,8 @@
 
   .dot {
     position: absolute;
-    top: 50%;
-    left: 50%;
     border-radius: 50%;
-    transform-origin: 0 0;
+    transform: translate(-50%, -50%);
   }
 
   /* Size-based dot sizing */
@@ -215,6 +245,14 @@
   .size-lg .dot {
     width: 4px;
     height: 4px;
+  }
+  .size-xl .dot {
+    width: 6px;
+    height: 6px;
+  }
+  .size-2xl .dot {
+    width: 8px;
+    height: 8px;
   }
 
   /* Custom size dot sizing */

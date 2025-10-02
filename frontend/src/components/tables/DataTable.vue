@@ -8,16 +8,16 @@
             <i class="fas fa-table text-indigo-600"></i>
           </div>
           <div>
-            <h3 class="text-lg font-bold text-gray-900">
+            <h3 class="text-2xl font-bold text-gray-900">
               <slot name="title">{{ title }}</slot>
             </h3>
-            <p class="text-sm text-gray-600" v-if="total">{{ total }} total records</p>
+            <p class="text-lg text-gray-600" v-if="total">{{ total }} total records</p>
           </div>
         </div>
         <div class="flex items-center space-x-4">
-          <div class="text-sm text-gray-500" v-if="total">
+        <div class="text-lg text-gray-500" v-if="total">
             <span
-              class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800"
+              class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800"
             >
               {{ total }} Records
             </span>
@@ -39,7 +39,7 @@
               v-for="col in columns"
               :key="col.key"
               scope="col"
-              class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider whitespace-nowrap border-b border-gray-200"
+              class="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider whitespace-nowrap border-b border-gray-200"
             >
               <div class="flex items-center space-x-1">
                 <span>{{ col.label }}</span>
@@ -57,7 +57,7 @@
                 <div
                   class="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-3"
                 ></div>
-                <p class="text-gray-500 font-medium">Loading data...</p>
+                <p class="text-gray-500 font-medium text-lg">Loading data...</p>
               </div>
             </td>
           </tr>
@@ -68,8 +68,8 @@
                 <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-3">
                   <i class="fas fa-inbox text-gray-400 text-xl"></i>
                 </div>
-                <p class="text-gray-500 font-medium">No records found</p>
-                <p class="text-gray-400 text-sm">Try adjusting your search criteria</p>
+                <p class="text-gray-500 font-medium text-lg">No records found</p>
+                <p class="text-gray-400 text-lg">Try adjusting your search criteria</p>
               </div>
             </td>
           </tr>
@@ -83,20 +83,20 @@
             <td
               v-for="col in columns"
               :key="col.key"
-              class="px-6 py-4 text-sm text-gray-700 align-top"
+              class="px-6 py-4 text-lg text-gray-700 align-top"
             >
               <template v-if="col.slot === 'status'">
                 <span
                   :class="[
-                    'inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold',
-                    row.status === 'Active'
+                    'inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold',
+                    row.status === 'Active' || row.status === 'Completed'
                       ? 'bg-green-100 text-green-800 border border-green-200'
                       : 'bg-red-100 text-red-800 border border-red-200'
                   ]"
                 >
                   <span
                     class="w-2 h-2 rounded-full mr-2"
-                    :class="row.status === 'Active' ? 'bg-green-500' : 'bg-red-500'"
+                    :class="(row.status === 'Active' || row.status === 'Completed') ? 'bg-green-500' : 'bg-red-500'"
                   ></span>
                   {{ row.status || 'Inactive' }}
                 </span>
@@ -116,7 +116,7 @@
     <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
       <div class="flex flex-col sm:flex-row items-center justify-between space-y-3 sm:space-y-0">
         <div class="flex items-center space-x-4">
-          <div class="text-sm text-gray-700">
+          <div class="text-lg text-gray-700">
             Showing <span class="font-semibold">{{ pageStart + 1 }}</span> -
             <span class="font-semibold">{{
               Math.min(pageStart + perPage, total || rows.length)
@@ -126,9 +126,9 @@
             results
           </div>
           <div class="flex items-center space-x-2">
-            <label class="text-sm text-gray-600">Show:</label>
+            <label class="text-lg text-gray-600">Show:</label>
             <select
-              class="border border-gray-300 rounded-md px-3 py-1 text-sm bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              class="border border-gray-300 rounded-md px-3 py-1 text-lg bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               v-model.number="perPageLocal"
               @change="changePerPage"
             >
@@ -141,7 +141,7 @@
         </div>
         <div class="flex items-center space-x-2">
           <button
-            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            class="px-4 py-2 text-lg font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             :disabled="page === 1"
             @click="goTo(page - 1)"
           >
@@ -149,7 +149,7 @@
             Previous
           </button>
           <button
-            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            class="px-4 py-2 text-lg font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             :disabled="pageEnd >= (total || rows.length)"
             @click="goTo(page + 1)"
           >

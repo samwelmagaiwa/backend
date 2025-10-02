@@ -1375,11 +1375,10 @@ class IctOfficerController extends Controller
             ]);
 
             // Count unassigned requests (available for assignment)
+            // Fixed: Exclude requests that have ANY task assignment (assigned, in_progress, completed, or cancelled)
             $unassignedCount = UserAccess::where('head_it_status', 'approved')
                 ->whereNotNull('head_it_approved_at')
-                ->whereDoesntHave('ictTaskAssignments', function ($query) {
-                    $query->whereIn('status', [IctTaskAssignment::STATUS_ASSIGNED, IctTaskAssignment::STATUS_IN_PROGRESS]);
-                })
+                ->whereDoesntHave('ictTaskAssignments')
                 ->count();
 
             // Count requests assigned to this ICT Officer that need attention

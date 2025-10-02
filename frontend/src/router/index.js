@@ -276,37 +276,7 @@ const routes = [
   {
     path: '/edit-booking-request',
     name: 'EditBookingRequest',
-    component: () =>
-      import('../components/views/booking/EditBookingRequest.vue').catch((error) => {
-        console.error('Failed to load EditBookingRequest component:', error)
-        // Return a fallback component using render function instead of template
-        return {
-          name: 'EditBookingRequestFallback',
-          setup() {
-            return () =>
-              h('div', { class: 'p-8 text-center' }, [
-                h(
-                  'h1',
-                  { class: 'text-2xl font-bold text-red-600 mb-4' },
-                  'Component Loading Error'
-                ),
-                h(
-                  'p',
-                  { class: 'text-gray-600 mb-4' },
-                  'Failed to load EditBookingRequest component.'
-                ),
-                h(
-                  'button',
-                  {
-                    class: 'bg-blue-500 text-white px-4 py-2 rounded',
-                    onClick: () => window.history.back()
-                  },
-                  'Go Back'
-                )
-              ])
-          }
-        }
-      }),
+    component: () => import('../components/views/booking/EditBookingRequest.vue'),
     meta: {
       requiresAuth: true,
       roles: [ROLES.STAFF]
@@ -734,20 +704,20 @@ const routes = [
   {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
-    component: () =>
-      import('../components/NotFound.vue').catch(() => {
+    component: () => {
+      return import('../components/NotFound.vue').catch(() => {
         // Fallback if NotFound component doesn't exist - using render function instead of template
-        return {
+        return Promise.resolve({
           name: 'NotFoundFallback',
-          setup() {
-            return () =>
-              h('div', { class: 'text-center p-8' }, [
-                h('h1', { class: 'text-2xl font-bold text-red-600' }, 'Page Not Found'),
-                h('p', { class: 'mt-4' }, 'The requested page could not be found.')
-              ])
+          render() {
+            return h('div', { class: 'text-center p-8' }, [
+              h('h1', { class: 'text-2xl font-bold text-red-600' }, 'Page Not Found'),
+              h('p', { class: 'mt-4' }, 'The requested page could not be found.')
+            ])
           }
-        }
+        })
       })
+    }
   }
 ]
 

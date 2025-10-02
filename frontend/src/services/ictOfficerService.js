@@ -447,7 +447,10 @@ const ictOfficerService = {
       const response = await axiosInstance.get('/ict-officer/pending-count')
 
       if (response.data.success) {
-        console.log('✅ IctOfficerService: Pending count loaded successfully')
+        // Success logged only in development mode
+        if (process.env.NODE_ENV === 'development') {
+          console.log('✅ IctOfficerService: Pending count loaded successfully')
+        }
         return response.data.data
       } else {
         console.error('❌ IctOfficerService: Failed to load pending count:', response.data.message)

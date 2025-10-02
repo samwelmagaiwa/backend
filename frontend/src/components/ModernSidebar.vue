@@ -954,13 +954,6 @@
             category: 'dashboard',
             description: 'Divisional Director panel'
           },
-          '/ict-dashboard': {
-            name: 'IctDashboard',
-            displayName: 'ICT Dashboard',
-            icon: 'fas fa-laptop-code',
-            category: 'dashboard',
-            description: 'ICT Officer panel'
-          },
           '/ict-dashboard/access-requests': {
             name: 'IctAccessRequests',
             displayName: 'Access Requests',
@@ -1228,7 +1221,9 @@
 
         try {
           const role = piniaAuthStore?.userRole || userRole?.value || stableUserRole?.value
-          console.log('🔄 fetchNotificationCounts called with role:', role)
+          if (process.env.NODE_ENV === 'development') {
+            console.log('🔄 fetchNotificationCounts called with role:', role)
+          }
 
           if (!role) {
             console.warn('No role found, skipping notification fetch')
@@ -1237,21 +1232,26 @@
 
           // Import the universal notification service dynamically to avoid circular dependencies
           const notificationService = (await import('@/services/notificationService')).default
-          console.log('📡 Calling notification service API...')
+          if (process.env.NODE_ENV === 'development') {
+            console.log('📡 Calling notification service API...')
+          }
 
           const result = await notificationService.getPendingRequestsCount(forceRefresh)
-          console.log('📊 API response:', result)
+          
+          if (process.env.NODE_ENV === 'development') {
+            console.log('📊 API response:', result)
+            
+            // DEBUG: Log the API response details
+            console.log('🔍 NOTIFICATION DEBUG - API Response:', {
+              total_pending: result.total_pending,
+              requires_attention: result.requires_attention,
+              full_result: result,
+              timestamp: new Date().toISOString()
+            })
+          }
 
           // Reset retry counter on successful fetch
           notificationRetries.value = 0
-
-          // DEBUG: Log the API response details
-          console.log('🔍 NOTIFICATION DEBUG - API Response:', {
-            total_pending: result.total_pending,
-            requires_attention: result.requires_attention,
-            full_result: result,
-            timestamp: new Date().toISOString()
-          })
 
           // ICT Officer specific: cross-check with role-specific API and in-page override
           let finalPendingCount = result.total_pending || 0
@@ -1286,18 +1286,20 @@
               (typeof ictSpecificCount === 'number' ? ictSpecificCount : null) ??
               finalPendingCount
 
-            console.log('🧮 ICT Badge Count Reconciliation:', {
-              universal: result.total_pending,
-              ictSpecific: ictSpecificCount,
-              pageOverride: pageOverrideCount,
-              chosen: finalPendingCount
-            })
+            if (process.env.NODE_ENV === 'development') {
+              console.log('🧮 ICT Badge Count Reconciliation:', {
+                universal: result.total_pending,
+                ictSpecific: ictSpecificCount,
+                pageOverride: pageOverrideCount,
+                chosen: finalPendingCount
+              })
+            }
           }
 
           // EXTENDED DEBUG: Log breakdown if available to see what's being counted
-          if (result.breakdown || result.details) {
+          if ((result.details?.breakdown || result.details) && process.env.NODE_ENV === 'development') {
             console.log('📊 NOTIFICATION BREAKDOWN DEBUG:', {
-              breakdown: result.breakdown,
+              breakdown: result.details?.breakdown,
               details: result.details,
               role,
               endpoint_called: '/notifications/pending-count'
@@ -1357,7 +1359,9 @@
             // Clear all notification counts
             const oldCounts = { ...notificationCounts.value }
             notificationCounts.value = {}
-            console.log('🔕 No pending requests, clearing badges. Previous counts:', oldCounts)
+            if (process.env.NODE_ENV === 'development' && Object.keys(oldCounts).length > 0) {
+              console.log('🔕 Cleared notification badges (had:', Object.keys(oldCounts).length, 'routes)')
+            }
           }
         } catch (error) {
           console.error('❌ Failed to fetch notification counts:', error)

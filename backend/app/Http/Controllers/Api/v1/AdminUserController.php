@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use App\Models\UserAccess;
+use App\Models\BookingService;
 
 class AdminUserController extends Controller
 {
@@ -56,8 +58,7 @@ class AdminUserController extends Controller
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
                       ->orWhere('email', 'like', "%{$search}%")
-                      ->orWhere('pf_number', 'like', "%{$search}%")
-                      ->orWhere('staff_name', 'like', "%{$search}%");
+                      ->orWhere('pf_number', 'like', "%{$search}%");
                 });
             }
 
@@ -74,10 +75,12 @@ class AdminUserController extends Controller
                 $query->where('is_active', $isActive);
             }
 
-            // Exclude super admin users from the list
-            $query->whereDoesntHave('roles', function ($q) {
-                $q->where('name', 'super_admin');
-            });
+            // Only exclude super admin users if current user is not super admin
+            if (!$request->user()->hasRole('super_admin')) {
+                $query->whereDoesntHave('roles', function ($q) {
+                    $q->where('name', 'super_admin');
+                });
+            }
 
             // Sorting
             $sortBy = $request->get('sort_by', 'name');
@@ -97,7 +100,6 @@ class AdminUserController extends Controller
                     'name' => $user->name,
                     'email' => $user->email,
                     'pf_number' => $user->pf_number,
-                    'staff_name' => $user->staff_name,
                     'phone' => $user->phone,
                     'department_id' => $user->department_id,
                     'department' => $user->department ? [
@@ -182,7 +184,6 @@ class AdminUserController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'phone' => 'nullable|string|max:20',
             'pf_number' => 'nullable|string|max:50|unique:users',
-            'staff_name' => 'nullable|string|max:255',
             'department_id' => 'nullable|exists:departments,id',
             'password' => 'required|string|min:8',
             'password_confirmation' => 'required|string|same:password',
@@ -242,7 +243,6 @@ class AdminUserController extends Controller
                 'email' => $request->email,
                 'phone' => $request->phone,
                 'pf_number' => $request->pf_number,
-                'staff_name' => $request->staff_name,
                 'department_id' => $request->department_id,
                 'password' => Hash::make($request->password),
                 'is_active' => $request->get('is_active', true),
@@ -298,7 +298,6 @@ class AdminUserController extends Controller
                         'name' => $user->name,
                         'email' => $user->email,
                         'pf_number' => $user->pf_number,
-                        'staff_name' => $user->staff_name,
                         'phone' => $user->phone,
                         'department_id' => $user->department_id,
                         'department' => $user->department ? [
@@ -369,7 +368,6 @@ class AdminUserController extends Controller
                 'name' => $user->name,
                 'email' => $user->email,
                 'pf_number' => $user->pf_number,
-                'staff_name' => $user->staff_name,
                 'phone' => $user->phone,
                 'department_id' => $user->department_id,
                 'department' => $user->department ? [
@@ -460,7 +458,6 @@ class AdminUserController extends Controller
             'email' => ['sometimes', 'required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($userId)],
             'phone' => 'nullable|string|max:20',
             'pf_number' => ['sometimes', 'required', 'string', 'max:50', Rule::unique('users')->ignore($userId)],
-            'staff_name' => 'nullable|string|max:255',
             'department_id' => 'nullable|exists:departments,id',
             'password' => 'nullable|string|min:8|confirmed',
             'is_active' => 'boolean'
@@ -477,7 +474,7 @@ class AdminUserController extends Controller
         DB::beginTransaction();
 
         try {
-            $updateData = $request->only(['name', 'email', 'phone', 'pf_number', 'staff_name', 'department_id', 'is_active']);
+            $updateData = $request->only(['name', 'email', 'phone', 'pf_number', 'department_id', 'is_active']);
             
             if ($request->filled('password')) {
                 $updateData['password'] = Hash::make($request->password);
@@ -504,7 +501,6 @@ class AdminUserController extends Controller
                         'name' => $user->name,
                         'email' => $user->email,
                         'pf_number' => $user->pf_number,
-                        'staff_name' => $user->staff_name,
                         'phone' => $user->phone,
                         'department_id' => $user->department_id,
                         'department' => $user->department ? [
@@ -801,6 +797,126 @@ class AdminUserController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to retrieve form data'
+            ], 500);
+        }
+    }
+
+    /**
+     * Get comprehensive admin dashboard statistics
+     */
+    public function getDashboardStats(): JsonResponse
+    {
+        try {
+            Log::info('Admin dashboard stats requested');
+            
+            // Get total users count (excluding super admins for cleaner stats)
+            $totalUsers = User::whereDoesntHave('roles', function ($q) {
+                $q->where('name', 'super_admin');
+            })->count();
+            
+            // Initialize counters
+            $totalRequests = 0;
+            $pendingRequests = 0;
+            $completedRequests = 0;
+            $todaysRequests = 0;
+            
+            // Try to get UserAccess statistics safely
+            try {
+                $userAccessCount = UserAccess::count();
+                $totalRequests += $userAccessCount;
+                
+                $pendingUserAccess = UserAccess::where(function ($query) {
+                    $query->where('status', 'pending')
+                        ->orWhere('hod_status', 'pending')
+                        ->orWhere('divisional_status', 'pending')
+                        ->orWhere('ict_director_status', 'pending')
+                        ->orWhere('head_it_status', 'pending')
+                        ->orWhere('ict_officer_status', 'pending');
+                })->count();
+                $pendingRequests += $pendingUserAccess;
+                
+                $completedUserAccess = UserAccess::where('status', 'completed')->count();
+                $completedRequests += $completedUserAccess;
+                
+                $todayUserAccess = UserAccess::whereDate('created_at', today())->count();
+                $todaysRequests += $todayUserAccess;
+                
+                Log::info('UserAccess stats retrieved', [
+                    'total' => $userAccessCount,
+                    'pending' => $pendingUserAccess,
+                    'completed' => $completedUserAccess,
+                    'today' => $todayUserAccess
+                ]);
+            } catch (\Exception $e) {
+                Log::warning('Failed to get UserAccess statistics', ['error' => $e->getMessage()]);
+            }
+            
+            // Try to get BookingService statistics safely
+            try {
+                $bookingCount = BookingService::count();
+                $totalRequests += $bookingCount;
+                
+                $pendingBookings = BookingService::whereIn('status', [
+                    'pending', 'ict_approval_pending'
+                ])->count();
+                $pendingRequests += $pendingBookings;
+                
+                $completedBookings = BookingService::where('status', 'completed')->count();
+                $completedRequests += $completedBookings;
+                
+                $todayBookings = BookingService::whereDate('created_at', today())->count();
+                $todaysRequests += $todayBookings;
+                
+                Log::info('BookingService stats retrieved', [
+                    'total' => $bookingCount,
+                    'pending' => $pendingBookings,
+                    'completed' => $completedBookings,
+                    'today' => $todayBookings
+                ]);
+            } catch (\Exception $e) {
+                Log::warning('Failed to get BookingService statistics', ['error' => $e->getMessage()]);
+            }
+            
+            // Get active users (users active in last 30 days)
+            $activeUsers = User::where('updated_at', '>=', now()->subDays(30))
+                ->whereDoesntHave('roles', function ($q) {
+                    $q->where('name', 'super_admin');
+                })->count();
+            
+            // Calculate completion rate
+            $completionRate = $totalRequests > 0 
+                ? round(($completedRequests / $totalRequests) * 100, 1) 
+                : 0;
+            
+            $stats = [
+                'total_users' => $totalUsers,
+                'total_requests' => $totalRequests,
+                'pending_requests' => $pendingRequests,
+                'active_users' => $activeUsers,
+                'todays_requests' => $todaysRequests,
+                'completed_requests' => $completedRequests,
+                'completion_rate' => $completionRate,
+                'generated_at' => now()->toISOString()
+            ];
+            
+            Log::info('Admin dashboard stats generated successfully', $stats);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Dashboard statistics retrieved successfully',
+                'data' => $stats
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Error retrieving admin dashboard statistics', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve dashboard statistics',
+                'error' => config('app.debug') ? $e->getMessage() : null
             ], 500);
         }
     }

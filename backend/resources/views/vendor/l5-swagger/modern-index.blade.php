@@ -215,6 +215,10 @@
             }
         }
         @endif
+        /* Hide Swagger default info panel below the Explore input */
+        .swagger-ui .info {
+            display: none !important;
+        }
     </style>
 </head>
 

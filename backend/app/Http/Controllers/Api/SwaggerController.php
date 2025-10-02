@@ -154,13 +154,9 @@ class SwaggerController extends Controller
         return [
             'openapi' => '3.0.0',
             'info' => [
-                'title' => 'MNH API Documentation',
-                'version' => '2.0.0',
-                'description' => 'Comprehensive Laravel API for User Access Management, Device Booking, System Administration, and Complete CRUD Operations with 336 endpoints across 65 categories',
-                'contact' => [
-                    'name' => 'MNH API Support Team',
-                    'email' => 'api-support@mnh.go.tz'
-                ]
+                'title' => 'API Documentation',
+                'version' => '1.0.0',
+                'description' => 'Comprehensive Laravel API for User Access Management, Device Booking, System Administration, and Complete CRUD Operations with 336 endpoints across 65 categories'
             ],
             'paths' => $this->generatePaths()
         ];
@@ -699,6 +695,44 @@ class SwaggerController extends Controller
                     'responses' => [
                         '201' => ['description' => 'User created successfully'],
                         '403' => ['description' => 'Unauthorized - Admin access required']
+                    ]
+                ]
+            ],
+            '/admin/dashboard-stats' => [
+                'get' => [
+                    'tags' => ['Admin'],
+                    'summary' => 'Get Admin Dashboard Statistics',
+                    'description' => 'Retrieve comprehensive dashboard statistics for admin panel including total users, requests, and pending counts',
+                    'operationId' => 'getAdminDashboardStats',
+                    'security' => [['sanctum' => []]],
+                    'responses' => [
+                        '200' => [
+                            'description' => 'Dashboard statistics retrieved successfully',
+                            'content' => [
+                                'application/json' => [
+                                    'schema' => [
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'success' => ['type' => 'boolean', 'example' => true],
+                                            'data' => [
+                                                'type' => 'object',
+                                                'properties' => [
+                                                    'total_users' => ['type' => 'integer', 'example' => 156],
+                                                    'total_requests' => ['type' => 'integer', 'example' => 1247],
+                                                    'pending_requests' => ['type' => 'integer', 'example' => 23],
+                                                    'active_users' => ['type' => 'integer', 'example' => 148],
+                                                    'todays_requests' => ['type' => 'integer', 'example' => 12],
+                                                    'completed_requests' => ['type' => 'integer', 'example' => 1120],
+                                                    'completion_rate' => ['type' => 'number', 'example' => 89.8]
+                                                ]
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ],
+                        '403' => ['description' => 'Unauthorized - Admin access required'],
+                        '500' => ['description' => 'Internal server error']
                     ]
                 ]
             ],
@@ -5034,79 +5068,6 @@ class SwaggerController extends Controller
                         ]
                     ],
                     'responses' => ['200' => ['description' => 'Password reset successful']]
-                ]
-            ],
-            // Email Verification
-            '/api/v1/email-verification/send' => [
-                'post' => [
-                    'tags' => ['Authentication'], 'summary' => 'Send Email Verification',
-                    'description' => 'Send email verification link',
-                    'security' => [['sanctum' => []]],
-                    'responses' => ['200' => ['description' => 'Verification email sent']]
-                ]
-            ],
-            '/api/v1/email-verification/verify/{id}/{hash}' => [
-                'get' => [
-                    'tags' => ['Authentication'], 'summary' => 'Verify Email Address',
-                    'description' => 'Verify email address using signed URL',
-                    'parameters' => [
-                        ['name' => 'id', 'in' => 'path', 'required' => true, 'schema' => ['type' => 'integer']],
-                        ['name' => 'hash', 'in' => 'path', 'required' => true, 'schema' => ['type' => 'string']],
-                        ['name' => 'expires', 'in' => 'query', 'required' => true, 'schema' => ['type' => 'integer']],
-                        ['name' => 'signature', 'in' => 'query', 'required' => true, 'schema' => ['type' => 'string']]
-                    ],
-                    'responses' => ['200' => ['description' => 'Email verified successfully']]
-                ]
-            ],
-            // Two-Factor Authentication
-            '/api/v1/two-factor-auth/enable' => [
-                'post' => [
-                    'tags' => ['Authentication'], 'summary' => 'Enable 2FA',
-                    'description' => 'Enable two-factor authentication for user',
-                    'security' => [['sanctum' => []]],
-                    'responses' => ['200' => ['description' => '2FA enabled', 'content' => ['application/json' => ['schema' => ['type' => 'object', 'properties' => ['qr_code' => ['type' => 'string'], 'secret_key' => ['type' => 'string'], 'recovery_codes' => ['type' => 'array', 'items' => ['type' => 'string']]]]]]]]
-                ]
-            ],
-            '/api/v1/two-factor-auth/verify' => [
-                'post' => [
-                    'tags' => ['Authentication'], 'summary' => 'Verify 2FA Code',
-                    'description' => 'Verify two-factor authentication code',
-                    'security' => [['sanctum' => []]],
-                    'requestBody' => [
-                        'required' => true,
-                        'content' => [
-                            'application/json' => [
-                                'schema' => [
-                                    'type' => 'object',
-                                    'properties' => [
-                                        'code' => ['type' => 'string', 'example' => '123456']
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ],
-                    'responses' => ['200' => ['description' => '2FA code verified']]
-                ]
-            ],
-            '/api/v1/two-factor-auth/disable' => [
-                'delete' => [
-                    'tags' => ['Authentication'], 'summary' => 'Disable 2FA',
-                    'description' => 'Disable two-factor authentication',
-                    'security' => [['sanctum' => []]],
-                    'requestBody' => [
-                        'required' => true,
-                        'content' => [
-                            'application/json' => [
-                                'schema' => [
-                                    'type' => 'object',
-                                    'properties' => [
-                                        'password' => ['type' => 'string', 'example' => 'password123']
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ],
-                    'responses' => ['200' => ['description' => '2FA disabled']]
                 ]
             ],
             // API Key Management

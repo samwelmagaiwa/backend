@@ -25,13 +25,11 @@ export const ROLE_PERMISSIONS = {
       '/service-users',
       '/admin/user-roles',
       '/admin/departments',
-      '/admin/onboarding-reset',
-      '/wellsoft-users',
-      '/internet-users'
+      '/admin/onboarding-reset'
     ],
     dashboards: ['admin-dashboard'],
     forms: [],
-    userManagement: ['service-users', 'wellsoft-users', 'internet-users'],
+    userManagement: ['service-users'],
     adminFeatures: ['admin/user-roles', 'admin/departments', 'admin/onboarding-reset']
   },
 
@@ -124,21 +122,28 @@ export const ROLE_PERMISSIONS = {
     routes: [
       '/ict-dashboard',
       '/ict-dashboard/access-requests',
+      '/ict-dashboard/request-progress/:id',
+      '/ict-approval/requests',
+      '/ict-approval/requests-simple',
+      '/ict-approval/requests-original',
+      '/ict-approval/request/:id',
+      '/user-security-access/:id',
       '/jeeva-access',
-      '/wellsoft-access',
+      '/wellsoft-access', 
       '/internet-access',
       '/both-service-form',
-      '/ict-approval/requests',
-      '/ict-approval/request/:id',
-      '/internal-access/list',
-      '/internal-access/details',
+      '/both-service-form/:id',
+      '/hod-dashboard/debug',
+      '/debug/ict-requests',
+      '/debug/user-security-access-test',
+      '/debug/api-test',
       '/onboarding'
     ],
     dashboards: ['ict-dashboard'],
     forms: ['jeeva-access', 'wellsoft-access', 'internet-access', 'both-service-form'],
     userManagement: [],
-    deviceManagement: ['ict-approval/requests', 'ict-approval/request/:id'],
-    requestsManagement: ['internal-access/list', 'internal-access/details']
+    deviceManagement: ['ict-approval/requests', 'ict-approval/request/:id', 'user-security-access/:id'],
+    requestsManagement: ['ict-dashboard/access-requests', 'ict-dashboard/request-progress/:id']
   },
 
   [ROLES.HEAD_OF_IT]: {

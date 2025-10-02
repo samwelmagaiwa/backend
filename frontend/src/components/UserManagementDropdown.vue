@@ -13,8 +13,8 @@
             <i class="fas fa-users-cog text-white text-lg drop-shadow-lg"></i>
           </div>
           <div>
-            <h2 class="text-xl font-bold text-white drop-shadow-md">User Management System</h2>
-            <p class="text-blue-100 text-sm drop-shadow-sm">
+            <h2 class="text-3xl font-bold text-white drop-shadow-md">User Management System</h2>
+            <p class="text-blue-100 text-lg drop-shadow-sm">
               Monitor and manage user access across all platforms
             </p>
           </div>
@@ -44,8 +44,8 @@
               <i class="fas fa-database text-white text-sm drop-shadow-sm"></i>
             </div>
             <div class="text-white">
-              <p class="text-sm font-medium drop-shadow-sm">Jeeva</p>
-              <p class="text-2xl font-bold drop-shadow-md">
+              <p class="text-lg font-medium drop-shadow-sm">Jeeva</p>
+              <p class="text-3xl font-bold drop-shadow-md">
                 {{ totals.jeeva || 0 }}
               </p>
             </div>
@@ -63,8 +63,8 @@
               <i class="fas fa-laptop-medical text-white text-sm drop-shadow-sm"></i>
             </div>
             <div class="text-white">
-              <p class="text-sm font-medium drop-shadow-sm">Wellsoft</p>
-              <p class="text-2xl font-bold drop-shadow-md">
+              <p class="text-lg font-medium drop-shadow-sm">Wellsoft</p>
+              <p class="text-3xl font-bold drop-shadow-md">
                 {{ totals.wellsoft || 0 }}
               </p>
             </div>
@@ -82,8 +82,8 @@
               <i class="fas fa-wifi text-white text-sm drop-shadow-sm"></i>
             </div>
             <div class="text-white">
-              <p class="text-sm font-medium drop-shadow-sm">Internet</p>
-              <p class="text-2xl font-bold drop-shadow-md">
+              <p class="text-lg font-medium drop-shadow-sm">Internet</p>
+              <p class="text-3xl font-bold drop-shadow-md">
                 {{ totals.internet || 0 }}
               </p>
             </div>
@@ -115,7 +115,7 @@
               <input
                 v-model="searchQuery"
                 type="text"
-                class="block w-full pl-12 pr-10 py-3 text-sm border-2 border-blue-300/30 rounded-xl leading-4 bg-white/15 backdrop-blur-sm placeholder-blue-200/60 text-white focus:outline-none focus:placeholder-blue-200/40 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 hover:bg-white/20 focus:bg-white/20 shadow-lg focus:shadow-xl"
+                class="block w-full pl-12 pr-10 py-3 text-lg border-2 border-blue-300/30 rounded-xl leading-5 bg-white/15 backdrop-blur-sm placeholder-blue-200/60 text-white focus:outline-none focus:placeholder-blue-200/40 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 hover:bg-white/20 focus:bg-white/20 shadow-lg focus:shadow-xl"
                 placeholder="Search users..."
                 @input="handleSearch"
               />
@@ -137,7 +137,7 @@
             <div class="relative">
               <select
                 v-model="filterStatus"
-                class="appearance-none bg-white/15 backdrop-blur-sm border-2 border-blue-300/30 rounded-xl px-4 py-3 pr-10 text-base font-medium text-white hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 hover:bg-white/20 focus:bg-white/20 shadow-lg cursor-pointer"
+                class="appearance-none bg-white/15 backdrop-blur-sm border-2 border-blue-300/30 rounded-xl px-4 py-3 pr-10 text-lg font-medium text-white hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-300 hover:bg-white/20 focus:bg-white/20 shadow-lg cursor-pointer"
                 @change="handleFilter"
               >
                 <option value="" class="bg-gray-800 text-white">All Status</option>
@@ -154,7 +154,7 @@
             <button
               @click="exportToExcel"
               :disabled="loading || !hasData"
-              class="inline-flex items-center px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-sm font-semibold rounded-xl hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl backdrop-blur-sm border border-green-400/30"
+              class="inline-flex items-center px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-lg font-semibold rounded-xl hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl backdrop-blur-sm border border-green-400/30"
             >
               <i class="fas fa-file-excel mr-2 text-sm drop-shadow-sm"></i>
               <span v-if="!exporting" class="drop-shadow-sm">Export</span>
@@ -168,7 +168,7 @@
             <button
               @click="refreshData"
               :disabled="loading"
-              class="inline-flex items-center px-3 py-3 bg-white/15 text-white text-sm font-medium rounded-xl hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl backdrop-blur-sm border border-white/20"
+              class="inline-flex items-center px-3 py-3 bg-white/15 text-white text-lg font-medium rounded-xl hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl backdrop-blur-sm border border-white/20"
             >
               <i
                 :class="['fas fa-sync-alt', loading ? 'fa-spin' : '', 'text-sm drop-shadow-sm']"
@@ -185,7 +185,7 @@
               :key="t.key"
               @click="selectTab(t.key)"
               :class="[
-                'px-6 py-4 text-sm font-semibold border-b-2 transition-all duration-300 flex items-center rounded-t-xl backdrop-blur-sm transform hover:scale-105',
+                'px-6 py-4 text-lg font-semibold border-b-2 transition-all duration-300 flex items-center rounded-t-xl backdrop-blur-sm transform hover:scale-105',
                 activeTab === t.key
                   ? 'border-blue-400 text-white bg-blue-600/30 shadow-lg'
                   : 'border-transparent text-blue-200 hover:text-white hover:border-blue-400/50 hover:bg-blue-700/20'
@@ -309,15 +309,12 @@
             label: 'Temporary Until',
             format: (v) => (v ? `${v.day || ''}/${v.month || ''}/${v.year || ''}` : '')
           },
-          { key: 'approvals.userHod.name', label: 'User-HOD' },
-          { key: 'approvals.hod.comment', label: 'Comments' },
-          {
-            key: 'approvals.divisionalDirector.name',
-            label: 'Divisional Director'
-          },
-          { key: 'approvals.directorICT.name', label: 'Director ICT' },
-          { key: 'implementation.hod(IT).name', label: 'HOD(IT)' },
-          { key: 'implementation.ICT.name', label: 'ICT OFFICER' },
+          { key: 'hod_name', label: 'User-HOD' },
+          { key: 'hod_comments', label: 'Comments' },
+          { key: 'divisional_director_name', label: 'Divisional Director' },
+          { key: 'ict_director_name', label: 'Director ICT' },
+          { key: 'head_it_name', label: 'HOD(IT)' },
+          { key: 'ict_officer_name', label: 'ICT OFFICER' },
           { key: 'status', label: 'Status', slot: 'status' }
         ],
         wellsoftColumns: [
@@ -338,15 +335,12 @@
             label: 'Temporary Until',
             format: (v) => (v ? `${v.day || ''}/${v.month || ''}/${v.year || ''}` : '')
           },
-          { key: 'approvals.userHod.name', label: 'User-HOD' },
-          { key: 'approvals.hod.comment', label: 'Comments' },
-          {
-            key: 'approvals.divisionalDirector.name',
-            label: 'Divisional Director'
-          },
-          { key: 'approvals.directorICT.name', label: 'Director ICT' },
-          { key: 'implementation.hod(IT).name', label: 'HOD(IT)' },
-          { key: 'implementation.ICT.name', label: 'ICT OFFICER' },
+          { key: 'hod_name', label: 'User-HOD' },
+          { key: 'hod_comments', label: 'Comments' },
+          { key: 'divisional_director_name', label: 'Divisional Director' },
+          { key: 'ict_director_name', label: 'Director ICT' },
+          { key: 'head_it_name', label: 'HOD(IT)' },
+          { key: 'ict_officer_name', label: 'ICT OFFICER' },
           { key: 'status', label: 'Status', slot: 'status' }
         ],
         internetColumns: [
@@ -361,15 +355,12 @@
           },
           { key: 'signature', label: 'Signature' },
           { key: 'date', label: 'date-issued' },
-          { key: 'approvals.userHod.name', label: 'User-HOD' },
-          { key: 'approvals.hod.comment', label: 'Comments' },
-          {
-            key: 'approvals.divisionalDirector.name',
-            label: 'Divisional Director'
-          },
-          { key: 'approvals.directorICT.name', label: 'Director ICT' },
-          { key: 'implementation.hod(IT).name', label: 'HOD(IT)' },
-          { key: 'implementation.ICT.name', label: 'ICT OFFICER' },
+          { key: 'hod_name', label: 'User-HOD' },
+          { key: 'hod_comments', label: 'Comments' },
+          { key: 'divisional_director_name', label: 'Divisional Director' },
+          { key: 'ict_director_name', label: 'Director ICT' },
+          { key: 'head_it_name', label: 'HOD(IT)' },
+          { key: 'ict_officer_name', label: 'ICT OFFICER' },
           { key: 'status', label: 'Status', slot: 'status' }
         ]
       }

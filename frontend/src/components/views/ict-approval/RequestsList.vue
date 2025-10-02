@@ -33,6 +33,80 @@
           </div>
         </div>
 
+        <!-- Centered MNH Loading Banner -->
+        <div v-if="isLoading" class="absolute inset-0 z-40 flex items-center justify-center pointer-events-none animate-fade-in">
+          <div class="pointer-events-auto w-full max-w-lg mx-auto">
+            <!-- Main Loading Card -->
+            <div class="relative bg-gradient-to-br from-white/20 via-blue-50/30 to-white/10 border-2 border-blue-300/50 backdrop-blur-xl rounded-3xl p-8 shadow-2xl overflow-hidden">
+              <!-- Animated Background Pattern -->
+              <div class="absolute inset-0 opacity-10">
+                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-slide-across"></div>
+                <div class="absolute top-4 left-4 w-16 h-16 bg-blue-400/20 rounded-full animate-float"></div>
+                <div class="absolute bottom-4 right-4 w-20 h-20 bg-teal-400/20 rounded-full animate-float" style="animation-delay: 1s"></div>
+                <div class="absolute top-1/2 left-8 w-12 h-12 bg-blue-300/15 rounded-full animate-float" style="animation-delay: 2s"></div>
+              </div>
+
+              <!-- Hospital Logos and Branding -->
+              <div class="relative z-10">
+                <div class="flex items-center justify-center gap-6 mb-6">
+                  <!-- Left Logo -->
+                  <div class="relative">
+                    <div class="w-16 h-16 bg-gradient-to-br from-blue-500/30 to-teal-500/30 rounded-2xl backdrop-blur-sm border-2 border-blue-300/50 flex items-center justify-center shadow-xl hover:scale-105 transition-transform duration-300">
+                      <img src="/assets/images/ngao2.png" alt="National Shield" class="max-w-12 max-h-12 object-contain drop-shadow-lg" />
+                    </div>
+                    <div class="absolute -inset-1 bg-gradient-to-r from-blue-400 to-teal-400 rounded-2xl opacity-20 blur-sm animate-pulse"></div>
+                  </div>
+
+                  <!-- Center Loading Spinner -->
+                  <div class="relative flex flex-col items-center">
+                    <!-- Main Spinner -->
+                    <div class="relative mb-3">
+                      <div class="animate-spin rounded-full h-12 w-12 border-4 border-teal-300/40 border-t-teal-300 shadow-lg"></div>
+                      <div class="absolute inset-0 animate-spin rounded-full h-12 w-12 border-4 border-transparent border-r-blue-300" style="animation-direction: reverse; animation-duration: 1.5s"></div>
+                    </div>
+                    
+                    <!-- Loading Text -->
+                    <div class="text-center">
+                      <div class="text-white text-xl font-bold tracking-wide mb-1 drop-shadow-md">
+                        Loading Device Requests
+                      </div>
+                      <div class="text-blue-100 text-sm animate-pulse">
+                        Please wait...
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Right Logo -->
+                  <div class="relative">
+                    <div class="w-16 h-16 bg-gradient-to-br from-teal-500/30 to-blue-500/30 rounded-2xl backdrop-blur-sm border-2 border-teal-300/50 flex items-center justify-center shadow-xl hover:scale-105 transition-transform duration-300">
+                      <img src="/assets/images/logo2.png" alt="MNH Logo" class="max-w-12 max-h-12 object-contain drop-shadow-lg" />
+                    </div>
+                    <div class="absolute -inset-1 bg-gradient-to-r from-teal-400 to-blue-400 rounded-2xl opacity-20 blur-sm animate-pulse" style="animation-delay: 0.5s"></div>
+                  </div>
+                </div>
+
+                <!-- Hospital Name and Department -->
+                <div class="text-center border-t border-blue-300/30 pt-4">
+                  <div class="text-red-400 text-lg font-black tracking-widest mb-1 drop-shadow-sm">
+                    MUHIMBILI NATIONAL HOSPITAL
+                  </div>
+                  <div class="text-teal-200 text-sm font-semibold tracking-wider">
+                    ICT DEVICE REQUESTS MANAGEMENT
+                  </div>
+                </div>
+
+                <!-- Progress Indicators -->
+                <div class="flex justify-center gap-2 mt-4">
+                  <div class="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
+                  <div class="w-2 h-2 bg-teal-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                  <div class="w-2 h-2 bg-blue-300 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                  <div class="w-2 h-2 bg-teal-300 rounded-full animate-bounce" style="animation-delay: 0.3s"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="max-w-full mx-auto px-2 relative z-10">
           <!-- Header Section -->
           <div
@@ -676,18 +750,6 @@
       </main>
     </div>
 
-    <!-- Loading Modal -->
-    <div
-      v-if="isLoading"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-    >
-      <div class="bg-white rounded-xl shadow-2xl p-8 text-center">
-        <div class="flex justify-center mb-4">
-          <OrbitingDots size="lg" />
-        </div>
-        <p class="text-gray-600">Loading requests...</p>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -695,7 +757,6 @@
   import Header from '@/components/header.vue'
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppFooter from '@/components/footer.vue'
-  import OrbitingDots from '@/components/common/OrbitingDots.vue'
   import deviceBorrowingService from '@/services/deviceBorrowingService'
 
   export default {
@@ -703,8 +764,7 @@
     components: {
       Header,
       ModernSidebar,
-      AppFooter,
-      OrbitingDots
+      AppFooter
     },
     setup() {
       // Sidebar state now managed by Pinia - no local state needed
@@ -1163,6 +1223,20 @@
     animation: slide-up 0.6s ease-out;
   }
 
+  /* Sliding background animation for loading banner */
+  @keyframes slide-across {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  .animate-slide-across {
+    animation: slide-across 2.5s ease-in-out infinite;
+  }
+
   /* Focus styles for accessibility */
   input:focus,
   select:focus {
@@ -1174,15 +1248,6 @@
   }
 
   /* Enhanced Action Button Animations */
-  @keyframes shimmer {
-    0% {
-      transform: translateX(-100%) skewX(-12deg);
-    }
-    100% {
-      transform: translateX(200%) skewX(-12deg);
-    }
-  }
-
   @keyframes float-up {
     0% {
       transform: translateY(0px) scale(1);
@@ -1195,71 +1260,6 @@
     }
   }
 
-  @keyframes glow {
-    0%,
-    100% {
-      box-shadow: 0 0 5px rgba(147, 51, 234, 0.3);
-    }
-    50% {
-      box-shadow:
-        0 0 20px rgba(147, 51, 234, 0.6),
-        0 0 30px rgba(147, 51, 234, 0.4);
-    }
-  }
-
-  @keyframes rainbow {
-    0% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-    100% {
-      background-position: 0% 50%;
-    }
-  }
-
-  @keyframes sparkle {
-    0%,
-    100% {
-      opacity: 0;
-      transform: scale(0) rotate(0deg);
-    }
-    50% {
-      opacity: 1;
-      transform: scale(1) rotate(180deg);
-    }
-  }
-
-  /* Action Button Hover Effects */
-  .action-button-main:hover {
-    animation: float-up 0.6s ease-in-out infinite;
-  }
-
-  .action-button-main:hover .shimmer-effect {
-    animation: shimmer 1s ease-in-out infinite;
-  }
-
-  .action-button-main:focus {
-    animation: glow 1s ease-in-out infinite;
-  }
-
-  /* Dropdown Menu Enhancements */
-  .dropdown-menu {
-    backdrop-filter: blur(20px);
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.9));
-  }
-
-  .action-item:hover {
-    transform: translateX(5px) scale(1.02);
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
-  /* Sparkle Animation for Success Actions */
-  .success-sparkle {
-    animation: sparkle 1.5s ease-in-out infinite;
-  }
-
   /* Smooth transitions */
   * {
     transition-property:
@@ -1268,4 +1268,5 @@
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 200ms;
   }
+
 </style>

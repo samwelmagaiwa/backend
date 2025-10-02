@@ -267,13 +267,17 @@
                           </th>
                           <th class="text-left py-4 px-4 font-semibold text-lg">
                             <div class="flex items-center space-x-2">
-                              <span 
-                                :class="hasImplementedOrApproved ? 'text-green-400' : 'text-blue-200'"
+                              <span
+                                :class="
+                                  hasImplementedOrApproved ? 'text-green-400' : 'text-blue-200'
+                                "
                               >
                                 Status
                               </span>
-                              <i v-if="hasImplementedOrApproved" 
-                                 class="fas fa-check-circle text-green-400 text-sm"></i>
+                              <i
+                                v-if="hasImplementedOrApproved"
+                                class="fas fa-check-circle text-green-400 text-sm"
+                              ></i>
                             </div>
                           </th>
                           <th class="text-left py-4 px-4 text-blue-200 font-semibold text-lg">
@@ -340,8 +344,13 @@
                                 :class="getStatusTextColor(request.status)"
                               >
                                 <span>{{ getStatusText(request.status) }}</span>
-                                <i v-if="request.status === 'implemented' || request.status === 'approved'" 
-                                   class="fas fa-check-circle text-green-400 text-sm"></i>
+                                <i
+                                  v-if="
+                                    request.status === 'implemented' ||
+                                    request.status === 'approved'
+                                  "
+                                  class="fas fa-check-circle text-green-400 text-sm"
+                                ></i>
                               </span>
                             </div>
                           </td>
@@ -494,8 +503,12 @@
                             :class="getStatusTextColor(request.status)"
                           >
                             <span>{{ getStatusText(request.status) }}</span>
-                            <i v-if="request.status === 'implemented' || request.status === 'approved'" 
-                               class="fas fa-check-circle text-green-400 text-xs"></i>
+                            <i
+                              v-if="
+                                request.status === 'implemented' || request.status === 'approved'
+                              "
+                              class="fas fa-check-circle text-green-400 text-xs"
+                            ></i>
                           </span>
                         </div>
                       </div>
@@ -1231,8 +1244,8 @@
 
       // Check if there are any implemented or approved requests
       const hasImplementedOrApproved = computed(() => {
-        return requests.value.some(request => 
-          request.status === 'implemented' || request.status === 'approved'
+        return requests.value.some(
+          (request) => request.status === 'implemented' || request.status === 'approved'
         )
       })
 
