@@ -165,8 +165,8 @@
                           v-else-if="autoPopulated"
                           class="text-sm text-green-300 font-medium bg-green-500/20 px-2 py-1 rounded-full border border-green-400/30"
                         >
-                          <i class="fas fa-check mr-1 text-xs"></i>
-                          Auto-populated
+                          <i class="fas fa-lock mr-1 text-xs"></i>
+                          Auto-populated (Read Only)
                         </span>
                         <span
                           v-else-if="profileLoadError"
@@ -190,12 +190,15 @@
                           PF Number <span class="text-red-400 ml-1">*</span>
                         </label>
                         <div class="relative">
-                          <input
+                          <textarea
                             v-model="formData.pfNumber"
-                            type="text"
-                            class="medical-input w-full px-3 py-2 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50"
+                            readonly
+                            rows="1"
+                            class="medical-input w-full px-3 py-2 bg-blue-600/20 border-2 border-blue-400/40 rounded-lg text-white backdrop-blur-sm resize-none cursor-not-allowed opacity-80"
                             :placeholder="
-                              isLoadingProfile ? 'Loading your PF Number...' : 'Enter PF Number'
+                              isLoadingProfile
+                                ? 'Loading your PF Number...'
+                                : 'Auto-populated from your profile'
                             "
                             :disabled="isLoadingProfile"
                             required
@@ -214,9 +217,9 @@
                             <i v-else class="fas fa-hashtag"></i>
                           </div>
                         </div>
-                        <p class="text-xs text-blue-200/60 mt-1 italic flex items-center">
-                          <i class="fas fa-info-circle mr-1"></i>
-                          e.g. 12345
+                        <p class="text-xs text-green-200/70 mt-1 italic flex items-center">
+                          <i class="fas fa-lock mr-1"></i>
+                          Auto-populated from your profile (cannot be edited)
                         </p>
                       </div>
 
@@ -227,12 +230,15 @@
                           Staff Name <span class="text-red-400 ml-1">*</span>
                         </label>
                         <div class="relative">
-                          <input
+                          <textarea
                             v-model="formData.staffName"
-                            type="text"
-                            class="medical-input w-full px-4 py-2 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50"
+                            readonly
+                            rows="1"
+                            class="medical-input w-full px-4 py-2 bg-blue-600/20 border-2 border-blue-400/40 rounded-xl text-white backdrop-blur-sm resize-none cursor-not-allowed opacity-80"
                             :placeholder="
-                              isLoadingProfile ? 'Loading your name...' : 'Enter full name'
+                              isLoadingProfile
+                                ? 'Loading your name...'
+                                : 'Auto-populated from your profile'
                             "
                             :disabled="isLoadingProfile"
                             required
@@ -251,9 +257,9 @@
                             <i v-else class="fas fa-user-circle"></i>
                           </div>
                         </div>
-                        <p class="text-xs text-blue-200/60 mt-1 italic flex items-center">
-                          <i class="fas fa-info-circle mr-1"></i>
-                          e.g. Jane Doe
+                        <p class="text-xs text-green-200/70 mt-1 italic flex items-center">
+                          <i class="fas fa-lock mr-1"></i>
+                          Auto-populated from your profile (cannot be edited)
                         </p>
                       </div>
                     </div>
@@ -267,12 +273,15 @@
                           Phone Number <span class="text-red-400 ml-1">*</span>
                         </label>
                         <div class="relative">
-                          <input
+                          <textarea
                             v-model="formData.phoneNumber"
-                            type="tel"
-                            class="medical-input w-full px-4 py-2 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50"
+                            readonly
+                            rows="1"
+                            class="medical-input w-full px-4 py-2 bg-blue-600/20 border-2 border-blue-400/40 rounded-xl text-white backdrop-blur-sm resize-none cursor-not-allowed opacity-80"
                             :placeholder="
-                              isLoadingProfile ? 'Loading your phone...' : 'Enter phone number'
+                              isLoadingProfile
+                                ? 'Loading your phone...'
+                                : 'Auto-populated from your profile'
                             "
                             :disabled="isLoadingProfile"
                             required
@@ -291,9 +300,9 @@
                             <i v-else class="fas fa-mobile-alt"></i>
                           </div>
                         </div>
-                        <p class="text-xs text-blue-200/60 mt-1 italic flex items-center">
-                          <i class="fas fa-info-circle mr-1"></i>
-                          e.g. 0712 000 000
+                        <p class="text-xs text-green-200/70 mt-1 italic flex items-center">
+                          <i class="fas fa-lock mr-1"></i>
+                          Auto-populated from your profile (cannot be edited)
                         </p>
                       </div>
 
@@ -304,23 +313,16 @@
                           Department <span class="text-red-400 ml-1">*</span>
                         </label>
                         <div class="relative">
-                          <select
-                            v-model="formData.department"
-                            class="medical-input w-full px-4 py-2 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 appearance-none cursor-pointer group-hover:border-blue-400/50"
+                          <textarea
+                            :value="getDepartmentName(formData.department)"
+                            readonly
+                            rows="1"
+                            class="medical-input w-full px-4 py-2 bg-blue-600/20 border-2 border-blue-400/40 rounded-xl text-white backdrop-blur-sm resize-none cursor-not-allowed opacity-80"
+                            placeholder="Auto-populated from your profile"
                             required
-                          >
-                            <option value="" class="bg-blue-800 text-blue-300">
-                              Select Department
-                            </option>
-                            <option
-                              v-for="dept in departments"
-                              :key="dept.id"
-                              :value="dept.id"
-                              class="bg-blue-800 text-white"
-                            >
-                              {{ dept.name }}
-                            </option>
-                          </select>
+                          />
+                          <!-- Hidden input to maintain form value -->
+                          <input v-model="formData.department" type="hidden" required />
                           <div
                             class="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-300/50 pointer-events-none"
                           >
@@ -330,9 +332,9 @@
                             class="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/10 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
                           ></div>
                         </div>
-                        <p class="text-xs text-blue-200/60 mt-1 italic flex items-center">
-                          <i class="fas fa-info-circle mr-1"></i>
-                          Select your department
+                        <p class="text-xs text-green-200/70 mt-1 italic flex items-center">
+                          <i class="fas fa-lock mr-1"></i>
+                          Auto-populated from your profile (cannot be edited)
                         </p>
                       </div>
                     </div>
@@ -889,7 +891,7 @@
                 <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
                   <i class="fas fa-file-medical text-green-600 text-xs"></i>
                 </div>
-                <span class="text-sm font-medium text-green-800">Jeeva</span>
+                <span class="text-sm font-medium text-green-800">Jeeva Access</span>
               </div>
 
               <div
@@ -899,7 +901,7 @@
                 <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
                   <i class="fas fa-laptop-medical text-blue-600 text-xs"></i>
                 </div>
-                <span class="text-sm font-medium text-blue-800">Wellsoft</span>
+                <span class="text-sm font-medium text-blue-800">Wellsoft Access</span>
               </div>
 
               <div
@@ -909,8 +911,17 @@
                 <div class="w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
                   <i class="fas fa-wifi text-teal-600 text-xs"></i>
                 </div>
-                <span class="text-sm font-medium text-teal-800">Internet</span>
+                <span class="text-sm font-medium text-teal-800">Internet Access</span>
               </div>
+            </div>
+            
+            <!-- Fallback message if no services are selected -->
+            <div
+              v-if="!hasSelectedService"
+              class="text-center py-4 text-gray-500 italic"
+            >
+              <i class="fas fa-exclamation-circle mr-2"></i>
+              No services selected
             </div>
 
             <!-- Internet Purposes -->
@@ -1725,6 +1736,15 @@
             id: 'REQ-' + Date.now()
           }
         })
+      },
+
+      getDepartmentName(departmentId) {
+        if (!departmentId) {
+          return 'Please select department'
+        }
+        
+        const department = this.departments.find(dept => dept.id == departmentId)
+        return department ? department.name : `Department ID: ${departmentId}`
       },
 
       showNotification(message, type = 'info') {

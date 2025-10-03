@@ -34,16 +34,31 @@
         </div>
 
         <!-- Centered MNH Loading Banner -->
-        <div v-if="isLoading" class="absolute inset-0 z-40 flex items-center justify-center pointer-events-none animate-fade-in">
+        <div
+          v-if="isLoading"
+          class="absolute inset-0 z-40 flex items-center justify-center pointer-events-none animate-fade-in"
+        >
           <div class="pointer-events-auto w-full max-w-lg mx-auto">
             <!-- Main Loading Card -->
-            <div class="relative bg-gradient-to-br from-white/20 via-blue-50/30 to-white/10 border-2 border-blue-300/50 backdrop-blur-xl rounded-3xl p-8 shadow-2xl overflow-hidden">
+            <div
+              class="relative bg-gradient-to-br from-white/20 via-blue-50/30 to-white/10 border-2 border-blue-300/50 backdrop-blur-xl rounded-3xl p-8 shadow-2xl overflow-hidden"
+            >
               <!-- Animated Background Pattern -->
               <div class="absolute inset-0 opacity-10">
-                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-slide-across"></div>
-                <div class="absolute top-4 left-4 w-16 h-16 bg-blue-400/20 rounded-full animate-float"></div>
-                <div class="absolute bottom-4 right-4 w-20 h-20 bg-teal-400/20 rounded-full animate-float" style="animation-delay: 1s"></div>
-                <div class="absolute top-1/2 left-8 w-12 h-12 bg-blue-300/15 rounded-full animate-float" style="animation-delay: 2s"></div>
+                <div
+                  class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-slide-across"
+                ></div>
+                <div
+                  class="absolute top-4 left-4 w-16 h-16 bg-blue-400/20 rounded-full animate-float"
+                ></div>
+                <div
+                  class="absolute bottom-4 right-4 w-20 h-20 bg-teal-400/20 rounded-full animate-float"
+                  style="animation-delay: 1s"
+                ></div>
+                <div
+                  class="absolute top-1/2 left-8 w-12 h-12 bg-blue-300/15 rounded-full animate-float"
+                  style="animation-delay: 2s"
+                ></div>
               </div>
 
               <!-- Hospital Logos and Branding -->
@@ -51,37 +66,57 @@
                 <div class="flex items-center justify-center gap-6 mb-6">
                   <!-- Left Logo -->
                   <div class="relative">
-                    <div class="w-16 h-16 bg-gradient-to-br from-blue-500/30 to-teal-500/30 rounded-2xl backdrop-blur-sm border-2 border-blue-300/50 flex items-center justify-center shadow-xl hover:scale-105 transition-transform duration-300">
-                      <img src="/assets/images/ngao2.png" alt="National Shield" class="max-w-12 max-h-12 object-contain drop-shadow-lg" />
+                    <div
+                      class="w-16 h-16 bg-gradient-to-br from-blue-500/30 to-teal-500/30 rounded-2xl backdrop-blur-sm border-2 border-blue-300/50 flex items-center justify-center shadow-xl hover:scale-105 transition-transform duration-300"
+                    >
+                      <img
+                        src="/assets/images/ngao2.png"
+                        alt="National Shield"
+                        class="max-w-12 max-h-12 object-contain drop-shadow-lg"
+                      />
                     </div>
-                    <div class="absolute -inset-1 bg-gradient-to-r from-blue-400 to-teal-400 rounded-2xl opacity-20 blur-sm animate-pulse"></div>
+                    <div
+                      class="absolute -inset-1 bg-gradient-to-r from-blue-400 to-teal-400 rounded-2xl opacity-20 blur-sm animate-pulse"
+                    ></div>
                   </div>
 
                   <!-- Center Loading Spinner -->
                   <div class="relative flex flex-col items-center">
                     <!-- Main Spinner -->
                     <div class="relative mb-3">
-                      <div class="animate-spin rounded-full h-12 w-12 border-4 border-teal-300/40 border-t-teal-300 shadow-lg"></div>
-                      <div class="absolute inset-0 animate-spin rounded-full h-12 w-12 border-4 border-transparent border-r-blue-300" style="animation-direction: reverse; animation-duration: 1.5s"></div>
+                      <div
+                        class="animate-spin rounded-full h-12 w-12 border-4 border-teal-300/40 border-t-teal-300 shadow-lg"
+                      ></div>
+                      <div
+                        class="absolute inset-0 animate-spin rounded-full h-12 w-12 border-4 border-transparent border-r-blue-300"
+                        style="animation-direction: reverse; animation-duration: 1.5s"
+                      ></div>
                     </div>
-                    
+
                     <!-- Loading Text -->
                     <div class="text-center">
                       <div class="text-white text-xl font-bold tracking-wide mb-1 drop-shadow-md">
                         Loading Device Requests
                       </div>
-                      <div class="text-blue-100 text-sm animate-pulse">
-                        Please wait...
-                      </div>
+                      <div class="text-blue-100 text-sm animate-pulse">Please wait...</div>
                     </div>
                   </div>
 
                   <!-- Right Logo -->
                   <div class="relative">
-                    <div class="w-16 h-16 bg-gradient-to-br from-teal-500/30 to-blue-500/30 rounded-2xl backdrop-blur-sm border-2 border-teal-300/50 flex items-center justify-center shadow-xl hover:scale-105 transition-transform duration-300">
-                      <img src="/assets/images/logo2.png" alt="MNH Logo" class="max-w-12 max-h-12 object-contain drop-shadow-lg" />
+                    <div
+                      class="w-16 h-16 bg-gradient-to-br from-teal-500/30 to-blue-500/30 rounded-2xl backdrop-blur-sm border-2 border-teal-300/50 flex items-center justify-center shadow-xl hover:scale-105 transition-transform duration-300"
+                    >
+                      <img
+                        src="/assets/images/logo2.png"
+                        alt="MNH Logo"
+                        class="max-w-12 max-h-12 object-contain drop-shadow-lg"
+                      />
                     </div>
-                    <div class="absolute -inset-1 bg-gradient-to-r from-teal-400 to-blue-400 rounded-2xl opacity-20 blur-sm animate-pulse" style="animation-delay: 0.5s"></div>
+                    <div
+                      class="absolute -inset-1 bg-gradient-to-r from-teal-400 to-blue-400 rounded-2xl opacity-20 blur-sm animate-pulse"
+                      style="animation-delay: 0.5s"
+                    ></div>
                   </div>
                 </div>
 
@@ -98,9 +133,18 @@
                 <!-- Progress Indicators -->
                 <div class="flex justify-center gap-2 mt-4">
                   <div class="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
-                  <div class="w-2 h-2 bg-teal-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
-                  <div class="w-2 h-2 bg-blue-300 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
-                  <div class="w-2 h-2 bg-teal-300 rounded-full animate-bounce" style="animation-delay: 0.3s"></div>
+                  <div
+                    class="w-2 h-2 bg-teal-400 rounded-full animate-bounce"
+                    style="animation-delay: 0.1s"
+                  ></div>
+                  <div
+                    class="w-2 h-2 bg-blue-300 rounded-full animate-bounce"
+                    style="animation-delay: 0.2s"
+                  ></div>
+                  <div
+                    class="w-2 h-2 bg-teal-300 rounded-full animate-bounce"
+                    style="animation-delay: 0.3s"
+                  ></div>
                 </div>
               </div>
             </div>
@@ -749,7 +793,6 @@
         </div>
       </main>
     </div>
-
   </div>
 </template>
 
@@ -1268,5 +1311,4 @@
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 200ms;
   }
-
 </style>

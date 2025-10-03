@@ -180,7 +180,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(30, 58, 138, 0.85); /* Semi-transparent blue overlay */
+    background: #0000a3; /* Custom dark blue background */
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     opacity: 1;

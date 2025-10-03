@@ -11,7 +11,7 @@ export async function fetchJeevaUsers(params = {}) {
     console.log('🔍 Fetching Jeeva users with params:', params)
     const { data } = await apiClient.get('/jeeva-users', { params })
     console.log('✅ Jeeva users response:', data)
-    
+
     // Transform response to match expected format
     return {
       items: data.items || [],
@@ -27,7 +27,7 @@ export async function fetchJeevaUsers(params = {}) {
       message: error.response?.data?.message,
       data: error.response?.data
     })
-    
+
     // Return fallback data to prevent UI breaking
     return {
       items: [],
@@ -46,7 +46,7 @@ export async function fetchWellsoftUsers(params = {}) {
     console.log('🔍 Fetching Wellsoft users with params:', params)
     const { data } = await apiClient.get('/wellsoft-users', { params })
     console.log('✅ Wellsoft users response:', data)
-    
+
     // Transform response to match expected format
     return {
       items: data.items || [],
@@ -62,7 +62,7 @@ export async function fetchWellsoftUsers(params = {}) {
       message: error.response?.data?.message,
       data: error.response?.data
     })
-    
+
     // Return fallback data to prevent UI breaking
     return {
       items: [],
@@ -81,7 +81,7 @@ export async function fetchInternetUsers(params = {}) {
     console.log('🔍 Fetching Internet users with params:', params)
     const { data } = await apiClient.get('/internet-users', { params })
     console.log('✅ Internet users response:', data)
-    
+
     // Transform response to match expected format
     return {
       items: data.items || [],
@@ -97,7 +97,7 @@ export async function fetchInternetUsers(params = {}) {
       message: error.response?.data?.message,
       data: error.response?.data
     })
-    
+
     // Return fallback data to prevent UI breaking
     return {
       items: [],

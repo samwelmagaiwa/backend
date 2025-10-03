@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\v1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ModuleAccessApprovalRequest;
 use App\Models\UserAccess;
+use App\Events\ApprovalStatusChanged;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -96,6 +97,44 @@ class ModuleAccessApprovalController extends Controller
             $newStatus = $this->getNextWorkflowStatus($approvalData['stage'], $approvalData['approval_status']);
             $userAccess->update(['status' => $newStatus]);
             
+            $freshUserAccess = $userAccess->fresh();
+            
+            // Fire SMS notification event
+            try {
+                $user = $freshUserAccess->user;
+                $approver = $currentUser;
+                $oldStatus = $this->getPreviousStatus($approvalData['stage']);
+                
+                // Get additional users to notify (next approvers if approved)
+                $additionalNotifyUsers = [];
+                if ($approvalData['approval_status'] === 'approved') {
+                    $additionalNotifyUsers = $this->getNextApprovers($freshUserAccess);
+                }
+                
+                ApprovalStatusChanged::dispatch(
+                    $user,
+                    $freshUserAccess,
+                    'module_access',
+                    $oldStatus,
+                    $newStatus,
+                    $approver,
+                    $approvalData['comments'] ?? null,
+                    $additionalNotifyUsers
+                );
+                
+                Log::info('SMS notification event fired for module access approval', [
+                    'request_id' => $freshUserAccess->id,
+                    'stage' => $approvalData['stage'],
+                    'action' => $approvalData['approval_status'],
+                    'approver_id' => $approver->id
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Failed to fire SMS notification for module access approval', [
+                    'request_id' => $freshUserAccess->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
+            
             DB::commit();
             
             Log::info('Module access approval processed successfully', [
@@ -107,7 +146,7 @@ class ModuleAccessApprovalController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Approval processed successfully',
-                'data' => $this->transformRequestForApproval($userAccess->fresh())
+                'data' => $this->transformRequestForApproval($freshUserAccess)
             ]);
             
         } catch (\Exception $e) {
@@ -349,5 +388,66 @@ class ModuleAccessApprovalController extends Controller
             'created_at' => $userAccess->created_at?->format('Y-m-d H:i:s'),
             'updated_at' => $userAccess->updated_at?->format('Y-m-d H:i:s'),
         ];
+    }
+    
+    /**
+     * Get previous status based on current stage
+     */
+    private function getPreviousStatus($stage): string
+    {
+        switch ($stage) {
+            case 'hod':
+                return 'pending';
+            case 'divisional_director':
+                return 'hod_approved';
+            case 'ict_director':
+                return 'divisional_approved';
+            case 'head_it':
+                return 'ict_director_approved';
+            case 'ict_officer':
+                return 'head_it_approved';
+            default:
+                return 'pending';
+        }
+    }
+    
+    /**
+     * Get next approvers based on current status
+     */
+    private function getNextApprovers(UserAccess $userAccess): array
+    {
+        $approvers = [];
+        
+        switch ($userAccess->status) {
+            case 'hod_approved':
+            case 'pending_divisional':
+                $approvers = \App\Models\User::whereHas('roles', function ($query) {
+                    $query->where('name', 'divisional_director');
+                })->whereNotNull('phone')->get()->toArray();
+                break;
+                
+            case 'divisional_approved':
+            case 'pending_ict_director':
+                $approvers = \App\Models\User::whereHas('roles', function ($query) {
+                    $query->where('name', 'ict_director');
+                })->whereNotNull('phone')->get()->toArray();
+                break;
+                
+            case 'ict_director_approved':
+            case 'pending_head_it':
+                $approvers = \App\Models\User::whereHas('roles', function ($query) {
+                    $query->where('name', 'head_it');
+                })->whereNotNull('phone')->get()->toArray();
+                break;
+                
+            case 'head_it_approved':
+            case 'pending_ict_officer':
+                $approvers = \App\Models\User::whereHas('roles', function ($query) {
+                    $query->where('name', 'ict_officer');
+                })->whereNotNull('phone')->get()->toArray();
+                break;
+        }
+        
+        return $approvers;
     }
 }

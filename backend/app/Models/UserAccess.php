@@ -571,18 +571,84 @@ class UserAccess extends Model
 
     /**
      * Scope a query to only include requests with a given status.
+     * NOTE: This method is deprecated since status column no longer exists.
+     * Use specific status column queries instead.
+     * @deprecated
      */
     public function scopeWithStatus($query, string $status)
     {
-        return $query->where('status', $status);
+        // Since status column no longer exists, we need to calculate based on role-specific status columns
+        return $query->where(function($q) use ($status) {
+            switch ($status) {
+                case 'pending':
+                    $q->where(function($subQ) {
+                        $subQ->where('hod_status', 'pending')
+                             ->orWhereNull('hod_status');
+                    });
+                    break;
+                case 'hod_approved':
+                    $q->where('hod_status', 'approved')
+                      ->where(function($subQ) {
+                          $subQ->where('divisional_status', 'pending')
+                               ->orWhereNull('divisional_status');
+                      });
+                    break;
+                case 'divisional_approved':
+                    $q->where('divisional_status', 'approved')
+                      ->where(function($subQ) {
+                          $subQ->where('ict_director_status', 'pending')
+                               ->orWhereNull('ict_director_status');
+                      });
+                    break;
+                case 'ict_director_approved':
+                    $q->where('ict_director_status', 'approved')
+                      ->where(function($subQ) {
+                          $subQ->where('head_it_status', 'pending')
+                               ->orWhereNull('head_it_status');
+                      });
+                    break;
+                case 'head_it_approved':
+                    $q->where('head_it_status', 'approved')
+                      ->where(function($subQ) {
+                          $subQ->where('ict_officer_status', 'pending')
+                               ->orWhereNull('ict_officer_status');
+                      });
+                    break;
+                case 'implemented':
+                    $q->where('ict_officer_status', 'implemented');
+                    break;
+                case 'hod_rejected':
+                    $q->where('hod_status', 'rejected');
+                    break;
+                case 'divisional_rejected':
+                    $q->where('divisional_status', 'rejected');
+                    break;
+                case 'ict_director_rejected':
+                    $q->where('ict_director_status', 'rejected');
+                    break;
+                case 'head_it_rejected':
+                    $q->where('head_it_status', 'rejected');
+                    break;
+                case 'rejected':
+                    $q->where(function($subQ) {
+                        $subQ->where('hod_status', 'rejected')
+                             ->orWhere('divisional_status', 'rejected')
+                             ->orWhere('ict_director_status', 'rejected')
+                             ->orWhere('head_it_status', 'rejected')
+                             ->orWhere('ict_officer_status', 'rejected');
+                    });
+                    break;
+            }
+        });
     }
 
     /**
      * Scope a query to only include pending requests.
+     * @deprecated Use scopeWithStatus('pending') instead
      */
     public function scopePending($query)
     {
-        return $query->where('status', 'pending');
+        return $this->scopeWithStatus($query, 'pending');
     }
 
     /**
@@ -602,7 +668,8 @@ class UserAccess extends Model
      */
     public function getStatusNameAttribute(): string
     {
-        return self::STATUSES[$this->status] ?? $this->status;
+        $calculatedStatus = $this->getCalculatedStatus();
+        return self::STATUSES[$calculatedStatus] ?? $calculatedStatus;
     }
 
     /**
@@ -610,7 +677,7 @@ class UserAccess extends Model
      */
     public function isPending(): bool
     {
-        return $this->status === 'pending';
+        return $this->getCalculatedStatus() === 'pending';
     }
 
     /**
@@ -618,7 +685,8 @@ class UserAccess extends Model
      */
     public function isApproved(): bool
     {
-        return $this->status === 'approved';
+        $status = $this->getCalculatedStatus();
+        return $status === 'approved' || $status === 'implemented';
     }
 
     /**
@@ -626,7 +694,11 @@ class UserAccess extends Model
      */
     public function isRejected(): bool
     {
-        return $this->status === 'rejected';
+        $status = $this->getCalculatedStatus();
+        return in_array($status, [
+            'rejected', 'hod_rejected', 'divisional_rejected', 
+            'ict_director_rejected', 'head_it_rejected', 'ict_officer_rejected'
+        ]);
     }
 
     /**
@@ -713,7 +785,7 @@ class UserAccess extends Model
      */
     public function isInReview(): bool
     {
-        return $this->status === 'in_review';
+        return $this->getCalculatedStatus() === 'in_review';
     }
 
     /**
@@ -760,7 +832,8 @@ class UserAccess extends Model
      */
     public function getNextApprovalStage(): ?string
     {
-        return match($this->status) {
+        $calculatedStatus = $this->getCalculatedStatus();
+        return match($calculatedStatus) {
             'pending', 'pending_hod' => 'hod',
             'hod_approved', 'pending_divisional' => 'divisional_director',
             'divisional_approved', 'pending_ict_director' => 'ict_director',
@@ -775,12 +848,13 @@ class UserAccess extends Model
      */
     public function isAtStage(string $stage): bool
     {
+        $calculatedStatus = $this->getCalculatedStatus();
         return match($stage) {
-            'hod' => in_array($this->status, ['pending', 'pending_hod']),
-            'divisional_director' => in_array($this->status, ['hod_approved', 'pending_divisional']),
-            'ict_director' => in_array($this->status, ['divisional_approved', 'pending_ict_director']),
-            'head_it' => in_array($this->status, ['ict_director_approved', 'pending_head_it']),
-            'ict_officer' => in_array($this->status, ['head_it_approved', 'pending_ict_officer']),
+            'hod' => in_array($calculatedStatus, ['pending', 'pending_hod']),
+            'divisional_director' => in_array($calculatedStatus, ['hod_approved', 'pending_divisional']),
+            'ict_director' => in_array($calculatedStatus, ['divisional_approved', 'pending_ict_director']),
+            'head_it' => in_array($calculatedStatus, ['ict_director_approved', 'pending_head_it']),
+            'ict_officer' => in_array($calculatedStatus, ['head_it_approved', 'pending_ict_officer']),
             default => false
         };
     }
@@ -924,10 +998,7 @@ class UserAccess extends Model
      */
     public function getStatusAttribute(): string
     {
-        // If status column exists, use it, otherwise calculate
-        if (isset($this->attributes['status'])) {
-            return $this->attributes['status'];
-        }
+        // Status column no longer exists, always calculate dynamically
         return $this->getCalculatedStatus();
     }
     
@@ -941,17 +1012,13 @@ class UserAccess extends Model
     
     /**
      * Update the main status field based on the current workflow stage
-     * @deprecated Use getCalculatedStatus() instead
+     * @deprecated Status column no longer exists - this method is a no-op
      */
     public function updateMainStatus(): void
     {
-        // This method is deprecated - status will be calculated dynamically
-        $calculatedStatus = $this->getCalculatedStatus();
-        
-        // Only update if status column still exists
-        if (Schema::hasColumn('user_access', 'status')) {
-            $this->status = $calculatedStatus;
-        }
+        // This method is deprecated - status column no longer exists
+        // Status is now calculated dynamically via getCalculatedStatus()
+        // This method is kept for backwards compatibility but does nothing
     }
     
     /**
@@ -1015,7 +1082,7 @@ class UserAccess extends Model
             'rejected'
         ];
         
-        return in_array($this->status, $updatableStatuses);
+        return in_array($this->getCalculatedStatus(), $updatableStatuses);
     }
 
     /**

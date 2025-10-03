@@ -96,14 +96,14 @@ const notificationService = {
           `❌ NotificationService: Error fetching pending count (attempt ${attempt}):`,
           error
         )
-        
+
         // Log more detailed error information
         if (error.response) {
           console.error('Response status:', error.response.status)
           console.error('Response data:', error.response.data)
           console.error('Response headers:', error.response.headers)
         }
-        
+
         lastError = error
 
         // Don't retry on authentication errors
@@ -111,7 +111,7 @@ const notificationService = {
           console.log('🔐 Authentication error - not retrying')
           break
         }
-        
+
         // Don't retry on server errors that are likely persistent
         if (error.response?.status === 500) {
           console.log('🚫 Server error detected - checking if retryable...')
@@ -150,11 +150,11 @@ const notificationService = {
       // This prevents the UI from breaking when the API is down
       console.warn('🔄 NotificationService: Providing fallback data to prevent UI breakage')
       const fallbackData = { total_pending: 0, requires_attention: false, details: null }
-      
+
       // Cache the fallback for a short time to reduce repeated failed requests
       notificationCache.data = fallbackData
       notificationCache.timestamp = Date.now()
-      
+
       return fallbackData
     }
 

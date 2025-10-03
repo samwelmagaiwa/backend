@@ -48,10 +48,10 @@ class HodCombinedAccessController extends Controller
                     'requests_before_dept_filter' => UserAccess::with(['user', 'department'])
                         ->whereNotNull('request_type')
                         ->where(function ($q) {
-                            $q->where('status', 'pending')
-                                ->orWhere('status', 'pending_hod')
-                                ->orWhere('status', 'hod_approved')
-                                ->orWhere('status', 'hod_rejected');
+                            $q->whereNull('hod_status')
+                                ->orWhere('hod_status', 'pending')
+                                ->orWhere('hod_status', 'approved')
+                                ->orWhere('hod_status', 'rejected');
                         })->count(),
                     'requests_after_dept_filter' => (clone $query)->count()
                 ]);
@@ -80,7 +80,16 @@ class HodCombinedAccessController extends Controller
             }
 
             if ($request->filled('status')) {
-                $query->where('status', $request->status);
+                // Map frontend status values to the appropriate database columns
+                $statusValue = $request->status;
+                
+                if (in_array($statusValue, ['pending', 'approved', 'rejected'])) {
+                    $query->where('hod_status', $statusValue);
+                } else {
+                    // For other statuses, we might need to check different columns
+                    // This ensures compatibility if frontend sends other status values
+                    $query->where('hod_status', $statusValue);
+                }
             }
 
             if ($request->filled('department')) {
@@ -236,8 +245,7 @@ class HodCombinedAccessController extends Controller
             // Update the request - automatically capture authenticated user's name
             $currentUser = auth()->user();
             $updateData = [
-                'status' => $validatedData['hod_status'] === 'approved' ? 'hod_approved' : 'hod_rejected',
-                'hod_status' => $validatedData['hod_status'], // Set the new hod_status column
+                'hod_status' => $validatedData['hod_status'], // Set the hod_status column
                 'hod_comments' => $validatedData['hod_comments'] ?? '',
                 'hod_name' => $currentUser->name, // Always use authenticated user's name
                 'hod_approved_by' => $currentUser->id,
@@ -322,7 +330,7 @@ class HodCombinedAccessController extends Controller
             DB::beginTransaction();
 
             $userAccessRequest->update([
-                'status' => 'cancelled',
+                'hod_status' => 'cancelled',
                 'cancellation_reason' => $validatedData['reason'],
                 'cancelled_by' => auth()->id(),
                 'cancelled_at' => now(),
@@ -383,10 +391,10 @@ class HodCombinedAccessController extends Controller
                 'pendingHod' => (clone $baseQuery)->where(function($q) { $q->whereNull('hod_status')->orWhere('hod_status', 'pending'); })->count(),
                 'hodApproved' => (clone $baseQuery)->where('hod_status', 'approved')->count(),
                 'hodRejected' => (clone $baseQuery)->where('hod_status', 'rejected')->count(),
-                'approved' => (clone $baseQuery)->where('status', 'approved')->count(),
-                'implemented' => (clone $baseQuery)->where('status', 'implemented')->count(),
-                'completed' => (clone $baseQuery)->where('status', 'completed')->count(),
-                'cancelled' => (clone $baseQuery)->where('status', 'cancelled')->count(),
+                'approved' => (clone $baseQuery)->where('ict_officer_status', 'approved')->count(),
+                'implemented' => (clone $baseQuery)->where('ict_officer_status', 'implemented')->count(),
+                'completed' => (clone $baseQuery)->where('ict_officer_status', 'completed')->count(),
+                'cancelled' => (clone $baseQuery)->where('hod_status', 'cancelled')->count(),
                 'total' => (clone $baseQuery)->count(),
                 'thisMonth' => (clone $baseQuery)->whereMonth('created_at', Carbon::now()->month)
                     ->whereYear('created_at', Carbon::now()->year)
@@ -460,9 +468,9 @@ class HodCombinedAccessController extends Controller
             'access_type' => $request->access_type,
             'temporary_until' => $request->temporary_until?->format('Y-m-d'),
             
-            'status' => $request->status,
-            'hod_status' => $request->status,  // Alias for frontend
-            'status_display' => $request->status_name,
+            'status' => $request->hod_status ?? 'pending',
+            'hod_status' => $request->hod_status ?? 'pending',  // Use actual hod_status
+            'status_display' => $this->getStatusDisplayName($request->hod_status ?? 'pending'),
             'signature_path' => $request->signature_path,
             'created_at' => $request->created_at,
             'updated_at' => $request->updated_at,
@@ -523,7 +531,7 @@ class HodCombinedAccessController extends Controller
                     'department' => $request->department?->name ?? 'N/A',
                     'request_type' => $request->getRequestTypesArray(),
                     'purpose' => $request->purpose,
-                    'current_status' => $request->status,
+                    'current_status' => $request->hod_status ?? 'pending',
                     'created_at' => $request->created_at,
                 ],
                 'approval_stages' => [],
@@ -593,17 +601,17 @@ class HodCombinedAccessController extends Controller
             }
             
             // Implementation details
-            if ($request->status === 'implemented' || $request->status === 'completed') {
+            if ($request->ict_officer_status === 'implemented' || $request->ict_officer_status === 'completed') {
                 $timeline['implementation'] = [
-                    'implemented_at' => $request->implemented_at,
-                    'implemented_by' => $request->implemented_by ?? 'N/A',
-                    'implementation_notes' => $request->implementation_notes ?? '',
-                    'completion_date' => $request->status === 'completed' ? $request->completed_at : null
+                    'implemented_at' => $request->ict_officer_implemented_at,
+                    'implemented_by' => $request->ict_officer_name ?? 'N/A',
+                    'implementation_notes' => $request->ict_officer_comments ?? '',
+                    'completion_date' => $request->ict_officer_status === 'completed' ? $request->ict_officer_implemented_at : null
                 ];
             }
             
             // Cancellation details
-            if ($request->status === 'cancelled') {
+            if ($request->hod_status === 'cancelled') {
                 $timeline['cancellation'] = [
                     'cancelled_at' => $request->cancelled_at,
                     'cancelled_by' => $request->cancelled_by ?? 'N/A',
@@ -688,5 +696,22 @@ class HodCombinedAccessController extends Controller
             default:
                 return 'pending';
         }
+    }
+
+    /**
+     * Get human-readable status display name
+     */
+    private function getStatusDisplayName($status): string
+    {
+        $statusMap = [
+            'pending' => 'Pending Review',
+            'approved' => 'Approved',
+            'rejected' => 'Rejected',
+            'cancelled' => 'Cancelled',
+            'implemented' => 'Implemented',
+            'completed' => 'Completed'
+        ];
+        
+        return $statusMap[$status] ?? ucfirst($status);
     }
 }

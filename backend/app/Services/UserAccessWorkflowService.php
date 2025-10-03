@@ -4,9 +4,12 @@ namespace App\Services;
 
 use App\Models\UserAccess;
 use App\Models\User;
+use App\Events\ApprovalRequestSubmitted;
+use App\Events\ApprovalStatusChanged;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
 
@@ -25,7 +28,38 @@ class UserAccessWorkflowService
                 $data['signature_path'] = $this->handleSignatureUpload($request->file('signature'), $data['pf_number']);
             }
             
-            return UserAccess::create($data);
+            $userAccess = UserAccess::create($data);
+            
+            // Fire approval request submitted event for SMS notification
+            try {
+                $user = User::find($userAccess->user_id) ?? auth()->user();
+                $approvers = $this->getNextApprovers($userAccess);
+                
+                ApprovalRequestSubmitted::dispatch(
+                    $user,
+                    $userAccess,
+                    'user_access',
+                    $approvers,
+                    [
+                        'department' => $userAccess->department->name ?? 'N/A',
+                        'access_type' => $this->getAccessTypeSummary($userAccess)
+                    ]
+                );
+                
+                Log::info('SMS notification event fired for new user access request', [
+                    'request_id' => $userAccess->id,
+                    'user_id' => $user->id,
+                    'approvers_count' => count($approvers)
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Failed to fire SMS notification for new request', [
+                    'request_id' => $userAccess->id,
+                    'error' => $e->getMessage()
+                ]);
+                // Don't fail the request creation if SMS notification fails
+            }
+            
+            return $userAccess;
         });
     }
 
@@ -47,7 +81,45 @@ class UserAccessWorkflowService
             }
             
             $userAccess->update($data);
-            return $userAccess->fresh();
+            $freshUserAccess = $userAccess->fresh();
+            
+            // Fire approval status changed event for SMS notification
+            try {
+                $user = $freshUserAccess->user;
+                $approver = auth()->user();
+                $oldStatus = 'pending';
+                $newStatus = $request->action === 'approve' ? 'hod_approved' : 'hod_rejected';
+                
+                // Get additional users to notify (next approvers if approved)
+                $additionalNotifyUsers = [];
+                if ($request->action === 'approve') {
+                    $additionalNotifyUsers = $this->getNextApprovers($freshUserAccess);
+                }
+                
+                ApprovalStatusChanged::dispatch(
+                    $user,
+                    $freshUserAccess,
+                    'user_access',
+                    $oldStatus,
+                    $newStatus,
+                    $approver,
+                    $request->comments,
+                    $additionalNotifyUsers
+                );
+                
+                Log::info('SMS notification event fired for HOD approval', [
+                    'request_id' => $freshUserAccess->id,
+                    'action' => $request->action,
+                    'approver_id' => $approver->id
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Failed to fire SMS notification for HOD approval', [
+                    'request_id' => $freshUserAccess->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
+            
+            return $freshUserAccess;
         });
     }
 
@@ -91,7 +163,45 @@ class UserAccessWorkflowService
             }
 
             $userAccess->update($data);
-            return $userAccess->fresh();
+            $freshUserAccess = $userAccess->fresh();
+            
+            // Fire approval status changed event for SMS notification
+            try {
+                $user = $freshUserAccess->user;
+                $approver = auth()->user();
+                $oldStatus = 'hod_approved';
+                $newStatus = $request->action === 'approve' ? 'divisional_approved' : 'divisional_rejected';
+                
+                // Get additional users to notify (next approvers if approved)
+                $additionalNotifyUsers = [];
+                if ($request->action === 'approve') {
+                    $additionalNotifyUsers = $this->getNextApprovers($freshUserAccess);
+                }
+                
+                ApprovalStatusChanged::dispatch(
+                    $user,
+                    $freshUserAccess,
+                    'user_access',
+                    $oldStatus,
+                    $newStatus,
+                    $approver,
+                    $request->comments,
+                    $additionalNotifyUsers
+                );
+                
+                Log::info('SMS notification event fired for Divisional Director approval', [
+                    'request_id' => $freshUserAccess->id,
+                    'action' => $request->action,
+                    'approver_id' => $approver->id
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Failed to fire SMS notification for Divisional Director approval', [
+                    'request_id' => $freshUserAccess->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
+            
+            return $freshUserAccess;
         });
     }
 
@@ -134,7 +244,45 @@ class UserAccessWorkflowService
             }
 
             $userAccess->update($data);
-            return $userAccess->fresh();
+            $freshUserAccess = $userAccess->fresh();
+            
+            // Fire approval status changed event for SMS notification
+            try {
+                $user = $freshUserAccess->user;
+                $approver = auth()->user();
+                $oldStatus = 'divisional_approved';
+                $newStatus = $request->action === 'approve' ? 'ict_director_approved' : 'ict_director_rejected';
+                
+                // Get additional users to notify (next approvers if approved)
+                $additionalNotifyUsers = [];
+                if ($request->action === 'approve') {
+                    $additionalNotifyUsers = $this->getNextApprovers($freshUserAccess);
+                }
+                
+                ApprovalStatusChanged::dispatch(
+                    $user,
+                    $freshUserAccess,
+                    'user_access',
+                    $oldStatus,
+                    $newStatus,
+                    $approver,
+                    $request->comments,
+                    $additionalNotifyUsers
+                );
+                
+                Log::info('SMS notification event fired for ICT Director approval', [
+                    'request_id' => $freshUserAccess->id,
+                    'action' => $request->action,
+                    'approver_id' => $approver->id
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Failed to fire SMS notification for ICT Director approval', [
+                    'request_id' => $freshUserAccess->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
+            
+            return $freshUserAccess;
         });
     }
 
@@ -177,7 +325,45 @@ class UserAccessWorkflowService
             }
 
             $userAccess->update($data);
-            return $userAccess->fresh();
+            $freshUserAccess = $userAccess->fresh();
+            
+            // Fire approval status changed event for SMS notification
+            try {
+                $user = $freshUserAccess->user;
+                $approver = auth()->user();
+                $oldStatus = 'ict_director_approved';
+                $newStatus = $request->action === 'approve' ? 'head_it_approved' : 'head_it_rejected';
+                
+                // Get additional users to notify (next approvers if approved)
+                $additionalNotifyUsers = [];
+                if ($request->action === 'approve') {
+                    $additionalNotifyUsers = $this->getNextApprovers($freshUserAccess);
+                }
+                
+                ApprovalStatusChanged::dispatch(
+                    $user,
+                    $freshUserAccess,
+                    'user_access',
+                    $oldStatus,
+                    $newStatus,
+                    $approver,
+                    $request->comments,
+                    $additionalNotifyUsers
+                );
+                
+                Log::info('SMS notification event fired for Head IT approval', [
+                    'request_id' => $freshUserAccess->id,
+                    'action' => $request->action,
+                    'approver_id' => $approver->id
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Failed to fire SMS notification for Head IT approval', [
+                    'request_id' => $freshUserAccess->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
+            
+            return $freshUserAccess;
         });
     }
 
@@ -220,7 +406,38 @@ class UserAccessWorkflowService
             }
 
             $userAccess->update($data);
-            return $userAccess->fresh();
+            $freshUserAccess = $userAccess->fresh();
+            
+            // Fire approval status changed event for SMS notification
+            try {
+                $user = $freshUserAccess->user;
+                $approver = auth()->user();
+                $oldStatus = 'head_it_approved';
+                $newStatus = $request->action === 'implement' ? 'implemented' : 'rejected';
+                
+                ApprovalStatusChanged::dispatch(
+                    $user,
+                    $freshUserAccess,
+                    'user_access',
+                    $oldStatus,
+                    $newStatus,
+                    $approver,
+                    $request->comments
+                );
+                
+                Log::info('SMS notification event fired for ICT Officer implementation', [
+                    'request_id' => $freshUserAccess->id,
+                    'action' => $request->action,
+                    'approver_id' => $approver->id
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Failed to fire SMS notification for ICT Officer implementation', [
+                    'request_id' => $freshUserAccess->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
+            
+            return $freshUserAccess;
         });
     }
 
@@ -472,5 +689,114 @@ class UserAccessWorkflowService
             'created_at' => $request->created_at->format('Y-m-d H:i:s'),
             'updated_at' => $request->updated_at->format('Y-m-d H:i:s'),
         ];
+    }
+    
+    /**
+     * Get next approvers based on current status
+     * 
+     * @param UserAccess $userAccess
+     * @return array
+     */
+    private function getNextApprovers(UserAccess $userAccess): array
+    {
+        $approvers = [];
+        
+        // Based on the current status, get the next approvers
+        switch ($userAccess->status) {
+            case 'pending':
+            case 'pending_hod':
+                // Get HODs for the request's department
+                $hods = User::whereHas('roles', function ($query) {
+                    $query->where('name', 'head_of_department');
+                })
+                ->whereHas('departmentsAsHOD', function ($query) use ($userAccess) {
+                    $query->where('departments.id', $userAccess->department_id);
+                })
+                ->whereNotNull('phone')
+                ->get()
+                ->toArray();
+                
+                $approvers = array_merge($approvers, $hods);
+                break;
+                
+            case 'hod_approved':
+            case 'pending_divisional':
+                // Get Divisional Directors
+                $divisionalDirectors = User::whereHas('roles', function ($query) {
+                    $query->where('name', 'divisional_director');
+                })
+                ->whereNotNull('phone')
+                ->get()
+                ->toArray();
+                
+                $approvers = array_merge($approvers, $divisionalDirectors);
+                break;
+                
+            case 'divisional_approved':
+            case 'pending_ict_director':
+                // Get ICT Directors
+                $ictDirectors = User::whereHas('roles', function ($query) {
+                    $query->where('name', 'ict_director');
+                })
+                ->whereNotNull('phone')
+                ->get()
+                ->toArray();
+                
+                $approvers = array_merge($approvers, $ictDirectors);
+                break;
+                
+            case 'ict_director_approved':
+            case 'pending_head_it':
+                // Get Head IT
+                $headIT = User::whereHas('roles', function ($query) {
+                    $query->where('name', 'head_it');
+                })
+                ->whereNotNull('phone')
+                ->get()
+                ->toArray();
+                
+                $approvers = array_merge($approvers, $headIT);
+                break;
+                
+            case 'head_it_approved':
+            case 'pending_ict_officer':
+                // Get ICT Officers
+                $ictOfficers = User::whereHas('roles', function ($query) {
+                    $query->where('name', 'ict_officer');
+                })
+                ->whereNotNull('phone')
+                ->get()
+                ->toArray();
+                
+                $approvers = array_merge($approvers, $ictOfficers);
+                break;
+        }
+        
+        return $approvers;
+    }
+    
+    /**
+     * Get access type summary for SMS notifications
+     * 
+     * @param UserAccess $userAccess
+     * @return string
+     */
+    private function getAccessTypeSummary(UserAccess $userAccess): string
+    {
+        $types = [];
+        
+        if (is_array($userAccess->request_type)) {
+            if (in_array('jeeva_access', $userAccess->request_type)) {
+                $types[] = 'Jeeva';
+            }
+            if (in_array('wellsoft', $userAccess->request_type)) {
+                $types[] = 'Wellsoft';
+            }
+            if (in_array('internet_access_request', $userAccess->request_type)) {
+                $types[] = 'Internet';
+            }
+        }
+        
+        return implode(', ', $types) ?: 'System Access';
     }
 }

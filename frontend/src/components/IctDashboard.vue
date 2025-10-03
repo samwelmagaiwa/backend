@@ -49,7 +49,6 @@
           <!-- Main Content -->
           <div class="medical-glass-card rounded-3xl overflow-hidden">
             <div class="p-6">
-
               <!-- Footer -->
               <AppFooter />
             </div>

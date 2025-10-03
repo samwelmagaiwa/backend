@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 py-8 px-4 relative overflow-hidden"
+    class="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 py-4 px-2 relative overflow-hidden"
   >
     <!-- Medical Background Pattern -->
     <div class="absolute inset-0 overflow-hidden">
@@ -28,9 +28,9 @@
       </div>
     </div>
 
-    <div class="max-w-8xl mx-auto relative z-10">
+    <div class="max-w-none mx-4 relative z-10">
       <!-- Professional Header -->
-      <div class="medical-glass-card rounded-t-3xl p-8 mb-0 border-b border-blue-300/30">
+      <div class="medical-glass-card rounded-t-3xl p-4 mb-0 border-b border-blue-300/30">
         <div class="text-center">
           <div class="flex items-center justify-center mb-4">
             <h1 class="text-4xl font-bold text-white tracking-wide drop-shadow-lg">
@@ -44,7 +44,7 @@
         </div>
 
         <!-- Version Control Information -->
-        <div class="bg-white/10 backdrop-blur-sm px-6 py-4 border-t border-blue-300/30 mt-6">
+        <div class="bg-white/10 backdrop-blur-sm px-4 py-3 border-t border-blue-300/30 mt-4">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             <div class="text-center md:text-left">
               <span class="font-semibold text-blue-100">Version:</span>
@@ -63,29 +63,29 @@
       </div>
 
       <!-- Structured Terms Content -->
-      <div class="medical-glass-card rounded-b-3xl p-8">
+      <div class="medical-glass-card rounded-b-3xl p-4">
         <!-- 1. Acceptance of Terms -->
-        <section class="mb-6">
+        <section class="mb-4">
           <div
-            class="medical-card bg-gradient-to-r from-blue-600/25 to-cyan-600/25 border-2 border-blue-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
+            class="medical-card bg-gradient-to-r from-blue-600/25 to-cyan-600/25 border-2 border-blue-400/40 p-4 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
           >
-            <div class="flex items-center mb-4">
+            <div class="flex items-center mb-3">
               <div
-                class="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center mr-4 shadow-lg group-hover:scale-110 transition-transform duration-300"
+                class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-3 shadow-lg group-hover:scale-110 transition-transform duration-300"
               >
                 <span class="text-white font-bold text-lg">1</span>
               </div>
               <h2 class="text-xl font-bold text-white">ACCEPTANCE OF TERMS</h2>
             </div>
-            <div class="ml-16">
-              <p class="text-blue-100 leading-relaxed mb-4">
+            <div class="ml-13">
+              <p class="text-blue-100 leading-relaxed mb-4 text-lg">
                 By using
                 <strong class="text-cyan-300">Muhimbili National Hospital (MNH) ICT systems</strong
                 >, you agree to follow these Terms of Service, the Acceptable ICT Use Policy, and
                 all relevant laws.
               </p>
               <div class="bg-white/15 rounded-xl p-4 border-2 border-cyan-300/30 backdrop-blur-sm">
-                <p class="text-sm text-blue-100">
+                <p class="text-base text-blue-100">
                   <strong class="text-cyan-300">Covered Systems:</strong> Jeeva (Medical Records),
                   Wellsoft (Hospital Management), and Internet Services
                 </p>
@@ -95,50 +95,50 @@
         </section>
 
         <!-- 2. Permitted Use -->
-        <section class="mb-6">
+        <section class="mb-4">
           <div
-            class="medical-card bg-gradient-to-r from-emerald-600/25 to-teal-600/25 border-2 border-emerald-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-500 group"
+            class="medical-card bg-gradient-to-r from-blue-600/25 to-cyan-600/25 border-2 border-blue-400/40 p-4 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
           >
-            <div class="flex items-center mb-4">
+            <div class="flex items-center mb-3">
               <div
-                class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center mr-4 shadow-lg group-hover:scale-110 transition-transform duration-300"
+                class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-3 shadow-lg group-hover:scale-110 transition-transform duration-300"
               >
                 <span class="text-white font-bold text-lg">2</span>
               </div>
               <h2 class="text-xl font-bold text-white">PERMITTED USE</h2>
             </div>
-            <div class="ml-16">
-              <p class="text-blue-100 leading-relaxed mb-4">
+            <div class="ml-13">
+              <p class="text-blue-100 leading-relaxed mb-4 text-lg">
                 You are authorized to use MNH ICT systems for the following purposes:
               </p>
               <div class="grid md:grid-cols-1 gap-4">
                 <div class="space-y-3">
                   <div class="flex items-start">
                     <i
-                      class="fas fa-check-circle text-emerald-400 mt-1 mr-3"
+                      class="fas fa-check-circle text-emerald-400 mt-1 mr-3 text-lg"
                       style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                     ></i>
-                    <span class="text-blue-100"
+                    <span class="text-blue-100 text-base"
                       ><strong class="text-emerald-300">Official Hospital Duties:</strong> Use ICT
                       systems only for authorized MNH work activities</span
                     >
                   </div>
                   <div class="flex items-start">
                     <i
-                      class="fas fa-check-circle text-emerald-400 mt-1 mr-3"
+                      class="fas fa-check-circle text-emerald-400 mt-1 mr-3 text-lg"
                       style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                     ></i>
-                    <span class="text-blue-100"
+                    <span class="text-blue-100 text-base"
                       ><strong class="text-emerald-300">Authorized Information Access:</strong>
                       Access only the information you are permitted to view</span
                     >
                   </div>
                   <div class="flex items-start">
                     <i
-                      class="fas fa-check-circle text-emerald-400 mt-1 mr-3"
+                      class="fas fa-check-circle text-emerald-400 mt-1 mr-3 text-lg"
                       style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                     ></i>
-                    <span class="text-blue-100"
+                    <span class="text-blue-100 text-base"
                       ><strong class="text-emerald-300">Credential Security:</strong> Keep your
                       login credentials confidential and secure</span
                     >
@@ -148,9 +148,9 @@
               <div
                 class="bg-white/15 rounded-xl p-4 border-2 border-emerald-300/30 backdrop-blur-sm mt-4"
               >
-                <p class="text-sm text-blue-100">
+                <p class="text-base text-blue-100">
                   <i
-                    class="fas fa-info-circle text-emerald-400 mr-2"
+                    class="fas fa-info-circle text-emerald-400 mr-2 text-lg"
                     style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                   ></i>
                   <strong class="text-emerald-300">Remember:</strong> All system usage must align
@@ -162,20 +162,20 @@
         </section>
 
         <!-- 3. Prohibited Actions -->
-        <section class="mb-6">
+        <section class="mb-4">
           <div
-            class="medical-card bg-gradient-to-r from-emerald-600/25 to-teal-600/25 border-2 border-emerald-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-500 group"
+            class="medical-card bg-gradient-to-r from-blue-600/25 to-cyan-600/25 border-2 border-blue-400/40 p-4 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
           >
-            <div class="flex items-center mb-4">
+            <div class="flex items-center mb-3">
               <div
-                class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center mr-4 shadow-lg group-hover:scale-110 transition-transform duration-300"
+                class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-3 shadow-lg group-hover:scale-110 transition-transform duration-300"
               >
                 <span class="text-white font-bold text-lg">3</span>
               </div>
               <h2 class="text-xl font-bold text-white">PROHIBITED ACTIONS</h2>
             </div>
-            <div class="ml-16">
-              <p class="text-blue-100 leading-relaxed mb-4">
+            <div class="ml-13">
+              <p class="text-blue-100 leading-relaxed mb-4 text-lg">
                 <strong class="text-emerald-300"
                   >You must NOT engage in any of the following activities:</strong
                 >
@@ -194,24 +194,24 @@
                       ></i>
                       Illegal & Inappropriate Activities
                     </h4>
-                    <ul class="text-sm text-blue-100 space-y-2">
+                    <ul class="text-base text-blue-100 space-y-2">
                       <li class="flex items-start">
                         <i
-                          class="fas fa-times text-emerald-400 mr-2 mt-1"
+                          class="fas fa-times text-emerald-400 mr-2 mt-1 text-lg"
                           style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Illegal activities or political campaigning
                       </li>
                       <li class="flex items-start">
                         <i
-                          class="fas fa-times text-emerald-400 mr-2 mt-1"
+                          class="fas fa-times text-emerald-400 mr-2 mt-1 text-lg"
                           style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Accessing obscene, pornographic, or offensive materials
                       </li>
                       <li class="flex items-start">
                         <i
-                          class="fas fa-times text-emerald-400 mr-2 mt-1"
+                          class="fas fa-times text-emerald-400 mr-2 mt-1 text-lg"
                           style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Sharing discriminatory content
@@ -229,24 +229,24 @@
                       ></i>
                       Security Violations
                     </h4>
-                    <ul class="text-sm text-blue-100 space-y-2">
+                    <ul class="text-base text-blue-100 space-y-2">
                       <li class="flex items-start">
                         <i
-                          class="fas fa-times text-emerald-400 mr-2 mt-1"
+                          class="fas fa-times text-emerald-400 mr-2 mt-1 text-lg"
                           style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Installing unauthorized software
                       </li>
                       <li class="flex items-start">
                         <i
-                          class="fas fa-times text-emerald-400 mr-2 mt-1"
+                          class="fas fa-times text-emerald-400 mr-2 mt-1 text-lg"
                           style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Disabling security controls
                       </li>
                       <li class="flex items-start">
                         <i
-                          class="fas fa-times text-emerald-400 mr-2 mt-1"
+                          class="fas fa-times text-emerald-400 mr-2 mt-1 text-lg"
                           style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Bypassing system authentication
@@ -266,24 +266,24 @@
                       ></i>
                       Misuse of Internet
                     </h4>
-                    <ul class="text-sm text-blue-100 space-y-2">
+                    <ul class="text-base text-blue-100 space-y-2">
                       <li class="flex items-start">
                         <i
-                          class="fas fa-times text-emerald-400 mr-2 mt-1"
+                          class="fas fa-times text-emerald-400 mr-2 mt-1 text-lg"
                           style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Gambling or personal shopping
                       </li>
                       <li class="flex items-start">
                         <i
-                          class="fas fa-times text-emerald-400 mr-2 mt-1"
+                          class="fas fa-times text-emerald-400 mr-2 mt-1 text-lg"
                           style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Streaming unrelated to work
                       </li>
                       <li class="flex items-start">
                         <i
-                          class="fas fa-times text-emerald-400 mr-2 mt-1"
+                          class="fas fa-times text-emerald-400 mr-2 mt-1 text-lg"
                           style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Sending spam or chain emails
@@ -301,24 +301,24 @@
                       ></i>
                       Confidentiality Breaches
                     </h4>
-                    <ul class="text-sm text-blue-100 space-y-2">
+                    <ul class="text-base text-blue-100 space-y-2">
                       <li class="flex items-start">
                         <i
-                          class="fas fa-times text-emerald-400 mr-2 mt-1"
+                          class="fas fa-times text-emerald-400 mr-2 mt-1 text-lg"
                           style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Disclosing patient information without authorization
                       </li>
                       <li class="flex items-start">
                         <i
-                          class="fas fa-times text-emerald-400 mr-2 mt-1"
+                          class="fas fa-times text-emerald-400 mr-2 mt-1 text-lg"
                           style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Sharing confidential hospital data
                       </li>
                       <li class="flex items-start">
                         <i
-                          class="fas fa-times text-emerald-400 mr-2 mt-1"
+                          class="fas fa-times text-emerald-400 mr-2 mt-1 text-lg"
                           style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Attempting unauthorized access
@@ -331,9 +331,9 @@
               <div
                 class="bg-white/15 rounded-xl p-4 border-2 border-emerald-300/30 backdrop-blur-sm mt-4"
               >
-                <p class="text-sm text-blue-100">
+                <p class="text-base text-blue-100">
                   <i
-                    class="fas fa-exclamation-triangle text-emerald-400 mr-2"
+                    class="fas fa-exclamation-triangle text-emerald-400 mr-2 text-lg"
                     style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                   ></i>
                   <strong class="text-emerald-300">Warning:</strong> Violation of these prohibited
@@ -346,20 +346,20 @@
         </section>
 
         <!-- 4. Security Requirements -->
-        <section class="mb-6">
+        <section class="mb-4">
           <div
-            class="medical-card bg-gradient-to-r from-emerald-600/25 to-teal-600/25 border-2 border-emerald-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-500 group"
+            class="medical-card bg-gradient-to-r from-blue-600/25 to-cyan-600/25 border-2 border-blue-400/40 p-4 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
           >
-            <div class="flex items-center mb-4">
+            <div class="flex items-center mb-3">
               <div
-                class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center mr-4 shadow-lg group-hover:scale-110 transition-transform duration-300"
+                class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-3 shadow-lg group-hover:scale-110 transition-transform duration-300"
               >
                 <span class="text-white font-bold text-lg">4</span>
               </div>
               <h2 class="text-xl font-bold text-white">SECURITY REQUIREMENTS</h2>
             </div>
-            <div class="ml-16">
-              <p class="text-blue-100 leading-relaxed mb-4">
+            <div class="ml-13">
+              <p class="text-blue-100 leading-relaxed mb-4 text-lg">
                 To maintain system security and protect hospital data, you must follow these
                 requirements:
               </p>
@@ -370,14 +370,14 @@
                   <div
                     class="bg-white/15 rounded-xl p-4 border-2 border-emerald-300/30 backdrop-blur-sm"
                   >
-                    <h4 class="font-bold text-emerald-300 mb-3 flex items-center">
+                    <h4 class="font-bold text-emerald-300 mb-3 flex items-center text-lg">
                       <i
-                        class="fas fa-key text-emerald-400 mr-2"
+                        class="fas fa-key text-emerald-400 mr-2 text-lg"
                         style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                       ></i>
                       Password Management
                     </h4>
-                    <ul class="text-sm text-blue-100 space-y-2">
+                    <ul class="text-base text-blue-100 space-y-2">
                       <li class="flex items-start">
                         <i
                           class="fas fa-arrow-right text-emerald-400 mr-2 mt-1"
@@ -458,19 +458,19 @@
         </section>
 
         <!-- 5. Monitoring and Compliance -->
-        <section class="mb-6">
+        <section class="mb-4">
           <div
-            class="medical-card bg-gradient-to-r from-emerald-600/25 to-teal-600/25 border-2 border-emerald-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-500 group"
+            class="medical-card bg-gradient-to-r from-blue-600/25 to-cyan-600/25 border-2 border-blue-400/40 p-4 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
           >
-            <div class="flex items-center mb-4">
+            <div class="flex items-center mb-3">
               <div
-                class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center mr-4 shadow-lg group-hover:scale-110 transition-transform duration-300"
+                class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-3 shadow-lg group-hover:scale-110 transition-transform duration-300"
               >
                 <span class="text-white font-bold text-lg">5</span>
               </div>
-              <h2 class="text-xl font-bold text-white">MONITORING AND COMPLIANCE</h2>
+              <h2 class="text-xl font-bold" style="color: #d10000">MONITORING AND COMPLIANCE</h2>
             </div>
-            <div class="ml-16">
+            <div class="ml-13">
               <div
                 class="bg-white/15 rounded-xl p-6 border-2 border-emerald-300/30 backdrop-blur-sm"
               >
@@ -493,7 +493,7 @@
                     </ul>
                   </div>
                   <div>
-                    <h4 class="font-semibold text-emerald-300 mb-2">Compliance Actions:</h4>
+                    <h4 class="font-semibold mb-2" style="color: #d10000">Compliance Actions:</h4>
                     <ul class="text-sm text-blue-100 space-y-1">
                       <li>• Disciplinary action</li>
                       <li>• Access termination</li>
@@ -511,9 +511,12 @@
                       class="fas fa-info-circle text-emerald-400 mr-2"
                       style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                     ></i>
-                    <strong class="text-emerald-300">Note:</strong> Any violation of these terms may
-                    result in immediate disciplinary action, termination of employment, or legal
-                    action as deemed appropriate by hospital management.
+                    <strong style="color: #d10000">Note:</strong>
+                    <strong style="color: #d10000"
+                      >Any violation of these terms may result in immediate disciplinary action,
+                      termination of employment, or legal action as deemed appropriate by hospital
+                      management.</strong
+                    >
                   </p>
                 </div>
               </div>
@@ -522,19 +525,19 @@
         </section>
 
         <!-- 6. Liability -->
-        <section class="mb-6">
+        <section class="mb-4">
           <div
-            class="medical-card bg-gradient-to-r from-emerald-600/25 to-teal-600/25 border-2 border-emerald-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-500 group"
+            class="medical-card bg-gradient-to-r from-blue-600/25 to-cyan-600/25 border-2 border-blue-400/40 p-4 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
           >
-            <div class="flex items-center mb-4">
+            <div class="flex items-center mb-3">
               <div
-                class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center mr-4 shadow-lg group-hover:scale-110 transition-transform duration-300"
+                class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-3 shadow-lg group-hover:scale-110 transition-transform duration-300"
               >
                 <span class="text-white font-bold text-lg">6</span>
               </div>
               <h2 class="text-xl font-bold text-white">LIABILITY</h2>
             </div>
-            <div class="ml-16">
+            <div class="ml-13">
               <div class="grid md:grid-cols-2 gap-6">
                 <div
                   class="bg-white/15 rounded-xl p-4 border-2 border-emerald-300/30 backdrop-blur-sm"
@@ -586,9 +589,9 @@
         </section>
 
         <!-- Contact Information -->
-        <section class="mb-6">
+        <section class="mb-4">
           <div
-            class="medical-card bg-gradient-to-r from-emerald-600/25 to-teal-600/25 border-2 border-emerald-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-500 group"
+            class="medical-card bg-gradient-to-r from-blue-600/25 to-cyan-600/25 border-2 border-blue-400/40 p-4 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
           >
             <h3 class="text-lg font-bold text-white mb-4 flex items-center">
               <i
@@ -597,25 +600,25 @@
               ></i>
               Questions or Concerns?
             </h3>
-            <p class="text-blue-100 mb-4">
+            <p class="text-blue-100 mb-4 text-lg">
               If you have questions about these Terms of Service or need clarification, contact:
             </p>
             <div class="grid md:grid-cols-2 gap-4">
               <div
                 class="bg-white/15 rounded-xl p-4 border-2 border-emerald-300/30 backdrop-blur-sm"
               >
-                <h4 class="font-semibold text-emerald-300 mb-2">ICT Department</h4>
-                <p class="text-sm text-blue-100">Email: ict@muhimbili.go.tz</p>
-                <p class="text-sm text-blue-100">Phone: +255 22 221 5701</p>
-                <p class="text-sm text-blue-100">Office: ICT Building, Ground Floor</p>
+                <h4 class="font-semibold text-emerald-300 mb-2 text-lg">ICT Department</h4>
+                <p class="text-base text-blue-100">Email: ict@muhimbili.go.tz</p>
+                <p class="text-base text-blue-100">Phone: +255 22 221 5701</p>
+                <p class="text-base text-blue-100">Office: ICT Building, Ground Floor</p>
               </div>
               <div
                 class="bg-white/15 rounded-xl p-4 border-2 border-emerald-300/30 backdrop-blur-sm"
               >
-                <h4 class="font-semibold text-emerald-300 mb-2">Legal & Compliance</h4>
-                <p class="text-sm text-blue-100">Email: info@mloganzila.go.tz</p>
-                <p class="text-sm text-blue-100">Phone: +255 22 221 5701</p>
-                <p class="text-sm text-blue-100">Office: Administration Block, 3rd Floor</p>
+                <h4 class="font-semibold text-emerald-300 mb-2 text-lg">Legal & Compliance</h4>
+                <p class="text-base text-blue-100">Email: info@mloganzila.go.tz</p>
+                <p class="text-base text-blue-100">Phone: +255 22 221 5701</p>
+                <p class="text-base text-blue-100">Office: Administration Block, 3rd Floor</p>
               </div>
             </div>
           </div>
@@ -624,11 +627,11 @@
         <!-- Acknowledgment Section -->
         <section class="mb-0">
           <div
-            class="medical-card bg-gradient-to-r from-indigo-600/25 to-purple-600/25 border-2 border-indigo-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-indigo-500/20 transition-all duration-500 group"
+            class="medical-card bg-gradient-to-r from-blue-600/25 to-cyan-600/25 border-2 border-blue-400/40 p-4 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
           >
-            <div class="flex items-center mb-4">
+            <div class="flex items-center mb-3">
               <div
-                class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center mr-4 shadow-lg group-hover:scale-110 transition-transform duration-300"
+                class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-3 shadow-lg group-hover:scale-110 transition-transform duration-300"
               >
                 <i
                   class="fas fa-handshake text-white text-lg"
@@ -637,8 +640,8 @@
               </div>
               <h2 class="text-xl font-bold text-white">ACKNOWLEDGMENT</h2>
             </div>
-            <div class="ml-16">
-              <p class="text-blue-100 mb-6 leading-relaxed">
+            <div class="ml-13">
+              <p class="text-blue-100 mb-4 leading-relaxed text-lg">
                 By requesting access to
                 <strong class="text-indigo-300">Jeeva</strong>,
                 <strong class="text-indigo-300">Wellsoft</strong>, or
@@ -657,11 +660,11 @@
                     class="mt-1 mr-3 w-6 h-6 text-indigo-500 bg-white/15 border-2 border-indigo-300/40 rounded-lg focus:ring-indigo-400 focus:ring-2 backdrop-blur-sm transition-all duration-300"
                     required
                   />
-                  <span class="text-blue-100 leading-relaxed">
-                    <strong class="text-white"
+                  <span class="text-blue-100 leading-relaxed text-base">
+                    <strong class="text-white text-lg"
                       >I acknowledge that I have read and understood these Terms of Service.</strong
                     ><br />
-                    <span class="text-blue-200 text-sm">
+                    <span class="text-blue-200 text-base">
                       <strong>
                         I agree to comply with all terms and conditions outlined above. I understand
                         that violations may result in disciplinary action, termination, or legal
@@ -671,37 +674,17 @@
                   </span>
                 </label>
               </div>
-
-              <!-- Action Buttons -->
-              <div class="mt-6 flex flex-col sm:flex-row gap-4 justify-center">
-                <button
-                  @click="goBack"
-                  class="px-6 py-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-xl font-medium hover:from-gray-600 hover:to-gray-700 transition-all duration-300 transform hover:scale-105 shadow-lg border border-gray-400/30 flex items-center justify-center"
-                >
-                  <i class="fas fa-arrow-left mr-2"></i>
-                  Go Back
-                </button>
-
-                <button
-                  @click="acceptTerms"
-                  :disabled="!acknowledged"
-                  class="px-8 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl font-medium hover:from-indigo-600 hover:to-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 shadow-lg border border-indigo-400/30 flex items-center justify-center"
-                >
-                  <i class="fas fa-check mr-2"></i>
-                  Accept Terms & Continue
-                </button>
-              </div>
             </div>
           </div>
         </section>
       </div>
 
       <!-- Footer -->
-      <div class="text-center mt-8">
+      <div class="text-center mt-4">
         <div
           class="inline-block bg-white/10 backdrop-blur-sm border border-blue-300/30 px-6 py-3 rounded-xl shadow-lg"
         >
-          <p class="text-sm text-blue-100">
+          <p class="text-base text-blue-100">
             © 2025 Muhimbili National Hospital - ICT Department | Terms effective as of publication
             date
           </p>

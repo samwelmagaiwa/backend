@@ -277,7 +277,9 @@
           // Clear password but keep email if remember is enabled
           password.value = ''
         } else {
-          console.error('❌ Login failed:', result.error)
+          console.error('❌ Login failed:', result)
+          console.log('🔍 Current error value from store:', error.value)
+          console.log('🔍 Current errorMessage computed:', errorMessage.value)
           // Clear password on failed login for security
           password.value = ''
         }

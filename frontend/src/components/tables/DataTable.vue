@@ -15,7 +15,7 @@
           </div>
         </div>
         <div class="flex items-center space-x-4">
-        <div class="text-lg text-gray-500" v-if="total">
+          <div class="text-lg text-gray-500" v-if="total">
             <span
               class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800"
             >
@@ -96,7 +96,11 @@
                 >
                   <span
                     class="w-2 h-2 rounded-full mr-2"
-                    :class="(row.status === 'Active' || row.status === 'Completed') ? 'bg-green-500' : 'bg-red-500'"
+                    :class="
+                      row.status === 'Active' || row.status === 'Completed'
+                        ? 'bg-green-500'
+                        : 'bg-red-500'
+                    "
                   ></span>
                   {{ row.status || 'Inactive' }}
                 </span>

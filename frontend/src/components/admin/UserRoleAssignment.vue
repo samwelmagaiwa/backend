@@ -151,14 +151,6 @@
                       <i :class="loading ? 'fas fa-spinner fa-spin' : 'fas fa-refresh'"></i>
                       <span>{{ loading ? 'Loading...' : 'Refresh' }}</span>
                     </button>
-                    <button
-                      v-if="isDevelopment"
-                      @click="debugFilterData"
-                      class="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-yellow-600 hover:to-yellow-700 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center space-x-2"
-                    >
-                      <i class="fas fa-bug"></i>
-                      <span>Debug</span>
-                    </button>
                   </div>
                 </div>
 
@@ -181,14 +173,18 @@
                   </div>
 
                   <div>
-                    <label class="block text-base font-bold text-teal-100 mb-2">Filter by Role</label>
+                    <label class="block text-base font-bold text-teal-100 mb-2"
+                      >Filter by Role</label
+                    >
                     <div class="relative">
                       <select
                         v-model="filterRole"
                         class="medical-input w-full px-4 py-3 bg-white/15 border-2 border-teal-300/30 rounded-xl focus:border-cyan-400 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-cyan-500/20 appearance-none cursor-pointer"
                         @change="applyFilters"
                       >
-                        <option value="" class="bg-blue-900 text-white">All Roles ({{ availableRoles.length }} available)</option>
+                        <option value="" class="bg-blue-900 text-white">
+                          All Roles ({{ availableRoles.length }} available)
+                        </option>
                         <option
                           v-for="role in availableRoles"
                           :key="role.id"
@@ -199,21 +195,27 @@
                           {{ role.display_name || role.name }}
                         </option>
                       </select>
-                      <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                      <div
+                        class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none"
+                      >
                         <i class="fas fa-chevron-down text-teal-300"></i>
                       </div>
                     </div>
                   </div>
 
                   <div>
-                    <label class="block text-base font-bold text-teal-100 mb-2">Filter by Department</label>
+                    <label class="block text-base font-bold text-teal-100 mb-2"
+                      >Filter by Department</label
+                    >
                     <div class="relative">
                       <select
                         v-model="filterDepartment"
                         class="medical-input w-full px-4 py-3 bg-white/15 border-2 border-teal-300/30 rounded-xl focus:border-cyan-400 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-cyan-500/20 appearance-none cursor-pointer"
                         @change="applyFilters"
                       >
-                        <option value="" class="bg-blue-900 text-white">All Departments ({{ availableDepartments.length }} available)</option>
+                        <option value="" class="bg-blue-900 text-white">
+                          All Departments ({{ availableDepartments.length }} available)
+                        </option>
                         <option
                           v-for="department in availableDepartments"
                           :key="department.id"
@@ -223,13 +225,13 @@
                           {{ department.display_name || department.name }}
                         </option>
                       </select>
-                      <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                      <div
+                        class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none"
+                      >
                         <i class="fas fa-chevron-down text-teal-300"></i>
                       </div>
                     </div>
                   </div>
-
-
 
                   <div>
                     <label class="block text-base font-bold text-teal-100 mb-2">Sort By</label>
@@ -281,17 +283,22 @@
                           </span>
                         </div>
                         <div class="flex-1">
-                          <h4 class="font-bold text-white text-lg">{{ user.name || 'Unknown User' }}</h4>
+                          <h4 class="font-bold text-white text-lg">
+                            {{ user.name || 'Unknown User' }}
+                          </h4>
                           <p class="text-teal-100 text-sm">{{ user.email || 'No email' }}</p>
                           <p v-if="user.pf_number" class="text-teal-200 text-xs">
                             PF: {{ user.pf_number }}
                           </p>
-                          <p v-if="user.department && user.department.display_name" class="text-teal-200 text-xs">
+                          <p
+                            v-if="user.department && user.department.display_name"
+                            class="text-teal-200 text-xs"
+                          >
                             <i class="fas fa-building mr-1"></i>{{ user.department.display_name }}
                           </p>
                         </div>
                       </div>
-                      
+
                       <!-- Three-dot menu -->
                       <div class="relative" data-dropdown-menu>
                         <button
@@ -299,39 +306,73 @@
                           class="w-8 h-8 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110 group/menu"
                           :class="{ 'bg-white/20': openMenuId === user.id }"
                         >
-                          <i class="fas fa-ellipsis-v text-white text-sm group-hover/menu:scale-110 transition-transform duration-200"></i>
+                          <i
+                            class="fas fa-ellipsis-v text-white text-sm group-hover/menu:scale-110 transition-transform duration-200"
+                          ></i>
                         </button>
-                        
+
                         <!-- Dropdown menu -->
                         <div
                           v-if="openMenuId === user.id"
                           class="absolute right-0 top-10 w-48 bg-blue-900/95 backdrop-blur-lg border border-blue-400/30 rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200"
                         >
+                          <!-- Edit User -->
+                          <button
+                            @click.stop="openEditUserModal(user)"
+                            class="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-blue-500/20 transition-colors duration-200 text-white group/item"
+                          >
+                            <div
+                              class="w-8 h-8 bg-blue-500/30 rounded-lg flex items-center justify-center group-hover/item:bg-blue-500/50 transition-colors duration-200"
+                            >
+                              <i
+                                class="fas fa-user-edit text-blue-300 text-sm group-hover/item:text-blue-200"
+                              ></i>
+                            </div>
+                            <div class="flex-1">
+                              <div class="font-medium text-sm">Edit User</div>
+                              <div class="text-xs text-gray-300 group-hover/item:text-gray-200">
+                                Edit user details
+                              </div>
+                            </div>
+                          </button>
+
                           <!-- Delete User -->
                           <button
                             @click.stop="confirmDeleteUser(user)"
-                            class="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-red-500/20 transition-colors duration-200 text-white group/item"
+                            class="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-red-500/20 transition-colors duration-200 text-white group/item border-t border-blue-400/20"
                           >
-                            <div class="w-8 h-8 bg-red-500/30 rounded-lg flex items-center justify-center group-hover/item:bg-red-500/50 transition-colors duration-200">
-                              <i class="fas fa-user-times text-red-300 text-sm group-hover/item:text-red-200"></i>
+                            <div
+                              class="w-8 h-8 bg-red-500/30 rounded-lg flex items-center justify-center group-hover/item:bg-red-500/50 transition-colors duration-200"
+                            >
+                              <i
+                                class="fas fa-user-times text-red-300 text-sm group-hover/item:text-red-200"
+                              ></i>
                             </div>
                             <div class="flex-1">
                               <div class="font-medium text-sm">Delete User</div>
-                              <div class="text-xs text-gray-300 group-hover/item:text-gray-200">Remove user permanently</div>
+                              <div class="text-xs text-gray-300 group-hover/item:text-gray-200">
+                                Remove user permanently
+                              </div>
                             </div>
                           </button>
-                          
+
                           <!-- Delete Role -->
                           <button
                             @click.stop="confirmDeleteUserRole(user)"
                             class="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-orange-500/20 transition-colors duration-200 text-white group/item border-t border-blue-400/20"
                           >
-                            <div class="w-8 h-8 bg-orange-500/30 rounded-lg flex items-center justify-center group-hover/item:bg-orange-500/50 transition-colors duration-200">
-                              <i class="fas fa-shield-alt text-orange-300 text-sm group-hover/item:text-orange-200"></i>
+                            <div
+                              class="w-8 h-8 bg-orange-500/30 rounded-lg flex items-center justify-center group-hover/item:bg-orange-500/50 transition-colors duration-200"
+                            >
+                              <i
+                                class="fas fa-shield-alt text-orange-300 text-sm group-hover/item:text-orange-200"
+                              ></i>
                             </div>
                             <div class="flex-1">
                               <div class="font-medium text-sm">Delete Roles</div>
-                              <div class="text-xs text-gray-300 group-hover/item:text-gray-200">Remove all user roles</div>
+                              <div class="text-xs text-gray-300 group-hover/item:text-gray-200">
+                                Remove all user roles
+                              </div>
                             </div>
                           </button>
                         </div>
@@ -513,7 +554,9 @@
                     placeholder="Enter full name"
                     required
                   />
-                  <p v-if="userFormErrors.name" class="text-red-400 text-xs mt-1">{{ userFormErrors.name }}</p>
+                  <p v-if="userFormErrors.name" class="text-red-400 text-xs mt-1">
+                    {{ userFormErrors.name }}
+                  </p>
                 </div>
                 <div>
                   <label class="block text-lg font-bold text-blue-100 mb-3">Email Address *</label>
@@ -522,13 +565,23 @@
                     type="email"
                     :class="[
                       'medical-input w-full px-5 py-4 text-lg bg-white/15 border-2 rounded-xl focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm',
-                      userFormErrors.email ? 'border-red-400/70 focus:border-red-400' : 'border-blue-300/30 focus:border-blue-400'
+                      userFormErrors.email
+                        ? 'border-red-400/70 focus:border-red-400'
+                        : 'border-blue-300/30 focus:border-blue-400'
                     ]"
                     placeholder="user@example.com"
                     required
                   />
-                  <p v-if="userFormErrors.email" class="text-red-300 text-sm mt-2 font-semibold bg-red-900/30 px-3 py-2 rounded-lg border border-red-400/30">
-                    <i class="fas fa-exclamation-circle mr-2"></i>{{ Array.isArray(userFormErrors.email) ? userFormErrors.email[0] : userFormErrors.email }}
+                  <p
+                    v-if="userFormErrors.email"
+                    class="text-red-300 text-sm mt-2 font-semibold bg-red-900/30 px-3 py-2 rounded-lg border border-red-400/30"
+                  >
+                    <i class="fas fa-exclamation-circle mr-2"></i
+                    >{{
+                      Array.isArray(userFormErrors.email)
+                        ? userFormErrors.email[0]
+                        : userFormErrors.email
+                    }}
                   </p>
                 </div>
                 <div>
@@ -540,7 +593,9 @@
                     placeholder="Enter phone number"
                     required
                   />
-                  <p v-if="userFormErrors.phone" class="text-red-400 text-xs mt-1">{{ userFormErrors.phone }}</p>
+                  <p v-if="userFormErrors.phone" class="text-red-400 text-xs mt-1">
+                    {{ userFormErrors.phone }}
+                  </p>
                 </div>
                 <div>
                   <label class="block text-lg font-bold text-blue-100 mb-3">PF Number</label>
@@ -549,12 +604,22 @@
                     type="text"
                     :class="[
                       'medical-input w-full px-5 py-4 text-lg bg-white/15 border-2 rounded-xl focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm',
-                      userFormErrors.pf_number ? 'border-red-400/70 focus:border-red-400' : 'border-blue-300/30 focus:border-blue-400'
+                      userFormErrors.pf_number
+                        ? 'border-red-400/70 focus:border-red-400'
+                        : 'border-blue-300/30 focus:border-blue-400'
                     ]"
                     placeholder="Enter PF number (optional)"
                   />
-                  <p v-if="userFormErrors.pf_number" class="text-red-300 text-sm mt-2 font-semibold bg-red-900/30 px-3 py-2 rounded-lg border border-red-400/30">
-                    <i class="fas fa-exclamation-circle mr-2"></i>{{ Array.isArray(userFormErrors.pf_number) ? userFormErrors.pf_number[0] : userFormErrors.pf_number }}
+                  <p
+                    v-if="userFormErrors.pf_number"
+                    class="text-red-300 text-sm mt-2 font-semibold bg-red-900/30 px-3 py-2 rounded-lg border border-red-400/30"
+                  >
+                    <i class="fas fa-exclamation-circle mr-2"></i
+                    >{{
+                      Array.isArray(userFormErrors.pf_number)
+                        ? userFormErrors.pf_number[0]
+                        : userFormErrors.pf_number
+                    }}
                   </p>
                 </div>
                 <div>
@@ -575,10 +640,14 @@
                       <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
                     </button>
                   </div>
-                  <p v-if="userFormErrors.password" class="text-red-400 text-xs mt-1">{{ userFormErrors.password }}</p>
+                  <p v-if="userFormErrors.password" class="text-red-400 text-xs mt-1">
+                    {{ userFormErrors.password }}
+                  </p>
                 </div>
                 <div>
-                  <label class="block text-lg font-bold text-blue-100 mb-3">Confirm Password *</label>
+                  <label class="block text-lg font-bold text-blue-100 mb-3"
+                    >Confirm Password *</label
+                  >
                   <div class="relative">
                     <input
                       v-model="newUser.password_confirmation"
@@ -595,8 +664,19 @@
                       <i :class="showConfirmPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
                     </button>
                   </div>
-                  <p v-if="userFormErrors.password_confirmation" class="text-red-400 text-xs mt-1">{{ userFormErrors.password_confirmation }}</p>
-                  <p v-if="!userFormErrors.password_confirmation && newUser.password_confirmation && newUser.password !== newUser.password_confirmation" class="text-red-400 text-xs mt-1">Passwords do not match</p>
+                  <p v-if="userFormErrors.password_confirmation" class="text-red-400 text-xs mt-1">
+                    {{ userFormErrors.password_confirmation }}
+                  </p>
+                  <p
+                    v-if="
+                      !userFormErrors.password_confirmation &&
+                      newUser.password_confirmation &&
+                      newUser.password !== newUser.password_confirmation
+                    "
+                    class="text-red-400 text-xs mt-1"
+                  >
+                    Passwords do not match
+                  </p>
                 </div>
               </div>
             </div>
@@ -617,7 +697,9 @@
                   <span class="text-lg font-bold text-blue-100">User is active</span>
                 </label>
                 <p class="text-base text-blue-200/70 mt-2">Inactive users cannot log in</p>
-                <p v-if="userFormErrors.is_active" class="text-red-400 text-xs mt-1">{{ userFormErrors.is_active }}</p>
+                <p v-if="userFormErrors.is_active" class="text-red-400 text-xs mt-1">
+                  {{ userFormErrors.is_active }}
+                </p>
               </div>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -627,7 +709,9 @@
                       v-model="newUser.department_id"
                       class="medical-input w-full px-5 py-4 text-lg bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm appearance-none cursor-pointer"
                     >
-                      <option value="" class="bg-blue-900 text-white">Select Department (Optional)</option>
+                      <option value="" class="bg-blue-900 text-white">
+                        Select Department (Optional)
+                      </option>
                       <option
                         v-for="department in availableDepartments"
                         :key="department.id"
@@ -637,11 +721,15 @@
                         {{ department.display_name || department.name }}
                       </option>
                     </select>
-                    <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                    <div
+                      class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none"
+                    >
                       <i class="fas fa-chevron-down text-blue-300"></i>
                     </div>
                   </div>
-                  <p v-if="userFormErrors.department_id" class="text-red-400 text-xs mt-1">{{ userFormErrors.department_id }}</p>
+                  <p v-if="userFormErrors.department_id" class="text-red-400 text-xs mt-1">
+                    {{ userFormErrors.department_id }}
+                  </p>
                 </div>
                 <div>
                   <label class="block text-lg font-bold text-blue-100 mb-3">Primary Role</label>
@@ -650,7 +738,9 @@
                       v-model="newUser.primary_role"
                       class="medical-input w-full px-5 py-4 text-lg bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm appearance-none cursor-pointer"
                     >
-                      <option value="" class="bg-blue-900 text-white">Select Primary Role (Optional)</option>
+                      <option value="" class="bg-blue-900 text-white">
+                        Select Primary Role (Optional)
+                      </option>
                       <option
                         v-for="role in availableRoles"
                         :key="role.id"
@@ -660,11 +750,15 @@
                         {{ role.display_name || role.name }}
                       </option>
                     </select>
-                    <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                    <div
+                      class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none"
+                    >
                       <i class="fas fa-chevron-down text-blue-300"></i>
                     </div>
                   </div>
-                  <p v-if="userFormErrors.primary_role" class="text-red-400 text-xs mt-1">{{ userFormErrors.primary_role }}</p>
+                  <p v-if="userFormErrors.primary_role" class="text-red-400 text-xs mt-1">
+                    {{ userFormErrors.primary_role }}
+                  </p>
                 </div>
               </div>
             </div>
@@ -686,6 +780,290 @@
               >
                 <i :class="creatingUser ? 'fas fa-spinner fa-spin' : 'fas fa-user-plus'"></i>
                 <span>{{ creatingUser ? 'Creating...' : 'Create User' }}</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div
+      v-if="showEditUserModal && editingUser"
+      class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      @click="closeEditUserModal"
+    >
+      <div
+        class="bg-blue-900 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+        @click.stop
+      >
+        <!-- Modal Header -->
+        <div class="bg-blue-800 p-6 rounded-t-2xl border-b border-blue-500/30">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+              <div class="w-12 h-12 bg-blue-500/30 rounded-xl flex items-center justify-center">
+                <i class="fas fa-user-edit text-white text-xl"></i>
+              </div>
+              <div>
+                <h2 class="text-4xl font-bold text-white">Edit User</h2>
+                <p class="text-blue-100 text-lg">Update user details and permissions</p>
+              </div>
+            </div>
+            <button
+              @click="closeEditUserModal"
+              class="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-lg transition-colors duration-200 flex items-center justify-center"
+            >
+              <i class="fas fa-times text-white"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="p-6">
+          <form @submit.prevent="updateUser" class="space-y-6">
+            <!-- Personal Information Section -->
+            <div class="bg-white/10 rounded-xl p-8 backdrop-blur-sm border border-blue-300/30">
+              <h3 class="text-3xl font-semibold text-white mb-6 flex items-center">
+                <i class="fas fa-user mr-3 text-blue-300 text-2xl"></i>
+                Personal Information
+              </h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-xl font-bold text-blue-100 mb-3">Name *</label>
+                  <input
+                    v-model="editUserData.name"
+                    type="text"
+                    class="medical-input w-full px-5 py-4 text-xl bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm"
+                    placeholder="Enter full name"
+                    required
+                  />
+                  <p v-if="editUserFormErrors.name" class="text-red-400 text-xs mt-1">
+                    {{ editUserFormErrors.name }}
+                  </p>
+                </div>
+                <div>
+                  <label class="block text-lg font-bold text-blue-100 mb-3">Email Address *</label>
+                  <input
+                    v-model="editUserData.email"
+                    type="email"
+                    :class="[
+                      'medical-input w-full px-5 py-4 text-lg bg-white/15 border-2 rounded-xl focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm',
+                      editUserFormErrors.email
+                        ? 'border-red-400/70 focus:border-red-400'
+                        : 'border-blue-300/30 focus:border-blue-400'
+                    ]"
+                    placeholder="user@example.com"
+                    required
+                  />
+                  <p
+                    v-if="editUserFormErrors.email"
+                    class="text-red-300 text-sm mt-2 font-semibold bg-red-900/30 px-3 py-2 rounded-lg border border-red-400/30"
+                  >
+                    <i class="fas fa-exclamation-circle mr-2"></i
+                    >{{
+                      Array.isArray(editUserFormErrors.email)
+                        ? editUserFormErrors.email[0]
+                        : editUserFormErrors.email
+                    }}
+                  </p>
+                </div>
+                <div>
+                  <label class="block text-lg font-bold text-blue-100 mb-3">Phone Number *</label>
+                  <input
+                    v-model="editUserData.phone"
+                    type="tel"
+                    class="medical-input w-full px-5 py-4 text-lg bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm"
+                    placeholder="Enter phone number"
+                    required
+                  />
+                  <p v-if="editUserFormErrors.phone" class="text-red-400 text-xs mt-1">
+                    {{ editUserFormErrors.phone }}
+                  </p>
+                </div>
+                <div>
+                  <label class="block text-lg font-bold text-blue-100 mb-3">PF Number</label>
+                  <input
+                    v-model="editUserData.pf_number"
+                    type="text"
+                    :class="[
+                      'medical-input w-full px-5 py-4 text-lg bg-white/15 border-2 rounded-xl focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm',
+                      editUserFormErrors.pf_number
+                        ? 'border-red-400/70 focus:border-red-400'
+                        : 'border-blue-300/30 focus:border-blue-400'
+                    ]"
+                    placeholder="Enter PF number (optional)"
+                  />
+                  <p
+                    v-if="editUserFormErrors.pf_number"
+                    class="text-red-300 text-sm mt-2 font-semibold bg-red-900/30 px-3 py-2 rounded-lg border border-red-400/30"
+                  >
+                    <i class="fas fa-exclamation-circle mr-2"></i
+                    >{{
+                      Array.isArray(editUserFormErrors.pf_number)
+                        ? editUserFormErrors.pf_number[0]
+                        : editUserFormErrors.pf_number
+                    }}
+                  </p>
+                </div>
+                <div>
+                  <label class="block text-lg font-bold text-blue-100 mb-3">New Password</label>
+                  <div class="relative">
+                    <input
+                      v-model="editUserData.password"
+                      :type="showEditPassword ? 'text' : 'password'"
+                      class="medical-input w-full px-5 py-4 text-lg bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm pr-12"
+                      placeholder="Enter new password (leave blank to keep current)"
+                    />
+                    <button
+                      type="button"
+                      @click="showEditPassword = !showEditPassword"
+                      class="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-300 hover:text-blue-200"
+                    >
+                      <i :class="showEditPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                    </button>
+                  </div>
+                  <p v-if="editUserFormErrors.password" class="text-red-400 text-xs mt-1">
+                    {{ editUserFormErrors.password }}
+                  </p>
+                </div>
+                <div>
+                  <label class="block text-lg font-bold text-blue-100 mb-3"
+                    >Confirm New Password</label
+                  >
+                  <div class="relative">
+                    <input
+                      v-model="editUserData.password_confirmation"
+                      :type="showEditConfirmPassword ? 'text' : 'password'"
+                      class="medical-input w-full px-5 py-4 text-lg bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm pr-12"
+                      placeholder="Confirm new password"
+                    />
+                    <button
+                      type="button"
+                      @click="showEditConfirmPassword = !showEditConfirmPassword"
+                      class="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-300 hover:text-blue-200"
+                    >
+                      <i :class="showEditConfirmPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                    </button>
+                  </div>
+                  <p
+                    v-if="editUserFormErrors.password_confirmation"
+                    class="text-red-400 text-xs mt-1"
+                  >
+                    {{ editUserFormErrors.password_confirmation }}
+                  </p>
+                  <p
+                    v-if="
+                      !editUserFormErrors.password_confirmation &&
+                      editUserData.password_confirmation &&
+                      editUserData.password !== editUserData.password_confirmation
+                    "
+                    class="text-red-400 text-xs mt-1"
+                  >
+                    Passwords do not match
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Department and Role Assignment Section -->
+            <div class="bg-white/10 rounded-xl p-8 backdrop-blur-sm border border-blue-300/30">
+              <h3 class="text-2xl font-bold text-white mb-6 flex items-center">
+                <i class="fas fa-building mr-3 text-blue-300 text-xl"></i>
+                Department & Role Assignment
+              </h3>
+              <div class="mb-6">
+                <label class="flex items-center space-x-4 cursor-pointer">
+                  <input
+                    v-model="editUserData.is_active"
+                    type="checkbox"
+                    class="w-5 h-5 text-blue-600 bg-white/20 border-blue-300/50 rounded focus:ring-blue-500 focus:ring-2"
+                  />
+                  <span class="text-lg font-bold text-blue-100">User is active</span>
+                </label>
+                <p class="text-base text-blue-200/70 mt-2">Inactive users cannot log in</p>
+                <p v-if="editUserFormErrors.is_active" class="text-red-400 text-xs mt-1">
+                  {{ editUserFormErrors.is_active }}
+                </p>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-lg font-bold text-blue-100 mb-3">Department</label>
+                  <div class="relative">
+                    <select
+                      v-model="editUserData.department_id"
+                      class="medical-input w-full px-5 py-4 text-lg bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm appearance-none cursor-pointer"
+                    >
+                      <option value="" class="bg-blue-900 text-white">
+                        Select Department (Optional)
+                      </option>
+                      <option
+                        v-for="department in availableDepartments"
+                        :key="department.id"
+                        :value="department.id"
+                        class="bg-blue-900 text-white"
+                      >
+                        {{ department.display_name || department.name }}
+                      </option>
+                    </select>
+                    <div
+                      class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none"
+                    >
+                      <i class="fas fa-chevron-down text-blue-300"></i>
+                    </div>
+                  </div>
+                  <p v-if="editUserFormErrors.department_id" class="text-red-400 text-xs mt-1">
+                    {{ editUserFormErrors.department_id }}
+                  </p>
+                </div>
+                <div>
+                  <label class="block text-lg font-bold text-blue-100 mb-3">Primary Role</label>
+                  <div class="relative">
+                    <select
+                      v-model="editUserData.primary_role"
+                      class="medical-input w-full px-5 py-4 text-lg bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm appearance-none cursor-pointer"
+                    >
+                      <option value="" class="bg-blue-900 text-white">
+                        Select Primary Role (Optional)
+                      </option>
+                      <option
+                        v-for="role in availableRoles"
+                        :key="role.id"
+                        :value="role.id"
+                        class="bg-blue-900 text-white"
+                      >
+                        {{ role.display_name || role.name }}
+                      </option>
+                    </select>
+                    <div
+                      class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none"
+                    >
+                      <i class="fas fa-chevron-down text-blue-300"></i>
+                    </div>
+                  </div>
+                  <p v-if="editUserFormErrors.primary_role" class="text-red-400 text-xs mt-1">
+                    {{ editUserFormErrors.primary_role }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="flex justify-end space-x-4 pt-4 border-t border-blue-300/30">
+              <button
+                type="button"
+                @click="closeEditUserModal"
+                class="px-6 py-3 bg-gray-600 text-white rounded-xl font-semibold hover:bg-gray-700 transition-all duration-300 flex items-center space-x-2"
+              >
+                <i class="fas fa-times"></i>
+                <span>Cancel</span>
+              </button>
+              <button
+                type="submit"
+                :disabled="updatingUser"
+                class="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+              >
+                <i :class="updatingUser ? 'fas fa-spinner fa-spin' : 'fas fa-save'"></i>
+                <span>{{ updatingUser ? 'Updating...' : 'Update User' }}</span>
               </button>
             </div>
           </form>
@@ -743,11 +1121,17 @@
                     placeholder="e.g. senior_manager"
                     required
                   />
-                  <p class="text-blue-200/70 text-sm mt-2">Use lowercase with underscores (used internally)</p>
-                  <p v-if="roleFormErrors.name" class="text-red-400 text-xs mt-1">{{ roleFormErrors.name }}</p>
+                  <p class="text-blue-200/70 text-sm mt-2">
+                    Use lowercase with underscores (used internally)
+                  </p>
+                  <p v-if="roleFormErrors.name" class="text-red-400 text-xs mt-1">
+                    {{ roleFormErrors.name }}
+                  </p>
                 </div>
                 <div>
-                  <label class="block text-base font-medium text-blue-100 mb-3">Display Name *</label>
+                  <label class="block text-base font-medium text-blue-100 mb-3"
+                    >Display Name *</label
+                  >
                   <input
                     v-model="newRole.display_name"
                     type="text"
@@ -756,7 +1140,9 @@
                     required
                   />
                   <p class="text-blue-200/70 text-sm mt-2">Human-readable name (shown to users)</p>
-                  <p v-if="roleFormErrors.display_name" class="text-red-400 text-xs mt-1">{{ roleFormErrors.display_name }}</p>
+                  <p v-if="roleFormErrors.display_name" class="text-red-400 text-xs mt-1">
+                    {{ roleFormErrors.display_name }}
+                  </p>
                 </div>
               </div>
               <div class="mt-6">
@@ -767,7 +1153,9 @@
                   class="medical-input w-full px-5 py-4 text-lg bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm resize-none"
                   placeholder="Describe the role and its responsibilities (optional)"
                 ></textarea>
-                <p v-if="roleFormErrors.description" class="text-red-400 text-xs mt-1">{{ roleFormErrors.description }}</p>
+                <p v-if="roleFormErrors.description" class="text-red-400 text-xs mt-1">
+                  {{ roleFormErrors.description }}
+                </p>
               </div>
             </div>
 
@@ -795,22 +1183,30 @@
                   </button>
                 </div>
               </h3>
-              
+
               <div v-if="loadingPermissions" class="text-center py-8">
                 <div class="inline-flex items-center space-x-2 text-blue-100">
                   <i class="fas fa-spinner fa-spin text-xl"></i>
                   <span>Loading permissions...</span>
                 </div>
               </div>
-              
+
               <div v-else-if="availablePermissions.length > 0" class="space-y-6">
                 <!-- Group permissions by category if they have prefixes -->
-                <div v-for="(permissionGroup, category) in groupedPermissions" :key="category" class="space-y-3">
+                <div
+                  v-for="(permissionGroup, category) in groupedPermissions"
+                  :key="category"
+                  class="space-y-3"
+                >
                   <div class="flex items-center space-x-3 mb-4">
-                    <h4 class="text-base font-semibold text-blue-200 capitalize">{{ category }} Permissions</h4>
+                    <h4 class="text-base font-semibold text-blue-200 capitalize">
+                      {{ category }} Permissions
+                    </h4>
                     <div class="flex-1 h-px bg-blue-300/30"></div>
                   </div>
-                  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                  <div
+                    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3"
+                  >
                     <div
                       v-for="permission in permissionGroup"
                       :key="permission.id"
@@ -833,13 +1229,15 @@
                   </div>
                 </div>
               </div>
-              
+
               <div v-else class="text-center py-8 text-blue-300">
                 <i class="fas fa-key text-2xl mb-2 opacity-50"></i>
                 <p>No permissions available</p>
               </div>
-              
-              <p v-if="roleFormErrors.permissions" class="text-red-400 text-xs mt-2">{{ roleFormErrors.permissions }}</p>
+
+              <p v-if="roleFormErrors.permissions" class="text-red-400 text-xs mt-2">
+                {{ roleFormErrors.permissions }}
+              </p>
             </div>
 
             <!-- Form Actions -->
@@ -857,7 +1255,11 @@
                 :disabled="creatingRole"
                 class="px-8 py-4 text-lg bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl font-semibold hover:from-purple-600 hover:to-purple-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
               >
-                <i :class="creatingRole ? 'fas fa-spinner fa-spin text-lg' : 'fas fa-shield-alt text-lg'"></i>
+                <i
+                  :class="
+                    creatingRole ? 'fas fa-spinner fa-spin text-lg' : 'fas fa-shield-alt text-lg'
+                  "
+                ></i>
                 <span>{{ creatingRole ? 'Creating...' : 'Create Role' }}</span>
               </button>
             </div>
@@ -902,13 +1304,20 @@
           <!-- User Info -->
           <div class="bg-white/10 rounded-xl p-4 mb-6 backdrop-blur-sm border border-blue-300/30">
             <div class="flex items-center space-x-4">
-              <div class="w-16 h-16 bg-gradient-to-br from-teal-500 to-blue-600 rounded-full flex items-center justify-center">
-                <span class="text-white font-bold text-lg">{{ getInitials(selectedUser.name) }}</span>
+              <div
+                class="w-16 h-16 bg-gradient-to-br from-teal-500 to-blue-600 rounded-full flex items-center justify-center"
+              >
+                <span class="text-white font-bold text-lg">{{
+                  getInitials(selectedUser.name)
+                }}</span>
               </div>
               <div>
                 <h3 class="text-xl font-bold text-white">{{ selectedUser.name }}</h3>
                 <p class="text-blue-100">{{ selectedUser.email }}</p>
-                <p v-if="selectedUser.department && selectedUser.department.display_name" class="text-blue-200 text-sm">
+                <p
+                  v-if="selectedUser.department && selectedUser.department.display_name"
+                  class="text-blue-200 text-sm"
+                >
                   <i class="fas fa-building mr-1"></i>{{ selectedUser.department.display_name }}
                 </p>
               </div>
@@ -921,30 +1330,33 @@
               <i class="fas fa-shield-alt mr-2 text-blue-300"></i>
               Current Roles
             </h3>
-            <div v-if="selectedUser.roles && selectedUser.roles.length > 0" class="flex flex-wrap gap-2">
+            <div
+              v-if="selectedUser.roles && selectedUser.roles.length > 0"
+              class="flex flex-wrap gap-2"
+            >
               <span
                 v-for="role in selectedUser.roles"
                 :key="role.id"
-                :class="[
-                  'px-3 py-1 rounded-lg text-sm border',
-                  getRoleColorClasses(role.name)
-                ]"
+                :class="['px-3 py-1 rounded-lg text-sm border', getRoleColorClasses(role.name)]"
               >
                 {{ role.display_name || role.name }}
               </span>
             </div>
-            <div v-else class="px-3 py-1 bg-gray-500/30 text-gray-100 rounded text-sm border border-gray-400/50">
+            <div
+              v-else
+              class="px-3 py-1 bg-gray-500/30 text-gray-100 rounded text-sm border border-gray-400/50"
+            >
               No roles currently assigned
             </div>
           </div>
 
-            <!-- Role Assignment -->
+          <!-- Role Assignment -->
           <div class="mb-6">
             <h3 class="text-lg font-semibold text-white mb-3 flex items-center">
               <i class="fas fa-tasks mr-2 text-blue-300"></i>
               Assign Roles
             </h3>
-            
+
             <!-- Loading state for roles -->
             <div v-if="loadingRoles" class="text-center py-8">
               <div class="inline-flex items-center space-x-2 text-blue-100">
@@ -952,19 +1364,25 @@
                 <span>Loading available roles...</span>
               </div>
             </div>
-            
+
             <!-- No roles found -->
-            <div v-else-if="!availableRoles || availableRoles.length === 0" class="text-center py-8">
+            <div
+              v-else-if="!availableRoles || availableRoles.length === 0"
+              class="text-center py-8"
+            >
               <div class="text-blue-100">
                 <i class="fas fa-exclamation-triangle text-4xl mb-4 opacity-50"></i>
                 <p class="text-lg mb-2">No roles available</p>
                 <p class="text-sm opacity-75">Unable to load roles for assignment</p>
-                <button @click="fetchRoles" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                <button
+                  @click="fetchRoles"
+                  class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                >
                   <i class="fas fa-refresh mr-2"></i>Retry
                 </button>
               </div>
             </div>
-            
+
             <!-- Roles grid -->
             <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
               <div
@@ -984,11 +1402,15 @@
                   class="text-sm text-blue-100 cursor-pointer hover:text-white transition-colors flex-1"
                 >
                   <div class="font-medium">{{ role.display_name || role.name }}</div>
-                  <div v-if="role.description" class="text-xs text-blue-200/70 mt-1">{{ role.description }}</div>
+                  <div v-if="role.description" class="text-xs text-blue-200/70 mt-1">
+                    {{ role.description }}
+                  </div>
                 </label>
               </div>
             </div>
-            <p v-if="roleAssignmentErrors.role_ids" class="text-red-400 text-xs mt-2">{{ roleAssignmentErrors.role_ids[0] }}</p>
+            <p v-if="roleAssignmentErrors.role_ids" class="text-red-400 text-xs mt-2">
+              {{ roleAssignmentErrors.role_ids[0] }}
+            </p>
           </div>
 
           <!-- Form Actions -->
@@ -1050,13 +1472,20 @@
           <!-- User Info -->
           <div class="bg-white/10 rounded-xl p-4 mb-6 backdrop-blur-sm border border-blue-300/30">
             <div class="flex items-center space-x-4">
-              <div class="w-16 h-16 bg-gradient-to-br from-teal-500 to-blue-600 rounded-full flex items-center justify-center">
-                <span class="text-white font-bold text-lg">{{ getInitials(selectedUser.name) }}</span>
+              <div
+                class="w-16 h-16 bg-gradient-to-br from-teal-500 to-blue-600 rounded-full flex items-center justify-center"
+              >
+                <span class="text-white font-bold text-lg">{{
+                  getInitials(selectedUser.name)
+                }}</span>
               </div>
               <div>
                 <h3 class="text-xl font-bold text-white">{{ selectedUser.name }}</h3>
                 <p class="text-blue-100">{{ selectedUser.email }}</p>
-                <p v-if="selectedUser.department && selectedUser.department.display_name" class="text-blue-200 text-sm">
+                <p
+                  v-if="selectedUser.department && selectedUser.department.display_name"
+                  class="text-blue-200 text-sm"
+                >
                   <i class="fas fa-building mr-1"></i>{{ selectedUser.department.display_name }}
                 </p>
               </div>
@@ -1089,19 +1518,23 @@
                     <div
                       :class="[
                         'w-10 h-10 rounded-full flex items-center justify-center shadow-lg',
-                        change.action === 'assigned' ? 'bg-green-500/30 text-green-100' : 'bg-red-500/30 text-red-100'
+                        change.action === 'assigned'
+                          ? 'bg-green-500/30 text-green-100'
+                          : 'bg-red-500/30 text-red-100'
                       ]"
                     >
                       <i :class="change.action === 'assigned' ? 'fas fa-plus' : 'fas fa-minus'"></i>
                     </div>
-                    
+
                     <!-- Change Details -->
                     <div class="flex-1">
                       <div class="flex items-center space-x-3 mb-2">
                         <span
                           :class="[
                             'px-2 py-1 rounded text-xs font-semibold',
-                            change.action === 'assigned' ? 'bg-green-500/30 text-green-100' : 'bg-red-500/30 text-red-100'
+                            change.action === 'assigned'
+                              ? 'bg-green-500/30 text-green-100'
+                              : 'bg-red-500/30 text-red-100'
                           ]"
                         >
                           {{ change.action === 'assigned' ? 'Role Added' : 'Role Removed' }}
@@ -1116,12 +1549,15 @@
                           {{ change.role.display_name || change.role.name }}
                         </span>
                       </div>
-                      
+
                       <p class="text-blue-100 text-sm mb-1">
-                        <span class="font-medium">{{ change.role?.display_name || change.role?.name || 'Unknown Role' }}</span>
-                        {{ change.action === 'assigned' ? 'was assigned to' : 'was removed from' }} this user
+                        <span class="font-medium">{{
+                          change.role?.display_name || change.role?.name || 'Unknown Role'
+                        }}</span>
+                        {{ change.action === 'assigned' ? 'was assigned to' : 'was removed from' }}
+                        this user
                       </p>
-                      
+
                       <div class="flex items-center space-x-4 text-xs text-blue-200/70">
                         <span v-if="change.changed_by">
                           <i class="fas fa-user mr-1"></i>
@@ -1129,12 +1565,19 @@
                         </span>
                         <span v-if="change.changed_at">
                           <i class="fas fa-calendar mr-1"></i>
-                          {{ new Date(change.changed_at).toLocaleDateString() }} at {{ new Date(change.changed_at).toLocaleTimeString() }}
+                          {{ new Date(change.changed_at).toLocaleDateString() }} at
+                          {{ new Date(change.changed_at).toLocaleTimeString() }}
                         </span>
                       </div>
-                      
+
                       <!-- Metadata -->
-                      <div v-if="change.metadata && (change.metadata.context || change.metadata.changed_by_email)" class="mt-2 text-xs text-blue-200/50">
+                      <div
+                        v-if="
+                          change.metadata &&
+                          (change.metadata.context || change.metadata.changed_by_email)
+                        "
+                        class="mt-2 text-xs text-blue-200/50"
+                      >
                         <div v-if="change.metadata.context" class="mb-1">
                           <i class="fas fa-info-circle mr-1"></i>
                           Context: {{ change.metadata.context }}
@@ -1146,11 +1589,15 @@
                       </div>
                     </div>
                   </div>
-                  
+
                   <!-- Timestamp -->
                   <div class="text-xs text-blue-200/70 text-right">
-                    <div v-if="change.changed_at">{{ new Date(change.changed_at).toLocaleDateString() }}</div>
-                    <div v-if="change.changed_at">{{ new Date(change.changed_at).toLocaleTimeString() }}</div>
+                    <div v-if="change.changed_at">
+                      {{ new Date(change.changed_at).toLocaleDateString() }}
+                    </div>
+                    <div v-if="change.changed_at">
+                      {{ new Date(change.changed_at).toLocaleTimeString() }}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1177,7 +1624,7 @@
         </div>
       </div>
     </div>
-    
+
     <!-- Delete User Confirmation Modal -->
     <div
       v-if="showDeleteUserModal && userToDelete"
@@ -1213,15 +1660,19 @@
         <div class="p-6">
           <div class="mb-6">
             <div class="flex items-center space-x-4 mb-4">
-              <div class="w-12 h-12 bg-gradient-to-br from-teal-500 to-blue-600 rounded-full flex items-center justify-center">
-                <span class="text-white font-bold text-sm">{{ getInitials(userToDelete.name) }}</span>
+              <div
+                class="w-12 h-12 bg-gradient-to-br from-teal-500 to-blue-600 rounded-full flex items-center justify-center"
+              >
+                <span class="text-white font-bold text-sm">{{
+                  getInitials(userToDelete.name)
+                }}</span>
               </div>
               <div>
                 <h3 class="font-bold text-white">{{ userToDelete.name }}</h3>
                 <p class="text-red-200 text-sm">{{ userToDelete.email }}</p>
               </div>
             </div>
-            
+
             <div class="bg-red-500/20 border border-red-400/30 rounded-lg p-4 mb-4">
               <div class="flex items-start space-x-3">
                 <i class="fas fa-exclamation-triangle text-red-300 text-lg mt-0.5"></i>
@@ -1240,7 +1691,7 @@
               </div>
             </div>
           </div>
-          
+
           <div class="flex justify-end space-x-3">
             <button
               @click="closeDeleteUserModal"
@@ -1254,14 +1705,16 @@
               :disabled="deletingUser"
               class="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
             >
-              <i :class="deletingUser ? 'fas fa-spinner fa-spin text-sm' : 'fas fa-trash text-sm'"></i>
+              <i
+                :class="deletingUser ? 'fas fa-spinner fa-spin text-sm' : 'fas fa-trash text-sm'"
+              ></i>
               <span>{{ deletingUser ? 'Deleting...' : 'Delete User' }}</span>
             </button>
           </div>
         </div>
       </div>
     </div>
-    
+
     <!-- Delete User Roles Confirmation Modal -->
     <div
       v-if="showDeleteRoleModal && userToRemoveRoles"
@@ -1297,18 +1750,24 @@
         <div class="p-6">
           <div class="mb-6">
             <div class="flex items-center space-x-4 mb-4">
-              <div class="w-12 h-12 bg-gradient-to-br from-teal-500 to-blue-600 rounded-full flex items-center justify-center">
-                <span class="text-white font-bold text-sm">{{ getInitials(userToRemoveRoles.name) }}</span>
+              <div
+                class="w-12 h-12 bg-gradient-to-br from-teal-500 to-blue-600 rounded-full flex items-center justify-center"
+              >
+                <span class="text-white font-bold text-sm">{{
+                  getInitials(userToRemoveRoles.name)
+                }}</span>
               </div>
               <div>
                 <h3 class="font-bold text-white">{{ userToRemoveRoles.name }}</h3>
                 <p class="text-orange-200 text-sm">{{ userToRemoveRoles.email }}</p>
               </div>
             </div>
-            
+
             <!-- Current Roles -->
             <div class="mb-4" v-if="userToRemoveRoles.roles && userToRemoveRoles.roles.length > 0">
-              <h4 class="text-sm font-semibold text-orange-100 mb-2">Current Roles to be Removed:</h4>
+              <h4 class="text-sm font-semibold text-orange-100 mb-2">
+                Current Roles to be Removed:
+              </h4>
               <div class="flex flex-wrap gap-2">
                 <span
                   v-for="role in userToRemoveRoles.roles"
@@ -1322,7 +1781,7 @@
                 </span>
               </div>
             </div>
-            
+
             <div class="bg-orange-500/20 border border-orange-400/30 rounded-lg p-4 mb-4">
               <div class="flex items-start space-x-3">
                 <i class="fas fa-info-circle text-orange-300 text-lg mt-0.5"></i>
@@ -1341,7 +1800,7 @@
               </div>
             </div>
           </div>
-          
+
           <div class="flex justify-end space-x-3">
             <button
               @click="closeDeleteRoleModal"
@@ -1355,7 +1814,11 @@
               :disabled="deletingRoles"
               class="px-4 py-2 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
             >
-              <i :class="deletingRoles ? 'fas fa-spinner fa-spin text-sm' : 'fas fa-shield-alt text-sm'"></i>
+              <i
+                :class="
+                  deletingRoles ? 'fas fa-spinner fa-spin text-sm' : 'fas fa-shield-alt text-sm'
+                "
+              ></i>
               <span>{{ deletingRoles ? 'Removing...' : 'Remove All Roles' }}</span>
             </button>
           </div>
@@ -1452,10 +1915,10 @@
       const showSnackbar = ref(false)
       const snackbarMessage = ref('')
       const snackbarColor = ref('success')
-      
+
       // Three-dot menu state
       const openMenuId = ref(null)
-      
+
       // Delete confirmation modals
       const showDeleteUserModal = ref(false)
       const showDeleteRoleModal = ref(false)
@@ -1463,7 +1926,30 @@
       const userToRemoveRoles = ref(null)
       const deletingUser = ref(false)
       const deletingRoles = ref(false)
-      
+
+      // Edit User Modal states
+      const showEditUserModal = ref(false)
+      const editingUser = ref(null)
+      const updatingUser = ref(false)
+      const showEditPassword = ref(false)
+      const showEditConfirmPassword = ref(false)
+
+      // Edit User Form data
+      const editUserData = ref({
+        name: '',
+        email: '',
+        phone: '',
+        pf_number: '',
+        password: '',
+        password_confirmation: '',
+        department_id: '',
+        primary_role: '',
+        is_active: true
+      })
+
+      // Edit User Form validation errors
+      const editUserFormErrors = ref({})
+
       // Environment check
       const isDevelopment = computed(() => process.env.NODE_ENV === 'development')
 
@@ -1484,7 +1970,7 @@
             })
           }
         }
-        
+
         let filtered = [...users.value]
 
         // Apply search filter
@@ -1492,8 +1978,8 @@
           const query = searchQuery.value.toLowerCase()
           filtered = filtered.filter(
             (user) =>
-              user.name && user.name.toLowerCase().includes(query) ||
-              user.email && user.email.toLowerCase().includes(query) ||
+              (user.name && user.name.toLowerCase().includes(query)) ||
+              (user.email && user.email.toLowerCase().includes(query)) ||
               (user.pf_number && user.pf_number.toLowerCase().includes(query))
           )
         }
@@ -1505,18 +1991,25 @@
             console.log('Available users before role filter:', filtered.length)
             console.log('Sample user roles:', filtered.length > 0 ? filtered[0].roles : 'No users')
           }
-          
+
           filtered = filtered.filter((user) => {
-            const hasRole = user.roles && Array.isArray(user.roles) && user.roles.some((role) => {
-              const matches = role.name === filterRole.value
-              if (process.env.NODE_ENV === 'development' && user.roles.length > 0) {
-                console.log(`User ${user.name} has roles:`, user.roles.map(r => r.name), `Looking for: ${filterRole.value}, Match: ${matches}`)
-              }
-              return matches
-            })
+            const hasRole =
+              user.roles &&
+              Array.isArray(user.roles) &&
+              user.roles.some((role) => {
+                const matches = role.name === filterRole.value
+                if (process.env.NODE_ENV === 'development' && user.roles.length > 0) {
+                  console.log(
+                    `User ${user.name} has roles:`,
+                    user.roles.map((r) => r.name),
+                    `Looking for: ${filterRole.value}, Match: ${matches}`
+                  )
+                }
+                return matches
+              })
             return hasRole
           })
-          
+
           if (process.env.NODE_ENV === 'development') {
             console.log('Users after role filter:', filtered.length)
           }
@@ -1540,18 +2033,18 @@
       // Group permissions by category
       const groupedPermissions = computed(() => {
         const groups = {}
-        
-        availablePermissions.value.forEach(permission => {
+
+        availablePermissions.value.forEach((permission) => {
           // Try to determine category from permission name
           const parts = permission.name.split('.')
           const category = parts.length > 1 ? parts[0] : 'general'
-          
+
           if (!groups[category]) {
             groups[category] = []
           }
           groups[category].push(permission)
         })
-        
+
         return groups
       })
 
@@ -1563,7 +2056,7 @@
           if (!Array.isArray(users.value)) {
             users.value = []
           }
-          
+
           // Fetch all data including filter options
           const results = await Promise.allSettled([
             fetchUsers(),
@@ -1571,7 +2064,7 @@
             fetchRoles(),
             fetchDepartments()
           ])
-          
+
           // Log any failures but don't throw
           results.forEach((result, index) => {
             const labels = ['users', 'statistics', 'roles', 'departments']
@@ -1579,7 +2072,6 @@
               console.error(`Data fetch ${labels[index]} failed:`, result.reason)
             }
           })
-          
         } catch (error) {
           console.error('Error initializing data:', error)
           // Ensure arrays are still initialized even if something fails
@@ -1593,15 +2085,15 @@
 
       const fetchUsers = async () => {
         try {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Fetching users...')
-        }
-        const response = await adminUserService.getAllUsers()
-        
-        // Ensure we have a proper response structure
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Raw user response structure:', response)
-        }
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Fetching users...')
+          }
+          const response = await adminUserService.getAllUsers()
+
+          // Ensure we have a proper response structure
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Raw user response structure:', response)
+          }
           if (response && response.success && response.data) {
             // Handle success response structure
             if (Array.isArray(response.data.users)) {
@@ -1628,20 +2120,23 @@
             console.warn('No data in response:', response)
             users.value = []
           }
-          
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Fetched users successfully:', users.value.length)
-          console.log('All users fetched:', users.value.map(u => ({
-            name: u.name,
-            email: u.email,
-            roles: u.roles ? u.roles.map(r => r.name) : []
-          })))
-        }
+
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Fetched users successfully:', users.value.length)
+            console.log(
+              'All users fetched:',
+              users.value.map((u) => ({
+                name: u.name,
+                email: u.email,
+                roles: u.roles ? u.roles.map((r) => r.name) : []
+              }))
+            )
+          }
         } catch (error) {
           console.error('Error fetching users:', error)
           // Always ensure users.value is an array
           users.value = []
-          
+
           // Show user-friendly message if it's a network error
           if (error.code === 'NETWORK_ERROR' || error.message?.includes('Network Error')) {
             showErrorMessage('Network error: Unable to fetch users. Please check your connection.')
@@ -1662,9 +2157,9 @@
             department_distribution: [],
             hod_users: 0
           }
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Fetched user statistics')
-        }
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Fetched user statistics')
+          }
         } catch (error) {
           console.error('Error fetching user statistics:', error)
           // Set default values but don't throw
@@ -1680,23 +2175,32 @@
       const refreshData = async () => {
         await initializeData()
       }
-      
+
       const debugFilterData = () => {
         if (process.env.NODE_ENV === 'development') {
           console.log('=== DEBUG FILTER DATA ===')
           console.log('Total users loaded:', users.value.length)
-          console.log('Available roles:', availableRoles.value.map(r => ({ id: r.id, name: r.name, display: r.display_name })))
+          console.log(
+            'Available roles:',
+            availableRoles.value.map((r) => ({ id: r.id, name: r.name, display: r.display_name }))
+          )
           console.log('Current filter role:', filterRole.value)
           console.log('Users with super_admin role:')
-          users.value.forEach(user => {
-            if (user.roles && user.roles.some(role => role.name === 'super_admin')) {
-              console.log(`  - ${user.name} (${user.email}) has roles:`, user.roles.map(r => r.name))
+          users.value.forEach((user) => {
+            if (user.roles && user.roles.some((role) => role.name === 'super_admin')) {
+              console.log(
+                `  - ${user.name} (${user.email}) has roles:`,
+                user.roles.map((r) => r.name)
+              )
             }
           })
           console.log('Users with any roles:')
-          users.value.forEach(user => {
+          users.value.forEach((user) => {
             if (user.roles && user.roles.length > 0) {
-              console.log(`  - ${user.name} has roles:`, user.roles.map(r => r.name))
+              console.log(
+                `  - ${user.name} has roles:`,
+                user.roles.map((r) => r.name)
+              )
             } else {
               console.log(`  - ${user.name} has NO roles`)
             }
@@ -1717,14 +2221,14 @@
       const openCreateUserModal = async () => {
         showCreateUserModal.value = true
         userFormErrors.value = {}
-        
+
         // Load form data (departments and roles)
         try {
           const [departmentsResponse, rolesResponse] = await Promise.all([
             adminUserService.getDepartments(),
             adminUserService.getRoles()
           ])
-          
+
           availableDepartments.value = departmentsResponse.data || []
           availableRoles.value = rolesResponse.data || []
         } catch (error) {
@@ -1738,10 +2242,69 @@
         resetUserForm()
       }
 
+      // Edit User Modal methods
+      const openEditUserModal = async (user) => {
+        openMenuId.value = null // Close the dropdown menu
+
+        showEditUserModal.value = true
+        editingUser.value = user
+        editUserFormErrors.value = {}
+
+        // Populate the form with current user data
+        editUserData.value = {
+          name: user.name || '',
+          email: user.email || '',
+          phone: user.phone || '',
+          pf_number: user.pf_number || '',
+          password: '',
+          password_confirmation: '',
+          department_id: user.department_id || '',
+          primary_role: user.roles && user.roles.length > 0 ? user.roles[0].id : '',
+          is_active: user.is_active !== undefined ? user.is_active : true
+        }
+
+        // Load form data (departments and roles)
+        try {
+          const [departmentsResponse, rolesResponse] = await Promise.all([
+            adminUserService.getDepartments(),
+            adminUserService.getRoles()
+          ])
+
+          availableDepartments.value = departmentsResponse.data || []
+          availableRoles.value = rolesResponse.data || []
+        } catch (error) {
+          console.error('Error loading form data:', error)
+          showErrorMessage('Failed to load form data')
+        }
+      }
+
+      const closeEditUserModal = () => {
+        showEditUserModal.value = false
+        resetEditUserForm()
+      }
+
+      const resetEditUserForm = () => {
+        editUserData.value = {
+          name: '',
+          email: '',
+          phone: '',
+          pf_number: '',
+          password: '',
+          password_confirmation: '',
+          department_id: '',
+          primary_role: '',
+          is_active: true
+        }
+        editUserFormErrors.value = {}
+        editingUser.value = null
+        showEditPassword.value = false
+        showEditConfirmPassword.value = false
+      }
+
       const openCreateRoleModal = async () => {
         showCreateRoleModal.value = true
         roleFormErrors.value = {}
-        
+
         // Load permissions
         await fetchPermissions()
       }
@@ -1768,7 +2331,6 @@
         showPassword.value = false
         showConfirmPassword.value = false
       }
-
 
       const resetRoleForm = () => {
         newRole.value = {
@@ -1810,7 +2372,7 @@
       }
 
       const selectAllPermissions = () => {
-        newRole.value.permissions = availablePermissions.value.map(p => p.id)
+        newRole.value.permissions = availablePermissions.value.map((p) => p.id)
       }
 
       const clearAllPermissions = () => {
@@ -1848,21 +2410,23 @@
           if (newUser.value.primary_role) {
             userData.role_ids.push(parseInt(newUser.value.primary_role))
           }
-          
+
           // If no roles selected, assign default 'staff' role
           if (userData.role_ids.length === 0) {
             // Find staff role ID from available roles
-            const staffRole = availableRoles.value.find(role => role.name === 'staff')
+            const staffRole = availableRoles.value.find((role) => role.name === 'staff')
             if (staffRole) {
               userData.role_ids.push(staffRole.id)
             } else {
               // If no staff role found, show error
-              throw new Error('No default role available. Please select a role or create a staff role first.')
+              throw new Error(
+                'No default role available. Please select a role or create a staff role first.'
+              )
             }
           }
 
           const response = await adminUserService.createUser(userData)
-          
+
           if (response.success) {
             showSuccessMessage('User created successfully!')
             closeCreateUserModal()
@@ -1872,28 +2436,35 @@
           }
         } catch (error) {
           console.error('Error creating user:', error)
-          
+
           // Handle validation errors
           if (error.response?.status === 422 && error.response.data?.errors) {
             userFormErrors.value = error.response.data.errors
-            
+
             // Show specific user-friendly messages for common validation errors
             const errors = error.response.data.errors
             let friendlyMessage = ''
-            
-            if (errors.email && errors.email.includes('This email address is already registered.')) {
+
+            if (
+              errors.email &&
+              errors.email.includes('This email address is already registered.')
+            ) {
               friendlyMessage = `❌ User with email "${newUser.value.email}" already exists. Please use a different email address.`
-            } else if (errors.pf_number && errors.pf_number.includes('This PF number is already registered.')) {
+            } else if (
+              errors.pf_number &&
+              errors.pf_number.includes('This PF number is already registered.')
+            ) {
               friendlyMessage = `❌ User with PF Number "${newUser.value.pf_number}" already exists. Please use a different PF number.`
             } else if (errors.email || errors.pf_number) {
               // General duplicate user message
-              friendlyMessage = '❌ A user with this email or PF number already exists. Please check your details and try again.'
+              friendlyMessage =
+                '❌ A user with this email or PF number already exists. Please check your details and try again.'
             } else {
               // Other validation errors
               const firstError = Object.values(errors)[0]
               friendlyMessage = Array.isArray(firstError) ? firstError[0] : firstError
             }
-            
+
             if (friendlyMessage) {
               showErrorMessage(friendlyMessage)
             }
@@ -1918,7 +2489,7 @@
           }
 
           const response = await adminUserService.createRole(roleData)
-          
+
           if (response.success) {
             showSuccessMessage('Role created successfully!')
             closeCreateRoleModal()
@@ -1926,10 +2497,9 @@
           } else {
             throw new Error(response.message || 'Failed to create role')
           }
-          
         } catch (error) {
           console.error('Error creating role:', error)
-          
+
           // Handle validation errors
           if (error.response?.status === 422 && error.response.data?.errors) {
             roleFormErrors.value = error.response.data.errors
@@ -1938,6 +2508,95 @@
           }
         } finally {
           creatingRole.value = false
+        }
+      }
+
+      // Update User method
+      const updateUser = async () => {
+        updatingUser.value = true
+        editUserFormErrors.value = {}
+
+        // Client-side validation for password confirmation if password is provided
+        if (
+          editUserData.value.password &&
+          editUserData.value.password !== editUserData.value.password_confirmation
+        ) {
+          editUserFormErrors.value = {
+            password_confirmation: ['Passwords do not match.']
+          }
+          updatingUser.value = false
+          return
+        }
+
+        try {
+          const userData = {
+            name: editUserData.value.name.trim(),
+            email: editUserData.value.email.trim().toLowerCase(),
+            phone: editUserData.value.phone.trim(),
+            pf_number: editUserData.value.pf_number.trim() || null,
+            department_id: editUserData.value.department_id || null,
+            is_active: editUserData.value.is_active
+          }
+
+          // Only include password fields if password is provided
+          if (editUserData.value.password) {
+            userData.password = editUserData.value.password
+            userData.password_confirmation = editUserData.value.password_confirmation
+          }
+
+          // Handle role assignment
+          if (editUserData.value.primary_role) {
+            userData.role_ids = [parseInt(editUserData.value.primary_role)]
+          }
+
+          const response = await adminUserService.updateUser(editingUser.value.id, userData)
+
+          if (response.success) {
+            showSuccessMessage('User updated successfully!')
+            closeEditUserModal()
+            await refreshData() // Refresh the user list
+          } else {
+            throw new Error(response.message || 'Failed to update user')
+          }
+        } catch (error) {
+          console.error('Error updating user:', error)
+
+          // Handle validation errors
+          if (error.response?.status === 422 && error.response.data?.errors) {
+            editUserFormErrors.value = error.response.data.errors
+
+            // Show specific user-friendly messages for common validation errors
+            const errors = error.response.data.errors
+            let friendlyMessage = ''
+
+            if (
+              errors.email &&
+              errors.email.includes('This email address is already registered.')
+            ) {
+              friendlyMessage = `❌ Email "${editUserData.value.email}" is already in use by another user. Please use a different email address.`
+            } else if (
+              errors.pf_number &&
+              errors.pf_number.includes('This PF number is already registered.')
+            ) {
+              friendlyMessage = `❌ PF Number "${editUserData.value.pf_number}" is already in use by another user. Please use a different PF number.`
+            } else if (errors.email || errors.pf_number) {
+              // General duplicate user message
+              friendlyMessage =
+                '❌ The email or PF number you entered is already in use by another user. Please check your details and try again.'
+            } else {
+              // Other validation errors
+              const firstError = Object.values(errors)[0]
+              friendlyMessage = Array.isArray(firstError) ? firstError[0] : firstError
+            }
+
+            if (friendlyMessage) {
+              showErrorMessage(friendlyMessage)
+            }
+          } else {
+            showErrorMessage(error.message || 'Failed to update user')
+          }
+        } finally {
+          updatingUser.value = false
         }
       }
 
@@ -1986,26 +2645,33 @@
       const fetchRoles = async () => {
         loadingRoles.value = true
         try {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Fetching roles...')
-        }
-        const response = await adminUserService.getRoles()
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Raw response:', response)
-        }
-        
-        if (response && response.success && response.data) {
-          availableRoles.value = Array.isArray(response.data) ? response.data : []
           if (process.env.NODE_ENV === 'development') {
-            console.log('Fetched roles successfully for filters:', availableRoles.value.length, 'roles loaded')
-            console.log('Available roles for filters:', availableRoles.value.map(r => r.display_name || r.name))
+            console.log('Fetching roles...')
           }
-        } else {
+          const response = await adminUserService.getRoles()
           if (process.env.NODE_ENV === 'development') {
-            console.warn('Invalid response structure:', response)
+            console.log('Raw response:', response)
           }
-          availableRoles.value = []
-        }
+
+          if (response && response.success && response.data) {
+            availableRoles.value = Array.isArray(response.data) ? response.data : []
+            if (process.env.NODE_ENV === 'development') {
+              console.log(
+                'Fetched roles successfully for filters:',
+                availableRoles.value.length,
+                'roles loaded'
+              )
+              console.log(
+                'Available roles for filters:',
+                availableRoles.value.map((r) => r.display_name || r.name)
+              )
+            }
+          } else {
+            if (process.env.NODE_ENV === 'development') {
+              console.warn('Invalid response structure:', response)
+            }
+            availableRoles.value = []
+          }
         } catch (error) {
           console.error('Error fetching roles:', error)
           console.error('Error details:', {
@@ -2014,7 +2680,9 @@
             status: error.response?.status
           })
           availableRoles.value = []
-          showErrorMessage('Failed to load available roles: ' + (error.response?.data?.message || error.message))
+          showErrorMessage(
+            'Failed to load available roles: ' + (error.response?.data?.message || error.message)
+          )
         } finally {
           loadingRoles.value = false
         }
@@ -2023,32 +2691,42 @@
       // Fetch departments function
       const fetchDepartments = async () => {
         try {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Fetching departments...')
-        }
-        const response = await adminUserService.getDepartments()
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Raw departments response:', response)
-        }
-        
-        if (response && response.success && response.data) {
-          availableDepartments.value = Array.isArray(response.data) ? response.data : []
           if (process.env.NODE_ENV === 'development') {
-            console.log('Fetched departments successfully for filters:', availableDepartments.value.length, 'departments loaded')
-            console.log('Available departments for filters:', availableDepartments.value.map(d => d.display_name || d.name))
+            console.log('Fetching departments...')
           }
-        } else if (response && response.data) {
-          // Fallback for different response structure
-          availableDepartments.value = Array.isArray(response.data) ? response.data : []
+          const response = await adminUserService.getDepartments()
           if (process.env.NODE_ENV === 'development') {
-            console.log('Fetched departments with fallback structure:', availableDepartments.value.length)
+            console.log('Raw departments response:', response)
           }
-        } else {
-          availableDepartments.value = []
-          if (process.env.NODE_ENV === 'development') {
-            console.log('No departments data received')
+
+          if (response && response.success && response.data) {
+            availableDepartments.value = Array.isArray(response.data) ? response.data : []
+            if (process.env.NODE_ENV === 'development') {
+              console.log(
+                'Fetched departments successfully for filters:',
+                availableDepartments.value.length,
+                'departments loaded'
+              )
+              console.log(
+                'Available departments for filters:',
+                availableDepartments.value.map((d) => d.display_name || d.name)
+              )
+            }
+          } else if (response && response.data) {
+            // Fallback for different response structure
+            availableDepartments.value = Array.isArray(response.data) ? response.data : []
+            if (process.env.NODE_ENV === 'development') {
+              console.log(
+                'Fetched departments with fallback structure:',
+                availableDepartments.value.length
+              )
+            }
+          } else {
+            availableDepartments.value = []
+            if (process.env.NODE_ENV === 'development') {
+              console.log('No departments data received')
+            }
           }
-        }
         } catch (error) {
           console.error('Error fetching departments:', error)
           availableDepartments.value = []
@@ -2059,20 +2737,22 @@
       // Role assignment and history methods
       const openAssignRolesDialog = async (user) => {
         try {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Opening assign roles dialog for user:', user.name)
-        }
-        selectedUser.value = user
-        userRoleAssignment.value.selectedRoles = user.roles ? user.roles.map(role => role.id) : []
-        roleAssignmentErrors.value = {}
-        showAssignRolesModal.value = true
-        
-        // Always fetch roles to ensure we have the latest data
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Current availableRoles length:', availableRoles.value.length)
-        }
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Opening assign roles dialog for user:', user.name)
+          }
+          selectedUser.value = user
+          userRoleAssignment.value.selectedRoles = user.roles
+            ? user.roles.map((role) => role.id)
+            : []
+          roleAssignmentErrors.value = {}
+          showAssignRolesModal.value = true
+
+          // Always fetch roles to ensure we have the latest data
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Current availableRoles length:', availableRoles.value.length)
+          }
           await fetchRoles()
-          
+
           if (availableDepartments.value.length === 0) {
             await fetchDepartments()
           }
@@ -2088,7 +2768,7 @@
           loadingRoleHistory.value = true
           showRoleHistoryModal.value = true
           roleHistory.value = []
-          
+
           // Fetch role history
           const response = await adminUserService.getUserRoleHistory(user.id)
           if (response.success) {
@@ -2120,39 +2800,42 @@
 
       const assignRolesToUser = async () => {
         if (!selectedUser.value) return
-        
+
         assigningRoles.value = true
         roleAssignmentErrors.value = {}
-        
+
         // Store current filter state to potentially clear it
         const currentRoleFilter = filterRole.value
-        
+
         try {
           const response = await adminUserService.assignUserRoles(
             selectedUser.value.id,
             userRoleAssignment.value.selectedRoles
           )
-          
+
           if (response.success) {
             if (isDevelopment.value) {
               console.log('Role assignment successful:', response)
             }
-            
+
             showSuccessMessage('Roles updated successfully!')
             closeAssignRolesModal()
-            
+
             if (isDevelopment.value) {
               console.log('Refreshing data after role assignment...')
             }
-            
+
             // If there's a role filter active, check if the user would still be visible
             // If not, temporarily clear the filter to ensure user visibility
             const userNewRoles = userRoleAssignment.value.selectedRoles
-            const userHasFilteredRole = currentRoleFilter && userNewRoles.length > 0 && 
-              availableRoles.value.some(role => 
-                role.id && userNewRoles.includes(role.id) && role.name === currentRoleFilter
+            const userHasFilteredRole =
+              currentRoleFilter &&
+              userNewRoles.length > 0 &&
+              availableRoles.value.some(
+                (role) =>
+                  role.id && userNewRoles.includes(role.id) && role.name === currentRoleFilter
               )
-              
+
             if (currentRoleFilter && !userHasFilteredRole) {
               // Clear the role filter temporarily so user remains visible
               filterRole.value = ''
@@ -2160,9 +2843,9 @@
                 console.log('Cleared role filter to maintain user visibility after role change')
               }
             }
-            
+
             await refreshData() // Refresh user list to show updated roles
-            
+
             if (isDevelopment.value) {
               console.log('Data refresh completed')
             }
@@ -2171,7 +2854,7 @@
           }
         } catch (error) {
           console.error('Error assigning roles:', error)
-          
+
           // Handle validation errors
           if (error.response?.status === 422 && error.response.data?.errors) {
             roleAssignmentErrors.value = error.response.data.errors
@@ -2199,10 +2882,10 @@
           openMenuId.value = null
           return
         }
-        
+
         // Check if click is outside any dropdown menu
         const isClickInsideDropdown = event.target.closest('[data-dropdown-menu]')
-        
+
         if (!isClickInsideDropdown) {
           openMenuId.value = null
         }
@@ -2236,12 +2919,12 @@
       // Delete user permanently
       const deleteUser = async () => {
         if (!userToDelete.value) return
-        
+
         deletingUser.value = true
-        
+
         try {
           const response = await adminUserService.deleteUser(userToDelete.value.id)
-          
+
           if (response.success) {
             showSuccessMessage(`User "${userToDelete.value.name}" has been deleted successfully`)
             closeDeleteUserModal()
@@ -2260,16 +2943,16 @@
       // Remove all roles from user
       const deleteUserRoles = async () => {
         if (!userToRemoveRoles.value) return
-        
+
         deletingRoles.value = true
-        
+
         try {
           // Call the assign roles method with empty array to remove all roles
           const response = await adminUserService.assignUserRoles(
             userToRemoveRoles.value.id,
             [] // Empty array removes all roles
           )
-          
+
           if (response.success) {
             showSuccessMessage(`All roles have been removed from "${userToRemoveRoles.value.name}"`)
             closeDeleteRoleModal()
@@ -2288,7 +2971,7 @@
       // Initialize data on mount
       onMounted(() => {
         initializeData()
-        
+
         // Add click listener to close menus when clicking outside
         document.addEventListener('click', closeAllMenus)
       })
@@ -2325,6 +3008,11 @@
         showConfirmPassword,
         deletingUser,
         deletingRoles,
+        showEditUserModal,
+        editingUser,
+        updatingUser,
+        showEditPassword,
+        showEditConfirmPassword,
 
         // Form data
         newUser,
@@ -2339,6 +3027,8 @@
         userToDelete,
         userToRemoveRoles,
         openMenuId,
+        editUserData,
+        editUserFormErrors,
 
         // Computed
         filteredUsers,
@@ -2362,18 +3052,21 @@
         closeCreateUserModal,
         openCreateRoleModal,
         closeCreateRoleModal,
+        openEditUserModal,
+        closeEditUserModal,
         closeAssignRolesModal,
         closeRoleHistoryModal,
 
         // Form methods
         createUser,
+        updateUser,
         createRole,
         assignRolesToUser,
         selectAllPermissions,
         clearAllPermissions,
         showSuccessMessage,
         showErrorMessage,
-        
+
         // Three-dot menu methods
         toggleUserMenu,
         closeAllMenus,
@@ -2485,19 +3178,22 @@
   }
 
   /* Force blue background for all input and select elements */
-  input.medical-input, textarea.medical-input {
+  input.medical-input,
+  textarea.medical-input {
     background-color: rgba(30, 58, 138, 0.6) !important;
     border-color: rgba(96, 165, 250, 0.5) !important;
     color: white !important;
   }
 
-  input.medical-input:focus, textarea.medical-input:focus {
+  input.medical-input:focus,
+  textarea.medical-input:focus {
     background-color: rgba(30, 58, 138, 0.7) !important;
     border-color: rgba(45, 212, 191, 0.8) !important;
     color: white !important;
   }
 
-  input.medical-input::placeholder, textarea.medical-input::placeholder {
+  input.medical-input::placeholder,
+  textarea.medical-input::placeholder {
     color: rgba(191, 219, 254, 0.7) !important;
   }
 

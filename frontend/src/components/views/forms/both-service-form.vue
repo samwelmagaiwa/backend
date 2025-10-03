@@ -2587,9 +2587,7 @@
 
                               <!-- Show existing signature when implementation is completed -->
                               <div
-                                v-else-if="
-                                  shouldShowIctOfficerSignedIndicator
-                                "
+                                v-else-if="shouldShowIctOfficerSignedIndicator"
                                 class="w-full px-3 py-2 border-2 border-green-300/40 rounded-xl bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-green-500/20 min-h-[35px] flex items-center justify-center relative"
                               >
                                 <div class="text-center">
@@ -2601,11 +2599,11 @@
                                     </div>
                                     <span class="text-green-400 font-semibold text-sm">Signed</span>
                                   </div>
-                                  <p class="text-xs text-green-200/80">
-                                    Implementation completed
-                                  </p>
+                                  <p class="text-xs text-green-200/80">Implementation completed</p>
                                   <p class="text-xs text-blue-100 opacity-80">
-                                    {{ getSignatureFileName(requestData.ict_officer_signature_path) }}
+                                    {{
+                                      getSignatureFileName(requestData.ict_officer_signature_path)
+                                    }}
                                   </p>
                                 </div>
                                 <!-- Optional: Show signature preview icon -->
@@ -5267,16 +5265,18 @@
         )
       },
       shouldShowHeadITSignedIndicator() {
-        const baseResult = this.isReviewMode && this.viewerAfter('head_it') && this.hasStageSigned('head_it')
-        
+        const baseResult =
+          this.isReviewMode && this.viewerAfter('head_it') && this.hasStageSigned('head_it')
+
         // Explicit fallback: if user is Head of IT and head_it_signature_path exists, show signed
-        const isHeadOfIt = this.getUserRole()?.toLowerCase() === 'head_of_it' || 
-                           this.getUserRole()?.toLowerCase() === 'head_it'
+        const isHeadOfIt =
+          this.getUserRole()?.toLowerCase() === 'head_of_it' ||
+          this.getUserRole()?.toLowerCase() === 'head_it'
         const headItSignatureExists = !!this.requestData?.head_it_signature_path
         const fallbackResult = this.isReviewMode && isHeadOfIt && headItSignatureExists
-        
+
         const result = baseResult || fallbackResult
-        
+
         if (this.isDevelopment) {
           console.log('🟢 shouldShowHeadITSignedIndicator:', {
             isReviewMode: this.isReviewMode,
@@ -5295,9 +5295,10 @@
       shouldShowHeadITNoSignatureIndicator() {
         // Don't show no signature if we should show signed indicator
         const shouldShowSigned = this.shouldShowHeadITSignedIndicator
-        const baseResult = this.isReviewMode && this.viewerAfter('head_it') && !this.hasStageSigned('head_it')
+        const baseResult =
+          this.isReviewMode && this.viewerAfter('head_it') && !this.hasStageSigned('head_it')
         const result = baseResult && !shouldShowSigned
-        
+
         if (this.isDevelopment) {
           console.log('🔴 shouldShowHeadITNoSignatureIndicator:', {
             isReviewMode: this.isReviewMode,
@@ -5310,18 +5311,19 @@
         }
         return result
       },
-      
+
       // ICT Officer signature visibility indicators
       shouldShowIctOfficerSignedIndicator() {
-        const baseResult = this.isReviewMode && this.viewerAfter('ict_officer') && this.hasStageSigned('ict_officer')
-        
+        const baseResult =
+          this.isReviewMode && this.viewerAfter('ict_officer') && this.hasStageSigned('ict_officer')
+
         // Explicit fallback: if user is ICT Officer and ict_officer_signature_path exists, show signed
         const isIctOfficer = this.getUserRole()?.toLowerCase() === 'ict_officer'
         const ictOfficerSignatureExists = !!this.requestData?.ict_officer_signature_path
         const fallbackResult = this.isReviewMode && isIctOfficer && ictOfficerSignatureExists
-        
+
         const result = baseResult || fallbackResult
-        
+
         if (this.isDevelopment) {
           console.log('🟢 shouldShowIctOfficerSignedIndicator:', {
             isReviewMode: this.isReviewMode,
@@ -5340,9 +5342,12 @@
       shouldShowIctOfficerNoSignatureIndicator() {
         // Don't show no signature if we should show signed indicator
         const shouldShowSigned = this.shouldShowIctOfficerSignedIndicator
-        const baseResult = this.isReviewMode && this.viewerAfter('ict_officer') && !this.hasStageSigned('ict_officer')
+        const baseResult =
+          this.isReviewMode &&
+          this.viewerAfter('ict_officer') &&
+          !this.hasStageSigned('ict_officer')
         const result = baseResult && !shouldShowSigned
-        
+
         if (this.isDevelopment) {
           console.log('🔴 shouldShowIctOfficerNoSignatureIndicator:', {
             isReviewMode: this.isReviewMode,

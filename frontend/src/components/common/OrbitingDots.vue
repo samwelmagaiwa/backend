@@ -17,8 +17,8 @@
         :key="`dot-${index}`"
         :class="`dot ${dot.color}`"
         :style="{
-          left: `${50 + Math.cos((rotation + index * dotSpacing) * Math.PI / 180) * (orbitRadius / currentContainerSize * 100)}%`,
-          top: `${50 + Math.sin((rotation + index * dotSpacing) * Math.PI / 180) * (orbitRadius / currentContainerSize * 100)}%`
+          left: `${50 + Math.cos(((rotation + index * dotSpacing) * Math.PI) / 180) * ((orbitRadius / currentContainerSize) * 100)}%`,
+          top: `${50 + Math.sin(((rotation + index * dotSpacing) * Math.PI) / 180) * ((orbitRadius / currentContainerSize) * 100)}%`
         }"
       ></div>
     </div>
@@ -59,14 +59,30 @@
 
         // 24 dots with logo colors in repeating pattern
         dots: [
-          { color: 'logo-red' }, { color: 'logo-gold' }, { color: 'logo-white' },
-          { color: 'logo-red' }, { color: 'logo-gold' }, { color: 'logo-white' },
-          { color: 'logo-red' }, { color: 'logo-gold' }, { color: 'logo-white' },
-          { color: 'logo-red' }, { color: 'logo-gold' }, { color: 'logo-white' },
-          { color: 'logo-red' }, { color: 'logo-gold' }, { color: 'logo-white' },
-          { color: 'logo-red' }, { color: 'logo-gold' }, { color: 'logo-white' },
-          { color: 'logo-red' }, { color: 'logo-gold' }, { color: 'logo-white' },
-          { color: 'logo-red' }, { color: 'logo-gold' }, { color: 'logo-white' }
+          { color: 'logo-red' },
+          { color: 'logo-gold' },
+          { color: 'logo-white' },
+          { color: 'logo-red' },
+          { color: 'logo-gold' },
+          { color: 'logo-white' },
+          { color: 'logo-red' },
+          { color: 'logo-gold' },
+          { color: 'logo-white' },
+          { color: 'logo-red' },
+          { color: 'logo-gold' },
+          { color: 'logo-white' },
+          { color: 'logo-red' },
+          { color: 'logo-gold' },
+          { color: 'logo-white' },
+          { color: 'logo-red' },
+          { color: 'logo-gold' },
+          { color: 'logo-white' },
+          { color: 'logo-red' },
+          { color: 'logo-gold' },
+          { color: 'logo-white' },
+          { color: 'logo-red' },
+          { color: 'logo-gold' },
+          { color: 'logo-white' }
         ]
       }
     },
@@ -115,15 +131,22 @@
 
       currentContainerSize() {
         if (this.customWidth) return this.customWidth
-        
+
         switch (this.size) {
-          case 'xs': return 16
-          case 'sm': return 20
-          case 'md': return 28
-          case 'lg': return 36
-          case 'xl': return 64
-          case '2xl': return 120
-          default: return 20
+          case 'xs':
+            return 16
+          case 'sm':
+            return 20
+          case 'md':
+            return 28
+          case 'lg':
+            return 36
+          case 'xl':
+            return 64
+          case '2xl':
+            return 120
+          default:
+            return 20
         }
       }
     },
@@ -201,13 +224,13 @@
     justify-content: center;
   }
 
-.logo-img {
+  .logo-img {
     width: 50%;
     height: 50%;
     object-fit: contain;
     opacity: 0.8;
   }
-  
+
   /* Larger logo for 2xl size */
   .size-2xl .logo-img {
     width: 60%;

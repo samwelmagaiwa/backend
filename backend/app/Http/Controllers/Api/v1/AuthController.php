@@ -67,7 +67,7 @@ class AuthController extends Controller
      *                 @OA\Property(property="needs_onboarding", type="boolean", example=false),
      *                 @OA\Property(property="onboarding_step", type="string", example="completed")
      *             ),
-     *             @OA\Property(property="token", type="string", example="1|abcdef123456..."),
+     *             @OA\Property(property="token", type="string", description="Laravel Sanctum plain text token for API authentication", example="1|abcdef123456789abcdef123456789abcdef123456789abcdef"),
      *             @OA\Property(property="token_name", type="string", example="STAFF_Chrome_192.168.1.1_2024-01-01 12:00:00"),
      *             @OA\Property(
      *                 property="session_info",
@@ -170,7 +170,7 @@ class AuthController extends Controller
         
         // Create token with abilities based on user role
         $abilities = $this->getTokenAbilities($user);
-        $token = $user->createToken($tokenName, $abilities)->plainTextToken;
+        $token = $user->createToken($tokenName, array_values($abilities))->plainTextToken;
         
         Log::info('Token created successfully', [
             'user_id' => $user->id,
@@ -194,7 +194,7 @@ class AuthController extends Controller
                 'email' => $user->email,
                 'phone' => $user->phone,
                 'pf_number' => $user->pf_number,
-'role_id' => null,
+                'role_id' => null,
                 'role' => $primaryRole, // Normalized role field
                 'role_name' => $primaryRole, // For backward compatibility
                 'primary_role' => $primaryRole, // Explicit primary role
@@ -497,7 +497,7 @@ class AuthController extends Controller
             $sessions = $user->tokens()->select('id', 'name', 'created_at', 'last_used_at')
                 ->orderBy('created_at', 'desc')
                 ->get()
-                ->map(function ($token) {
+                ->map(function ($token) use ($request) {
                     $parts = explode('_', $token->name);
                     return [
                         'id' => $token->id,

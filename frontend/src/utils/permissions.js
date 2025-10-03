@@ -129,7 +129,7 @@ export const ROLE_PERMISSIONS = {
       '/ict-approval/request/:id',
       '/user-security-access/:id',
       '/jeeva-access',
-      '/wellsoft-access', 
+      '/wellsoft-access',
       '/internet-access',
       '/both-service-form',
       '/both-service-form/:id',
@@ -142,7 +142,11 @@ export const ROLE_PERMISSIONS = {
     dashboards: ['ict-dashboard'],
     forms: ['jeeva-access', 'wellsoft-access', 'internet-access', 'both-service-form'],
     userManagement: [],
-    deviceManagement: ['ict-approval/requests', 'ict-approval/request/:id', 'user-security-access/:id'],
+    deviceManagement: [
+      'ict-approval/requests',
+      'ict-approval/request/:id',
+      'user-security-access/:id'
+    ],
     requestsManagement: ['ict-dashboard/access-requests', 'ict-dashboard/request-progress/:id']
   },
 

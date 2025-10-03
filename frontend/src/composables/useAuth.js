@@ -53,9 +53,16 @@ export function useAuth() {
 
         await router.push(redirectPath)
         return { success: true, user }
+      } else {
+        // Handle failed login - set error message from authService response
+        const errorMessage = result.message || 'Login failed'
+        console.error('❌ Login failed:', errorMessage)
+        authStore.setError(errorMessage)
+        return {
+          success: false,
+          message: errorMessage
+        }
       }
-
-      return result
     } catch (error) {
       console.error('❌ Login error in composable:', error)
       authStore.setError(error.message || 'Login failed')

@@ -8,19 +8,19 @@
       <div class="absolute inset-0 opacity-5">
         <div class="grid grid-cols-12 gap-8 h-full transform rotate-45">
           <div
-            v-for="i in 48"
+            v-for="i in 24"
             :key="i"
             class="bg-white rounded-full w-2 h-2 animate-pulse"
-            :style="{ animationDelay: i * 0.1 + 's' }"
+            :style="{ animationDelay: i * 0.2 + 's' }"
           ></div>
         </div>
       </div>
       <!-- Floating medical icons -->
       <div class="absolute inset-0">
         <div
-          v-for="i in 15"
+          v-for="i in 8"
           :key="i"
-          class="absolute text-white opacity-10 animate-float"
+          class="absolute text-white opacity-5 animate-float"
           :style="getIconStyle(i)"
         >
           <i :class="getIconClass(i)"></i>
@@ -28,7 +28,7 @@
       </div>
     </div>
 
-    <div class="max-w-8xl mx-auto relative z-10">
+    <div class="max-w-none mx-4 relative z-10">
       <!-- Professional Header -->
       <div class="medical-glass-card rounded-t-3xl p-8 mb-0 border-b border-blue-300/30">
         <div class="text-center">
@@ -65,11 +65,11 @@
         <!-- 1. Policy Overview -->
         <section class="mb-6">
           <div
-            class="medical-card bg-gradient-to-r from-emerald-600/25 to-teal-600/25 border-2 border-emerald-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-500 group"
+            class="medical-card bg-gradient-to-r from-blue-600/25 to-cyan-600/25 border-2 border-blue-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
           >
             <div class="flex items-center mb-4">
               <div
-                class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center mr-4 shadow-lg group-hover:scale-110 transition-transform duration-300"
+                class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-4 shadow-lg group-hover:scale-110 transition-transform duration-300"
               >
                 <span class="text-white font-bold text-lg">1</span>
               </div>
@@ -98,11 +98,11 @@
         <!-- 2. Information Security -->
         <section class="mb-6">
           <div
-            class="medical-card bg-gradient-to-r from-emerald-600/25 to-teal-600/25 border-2 border-emerald-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-500 group"
+            class="medical-card bg-gradient-to-r from-blue-600/25 to-cyan-600/25 border-2 border-blue-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
           >
             <div class="flex items-center mb-4">
               <div
-                class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center mr-4 shadow-lg group-hover:scale-110 transition-transform duration-300"
+                class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-4 shadow-lg group-hover:scale-110 transition-transform duration-300"
               >
                 <span class="text-white font-bold text-lg">2</span>
               </div>
@@ -197,11 +197,11 @@
         <!-- 3. Network and Internet Usage -->
         <section class="mb-6">
           <div
-            class="medical-card bg-gradient-to-r from-emerald-600/25 to-teal-600/25 border-2 border-emerald-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-500 group"
+            class="medical-card bg-gradient-to-r from-blue-600/25 to-cyan-600/25 border-2 border-blue-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
           >
             <div class="flex items-center mb-4">
               <div
-                class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center mr-4 shadow-lg group-hover:scale-110 transition-transform duration-300"
+                class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-4 shadow-lg group-hover:scale-110 transition-transform duration-300"
               >
                 <span class="text-white font-bold text-lg">3</span>
               </div>
@@ -301,11 +301,11 @@
         <!-- 4. Email and Communication Systems -->
         <section class="mb-6">
           <div
-            class="medical-card bg-gradient-to-r from-emerald-600/25 to-teal-600/25 border-2 border-emerald-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-500 group"
+            class="medical-card bg-gradient-to-r from-blue-600/25 to-cyan-600/25 border-2 border-blue-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
           >
             <div class="flex items-center mb-4">
               <div
-                class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center mr-4 shadow-lg group-hover:scale-110 transition-transform duration-300"
+                class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-4 shadow-lg group-hover:scale-110 transition-transform duration-300"
               >
                 <span class="text-white font-bold text-lg">4</span>
               </div>
@@ -390,11 +390,11 @@
         <!-- 5. Mobile Devices and BYOD -->
         <section class="mb-6">
           <div
-            class="medical-card bg-gradient-to-r from-emerald-600/25 to-teal-600/25 border-2 border-emerald-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-500 group"
+            class="medical-card bg-gradient-to-r from-blue-600/25 to-cyan-600/25 border-2 border-blue-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
           >
             <div class="flex items-center mb-4">
               <div
-                class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center mr-4 shadow-lg group-hover:scale-110 transition-transform duration-300"
+                class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-4 shadow-lg group-hover:scale-110 transition-transform duration-300"
               >
                 <span class="text-white font-bold text-lg">5</span>
               </div>
@@ -521,54 +521,52 @@
         <!-- 6. Compliance and Enforcement -->
         <section class="mb-6">
           <div
-            class="medical-card bg-gradient-to-r from-emerald-600/25 to-teal-600/25 border-2 border-emerald-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-500 group"
+            class="medical-card bg-gradient-to-r from-blue-600/25 to-cyan-600/25 border-2 border-blue-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
           >
             <div class="flex items-center mb-4">
               <div
-                class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center mr-4 shadow-lg group-hover:scale-110 transition-transform duration-300"
+                class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-4 shadow-lg group-hover:scale-110 transition-transform duration-300"
               >
                 <span class="text-white font-bold text-lg">6</span>
               </div>
               <h2 class="text-xl font-bold text-white">COMPLIANCE AND ENFORCEMENT</h2>
             </div>
             <div class="ml-16">
-              <div
-                class="bg-white/15 rounded-xl p-6 border-2 border-emerald-300/30 backdrop-blur-sm"
-              >
-                <h3 class="text-lg font-bold text-emerald-300 mb-4">Policy Violations</h3>
+              <div class="bg-white/15 rounded-xl p-4 border-2 border-blue-300/30 backdrop-blur-sm">
+                <h3 class="text-lg font-bold text-blue-300 mb-4">Policy Violations</h3>
                 <p class="text-blue-100 mb-4">
                   Compliance with this policy is
-                  <strong class="text-emerald-300">mandatory</strong>. Violations may result in:
+                  <strong class="text-blue-300">mandatory</strong>. Violations may result in:
                 </p>
 
                 <div class="grid md:grid-cols-2 gap-6">
                   <div>
-                    <h4 class="font-semibold text-emerald-300 mb-2">Immediate Actions:</h4>
+                    <h4 class="font-semibold text-blue-300 mb-2">Immediate Actions:</h4>
                     <ul class="text-sm text-blue-100 space-y-1">
                       <li class="flex items-start">
                         <i
-                          class="fas fa-exclamation-triangle text-emerald-400 mr-2 mt-1"
+                          class="fas fa-exclamation-triangle text-blue-400 mr-2 mt-1"
                           style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Suspension of ICT access privileges
                       </li>
                       <li class="flex items-start">
                         <i
-                          class="fas fa-exclamation-triangle text-emerald-400 mr-2 mt-1"
+                          class="fas fa-exclamation-triangle text-blue-400 mr-2 mt-1"
                           style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Investigation of incident
                       </li>
                       <li class="flex items-start">
                         <i
-                          class="fas fa-exclamation-triangle text-emerald-400 mr-2 mt-1"
+                          class="fas fa-exclamation-triangle text-blue-400 mr-2 mt-1"
                           style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Documentation of violation
                       </li>
                       <li class="flex items-start">
                         <i
-                          class="fas fa-exclamation-triangle text-emerald-400 mr-2 mt-1"
+                          class="fas fa-exclamation-triangle text-blue-400 mr-2 mt-1"
                           style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Notification of management
@@ -576,32 +574,32 @@
                     </ul>
                   </div>
                   <div>
-                    <h4 class="font-semibold text-emerald-300 mb-2">Potential Consequences:</h4>
+                    <h4 class="font-semibold text-blue-300 mb-2">Potential Consequences:</h4>
                     <ul class="text-sm text-blue-100 space-y-1">
                       <li class="flex items-start">
                         <i
-                          class="fas fa-times text-emerald-400 mr-2 mt-1"
+                          class="fas fa-times text-blue-400 mr-2 mt-1"
                           style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Formal disciplinary action
                       </li>
                       <li class="flex items-start">
                         <i
-                          class="fas fa-times text-emerald-400 mr-2 mt-1"
+                          class="fas fa-times text-blue-400 mr-2 mt-1"
                           style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Termination of employment
                       </li>
                       <li class="flex items-start">
                         <i
-                          class="fas fa-times text-emerald-400 mr-2 mt-1"
+                          class="fas fa-times text-blue-400 mr-2 mt-1"
                           style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Legal action where appropriate
                       </li>
                       <li class="flex items-start">
                         <i
-                          class="fas fa-times text-emerald-400 mr-2 mt-1"
+                          class="fas fa-times text-blue-400 mr-2 mt-1"
                           style="font-family: 'Font Awesome 6 Free'; font-weight: 900"
                         ></i>
                         Reporting to regulatory authorities
@@ -617,34 +615,30 @@
         <!-- Contact Information -->
         <section class="mb-6">
           <div
-            class="medical-card bg-gradient-to-r from-emerald-600/25 to-teal-600/25 border-2 border-emerald-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-500 group"
+            class="medical-card bg-gradient-to-r from-blue-600/25 to-cyan-600/25 border-2 border-blue-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
           >
             <h3 class="text-lg font-bold text-white mb-4 flex items-center">
-              <i class="fas fa-headset text-emerald-400 mr-2"></i>
+              <i class="fas fa-headset text-blue-400 mr-2"></i>
               ICT Support and Contact Information
             </h3>
             <p class="text-blue-100 mb-4">
               For ICT support, policy questions, or incident reporting:
             </p>
             <div class="grid md:grid-cols-2 gap-4">
-              <div
-                class="bg-white/15 rounded-xl p-4 border-2 border-emerald-300/30 backdrop-blur-sm"
-              >
-                <h4 class="font-semibold text-emerald-300 mb-2">ICT Help Desk</h4>
+              <div class="bg-white/15 rounded-xl p-4 border-2 border-blue-300/30 backdrop-blur-sm">
+                <h4 class="font-semibold text-blue-300 mb-2">ICT Help Desk</h4>
                 <p class="text-sm text-blue-100">Email: helpdesk@mnh.go.tz</p>
                 <p class="text-sm text-blue-100">Phone: +255 22 215 0302 (Ext. 2150)</p>
                 <p class="text-sm text-blue-100">Emergency: +255 754 123 456</p>
                 <p class="text-sm text-blue-100">Office: ICT Building, Ground Floor</p>
               </div>
-              <div
-                class="bg-white/15 rounded-xl p-4 border-2 border-emerald-300/30 backdrop-blur-sm"
-              >
-                <h4 class="font-semibold text-emerald-300 mb-2">ICT Management</h4>
+              <div class="bg-white/15 rounded-xl p-4 border-2 border-blue-300/30 backdrop-blur-sm">
+                <h4 class="font-semibold text-blue-300 mb-2">ICT Management</h4>
                 <p class="text-sm text-blue-100">Email: ict.director@mnh.go.tz</p>
                 <p class="text-sm text-blue-100">Phone: +255 22 215 0302 (Ext. 2100)</p>
                 <p class="text-sm text-blue-100">Office: ICT Building, 2nd Floor</p>
                 <p class="text-sm text-blue-100">
-                  <strong class="text-emerald-300">Office Hours:</strong> Monday - Friday, 8:00 AM -
+                  <strong class="text-blue-300">Office Hours:</strong> Monday - Friday, 8:00 AM -
                   5:00 PM
                 </p>
               </div>
@@ -655,11 +649,11 @@
         <!-- Acknowledgment Section -->
         <section class="mb-0">
           <div
-            class="medical-card bg-gradient-to-r from-indigo-600/25 to-purple-600/25 border-2 border-indigo-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-indigo-500/20 transition-all duration-500 group"
+            class="medical-card bg-gradient-to-r from-blue-600/25 to-cyan-600/25 border-2 border-blue-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
           >
             <div class="flex items-center mb-4">
               <div
-                class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center mr-4 shadow-lg group-hover:scale-110 transition-transform duration-300"
+                class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-4 shadow-lg group-hover:scale-110 transition-transform duration-300"
               >
                 <i
                   class="fas fa-file-signature text-white text-lg"
@@ -680,7 +674,7 @@
 
                 <!-- Checkbox for Agreement -->
                 <div
-                  class="bg-white/15 rounded-xl p-4 shadow-md border-2 border-indigo-300/30 backdrop-blur-sm"
+                  class="bg-white/15 rounded-xl p-4 shadow-md border-2 border-blue-300/30 backdrop-blur-sm"
                 >
                   <label class="flex items-start cursor-pointer">
                     <span class="text-blue-100 leading-relaxed">
@@ -729,11 +723,11 @@
                 <!-- Ready to Proceed (when timer is done) -->
                 <div
                   v-else
-                  class="bg-gradient-to-r from-emerald-500/20 to-teal-500/20 rounded-xl p-6 border-2 border-emerald-400/40 backdrop-blur-sm text-center"
+                  class="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-xl p-6 border-2 border-blue-400/40 backdrop-blur-sm text-center"
                 >
                   <div class="flex items-center justify-center mb-3">
                     <div
-                      class="w-12 h-12 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full flex items-center justify-center mr-3"
+                      class="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mr-3"
                     >
                       <i
                         class="fas fa-check text-white text-lg"
@@ -742,7 +736,7 @@
                     </div>
                     <h3 class="text-lg font-bold text-white">Ready to Proceed</h3>
                   </div>
-                  <p class="text-emerald-100 text-sm mb-4">
+                  <p class="text-blue-100 text-sm mb-4">
                     You have completed the required reading time. Select the checkbox to proceed.
                   </p>
 
@@ -752,7 +746,7 @@
                     :class="[
                       'w-full px-6 py-4 rounded-xl font-semibold transition-all duration-300 border-2',
                       acknowledged && canProceed
-                        ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:from-emerald-700 hover:to-teal-700 border-emerald-500/50 shadow-xl hover:shadow-2xl transform hover:scale-105'
+                        ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white hover:from-blue-700 hover:to-cyan-700 border-blue-500/50 shadow-xl hover:shadow-2xl transform hover:scale-105'
                         : 'bg-gray-600 text-gray-300 cursor-not-allowed border-gray-500/50'
                     ]"
                   >
@@ -792,19 +786,21 @@
         acknowledged: false,
         readingTimer: 5,
         isTimerActive: false,
-        canProceed: false
+        canProceed: false,
+        timerInterval: null,
+        isMounted: false
       }
     },
     methods: {
       getIconStyle(index) {
         // Use index to create deterministic but varied positions
-        const seed = index * 137.508 // Golden angle for good distribution
+        const seed = (index * 137.508) % 10000 // Prevent large numbers
         return {
-          left: ((seed * 7) % 100) + '%',
-          top: ((seed * 11) % 100) + '%',
-          animationDelay: ((seed * 3) % 3) + 's',
-          animationDuration: ((seed * 2) % 3) + 2 + 's',
-          fontSize: ((seed * 5) % 20) + 10 + 'px'
+          left: Math.abs((seed * 7) % 100) + '%',
+          top: Math.abs((seed * 11) % 100) + '%',
+          animationDelay: Math.abs((seed * 3) % 3) + 's',
+          animationDuration: Math.abs((seed * 2) % 3) + 2 + 's',
+          fontSize: Math.abs((seed * 5) % 20) + 10 + 'px'
         }
       },
       getIconClass(index) {
@@ -812,14 +808,20 @@
         return ['fas', icons[index % icons.length]]
       },
       startReadingTimer() {
+        // Clear any existing timer first
+        if (this.timerInterval) {
+          clearInterval(this.timerInterval)
+        }
+
         this.isTimerActive = true
         this.canProceed = false
         this.readingTimer = 5
 
-        const timer = setInterval(() => {
+        this.timerInterval = setInterval(() => {
           this.readingTimer--
           if (this.readingTimer <= 0) {
-            clearInterval(timer)
+            clearInterval(this.timerInterval)
+            this.timerInterval = null
             this.isTimerActive = false
             this.canProceed = true
           }
@@ -885,18 +887,37 @@
       }
     },
     mounted() {
-      // Add smooth scroll behavior
-      document.documentElement.style.scrollBehavior = 'smooth'
+      try {
+        if (this.isMounted) return // Prevent double mounting
+        this.isMounted = true
 
-      // Check for existing acknowledgment
-      this.checkExistingAcknowledgment()
+        // Add smooth scroll behavior
+        document.documentElement.style.scrollBehavior = 'smooth'
 
-      // Start reading timer
-      this.startReadingTimer()
+        // Check for existing acknowledgment
+        this.checkExistingAcknowledgment()
+
+        // Start reading timer
+        this.startReadingTimer()
+      } catch (error) {
+        console.error('Error during component mounting:', error)
+      }
     },
     beforeUnmount() {
-      // Reset scroll behavior
-      document.documentElement.style.scrollBehavior = 'auto'
+      try {
+        this.isMounted = false
+
+        // Clean up timer
+        if (this.timerInterval) {
+          clearInterval(this.timerInterval)
+          this.timerInterval = null
+        }
+
+        // Reset scroll behavior
+        document.documentElement.style.scrollBehavior = 'auto'
+      } catch (error) {
+        console.error('Error during component unmounting:', error)
+      }
     }
   }
 </script>
@@ -954,15 +975,17 @@
   @keyframes float {
     0%,
     100% {
-      transform: translateY(0px);
+      transform: translateY(0px) translateZ(0);
     }
     50% {
-      transform: translateY(-20px);
+      transform: translateY(-20px) translateZ(0);
     }
   }
 
   .animate-float {
-    animation: float 6s ease-in-out infinite;
+    animation: float 8s ease-in-out infinite;
+    will-change: transform;
+    backface-visibility: hidden;
   }
 
   /* Compact hover effects */
@@ -1032,6 +1055,13 @@
   @media (prefers-reduced-motion: reduce) {
     .transform:hover {
       transform: none;
+    }
+
+    .animate-float,
+    .animate-pulse,
+    .animate-spin,
+    .animate-bounce {
+      animation: none !important;
     }
   }
 

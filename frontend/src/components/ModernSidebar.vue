@@ -140,7 +140,7 @@
                 <p
                   class="text-blue-100 responsive-profile-role truncate opacity-80 group-hover:opacity-100 transition-opacity duration-300"
                 >
-                  {{ getRoleDisplayName(userRole) }}
+                  {{ userDepartmentOrRole }}
                 </p>
               </div>
 
@@ -883,6 +883,25 @@
         }
       })
 
+      const userDepartmentOrRole = computed(() => {
+        try {
+          // Try to get department name from user data
+          const user = currentUser?.value || piniaAuthStore?.user
+          if (user?.department?.name) {
+            return user.department.name
+          }
+          if (user?.department_name) {
+            return user.department_name
+          }
+          // Fallback to role display name
+          const role = piniaAuthStore?.userRole || userRole?.value || stableUserRole?.value
+          return getRoleDisplayName(role)
+        } catch (error) {
+          console.warn('Error getting userDepartmentOrRole:', error)
+          return 'Staff Member'
+        }
+      })
+
       // Enhanced sidebar visibility logic with dual auth store support
       const shouldShowSidebar = computed(() => {
         try {
@@ -1178,7 +1197,7 @@
           [ROLES.HEAD_OF_DEPARTMENT]: 'Head of Department',
           [ROLES.ICT_DIRECTOR]: 'ICT Director',
           [ROLES.HEAD_OF_IT]: 'Head of IT',
-          [ROLES.STAFF]: 'D. IN MEDICINE',
+          [ROLES.STAFF]: 'Staff Member',
           [ROLES.ICT_OFFICER]: 'ICT Officer'
         }
         return roleNames[role] || role
@@ -1237,10 +1256,10 @@
           }
 
           const result = await notificationService.getPendingRequestsCount(forceRefresh)
-          
+
           if (process.env.NODE_ENV === 'development') {
             console.log('📊 API response:', result)
-            
+
             // DEBUG: Log the API response details
             console.log('🔍 NOTIFICATION DEBUG - API Response:', {
               total_pending: result.total_pending,
@@ -1297,7 +1316,10 @@
           }
 
           // EXTENDED DEBUG: Log breakdown if available to see what's being counted
-          if ((result.details?.breakdown || result.details) && process.env.NODE_ENV === 'development') {
+          if (
+            (result.details?.breakdown || result.details) &&
+            process.env.NODE_ENV === 'development'
+          ) {
             console.log('📊 NOTIFICATION BREAKDOWN DEBUG:', {
               breakdown: result.details?.breakdown,
               details: result.details,
@@ -1360,7 +1382,11 @@
             const oldCounts = { ...notificationCounts.value }
             notificationCounts.value = {}
             if (process.env.NODE_ENV === 'development' && Object.keys(oldCounts).length > 0) {
-              console.log('🔕 Cleared notification badges (had:', Object.keys(oldCounts).length, 'routes)')
+              console.log(
+                '🔕 Cleared notification badges (had:',
+                Object.keys(oldCounts).length,
+                'routes)'
+              )
             }
           }
         } catch (error) {
@@ -1537,6 +1563,7 @@
         isLoading,
         userName,
         userInitials,
+        userDepartmentOrRole,
         shouldShowSidebar,
         dashboardItems,
         userManagementItems,

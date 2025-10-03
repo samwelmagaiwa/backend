@@ -25,11 +25,11 @@
           <div class="medical-glass-card rounded-t-3xl p-6 mb-0 border-b border-blue-300/30">
             <div class="flex justify-between items-center">
               <div class="text-center flex-1">
-                <h1 class="text-5xl font-bold text-white mb-3 tracking-wide drop-shadow-lg">
+                <h1 class="text-xl font-bold text-white mb-3 tracking-wide drop-shadow-lg">
                   <i class="fas fa-clipboard-check mr-3 text-blue-300"></i>
                   REQUEST STATUS & TRACKING
                 </h1>
-                <p class="text-blue-100/80 text-3xl">
+                <p class="text-blue-100/80 text-sm">
                   Track your submitted requests and view approval status
                 </p>
               </div>

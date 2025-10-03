@@ -7,6 +7,7 @@ use App\Models\BookingService;
 use App\Models\User;
 use App\Models\Department;
 use App\Models\DeviceAssessment;
+use App\Events\ApprovalStatusChanged;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
@@ -474,6 +475,33 @@ class ICTApprovalController extends Controller
             // Load relationships
             $booking->load(['user', 'approvedBy', 'departmentInfo']);
 
+            // Fire SMS notification event
+            try {
+                $user = $booking->user;
+                $approver = $request->user();
+                
+                ApprovalStatusChanged::dispatch(
+                    $user,
+                    $booking,
+                    'device_booking',
+                    'pending',
+                    'ict_approved',
+                    $approver,
+                    $validatedData['ict_notes'] ?? 'Your device booking request has been approved by ICT.'
+                );
+                
+                Log::info('SMS notification event fired for device booking approval', [
+                    'booking_id' => $booking->id,
+                    'user_id' => $user->id,
+                    'approver_id' => $approver->id
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Failed to fire SMS notification for device booking approval', [
+                    'booking_id' => $booking->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
+
             Log::info('Device borrowing request approved', [
                 'booking_id' => $booking->id,
                 'approved_by' => $request->user()->id,
@@ -558,6 +586,33 @@ class ICTApprovalController extends Controller
 
             // Load relationships
             $booking->load(['user', 'approvedBy', 'departmentInfo']);
+
+            // Fire SMS notification event
+            try {
+                $user = $booking->user;
+                $approver = $request->user();
+                
+                ApprovalStatusChanged::dispatch(
+                    $user,
+                    $booking,
+                    'device_booking',
+                    'pending',
+                    'ict_rejected',
+                    $approver,
+                    $validatedData['ict_notes']
+                );
+                
+                Log::info('SMS notification event fired for device booking rejection', [
+                    'booking_id' => $booking->id,
+                    'user_id' => $user->id,
+                    'approver_id' => $approver->id
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Failed to fire SMS notification for device booking rejection', [
+                    'booking_id' => $booking->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
 
             Log::info('Device borrowing request rejected', [
                 'booking_id' => $booking->id,
