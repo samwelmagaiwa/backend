@@ -221,7 +221,7 @@
                           </span>
                         </div>
                         <!-- Show raw status for debugging (only in development) -->
-                        <div v-if="$env !== 'production'" class="text-sm text-gray-400">
+                        <div v-if="isDevelopment" class="text-sm text-gray-400">
                           Raw: {{ request.status }}
                         </div>
                       </div>
@@ -398,6 +398,9 @@
       }
     },
     computed: {
+      isDevelopment() {
+        return process.env.NODE_ENV !== 'production'
+      },
       filteredRequests() {
         // Ensure requests is always an array
         if (!Array.isArray(this.requests)) {

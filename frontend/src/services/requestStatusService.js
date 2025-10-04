@@ -409,6 +409,7 @@ const requestStatusService = {
     return icons[type] || 'fas fa-file-alt'
   },
 
+
   /**
    * Debug endpoint to check database records
    * @returns {Promise<Object>} API response

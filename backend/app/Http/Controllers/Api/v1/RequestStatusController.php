@@ -116,6 +116,7 @@ class RequestStatusController extends Controller
         }
     }
 
+
     /**
      * Get a specific request by ID and type.
      */

@@ -465,7 +465,7 @@
                                 class="px-4 py-2 bg-green-500/20 hover:bg-green-500/30 border border-green-400/30 rounded-lg text-green-300 text-lg font-medium transition-colors flex items-center"
                               >
                                 <i class="fas fa-edit mr-2"></i>
-                                Edit
+                                {{ request.status === 'cancelled' ? 'Edit & Resubmit' : 'Edit' }}
                               </button>
 
                               <button
@@ -662,6 +662,18 @@
       @confirm="handleEditConfirm"
       @close="closeEditModal"
     />
+
+    <!-- Resubmit Confirmation Modal -->
+    <ResubmitConfirmationModal
+      :isVisible="showResubmitModal"
+      :requestData="{
+        id: selectedRequest?.id || '',
+        type: getRequestTypeName(selectedRequest?.type || ''),
+        status: selectedRequest?.status || ''
+      }"
+      @confirm="handleResubmitConfirm"
+      @cancel="closeResubmitModal"
+    />
   </div>
 </template>
 
@@ -671,6 +683,7 @@
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppHeader from '@/components/AppHeader.vue'
   import EditRequestModal from '@/components/modals/EditRequestModal.vue'
+  import ResubmitConfirmationModal from '@/components/modals/ResubmitConfirmationModal.vue'
   import OrbitingDots from '@/components/common/OrbitingDots.vue'
   import { useAuth } from '@/composables/useAuth'
   import { useAuthStore } from '@/stores/auth'
@@ -682,6 +695,7 @@
       ModernSidebar,
       AppHeader,
       EditRequestModal,
+      ResubmitConfirmationModal,
       OrbitingDots
     },
     setup() {
@@ -704,6 +718,7 @@
 
       // Modal state
       const showEditModal = ref(false)
+      const showResubmitModal = ref(false)
       const selectedRequest = ref(null)
 
       // Reactive data for requests
@@ -819,6 +834,93 @@
         loadRequests(currentPage.value)
       }
 
+      const editCancelledRequest = async (request) => {
+        console.log('📝 Editing cancelled request for resubmission:', {
+          requestId: request.original_id || request.id,
+          requestType: request.type,
+          currentStatus: request.status
+        })
+
+        // Navigate to appropriate edit page based on request type
+        let editPath = ''
+        let hasEditSupport = true
+
+        switch (request.type) {
+          case 'booking_service':
+            editPath = '/edit-booking-request'
+            break
+          case 'combined_access':
+            editPath = '/user-combined-form'
+            break
+          case 'jeeva_access':
+          case 'jeeva':
+            alert(
+              `Edit functionality for ${getRequestTypeName(request.type)} requests is currently in development.\n\n` +
+              `For now, you can:\n` +
+              `1. Submit a new ${getRequestTypeName(request.type)} request\n` +
+              `2. Contact support for assistance with modifying this request\n\n` +
+              `Combined access requests already support editing.`
+            )
+            hasEditSupport = false
+            break
+          case 'wellsoft':
+            alert(
+              `Edit functionality for ${getRequestTypeName(request.type)} requests is currently in development.\n\n` +
+              `For now, you can:\n` +
+              `1. Submit a new ${getRequestTypeName(request.type)} request\n` +
+              `2. Contact support for assistance with modifying this request\n\n` +
+              `Combined access requests already support editing.`
+            )
+            hasEditSupport = false
+            break
+          case 'internet_access_request':
+          case 'internet':
+            alert(
+              `Edit functionality for ${getRequestTypeName(request.type)} requests is currently in development.\n\n` +
+              `For now, you can:\n` +
+              `1. Submit a new ${getRequestTypeName(request.type)} request\n` +
+              `2. Contact support for assistance with modifying this request\n\n` +
+              `Combined access requests already support editing.`
+            )
+            hasEditSupport = false
+            break
+          default:
+            alert(
+              `Edit functionality not yet implemented for ${getRequestTypeName(request.type)} requests.`
+            )
+            hasEditSupport = false
+            break
+        }
+
+        if (!hasEditSupport) {
+          return
+        }
+
+        try {
+          const navigationTarget = {
+            path: editPath,
+            query: {
+              id: request.original_id || request.id,
+              mode: 'edit',
+              status: 'cancelled' // Pass cancelled status instead of rejected
+            }
+          }
+
+          console.log('📝 EditCancelledRequest: Navigation target prepared:', navigationTarget)
+          
+          // Navigate to edit form
+          const navigationResult = await router.push(navigationTarget)
+          console.log('✅ EditCancelledRequest: Navigation completed successfully:', navigationResult)
+        } catch (error) {
+          console.error('❌ EditCancelledRequest: Navigation failed:', error)
+          alert(
+            `Navigation error: Unable to navigate to edit page.\n\n` +
+            `Please try refreshing the page or contact support.\n\n` +
+            `Error: ${error.message}`
+          )
+        }
+      }
+
       const viewRequestDetails = (request) => {
         // Navigate to staff-specific request details page
         // Use original_id (database ID) instead of formatted id
@@ -832,7 +934,7 @@
       }
 
       const editRequest = async (request) => {
-        console.log('🚀 EditRequest: Starting edit request flow', {
+        console.log('🚀 EditRequest: Starting edit/resubmit request flow', {
           requestId: request.id,
           originalId: request.original_id,
           requestType: request.type,
@@ -849,7 +951,7 @@
           userId: piniaAuthStore.user?.id
         })
 
-        // Check if request can be edited
+        // Check if request can be edited/resubmitted
         if (!canEditRequest(request)) {
           alert(
             `This ${getRequestTypeName(request.type)} request cannot be edited in its current status: ${getStatusText(request.status)}`
@@ -857,7 +959,15 @@
           return
         }
 
-        // Show custom modal instead of browser confirm
+        // Handle cancelled requests - allow editing before resubmission
+        if (request.status === 'cancelled') {
+          // Show attractive confirmation modal instead of basic confirm dialog
+          selectedRequest.value = request
+          showResubmitModal.value = true
+          return
+        }
+
+        // Show custom modal for other rejected requests
         selectedRequest.value = request
         showEditModal.value = true
 
@@ -1005,6 +1115,23 @@
         selectedRequest.value = null
       }
 
+      const closeResubmitModal = () => {
+        showResubmitModal.value = false
+        selectedRequest.value = null
+      }
+
+      const handleResubmitConfirm = async () => {
+        // Close the modal first
+        showResubmitModal.value = false
+        
+        // Get the selected request
+        const request = selectedRequest.value
+        if (!request) return
+        
+        // Navigate to the appropriate edit form based on request type
+        await handleEditConfirm()
+      }
+
       const goToSubmitRequest = () => {
         router.push('/user-dashboard')
       }
@@ -1038,16 +1165,17 @@
         return canCancel
       }
 
-      // Check if request can be edited
+      // Check if request can be edited/resubmitted
       const canEditRequest = (request) => {
-        // Allow editing rejected requests for all types
+        // Allow editing rejected and cancelled requests for all types
         const rejectedStatuses = [
           'rejected',
           'hod_rejected',
           'divisional_rejected',
           'ict_director_rejected',
           'head_it_rejected',
-          'ict_officer_rejected'
+          'ict_officer_rejected',
+          'cancelled' // Allow resubmission of cancelled requests
         ]
 
         const canEdit = rejectedStatuses.includes(request.status) && !cancelingRequest.value
@@ -1266,15 +1394,19 @@
         latestRequestId,
         cancelingRequest,
         showEditModal,
+        showResubmitModal,
         selectedRequest,
         approvalSteps,
         bookingSteps,
         loadRequests,
         refreshRequests,
+        editCancelledRequest,
         viewRequestDetails,
         editRequest,
         handleEditConfirm,
         closeEditModal,
+        closeResubmitModal,
+        handleResubmitConfirm,
         goToSubmitRequest,
         submitNewRequest,
         viewPendingBookingDetails,

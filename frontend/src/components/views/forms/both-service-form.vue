@@ -699,10 +699,10 @@
                     </div>
                   </div>
 
-                  <!-- Previous Comments Section - Always show modules and comments in review mode -->
-                  <!-- This section shows for ALL users in review mode, regardless of request status -->
+                  <!-- Previous Comments Section - Show modules summary and comments for non-HOD users in review mode -->
+                  <!-- HOD users will see full module selection tabs instead -->
                   <div
-                    v-if="requestData && !loading"
+                    v-if="requestData && !loading && !isHodApprovalEditable"
                     v-show="!loading"
                     :class="[
                       'medical-card bg-gradient-to-r from-amber-600/15 to-orange-600/15 border-2 border-amber-400/40 rounded-lg backdrop-blur-sm hover:shadow-lg hover:shadow-amber-500/20 transition-all duration-300 group mb-4',
@@ -2856,10 +2856,23 @@
 
                 <!-- Right: tabs -->
                 <section
-                  v-if="!isReviewMode"
+                  v-if="!isReviewMode || isHodApprovalEditable"
                   aria-labelledby="module-tabs"
                   class="lg:col-span-1 space-y-4"
                 >
+                  <!-- Debug info for HOD module tabs (development only) -->
+                  <div v-if="isDevelopment && (getUserRole() || '').toLowerCase().includes('hod')" class="bg-yellow-500/20 border-2 border-yellow-400/60 rounded-lg p-2 mb-4">
+                    <h4 class="text-yellow-200 font-bold text-sm mb-2">🔧 HOD Module Debug Info</h4>
+                    <div class="text-xs text-yellow-100 space-y-1">
+                      <div>isReviewMode: {{ isReviewMode }}</div>
+                      <div>isHodApprovalEditable: {{ isHodApprovalEditable }}</div>
+                      <div>User Role: {{ getUserRole() }}</div>
+                      <div>Request Status: {{ requestData?.status || 'none' }}</div>
+                      <div>Show Tabs: {{ !isReviewMode || isHodApprovalEditable }}</div>
+                      <div>Module reviewMode: {{ isReviewMode && !isHodApprovalEditable }}</div>
+                      <div>Available Tabs: {{ tabs.map(t => t.label).join(', ') }}</div>
+                    </div>
+                  </div>
                   <h2 id="module-tabs" class="sr-only">Module Details</h2>
 
                   <!-- Desktop tabs -->
@@ -2887,7 +2900,7 @@
                           <component
                             :is="currentTab.component"
                             v-model="moduleData[currentTab.key]"
-                            :reviewMode="isReviewMode"
+                            :reviewMode="isReviewMode && !isHodApprovalEditable"
                           />
                         </div>
                       </transition>
@@ -2914,7 +2927,7 @@
                           <component
                             :is="t.component"
                             v-model="moduleData[t.key]"
-                            :reviewMode="isReviewMode"
+                            :reviewMode="isReviewMode && !isHodApprovalEditable"
                           />
                           <div class="mt-3 text-right">
                             <button class="btn-secondary btn-sm" @click="tryCloseTab(t.key)">
@@ -4257,7 +4270,22 @@
           'ict_officer_rejected' // Rejected by ICT Officer - back to HOD
         ]
 
-        return hodRoles.includes(userRole) && hodEditableStatuses.includes(status)
+        const canEdit = hodRoles.includes(userRole) && hodEditableStatuses.includes(status)
+        
+        // Debug logging for HOD module access
+        if (this.isDevelopment && hodRoles.includes(userRole)) {
+          console.log('🏥 HOD Module Access Check:', {
+            userRole,
+            status,
+            canEdit,
+            isReviewMode: this.isReviewMode,
+            hasRequestData: !!this.requestData,
+            hodEditableStatuses,
+            message: canEdit ? 'HOD can edit modules' : 'HOD cannot edit modules'
+          })
+        }
+
+        return canEdit
       },
 
       // Check if request was rejected back to HOD from a higher approval stage
@@ -6522,6 +6550,16 @@
             // Populate module selections based on actual database data
             if (this.requestData.request_types || this.requestData.request_type) {
               const types = this.requestData.request_types || this.requestData.request_type || []
+              
+              // Debug logging for HOD users
+              if (this.isDevelopment && ['head_of_department', 'hod'].includes(this.getUserRole()?.toLowerCase())) {
+                console.log('🏥 HOD Module Loading Debug:', {
+                  requestTypes: types,
+                  userRole: this.getUserRole(),
+                  canEdit: this.isHodApprovalEditable,
+                  isReviewMode: this.isReviewMode
+                })
+              }
 
               // Handle Wellsoft modules - use selected modules from database
               if (types.includes('wellsoft')) {
@@ -6603,6 +6641,26 @@
               this.selectedWellsoft = []
               this.selectedJeeva = []
               this.internetPurposes = ['', '', '', '']
+            }
+
+            // Force tab generation for HOD users in review mode to ensure they see the module tabs
+            if (this.isHodApprovalEditable) {
+              // Ensure tabs are properly synchronized for HOD users
+              if (this.selectedWellsoft.length > 0) {
+                this.syncTabs('wellsoft', this.selectedWellsoft)
+              }
+              
+              if (this.selectedJeeva.length > 0) {
+                this.syncTabs('jeeva', this.selectedJeeva)
+              }
+
+              if (this.isDevelopment) {
+                console.log('🔄 HOD Module tabs force-synced:', {
+                  wellsoftTabs: this.selectedWellsoft,
+                  jeevaTabs: this.selectedJeeva,
+                  resultingTabs: this.tabs.map(t => t.label)
+                })
+              }
             }
 
             if (this.isDevelopment) {

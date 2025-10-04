@@ -388,9 +388,17 @@ class HodCombinedAccessController extends Controller
             }
             
             $stats = [
-                'pendingHod' => (clone $baseQuery)->where(function($q) { $q->whereNull('hod_status')->orWhere('hod_status', 'pending'); })->count(),
+                'pendingHod' => (clone $baseQuery)->where(function($q) { 
+                    $q->whereNull('hod_status')->orWhere('hod_status', 'pending'); 
+                })
+                ->where(function($q) {
+                    $q->whereNull('ict_officer_status')
+                      ->orWhereNotIn('ict_officer_status', ['implemented', 'completed']);
+                })
+                ->where('hod_status', '!=', 'cancelled')
+                ->count(),
                 'hodApproved' => (clone $baseQuery)->where('hod_status', 'approved')->count(),
-                'hodRejected' => (clone $baseQuery)->where('hod_status', 'rejected')->count(),
+                'hodRejected' => (clone $baseQuery)->whereIn('hod_status', ['rejected', 'cancelled'])->count(),
                 'approved' => (clone $baseQuery)->where('ict_officer_status', 'approved')->count(),
                 'implemented' => (clone $baseQuery)->where('ict_officer_status', 'implemented')->count(),
                 'completed' => (clone $baseQuery)->where('ict_officer_status', 'completed')->count(),

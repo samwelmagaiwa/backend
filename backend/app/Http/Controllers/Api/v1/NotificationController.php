@@ -66,9 +66,20 @@ class NotificationController extends Controller
                     switch ($roleName) {
                         case 'head_of_department':
                             // Count requests pending HOD approval (newly submitted) - optimized query
+                            // Exclude requests that have been completed/implemented downstream
                             try {
-                                $pendingCount = UserAccess::where('hod_status', 'pending')
+                                $pendingCount = UserAccess::where(function($q) {
+                                        $q->whereNull('hod_status')
+                                          ->orWhere('hod_status', 'pending');
+                                    })
                                     ->whereNull('hod_approved_at')
+                                    // Exclude completed/implemented requests
+                                    ->where(function($q) {
+                                        $q->whereNull('ict_officer_status')
+                                          ->orWhereNotIn('ict_officer_status', ['implemented', 'completed']);
+                                    })
+                                    // Exclude cancelled requests
+                                    ->where('hod_status', '!=', 'cancelled')
                                     ->selectRaw('COUNT(*) as count')
                                     ->value('count') ?? 0;
                             } catch (\Exception $dbError) {
@@ -94,6 +105,11 @@ class NotificationController extends Controller
                                 ->where('divisional_status', 'pending')
                                 ->whereNotNull('hod_approved_at')
                                 ->whereNull('divisional_approved_at')
+                                // Exclude completed/implemented requests
+                                ->where(function($q) {
+                                    $q->whereNull('ict_officer_status')
+                                      ->orWhereNotIn('ict_officer_status', ['implemented', 'completed']);
+                                })
                                 ->selectRaw('COUNT(*) as count')
                                 ->value('count') ?? 0;
                             
@@ -113,6 +129,11 @@ class NotificationController extends Controller
                                 ->where('ict_director_status', 'pending')
                                 ->whereNotNull('divisional_approved_at')
                                 ->whereNull('ict_director_approved_at')
+                                // Exclude completed/implemented requests
+                                ->where(function($q) {
+                                    $q->whereNull('ict_officer_status')
+                                      ->orWhereNotIn('ict_officer_status', ['implemented', 'completed']);
+                                })
                                 ->selectRaw('COUNT(*) as count')
                                 ->value('count') ?? 0;
                             
@@ -132,6 +153,11 @@ class NotificationController extends Controller
                                 ->where('head_it_status', 'pending')
                                 ->whereNotNull('ict_director_approved_at')
                                 ->whereNull('head_it_approved_at')
+                                // Exclude completed/implemented requests
+                                ->where(function($q) {
+                                    $q->whereNull('ict_officer_status')
+                                      ->orWhereNotIn('ict_officer_status', ['implemented', 'completed']);
+                                })
                                 ->selectRaw('COUNT(*) as count')
                                 ->value('count') ?? 0;
                             

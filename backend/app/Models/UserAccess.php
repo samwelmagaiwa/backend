@@ -251,7 +251,7 @@ class UserAccess extends Model
     // STATUS CONSTANTS FOR NEW COLUMNS
     // ========================================
     
-    const HOD_STATUSES = ['pending', 'approved', 'rejected'];
+    const HOD_STATUSES = ['pending', 'approved', 'rejected', 'cancelled'];
     const DIVISIONAL_STATUSES = ['pending', 'approved', 'rejected'];
     const ICT_DIRECTOR_STATUSES = ['pending', 'approved', 'rejected'];
     const HEAD_IT_STATUSES = ['pending', 'approved', 'rejected'];
@@ -953,7 +953,12 @@ class UserAccess extends Model
      */
     public function getCalculatedStatus(): string
     {
-        // Check for rejections first (highest priority)
+        // Check for cancelled status first (highest priority)
+        if ($this->hod_status === 'cancelled') {
+            return 'cancelled';
+        }
+        
+        // Check for rejections (high priority)
         if ($this->hod_status === 'rejected') {
             return 'hod_rejected';
         }
@@ -1079,7 +1084,8 @@ class UserAccess extends Model
             'divisional_rejected',
             'ict_director_rejected',
             'head_it_rejected',
-            'rejected'
+            'rejected',
+            'cancelled' // Allow updating cancelled requests for resubmission
         ];
         
         return in_array($this->getCalculatedStatus(), $updatableStatuses);

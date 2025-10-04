@@ -667,8 +667,10 @@ class UserAccessController extends Controller
                 'jeeva_modules_count' => count($selectedJeeva)
             ]);
 
-            // Update the request with all fields including services and modules
-            $userAccess->update([
+            // Check if this is a cancelled request to clear cancellation info
+            $isCancelledRequest = $userAccess->hod_status === 'cancelled';
+            
+            $updateData = [
                 'pf_number' => $validatedData['pf_number'],
                 'staff_name' => $validatedData['staff_name'],
                 'phone_number' => $validatedData['phone_number'],
@@ -691,7 +693,41 @@ class UserAccessController extends Controller
                 'jeeva_modules' => $selectedJeeva,
                 'jeeva_modules_selected' => $selectedJeeva,
                 'module_requested_for' => $request->input('wellsoftRequestType', 'use'),
-            ]);
+            ];
+            
+            // If this was a cancelled request, clear cancellation and approval info for resubmission
+            if ($isCancelledRequest) {
+                $updateData = array_merge($updateData, [
+                    // Clear approval timestamps
+                    'hod_approved_at' => null,
+                    'divisional_approved_at' => null,
+                    'ict_director_approved_at' => null,
+                    'head_it_approved_at' => null,
+                    'ict_officer_implemented_at' => null,
+                    
+                    // Clear approver information
+                    'hod_name' => null,
+                    'hod_approved_by' => null,
+                    'hod_approved_by_name' => null,
+                    'hod_comments' => null,
+                    'divisional_director_name' => null,
+                    'divisional_director_comments' => null,
+                    'ict_director_name' => null,
+                    'ict_director_comments' => null,
+                    'head_it_name' => null,
+                    'head_it_comments' => null,
+                    'ict_officer_name' => null,
+                    'ict_officer_comments' => null,
+                    
+                    // Clear cancellation information
+                    'cancellation_reason' => null,
+                    'cancelled_by' => null,
+                    'cancelled_at' => null,
+                ]);
+            }
+            
+            // Update the request
+            $userAccess->update($updateData);
 
             $userAccess->load(['user', 'department']);
             
