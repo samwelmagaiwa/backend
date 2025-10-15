@@ -253,6 +253,22 @@ const routes = [
       ]
     }
   },
+  {
+    path: '/both-service-form/:id/edit',
+    name: 'BothServiceFormEdit',
+    component: () => import('../components/views/forms/both-service-form.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: [
+        ROLES.DIVISIONAL_DIRECTOR,
+        ROLES.HEAD_OF_DEPARTMENT,
+        ROLES.ICT_DIRECTOR,
+        ROLES.HEAD_OF_IT,
+        ROLES.ICT_OFFICER,
+        ROLES.STAFF // Allow staff to edit their own rejected requests
+      ]
+    }
+  },
 
   // User submission forms
   {

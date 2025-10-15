@@ -82,19 +82,19 @@
             ]"
           >
             <div class="flex justify-between items-center">
-              <!-- Left Logo - Smaller for divisional directors and ICT directors -->
+              <!-- Left Logo - Increased sizes for better visibility -->
               <div
                 :class="[
                   'mr-2 transform hover:scale-110 transition-transform duration-300',
                   isReviewMode
-                    ? 'w-10 h-10'
+                    ? 'w-14 h-14'
                     : isDivisionalDirectorUser
-                      ? 'w-10 h-10'
+                      ? 'w-14 h-14'
                       : isIctDirectorUser
-                        ? 'w-12 h-12'
+                        ? 'w-16 h-16'
                         : isHodApprovalEditable
-                          ? 'w-12 h-12'
-                          : 'w-14 h-14'
+                          ? 'w-16 h-16'
+                          : 'w-18 h-18'
                 ]"
               >
                 <div
@@ -105,14 +105,14 @@
                     alt="National Shield"
                     :class="
                       isReviewMode
-                        ? 'max-w-8 max-h-8'
+                        ? 'max-w-12 max-h-12'
                         : isDivisionalDirectorUser
-                          ? 'max-w-8 max-h-8'
+                          ? 'max-w-12 max-h-12'
                           : isIctDirectorUser
-                            ? 'max-w-10 max-h-10'
+                            ? 'max-w-14 max-h-14'
                             : isHodApprovalEditable
-                              ? 'max-w-10 max-h-10'
-                              : 'max-w-12 max-h-12'
+                              ? 'max-w-14 max-h-14'
+                              : 'max-w-16 max-h-16'
                     "
                     class="object-contain"
                   />
@@ -181,19 +181,19 @@
                 </h2>
               </div>
 
-              <!-- Right Logo - Smaller for divisional directors and ICT directors -->
+              <!-- Right Logo - Increased sizes for better visibility -->
               <div
                 :class="[
                   'ml-2 transform hover:scale-110 transition-transform duration-300',
                   isReviewMode
-                    ? 'w-10 h-10'
+                    ? 'w-14 h-14'
                     : isDivisionalDirectorUser
-                      ? 'w-10 h-10'
+                      ? 'w-14 h-14'
                       : isIctDirectorUser
-                        ? 'w-12 h-12'
+                        ? 'w-16 h-16'
                         : isHodApprovalEditable
-                          ? 'w-12 h-12'
-                          : 'w-14 h-14'
+                          ? 'w-16 h-16'
+                          : 'w-18 h-18'
                 ]"
               >
                 <div
@@ -204,14 +204,14 @@
                     alt="Muhimbili Logo"
                     :class="
                       isReviewMode
-                        ? 'max-w-8 max-h-8'
+                        ? 'max-w-12 max-h-12'
                         : isDivisionalDirectorUser
-                          ? 'max-w-8 max-h-8'
+                          ? 'max-w-12 max-h-12'
                           : isIctDirectorUser
-                            ? 'max-w-10 max-h-10'
+                            ? 'max-w-14 max-h-14'
                             : isHodApprovalEditable
-                              ? 'max-w-10 max-h-10'
-                              : 'max-w-12 max-h-12'
+                              ? 'max-w-14 max-h-14'
+                              : 'max-w-16 max-h-16'
                     "
                     class="object-contain"
                   />
@@ -401,152 +401,189 @@
                       </div>
                     </div>
 
-                    <!-- Bottom row: Module Requested for (left), Module Selection (middle), and Signature (right) -->
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
-                      <!-- Module Requested for Section -->
-                      <div class="space-y-3">
+                    <!-- Bottom row: Module Requested for (left), Access Rights (middle), and Signature (right) -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4 items-stretch">
+                      <!-- Module Requested for Section (Left Column) -->
+                      <div class="flex flex-col h-full">
                         <div
-                          class="flex justify-center mb-3"
+                          class="bg-white/10 rounded-lg p-2 border border-blue-300/30 backdrop-blur-sm w-full min-h-[85px] flex flex-col justify-center"
                           :class="{
                             'opacity-50': isReviewMode && !hasWellsoftRequest && !hasJeevaRequest
                           }"
                         >
-                          <div
-                            class="bg-white/10 rounded-lg p-6 border border-blue-300/30 backdrop-blur-sm w-full ml-0"
+                          <label
+                            class="block text-xs font-bold text-blue-100 mb-1 text-center flex items-center justify-center gap-2"
                           >
-                            <label
-                              class="block text-base font-bold text-blue-100 mb-4 text-center flex items-center justify-center gap-2"
+                            <i class="fas fa-toggle-on mr-1 text-blue-300 text-xs"></i>
+                            Module Requested for
+                            <span class="text-red-400">*</span>
+                            <span
+                              v-if="isReviewMode && !hasWellsoftRequest && !hasJeevaRequest"
+                              class="text-xs px-2 py-1 bg-gray-500/30 rounded-full text-gray-300"
                             >
-                              <i class="fas fa-toggle-on mr-1 text-blue-300 text-xs"></i>
-                              Module Requested for
-                              <span class="text-red-400">*</span>
+                              <i class="fas fa-lock text-xs mr-1"></i>
+                              Not Applicable
+                            </span>
+                          </label>
+                          <div class="flex items-center gap-3 justify-center">
+                            <label
+                              class="flex items-center cursor-pointer px-2 py-1 rounded-lg transition-all border min-w-12"
+                              :class="{
+                                'hover:bg-blue-500/20': !isFormSectionReadOnly,
+                                'bg-amber-500/20 border-amber-400/40 text-amber-200 shadow-md ring-1 ring-amber-400/30':
+                                  isFormSectionReadOnly && wellsoftRequestType === 'use',
+                                'bg-white/5 border-white/10 text-blue-200/80':
+                                  isFormSectionReadOnly && wellsoftRequestType !== 'use',
+                                'pointer-events-none':
+                                  isReviewMode && !hasWellsoftRequest && !hasJeevaRequest
+                              }"
+                            >
+                              <input
+                                v-model="wellsoftRequestType"
+                                type="radio"
+                                value="use"
+                                :disabled="
+                                  (isReviewMode && !hasWellsoftRequest && !hasJeevaRequest) ||
+                                  isFormSectionReadOnly
+                                "
+                                :class="[
+                                  'w-3 h-3 border-blue-300 focus:ring-blue-500 mr-1',
+                                  isFormSectionReadOnly
+                                    ? wellsoftRequestType === 'use'
+                                      ? 'text-amber-500 accent-amber-500'
+                                      : 'text-blue-400 accent-blue-400'
+                                    : 'text-blue-600'
+                                ]"
+                              />
                               <span
-                                v-if="isReviewMode && !hasWellsoftRequest && !hasJeevaRequest"
-                                class="text-xs px-2 py-1 bg-gray-500/30 rounded-full text-gray-300"
-                              >
-                                <i class="fas fa-lock text-xs mr-1"></i>
-                                Not Applicable
-                              </span>
-                            </label>
-                            <div class="flex items-center gap-8 justify-center mb-4">
-                              <label
-                                class="flex items-center cursor-pointer px-6 py-4 rounded-lg transition-all border min-w-24"
+                                class="text-xs font-semibold flex items-center"
                                 :class="{
-                                  'hover:bg-blue-500/20': !isFormSectionReadOnly,
-                                  'bg-amber-500/20 border-amber-400/40 text-amber-200 shadow-md ring-1 ring-amber-400/30':
+                                  'text-amber-200':
                                     isFormSectionReadOnly && wellsoftRequestType === 'use',
-                                  'bg-white/5 border-white/10 text-blue-200/80':
-                                    isFormSectionReadOnly && wellsoftRequestType !== 'use',
-                                  'pointer-events-none':
-                                    isReviewMode && !hasWellsoftRequest && !hasJeevaRequest
+                                  'text-blue-100':
+                                    !isFormSectionReadOnly || wellsoftRequestType !== 'use'
                                 }"
                               >
-                                <input
-                                  v-model="wellsoftRequestType"
-                                  type="radio"
-                                  value="use"
-                                  :disabled="
-                                    (isReviewMode && !hasWellsoftRequest && !hasJeevaRequest) ||
-                                    isFormSectionReadOnly
-                                  "
-                                  :class="[
-                                    'w-5 h-5 border-blue-300 focus:ring-blue-500 mr-3',
-                                    isFormSectionReadOnly
-                                      ? wellsoftRequestType === 'use'
-                                        ? 'text-amber-500 accent-amber-500'
-                                        : 'text-blue-400 accent-blue-400'
-                                      : 'text-blue-600'
-                                  ]"
-                                />
-                                <span
-                                  class="text-base font-semibold flex items-center"
+                                <i
+                                  class="fas fa-plus-circle mr-1 text-xs"
                                   :class="{
-                                    'text-amber-200':
+                                    'text-amber-400':
                                       isFormSectionReadOnly && wellsoftRequestType === 'use',
-                                    'text-blue-100':
+                                    'text-green-400':
                                       !isFormSectionReadOnly || wellsoftRequestType !== 'use'
                                   }"
-                                >
-                                  <i
-                                    class="fas fa-plus-circle mr-2 text-sm"
-                                    :class="{
-                                      'text-amber-400':
-                                        isFormSectionReadOnly && wellsoftRequestType === 'use',
-                                      'text-green-400':
-                                        !isFormSectionReadOnly || wellsoftRequestType !== 'use'
-                                    }"
-                                  ></i>
-                                  Use
-                                </span>
-                              </label>
-                              <label
-                                class="flex items-center cursor-pointer px-6 py-4 rounded-lg transition-all border min-w-24"
+                                ></i>
+                                Use
+                              </span>
+                            </label>
+                            <label
+                              class="flex items-center cursor-pointer px-2 py-1 rounded-lg transition-all border min-w-12"
+                              :class="{
+                                'hover:bg-red-500/20': !isFormSectionReadOnly,
+                                'bg-amber-500/20 border-amber-400/40 text-amber-200 shadow-md ring-1 ring-amber-400/30':
+                                  isFormSectionReadOnly && wellsoftRequestType === 'revoke',
+                                'bg-white/5 border-white/10 text-blue-200/80':
+                                  isFormSectionReadOnly && wellsoftRequestType !== 'revoke',
+                                'pointer-events-none':
+                                  isReviewMode && !hasWellsoftRequest && !hasJeevaRequest
+                              }"
+                            >
+                              <input
+                                v-model="wellsoftRequestType"
+                                type="radio"
+                                value="revoke"
+                                :disabled="
+                                  (isReviewMode && !hasWellsoftRequest && !hasJeevaRequest) ||
+                                  isFormSectionReadOnly
+                                "
+                                :class="[
+                                  'w-3 h-3 border-blue-300 focus:ring-blue-500 mr-1',
+                                  isFormSectionReadOnly
+                                    ? wellsoftRequestType === 'revoke'
+                                      ? 'text-amber-500 accent-amber-500'
+                                      : 'text-blue-400 accent-blue-400'
+                                    : 'text-blue-600'
+                                ]"
+                              />
+                              <span
+                                class="text-xs font-semibold flex items-center"
                                 :class="{
-                                  'hover:bg-red-500/20': !isFormSectionReadOnly,
-                                  'bg-amber-500/20 border-amber-400/40 text-amber-200 shadow-md ring-1 ring-amber-400/30':
+                                  'text-amber-200':
                                     isFormSectionReadOnly && wellsoftRequestType === 'revoke',
-                                  'bg-white/5 border-white/10 text-blue-200/80':
-                                    isFormSectionReadOnly && wellsoftRequestType !== 'revoke',
-                                  'pointer-events-none':
-                                    isReviewMode && !hasWellsoftRequest && !hasJeevaRequest
+                                  'text-blue-100':
+                                    !isFormSectionReadOnly || wellsoftRequestType !== 'revoke'
                                 }"
                               >
-                                <input
-                                  v-model="wellsoftRequestType"
-                                  type="radio"
-                                  value="revoke"
-                                  :disabled="
-                                    (isReviewMode && !hasWellsoftRequest && !hasJeevaRequest) ||
-                                    isFormSectionReadOnly
-                                  "
-                                  :class="[
-                                    'w-5 h-5 border-blue-300 focus:ring-blue-500 mr-3',
-                                    isFormSectionReadOnly
-                                      ? wellsoftRequestType === 'revoke'
-                                        ? 'text-amber-500 accent-amber-500'
-                                        : 'text-blue-400 accent-blue-400'
-                                      : 'text-blue-600'
-                                  ]"
-                                />
-                                <span
-                                  class="text-base font-semibold flex items-center"
+                                <i
+                                  class="fas fa-minus-circle mr-1 text-xs"
                                   :class="{
-                                    'text-amber-200':
+                                    'text-amber-400':
                                       isFormSectionReadOnly && wellsoftRequestType === 'revoke',
-                                    'text-blue-100':
+                                    'text-red-400':
                                       !isFormSectionReadOnly || wellsoftRequestType !== 'revoke'
                                   }"
-                                >
-                                  <i
-                                    class="fas fa-minus-circle mr-2 text-sm"
-                                    :class="{
-                                      'text-amber-400':
-                                        isFormSectionReadOnly && wellsoftRequestType === 'revoke',
-                                      'text-red-400':
-                                        !isFormSectionReadOnly || wellsoftRequestType !== 'revoke'
-                                    }"
-                                  ></i>
-                                  Revoke
-                                </span>
-                              </label>
-                            </div>
-                            <!-- Additional spacing to match Signature section height -->
-                            <div class="mb-4"></div>
+                                ></i>
+                                Revoke
+                              </span>
+                            </label>
                           </div>
                         </div>
                       </div>
 
-                      <!-- Module Selection Section (Middle) -->
-                      <div class="flex items-center justify-center">
+                      <!-- Access Rights Section (Middle) -->
+                      <div class="flex flex-col h-full">
+                        <!-- HOD Access Rights Interface -->
                         <div
-                          class="bg-white/10 rounded-lg border border-blue-300/30 p-4 text-center w-full"
+                          v-if="isHodApprovalEditable"
+                          class="bg-white/10 rounded-lg border border-blue-300/30 p-2 w-full min-h-[85px] flex flex-col justify-center"
+                        >
+                          <!-- Access Rights Section -->
+                          <div>
+                            <label class="block text-xs font-bold text-blue-100 mb-1 text-center">
+                              <i class="fas fa-clock mr-1"></i>
+                              Please Specify Access Rights:
+                            </label>
+                            <div class="space-y-0.5 text-left">
+                              <label class="flex items-center cursor-pointer text-xs">
+                                <input
+                                  v-model="hodAccessType"
+                                  type="radio"
+                                  value="permanent"
+                                  class="w-3 h-3 text-blue-600 mr-2"
+                                />
+                                <span class="text-blue-200">Permanent (until retirement)</span>
+                              </label>
+                              <label class="flex items-center cursor-pointer text-xs">
+                                <input
+                                  v-model="hodAccessType"
+                                  type="radio"
+                                  value="temporary"
+                                  class="w-3 h-3 text-blue-600 mr-2"
+                                />
+                                <span class="text-blue-200">Temporary Until:</span>
+                                <input
+                                  v-if="hodAccessType === 'temporary'"
+                                  v-model="hodTemporaryUntil"
+                                  type="date"
+                                  :min="tomorrow"
+                                  class="ml-2 px-1 py-0.5 bg-white/10 border border-blue-300/40 rounded text-xs text-white focus:ring-1 focus:ring-blue-400"
+                                />
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Non-HOD Module Selection (Original) -->
+                        <div
+                          v-else
+                          class="bg-white/10 rounded-lg border border-blue-300/30 p-2 text-center w-full min-h-[85px] flex flex-col justify-center"
                           v-once
                         >
-                          <div class="flex items-center justify-center space-x-2 mb-3">
-                            <i class="fas fa-info-circle text-blue-300 text-base"></i>
-                            <span class="text-sm font-medium text-blue-100">Module Selection</span>
+                          <div class="flex items-center justify-center space-x-2 mb-1">
+                            <i class="fas fa-info-circle text-blue-300 text-sm"></i>
+                            <span class="text-xs font-medium text-blue-100">Module Selection</span>
                           </div>
-                          <p class="text-sm text-blue-200/80 leading-relaxed">
+                          <p class="text-xs text-blue-200/80 leading-tight">
                             Selected modules and purposes will be displayed in the review comments
                             section for approval workflow.
                           </p>
@@ -554,53 +591,44 @@
                       </div>
 
                       <!-- Signature Section -->
-                      <div>
-                        <label class="block text-xs font-medium text-blue-100 mb-1 text-center">
-                          Signature <span class="text-red-400">*</span>
-                        </label>
+                      <div class="flex flex-col h-full">
                         <div
-                          :class="[
-                            'relative mx-auto',
-                            isHodApprovalEditable ? 'max-w-lg' : 'max-w-md'
-                          ]"
+                          class="relative bg-white/10 rounded-lg border border-blue-300/30 p-2 w-full min-h-[85px] flex flex-col justify-center"
                         >
+                          <label class="block text-xs font-bold text-blue-100 mb-1 text-center">
+                            Signature <span class="text-red-400">*</span>
+                          </label>
+
                           <!-- Review mode: Show signature status from database -->
                           <div
                             v-if="isReviewMode"
-                            :class="[
-                              'w-full px-2 py-2 border-2 border-blue-300/40 rounded-lg bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 flex items-center justify-center',
-                              isReviewMode && isIctDirectorUser
-                                ? 'min-h-[30px]'
-                                : isDivisionalDirectorUser || isIctDirectorUser
-                                  ? 'min-h-[35px]'
-                                  : 'min-h-[35px]'
-                            ]"
+                            class="w-full px-1 py-1 border-2 border-blue-300/40 rounded-lg bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 flex items-center justify-center min-h-[35px]"
                           >
                             <!-- Loading state -->
                             <div v-if="loading" class="text-center">
-                              <OrbitingDots size="sm" class="mb-1" />
-                              <p class="text-blue-100 text-xs">Loading signature...</p>
+                              <OrbitingDots size="sm" />
+                              <p class="text-blue-100 text-xs mt-0.5">Loading signature...</p>
                             </div>
                             <!-- Loaded state -->
                             <div v-else class="text-center">
-                              <div v-if="hasSignature" class="mb-1">
-                                <i class="fas fa-check-circle text-green-400 text-lg mb-1"></i>
+                              <div v-if="hasSignature">
+                                <i class="fas fa-check-circle text-green-400 text-sm"></i>
                                 <p
-                                  class="text-green-300 text-xs font-semibold flex items-center justify-center gap-1"
+                                  class="text-green-300 text-xs font-semibold flex items-center justify-center gap-1 mt-0.5"
                                 >
                                   <i class="fas fa-check text-xs"></i>
                                   Signed
                                 </p>
                                 <p
                                   v-if="requestData?.signature_path"
-                                  class="text-blue-200 text-xs mt-1"
+                                  class="text-blue-200 text-xs mt-0.5 truncate"
                                 >
                                   File: {{ getSignatureFileName(requestData.signature_path) }}
                                 </p>
                               </div>
-                              <div v-else class="mb-1">
-                                <i class="fas fa-signature text-blue-300 text-lg mb-1"></i>
-                                <p class="text-blue-100 text-xs">No signature uploaded</p>
+                              <div v-else>
+                                <i class="fas fa-signature text-blue-300 text-sm"></i>
+                                <p class="text-blue-100 text-xs mt-0.5">No signature uploaded</p>
                               </div>
                             </div>
                           </div>
@@ -608,24 +636,15 @@
                           <!-- Edit mode: Show signature upload interface -->
                           <div
                             v-else-if="!signaturePreview"
-                            :class="[
-                              'w-full px-2 py-2 border-2 border-dashed border-blue-300/40 rounded-lg focus-within:border-blue-400 bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 flex items-center justify-center hover:bg-white/20',
-                              isReviewMode && isIctDirectorUser
-                                ? 'min-h-[30px]'
-                                : isDivisionalDirectorUser || isIctDirectorUser
-                                  ? 'min-h-[35px]'
-                                  : 'min-h-[35px]'
-                            ]"
+                            class="w-full px-1 py-1 border-2 border-dashed border-blue-300/40 rounded-lg focus-within:border-blue-400 bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 flex items-center justify-center hover:bg-white/20 min-h-[35px]"
                           >
                             <div class="text-center">
-                              <div class="mb-1">
-                                <i class="fas fa-signature text-blue-300 text-lg mb-1"></i>
-                                <p class="text-blue-100 text-xs">No signature uploaded</p>
-                              </div>
+                              <i class="fas fa-signature text-blue-300 text-sm"></i>
+                              <p class="text-blue-100 text-xs mt-0.5">No signature uploaded</p>
                               <button
                                 type="button"
                                 @click="triggerFileUpload"
-                                class="px-3 py-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/50"
+                                class="px-2 py-0.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/50 mt-1"
                               >
                                 <i class="fas fa-upload"></i>
                                 Press to load your signature
@@ -636,41 +655,34 @@
                           <!-- Edit mode: Show uploaded signature preview -->
                           <div
                             v-else-if="!isReviewMode"
-                            :class="[
-                              'w-full px-2 py-2 border-2 border-blue-300/40 rounded-lg bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 flex items-center justify-center relative',
-                              isReviewMode && isIctDirectorUser
-                                ? 'min-h-[30px]'
-                                : isDivisionalDirectorUser || isIctDirectorUser
-                                  ? 'min-h-[35px]'
-                                  : 'min-h-[35px]'
-                            ]"
+                            class="w-full px-1 py-1 border-2 border-blue-300/40 rounded-lg bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 flex items-center justify-center relative min-h-[35px]"
                           >
                             <div v-if="isImage(signaturePreview)" class="text-center">
                               <img
                                 :src="signaturePreview"
                                 alt="Digital Signature"
-                                class="max-h-[50px] max-w-full object-contain mx-auto mb-1"
+                                class="max-h-[25px] max-w-full object-contain mx-auto"
                               />
-                              <p class="text-xs text-blue-100">
+                              <p class="text-xs text-blue-100 mt-0.5 truncate">
                                 {{ signatureFileName }}
                               </p>
                             </div>
                             <div v-else class="text-center">
                               <div
-                                class="w-16 h-16 bg-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-1"
+                                class="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center mx-auto"
                               >
                                 <i class="fas fa-file-pdf text-red-400 text-2xl"></i>
                               </div>
-                              <p class="text-sm text-blue-100">
+                              <p class="text-sm text-blue-100 mt-0.5 truncate">
                                 {{ signatureFileName }}
                               </p>
                             </div>
 
-                            <div class="absolute top-2 right-2 flex gap-2">
+                            <div class="absolute top-1 right-1 flex gap-1">
                               <button
                                 type="button"
                                 @click="triggerFileUpload"
-                                class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm hover:bg-blue-600 transition-colors duration-200 shadow-lg"
+                                class="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-blue-600 transition-colors duration-200 shadow-lg"
                                 title="Change signature"
                               >
                                 <i class="fas fa-edit"></i>
@@ -678,7 +690,7 @@
                               <button
                                 type="button"
                                 @click="clearSignature"
-                                class="w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center text-sm hover:bg-red-600 transition-colors duration-200 shadow-lg"
+                                class="w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors duration-200 shadow-lg"
                                 title="Remove signature"
                               >
                                 <i class="fas fa-times"></i>
@@ -697,10 +709,104 @@
                         </div>
                       </div>
                     </div>
+
+                    <!-- HOD Module Selection Section - Jeeva and Wellsoft Side by Side -->
+                    <div
+                      v-if="isHodApprovalEditable && (hasJeevaRequest || hasWellsoftRequest)"
+                      class="mt-2"
+                    >
+                      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 relative">
+                        <!-- Vertical Divider Line -->
+                        <div
+                          class="hidden lg:block absolute left-2/3 top-0 bottom-0 w-px bg-gradient-to-b from-blue-300/30 via-blue-400/50 to-blue-300/30 transform -translate-x-px"
+                        ></div>
+
+                        <!-- Jeeva Modules (Left Side - Takes 2 columns) -->
+                        <div v-if="hasJeevaRequest" class="lg:col-span-2">
+                          <div
+                            class="bg-white/10 rounded-lg border border-purple-300/30 p-4 w-full h-auto"
+                          >
+                            <div class="mb-1">
+                              <label
+                                class="block text-sm font-semibold text-purple-200 mb-1 flex items-center justify-between"
+                              >
+                                <span>
+                                  <i class="fas fa-database mr-2"></i>
+                                  Jeeva Modules
+                                </span>
+                                <span class="text-xs text-purple-300/70">
+                                  Selected: {{ selectedJeeva?.length || 0 }} modules
+                                </span>
+                              </label>
+                            </div>
+                            <div
+                              class="grid grid-cols-4 gap-1 border border-purple-300/20 rounded p-2"
+                            >
+                              <label
+                                v-for="module in jeevaModules"
+                                :key="'jeeva-' + module"
+                                class="flex items-center cursor-pointer text-xs hover:bg-white/10 p-0.5 rounded transition-colors leading-none"
+                              >
+                                <input
+                                  v-model="selectedJeeva"
+                                  :value="module"
+                                  type="checkbox"
+                                  class="w-3 h-3 text-red-600 accent-red-600 mr-1 flex-shrink-0"
+                                />
+                                <span class="text-purple-100 text-xs leading-none">{{
+                                  module
+                                }}</span>
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Wellsoft Modules (Right Side - Takes 1 column) -->
+                        <div v-if="hasWellsoftRequest" class="lg:col-span-1">
+                          <div
+                            class="bg-white/10 rounded-lg border border-amber-300/30 p-4 w-full h-auto"
+                          >
+                            <div class="mb-3">
+                              <label
+                                class="block text-sm font-semibold text-amber-200 mb-3 flex items-center justify-between"
+                              >
+                                <span>
+                                  <i class="fas fa-hospital mr-2"></i>
+                                  Wellsoft Modules
+                                </span>
+                                <span class="text-xs text-amber-300/70">
+                                  Selected: {{ selectedWellsoft?.length || 0 }} modules
+                                </span>
+                              </label>
+                            </div>
+                            <div
+                              class="grid grid-cols-2 gap-2 border border-amber-300/20 rounded p-3"
+                            >
+                              <label
+                                v-for="module in wellsoftModules"
+                                :key="'wellsoft-' + module"
+                                class="flex items-center cursor-pointer text-xs hover:bg-white/10 p-1.5 rounded transition-colors"
+                              >
+                                <input
+                                  v-model="selectedWellsoft"
+                                  :value="module"
+                                  type="checkbox"
+                                  class="w-3 h-3 text-red-600 accent-red-600 mr-2 flex-shrink-0"
+                                />
+                                <span class="text-amber-100 text-xs leading-tight">{{
+                                  module
+                                }}</span>
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
                   <!-- Previous Comments Section - Show modules summary and comments for non-HOD users in review mode -->
                   <!-- HOD users will see full module selection tabs instead -->
+
                   <div
                     v-if="requestData && !loading && !isHodApprovalEditable"
                     v-show="!loading"
@@ -2861,7 +2967,10 @@
                   class="lg:col-span-1 space-y-4"
                 >
                   <!-- Debug info for HOD module tabs (development only) -->
-                  <div v-if="isDevelopment && (getUserRole() || '').toLowerCase().includes('hod')" class="bg-yellow-500/20 border-2 border-yellow-400/60 rounded-lg p-2 mb-4">
+                  <div
+                    v-if="isDevelopment && (getUserRole() || '').toLowerCase().includes('hod')"
+                    class="bg-yellow-500/20 border-2 border-yellow-400/60 rounded-lg p-2 mb-4"
+                  >
                     <h4 class="text-yellow-200 font-bold text-sm mb-2">🔧 HOD Module Debug Info</h4>
                     <div class="text-xs text-yellow-100 space-y-1">
                       <div>isReviewMode: {{ isReviewMode }}</div>
@@ -2870,7 +2979,7 @@
                       <div>Request Status: {{ requestData?.status || 'none' }}</div>
                       <div>Show Tabs: {{ !isReviewMode || isHodApprovalEditable }}</div>
                       <div>Module reviewMode: {{ isReviewMode && !isHodApprovalEditable }}</div>
-                      <div>Available Tabs: {{ tabs.map(t => t.label).join(', ') }}</div>
+                      <div>Available Tabs: {{ tabs.map((t) => t.label).join(', ') }}</div>
                     </div>
                   </div>
                   <h2 id="module-tabs" class="sr-only">Module Details</h2>
@@ -3951,55 +4060,9 @@
           'For Implementation'
         ],
         jeevaItemSelections: [],
-        // From Wellsoft form
-        wellsoftModules: [
-          'Registrar',
-          'Specialist',
-          'Cashier',
-          'Resident Nurse',
-          'Intern Doctor',
-          'Intern Nurse',
-          'Medical Recorder',
-          'Social Worker',
-          'Quality Officer',
-          'Administrator',
-          'Health Attendant'
-        ],
-        // From Jeeva form (names extracted)
-        jeevaModules: [
-          'FINANCIAL ACCOUNTING',
-          'DOCTOR CONSULTATION',
-          'MEDICAL RECORDS',
-          'OUTPATIENT',
-          'NURSING STATION',
-          'INPATIENT',
-          'IP CASHIER',
-          'HIV',
-          'LINEN & LAUNDRY',
-          'FIXED ASSETS',
-          'PMTCT',
-          'PHARMACY',
-          'BILL NOTE',
-          'BLOOD BANK',
-          'ORDER MANAGEMENT',
-          'PRIVATE CREDIT',
-          'LABORATORY',
-          'GENERAL STORE',
-          'IP BILLING',
-          'RADIOLOGY',
-          'PURCHASE',
-          'SCROLLING',
-          'OPERATION THEATRE',
-          'CSSD',
-          'WEB INDENT',
-          'MORTUARY',
-          'GENERAL MAINTENANCE',
-          'PERSONNEL',
-          'MAINTENANCE',
-          'PAYROLL',
-          'CMS',
-          'MIS STATISTICS'
-        ],
+        // Dynamic modules loaded from database
+        wellsoftModules: [],
+        jeevaModules: [],
         // Suggested Internet purposes
         // internetPurposes: ['Research','Training','Remote Work','Telemedicine','Email/Communication'], // Removed duplicate - using the one in form data
 
@@ -4041,6 +4104,7 @@
         selectedWellsoft: [],
         selectedJeeva: [],
         wellsoftRequestType: 'use',
+        jeevaRequestType: 'use', // HOD can select use/revoke for Jeeva modules
         // search queries
         wellsoftQuery: '',
         jeevaQuery: '',
@@ -4063,6 +4127,8 @@
         rejectionReason: '',
         // Current authenticated user data
         currentUser: null,
+        // Performance optimization flags
+        loadingRequestData: false,
         // Debouncing flag for approval button
         processing: false,
         // Divisional Director comments (editable for divisional director)
@@ -4257,13 +4323,14 @@
         const userRole = (this.getUserRole() || '').toLowerCase()
         const hodRoles = ['head_of_department', 'hod']
         const status = this.requestData.status || 'pending'
-
         // HOD can edit only in these scenarios:
         // 1. Initial HOD approval stage (pending, pending_hod)
         // 2. When request is rejected back to HOD from higher levels
         const hodEditableStatuses = [
           'pending',
           'pending_hod',
+          'hod_pending', // Alternative naming convention
+          'submitted', // Initial submission state
           'divisional_rejected', // Rejected by Divisional Director - back to HOD
           'ict_director_rejected', // Rejected by ICT Director - back to HOD
           'head_it_rejected', // Rejected by Head IT - back to HOD
@@ -4271,17 +4338,15 @@
         ]
 
         const canEdit = hodRoles.includes(userRole) && hodEditableStatuses.includes(status)
-        
-        // Debug logging for HOD module access
-        if (this.isDevelopment && hodRoles.includes(userRole)) {
+
+        // Reduced debug logging frequency to improve performance
+        if (this.isDevelopment && Math.random() < 0.1) {
+          // Only log 10% of the time
           console.log('🏥 HOD Module Access Check:', {
             userRole,
-            status,
             canEdit,
-            isReviewMode: this.isReviewMode,
-            hasRequestData: !!this.requestData,
-            hodEditableStatuses,
-            message: canEdit ? 'HOD can edit modules' : 'HOD cannot edit modules'
+            status,
+            requestId: this.getRequestId
           })
         }
 
@@ -4363,13 +4428,18 @@
       // Consolidated read-only state for form sections (combines divisional director and ICT director)
       isFormSectionReadOnly() {
         // If HOD can edit (initial approval or after rejection back to them), sections should be editable
+        // This is the primary check - HOD users should always be able to edit when it's their turn
         if (this.isHodApprovalEditable) {
+          if (this.isDevelopment) {
+            console.log('🔓 Form sections are EDITABLE for HOD user')
+          }
           return false
         }
 
         // Once HOD has approved and request moves to higher stages, make all modules read-only
         if (this.isReviewMode && this.requestData) {
           const status = this.requestData.status || 'pending'
+          const hodStatus = this.requestData.hod_status || 'pending'
           const postHodStatuses = [
             'hod_approved',
             'pending_divisional',
@@ -4384,12 +4454,23 @@
           ]
 
           // If status indicates form has moved beyond HOD stage, make modules read-only
-          if (postHodStatuses.includes(status)) {
+          if (postHodStatuses.includes(status) || postHodStatuses.includes(hodStatus)) {
+            if (this.isDevelopment) {
+              console.log('🔒 Form sections are READ-ONLY - request moved beyond HOD stage:', {
+                status,
+                hodStatus
+              })
+            }
             return true
           }
         }
 
-        return this.isDivisionalDirectorReadOnly || this.isIctDirectorReadOnly
+        const readOnlyResult = this.isDivisionalDirectorReadOnly || this.isIctDirectorReadOnly
+        if (this.isDevelopment && readOnlyResult) {
+          console.log('🔒 Form sections are READ-ONLY for divisional/ICT director')
+        }
+
+        return readOnlyResult
       },
 
       // Check if current user is ICT Director
@@ -4738,7 +4819,17 @@
         const userRole = (this.getUserRole() || '').toLowerCase()
 
         // For HOD stage, check HOD signature
-        if (stage === 'hod' && ['head_of_department', 'hod'].includes(userRole)) {
+        if (
+          stage === 'hod' &&
+          [
+            'head_of_department',
+            'hod',
+            'department_head',
+            'head_department',
+            'hod_user',
+            'head_of_dept'
+          ].includes(userRole)
+        ) {
           return !this.form.approvals.hod.signature
         }
 
@@ -4850,39 +4941,12 @@
       // Collect all previous comments from completed stages in chronological order
       // This should show ALL comments from completed stages, regardless of current request status
       previousComments() {
-        console.log('🚀 previousComments computed property CALLED!')
         if (!this.requestData) {
-          console.log('🚨 No requestData available, returning empty array')
           return []
         }
 
-        // Debug: Log available date fields in requestData (TEMPORARILY DISABLED)
-
         const comments = []
         const currentRole = this.getUserRole()?.toLowerCase()
-
-        // TEMPORARY DEBUG: Understanding why comments are empty
-        try {
-          console.log('🔍 DEBUG previousComments STARTED - Current time:', new Date().toISOString())
-          console.log('🔍 DEBUG previousComments data:', {
-            hasRequestData: !!this.requestData,
-            currentRole,
-            hodComments: this.hodComments,
-            divisionalDirectorComments: this.divisionalDirectorComments,
-            ictDirectorComments: this.ictDirectorComments,
-            headItComments: this.headItComments,
-            ictOfficerComments: this.ictOfficerComments,
-            rawCommentFields: {
-              hod_comments: this.requestData?.hod_comments,
-              divisional_comments: this.requestData?.divisional_comments,
-              ict_director_comments: this.requestData?.ict_director_comments,
-              head_it_comments: this.requestData?.head_it_comments,
-              ict_officer_comments: this.requestData?.ict_officer_comments
-            }
-          })
-        } catch (e) {
-          console.error('🚨 ERROR in previousComments debug logging:', e)
-        }
 
         // Define the approval workflow stages in order
         const stages = [
@@ -5060,19 +5124,8 @@
           }
         })
 
-        // TEMPORARY DEBUG: Final result
-        console.log('🔍 Final previousComments result:', {
-          totalComments: comments.length,
-          comments: comments.map((c) => ({
-            stage: c.stage,
-            stageName: c.stageName,
-            hasComments: !!c.comments
-          }))
-        })
-
-        // Sort by date (earliest first to show chronological order)
-        // Use fallback dates if primary dates are not available
-        return comments.sort((a, b) => {
+        // Sort comments
+        const sortedComments = comments.sort((a, b) => {
           const dateA = a.date || this.requestData.updated_at || this.requestData.created_at
           const dateB = b.date || this.requestData.updated_at || this.requestData.created_at
 
@@ -5082,6 +5135,8 @@
 
           return new Date(dateA) - new Date(dateB)
         })
+
+        return sortedComments
       },
 
       // Check if there are any previous comments to show
@@ -5505,12 +5560,15 @@
       }
     },
     async mounted() {
-      console.log('🚀 Component mounted - starting user authentication...')
+      console.log('🚀 Component mounted - starting initialization...')
 
-      // Prevent page disappearing by catching errors
+      // Use Promise.all for parallel loading to reduce total load time
       try {
-        // Try to get current user from multiple sources
-        await this.getCurrentUser()
+        // Load critical data in parallel - modules can be cached
+        const [currentUser] = await Promise.all([
+          this.getCurrentUser(),
+          this.loadModulesWithCaching() // Load modules with caching strategy
+        ])
         console.log('🔍 After getCurrentUser:', {
           hasCurrentUser: !!this.currentUser,
           userName: this.currentUser?.name,
@@ -5545,6 +5603,27 @@
         } else {
           console.log('✅ User successfully loaded:', this.currentUser.name)
           console.log('✅ Detected user role:', this.getUserRole())
+
+          // IMMEDIATE HOD CHECK for troubleshooting
+          const userRole = (this.getUserRole() || '').toLowerCase()
+          const hodRoles = [
+            'head_of_department',
+            'hod',
+            'department_head',
+            'head_department',
+            'hod_user',
+            'head_of_dept'
+          ]
+          const isHodUser = hodRoles.includes(userRole)
+
+          console.log('🚨 IMMEDIATE HOD CHECK ON MOUNT:', {
+            userName: this.currentUser.name,
+            detectedRole: userRole,
+            isHodUser,
+            hodRolesChecked: hodRoles,
+            isInReviewMode: this.isReviewMode,
+            requestId: this.getRequestId
+          })
         }
 
         if (this.isReviewMode && this.getRequestId) {
@@ -5703,6 +5782,21 @@
         immediate: true
       },
 
+      // Watch for changes in the central wellsoftRequestType and sync with jeevaRequestType
+      wellsoftRequestType: {
+        handler(newValue) {
+          // Sync the central Use/Revoke selection with both module types
+          this.jeevaRequestType = newValue
+          if (this.isDevelopment) {
+            console.log('🔄 Central request type changed:', {
+              newValue,
+              appliedToBoth: 'Jeeva and Wellsoft modules'
+            })
+          }
+        },
+        immediate: true
+      },
+
       // Watch for when request data is loaded and user is Head IT
       requestData: {
         handler(newRequestData) {
@@ -5728,6 +5822,116 @@
       }
     },
     methods: {
+      // ===========================================
+      // MODULE LOADING METHODS WITH CACHING
+      // ===========================================
+
+      // Cache modules in localStorage with 24-hour TTL
+      async loadModulesWithCaching() {
+        const CACHE_KEY_WELLSOFT = 'cached_wellsoft_modules'
+        const CACHE_KEY_JEEVA = 'cached_jeeva_modules'
+        const CACHE_TTL = 24 * 60 * 60 * 1000 // 24 hours
+
+        const loadFromCacheOrAPI = async (cacheKey, apiCall, fallbackData) => {
+          try {
+            // Check cache first
+            const cached = localStorage.getItem(cacheKey)
+            if (cached) {
+              const { data, timestamp } = JSON.parse(cached)
+              if (Date.now() - timestamp < CACHE_TTL) {
+                console.log(`✅ Using cached ${cacheKey}:`, data.length, 'modules')
+                return data
+              }
+            }
+
+            // Load from API if cache miss or expired
+            const response = await apiCall()
+            if (response && response.success && Array.isArray(response.data)) {
+              const modules = response.data.map((module) => module.name).sort()
+              // Cache the result
+              localStorage.setItem(
+                cacheKey,
+                JSON.stringify({
+                  data: modules,
+                  timestamp: Date.now()
+                })
+              )
+              console.log(`✅ ${cacheKey} loaded from API:`, modules.length, 'modules')
+              return modules
+            } else {
+              throw new Error('Invalid API response')
+            }
+          } catch (error) {
+            console.warn(`⚠️ Failed to load ${cacheKey}, using fallback`, error)
+            return fallbackData
+          }
+        }
+
+        // Load both module types in parallel with caching
+        const [wellsoftModules, jeevaModules] = await Promise.all([
+          loadFromCacheOrAPI(CACHE_KEY_WELLSOFT, combinedAccessService.getWellsoftModules, [
+            'Administrator',
+            'Cashier',
+            'Health Attendant',
+            'Intern Doctor',
+            'Intern Nurse',
+            'Medical Recorder',
+            'Quality Officer',
+            'Registrar',
+            'Resident Nurse',
+            'Social Worker',
+            'Specialist'
+          ]),
+          loadFromCacheOrAPI(CACHE_KEY_JEEVA, combinedAccessService.getJeevaModules, [
+            'BILL NOTE',
+            'BLOOD BANK',
+            'CMS',
+            'CSSD',
+            'DOCTOR CONSULTATION',
+            'FINANCIAL ACCOUNTING',
+            'FIXED ASSETS',
+            'GENERAL MAINTENANCE',
+            'GENERAL STORE',
+            'HIV',
+            'INPATIENT',
+            'IP BILLING',
+            'IP CASHIER',
+            'LABORATORY',
+            'LINEN & LAUNDRY',
+            'MAINTENANCE',
+            'MEDICAL RECORDS',
+            'MIS STATISTICS',
+            'MORTUARY',
+            'NURSING STATION',
+            'OPERATION THEATRE',
+            'ORDER MANAGEMENT',
+            'OUTPATIENT',
+            'PAYROLL',
+            'PERSONNEL',
+            'PHARMACY',
+            'PMTCT',
+            'PRIVATE CREDIT',
+            'PURCHASE',
+            'RADIOLOGY',
+            'SCROLLING',
+            'WEB INDENT'
+          ])
+        ])
+
+        this.wellsoftModules = wellsoftModules
+        this.jeevaModules = jeevaModules
+      },
+
+
+      // Legacy methods kept for compatibility - now just call cached version
+      async loadWellsoftModules() {
+        await this.loadModulesWithCaching()
+      },
+
+      async loadJeevaModules() {
+        await this.loadModulesWithCaching()
+      },
+
       // ===========================================
       // JEEVA DROPDOWN HANDLERS
       // ===========================================
@@ -5807,6 +6011,7 @@
       },
 
       // ===========================================
+
       // APPROVAL AND USER ROLE METHODS
       // ===========================================
 
@@ -5921,6 +6126,11 @@
             'ict_director',
             'divisional_director',
             'head_of_department',
+            'hod',
+            'department_head',
+            'head_department',
+            'hod_user',
+            'head_of_dept',
             'ict_officer'
           ]
 
@@ -5945,13 +6155,17 @@
           return firstRole
         }
 
-        console.log('🔍 getUserRole debug:', {
-          role,
-          currentUser: this.currentUser,
-          roleProperty: this.currentUser.role,
-          userRoleProperty: this.currentUser.user_role,
-          primaryRoleProperty: this.currentUser.primary_role,
-          rolesArray: this.currentUser.roles
+        console.log('🚨 CRITICAL: getUserRole debug for HOD troubleshooting:', {
+          detectedRole: role,
+          currentUserExists: !!this.currentUser,
+          currentUserName: this.currentUser?.name,
+          roleProperty: this.currentUser?.role,
+          userRoleProperty: this.currentUser?.user_role,
+          primaryRoleProperty: this.currentUser?.primary_role,
+          userRoleProperty2: this.currentUser?.userRole,
+          rolesArray: this.currentUser?.roles,
+          rolesArrayLength: this.currentUser?.roles?.length,
+          fullCurrentUser: JSON.stringify(this.currentUser, null, 2)
         })
 
         return role || ''
@@ -6117,8 +6331,11 @@
             selectedWellsoft: this.selectedWellsoft,
             selectedJeeva: this.selectedJeeva,
             wellsoftRequestType: this.wellsoftRequestType,
+            jeevaRequestType: this.jeevaRequestType,
             internetPurposes: this.internetPurposes,
-            // accessRights removed - will be decided by HOD during approval
+            // HOD access rights
+            hodAccessType: this.hodAccessType,
+            hodTemporaryUntil: this.hodTemporaryUntil,
             approvals: this.form.approvals,
             implementation: this.form.implementation,
             comments: this.form.comments,
@@ -6136,8 +6353,11 @@
             selectedWellsoft: this.selectedWellsoft,
             selectedJeeva: this.selectedJeeva,
             wellsoftRequestType: this.wellsoftRequestType,
+            jeevaRequestType: this.jeevaRequestType, // HOD can specify use/revoke for Jeeva modules
             internetPurposes: this.internetPurposes.filter((purpose) => purpose.trim()),
-            // accessRights removed - will be decided by HOD during approval process
+            // HOD access rights (decided during HOD approval)
+            hodAccessType: this.hodAccessType,
+            hodTemporaryUntil: this.hodAccessType === 'temporary' ? this.hodTemporaryUntil : null,
             signature: this.form.shared.signature, // This should be the actual file object
             approvals: {
               hod: {
@@ -6303,31 +6523,52 @@
         this.ictOfficerSignatureFileName = ''
       },
 
-      // Review mode methods
+      // Review mode methods - optimized with request deduplication and timeout
       async loadRequestData() {
+        // Prevent multiple simultaneous API calls for the same request
+        if (this.loadingRequestData) {
+          console.log('⏳ Request data already loading, waiting...')
+          return
+        }
+
         try {
           this.loading = true
+          this.loadingRequestData = true
           this.error = null
 
-          // Load request data for review mode
+          // Load request data for review mode with timeout
           console.log('💾 Loading request data for ID:', this.getRequestId)
-          console.log('💾 API call starting...')
 
-          // Always try combined API first to get complete request data with signatures
-          let response
+          const requestId = this.getRequestId
+          if (!requestId) {
+            throw new Error('No request ID provided')
+          }
+
+          // Use race condition with timeout to prevent hanging
+          const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Request timeout - API call took too long')), 15000)
+          )
+
           const userRole = (this.getUserRole() || '').toLowerCase()
           console.log('💾 User role:', userRole)
 
-          console.log('💾 Trying combined API service first for complete data...')
+          console.log('💾 Trying combined API service with timeout...')
+          let response
           try {
-            response = await combinedAccessService.getRequestById(this.getRequestId)
-            console.log('💾 Combined API response received')
+            response = await Promise.race([
+              combinedAccessService.getRequestById(requestId),
+              timeoutPromise
+            ])
+            console.log('💾 Combined API response received successfully')
           } catch (error) {
-            console.warn('💾 Combined API failed, trying role-specific API:', error)
+            console.warn('💾 Combined API failed, trying role-specific API:', error.message)
 
             if (['ict_officer', 'officer_ict'].includes(userRole)) {
               console.log('💾 Using ICT Officer API service as fallback')
-              response = await ictOfficerService.getAccessRequestById(this.getRequestId)
+              response = await Promise.race([
+                ictOfficerService.getAccessRequestById(requestId),
+                timeoutPromise
+              ])
             } else {
               console.error('💾 No fallback API available')
               throw error
@@ -6550,9 +6791,19 @@
             // Populate module selections based on actual database data
             if (this.requestData.request_types || this.requestData.request_type) {
               const types = this.requestData.request_types || this.requestData.request_type || []
-              
+
               // Debug logging for HOD users
-              if (this.isDevelopment && ['head_of_department', 'hod'].includes(this.getUserRole()?.toLowerCase())) {
+              if (
+                this.isDevelopment &&
+                [
+                  'head_of_department',
+                  'hod',
+                  'department_head',
+                  'head_department',
+                  'hod_user',
+                  'head_of_dept'
+                ].includes(this.getUserRole()?.toLowerCase())
+              ) {
                 console.log('🏥 HOD Module Loading Debug:', {
                   requestTypes: types,
                   userRole: this.getUserRole(),
@@ -6584,8 +6835,17 @@
                 }
 
                 this.selectedWellsoft = Array.isArray(parsedWellsoft) ? parsedWellsoft : []
+
+                // Load Wellsoft request type (use/revoke)
+                const wellsoftReqType =
+                  this.requestData.wellsoft_request_type || this.requestData.wellsoft_type || 'use'
+                this.wellsoftRequestType = ['use', 'revoke'].includes(wellsoftReqType)
+                  ? wellsoftReqType
+                  : 'use'
+
                 if (this.isDevelopment) {
                   console.log('Loaded Wellsoft selected modules:', this.selectedWellsoft)
+                  console.log('Loaded Wellsoft request type:', this.wellsoftRequestType)
                 }
               } else {
                 this.selectedWellsoft = []
@@ -6614,8 +6874,17 @@
                 }
 
                 this.selectedJeeva = Array.isArray(parsedJeeva) ? parsedJeeva : []
+
+                // Load Jeeva request type (use/revoke)
+                const jeevaReqType =
+                  this.requestData.jeeva_request_type || this.requestData.jeeva_type || 'use'
+                this.jeevaRequestType = ['use', 'revoke'].includes(jeevaReqType)
+                  ? jeevaReqType
+                  : 'use'
+
                 if (this.isDevelopment) {
                   console.log('Loaded Jeeva selected modules:', this.selectedJeeva)
+                  console.log('Loaded Jeeva request type:', this.jeevaRequestType)
                 }
               } else {
                 this.selectedJeeva = []
@@ -6644,22 +6913,92 @@
             }
 
             // Force tab generation for HOD users in review mode to ensure they see the module tabs
+            // This is crucial for HOD workflow - they need to see and edit modules for pending requests
+
+            // CRITICAL DEBUG: Always log this for troubleshooting HOD workflow
+            console.log('🚨 CRITICAL HOD DEBUG - loadRequestData end:', {
+              isHodApprovalEditable: this.isHodApprovalEditable,
+              isReviewMode: this.isReviewMode,
+              hasRequestData: !!this.requestData,
+              requestStatus: this.requestData?.status,
+              hodStatus: this.requestData?.hod_status,
+              userRole: this.getUserRole(),
+              requestId: this.getRequestId,
+              currentTabs: this.tabs.length,
+              tabDetails: this.tabs.map((t) => ({ key: t.key, label: t.label, type: t.type }))
+            })
+
             if (this.isHodApprovalEditable) {
-              // Ensure tabs are properly synchronized for HOD users
-              if (this.selectedWellsoft.length > 0) {
+              if (this.isDevelopment) {
+                console.log('🏥 HOD Force Tab Generation Debug:', {
+                  isHodApprovalEditable: this.isHodApprovalEditable,
+                  selectedWellsoft: this.selectedWellsoft,
+                  selectedJeeva: this.selectedJeeva,
+                  requestTypes: this.requestData.request_types || this.requestData.request_type,
+                  currentTabs: this.tabs.length
+                })
+              }
+
+              // For HOD users, ensure all available module types are accessible even if not initially selected
+              // This allows them to select modules for pending requests
+              const requestTypes =
+                this.requestData.request_types || this.requestData.request_type || []
+
+              // Check if this is a combined access request that should have Wellsoft and Jeeva options
+              const shouldShowWellsoft =
+                requestTypes.includes('wellsoft') || requestTypes.length === 0
+              const shouldShowJeeva =
+                requestTypes.includes('jeeva_access') ||
+                requestTypes.includes('jeeva') ||
+                requestTypes.length === 0
+              const shouldShowInternet =
+                requestTypes.includes('internet_access_request') ||
+                requestTypes.includes('internet') ||
+                requestTypes.length === 0
+
+              // Always sync tabs for HOD users to allow module selection
+              if (shouldShowWellsoft) {
                 this.syncTabs('wellsoft', this.selectedWellsoft)
               }
-              
-              if (this.selectedJeeva.length > 0) {
+
+              if (shouldShowJeeva) {
                 this.syncTabs('jeeva', this.selectedJeeva)
+              }
+
+              // Also handle internet if present or if no specific request types are defined
+              if (
+                shouldShowInternet &&
+                (this.internetPurposes.some((purpose) => purpose.trim()) ||
+                  requestTypes.length === 0)
+              ) {
+                this.syncTabs('internet', [])
               }
 
               if (this.isDevelopment) {
                 console.log('🔄 HOD Module tabs force-synced:', {
+                  shouldShowWellsoft,
+                  shouldShowJeeva,
+                  shouldShowInternet,
                   wellsoftTabs: this.selectedWellsoft,
                   jeevaTabs: this.selectedJeeva,
-                  resultingTabs: this.tabs.map(t => t.label)
+                  internetPurposes: this.internetPurposes.filter((p) => p.trim()),
+                  resultingTabs: this.tabs.map((t) => ({
+                    key: t.key,
+                    label: t.label,
+                    type: t.type
+                  }))
                 })
+              }
+
+              // Force the first tab to be active if no tab is currently active
+              if (
+                this.tabs.length > 0 &&
+                (!this.activeTab || !this.tabs.find((t) => t.key === this.activeTab))
+              ) {
+                this.activeTab = this.tabs[0].key
+                if (this.isDevelopment) {
+                  console.log('🎯 HOD: Set active tab to:', this.activeTab)
+                }
               }
             }
 
@@ -6698,6 +7037,7 @@
           setTimeout(() => (this.toast.show = false), 3000)
         } finally {
           this.loading = false
+          this.loadingRequestData = false
         }
       },
 
@@ -6734,7 +7074,14 @@
         const userRole = (this.getUserRole() || '').toLowerCase()
 
         // Define role mappings for each stage
-        const hodRoles = ['head_of_department', 'hod']
+        const hodRoles = [
+          'head_of_department',
+          'hod',
+          'department_head',
+          'head_department',
+          'hod_user',
+          'head_of_dept'
+        ]
         const divisionalRoles = ['divisional_director']
         const ictDirectorRoles = ['ict_director', 'dict']
 
@@ -6804,7 +7151,17 @@
           const userRole = (this.getUserRole() || '').toLowerCase()
 
           // Route to appropriate approval method based on stage and role
-          if (stage === 'hod' && ['head_of_department', 'hod'].includes(userRole)) {
+          if (
+            stage === 'hod' &&
+            [
+              'head_of_department',
+              'hod',
+              'department_head',
+              'head_department',
+              'hod_user',
+              'head_of_dept'
+            ].includes(userRole)
+          ) {
             await this.approveAsHod()
           } else if (stage === 'divisional' && ['divisional_director'].includes(userRole)) {
             await this.approveAsDivisionalDirector()
@@ -7292,7 +7649,17 @@
 
           let result
 
-          if (stage === 'hod' && ['head_of_department', 'hod'].includes(userRole)) {
+          if (
+            stage === 'hod' &&
+            [
+              'head_of_department',
+              'hod',
+              'department_head',
+              'head_department',
+              'hod_user',
+              'head_of_dept'
+            ].includes(userRole)
+          ) {
             // HOD rejection using the existing API
             result = await combinedAccessService.updateHodApproval(this.getRequestId, {
               status: 'rejected',

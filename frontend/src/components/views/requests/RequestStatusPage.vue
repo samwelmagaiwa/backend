@@ -688,6 +688,7 @@
   import { useAuth } from '@/composables/useAuth'
   import { useAuthStore } from '@/stores/auth'
   import requestStatusService from '@/services/requestStatusService'
+  import apiClient from '@/services/apiClient'
 
   export default {
     name: 'RequestStatusPage',
@@ -856,20 +857,20 @@
           case 'jeeva':
             alert(
               `Edit functionality for ${getRequestTypeName(request.type)} requests is currently in development.\n\n` +
-              `For now, you can:\n` +
-              `1. Submit a new ${getRequestTypeName(request.type)} request\n` +
-              `2. Contact support for assistance with modifying this request\n\n` +
-              `Combined access requests already support editing.`
+                `For now, you can:\n` +
+                `1. Submit a new ${getRequestTypeName(request.type)} request\n` +
+                `2. Contact support for assistance with modifying this request\n\n` +
+                `Combined access requests already support editing.`
             )
             hasEditSupport = false
             break
           case 'wellsoft':
             alert(
               `Edit functionality for ${getRequestTypeName(request.type)} requests is currently in development.\n\n` +
-              `For now, you can:\n` +
-              `1. Submit a new ${getRequestTypeName(request.type)} request\n` +
-              `2. Contact support for assistance with modifying this request\n\n` +
-              `Combined access requests already support editing.`
+                `For now, you can:\n` +
+                `1. Submit a new ${getRequestTypeName(request.type)} request\n` +
+                `2. Contact support for assistance with modifying this request\n\n` +
+                `Combined access requests already support editing.`
             )
             hasEditSupport = false
             break
@@ -877,10 +878,10 @@
           case 'internet':
             alert(
               `Edit functionality for ${getRequestTypeName(request.type)} requests is currently in development.\n\n` +
-              `For now, you can:\n` +
-              `1. Submit a new ${getRequestTypeName(request.type)} request\n` +
-              `2. Contact support for assistance with modifying this request\n\n` +
-              `Combined access requests already support editing.`
+                `For now, you can:\n` +
+                `1. Submit a new ${getRequestTypeName(request.type)} request\n` +
+                `2. Contact support for assistance with modifying this request\n\n` +
+                `Combined access requests already support editing.`
             )
             hasEditSupport = false
             break
@@ -907,16 +908,19 @@
           }
 
           console.log('📝 EditCancelledRequest: Navigation target prepared:', navigationTarget)
-          
+
           // Navigate to edit form
           const navigationResult = await router.push(navigationTarget)
-          console.log('✅ EditCancelledRequest: Navigation completed successfully:', navigationResult)
+          console.log(
+            '✅ EditCancelledRequest: Navigation completed successfully:',
+            navigationResult
+          )
         } catch (error) {
           console.error('❌ EditCancelledRequest: Navigation failed:', error)
           alert(
             `Navigation error: Unable to navigate to edit page.\n\n` +
-            `Please try refreshing the page or contact support.\n\n` +
-            `Error: ${error.message}`
+              `Please try refreshing the page or contact support.\n\n` +
+              `Error: ${error.message}`
           )
         }
       }
@@ -1123,11 +1127,11 @@
       const handleResubmitConfirm = async () => {
         // Close the modal first
         showResubmitModal.value = false
-        
+
         // Get the selected request
         const request = selectedRequest.value
         if (!request) return
-        
+
         // Navigate to the appropriate edit form based on request type
         await handleEditConfirm()
       }
@@ -1208,45 +1212,21 @@
         cancelingRequest.value = request.id
 
         try {
-          // Call the appropriate cancel API based on request type
-          let response
+          // Call the appropriate cancel API based on request type using apiClient
           if (request.type === 'booking_service') {
             // For booking service requests, call the booking service API
-            response = await fetch(
-              `/api/booking-service/bookings/${request.original_id || request.id}`,
-              {
-                method: 'DELETE',
-                headers: {
-                  Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
-                  'Content-Type': 'application/json',
-                  Accept: 'application/json'
-                }
-              }
-            )
+            await apiClient.delete(`/booking-service/bookings/${request.original_id || request.id}`)
           } else {
             // For access requests, call the user access API
-            response = await fetch(`/api/v1/user-access/${request.original_id || request.id}`, {
-              method: 'DELETE',
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
-                'Content-Type': 'application/json',
-                Accept: 'application/json'
-              }
-            })
+            await apiClient.delete(`/v1/user-access/${request.original_id || request.id}`)
           }
 
-          if (response.ok) {
-            await response.json()
+          // Axios automatically handles status codes, so if we get here, it was successful
+          // Show success message
+          alert(`Request #${request.id} has been cancelled successfully.`)
 
-            // Show success message
-            alert(`Request #${request.id} has been cancelled successfully.`)
-
-            // Refresh the requests list
-            await loadRequests(currentPage.value)
-          } else {
-            const errorData = await response.json()
-            throw new Error(errorData.message || 'Failed to cancel request')
-          }
+          // Refresh the requests list
+          await loadRequests(currentPage.value)
         } catch (error) {
           console.error('❌ Error cancelling request:', error)
           alert(

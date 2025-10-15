@@ -777,7 +777,8 @@ class UserAccessController extends Controller
     }
 
     /**
-     * Remove the specified user access request.
+     * Cancel (soft delete) the specified user access request.
+     * Instead of deleting, this sets the status to 'cancelled'
      */
     public function destroy(UserAccess $userAccess): JsonResponse
     {
@@ -790,32 +791,48 @@ class UserAccessController extends Controller
                 ], 403);
             }
 
-            // Check if request can be deleted (only pending requests)
+            // Check if request can be cancelled (only pending requests)
             if (!$userAccess->isPending()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Only pending requests can be deleted.'
+                    'message' => 'Only pending requests can be cancelled.'
                 ], 422);
             }
 
-            $userAccess->delete();
+            // Cancel the request by updating status instead of deleting
+            $userAccess->update([
+                'hod_status' => 'cancelled',
+                'cancellation_reason' => 'Cancelled by user',
+                'cancelled_by' => Auth::id(),
+                'cancelled_at' => now()
+            ]);
 
-            Log::info("User access request deleted", [
+            Log::info("User access request cancelled", [
                 'user_id' => Auth::id(),
-                'request_id' => $userAccess->id
+                'request_id' => $userAccess->id,
+                'cancelled_at' => now()
             ]);
 
             return response()->json([
                 'success' => true,
-                'message' => 'User access request deleted successfully.'
+                'message' => 'User access request cancelled successfully.',
+                'data' => [
+                    'id' => $userAccess->id,
+                    'status' => 'cancelled',
+                    'cancelled_at' => now()
+                ]
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Error deleting user access request: ' . $e->getMessage());
+            Log::error('Error cancelling user access request: ' . $e->getMessage(), [
+                'user_id' => Auth::id(),
+                'request_id' => $userAccess->id,
+                'error_trace' => $e->getTraceAsString()
+            ]);
             
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to delete user access request.',
+                'message' => 'Failed to cancel user access request.',
                 'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
             ], 500);
         }

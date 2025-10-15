@@ -37,9 +37,14 @@
             <i
               :class="[
                 'fas',
-                ['fa-edit', 'fa-redo-alt', 'fa-file-alt', 'fa-check-circle', 'fa-sync-alt', 'fa-arrow-right'][
-                  Math.floor(Math.random() * 6)
-                ]
+                [
+                  'fa-edit',
+                  'fa-redo-alt',
+                  'fa-file-alt',
+                  'fa-check-circle',
+                  'fa-sync-alt',
+                  'fa-arrow-right'
+                ][Math.floor(Math.random() * 6)]
               ]"
             ></i>
           </div>
@@ -57,11 +62,9 @@
               class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-xl"
             ></div>
             <i class="fas fa-edit text-white text-xl relative z-10 drop-shadow-lg"></i>
-            <div
-              class="absolute top-1 right-1 w-1 h-1 bg-white/60 rounded-full animate-ping"
-            ></div>
+            <div class="absolute top-1 right-1 w-1 h-1 bg-white/60 rounded-full animate-ping"></div>
           </div>
-          
+
           <!-- Title -->
           <div class="flex-1">
             <h3 class="text-xl font-bold text-white mb-1 flex items-center">
@@ -69,7 +72,9 @@
               Edit & Resubmit Request?
             </h3>
             <div class="flex items-center space-x-2">
-              <span class="text-xs text-blue-300 font-medium bg-blue-500/20 px-2 py-1 rounded-full border border-blue-400/30">
+              <span
+                class="text-xs text-blue-300 font-medium bg-blue-500/20 px-2 py-1 rounded-full border border-blue-400/30"
+              >
                 <i class="fas fa-sync-alt mr-1 text-xs"></i>
                 Confirmation Required
               </span>
@@ -96,7 +101,9 @@
                 <i class="fas fa-tag mr-2 text-blue-300"></i>
                 Request ID:
               </span>
-              <span class="text-white font-bold text-sm bg-blue-500/20 px-2 py-1 rounded border border-blue-400/30">
+              <span
+                class="text-white font-bold text-sm bg-blue-500/20 px-2 py-1 rounded border border-blue-400/30"
+              >
                 {{ requestData.id }}
               </span>
             </div>
@@ -116,7 +123,9 @@
                 <i class="fas fa-info-circle mr-2 text-blue-300"></i>
                 Status:
               </span>
-              <span class="text-red-300 font-medium text-sm bg-red-500/20 px-2 py-1 rounded border border-red-400/30 flex items-center">
+              <span
+                class="text-red-300 font-medium text-sm bg-red-500/20 px-2 py-1 rounded border border-red-400/30 flex items-center"
+              >
                 <i class="fas fa-ban mr-1 text-xs"></i>
                 {{ requestData.status }}
               </span>
@@ -127,7 +136,9 @@
         <!-- Information Message -->
         <div class="bg-green-500/10 border border-green-400/30 rounded-xl p-4 backdrop-blur-sm">
           <div class="flex items-start space-x-3">
-            <div class="w-5 h-5 bg-green-500/20 rounded-full flex items-center justify-center mt-0.5">
+            <div
+              class="w-5 h-5 bg-green-500/20 rounded-full flex items-center justify-center mt-0.5"
+            >
               <i class="fas fa-info text-green-400 text-xs"></i>
             </div>
             <p class="text-green-100 text-sm">
@@ -178,104 +189,105 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+  import { ref } from 'vue'
 
-export default {
-  name: 'ResubmitConfirmationModal',
-  
-  props: {
-    isVisible: {
-      type: Boolean,
-      default: false
+  export default {
+    name: 'ResubmitConfirmationModal',
+
+    props: {
+      isVisible: {
+        type: Boolean,
+        default: false
+      },
+      requestData: {
+        type: Object,
+        default: () => ({
+          id: 'REQ-000000',
+          type: 'Combined Access',
+          status: 'Cancelled'
+        })
+      }
     },
-    requestData: {
-      type: Object,
-      default: () => ({
-        id: 'REQ-000000',
-        type: 'Combined Access',
-        status: 'Cancelled'
-      })
-    }
-  },
-  
-  emits: ['confirm', 'cancel'],
-  
-  setup(props, { emit }) {
-    const processing = ref(false)
-    
-    const handleConfirm = async () => {
-      processing.value = true
-      
-      // Add slight delay for better UX
-      await new Promise(resolve => setTimeout(resolve, 500))
-      
-      emit('confirm')
-      processing.value = false
-    }
-    
-    const handleCancel = () => {
-      if (!processing.value) {
-        emit('cancel')
+
+    emits: ['confirm', 'cancel'],
+
+    setup(props, { emit }) {
+      const processing = ref(false)
+
+      const handleConfirm = async () => {
+        processing.value = true
+
+        // Add slight delay for better UX
+        await new Promise((resolve) => setTimeout(resolve, 500))
+
+        emit('confirm')
+        processing.value = false
+      }
+
+      const handleCancel = () => {
+        if (!processing.value) {
+          emit('cancel')
+        }
+      }
+
+      return {
+        processing,
+        handleConfirm,
+        handleCancel
       }
     }
-    
-    return {
-      processing,
-      handleConfirm,
-      handleCancel
-    }
   }
-}
 </script>
 
 <style scoped>
-/* Medical Glass morphism effects */
-.bg-gradient-to-br {
-  background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
-}
-
-/* Floating animation */
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px) rotate(0deg);
+  /* Medical Glass morphism effects */
+  .bg-gradient-to-br {
+    background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
   }
-  50% {
-    transform: translateY(-10px) rotate(180deg);
+
+  /* Floating animation */
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-10px) rotate(180deg);
+    }
   }
-}
 
-.animate-float {
-  animation: float 4s ease-in-out infinite;
-}
-
-/* Backdrop blur for older browsers */
-.backdrop-blur-sm {
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-}
-
-/* Custom scrollbar if needed */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: rgba(59, 130, 246, 0.3);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(59, 130, 246, 0.5);
-}
-
-/* Responsive adjustments */
-@media (max-width: 640px) {
-  .max-w-md {
-    max-width: calc(100vw - 2rem);
+  .animate-float {
+    animation: float 4s ease-in-out infinite;
   }
-}
+
+  /* Backdrop blur for older browsers */
+  .backdrop-blur-sm {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  /* Custom scrollbar if needed */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: rgba(59, 130, 246, 0.3);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(59, 130, 246, 0.5);
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 640px) {
+    .max-w-md {
+      max-width: calc(100vw - 2rem);
+    }
+  }
 </style>

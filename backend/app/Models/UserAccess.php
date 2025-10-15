@@ -24,6 +24,7 @@ class UserAccess extends Model
      */
     protected $fillable = [
         'user_id',
+        'request_id',
         'pf_number',
         'staff_name',
         'phone_number',
@@ -1167,5 +1168,30 @@ class UserAccess extends Model
     public function isModuleRequestForRevoke(): bool
     {
         return $this->module_requested_for === 'revoke';
+    }
+    
+    /**
+     * Get the request ID attribute or generate one
+     */
+    public function getRequestIdAttribute($value)
+    {
+        return $value ?? 'REQ-' . str_pad($this->id, 6, '0', STR_PAD_LEFT);
+    }
+    
+    /**
+     * Generate and set request_id after model is created
+     */
+    protected static function booted()
+    {
+        // Set request_id after creation when ID is available
+        static::created(function ($userAccess) {
+            // Check if request_id is missing in raw attributes
+            $rawRequestId = $userAccess->getAttributes()['request_id'] ?? null;
+            if (empty($rawRequestId)) {
+                $generatedId = 'REQ-' . str_pad($userAccess->id, 6, '0', STR_PAD_LEFT);
+                $userAccess->request_id = $generatedId;
+                $userAccess->saveQuietly(); // Save without triggering events
+            }
+        });
     }
 }

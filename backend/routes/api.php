@@ -175,6 +175,51 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/current-user', [AuthController::class, 'getCurrentUser'])->name('current-user');
     Route::get('/role-redirect', [AuthController::class, 'getRoleBasedRedirect'])->name('role-redirect');
 
+    // Module data routes for dynamic loading
+    Route::get('/wellsoft-modules', function () {
+        try {
+            $modules = \App\Models\WellsoftModule::where('is_active', true)
+                ->orderBy('name')
+                ->get(['id', 'name', 'description']);
+            
+            return response()->json([
+                'success' => true,
+                'data' => $modules,
+                'message' => 'Wellsoft modules loaded successfully',
+                'count' => $modules->count()
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to load Wellsoft modules',
+                'message' => $e->getMessage(),
+                'data' => []
+            ], 500);
+        }
+    })->name('wellsoft-modules.index');
+
+    Route::get('/jeeva-modules', function () {
+        try {
+            $modules = \App\Models\JeevaModule::where('is_active', true)
+                ->orderBy('name')
+                ->get(['id', 'name', 'description']);
+            
+            return response()->json([
+                'success' => true,
+                'data' => $modules,
+                'message' => 'Jeeva modules loaded successfully',
+                'count' => $modules->count()
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to load Jeeva modules',
+                'message' => $e->getMessage(),
+                'data' => []
+            ], 500);
+        }
+    })->name('jeeva-modules.index');
+
     // Onboarding routes
     Route::prefix('onboarding')->group(function () {
         Route::get('/status', [OnboardingController::class, 'getStatus'])->name('onboarding.status');

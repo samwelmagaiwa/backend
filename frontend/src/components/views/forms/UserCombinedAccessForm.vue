@@ -885,7 +885,7 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
               <div
-                v-if="formData.services.jeeva"
+                v-if="submittedServices.jeeva"
                 class="bg-white rounded-lg p-3 shadow-sm border border-green-200 flex items-center gap-2 transition-transform hover:scale-105"
               >
                 <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
@@ -895,7 +895,7 @@
               </div>
 
               <div
-                v-if="formData.services.wellsoft"
+                v-if="submittedServices.wellsoft"
                 class="bg-white rounded-lg p-3 shadow-sm border border-blue-200 flex items-center gap-2 transition-transform hover:scale-105"
               >
                 <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
@@ -905,7 +905,7 @@
               </div>
 
               <div
-                v-if="formData.services.internet"
+                v-if="submittedServices.internet"
                 class="bg-white rounded-lg p-3 shadow-sm border border-teal-200 flex items-center gap-2 transition-transform hover:scale-105"
               >
                 <div class="w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
@@ -914,19 +914,16 @@
                 <span class="text-sm font-medium text-teal-800">Internet Access</span>
               </div>
             </div>
-            
+
             <!-- Fallback message if no services are selected -->
-            <div
-              v-if="!hasSelectedService"
-              class="text-center py-4 text-gray-500 italic"
-            >
+            <div v-if="!hasSelectedService" class="text-center py-4 text-gray-500 italic">
               <i class="fas fa-exclamation-circle mr-2"></i>
               No services selected
             </div>
 
             <!-- Internet Purposes -->
             <div
-              v-if="formData.services.internet && hasInternetPurposes"
+              v-if="submittedServices.internet && hasInternetPurposes"
               class="mt-4 pt-4 border-t border-blue-200"
             >
               <div class="flex items-center gap-2 mb-3">
@@ -1049,6 +1046,13 @@
         isEditMode: false,
         editRequestId: null,
         originalRequestData: null,
+        // Store selected services for success modal display
+        submittedServices: {
+          jeeva: false,
+          wellsoft: false,
+          internet: false
+        },
+        submittedInternetPurposes: [],
         formData: {
           // Applicant Details
           pfNumber: '',
@@ -1073,6 +1077,14 @@
 
     computed: {
       hasSelectedService() {
+        // If showing success modal, use submitted services, otherwise use current form data
+        if (this.showSuccessModal) {
+          return (
+            this.submittedServices.jeeva ||
+            this.submittedServices.wellsoft ||
+            this.submittedServices.internet
+          )
+        }
         return (
           this.formData.services.jeeva ||
           this.formData.services.wellsoft ||
@@ -1080,9 +1092,17 @@
         )
       },
       hasInternetPurposes() {
+        // If showing success modal, use submitted purposes, otherwise use current form data
+        if (this.showSuccessModal) {
+          return this.submittedInternetPurposes.some((purpose) => purpose.trim() !== '')
+        }
         return this.formData.internetPurposes.some((purpose) => purpose.trim() !== '')
       },
       filledInternetPurposes() {
+        // If showing success modal, use submitted purposes, otherwise use current form data
+        if (this.showSuccessModal) {
+          return this.submittedInternetPurposes.filter((purpose) => purpose.trim() !== '')
+        }
         return this.formData.internetPurposes.filter((purpose) => purpose.trim() !== '')
       }
     },
@@ -1613,6 +1633,12 @@
             const actionText = this.isEditMode ? 'updated and resubmitted' : 'submitted'
             console.log(`Combined access request ${actionText} successfully:`, response.data)
 
+            // Preserve service selections for success modal display
+            this.submittedServices = { ...this.formData.services }
+            this.submittedInternetPurposes = [
+              ...this.formData.internetPurposes.filter((p) => p.trim() !== '')
+            ]
+
             this.showSuccessModal = true
             if (!this.isEditMode) {
               this.resetForm()
@@ -1742,8 +1768,8 @@
         if (!departmentId) {
           return 'Please select department'
         }
-        
-        const department = this.departments.find(dept => dept.id == departmentId)
+
+        const department = this.departments.find((dept) => dept.id == departmentId)
         return department ? department.name : `Department ID: ${departmentId}`
       },
 

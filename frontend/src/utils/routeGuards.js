@@ -93,9 +93,14 @@ export async function checkRouteAccess(route) {
           reason: 'Onboarding required'
         }
       }
-      
+
       // Special case: Allow access to onboarding route if user needs onboarding
-      if ((route.name === 'Onboarding' || route.path === '/onboarding') && user?.needs_onboarding && userRole !== 'admin' && userRole !== 'ADMIN') {
+      if (
+        (route.name === 'Onboarding' || route.path === '/onboarding') &&
+        user?.needs_onboarding &&
+        userRole !== 'admin' &&
+        userRole !== 'ADMIN'
+      ) {
         console.log('✅ Route Guard: Allowing onboarding access for user who needs it')
         return {
           hasAccess: true,
@@ -292,10 +297,16 @@ export async function enhancedNavigationGuard(to, from, next) {
     // Handle redirect query parameter - but only if user doesn't need onboarding
     if (to.query.redirect && piniaAuthStore.isAuthenticated && piniaAuthStore.userRole) {
       const user = piniaAuthStore.user
-      
+
       // Skip redirect processing if user needs onboarding
-      if (user?.needs_onboarding && piniaAuthStore.userRole !== 'admin' && piniaAuthStore.userRole !== 'ADMIN') {
-        console.log('⏸️ Enhanced Route Guard: Skipping redirect processing - user needs onboarding first')
+      if (
+        user?.needs_onboarding &&
+        piniaAuthStore.userRole !== 'admin' &&
+        piniaAuthStore.userRole !== 'ADMIN'
+      ) {
+        console.log(
+          '⏸️ Enhanced Route Guard: Skipping redirect processing - user needs onboarding first'
+        )
         // Let the normal route access check handle the onboarding redirect
       } else {
         const redirectPath = to.query.redirect
@@ -345,7 +356,12 @@ export async function enhancedNavigationGuard(to, from, next) {
     }
 
     // Special case: Allow direct access to onboarding if user needs it
-    if (to.path === '/onboarding' && piniaAuthStore.user?.needs_onboarding && piniaAuthStore.userRole !== 'admin' && piniaAuthStore.userRole !== 'ADMIN') {
+    if (
+      to.path === '/onboarding' &&
+      piniaAuthStore.user?.needs_onboarding &&
+      piniaAuthStore.userRole !== 'admin' &&
+      piniaAuthStore.userRole !== 'ADMIN'
+    ) {
       console.log('✅ Enhanced Route Guard: Allowing access to onboarding for user who needs it')
       return next()
     }

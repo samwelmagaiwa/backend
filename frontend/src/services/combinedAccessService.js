@@ -509,6 +509,70 @@ class CombinedAccessService {
       }
     }
   }
+
+  /**
+   * Get all Wellsoft modules from database
+   * @returns {Promise<Object>} Response with Wellsoft modules data
+   */
+  async getWellsoftModules() {
+    try {
+      console.log('🔄 CombinedAccessService: Fetching Wellsoft modules...')
+
+      const response = await apiClient.get('/wellsoft-modules')
+
+      if (response.data && response.data.success) {
+        console.log(
+          '✅ CombinedAccessService: Wellsoft modules loaded successfully:',
+          response.data.data?.length || 0
+        )
+        return {
+          success: true,
+          data: response.data.data
+        }
+      } else {
+        throw new Error(response.data?.message || 'Failed to load Wellsoft modules')
+      }
+    } catch (error) {
+      console.error('❌ CombinedAccessService: Error fetching Wellsoft modules:', error)
+      return {
+        success: false,
+        error: error.response?.data?.message || error.message || 'Failed to load Wellsoft modules',
+        data: []
+      }
+    }
+  }
+
+  /**
+   * Get all Jeeva modules from database
+   * @returns {Promise<Object>} Response with Jeeva modules data
+   */
+  async getJeevaModules() {
+    try {
+      console.log('🔄 CombinedAccessService: Fetching Jeeva modules...')
+
+      const response = await apiClient.get('/jeeva-modules')
+
+      if (response.data && response.data.success) {
+        console.log(
+          '✅ CombinedAccessService: Jeeva modules loaded successfully:',
+          response.data.data?.length || 0
+        )
+        return {
+          success: true,
+          data: response.data.data
+        }
+      } else {
+        throw new Error(response.data?.message || 'Failed to load Jeeva modules')
+      }
+    } catch (error) {
+      console.error('❌ CombinedAccessService: Error fetching Jeeva modules:', error)
+      return {
+        success: false,
+        error: error.response?.data?.message || error.message || 'Failed to load Jeeva modules',
+        data: []
+      }
+    }
+  }
 }
 
 export default new CombinedAccessService()
