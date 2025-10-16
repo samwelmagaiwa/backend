@@ -802,6 +802,41 @@
                         </div>
                       </div>
                     </div>
+
+                    <!-- HOD Comments Section - Positioned below Module Requested and Access Rights sections -->
+                    <div class="mt-4 mb-2">
+                      <div class="medical-card bg-gradient-to-r from-blue-600/15 to-indigo-600/15 border-2 border-blue-400/40 rounded-lg backdrop-blur-sm hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 group p-3">
+                        <div class="flex items-center space-x-3 mb-3">
+                          <div class="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50">
+                            <i class="fas fa-comment-dots text-white text-sm"></i>
+                          </div>
+                          <h3 class="text-sm font-bold text-white flex items-center">
+                            <i class="fas fa-user-tie mr-2 text-blue-300"></i>
+                            HOD Comments
+                          </h3>
+                        </div>
+                        
+                        <!-- HOD Comments Textarea -->
+                        <div class="w-full">
+                          <textarea
+                            v-model="hodComments"
+                            :disabled="isReviewMode && !isHodApprovalEditable"
+                            class="w-full h-24 bg-white/10 border border-blue-300/30 rounded-lg p-3 text-white placeholder-blue-300/60 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-transparent transition-all duration-200"
+                            placeholder="Specify access category and additional comments"
+                            rows="3"
+                          ></textarea>
+                          <div class="flex justify-between items-center mt-2">
+                            <span class="text-xs text-blue-300/70">
+                              Characters: {{ (hodComments || '').length }}/500
+                            </span>
+                            <span v-if="hodComments && hodComments.trim()" class="text-xs text-green-300">
+                              <i class="fas fa-check-circle mr-1"></i>
+                              Comment saved
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
                   <!-- Previous Comments Section - Show modules summary and comments for non-HOD users in review mode -->
@@ -4036,6 +4071,8 @@
         hodAccessType: 'permanent',
         hodTemporaryUntil: '',
         hodTemporaryUntilError: '',
+        // HOD Comments for access category specification
+        hodComments: '',
         // Approval signatures
         hodSignaturePreview: '',
         hodSignatureFileName: '',
@@ -4852,8 +4889,8 @@
         return false
       },
 
-      // Get HOD comments from requestData for Divisional Directors and ICT Directors to view
-      hodComments() {
+      // Get HOD comments from requestData for display in review mode
+      displayedHodComments() {
         if (!this.requestData) return null
 
         // Try multiple possible sources for HOD comments - prioritize hod_comments field
@@ -4955,7 +4992,7 @@
             name: 'Head of Department',
             icon: 'fa-user-tie',
             color: 'blue',
-            getComments: () => this.hodComments,
+            getComments: () => this.displayedHodComments,
             getDate: () => {
               const date =
                 this.requestData.hod_approved_at ||
@@ -6608,6 +6645,10 @@
                 this.hodTemporaryUntil = `${yyyy}-${mm}-${dd}`
               }
             }
+            // Load HOD comments from database
+            if (this.requestData.hod_comments) {
+              this.hodComments = this.requestData.hod_comments
+            }
             if (this.isDevelopment) {
               console.log('Signature path from API:', this.requestData.signature_path)
               console.log('Type of signature_path:', typeof this.requestData.signature_path)
@@ -7230,7 +7271,8 @@
           selectedJeeva: this.selectedJeeva,
           moduleRequestedFor: this.wellsoftRequestType || 'use',
           accessType: this.hodAccessType,
-          temporaryUntil: this.hodAccessType === 'temporary' ? this.hodTemporaryUntil : undefined
+          temporaryUntil: this.hodAccessType === 'temporary' ? this.hodTemporaryUntil : undefined,
+          hodComments: this.hodComments // Add HOD comments to payload
         }
 
         // Add timeout to prevent hanging requests

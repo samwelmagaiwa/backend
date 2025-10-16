@@ -373,33 +373,6 @@ const routes = [
     }
   },
   {
-    path: '/debug/ict-requests',
-    name: 'RequestsListDebug',
-    component: () => import('../components/debug/RequestsListDebug.vue'),
-    meta: {
-      requiresAuth: true,
-      roles: [ROLES.ICT_OFFICER]
-    }
-  },
-  {
-    path: '/debug/user-security-access-test',
-    name: 'UserSecurityAccessTest',
-    component: () => import('../components/debug/UserSecurityAccessTest.vue'),
-    meta: {
-      requiresAuth: true,
-      roles: [ROLES.ICT_OFFICER]
-    }
-  },
-  {
-    path: '/debug/api-test',
-    name: 'ApiTestComponent',
-    component: () => import('../components/debug/ApiTestComponent.vue'),
-    meta: {
-      requiresAuth: true,
-      roles: [ROLES.ICT_OFFICER]
-    }
-  },
-  {
     path: '/ict-approval/request/:id',
     name: 'RequestDetails',
     component: () => import('../components/views/ict-approval/RequestDetails.vue'),
@@ -545,17 +518,6 @@ const routes = [
     }
   },
 
-  // Head of IT Debug (temporary)
-  {
-    path: '/debug/head-of-it',
-    name: 'HeadOfItDebug',
-    component: () =>
-      import(/* webpackChunkName: "debug" */ '../components/debug/HeadOfItDebug.vue'),
-    meta: {
-      requiresAuth: true,
-      roles: [ROLES.HEAD_OF_IT, ROLES.ADMIN]
-    }
-  },
 
   // Redirect old route to new route for backward compatibility
   {
@@ -563,52 +525,7 @@ const routes = [
     redirect: '/hod-dashboard/request-list'
   },
 
-  // Debug route for HOD Dashboard
-  {
-    path: '/hod-dashboard/debug',
-    name: 'HODDashboardDebug',
-    component: () => import('../components/debug/HODDashboardDebug.vue'),
-    meta: {
-      requiresAuth: true,
-      roles: [
-        ROLES.HEAD_OF_DEPARTMENT,
-        ROLES.DIVISIONAL_DIRECTOR,
-        ROLES.ICT_DIRECTOR,
-        ROLES.ICT_OFFICER
-      ]
-    }
-  },
 
-  // Debug route for Request Details
-  {
-    path: '/debug/request-details',
-    name: 'RequestDetailsDebug',
-    component: () => import('../components/debug/RequestDetailsDebug.vue'),
-    meta: {
-      requiresAuth: true,
-      roles: Object.values(ROLES)
-    }
-  },
-  // Debug route for API Testing
-  {
-    path: '/debug/api-test',
-    name: 'ApiTest',
-    component: () => import('../components/debug/ApiTest.vue'),
-    meta: {
-      requiresAuth: true,
-      roles: Object.values(ROLES)
-    }
-  },
-  // Debug route for Dropdown Testing
-  {
-    path: '/debug/dropdown-test',
-    name: 'DropdownTest',
-    component: () => import('../components/debug/DropdownTest.vue'),
-    meta: {
-      requiresAuth: true,
-      roles: Object.values(ROLES)
-    }
-  },
   // Module Request Test Page
   {
     path: '/module-request-test',
