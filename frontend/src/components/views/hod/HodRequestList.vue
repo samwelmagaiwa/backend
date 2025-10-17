@@ -45,11 +45,11 @@
 
         <div class="max-w-full mx-auto relative z-10">
           <!-- Header Section -->
-          <div class="medical-glass-card rounded-t-3xl p-6 mb-0 border-b border-blue-300/30">
+          <div class="medical-glass-card rounded-t-3xl p-4 mb-0 border-b border-blue-300/30">
             <div class="flex justify-between items-center">
               <!-- Left Logo -->
               <div
-                class="w-28 h-28 mr-8 transform hover:scale-110 transition-transform duration-300"
+                class="w-32 h-32 mr-8 transform hover:scale-110 transition-transform duration-300"
               >
                 <div
                   class="w-full h-full bg-gradient-to-br from-blue-500/20 to-teal-500/20 rounded-2xl backdrop-blur-sm border-2 border-blue-300/40 flex items-center justify-center shadow-2xl hover:shadow-blue-500/25"
@@ -57,7 +57,7 @@
                   <img
                     src="/assets/images/ngao2.png"
                     alt="National Shield"
-                    class="max-w-20 max-h-20 object-contain"
+                    class="max-w-28 max-h-28 object-contain"
                   />
                 </div>
               </div>
@@ -65,34 +65,28 @@
               <!-- Center Content -->
               <div class="text-center flex-1">
                 <h1
-                  class="text-3xl font-bold text-white mb-4 tracking-wide drop-shadow-lg animate-fade-in"
+                  class="text-2xl font-bold text-white mb-2 tracking-wide drop-shadow-lg animate-fade-in"
                 >
                   MUHIMBILI NATIONAL HOSPITAL
                 </h1>
-                <div class="relative inline-block mb-4">
+                <div class="relative inline-block mb-2">
                   <div
-                    class="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white px-8 py-3 rounded-full text-xl font-bold shadow-2xl transform hover:scale-105 transition-all duration-300 border-2 border-emerald-400/60"
+                    class="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-2 rounded-full text-lg font-bold shadow-2xl transform hover:scale-105 transition-all duration-300 border-2 border-red-400/60"
                   >
                     <span class="relative z-10 flex items-center gap-3">
                       <i class="fas fa-clipboard-check text-xl"></i>
                       ACCESS REQUESTS - HOD APPROVAL STAGE
                     </span>
                     <div
-                      class="absolute inset-0 bg-gradient-to-r from-emerald-700 to-emerald-800 rounded-full opacity-0 hover:opacity-100 transition-opacity duration-300"
+                      class="absolute inset-0 bg-gradient-to-r from-red-700 to-red-800 rounded-full opacity-0 hover:opacity-100 transition-opacity duration-300"
                     ></div>
                   </div>
                 </div>
-                <h2
-                  class="text-lg font-bold text-blue-100 tracking-wide drop-shadow-md animate-fade-in-delay"
-                >
-                  Staff requests displayed in FIFO order. Click "View & Process" to capture: Module
-                  Requested for, Module Request, Access Rights, and Comments.
-                </h2>
               </div>
 
               <!-- Right Logo -->
               <div
-                class="w-28 h-28 ml-8 transform hover:scale-110 transition-transform duration-300"
+                class="w-32 h-32 ml-8 transform hover:scale-110 transition-transform duration-300"
               >
                 <div
                   class="w-full h-full bg-gradient-to-br from-teal-500/20 to-blue-500/20 rounded-2xl backdrop-blur-sm border-2 border-teal-300/40 flex items-center justify-center shadow-2xl hover:shadow-teal-500/25"
@@ -100,7 +94,7 @@
                   <img
                     src="/assets/images/logo2.png"
                     alt="Muhimbili Logo"
-                    class="max-w-20 max-h-20 object-contain"
+                    class="max-w-28 max-h-28 object-contain"
                   />
                 </div>
               </div>
@@ -428,79 +422,7 @@
                               </div>
                             </button>
 
-                            <!-- Dropdown menu -->
-                            <div
-                              v-show="activeDropdown === request.id"
-                              :id="'dropdown-' + request.id"
-                              class="dropdown-menu fixed w-56 origin-top-right bg-white rounded-xl shadow-2xl border border-gray-200/50 focus:outline-none backdrop-blur-sm"
-                              :style="getDropdownStyle(request.id)"
-                              @click.stop
-                            >
-                              <div class="py-2">
-                                <button
-                                  @click="viewAndProcessRequest(request.id)"
-                                  class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 hover:text-blue-700 transition-all duration-200 font-medium"
-                                >
-                                  <i
-                                    class="fas fa-eye mr-3 text-blue-500 group-hover:text-blue-600"
-                                  ></i>
-                                  View & Process
-                                </button>
-
-                                <button
-                                  v-if="canEdit(request)"
-                                  @click="editRequest(request.id)"
-                                  class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-amber-50 hover:to-amber-100 hover:text-amber-700 transition-all duration-200 font-medium"
-                                >
-                                  <i
-                                    class="fas fa-edit mr-3 text-amber-500 group-hover:text-amber-600"
-                                  ></i>
-                                  Edit
-                                </button>
-
-                                <div
-                                  v-if="canCancel(request)"
-                                  class="border-t border-gray-100 my-1"
-                                ></div>
-
-                                <button
-                                  v-if="canCancel(request)"
-                                  @click="cancelRequest(request.id)"
-                                  class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-red-50 hover:to-red-100 hover:text-red-700 transition-all duration-200 font-medium"
-                                >
-                                  <i
-                                    class="fas fa-ban mr-3 text-red-500 group-hover:text-red-600"
-                                  ></i>
-                                  Cancel
-                                </button>
-
-                                <!-- Separator for additional actions -->
-                                <div class="border-t border-gray-100 my-1"></div>
-
-                                <!-- View Progress action -->
-                                <button
-                                  @click="viewProgress(request)"
-                                  v-if="canViewProgress(request)"
-                                  class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-100 hover:text-orange-700 transition-all duration-200 font-medium"
-                                >
-                                  <i
-                                    class="fas fa-chart-line mr-3 text-orange-500 group-hover:text-orange-600"
-                                  ></i>
-                                  View Progress
-                                </button>
-
-                                <!-- View Timeline action -->
-                                <button
-                                  @click="viewTimeline(request)"
-                                  class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-indigo-100 hover:text-indigo-700 transition-all duration-200 font-medium"
-                                >
-                                  <i
-                                    class="fas fa-history mr-3 text-indigo-500 group-hover:text-indigo-600"
-                                  ></i>
-                                  View Timeline
-                                </button>
-                              </div>
-                            </div>
+                            <!-- Dropdown moved to global portal -->
                           </div>
                         </td>
                       </tr>
@@ -567,6 +489,76 @@
       @close="closeTimeline"
       @updated="handleTimelineUpdate"
     />
+
+    <!-- Global Dropdown Portal -->
+    <div v-if="activeDropdown" class="dropdown-portal">
+      <div
+        class="fixed w-56 origin-top-right bg-white rounded-xl shadow-2xl border border-gray-200/50 focus:outline-none backdrop-blur-sm dropdown-menu"
+        :style="getGlobalDropdownStyle()"
+        @click.stop
+      >
+        <div class="py-2">
+          <template v-if="activeRequest">
+            <button
+              v-if="!isCancelledByUser(activeRequest)"
+              @click="viewAndProcessRequest(activeRequest.id)"
+              class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 hover:text-blue-700 transition-all duration-200 font-medium"
+            >
+              <i class="fas fa-eye mr-3 text-blue-500 group-hover:text-blue-600"></i>
+              View & Process
+            </button>
+
+            <button
+              v-if="isCancelledByUser(activeRequest)"
+              @click="deleteRequest(activeRequest.id)"
+              class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-red-50 hover:to-red-100 hover:text-red-700 transition-all duration-200 font-medium"
+            >
+              <i class="fas fa-trash mr-3 text-red-500 group-hover:text-red-600"></i>
+              Delete
+            </button>
+
+            <button
+              v-if="canEdit(activeRequest)"
+              @click="editRequest(activeRequest.id)"
+              class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-amber-50 hover:to-amber-100 hover:text-amber-700 transition-all duration-200 font-medium"
+            >
+              <i class="fas fa-edit mr-3 text-amber-500 group-hover:text-amber-600"></i>
+              Edit
+            </button>
+
+            <div v-if="canCancel(activeRequest)" class="border-t border-gray-100 my-1"></div>
+
+            <button
+              v-if="canCancel(activeRequest)"
+              @click="cancelRequest(activeRequest.id)"
+              class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-red-50 hover:to-red-100 hover:text-red-700 transition-all duration-200 font-medium"
+            >
+              <i class="fas fa-ban mr-3 text-red-500 group-hover:text-red-600"></i>
+              Cancel
+            </button>
+
+            <div class="border-t border-gray-100 my-1"></div>
+
+            <button
+              @click="viewProgress(activeRequest)"
+              v-if="canViewProgress(activeRequest)"
+              class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-100 hover:text-orange-700 transition-all duration-200 font-medium"
+            >
+              <i class="fas fa-chart-line mr-3 text-orange-500 group-hover:text-orange-600"></i>
+              View Progress
+            </button>
+
+            <button
+              @click="viewTimeline(activeRequest)"
+              class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-indigo-100 hover:text-indigo-700 transition-all duration-200 font-medium"
+            >
+              <i class="fas fa-history mr-3 text-indigo-500 group-hover:text-indigo-600"></i>
+              View Timeline
+            </button>
+          </template>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -579,8 +571,12 @@
 
   /* Ensure dropdown menus are always on top */
   .dropdown-menu {
-    position: absolute !important;
+    /* Use fixed so it ignores ancestor overflow and aligns to viewport */
+    position: fixed !important;
     z-index: 99999 !important;
+    /* Keep visible within viewport */
+    max-height: calc(100vh - 20px);
+    overflow: auto;
     box-shadow:
       0 20px 25px -5px rgba(0, 0, 0, 0.1),
       0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
@@ -589,6 +585,16 @@
   /* Prevent overflow clipping in containers */
   .table-container {
     overflow: visible !important;
+  }
+
+  /* Dropdown portal - ensure it's above everything */
+  .dropdown-portal {
+    z-index: 100000;
+  }
+
+  .dropdown-portal > div {
+    z-index: 100000 !important;
+    position: fixed !important;
   }
 
   /* Medical Glass morphism effects */
@@ -741,12 +747,18 @@
           )
         }
 
+        // Exclude user-self-cancelled items (safety net)
+        filtered = filtered.filter((r) => !this.isCancelledByUser(r))
+
         // Sort by FIFO order (oldest first)
         return filtered.sort((a, b) => {
           const dateA = new Date(a.created_at || a.submission_date || 0)
           const dateB = new Date(b.created_at || b.submission_date || 0)
           return dateA - dateB
         })
+      },
+      activeRequest() {
+        return this.getActiveRequest()
       }
     },
     async mounted() {
@@ -754,6 +766,9 @@
         console.log('HodRequestList: Component mounted, initializing...')
         await this.fetchRequests()
         console.log('HodRequestList: Component initialized successfully')
+
+        // Poll periodically to reflect user-side cancellations
+        this._poller = setInterval(() => this.fetchRequests(), 30000)
 
         // Add click listener to close dropdowns when clicking outside
         document.addEventListener('click', this.closeDropdowns)
@@ -767,19 +782,21 @@
     beforeUnmount() {
       // Clean up the click listener
       document.removeEventListener('click', this.closeDropdowns)
+      if (this._poller) clearInterval(this._poller)
     },
 
     methods: {
       toggleDropdown(requestId) {
-        console.log('Toggle dropdown for request:', requestId)
+        const idStr = String(requestId)
+        console.log('Toggle dropdown for request:', idStr)
         console.log('Current activeDropdown:', this.activeDropdown)
 
-        if (this.activeDropdown === requestId) {
+        if (String(this.activeDropdown) === idStr) {
           this.activeDropdown = null
           console.log('Closing dropdown')
         } else {
-          this.activeDropdown = requestId
-          console.log('Opening dropdown for:', requestId)
+          this.activeDropdown = idStr
+          console.log('Opening dropdown for:', idStr)
 
           // Wait for DOM update before calculating position
           this.$nextTick(() => {
@@ -796,38 +813,35 @@
         }
       },
 
+      // Deprecated (kept for reference) - per-cell dropdown
       getDropdownStyle(requestId) {
         if (this.activeDropdown !== requestId) {
           return { display: 'none' }
         }
 
         // Find the button element
-        const buttonElement = document.querySelector(`[data-request-id="${requestId}"]`)
-        if (!buttonElement) {
-          return {
-            position: 'fixed',
-            top: '50px',
-            right: '10px',
-            zIndex: 99999
-          }
-        }
+        const idStr = String(requestId)
+        const buttonElement = document.querySelector(`[data-request-id="${idStr}"]`)
+        const dropdownEl = document.getElementById('dropdown-' + idStr)
 
-        const rect = buttonElement.getBoundingClientRect()
+        // Fallback defaults
+        let rect = { top: 50, bottom: 60, right: window.innerWidth - 10 }
+        if (buttonElement) rect = buttonElement.getBoundingClientRect()
+
         const viewportHeight = window.innerHeight
-        const dropdownHeight = 200 // Approximate height of dropdown (larger for HodRequestList)
+        const measuredHeight = dropdownEl ? dropdownEl.offsetHeight : 240
+        const dropdownHeight = Math.min(measuredHeight || 240, viewportHeight - 20)
 
         let top = rect.bottom + 8
-        let right = window.innerWidth - rect.right
+        let right = Math.max(10, window.innerWidth - rect.right)
 
         // If dropdown would go below viewport, position it above the button
         if (top + dropdownHeight > viewportHeight) {
-          top = rect.top - dropdownHeight - 8
+          top = Math.max(10, rect.top - dropdownHeight - 8)
         }
 
-        // Ensure dropdown doesn't go off-screen to the left
-        if (right < 0) {
-          right = 10
-        }
+        // Ensure top stays within viewport
+        if (top < 10) top = 10
 
         return {
           position: 'fixed',
@@ -836,6 +850,45 @@
           zIndex: 99999
         }
       },
+      getActiveRequest() {
+        if (!this.activeDropdown) return null
+        return this.filteredRequests.find((r) => String(r.id) === String(this.activeDropdown))
+      },
+
+      getGlobalDropdownStyle() {
+        if (!this.activeDropdown) return { display: 'none' }
+
+        const idStr = String(this.activeDropdown)
+        const buttonElement = document.querySelector(`[data-request-id="${idStr}"]`)
+        const menuWidth = 224 // w-56
+        const defaultStyle = { position: 'fixed', top: '50px', left: '10px', zIndex: 99999 }
+
+        if (!buttonElement) return defaultStyle
+
+        const rect = buttonElement.getBoundingClientRect()
+        const viewportHeight = window.innerHeight
+        const viewportWidth = window.innerWidth
+        const measuredHeight = 240
+
+        let top = rect.bottom + 8
+        let left = Math.min(rect.left, viewportWidth - menuWidth - 10)
+
+        // Flip up if bottom overflows
+        if (top + measuredHeight > viewportHeight) {
+          top = Math.max(10, rect.top - measuredHeight - 8)
+        }
+
+        if (left < 10) left = 10
+        if (top < 10) top = 10
+
+        return {
+          position: 'fixed',
+          top: top + 'px',
+          left: left + 'px',
+          zIndex: 99999
+        }
+      },
+
       async fetchRequests() {
         this.isLoading = true
         this.error = null
@@ -915,8 +968,8 @@
 
       viewAndProcessRequest(requestId) {
         this.closeDropdowns()
-        // Navigate to both-service-form.vue with populated data
-        this.$router.push(`/both-service-form/${requestId}`)
+        // Navigate to HOD-specific review path
+        this.$router.push(`/hod-combined-requests/both-service-form/${requestId}`)
       },
 
       editRequest(requestId) {
@@ -1041,7 +1094,7 @@
       viewProgress(request) {
         console.log('👁️ HodRequestList: Viewing progress for request:', request.id)
         this.activeDropdown = null
-        // Navigate to progress view - using ICT dashboard route for consistency
+        // Navigate to ICT progress view (existing page)
         this.$router.push(`/ict-dashboard/request-progress/${request.id}`)
       },
 
@@ -1049,6 +1102,41 @@
         // HOD can view progress for requests that are beyond the pending stage
         const status = request.hod_status || request.status
         return !['pending_hod', 'hod_rejected', 'cancelled'].includes(status)
+      },
+
+      // Helper to detect user-cancelled requests
+      isCancelledByUser(request) {
+        const status = request.hod_status || request.status
+        if (status !== 'cancelled') return false
+        // Prefer backend-provided boolean if present
+        if (typeof request.cancelled_by_user !== 'undefined') {
+          return !!request.cancelled_by_user
+        }
+        // Fallbacks: compare canceller to owner or detect reason text
+        const byId =
+          !!request.cancelled_by && !!request.user_id && request.cancelled_by === request.user_id
+        const byReason = (request.cancellation_reason || '')
+          .toString()
+          .toLowerCase()
+          .includes('cancelled by user')
+        return byId || byReason
+      },
+
+      // Delete from HOD view (UI-only removal if API not available)
+      async deleteRequest(requestId) {
+        this.closeDropdowns()
+        const confirmed = confirm('Delete this cancelled request from your list?')
+        if (!confirmed) return
+        try {
+          const res = await combinedAccessService.deleteCancelledRequest(requestId)
+          if (!res.success) throw new Error(res.error)
+          this.requests = this.requests.filter((r) => r.id !== requestId)
+          this.calculateStats()
+          alert('Request deleted.')
+        } catch (e) {
+          console.error('HOD delete failed:', e)
+          alert('Failed to delete request: ' + e.message)
+        }
       }
     }
   }

@@ -30,9 +30,17 @@ class HodCombinedAccessController extends Controller
             ]);
 
             $query = UserAccess::with(['user', 'department'])
-                ->whereNotNull('request_type');
-                // Show ALL requests regardless of status - HODs should see the complete history
-                // including pending, approved, rejected, implemented, and completed requests
+                ->whereNotNull('request_type')
+                // Exclude requests cancelled by the staff (owner) themselves
+                ->where(function ($q) {
+                    $q->whereNull('hod_status')
+                      ->orWhere('hod_status', '!=', 'cancelled')
+                      ->orWhere(function ($qq) {
+                          $qq->where('hod_status', 'cancelled')
+                             ->whereColumn('cancelled_by', '!=', 'user_id');
+                      });
+                });
+                // HODs see all except user-self-cancelled items
 
             // DEPARTMENT FILTERING: HOD only sees requests from their department(s)
             $currentUser = auth()->user();
@@ -366,6 +374,64 @@ class HodCombinedAccessController extends Controller
     }
 
     /**
+     * Permanently delete a user-cancelled request (HOD cleanup only)
+     */
+    public function destroy($id): JsonResponse
+    {
+        try {
+            Log::info('HOD Combined Access: Delete request attempt', [
+                'request_id' => $id,
+                'user_id' => auth()->id()
+            ]);
+
+            $userAccessRequest = UserAccess::findOrFail($id);
+
+            // Department authorization: HOD only for own departments
+            $currentUser = auth()->user();
+            $hodDepartmentIds = $currentUser->departmentsAsHOD()->pluck('id')->toArray();
+            if (!empty($hodDepartmentIds) && !in_array($userAccessRequest->department_id, $hodDepartmentIds)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Access denied. You can only delete requests from your department.'
+                ], 403);
+            }
+
+            // Only allow delete if the request was cancelled by the owner (staff)
+            $isUserCancelled = $userAccessRequest->hod_status === 'cancelled'
+                && (int) $userAccessRequest->cancelled_by === (int) $userAccessRequest->user_id;
+
+            if (!$isUserCancelled) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Only user-cancelled requests can be deleted by HOD.'
+                ], 422);
+            }
+
+            $userAccessRequest->delete();
+
+            Log::info('HOD Combined Access: Request deleted', [
+                'request_id' => $id,
+                'deleted_by' => $currentUser->id
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Request deleted successfully.'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('HOD Combined Access: Error deleting request', [
+                'request_id' => $id,
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete request.'
+            ], 500);
+        }
+    }
+
+    /**
      * Get statistics for HOD dashboard
      */
     public function statistics(): JsonResponse
@@ -450,49 +516,57 @@ class HodCombinedAccessController extends Controller
      */
     private function transformRequestData($request): array
     {
-        return [
-            'id' => $request->id,
-            'request_id' => 'REQ-' . str_pad($request->id, 6, '0', STR_PAD_LEFT),
-            'pf_number' => $request->pf_number,
-            'staff_name' => $request->staff_name,
-            'full_name' => $request->staff_name, // Alias for compatibility
-            'phone' => $request->phone_number,
-            'phone_number' => $request->phone_number,
-            'department' => $request->department?->name ?? 'N/A',
-            'department_id' => $request->department_id,
-            'department_name' => $request->department?->name ?? 'N/A',
-            'request_type' => $request->getRequestTypesArray(),
-            'request_type_display' => $request->request_type_name,
-            'request_types' => $request->getRequestTypesArray(), // Array format
-            'purpose' => $request->purpose,
-            
-            // NEW: Include module data for conditional display
-            'wellsoft_modules' => $request->wellsoft_modules,
-            'jeeva_modules' => $request->jeeva_modules,
-            'wellsoft_modules_selected' => $request->wellsoft_modules_selected ?? [],
-            'jeeva_modules_selected' => $request->jeeva_modules_selected ?? [],
-            'internet_purposes' => $request->internet_purposes,
-            'module_requested_for' => $request->module_requested_for ?? 'use',
-            'access_type' => $request->access_type,
-            'temporary_until' => $request->temporary_until?->format('Y-m-d'),
-            
-            'status' => $request->hod_status ?? 'pending',
-            'hod_status' => $request->hod_status ?? 'pending',  // Use actual hod_status
-            'status_display' => $this->getStatusDisplayName($request->hod_status ?? 'pending'),
-            'signature_path' => $request->signature_path,
-            'created_at' => $request->created_at,
-            'updated_at' => $request->updated_at,
-            'submission_date' => $request->created_at,
-            'hod_comments' => $request->hod_comments ?? '',
-            'hod_name' => $request->hod_name ?? '',
-            'hod_approved_at' => $request->hod_approved_at,
-            // Approval workflow status
-            'hod_approval_status' => $this->getApprovalStatus($request, 'hod'),
-            'divisional_approval_status' => $this->getApprovalStatus($request, 'divisional'),
-            'dict_approval_status' => $this->getApprovalStatus($request, 'dict'),
-            'head_it_approval_status' => $this->getApprovalStatus($request, 'head_it'),
-            'ict_approval_status' => $this->getApprovalStatus($request, 'ict'),
-        ];
+            return [
+                'id' => $request->id,
+                'user_id' => $request->user_id,
+                'request_id' => 'REQ-' . str_pad($request->id, 6, '0', STR_PAD_LEFT),
+                'pf_number' => $request->pf_number,
+                'staff_name' => $request->staff_name,
+                'full_name' => $request->staff_name, // Alias for compatibility
+                'phone' => $request->phone_number,
+                'phone_number' => $request->phone_number,
+                'department' => $request->department?->name ?? 'N/A',
+                'department_id' => $request->department_id,
+                'department_name' => $request->department?->name ?? 'N/A',
+                'request_type' => $request->getRequestTypesArray(),
+                'request_type_display' => $request->request_type_name,
+                'request_types' => $request->getRequestTypesArray(), // Array format
+                'purpose' => $request->purpose,
+                
+                // NEW: Include module data for conditional display
+                'wellsoft_modules' => $request->wellsoft_modules,
+                'jeeva_modules' => $request->jeeva_modules,
+                'wellsoft_modules_selected' => $request->wellsoft_modules_selected ?? [],
+                'jeeva_modules_selected' => $request->jeeva_modules_selected ?? [],
+                'internet_purposes' => $request->internet_purposes,
+                'module_requested_for' => $request->module_requested_for ?? 'use',
+                'access_type' => $request->access_type,
+                'temporary_until' => $request->temporary_until?->format('Y-m-d'),
+                
+                'status' => $request->hod_status ?? 'pending',
+                'hod_status' => $request->hod_status ?? 'pending',  // Use actual hod_status
+                'status_display' => $this->getStatusDisplayName($request->hod_status ?? 'pending'),
+                'signature_path' => $request->signature_path,
+                'created_at' => $request->created_at,
+                'updated_at' => $request->updated_at,
+                'submission_date' => $request->created_at,
+                'hod_comments' => $request->hod_comments ?? '',
+                'hod_name' => $request->hod_name ?? '',
+                'hod_approved_at' => $request->hod_approved_at,
+                
+                // Cancellation metadata for UI logic
+                'cancellation_reason' => $request->cancellation_reason,
+                'cancelled_by' => $request->cancelled_by,
+                'cancelled_at' => $request->cancelled_at,
+'cancelled_by_user' => ($request->hod_status === 'cancelled') && ((int) $request->cancelled_by === (int) $request->user_id),
+                
+                // Approval workflow status
+                'hod_approval_status' => $this->getApprovalStatus($request, 'hod'),
+                'divisional_approval_status' => $this->getApprovalStatus($request, 'divisional'),
+                'dict_approval_status' => $this->getApprovalStatus($request, 'dict'),
+                'head_it_approval_status' => $this->getApprovalStatus($request, 'head_it'),
+                'ict_approval_status' => $this->getApprovalStatus($request, 'ict'),
+            ];
     }
 
     /**

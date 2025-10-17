@@ -417,7 +417,7 @@ class UserAccessController extends Controller
                 'phone_number' => $validatedData['phone_number'],
                 'department_id' => $validatedData['department_id'],
                 'signature_path' => $signaturePath,
-                'purpose' => $purposes,
+'purpose' => $purposes, // Legacy alias (kept for backward compatibility)
                 'request_type' => $selectedServices, // Array stored as JSON
                 'status' => 'pending',
                 
@@ -677,7 +677,9 @@ class UserAccessController extends Controller
                 'department_id' => $validatedData['department_id'],
                 'signature_path' => $signaturePath,
                 'request_type' => $selectedServices, // Update services
-                'purpose' => $purposes, // Update internet purposes
+'internet_purposes' => $purposes, // Update internet purposes
+                // Backward-compatibility field (legacy)
+                'purpose' => $purposes,
                 'status' => 'pending', // Reset status to pending for resubmission
                 
                 // Reset new status columns for resubmission

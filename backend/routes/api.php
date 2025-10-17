@@ -569,6 +569,8 @@ Route::prefix('hod')->middleware('role:head_of_department,divisional_director,ic
         ->name('hod.combined-access-requests.approve');
     Route::post('combined-access-requests/{id}/cancel', [HodCombinedAccessController::class, 'cancel'])
         ->name('hod.combined-access-requests.cancel');
+    Route::delete('combined-access-requests/{id}', [HodCombinedAccessController::class, 'destroy'])
+        ->name('hod.combined-access-requests.delete');
     Route::get('combined-access-requests/{id}/timeline', [HodCombinedAccessController::class, 'getAccessRequestTimeline'])
         ->name('hod.combined-access-requests.timeline');
     

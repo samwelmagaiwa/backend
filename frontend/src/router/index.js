@@ -220,55 +220,67 @@ const routes = [
       ]
     }
   },
+  // Deprecated: old public both-service-form routes (use HOD-specific route instead)
+  // {
+  //   path: '/both-service-form',
+  //   name: 'BothServiceForm',
+  //   component: () => import('../components/views/forms/both-service-form.vue'),
+  //   meta: {
+  //     requiresAuth: true,
+  //     roles: [
+  //       ROLES.DIVISIONAL_DIRECTOR,
+  //       ROLES.HEAD_OF_DEPARTMENT,
+  //       ROLES.ICT_DIRECTOR,
+  //       ROLES.HEAD_OF_IT,
+  //       ROLES.ICT_OFFICER,
+  //       ROLES.STAFF
+  //     ]
+  //   },
+  //   alias: ['/both-service-from']
+  // },
+  // {
+  //   path: '/both-service-form/:id',
+  //   name: 'BothServiceFormReview',
+  //   component: () => import('../components/views/forms/both-service-form.vue'),
+  //   meta: {
+  //     requiresAuth: true,
+  //     roles: [
+  //       ROLES.DIVISIONAL_DIRECTOR,
+  //       ROLES.HEAD_OF_DEPARTMENT,
+  //       ROLES.ICT_DIRECTOR,
+  //       ROLES.HEAD_OF_IT,
+  //       ROLES.ICT_OFFICER,
+  //       ROLES.STAFF
+  //     ]
+  //   }
+  // },
+  // HOD-friendly path for reviewing combined requests
   {
-    path: '/both-service-form',
-    name: 'BothServiceForm',
+    path: '/hod-combined-requests/both-service-form/:id',
+    name: 'HodBothServiceFormReview',
     component: () => import('../components/views/forms/both-service-form.vue'),
     meta: {
       requiresAuth: true,
-      roles: [
-        ROLES.DIVISIONAL_DIRECTOR,
-        ROLES.HEAD_OF_DEPARTMENT,
-        ROLES.ICT_DIRECTOR,
-        ROLES.HEAD_OF_IT,
-        ROLES.ICT_OFFICER,
-        ROLES.STAFF // Allow staff to edit their own rejected requests
-      ]
-    },
-    alias: ['/both-service-from']
-  },
-  {
-    path: '/both-service-form/:id',
-    name: 'BothServiceFormReview',
-    component: () => import('../components/views/forms/both-service-form.vue'),
-    meta: {
-      requiresAuth: true,
-      roles: [
-        ROLES.DIVISIONAL_DIRECTOR,
-        ROLES.HEAD_OF_DEPARTMENT,
-        ROLES.ICT_DIRECTOR,
-        ROLES.HEAD_OF_IT,
-        ROLES.ICT_OFFICER,
-        ROLES.STAFF // Allow staff to edit their own rejected requests
-      ]
+      roles: [ROLES.HEAD_OF_DEPARTMENT]
     }
   },
-  {
-    path: '/both-service-form/:id/edit',
-    name: 'BothServiceFormEdit',
-    component: () => import('../components/views/forms/both-service-form.vue'),
-    meta: {
-      requiresAuth: true,
-      roles: [
-        ROLES.DIVISIONAL_DIRECTOR,
-        ROLES.HEAD_OF_DEPARTMENT,
-        ROLES.ICT_DIRECTOR,
-        ROLES.HEAD_OF_IT,
-        ROLES.ICT_OFFICER,
-        ROLES.STAFF // Allow staff to edit their own rejected requests
-      ]
-    }
-  },
+  // Deprecated: old edit route for both-service-form
+  // {
+  //   path: '/both-service-form/:id/edit',
+  //   name: 'BothServiceFormEdit',
+  //   component: () => import('../components/views/forms/both-service-form.vue'),
+  //   meta: {
+  //     requiresAuth: true,
+  //     roles: [
+  //       ROLES.DIVISIONAL_DIRECTOR,
+  //       ROLES.HEAD_OF_DEPARTMENT,
+  //       ROLES.ICT_DIRECTOR,
+  //       ROLES.HEAD_OF_IT,
+  //       ROLES.ICT_OFFICER,
+  //       ROLES.STAFF
+  //     ]
+  //   }
+  // },
 
   // User submission forms
   {
@@ -392,7 +404,7 @@ const routes = [
     path: '/hod-dashboard/combined-requests',
     name: 'HODCombinedRequestList',
     component: () =>
-      import(/* webpackChunkName: "hod" */ '../components/views/hod/HodRequestListSimplified.vue'),
+      import(/* webpackChunkName: "hod" */ '../components/views/hod/HodRequestList.vue'),
     meta: {
       requiresAuth: true,
       roles: [ROLES.HEAD_OF_DEPARTMENT]
@@ -518,13 +530,11 @@ const routes = [
     }
   },
 
-
   // Redirect old route to new route for backward compatibility
   {
     path: '/internal-access/list',
     redirect: '/hod-dashboard/request-list'
   },
-
 
   // Module Request Test Page
   {

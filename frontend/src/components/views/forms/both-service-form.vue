@@ -1,5 +1,5 @@
 <!-- eslint-disable vue/no-parsing-error -->
-<!-- eslint-disable-file -->
+<!-- eslint-disable prettier/prettier -->
 <template>
   <div class="flex flex-col h-screen">
     <Header />
@@ -252,7 +252,7 @@
                 ]"
               >
                 <!-- Left: shared + selectors -->
-                <section
+                <div
                   aria-labelledby="applicant-details"
                   :class="[
                     'xl:col-span-4',
@@ -803,41 +803,49 @@
                       </div>
                     </div>
 
-                    <!-- HOD Comments Section - Positioned below Module Requested and Access Rights sections -->
+                    <!-- HOD Comments + Internet Purposes Section (with visual divider and gap) -->
                     <div class="mt-4 mb-2">
-                      <div class="medical-card bg-gradient-to-r from-blue-600/15 to-indigo-600/15 border-2 border-blue-400/40 rounded-lg backdrop-blur-sm hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 group p-3">
-                        <div class="flex items-center space-x-3 mb-3">
-                          <div class="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50">
-                            <i class="fas fa-comment-dots text-white text-sm"></i>
+                      <div class="medical-card bg-gradient-to-r from-blue-600/15 to-indigo-600/15 border-2 border-blue-400/40 rounded-lg p-3">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                          <!-- Left: Internet Purposes (own outer wrap) -->
+                          <div class="h-full">
+                            <div class="bg-white/5 rounded-lg border border-blue-300/20 p-3 h-full">
+                              <div class="text-xs text-blue-100">
+                                <strong class="mr-2">Internet Purposes</strong>
+                                <span v-if="!hasInternetRequest">Not Requested</span>
+                                <ul v-else class="space-y-1 mt-1">
+                                  <li
+                                    v-for="(p, i) in filteredInternetPurposes.slice(0, 4)"
+                                    :key="'ip-' + i"
+                                    class="flex items-start gap-2"
+                                  >
+                                    <span
+                                      class="w-5 h-5 inline-flex items-center justify-center rounded-full bg-white/10 border border-blue-300/30 text-blue-200 text-xs font-semibold flex-shrink-0"
+                                    >
+                                      {{ i + 1 }}
+                                    </span>
+                                    <span class="truncate">{{ p }}</span>
+                                  </li>
+                                </ul>
+                              </div>
+                            </div>
                           </div>
-                          <h3 class="text-sm font-bold text-white flex items-center">
-                            <i class="fas fa-user-tie mr-2 text-blue-300"></i>
-                            HOD Comments
-                          </h3>
-                        </div>
-                        
-                        <!-- HOD Comments Textarea -->
-                        <div class="w-full">
-                          <textarea
-                            v-model="hodComments"
-                            :disabled="isReviewMode && !isHodApprovalEditable"
-                            class="w-full h-24 bg-white/10 border border-blue-300/30 rounded-lg p-3 text-white placeholder-blue-300/60 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-transparent transition-all duration-200"
-                            placeholder="Specify access category and additional comments"
-                            rows="3"
-                          ></textarea>
-                          <div class="flex justify-between items-center mt-2">
-                            <span class="text-xs text-blue-300/70">
-                              Characters: {{ (hodComments || '').length }}/500
-                            </span>
-                            <span v-if="hodComments && hodComments.trim()" class="text-xs text-green-300">
-                              <i class="fas fa-check-circle mr-1"></i>
-                              Comment saved
-                            </span>
+                          <!-- Right: HOD Comments (own outer wrap) -->
+                          <div class="h-full">
+                            <div class="bg-white/5 rounded-lg border border-blue-300/20 p-3 h-full">
+                              <label class="block text-blue-100 text-sm mb-1">HOD Comments</label>
+                              <textarea
+                                v-model="hodComments"
+                                :disabled="isReviewMode && !isHodApprovalEditable"
+                                class="w-full h-20 bg-white/10 border border-blue-300/30 rounded-lg p-2 text-white placeholder-blue-300/60 text-sm resize-none"
+                                placeholder="HOD specify access category here..."
+                                rows="3"
+                              ></textarea>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
 
                   <!-- Previous Comments Section - Show modules summary and comments for non-HOD users in review mode -->
                   <!-- HOD users will see full module selection tabs instead -->
@@ -873,8 +881,7 @@
                               'TEMPLATE DEBUG - previousComments length:',
                               previousComments && previousComments.length
                             ) || ''
-                          }}</span
-                        >
+                          }}</span>
                       </div>
                       <h3 class="text-xs font-bold text-white flex items-center">
                         <i class="fas fa-history mr-1 text-amber-300 text-xs"></i>
@@ -1061,8 +1068,7 @@
                                         </div>
                                         <span
                                           class="text-xs text-green-100 font-medium leading-tight"
-                                          >{{ purpose }}</span
-                                        >
+                                        >{{ purpose }}</span>
                                       </div>
                                       <div
                                         v-if="filteredInternetPurposes.length > 4"
@@ -1322,9 +1328,7 @@
                         </h5>
                         <div class="space-y-3">
                           <div>
-                            <label class="block text-xs font-medium text-blue-100 mb-1"
-                              >Name<span class="text-red-400">*</span></label
-                            >
+                            <label class="block text-xs font-medium text-blue-100 mb-1">Name<span class="text-red-400">*</span></label>
                             <div class="relative">
                               <input
                                 v-model="form.approvals.hod.name"
@@ -1343,9 +1347,7 @@
                             </div>
                           </div>
                           <div>
-                            <label class="block text-xs font-medium text-blue-100 mb-1"
-                              >Signature<span class="text-red-400">*</span></label
-                            >
+                            <label class="block text-xs font-medium text-blue-100 mb-1">Signature<span class="text-red-400">*</span></label>
                             <div class="relative">
                               <!-- Debug: Show which template condition is active -->
                               <!-- {{ console.log('🖼️ HOD Template Debug:', { shouldShowHodSignedIndicator, shouldShowHodNoSignatureIndicator, hodSignaturePreview, isReviewMode }) }} -->
@@ -1375,8 +1377,7 @@
                                           ? 'text-green-300 font-extrabold uppercase tracking-wide'
                                           : 'text-green-400 font-semibold'
                                       ]"
-                                      >Signed</span
-                                    >
+                                      >Signed</span>
                                   </div>
                                   <p
                                     :class="[
@@ -1413,9 +1414,7 @@
                                     >
                                       <i class="fas fa-times text-red-400 text-sm"></i>
                                     </div>
-                                    <span class="text-red-400 font-semibold text-sm"
-                                      >No signature on file</span
-                                    >
+                                    <span class="text-red-400 font-semibold text-sm">No signature on file</span>
                                   </div>
                                   <p class="text-red-300/80 text-xs">HOD approval pending</p>
                                 </div>
@@ -1560,9 +1559,7 @@
                             </div>
                           </div>
                           <div>
-                            <label class="block text-xs font-medium text-blue-100 mb-1"
-                              >Date (mm/dd/yyyy)<span class="text-red-400">*</span></label
-                            >
+                            <label class="block text-xs font-medium text-blue-100 mb-1">Date (mm/dd/yyyy)<span class="text-red-400">*</span></label>
                             <div class="relative">
                               <input
                                 v-model="form.approvals.hod.date"
@@ -1655,9 +1652,7 @@
                         </h5>
                         <div class="space-y-3">
                           <div>
-                            <label class="block text-xs font-medium text-blue-100 mb-1"
-                              >Name<span class="text-red-400">*</span></label
-                            >
+                            <label class="block text-xs font-medium text-blue-100 mb-1">Name<span class="text-red-400">*</span></label>
                             <div class="relative">
                               <input
                                 v-model="form.approvals.divisionalDirector.name"
@@ -1676,9 +1671,7 @@
                             </div>
                           </div>
                           <div>
-                            <label class="block text-xs font-medium text-blue-100 mb-1"
-                              >Signature<span class="text-red-400">*</span></label
-                            >
+                            <label class="block text-xs font-medium text-blue-100 mb-1">Signature<span class="text-red-400">*</span></label>
                             <div class="relative">
                               <!-- Show Divisional Director signed indicator for ICT Director stage -->
                               <div
@@ -1705,8 +1698,7 @@
                                           ? 'text-green-300 font-extrabold uppercase tracking-wide'
                                           : 'text-green-400 font-semibold'
                                       ]"
-                                      >Signed</span
-                                    >
+                                      >Signed</span>
                                   </div>
                                   <p
                                     :class="[
@@ -1732,9 +1724,7 @@
                                     >
                                       <i class="fas fa-times text-red-400 text-sm"></i>
                                     </div>
-                                    <span class="text-red-400 font-semibold text-sm"
-                                      >No signature on file</span
-                                    >
+                                    <span class="text-red-400 font-semibold text-sm">No signature on file</span>
                                   </div>
                                   <p class="text-red-300/80 text-xs">
                                     Divisional Director approval pending
@@ -1887,9 +1877,7 @@
                             </div>
                           </div>
                           <div>
-                            <label class="block text-base font-medium text-blue-100 mb-1"
-                              >Date (mm/dd/yyyy)<span class="text-red-400">*</span></label
-                            >
+                            <label class="block text-base font-medium text-blue-100 mb-1">Date (mm/dd/yyyy)<span class="text-red-400">*</span></label>
                             <div class="relative">
                               <input
                                 v-model="form.approvals.divisionalDirector.date"
@@ -1984,9 +1972,7 @@
                         </h5>
                         <div class="space-y-3">
                           <div>
-                            <label class="block text-base font-medium text-blue-100 mb-1"
-                              >Name<span class="text-red-400">*</span></label
-                            >
+                            <label class="block text-base font-medium text-blue-100 mb-1">Name<span class="text-red-400">*</span></label>
                             <div class="relative">
                               <input
                                 v-model="form.approvals.directorICT.name"
@@ -2005,9 +1991,7 @@
                             </div>
                           </div>
                           <div>
-                            <label class="block text-base font-medium text-blue-100 mb-1"
-                              >Signature<span class="text-red-400">*</span></label
-                            >
+                            <label class="block text-base font-medium text-blue-100 mb-1">Signature<span class="text-red-400">*</span></label>
                             <div class="relative">
                               <!-- Show ICT Director signed indicator for Head IT stage -->
                               <div
@@ -2041,9 +2025,7 @@
                                     >
                                       <i class="fas fa-times text-red-400 text-sm"></i>
                                     </div>
-                                    <span class="text-red-400 font-semibold text-sm"
-                                      >No signature on file</span
-                                    >
+                                    <span class="text-red-400 font-semibold text-sm">No signature on file</span>
                                   </div>
                                   <p class="text-red-300/80 text-xs">
                                     ICT Director approval pending
@@ -2196,9 +2178,7 @@
                             </div>
                           </div>
                           <div>
-                            <label class="block text-xs font-medium text-blue-100 mb-1"
-                              >Date (mm/dd/yyyy)<span class="text-red-400">*</span></label
-                            >
+                            <label class="block text-xs font-medium text-blue-100 mb-1">Date (mm/dd/yyyy)<span class="text-red-400">*</span></label>
                             <div class="relative">
                               <input
                                 v-model="form.approvals.directorICT.date"
@@ -2412,9 +2392,7 @@
                         </h5>
                         <div class="space-y-0.5">
                           <div>
-                            <label class="block text-xs font-medium text-blue-100 mb-0.5"
-                              >Name<span class="text-red-400">*</span></label
-                            >
+                            <label class="block text-xs font-medium text-blue-100 mb-0.5">Name<span class="text-red-400">*</span></label>
                             <div class="relative">
                               <input
                                 v-model="form.implementation.headIT.name"
@@ -2462,9 +2440,7 @@
                             </div>
                           </div>
                           <div>
-                            <label class="block text-xs font-medium text-blue-100 mb-0.5"
-                              >Signature<span class="text-red-400">*</span></label
-                            >
+                            <label class="block text-xs font-medium text-blue-100 mb-0.5">Signature<span class="text-red-400">*</span></label>
                             <div class="relative">
                               <!-- Show Head IT signed indicator for ICT Officer stage -->
                               <div
@@ -2498,9 +2474,7 @@
                                     >
                                       <i class="fas fa-times text-red-400 text-sm"></i>
                                     </div>
-                                    <span class="text-red-400 font-semibold text-xs"
-                                      >No signature on file</span
-                                    >
+                                    <span class="text-red-400 font-semibold text-xs">No signature on file</span>
                                   </div>
                                   <p class="text-red-300/80 text-xs">Head IT approval pending</p>
                                 </div>
@@ -2585,9 +2559,7 @@
                             </div>
                           </div>
                           <div>
-                            <label class="block text-xs font-medium text-blue-100 mb-0.5"
-                              >Date (mm/dd/yyyy)<span class="text-red-400">*</span></label
-                            >
+                            <label class="block text-xs font-medium text-blue-100 mb-0.5">Date (mm/dd/yyyy)<span class="text-red-400">*</span></label>
                             <div class="relative">
                               <input
                                 v-model="form.implementation.headIT.date"
@@ -2674,9 +2646,7 @@
                         </h5>
                         <div class="space-y-0.5">
                           <div>
-                            <label class="block text-xs font-medium text-blue-100 mb-0"
-                              >Name<span class="text-red-400">*</span></label
-                            >
+                            <label class="block text-xs font-medium text-blue-100 mb-0">Name<span class="text-red-400">*</span></label>
                             <div class="relative">
                               <input
                                 v-model="form.implementation.ictOfficer.name"
@@ -2695,9 +2665,7 @@
                             </div>
                           </div>
                           <div>
-                            <label class="block text-xs font-medium text-blue-100 mb-0"
-                              >Signature<span class="text-red-400">*</span></label
-                            >
+                            <label class="block text-xs font-medium text-blue-100 mb-0">Signature<span class="text-red-400">*</span></label>
                             <div class="relative">
                               <div
                                 v-if="
@@ -2834,9 +2802,7 @@
                             </div>
                           </div>
                           <div>
-                            <label class="block text-xs font-medium text-blue-100 mb-0"
-                              >Date<span class="text-red-400">*</span></label
-                            >
+                            <label class="block text-xs font-medium text-blue-100 mb-0">Date<span class="text-red-400">*</span></label>
                             <div class="relative">
                               <input
                                 v-model="form.approvals.hod.date"
@@ -2993,10 +2959,10 @@
                       </button>
                     </div>
                   </div>
-                </section>
+                </div>
 
                 <!-- Right: tabs -->
-                <section
+                <div
                   v-if="!isReviewMode || isHodApprovalEditable"
                   aria-labelledby="module-tabs"
                   class="lg:col-span-1 space-y-4"
@@ -3082,7 +3048,8 @@
                       </transition>
                     </div>
                   </div>
-                </section>
+                </div>
+                </div>
               </div>
             </form>
           </div>
@@ -3206,8 +3173,7 @@
               <p class="text-gray-700 text-lg leading-relaxed">
                 Now you can select the ICT Officer who will be assigned this task of releasing
                 access to
-                <span class="font-semibold text-blue-600">{{ getRequesterName() }}</span
-                >.
+                <span class="font-semibold text-blue-600">{{ getRequesterName() }}</span>.
               </p>
             </div>
 
@@ -3257,8 +3223,7 @@
           <div class="px-6 py-6 text-center">
             <p class="text-gray-700 text-base leading-relaxed mb-6">
               You are approaching to grant access to
-              <span class="font-semibold text-blue-600">{{ getRequesterName() }}</span
-              >. Do you want to continue?
+              <span class="font-semibold text-blue-600">{{ getRequesterName() }}</span>. Do you want to continue?
             </p>
 
             <!-- Action buttons -->
@@ -5958,7 +5923,6 @@
         this.wellsoftModules = wellsoftModules
         this.jeevaModules = jeevaModules
       },
-
 
       // Legacy methods kept for compatibility - now just call cached version
       async loadWellsoftModules() {

@@ -4,6 +4,25 @@ This file provides comprehensive guidance for WARP when working with the MNH (Mu
 
 ## 🚀 Quick Start Commands
 
+### First-time setup
+```bash
+# Backend
+cd backend
+cp .env.example .env
+composer install
+php artisan key:generate
+php artisan migrate --seed
+php artisan storage:link
+
+# Frontend
+cd ../frontend
+npm install
+
+# Root (for concurrently helper)
+cd ..
+npm install
+```
+
 ### Development Environment Setup
 ```bash
 # Start all services simultaneously
@@ -11,7 +30,7 @@ npm run dev
 
 # Or start services individually:
 npm run dev:api          # Laravel API server (port 8000)
-npm run dev:queue        # Laravel queue worker  
+npm run dev:queue        # Laravel queue worker
 npm run dev:frontend     # Vue.js dev server (port 8080)
 ```
 
@@ -44,13 +63,19 @@ php artisan test                # Run all tests
 php artisan test --filter=UserAccessTest # Run specific test
 ```
 
+### Swagger/OpenAPI
+```bash
+php artisan l5-swagger:generate   # Generate OpenAPI docs
+php artisan route:list --path=api # Inspect API routes
+```
+
 ### Frontend Commands (Vue.js 3)
 ```bash
 # Navigate to frontend directory first
 cd frontend
 
 # Development
-npm run serve                   # Start Vue dev server (hot reload)
+npm run serve                   # Start Vue dev server (HMR disabled by config)
 npm run dev                     # Alias for serve
 npm run dev:mobile             # Serve on all network interfaces (0.0.0.0)
 
@@ -58,6 +83,11 @@ npm run dev:mobile             # Serve on all network interfaces (0.0.0.0)
 npm run build                   # Build for production
 npm run build:prod             # Production build with optimizations
 npm run build:analyze          # Build with bundle analyzer
+
+> Windows (PowerShell) note: set NODE_ENV before running modern build
+```powershell
+$env:NODE_ENV = "production"; npm run build:modern
+```
 
 # Code quality
 npm run lint                    # Run ESLint
@@ -424,10 +454,8 @@ php artisan serve --host=127.0.0.1 --port=8000
 ### CORS Issues
 ```bash
 # If frontend can't reach API
-# Check backend .env CORS settings
-CORS_ALLOWED_ORIGINS=http://localhost:8080,http://127.0.0.1:8080
-
-# Clear Laravel config cache
+# Edit backend/config/cors.php and set 'allowed_origins' to your frontend URL(s)
+# In development it's currently '*' (allow all). For production, set explicit origins.
 php artisan config:clear
 ```
 

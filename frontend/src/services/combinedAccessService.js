@@ -511,6 +511,28 @@ class CombinedAccessService {
   }
 
   /**
+   * Permanently delete a user-cancelled request (HOD cleanup)
+   * @param {number} requestId
+   */
+  async deleteCancelledRequest(requestId) {
+    try {
+      console.log('🗑️ Deleting user-cancelled request as HOD:', requestId)
+      const response = await apiClient.delete(`/hod/combined-access-requests/${requestId}`)
+      if (response.data && response.data.success) {
+        return { success: true, message: response.data.message }
+      } else {
+        throw new Error(response.data?.message || 'Failed to delete request')
+      }
+    } catch (error) {
+      console.error('❌ Error deleting user-cancelled request:', error)
+      return {
+        success: false,
+        error: error.response?.data?.message || error.message || 'Failed to delete request'
+      }
+    }
+  }
+
+  /**
    * Get all Wellsoft modules from database
    * @returns {Promise<Object>} Response with Wellsoft modules data
    */

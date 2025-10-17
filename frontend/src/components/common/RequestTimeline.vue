@@ -695,19 +695,36 @@
             isHeadOfDepartment: this.isHeadOfDepartment
           })
 
-          const result = await this.currentService.getRequestTimeline(this.requestId)
+          let result
+          try {
+            result = await this.currentService.getRequestTimeline(this.requestId)
+          } catch (primaryErr) {
+            // Fallback for HOD: use ICT endpoint if HOD-specific API fails
+            if (this.isHeadOfDepartment) {
+              console.warn('Primary HOD timeline endpoint failed, falling back to ICT endpoint:', primaryErr)
+              try {
+                result = await ictOfficerService.getRequestTimeline(this.requestId)
+              } catch (fallbackErr) {
+                throw fallbackErr
+              }
+            } else {
+              throw primaryErr
+            }
+          }
 
           // Handle different response formats from different services
-          if (result.success !== undefined) {
+          if (result && result.success !== undefined) {
             // Services that return { success: boolean, data: object }
             if (result.success) {
               this.timelineData = result.data
             } else {
               throw new Error(result.error || result.message || 'Failed to load timeline data')
             }
-          } else {
+          } else if (result) {
             // Services that return data directly (like ictOfficerService.getRequestTimeline)
             this.timelineData = result
+          } else {
+            throw new Error('No timeline data returned')
           }
 
           console.log('✅ RequestTimeline: Timeline loaded successfully')

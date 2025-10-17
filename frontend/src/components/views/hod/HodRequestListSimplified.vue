@@ -233,7 +233,7 @@
                         <!-- Three dots button -->
                         <button
                           @click.stop="toggleDropdown(request.id)"
-                          :data-request-id="request.id"
+                          :data-request-id="String(request.id)"
                           class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-600/20 hover:bg-blue-600/40 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                         >
                           <div class="flex flex-col space-y-0.5">
@@ -285,11 +285,21 @@
       >
         <div class="py-1">
           <button
+            v-if="getActiveRequest() && !isCancelledByUser(getActiveRequest())"
             @click="viewAndProcessRequest(activeDropdown)"
             class="group flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-150"
           >
             <i class="fas fa-eye mr-3 text-blue-500 group-hover:text-blue-600"></i>
             View & Process
+          </button>
+
+          <button
+            v-if="getActiveRequest() && isCancelledByUser(getActiveRequest())"
+            @click="deleteRequest(activeDropdown)"
+            class="group flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+          >
+            <i class="fas fa-trash mr-3 text-red-500 group-hover:text-red-600"></i>
+            Delete
           </button>
 
           <button
@@ -342,8 +352,11 @@
 
   /* Ensure dropdown menus are always on top */
   .dropdown-menu {
-    position: absolute !important;
+    /* Use fixed so it ignores ancestor overflow and aligns to viewport */
+    position: fixed !important;
     z-index: 99999 !important;
+    max-height: calc(100vh - 20px);
+    overflow: auto;
     box-shadow:
       0 20px 25px -5px rgba(0, 0, 0, 0.1),
       0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
@@ -427,6 +440,9 @@
           filtered = filtered.filter((request) => request.status === this.statusFilter)
         }
 
+        // Exclude user-self-cancelled items (safety net)
+        filtered = filtered.filter((r) => !this.isCancelledByUser(r))
+
         // Sort by FIFO order (oldest first)
         return filtered.sort((a, b) => {
           const dateA = new Date(a.created_at || a.submission_date || 0)
@@ -441,6 +457,9 @@
         await this.fetchRequests()
         console.log('HodRequestListSimplified: Component initialized successfully')
 
+        // Poll periodically to reflect user-side cancellations
+        this._poller = setInterval(() => this.fetchRequests(), 30000)
+
         // Add click listener to close dropdowns when clicking outside
         document.addEventListener('click', this.closeDropdowns)
       } catch (error) {
@@ -453,18 +472,20 @@
     beforeUnmount() {
       // Clean up the click listener
       document.removeEventListener('click', this.closeDropdowns)
+      if (this._poller) clearInterval(this._poller)
     },
     methods: {
       toggleDropdown(requestId) {
-        console.log('Toggle dropdown for request:', requestId)
+        const idStr = String(requestId)
+        console.log('Toggle dropdown for request:', idStr)
         console.log('Current activeDropdown:', this.activeDropdown)
 
-        if (this.activeDropdown === requestId) {
+        if (String(this.activeDropdown) === idStr) {
           this.activeDropdown = null
           console.log('Closing dropdown')
         } else {
-          this.activeDropdown = requestId
-          console.log('Opening dropdown for:', requestId)
+          this.activeDropdown = idStr
+          console.log('Opening dropdown for:', idStr)
 
           // Wait for DOM update before calculating position
           this.$nextTick(() => {
@@ -524,13 +545,15 @@
 
       getActiveRequest() {
         if (!this.activeDropdown) return null
-        return this.filteredRequests.find((r) => r.id === this.activeDropdown)
+        return this.filteredRequests.find((r) => String(r.id) === String(this.activeDropdown))
       },
 
       getGlobalDropdownStyle() {
         if (!this.activeDropdown) return { display: 'none' }
 
-        const buttonElement = document.querySelector(`[data-request-id="${this.activeDropdown}"]`)
+        const buttonElement = document.querySelector(
+          `[data-request-id="${String(this.activeDropdown)}"]`
+        )
         if (!buttonElement) {
           return {
             position: 'fixed',
@@ -714,6 +737,35 @@
           request.status !== 'cancelled' &&
           request.status !== 'approved'
         )
+      },
+
+      isCancelledByUser(request) {
+        const status = request.hod_status || request.status
+        if (status !== 'cancelled') return false
+        if (typeof request.cancelled_by_user !== 'undefined') return !!request.cancelled_by_user
+        const byId =
+          !!request.cancelled_by && !!request.user_id && request.cancelled_by === request.user_id
+        const byReason = (request.cancellation_reason || '')
+          .toString()
+          .toLowerCase()
+          .includes('cancelled by user')
+        return byId || byReason
+      },
+
+      async deleteRequest(requestId) {
+        this.closeDropdowns()
+        const confirmed = confirm('Delete this cancelled request from your list?')
+        if (!confirmed) return
+        try {
+          const res = await combinedAccessService.deleteCancelledRequest(requestId)
+          if (!res.success) throw new Error(res.error)
+          this.requests = this.requests.filter((r) => r.id !== requestId)
+          this.calculateStats()
+          alert('Request deleted.')
+        } catch (e) {
+          console.error('HOD delete failed:', e)
+          alert('Failed to delete request: ' + e.message)
+        }
       },
 
       formatDate(dateString) {
