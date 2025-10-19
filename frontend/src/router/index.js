@@ -8,6 +8,8 @@ import { enhancedNavigationGuard } from '../utils/routeGuards'
 const LoginPageWrapper = () =>
   import(/* webpackChunkName: "auth" */ '../components/LoginPageWrapper.vue')
 
+import HodRequestList from '../components/views/hod/HodRequestList.vue'
+
 const routes = [
   // Public routes
   {
@@ -403,8 +405,7 @@ const routes = [
   {
     path: '/hod-dashboard/combined-requests',
     name: 'HODCombinedRequestList',
-    component: () =>
-      import(/* webpackChunkName: "hod" */ '../components/views/hod/HodRequestList.vue'),
+    component: HodRequestList,
     meta: {
       requiresAuth: true,
       roles: [ROLES.HEAD_OF_DEPARTMENT]
@@ -447,6 +448,21 @@ const routes = [
       requiresAuth: true,
       roles: [ROLES.DIVISIONAL_DIRECTOR]
     }
+  },
+  // Divisional Director review route for combined both-service form
+  {
+    path: '/divisional-dashboard/both-service-form/:id',
+    name: 'DivisionalBothServiceFormReview',
+    component: () => import('../components/views/forms/both-service-form.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: [ROLES.DIVISIONAL_DIRECTOR]
+    }
+  },
+  // Backward compatibility redirect if any code still links to /both-service-form/:id
+  {
+    path: '/both-service-form/:id',
+    redirect: (to) => `/divisional-dashboard/both-service-form/${to.params.id}`
   },
 
   // Divisional Director Dict Recommendations
@@ -741,6 +757,17 @@ router.onError((error) => {
     router.push('/').catch(() => {
       window.location.href = '/'
     })
+  }
+})
+
+// Strip stray cache-busting query params like ?v=... to keep URLs clean and prevent resource aborts
+router.beforeEach((to, from, next) => {
+  if (to.query && Object.prototype.hasOwnProperty.call(to.query, 'v')) {
+    const cleanQuery = { ...to.query }
+    delete cleanQuery.v
+    next({ name: to.name, params: to.params, query: cleanQuery, replace: true })
+  } else {
+    next()
   }
 })
 

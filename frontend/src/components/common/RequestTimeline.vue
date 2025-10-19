@@ -4,13 +4,17 @@
     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000]"
     @click.self="close"
   >
-    <div class="bg-white rounded-lg max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden">
+    <div
+      class="rounded-lg max-w-4xl w-full mx-4 h-[90vh] overflow-hidden bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white flex flex-col timeline-typography"
+    >
       <!-- Modal Header -->
-      <div class="flex items-center justify-between p-6 border-b border-gray-200">
+      <div
+        class="flex items-center justify-between p-6 border-b border-blue-600/40 bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white"
+      >
         <div>
-          <h2 class="text-xl font-semibold text-gray-900">Request Timeline</h2>
-          <p class="text-sm text-gray-600" v-if="timelineData?.request">
-            Request #{{ timelineData.request.id }} - {{ timelineData.request.staff_name }}
+          <h2 class="text-xl font-semibold text-white">Request Timeline</h2>
+          <p class="text-sm text-blue-200" v-if="normalizedRequest">
+            Request #{{ normalizedRequest.display_id }} - {{ normalizedRequest.staff_name || '—' }}
           </p>
         </div>
         <button @click="close" class="text-gray-400 hover:text-gray-600 transition-colors">
@@ -26,10 +30,22 @@
       </div>
 
       <!-- Modal Body -->
-      <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
-        <div v-if="loading" class="flex items-center justify-center py-12">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <span class="ml-3 text-gray-600">Loading timeline...</span>
+      <div class="p-6 overflow-y-auto flex-1">
+        <div v-if="loading" class="py-16 flex items-center justify-center">
+          <div
+            class="flex items-center space-x-3 px-4 py-2 rounded-full bg-blue-700/40 border border-blue-400/40 shadow-lg backdrop-blur-sm"
+          >
+            <div class="relative">
+              <div
+                class="h-6 w-6 rounded-full border-2 border-blue-300 border-t-transparent animate-spin"
+              ></div>
+              <div
+                class="absolute inset-0 rounded-full"
+                style="box-shadow: 0 0 12px 2px rgba(59, 130, 246, 0.6)"
+              ></div>
+            </div>
+            <span class="text-blue-100 font-medium tracking-wide">Loading timeline…</span>
+          </div>
         </div>
 
         <div v-else-if="error" class="text-center py-12">
@@ -56,30 +72,32 @@
         <!-- Timeline Content -->
         <div v-else-if="timelineData" class="relative">
           <!-- Request Information -->
-          <div class="mb-4 p-3 bg-gray-50 rounded-lg">
-            <h3 class="font-medium text-gray-900 mb-1 text-sm">Request Details</h3>
+          <div class="mb-4 p-3 bg-blue-800 text-white rounded-lg border border-blue-400/50">
+            <h3 class="font-medium text-white mb-1 text-sm">Request Details</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
               <div>
-                <span class="font-medium">Staff Name:</span> {{ timelineData.request.staff_name }}
+                <span class="font-medium">Staff Name:</span>
+                {{ normalizedRequest?.staff_name || '—' }}
               </div>
               <div>
-                <span class="font-medium">PF Number:</span> {{ timelineData.request.pf_number }}
+                <span class="font-medium">PF Number:</span>
+                {{ normalizedRequest?.pf_number || '—' }}
               </div>
               <div>
                 <span class="font-medium">Department:</span>
-                {{ timelineData.request.department?.name || 'N/A' }}
+                {{ normalizedRequest?.department_name || 'N/A' }}
               </div>
               <div>
                 <span class="font-medium">Request Type:</span>
-                {{ timelineData.request.request_type_name }}
+                {{ normalizedRequest?.request_type_name || '—' }}
               </div>
-              <div v-if="timelineData.request.access_type">
+              <div v-if="normalizedRequest?.access_type_name">
                 <span class="font-medium">Access Type:</span>
-                {{ timelineData.request.access_type_name }}
+                {{ normalizedRequest?.access_type_name }}
               </div>
               <div>
                 <span class="font-medium">Submitted:</span>
-                {{ formatDateTime(timelineData.request.created_at) }}
+                {{ formatDateTime(normalizedRequest?.created_at) }}
               </div>
             </div>
           </div>
@@ -97,13 +115,14 @@
                 class="absolute left-3 top-8 w-0.5 h-12 bg-gray-200"
                 :class="{
                   'bg-green-400': step.status === 'completed',
-                  'bg-red-400': step.status === 'rejected'
+                  'bg-red-400': step.status === 'rejected',
+                  'bg-yellow-400': step.status === 'pending'
                 }"
               ></div>
 
               <!-- Step Icon -->
               <div
-                class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center border-2 bg-white"
+                class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center border-2 bg-blue-800"
                 :class="getStepIconClasses(step.status)"
               >
                 <svg
@@ -136,29 +155,23 @@
               <!-- Step Content -->
               <div class="ml-4 flex-1">
                 <div
-                  class="bg-white border rounded-lg p-3 shadow-sm"
+                  class="bg-blue-800 text-white border rounded-lg p-3 shadow-sm"
                   :class="{
-                    'border-green-200 bg-green-50': step.status === 'completed',
-                    'border-red-200 bg-red-50': step.status === 'rejected',
-                    'border-gray-200': step.status === 'pending'
+                    'border-green-300': step.status === 'completed',
+                    'border-red-300': step.status === 'rejected',
+                    'border-yellow-300': step.status === 'pending',
+                    'border-blue-300': step.status === 'active'
                   }"
                 >
                   <!-- Step Header -->
                   <div class="flex items-center justify-between mb-1">
-                    <h4
-                      class="font-medium text-sm"
-                      :class="{
-                        'text-green-900': step.status === 'completed',
-                        'text-red-900': step.status === 'rejected',
-                        'text-gray-500': step.status === 'pending',
-                        'text-gray-900': step.status === 'active'
-                      }"
-                    >
+                    <h4 class="font-medium text-sm text-white">
                       {{ step.title }}
                     </h4>
                     <span
                       class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
-                      :class="getStatusClasses(step.status)"
+                      :class="getStatusClasses(step.statusLabel || step.status)"
+                      :style="getStatusStyle(step.statusLabel || step.status)"
                     >
                       {{ step.statusLabel }}
                     </span>
@@ -167,30 +180,30 @@
                   <!-- Step Details -->
                   <div class="space-y-1 text-xs">
                     <div v-if="step.actor" class="flex items-center">
-                      <span class="font-medium text-gray-700 w-16 text-xs">Actor:</span>
-                      <span class="text-xs">{{ step.actor }}</span>
-                      <span v-if="step.position" class="text-gray-500 ml-1 text-xs"
+                      <span class="font-medium text-white w-16 text-xs">Actor:</span>
+                      <span class="text-xs text-white">{{ step.actor }}</span>
+                      <span v-if="step.position" class="text-blue-200 ml-1 text-xs"
                         >({{ step.position }})</span
                       >
                     </div>
 
                     <div v-if="step.timestamp" class="flex items-center">
-                      <span class="font-medium text-gray-700 w-16 text-xs">Date:</span>
-                      <span class="text-xs">{{ formatDateTime(step.timestamp) }}</span>
+                      <span class="font-medium text-white w-16 text-xs">Date:</span>
+                      <span class="text-xs text-white">{{ formatDateTime(step.timestamp) }}</span>
                     </div>
 
                     <div v-if="step.comments" class="flex items-start">
-                      <span class="font-medium text-gray-700 w-16 flex-shrink-0 text-xs"
+                      <span class="font-medium text-white w-16 flex-shrink-0 text-xs"
                         >Comments:</span
                       >
-                      <span class="text-gray-900 text-xs leading-tight">{{ step.comments }}</span>
+                      <span class="text-white text-xs leading-tight">{{ step.comments }}</span>
                     </div>
 
                     <div
                       v-if="step.rejectionReasons && step.rejectionReasons.length > 0"
                       class="flex items-start"
                     >
-                      <span class="font-medium text-gray-700 w-16 flex-shrink-0 text-xs"
+                      <span class="font-medium text-white w-16 flex-shrink-0 text-xs"
                         >Reasons:</span
                       >
                       <div class="space-y-0.5">
@@ -205,13 +218,13 @@
                     </div>
 
                     <div v-if="step.hasSignature" class="flex items-center">
-                      <span class="font-medium text-gray-700 w-16 text-xs">Signature:</span>
-                      <span class="text-green-600 text-xs">✓ Signed</span>
+                      <span class="font-medium text-white w-16 text-xs">Signature:</span>
+                      <span class="text-green-300 text-xs">✓ Signed</span>
                     </div>
 
                     <div v-if="step.assignedOfficer" class="flex items-center">
-                      <span class="font-medium text-gray-700 w-16 text-xs">Officer:</span>
-                      <span class="text-xs">{{ step.assignedOfficer }}</span>
+                      <span class="font-medium text-white w-16 text-xs">Officer:</span>
+                      <span class="text-xs text-white">{{ step.assignedOfficer }}</span>
                     </div>
                   </div>
 
@@ -361,7 +374,9 @@
       </div>
 
       <!-- Modal Footer -->
-      <div class="flex justify-between p-4 border-t border-gray-200">
+      <div
+        class="flex justify-between p-4 border-t border-blue-600/40 bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900"
+      >
         <!-- Update Progress Button (for assigned ICT Officers) -->
         <div>
           <button
@@ -385,7 +400,10 @@
         <div>
           <button
             @click="close"
-            class="px-3 py-1.5 text-xs text-gray-700 bg-gray-200 hover:bg-gray-300 rounded transition-colors"
+            class="px-3 py-1.5 text-xs text-white rounded transition-colors shadow-md"
+            style="background-color: #ff0000"
+            @mouseenter="$event.target.style.backgroundColor = '#cc0000'"
+            @mouseleave="$event.target.style.backgroundColor = '#FF0000'"
           >
             Close
           </button>
@@ -440,6 +458,30 @@
       }
     },
     computed: {
+      normalizedRequest() {
+        const r = this.timelineData?.request || this.timelineData?.request_info || null
+        if (!r) return null
+        const requestTypes = Array.isArray(r.request_types)
+          ? r.request_types
+          : Array.isArray(r.request_type)
+            ? r.request_type
+            : r.request_type_name
+              ? [r.request_type_name]
+              : r.services || []
+        const requestTypeName = Array.isArray(requestTypes)
+          ? requestTypes.join(', ')
+          : requestTypes || ''
+        return {
+          id: r.id || r.request_id,
+          display_id: r.request_id || (r.id ? `REQ-${String(r.id).padStart(6, '0')}` : ''),
+          staff_name: r.staff_name || r.user?.name || r.full_name || '',
+          pf_number: r.pf_number || r.pfNumber || r.pf_number_display || '',
+          department_name: r.department?.name || r.department_name || r.department || '',
+          request_type_name: requestTypeName,
+          access_type_name: r.access_type_name || r.access_type || '',
+          created_at: r.created_at || r.submission_date || r.createdAt || null
+        }
+      },
       isIctOfficer() {
         return this.hasRole(this.ROLES.ICT_OFFICER)
       },
@@ -695,37 +737,75 @@
             isHeadOfDepartment: this.isHeadOfDepartment
           })
 
-          let result
-          try {
-            result = await this.currentService.getRequestTimeline(this.requestId)
-          } catch (primaryErr) {
-            // Fallback for HOD: use ICT endpoint if HOD-specific API fails
-            if (this.isHeadOfDepartment) {
-              console.warn('Primary HOD timeline endpoint failed, falling back to ICT endpoint:', primaryErr)
-              try {
-                result = await ictOfficerService.getRequestTimeline(this.requestId)
-              } catch (fallbackErr) {
-                throw fallbackErr
+          const id = this.requestId // snapshot to avoid prop changes (e.g., modal close) causing null
+
+          // Build a small failover chain: primary -> combinedAccessService -> ictOfficerService
+          const chain = []
+          chain.push(this.currentService)
+          if (this.currentService !== combinedAccessService) chain.push(combinedAccessService)
+          if (this.currentService !== ictOfficerService) chain.push(ictOfficerService)
+
+          let loaded = false
+          let lastError = null
+
+          for (const svc of chain) {
+            try {
+              const result = await svc.getRequestTimeline(id)
+
+              // Handle different response formats from different services
+              if (result && result.success !== undefined) {
+                if (result.success) {
+                  this.timelineData = result.data
+                  loaded = true
+                  break
+                } else {
+                  lastError = new Error(
+                    result.error || result.message || 'Failed to load timeline data'
+                  )
+                }
+              } else if (result) {
+                this.timelineData = result
+                loaded = true
+                break
+              } else {
+                lastError = new Error('No timeline data returned')
               }
-            } else {
-              throw primaryErr
+            } catch (e) {
+              lastError = e
+              // Try next service in the chain
             }
           }
 
-          // Handle different response formats from different services
-          if (result && result.success !== undefined) {
-            // Services that return { success: boolean, data: object }
-            if (result.success) {
-              this.timelineData = result.data
-            } else {
-              throw new Error(result.error || result.message || 'Failed to load timeline data')
+          if (!loaded) {
+            // Last resort: fetch request details and synthesize a read-only timeline
+            let req = null
+            try {
+              // Prefer HOD-authorized show endpoint first
+              const r1 = await combinedAccessService.getHodRequestById(id)
+              if (r1?.success && r1.data) req = r1.data
+            } catch (e) {
+              // ignore and try fallback
             }
-          } else if (result) {
-            // Services that return data directly (like ictOfficerService.getRequestTimeline)
-            this.timelineData = result
-          } else {
-            throw new Error('No timeline data returned')
+            if (!req) {
+              try {
+                // Fallback to general form endpoint
+                const r2a = await combinedAccessService.getRequestById(id)
+                if (r2a?.success && r2a.data) req = r2a.data
+                if (!req) {
+                  const r2 = await ictOfficerService.getAccessRequestById(id)
+                  if (r2?.success && r2.data) req = r2.data
+                }
+              } catch (e) {
+                // ignore
+              }
+            }
+            if (req) {
+              this.timelineData = { request: req, ict_assignments: [] }
+              loaded = true
+            }
           }
+
+          if (!loaded) throw lastError || new Error('Failed to load timeline')
 
           console.log('✅ RequestTimeline: Timeline loaded successfully')
         } catch (error) {
@@ -894,6 +974,8 @@
             return 'bg-green-500 border-green-500'
           case 'rejected':
             return 'bg-red-500 border-red-500'
+          case 'pending':
+            return 'bg-yellow-500 border-yellow-500'
           case 'active':
             return 'bg-blue-500 border-blue-500'
           default:
@@ -902,20 +984,26 @@
       },
 
       getStatusClasses(status) {
-        switch (status) {
-          case 'Completed':
-          case 'Approved':
-          case 'Assigned':
-            return 'bg-green-100 text-green-800'
-          case 'Rejected':
-          case 'Cancelled':
-            return 'bg-red-100 text-red-800'
-          case 'Pending':
-          case 'Pending Assignment':
-            return 'bg-blue-100 text-blue-800'
-          default:
-            return 'bg-gray-100 text-gray-800'
+        const s = (status || '').toString().toLowerCase()
+        if (['completed', 'approved', 'assigned'].includes(s)) {
+          return 'bg-green-600 text-white'
         }
+        if (['rejected', 'cancelled'].includes(s)) {
+          return 'bg-red-600 text-white'
+        }
+        if (['pending', 'pending assignment', 'waiting'].includes(s)) {
+          // Use exact red via inline style; keep text white here
+          return 'text-white'
+        }
+        return 'bg-gray-500 text-white'
+      },
+
+      getStatusStyle(status) {
+        const s = (status || '').toString().toLowerCase()
+        if (['pending', 'pending assignment', 'waiting'].includes(s)) {
+          return { backgroundColor: '#FF0000' }
+        }
+        return {}
       },
 
       getValidTimestamp(timestamp) {
@@ -977,5 +1065,27 @@
 
   .overflow-y-auto::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
+  }
+  /* Typography scale for timeline modal */
+  .timeline-typography {
+    font-size: 0.95rem;
+  }
+  .timeline-typography .text-xs {
+    font-size: 0.9rem !important;
+  }
+  .timeline-typography .text-sm {
+    font-size: 1rem !important;
+  }
+  .timeline-typography .text-base {
+    font-size: 1.125rem !important;
+  }
+  .timeline-typography h2 {
+    font-size: 1.35rem !important;
+  }
+  .timeline-typography h3 {
+    font-size: 1.05rem !important;
+  }
+  .timeline-typography h4 {
+    font-size: 1rem !important;
   }
 </style>

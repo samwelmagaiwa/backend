@@ -14,6 +14,8 @@ console.log('🚀 Starting Vue application...')
 // Create app instance
 const app = createApp(App)
 
+// (Removed auto hard-reload on chunk errors to keep clean URLs and avoid aborting requests)
+
 // Add global error handler
 app.config.errorHandler = (err, vm, info) => {
   console.error('❌ Vue Error:', err)
@@ -36,6 +38,11 @@ import('./stores/auth').then(({ useAuthStore }) => {
   const authStore = useAuthStore()
   authStore.initializeAuth()
   console.log('✅ Auth store initialized')
+  try {
+    window.dispatchEvent(new CustomEvent('auth-ready'))
+  } catch (e) {
+    console.warn('Auth ready event dispatch failed:', e)
+  }
 })
 
 // Initialize sidebar store after a short delay

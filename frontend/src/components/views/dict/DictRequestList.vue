@@ -292,11 +292,16 @@
       v-if="isLoading"
       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
     >
-      <div class="bg-white rounded-lg shadow-xl p-8 text-center">
-        <div
-          class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"
-        ></div>
-        <p class="text-gray-600 text-base font-medium">Loading requests...</p>
+      <div
+        class="rounded-xl shadow-2xl p-8 text-center border border-blue-400/40"
+        style="background: linear-gradient(90deg, #0b3a82, #0a2f6f, #0b3a82)"
+      >
+        <div class="flex justify-center mb-4">
+          <div
+            class="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"
+          ></div>
+        </div>
+        <p class="text-blue-100 font-medium">Loading requests...</p>
       </div>
     </div>
 

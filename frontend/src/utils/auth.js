@@ -7,6 +7,8 @@ import { reactive, computed } from 'vue'
 import { ROLES, isValidRole, getDefaultDashboard } from './permissions'
 import { authAPI } from './apiClient'
 
+const DEBUG = process.env.NODE_ENV === 'development'
+
 // Global reactive state
 const authState = reactive({
   isAuthenticated: false,
@@ -36,7 +38,7 @@ const roleMapping = {
 
 // Map backend role name to frontend role constant
 const mapBackendRole = (backendRoleName) => {
-  console.log('🔍 Backend role received:', backendRoleName)
+  if (DEBUG) console.log('🔍 Backend role received:', backendRoleName)
 
   // Handle undefined or null roles
   if (!backendRoleName || backendRoleName === 'undefined' || backendRoleName === 'null') {
@@ -49,7 +51,7 @@ const mapBackendRole = (backendRoleName) => {
   const mappedRole = roleMapping[backendRoleName]
 
   if (mappedRole) {
-    console.log('🎯 Successfully mapped to frontend role:', mappedRole)
+    if (DEBUG) console.log('🎯 Successfully mapped to frontend role:', mappedRole)
     return mappedRole
   } else {
     console.warn('⚠️ Role mapping not found for:', backendRoleName)
@@ -169,11 +171,13 @@ export const auth = {
         const { user, token } = result.data
 
         // Debug: Log the raw user data from backend
-        console.log('📊 Raw backend user data:', user)
-        console.log('🔍 user.role:', user.role)
-        console.log('🔍 user.role_name:', user.role_name)
-        console.log('🔍 user.roles:', user.roles)
-        console.log('🔍 user.permissions:', user.permissions)
+        if (DEBUG) {
+          console.log('📊 Raw backend user data:', user)
+          console.log('🔍 user.role:', user.role)
+          console.log('🔍 user.role_name:', user.role_name)
+          console.log('🔍 user.roles:', user.roles)
+          console.log('🔍 user.permissions:', user.permissions)
+        }
 
         // Map backend role to frontend role constant
         // Use primary role (role_name) for routing, but store all roles
@@ -201,9 +205,11 @@ export const auth = {
         localStorage.setItem('user_data', JSON.stringify(mappedUser))
         localStorage.setItem('session_data', JSON.stringify(sessionData))
 
-        console.log('✅ Token stored in localStorage:', token.substring(0, 20) + '...')
-        console.log('✅ User data stored:', mappedUser.name, mappedUser.role)
-        console.log('✅ Session info stored:', result.data.token_name)
+        if (DEBUG) {
+          console.log('✅ Token stored in localStorage:', token.substring(0, 20) + '...')
+          console.log('✅ User data stored:', mappedUser.name, mappedUser.role)
+          console.log('✅ Session info stored:', result.data.token_name)
+        }
 
         // Update state
         authState.isAuthenticated = true
@@ -212,7 +218,8 @@ export const auth = {
         authState.tokenName = result.data.token_name
         authState.sessionInfo = result.data.session_info
 
-        console.log('✅ Auth state updated - isAuthenticated:', authState.isAuthenticated)
+        if (DEBUG)
+          console.log('✅ Auth state updated - isAuthenticated:', authState.isAuthenticated)
 
         return { success: true, user: mappedUser }
       } else {
@@ -271,11 +278,11 @@ export const auth = {
   // Initialize authentication from localStorage
   async initializeAuth(force = false) {
     try {
-      console.log('🔄 Auth: Initializing authentication...', { force })
+      if (DEBUG) console.log('🔄 Auth: Initializing authentication...', { force })
 
       // If already authenticated and not forced, don't reinitialize
       if (!force && authState.isAuthenticated && authState.user && authState.token) {
-        console.log('✅ Auth: Already authenticated, skipping initialization')
+        if (DEBUG) console.log('✅ Auth: Already authenticated, skipping initialization')
         return true
       }
 
@@ -286,22 +293,24 @@ export const auth = {
       const userData = localStorage.getItem('user_data')
       const sessionData = localStorage.getItem('session_data')
 
-      console.log('🔍 Auth: Checking stored data...', {
-        hasToken: !!token,
-        hasUserData: !!userData,
-        hasSessionData: !!sessionData
-      })
+      if (DEBUG)
+        console.log('🔍 Auth: Checking stored data...', {
+          hasToken: !!token,
+          hasUserData: !!userData,
+          hasSessionData: !!sessionData
+        })
 
       if (token && userData) {
         try {
           const user = JSON.parse(userData)
           let session = null
 
-          console.log('📊 Auth: Parsed user data:', {
-            name: user.name,
-            role: user.role,
-            id: user.id
-          })
+          if (DEBUG)
+            console.log('📊 Auth: Parsed user data:', {
+              name: user.name,
+              role: user.role,
+              id: user.id
+            })
 
           // Try to parse session data if available
           if (sessionData) {
@@ -314,7 +323,7 @@ export const auth = {
 
           // Validate stored data
           if (isValidRole(user.role)) {
-            console.log('✅ Auth: Valid role found, setting auth state...', user.role)
+            if (DEBUG) console.log('✅ Auth: Valid role found, setting auth state...', user.role)
 
             // Set auth state immediately with stored data
             authState.isAuthenticated = true
@@ -323,10 +332,12 @@ export const auth = {
             authState.tokenName = session?.tokenName || null
             authState.sessionInfo = session?.sessionInfo || null
 
-            console.log('✅ Auth: Auth state updated successfully')
-            console.log('  - isAuthenticated:', authState.isAuthenticated)
-            console.log('  - user.role:', authState.user.role)
-            console.log('  - user.name:', authState.user.name)
+            if (DEBUG) {
+              console.log('✅ Auth: Auth state updated successfully')
+              console.log('  - isAuthenticated:', authState.isAuthenticated)
+              console.log('  - user.role:', authState.user.role)
+              console.log('  - user.name:', authState.user.name)
+            }
 
             // Try to verify token in background (don't await to avoid blocking)
             setTimeout(() => {
@@ -345,7 +356,7 @@ export const auth = {
           this.clearAuthData()
         }
       } else {
-        console.log('🚨 Auth: No stored auth data found')
+        if (DEBUG) console.log('🚨 Auth: No stored auth data found')
         // Ensure auth state is cleared
         authState.isAuthenticated = false
         authState.user = null
@@ -363,7 +374,7 @@ export const auth = {
       authState.loading = false
     }
 
-    console.log('❌ Auth: Initialization failed')
+    if (DEBUG) console.log('❌ Auth: Initialization failed')
     return false
   },
 
@@ -375,11 +386,13 @@ export const auth = {
       if (userResult.success) {
         // Update user data from backend
         const backendUser = userResult.data
-        console.log('🔄 Background verification - Raw backend user:', backendUser)
-        console.log('🔍 Background - user.role:', backendUser.role)
-        console.log('🔍 Background - user.role_name:', backendUser.role_name)
-        console.log('🔍 Background - user.roles:', backendUser.roles)
-        console.log('🔍 Background - user.permissions:', backendUser.permissions)
+        if (DEBUG) {
+          console.log('🔄 Background verification - Raw backend user:', backendUser)
+          console.log('🔍 Background - user.role:', backendUser.role)
+          console.log('🔍 Background - user.role_name:', backendUser.role_name)
+          console.log('🔍 Background - user.roles:', backendUser.roles)
+          console.log('🔍 Background - user.permissions:', backendUser.permissions)
+        }
 
         const mappedUser = {
           ...backendUser,
@@ -443,7 +456,7 @@ export const auth = {
   // Get default dashboard for current user
   getDefaultDashboard() {
     const dashboard = getDefaultDashboard(this.userRole)
-    console.log('🏠 Getting default dashboard for role:', this.userRole, '→', dashboard)
+    if (DEBUG) console.log('🏠 Getting default dashboard for role:', this.userRole, '→', dashboard)
     return dashboard
   },
 

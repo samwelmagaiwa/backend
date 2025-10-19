@@ -48,18 +48,19 @@ class CombinedAccessService {
   }
 
   /**
-   * Get a specific combined access request by ID
+   * Get a specific combined access request by ID (general form endpoint)
+   * NOTE: May be unauthorized for HOD; prefer getHodRequestById() when in HOD context.
    * @param {number} requestId - The request ID
    * @returns {Promise<Object>} Response with request data
    */
   async getRequestById(requestId) {
     try {
-      console.log('🔄 Fetching combined access request:', requestId)
+      console.log('🔄 Fetching combined access request (general):', requestId)
 
       const response = await apiClient.get(`/both-service-form/${requestId}`)
 
       if (response.data && response.data.success) {
-        console.log('✅ Request retrieved successfully:', requestId)
+        console.log('✅ Request retrieved successfully (general):', requestId)
         return {
           success: true,
           data: response.data.data
@@ -68,10 +69,40 @@ class CombinedAccessService {
         throw new Error(response.data?.message || 'Request not found')
       }
     } catch (error) {
-      console.error('❌ Error fetching request:', error)
+      console.error('❌ Error fetching request (general):', error)
       return {
         success: false,
         error: error.response?.data?.message || error.message || 'Failed to retrieve request',
+        data: null
+      }
+    }
+  }
+
+  /**
+   * Get a specific combined access request by ID for HOD view (authorized to HOD departments)
+   * @param {number} requestId - The request ID
+   * @returns {Promise<Object>} Response with request data
+   */
+  async getHodRequestById(requestId) {
+    try {
+      console.log('🔄 Fetching HOD combined access request:', requestId)
+
+      const response = await apiClient.get(`/hod/combined-access-requests/${requestId}`)
+
+      if (response.data && response.data.success) {
+        console.log('✅ HOD request retrieved successfully:', requestId)
+        return {
+          success: true,
+          data: response.data.data
+        }
+      } else {
+        throw new Error(response.data?.message || 'HOD request not found')
+      }
+    } catch (error) {
+      console.error('❌ Error fetching HOD request:', error)
+      return {
+        success: false,
+        error: error.response?.data?.message || error.message || 'Failed to retrieve HOD request',
         data: null
       }
     }
@@ -189,7 +220,8 @@ class CombinedAccessService {
         throw new Error(response.data?.message || 'Failed to retrieve statistics')
       }
     } catch (error) {
-      console.error('❌ Error fetching HOD statistics:', error)
+      // Downgrade to warning to avoid noisy console on refresh/timeouts
+      console.warn('⚠️ Statistics fetch fallback (using computed stats):', error?.message || error)
       return {
         success: false,
         error: error.response?.data?.message || error.message || 'Failed to retrieve statistics',

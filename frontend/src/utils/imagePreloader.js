@@ -83,10 +83,8 @@ export function preloadRoleBasedImages(userRole) {
   const baseUrl = '/assets/images/'
 
   // Common images used across multiple forms
-  const commonImages = [
-    { src: `${baseUrl}logo2.png`, alt: 'Muhimbili Logo' },
-    { src: `${baseUrl}ngao2.png`, alt: 'National Shield' }
-  ]
+  // NOTE: Avoid preloading ngao2.png to prevent duplicate fetches during startup
+  const commonImages = [{ src: `${baseUrl}logo2.png`, alt: 'Muhimbili Logo' }]
 
   // Normalize role for consistent mapping (handles spaces, hyphens, camelCase, etc.)
   const normalizedRole = (userRole || '').toLowerCase().replace(/[\s-]+/g, '_')
@@ -238,7 +236,7 @@ export function preloadRouteBasedImages(routePath) {
   if (needsImages) {
     devLog.debug('navigation', `🖼️ Route requires images, preloading: ${routePath}`)
     preloadImageWithLink(`${baseUrl}logo2.png`)
-    preloadImageWithLink(`${baseUrl}ngao2.png`)
+    // Intentionally do not preload ngao2.png to avoid NS_BINDING_ABORTED noise
   }
 }
 

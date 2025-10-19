@@ -1,8 +1,10 @@
 <template>
   <aside
-    v-if="shouldShowSidebar"
     class="min-h-full flex flex-col transition-all duration-300 ease-in-out overflow-hidden relative shadow-2xl sidebar-responsive"
-    :class="[isCollapsed ? 'w-16 sidebar-collapsed' : 'w-80 sidebar-expanded']"
+    :class="[
+      isCollapsed ? 'w-16 sidebar-collapsed' : 'w-80 sidebar-expanded',
+      !shouldShowSidebar ? 'invisible pointer-events-none opacity-0' : 'opacity-100'
+    ]"
     aria-label="Sidebar navigation"
     style="
       background: linear-gradient(
@@ -18,6 +20,7 @@
         0 0 0 1px rgba(255, 255, 255, 0.1);
       border-right: 1px solid rgba(59, 130, 246, 0.4);
     "
+    :aria-hidden="!shouldShowSidebar"
   >
     <!-- Enhanced Background Layers -->
     <div class="absolute inset-0">
@@ -755,6 +758,7 @@
 
       // Use Pinia auth store for additional reliability
       const piniaAuthStore = useAuthStore()
+      const DEBUG = process.env.NODE_ENV === 'development'
 
       // Ensure Pinia auth is initialized
       if (!piniaAuthStore.isInitialized) {
@@ -772,13 +776,14 @@
         const role = piniaAuthStore?.userRole || userRole?.value || stableUserRole?.value
         const isHeadOfIt = role === ROLES.HEAD_OF_IT
         if (isHeadOfIt) {
-          console.log('🔧 HEAD OF IT Debug:', {
-            role,
-            menuItems: menuItems.value.length,
-            dashboardItems: dashboardItems.value.length,
-            requestsItems: requestsManagementItems.value.length,
-            expandedSections: expandedSections.value
-          })
+          if (DEBUG)
+            console.log('🔧 HEAD OF IT Debug:', {
+              role,
+              menuItems: menuItems.value.length,
+              dashboardItems: dashboardItems.value.length,
+              requestsItems: requestsManagementItems.value.length,
+              expandedSections: expandedSections.value
+            })
         }
         return isHeadOfIt
       })
@@ -799,10 +804,10 @@
         [isAuthenticated, userRole],
         ([authenticated, role]) => {
           try {
-            console.log('🔄 Sidebar: Auth state changed:', { authenticated, role })
+            if (DEBUG) console.log('🔄 Sidebar: Auth state changed:', { authenticated, role })
             if (authenticated && role) {
               stableUserRole.value = role
-              console.log('✅ Sidebar: Stable user role set to:', role)
+              if (DEBUG) console.log('✅ Sidebar: Stable user role set to:', role)
             }
           } catch (error) {
             console.warn('Error in auth state watcher:', error)
@@ -842,7 +847,7 @@
 
           // Auto-expand sections for Head of IT
           if (userRole.value === ROLES.HEAD_OF_IT) {
-            console.log('📦 Expanding sections for Head of IT')
+            if (DEBUG) console.log('📦 Expanding sections for Head of IT')
             _setSectionExpanded('dashboard', true)
             _setSectionExpanded('requestsManagement', true)
           }
@@ -1177,7 +1182,7 @@
       // Methods
       function toggleCollapse() {
         toggleSidebar()
-        console.log('🔄 Sidebar toggled via Pinia')
+        if (DEBUG) console.log('🔄 Sidebar toggled via Pinia')
       }
 
       function toggleSectionLocal(section) {
@@ -1221,7 +1226,7 @@
       function getNotificationCount(routePath) {
         const count = notificationCounts.value[routePath] || 0
         if (count > 0) {
-          console.log(`🔍 getNotificationCount('${routePath}') returning:`, count)
+          if (DEBUG) console.log(`🔍 getNotificationCount('${routePath}') returning:`, count)
         }
         return count
       }
@@ -1234,7 +1239,7 @@
       async function fetchNotificationCounts(forceRefresh = false) {
         // Skip if temporarily disabled due to repeated failures
         if (isNotificationDisabled.value) {
-          console.log('🚫 Notification fetching temporarily disabled')
+          if (DEBUG) console.log('🚫 Notification fetching temporarily disabled')
           return
         }
 
@@ -1345,7 +1350,7 @@
           if (finalPendingCount > 0) {
             // Get role-specific configuration to know which routes should show badges
             const config = notificationService.getRoleNotificationConfig(role)
-            console.log('⚙️ Role config for', role, ':', config)
+            if (DEBUG) console.log('⚙️ Role config for', role, ':', config)
 
             // Clear old counts
             const oldCounts = { ...notificationCounts.value }
@@ -1364,19 +1369,21 @@
                 routeCount = window.accessRequestsPendingCount
               }
               notificationCounts.value[menuPath] = routeCount
-              console.log(
-                `🎯 Setting badge count ${routeCount} for route: ${menuPath} (was: ${oldCounts[menuPath] || 0})`
-              )
+              if (DEBUG)
+                console.log(
+                  `🎯 Setting badge count ${routeCount} for route: ${menuPath} (was: ${oldCounts[menuPath] || 0})`
+                )
             })
 
-            console.log('🔔 Notification badges updated:', {
-              role,
-              oldCounts,
-              newCount: finalPendingCount,
-              routes: config.menuItems,
-              finalCounts: notificationCounts.value,
-              countChanged: JSON.stringify(oldCounts) !== JSON.stringify(notificationCounts.value)
-            })
+            if (DEBUG)
+              console.log('🔔 Notification badges updated:', {
+                role,
+                oldCounts,
+                newCount: finalPendingCount,
+                routes: config.menuItems,
+                finalCounts: notificationCounts.value,
+                countChanged: JSON.stringify(oldCounts) !== JSON.stringify(notificationCounts.value)
+              })
           } else {
             // Clear all notification counts
             const oldCounts = { ...notificationCounts.value }
@@ -1403,7 +1410,7 @@
             // Re-enable after 5 minutes
             setTimeout(
               () => {
-                console.log('♾️ Re-enabling notification fetching')
+                if (DEBUG) console.log('♾️ Re-enabling notification fetching')
                 isNotificationDisabled.value = false
                 notificationRetries.value = 0
               },
@@ -1426,11 +1433,11 @@
       let notificationInterval = null
 
       onMounted(() => {
-        console.log('🚀 Sidebar mounted, triggering initial notification fetch')
+        if (DEBUG) console.log('🚀 Sidebar mounted, triggering initial notification fetch')
 
         // Initial fetch with delay to ensure auth is ready
         setTimeout(() => {
-          console.log('⏰ Delayed notification fetch triggered')
+          if (DEBUG) console.log('⏰ Delayed notification fetch triggered')
           fetchNotificationCounts()
         }, 2000)
 
@@ -1440,21 +1447,23 @@
         // Expose fetchNotificationCounts globally for other components to use
         window.sidebarInstance = {
           fetchNotificationCounts: (force = false) => {
-            console.log('🌍 🔔 GLOBAL SIDEBAR: Global sidebar notification refresh triggered:', {
-              force,
-              currentCounts: { ...notificationCounts.value },
-              timestamp: new Date().toISOString()
-            })
+            if (DEBUG)
+              console.log('🌍 🔔 GLOBAL SIDEBAR: Global sidebar notification refresh triggered:', {
+                force,
+                currentCounts: { ...notificationCounts.value },
+                timestamp: new Date().toISOString()
+              })
             fetchNotificationCounts(force)
           },
           setNotificationCount: (routePath, count) => {
             try {
               if (typeof count === 'number' && routePath) {
-                console.log('🌍 🔔 GLOBAL SIDEBAR: Forcing notification count set:', {
-                  routePath,
-                  count,
-                  prev: notificationCounts.value[routePath] || 0
-                })
+                if (DEBUG)
+                  console.log('🌍 🔔 GLOBAL SIDEBAR: Forcing notification count set:', {
+                    routePath,
+                    count,
+                    prev: notificationCounts.value[routePath] || 0
+                  })
                 notificationCounts.value[routePath] = count
               }
             } catch (e) {
@@ -1465,11 +1474,12 @@
 
         // Listen for global refresh events
         const handleRefreshNotifications = (event) => {
-          console.log('📻 🔔 NOTIFICATION EVENT: Received global refresh-notifications event:', {
-            detail: event?.detail,
-            timestamp: new Date().toISOString(),
-            currentCounts: { ...notificationCounts.value }
-          })
+          if (DEBUG)
+            console.log('📻 🔔 NOTIFICATION EVENT: Received global refresh-notifications event:', {
+              detail: event?.detail,
+              timestamp: new Date().toISOString(),
+              currentCounts: { ...notificationCounts.value }
+            })
           fetchNotificationCounts(true) // force refresh
         }
 
@@ -1477,21 +1487,22 @@
         const handleIctPendingCount = (event) => {
           const count = event?.detail?.count
           if (typeof count === 'number') {
-            console.log('🛰️ ICT AccessRequests pending count override received:', count)
+            if (DEBUG) console.log('🛰️ ICT AccessRequests pending count override received:', count)
             notificationCounts.value['/ict-dashboard/access-requests'] = count
           }
         }
 
         const handleForceRefreshNotifications = (event) => {
-          console.log('🔥 🔔 NOTIFICATION EVENT: Received force-refresh-notifications event:', {
-            detail: event?.detail,
-            timestamp: new Date().toISOString(),
-            currentCounts: { ...notificationCounts.value }
-          })
+          if (DEBUG)
+            console.log('🔥 🔔 NOTIFICATION EVENT: Received force-refresh-notifications event:', {
+              detail: event?.detail,
+              timestamp: new Date().toISOString(),
+              currentCounts: { ...notificationCounts.value }
+            })
           // Clear any existing counts and force immediate refresh
           const oldCounts = { ...notificationCounts.value }
           notificationCounts.value = {}
-          console.log('🗑️ Cleared notification counts. Old counts:', oldCounts)
+          if (DEBUG) console.log('🗑️ Cleared notification counts. Old counts:', oldCounts)
           fetchNotificationCounts(true)
         }
 

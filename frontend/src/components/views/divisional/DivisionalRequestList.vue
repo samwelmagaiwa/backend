@@ -76,7 +76,7 @@
           </div>
 
           <!-- Requests Table -->
-          <div class="bg-white/10 rounded-lg overflow-hidden">
+          <div class="bg-white/10 rounded-lg overflow-visible relative z-50">
             <table class="w-full">
               <thead class="bg-blue-800/50">
                 <tr>
@@ -189,7 +189,7 @@
                       <!-- Dropdown menu -->
                       <div
                         v-show="openDropdownId === request.id"
-                        class="dropdown-menu absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-[9999] py-1 min-w-max"
+                        class="dropdown-menu absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-[10000] py-1 min-w-max"
                         @click.stop="() => {}"
                         style="
                           box-shadow:
@@ -255,11 +255,16 @@
       v-if="isLoading"
       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
     >
-      <div class="bg-white rounded-lg shadow-xl p-8 text-center">
-        <div
-          class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"
-        ></div>
-        <p class="text-gray-600">Loading requests...</p>
+      <div
+        class="rounded-xl shadow-2xl p-8 text-center border border-blue-400/40"
+        style="background: linear-gradient(90deg, #0b3a82, #0a2f6f, #0b3a82)"
+      >
+        <div class="flex justify-center mb-4">
+          <div
+            class="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"
+          ></div>
+        </div>
+        <p class="text-blue-100 font-medium">Loading requests...</p>
       </div>
     </div>
 
@@ -454,13 +459,13 @@
       },
 
       viewAndProcessRequest(requestId) {
-        // Navigate to both-service-form.vue with populated data
-        this.$router.push(`/both-service-form/${requestId}`)
+        // Navigate to divisional review route for both-service-form.vue
+        this.$router.push(`/divisional-dashboard/both-service-form/${requestId}`)
       },
 
       editRequest(requestId) {
-        // Navigate to edit mode
-        this.$router.push(`/both-service-form/${requestId}/edit`)
+        // Navigate to divisional review route (edit handled within page if applicable)
+        this.$router.push(`/divisional-dashboard/both-service-form/${requestId}?mode=edit`)
       },
 
       async cancelRequest(requestId) {
@@ -742,7 +747,7 @@
   /* Ensure dropdown is always visible and properly positioned */
   .dropdown-menu {
     position: absolute !important;
-    z-index: 9999 !important;
+    z-index: 10000 !important;
     min-width: 12rem;
     max-width: 16rem;
     transform: translateX(-100%);
@@ -813,6 +818,7 @@
   table {
     position: relative;
     z-index: 1;
+    overflow: visible;
   }
 
   @keyframes dropdownFadeIn {

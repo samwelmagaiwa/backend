@@ -329,6 +329,99 @@ class BothServiceFormService {
   }
 
   /**
+   * Update comments/fields for an existing request (simple JSON PUT)
+   */
+  async updateComments(requestId, payload) {
+    try {
+      // Legacy endpoint (may not exist). Kept for backwards compatibility.
+      const res = await apiClient.post(`/both-service-form/${requestId}/update`, payload, {
+        headers: { 'Content-Type': 'application/json' }
+      })
+      if (res.data?.success) {
+        return { success: true, data: res.data.data, message: res.data.message }
+      }
+      throw new Error(res.data?.message || 'Failed to update request comments')
+    } catch (error) {
+      return {
+        success: false,
+        error:
+          error.response?.data?.message || error.message || 'Failed to update request comments',
+        errors: error.response?.data?.errors || null
+      }
+    }
+  }
+
+  /**
+   * Best-practice, role-aware comment save using existing role endpoints where possible,
+   * with graceful fallback to a generic comment route if available.
+   */
+  async saveRoleCommentSmart(requestId, { role, comment, name }) {
+    const r = (role || '').toLowerCase().replace(/[\s-]+/g, '_')
+
+    // Build prioritized attempts per role
+    const attempts = []
+
+    if (r === 'divisional_director') {
+      attempts.push(
+        // Divisional responds to ICT Director recommendations
+        {
+          url: `/divisional/ict-director-recommendations/${requestId}/respond`,
+          data: { divisional_comments: comment, comments: comment, divisional_name: name }
+        },
+        // Divisional combined access approval endpoint (accept comments only)
+        {
+          url: `/divisional/combined-access-requests/${requestId}/approve`,
+          data: { divisional_comments: comment, comments: comment, divisional_name: name }
+        }
+      )
+    } else if (r === 'ict_director' || r === 'dict') {
+      attempts.push({
+        // ICT Director combined access approval endpoint
+        url: `/ict-director/combined-access-requests/${requestId}/approve`,
+        data: {
+          dict_comments: comment,
+          ict_director_comments: comment,
+          comments: comment,
+          dict_name: name
+        }
+      })
+    } else if (r === 'head_of_department' || r === 'hod' || r === 'head_department') {
+      attempts.push({
+        url: `/hod/combined-access-requests/${requestId}/approve`,
+        data: { hod_comments: comment, comments: comment, hod_name: name }
+      })
+    } else if (r === 'head_it' || r === 'head_of_it' || r === 'it_head' || r === 'ict_head') {
+      attempts.push({
+        url: `/head-of-it/requests/${requestId}/approve`,
+        data: { head_it_comments: comment, comments: comment, head_it_name: name }
+      })
+    }
+
+    // Note: No generic fallback to /both-service-form/:id/update because the controller lacks an update method in some deployments.
+    // We intentionally avoid that route to prevent 500 errors.
+
+    // Try each attempt until one succeeds (HTTP 200 with success true or missing flag)
+    for (const attempt of attempts) {
+      try {
+        const res = await apiClient.post(attempt.url, attempt.data, {
+          headers: { 'Content-Type': 'application/json' }
+        })
+        const ok = res?.data?.success !== false // treat truthy or missing as success
+        if (ok) {
+          return { success: true, data: res.data?.data, message: res.data?.message }
+        }
+      } catch (e) {
+        // Continue to next attempt
+      }
+    }
+
+    return {
+      success: false,
+      error: 'No available endpoint accepted the comment payload for this role'
+    }
+  }
+
+  /**
    * Update an existing combined access request (for rejected requests)
    * @param {number} requestId - ID of the request to update
    * @param {Object} formData - Updated form data
@@ -466,7 +559,10 @@ class BothServiceFormService {
       // Required HOD fields
       fd.append('hod_name', payload.hodName || '')
       fd.append('approved_date', payload.approvedDate || new Date().toISOString().slice(0, 10))
-      fd.append('comments', payload.comments || '')
+      // Send comments using both keys for maximum backend compatibility
+      const hodComments = payload.hodComments || payload.comments || ''
+      fd.append('comments', hodComments)
+      fd.append('hod_comments', hodComments)
 
       if (payload.hodSignature) {
         fd.append('hod_signature', payload.hodSignature)

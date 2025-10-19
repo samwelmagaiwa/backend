@@ -1,6 +1,6 @@
 <template>
   <div class="orbiting-dots" :class="sizeClass" :style="customSize">
-    <!-- Small logo in center -->
+    <!-- Static logo in center -->
     <div class="center-logo">
       <img
         src="/assets/images/logo2.png"
@@ -10,16 +10,13 @@
       />
     </div>
 
-    <!-- Small orbiting dots -->
-    <div class="orbit">
+    <!-- Orbiting dots (CSS-animated container for smoothness) -->
+    <div class="orbit" :style="orbitStyle">
       <div
         v-for="(dot, index) in dots"
         :key="`dot-${index}`"
         :class="`dot ${dot.color}`"
-        :style="{
-          left: `${50 + Math.cos(((rotation + index * dotSpacing) * Math.PI) / 180) * ((orbitRadius / currentContainerSize) * 100)}%`,
-          top: `${50 + Math.sin(((rotation + index * dotSpacing) * Math.PI) / 180) * ((orbitRadius / currentContainerSize) * 100)}%`
-        }"
+        :style="getDotStyle(index)"
       ></div>
     </div>
   </div>
@@ -31,32 +28,17 @@
 
     props: {
       // Size options: 'xs', 'sm', 'md', 'lg', 'xl', '2xl'
-      size: {
-        type: String,
-        default: 'sm'
-      },
+      size: { type: String, default: 'sm' },
       // Custom size in pixels (overrides size prop)
-      customWidth: {
-        type: Number,
-        default: null
-      },
-      customHeight: {
-        type: Number,
-        default: null
-      },
-      // Animation speed
-      speed: {
-        type: Number,
-        default: 3 // degrees per frame
-      }
+      customWidth: { type: Number, default: null },
+      customHeight: { type: Number, default: null },
+      // Animation speed in degrees per frame (kept for backwards compatibility)
+      speed: { type: Number, default: 3 }
     },
 
     data() {
       return {
-        rotation: 0,
-        rotationInterval: null,
-        updateFrequency: 50, // milliseconds between updates
-
+        updateFrequency: 50, // ms; used to derive duration from speed
         // 24 dots with logo colors in repeating pattern
         dots: [
           { color: 'logo-red' },
@@ -92,7 +74,6 @@
         if (this.customWidth || this.customHeight) return ''
         return `size-${this.size}`
       },
-
       customSize() {
         if (this.customWidth || this.customHeight) {
           return {
@@ -102,15 +83,11 @@
         }
         return {}
       },
-
       dotSpacing() {
-        return 360 / this.dots.length // degrees between dots
+        return 360 / this.dots.length
       },
-
       orbitRadius() {
-        // Adjust orbit radius based on size
         if (this.customWidth) return Math.max(8, this.customWidth / 4)
-
         switch (this.size) {
           case 'xs':
             return 6
@@ -128,10 +105,8 @@
             return 8
         }
       },
-
       currentContainerSize() {
         if (this.customWidth) return this.customWidth
-
         switch (this.size) {
           case 'xs':
             return 16
@@ -148,33 +123,29 @@
           default:
             return 20
         }
+      },
+      // Convert speed + updateFrequency to a smooth CSS animation duration (seconds)
+      durationSeconds() {
+        const degPerSec = this.speed * (1000 / this.updateFrequency)
+        const sec = degPerSec > 0 ? 360 / degPerSec : 1.5
+        return Math.max(0.8, Math.min(sec, 4)) // clamp for stability
+      },
+      orbitStyle() {
+        return { '--orbit-duration': `${this.durationSeconds}s` }
       }
     },
 
-    mounted() {
-      this.startAnimation()
-    },
-
-    beforeUnmount() {
-      this.stopAnimation()
-    },
-
     methods: {
-      startAnimation() {
-        this.rotationInterval = setInterval(() => {
-          this.rotation = (this.rotation + this.speed) % 360
-        }, this.updateFrequency)
-      },
-
-      stopAnimation() {
-        if (this.rotationInterval) {
-          clearInterval(this.rotationInterval)
-          this.rotationInterval = null
+      getDotStyle(index) {
+        const angle = index * this.dotSpacing
+        const radius = this.orbitRadius
+        return {
+          top: '50%',
+          left: '50%',
+          transform: `translate(-50%, -50%) rotate(${angle}deg) translateX(${radius}px)`
         }
       },
-
       handleImageError() {
-        // Fallback: hide logo if it fails to load
         const logoEl = this.$el?.querySelector('.center-logo')
         if (logoEl) logoEl.style.display = 'none'
       }
@@ -228,7 +199,7 @@
     width: 50%;
     height: 50%;
     object-fit: contain;
-    opacity: 0.8;
+    opacity: 0.9;
   }
 
   /* Larger logo for 2xl size */
@@ -244,12 +215,24 @@
     width: 100%;
     height: 100%;
     pointer-events: none;
+    transform-origin: 50% 50%;
+    animation: spin var(--orbit-duration, 1.5s) linear infinite;
+    will-change: transform;
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
   }
 
   .dot {
     position: absolute;
     border-radius: 50%;
-    transform: translate(-50%, -50%);
+    will-change: transform;
   }
 
   /* Size-based dot sizing */
@@ -308,7 +291,8 @@
   /* Reduced motion support */
   @media (prefers-reduced-motion: reduce) {
     .orbit {
-      animation: none;
+      animation: none !important;
+      transform: none !important;
     }
     .dot {
       position: static;

@@ -1,26 +1,15 @@
 <template>
   <div v-if="isVisible" class="loading-banner" :class="{ 'fade-out': isComplete }">
-    <!-- Logo container with orbiting dots only -->
-    <div class="logo-container">
-      <!-- Logo only -->
-      <div class="logo-wrapper">
-        <img
-          src="/assets/images/logo2.png"
-          alt="Loading..."
-          class="hospital-logo"
-          @error="handleImageError"
-        />
-      </div>
-
-      <!-- Orbiting loading dots - matching logo colors -->
-      <div class="orbit-container">
+    <div
+      class="loading-card rounded-xl shadow-2xl p-8 text-center border border-blue-400/40"
+      style="background: linear-gradient(90deg, #0b3a82, #0a2f6f, #0b3a82)"
+    >
+      <div class="flex justify-center mb-4">
         <div
-          v-for="(dot, index) in logoDots"
-          :key="`logo-${index}`"
-          :class="`orbit-dot ${dot.color}`"
-          :style="{ transform: `rotate(${rotation + index * 15}deg) translateX(100px)` }"
+          class="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"
         ></div>
       </div>
+      <p class="text-blue-100 font-medium">Loading...</p>
     </div>
   </div>
 </template>
@@ -48,43 +37,7 @@
     data() {
       return {
         isVisible: true,
-        isComplete: false,
-        rotation: 0,
-
-        // Animation intervals
-        rotationInterval: null,
-
-        // Timing configurations
-        rotationSpeed: 3, // degrees per frame
-        updateFrequency: 40, // milliseconds between updates
-
-        // 24 orbiting dots matching Muhimbili Hospital logo colors
-        logoDots: [
-          { color: 'logo-red' }, // Logo red
-          { color: 'logo-gold' }, // Logo gold
-          { color: 'logo-white' }, // Logo white
-          { color: 'logo-red' },
-          { color: 'logo-gold' },
-          { color: 'logo-white' },
-          { color: 'logo-red' },
-          { color: 'logo-gold' },
-          { color: 'logo-white' },
-          { color: 'logo-red' },
-          { color: 'logo-gold' },
-          { color: 'logo-white' },
-          { color: 'logo-red' },
-          { color: 'logo-gold' },
-          { color: 'logo-white' },
-          { color: 'logo-red' },
-          { color: 'logo-gold' },
-          { color: 'logo-white' },
-          { color: 'logo-red' },
-          { color: 'logo-gold' },
-          { color: 'logo-white' },
-          { color: 'logo-red' },
-          { color: 'logo-gold' },
-          { color: 'logo-white' }
-        ]
+        isComplete: false
       }
     },
 
@@ -107,62 +60,20 @@
       }
     },
 
-    beforeUnmount() {
-      this.cleanup()
-    },
-
     methods: {
-      /**
-       * Start the loading animation
-       */
       startLoading() {
         this.isVisible = true
         this.isComplete = false
-        this.rotation = 0
-
-        // Start rotation animation
-        this.rotationInterval = setInterval(() => {
-          this.rotation = (this.rotation + this.rotationSpeed) % 360
-        }, this.updateFrequency)
       },
-
-      /**
-       * Stop loading animation
-       */
       stopLoading() {
-        this.cleanup()
         this.isVisible = false
       },
-
-      /**
-       * Complete loading and trigger fade out
-       */
       completeLoading() {
-        // Start fade out
         this.isComplete = true
-
-        // Hide completely after fade animation
         setTimeout(() => {
           this.isVisible = false
           this.$emit('loading-complete')
-        }, 300) // Match CSS transition duration
-      },
-
-      /**
-       * Clean up intervals
-       */
-      cleanup() {
-        if (this.rotationInterval) {
-          clearInterval(this.rotationInterval)
-          this.rotationInterval = null
-        }
-      },
-
-      /**
-       * Handle logo image load error
-       */
-      handleImageError() {
-        console.warn('⚠️ Hospital logo failed to load, using fallback')
+        }, 300)
       }
     }
   }
@@ -180,9 +91,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #0000a3; /* Custom dark blue background */
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.5);
     opacity: 1;
     transition: opacity 0.3s ease-out;
     pointer-events: auto;
@@ -193,6 +102,11 @@
     opacity: 0;
   }
 
+  /* Loader card */
+  .loading-card {
+    min-width: 280px;
+  }
+
   /* Logo container with positioning for orbit */
   .logo-container {
     position: relative;
@@ -200,7 +114,7 @@
     margin-bottom: 1rem;
   }
 
-  /* Logo wrapper */
+  /* Deprecated styles kept for reference; no longer used */
   .logo-wrapper {
     position: relative;
     z-index: 2;

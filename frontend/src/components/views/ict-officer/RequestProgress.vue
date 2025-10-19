@@ -1036,6 +1036,7 @@
 
 <script>
   import ictOfficerService from '../../../services/ictOfficerService'
+  import combinedAccessService from '../../../services/combinedAccessService'
   import ModernSidebar from '../../ModernSidebar.vue'
 
   export default {
@@ -1053,6 +1054,11 @@
       }
     },
     computed: {
+      isHodView() {
+        const name = this.$route?.name || ''
+        const path = this.$route?.path || ''
+        return name === 'HodRequestProgress' || path.startsWith('/hod-dashboard/')
+      },
       currentAssignment() {
         if (!this.timelineData || !this.timelineData.ict_assignments) return null
         // Get the most recent assignment - avoid mutating original array
@@ -1063,6 +1069,8 @@
       },
 
       canPerformActions() {
+        // Actions are only for ICT Officer workflow, never for HOD view
+        if (this.isHodView) return false
         return (
           this.currentAssignment &&
           this.currentAssignment.status !== 'completed' &&
@@ -1107,20 +1115,56 @@
         try {
           console.log('Loading request details for ID:', this.requestId)
 
-          // Load basic request details
-          const requestResult = await ictOfficerService.getAccessRequestById(this.requestId)
+          // Choose API based on context
+          let requestResult
+          if (this.isHodView) {
+            requestResult = await combinedAccessService.getRequestById(this.requestId)
+          } else {
+            requestResult = await ictOfficerService.getAccessRequestById(this.requestId)
+            if (!requestResult.success) {
+              // fallback if ICT endpoint blocks
+              requestResult = await combinedAccessService.getRequestById(this.requestId)
+            }
+          }
           if (!requestResult.success) {
             throw new Error(requestResult.message || 'Failed to load request details')
           }
 
-          // Load timeline data
-          const timelineResult = await ictOfficerService.getAccessRequestTimeline(this.requestId)
-          if (!timelineResult.success) {
-            throw new Error(timelineResult.message || 'Failed to load timeline data')
+          // Load timeline data with graceful fallback
+          let timelineOk = false
+          let timelineData = null
+          if (!this.isHodView) {
+            try {
+              const timelineResult = await ictOfficerService.getAccessRequestTimeline(
+                this.requestId
+              )
+              if (timelineResult.success) {
+                timelineOk = true
+                timelineData = timelineResult.data
+              }
+            } catch (e) {
+              // ignore and try fallback
+            }
+          }
+          if (!timelineOk) {
+            try {
+              const alt = await combinedAccessService.getRequestTimeline(this.requestId)
+              if (alt.success) {
+                timelineOk = true
+                timelineData = alt.data
+              }
+            } catch (e) {
+              // ignore final failure; will render without timeline
+            }
+          }
+          if (!timelineOk) {
+            // Still render page with basic details
+            console.warn('Timeline unavailable; rendering request details without timeline')
+            timelineData = { ict_assignments: [], request: requestResult.data || requestResult }
           }
 
-          this.request = requestResult.data
-          this.timelineData = timelineResult.data
+          this.request = requestResult.data || requestResult
+          this.timelineData = timelineData
 
           console.log('Request details loaded:', this.request)
           console.log('Timeline data loaded:', this.timelineData)

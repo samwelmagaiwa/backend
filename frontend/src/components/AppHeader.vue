@@ -13,6 +13,12 @@
               src="/assets/images/ngao2.png"
               alt="National Shield"
               class="max-w-6 max-h-6 object-contain"
+              loading="lazy"
+              decoding="async"
+              fetchpriority="low"
+              width="24"
+              height="24"
+              @error="(e) => (e.target.style.display = 'none')"
             />
           </div>
           <div>

@@ -77,8 +77,8 @@ export const ROLE_PERMISSIONS = {
 
   [ROLES.ICT_DIRECTOR]: {
     routes: [
-      '/ict-director-dashboard',
-      '/ict-director-dashboard/combined-requests',
+      '/dict-dashboard',
+      '/dict-dashboard/combined-requests',
       '/jeeva-access',
       '/wellsoft-access',
       '/internet-access',
@@ -91,7 +91,7 @@ export const ROLE_PERMISSIONS = {
     forms: ['jeeva-access', 'wellsoft-access', 'internet-access', 'both-service-form'],
     userManagement: [],
     requestsManagement: [
-      'ict-director-dashboard/combined-requests',
+      'dict-dashboard/combined-requests',
       'internal-access/list',
       'internal-access/details'
     ]
@@ -270,7 +270,7 @@ export function hasUserManagementAccess(userRole) {
 const DASHBOARD_ROUTES = {
   'admin-dashboard': '/admin-dashboard',
   'user-dashboard': '/user-dashboard',
-  'ict-director-dashboard': '/ict-director-dashboard',
+  'ict-director-dashboard': '/dict-dashboard',
   'hod-dashboard': '/hod-dashboard',
   'divisional-dashboard': '/divisional-dashboard',
   'ict-dashboard': '/ict-dashboard',

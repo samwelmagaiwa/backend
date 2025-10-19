@@ -12,7 +12,7 @@ const dictAccessService = {
    */
   async getDictRequests(params = {}) {
     try {
-      const response = await apiClient.get('/dict/combined-access-requests', { params })
+      const response = await apiClient.get('/ict-director/combined-access-requests', { params })
       return {
         success: true,
         data: response.data
@@ -33,7 +33,7 @@ const dictAccessService = {
    */
   async getDictRequest(requestId) {
     try {
-      const response = await apiClient.get(`/dict/combined-access-requests/${requestId}`)
+      const response = await apiClient.get(`/ict-director/combined-access-requests/${requestId}`)
       return {
         success: true,
         data: response.data
@@ -56,7 +56,7 @@ const dictAccessService = {
   async updateDictApproval(requestId, approvalData) {
     try {
       const response = await apiClient.post(
-        `/dict/combined-access-requests/${requestId}/approve`,
+        `/ict-director/combined-access-requests/${requestId}/approve`,
         approvalData
       )
       return {
@@ -80,9 +80,12 @@ const dictAccessService = {
    */
   async cancelRequest(requestId, reason) {
     try {
-      const response = await apiClient.post(`/dict/combined-access-requests/${requestId}/cancel`, {
-        reason
-      })
+      const response = await apiClient.post(
+        `/ict-director/combined-access-requests/${requestId}/cancel`,
+        {
+          reason
+        }
+      )
       return {
         success: true,
         data: response.data
@@ -102,7 +105,7 @@ const dictAccessService = {
    */
   async getDictStatistics() {
     try {
-      const response = await apiClient.get('/dict/combined-access-requests/statistics')
+      const response = await apiClient.get('/ict-director/combined-access-requests/statistics')
       return {
         success: true,
         data: response.data.data || response.data
@@ -240,7 +243,9 @@ const dictAccessService = {
   async getRequestTimeline(requestId) {
     try {
       console.log('🔄 DictAccessService: Fetching request timeline:', requestId)
-      const response = await apiClient.get(`/dict/combined-access-requests/${requestId}/timeline`)
+      const response = await apiClient.get(
+        `/ict-director/combined-access-requests/${requestId}/timeline`
+      )
 
       if (response.data && response.data.success) {
         console.log('✅ DictAccessService: Request timeline loaded successfully')

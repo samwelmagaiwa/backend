@@ -22,6 +22,8 @@ const notificationAxiosInstance = axios.create({
   }
 })
 
+const DEBUG = process.env.NODE_ENV === 'development'
+
 // Add auth token to requests for both instances
 const addAuthInterceptor = (instance) => {
   instance.interceptors.request.use(
@@ -58,9 +60,10 @@ const notificationService = {
     if (!forceRefresh && notificationCache.data && notificationCache.timestamp) {
       const cacheAge = Date.now() - notificationCache.timestamp
       if (cacheAge < notificationCache.maxAge) {
-        console.log(
-          '📋 NotificationService: Using cached count (age: ' + Math.round(cacheAge / 1000) + 's)'
-        )
+        if (DEBUG)
+          console.log(
+            '📋 NotificationService: Using cached count (age: ' + Math.round(cacheAge / 1000) + 's)'
+          )
         return notificationCache.data
       }
     }
@@ -70,14 +73,13 @@ const notificationService = {
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        console.log(
-          `🔄 NotificationService: Fetching pending requests count (attempt ${attempt}/${maxRetries})...`
-        )
+        if (DEBUG && attempt === 1)
+          console.log('🔄 NotificationService: Fetching pending requests count...')
 
         const response = await notificationAxiosInstance.get('/notifications/pending-count')
 
         if (response.data.success) {
-          console.log('✅ NotificationService: Pending count loaded successfully')
+          if (DEBUG) console.log('✅ NotificationService: Pending count loaded successfully')
 
           // Cache the successful response
           notificationCache.data = response.data.data
@@ -92,10 +94,12 @@ const notificationService = {
           lastError = new Error(response.data.message || 'Failed to load pending requests count')
         }
       } catch (error) {
-        console.error(
-          `❌ NotificationService: Error fetching pending count (attempt ${attempt}):`,
-          error
-        )
+        if (attempt === maxRetries && DEBUG) {
+          console.error(
+            '❌ NotificationService: Error fetching pending count:',
+            error?.message || error
+          )
+        }
 
         // Log more detailed error information
         if (error.response) {
@@ -108,23 +112,23 @@ const notificationService = {
 
         // Don't retry on authentication errors
         if (error.response?.status === 401 || error.response?.status === 403) {
-          console.log('🔐 Authentication error - not retrying')
+          if (DEBUG) console.log('🔐 Authentication error - not retrying')
           break
         }
 
         // Don't retry on server errors that are likely persistent
         if (error.response?.status === 500) {
-          console.log('🚫 Server error detected - checking if retryable...')
+          if (DEBUG) console.log('🚫 Server error detected - checking if retryable...')
           // Only retry server errors once to avoid spam
           if (attempt >= 2) {
-            console.log('🚫 Server error - not retrying further')
+            if (DEBUG) console.log('🚫 Server error - not retrying further')
             break
           }
         }
 
         // Add delay before retry (except on last attempt)
         if (attempt < maxRetries) {
-          console.log(`⏳ Retrying in ${attempt * 1000}ms...`)
+          if (DEBUG && attempt === 1) console.log(`⏳ Retrying in ${attempt * 1000}ms...`)
           await new Promise((resolve) => setTimeout(resolve, attempt * 1000))
         }
       }
@@ -139,16 +143,19 @@ const notificationService = {
       }
 
       // Log the error for debugging but provide graceful fallback
-      console.error('🚫 NotificationService: All retry attempts failed')
-      console.error('Last error details:', {
-        message: lastError.message,
-        status: lastError.response?.status,
-        data: lastError.response?.data
-      })
+      if (DEBUG) {
+        console.error('🚫 NotificationService: All retry attempts failed')
+        console.error('Last error details:', {
+          message: lastError.message,
+          status: lastError.response?.status,
+          data: lastError.response?.data
+        })
+      }
 
       // Provide graceful fallback instead of throwing error
       // This prevents the UI from breaking when the API is down
-      console.warn('🔄 NotificationService: Providing fallback data to prevent UI breakage')
+      if (DEBUG)
+        console.warn('🔄 NotificationService: Providing fallback data to prevent UI breakage')
       const fallbackData = { total_pending: 0, requires_attention: false, details: null }
 
       // Cache the fallback for a short time to reduce repeated failed requests
@@ -167,11 +174,11 @@ const notificationService = {
    */
   async getPendingRequestsBreakdown() {
     try {
-      console.log('🔄 NotificationService: Fetching pending requests breakdown...')
+      if (DEBUG) console.log('🔄 NotificationService: Fetching pending requests breakdown...')
       const response = await notificationAxiosInstance.get('/notifications/breakdown')
 
       if (response.data.success) {
-        console.log('✅ NotificationService: Breakdown loaded successfully')
+        if (DEBUG) console.log('✅ NotificationService: Breakdown loaded successfully')
         return response.data.data
       } else {
         console.error('❌ NotificationService: Failed to load breakdown:', response.data.message)
@@ -197,7 +204,7 @@ const notificationService = {
    * Clear notification cache (useful for forcing refresh)
    */
   clearCache() {
-    console.log('🗑️ NotificationService: Clearing cache')
+    if (DEBUG) console.log('🗑️ NotificationService: Clearing cache')
     notificationCache.data = null
     notificationCache.timestamp = null
   },

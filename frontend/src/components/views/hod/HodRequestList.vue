@@ -4,10 +4,14 @@
     <div class="flex flex-1 overflow-hidden">
       <ModernSidebar />
       <main
-        class="flex-1 p-4 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative"
+        :class="[
+          'flex-1 p-4 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative',
+          { 'is-loading': isLoading, 'fx-transitions': enableTransitions }
+        ]"
       >
+        { 'is-loading': isLoading } ]" >
         <!-- Medical Background Pattern -->
-        <div class="absolute inset-0 overflow-hidden">
+        <div v-if="enableBackgroundFX" class="absolute inset-0 overflow-hidden medical-pattern">
           <div class="absolute inset-0 opacity-5">
             <div class="grid grid-cols-12 gap-8 h-full transform rotate-45">
               <div
@@ -58,6 +62,12 @@
                     src="/assets/images/ngao2.png"
                     alt="National Shield"
                     class="max-w-28 max-h-28 object-contain"
+                    loading="lazy"
+                    decoding="async"
+                    fetchpriority="low"
+                    width="112"
+                    height="112"
+                    @error="(e) => (e.target.style.visibility = 'hidden')"
                   />
                 </div>
               </div>
@@ -474,11 +484,16 @@
       v-if="isLoading"
       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
     >
-      <div class="bg-white rounded-xl shadow-2xl p-8 text-center">
+      <div
+        class="rounded-xl shadow-2xl p-8 text-center border border-blue-400/40"
+        style="background: linear-gradient(90deg, #0b3a82, #0a2f6f, #0b3a82)"
+      >
         <div class="flex justify-center mb-4">
-          <OrbitingDots size="lg" />
+          <div
+            class="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"
+          ></div>
         </div>
-        <p class="text-gray-600">Loading requests...</p>
+        <p class="text-blue-100 font-medium">Loading requests...</p>
       </div>
     </div>
 
@@ -540,15 +555,6 @@
             <div class="border-t border-gray-100 my-1"></div>
 
             <button
-              @click="viewProgress(activeRequest)"
-              v-if="canViewProgress(activeRequest)"
-              class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-100 hover:text-orange-700 transition-all duration-200 font-medium"
-            >
-              <i class="fas fa-chart-line mr-3 text-orange-500 group-hover:text-orange-600"></i>
-              View Progress
-            </button>
-
-            <button
               @click="viewTimeline(activeRequest)"
               class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-indigo-100 hover:text-indigo-700 transition-all duration-200 font-medium"
             >
@@ -562,123 +568,11 @@
   </div>
 </template>
 
-<style scoped>
-  /* Force dropdown to be visible above all content */
-  .relative {
-    position: relative;
-    z-index: 1;
-  }
-
-  /* Ensure dropdown menus are always on top */
-  .dropdown-menu {
-    /* Use fixed so it ignores ancestor overflow and aligns to viewport */
-    position: fixed !important;
-    z-index: 99999 !important;
-    /* Keep visible within viewport */
-    max-height: calc(100vh - 20px);
-    overflow: auto;
-    box-shadow:
-      0 20px 25px -5px rgba(0, 0, 0, 0.1),
-      0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
-  }
-
-  /* Prevent overflow clipping in containers */
-  .table-container {
-    overflow: visible !important;
-  }
-
-  /* Dropdown portal - ensure it's above everything */
-  .dropdown-portal {
-    z-index: 100000;
-  }
-
-  .dropdown-portal > div {
-    z-index: 100000 !important;
-    position: fixed !important;
-  }
-
-  /* Medical Glass morphism effects */
-  .medical-glass-card {
-    background: rgba(59, 130, 246, 0.15);
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
-    border: 2px solid rgba(96, 165, 250, 0.3);
-    box-shadow:
-      0 8px 32px rgba(29, 78, 216, 0.4),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  }
-
-  /* Animations */
-  @keyframes float {
-    0%,
-    100% {
-      transform: translateY(0px);
-    }
-    50% {
-      transform: translateY(-20px);
-    }
-  }
-
-  @keyframes fade-in {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes fade-in-delay {
-    0% {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    50% {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes slide-up {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .animate-float {
-    animation: float ease-in-out infinite;
-  }
-
-  .animate-fade-in {
-    animation: fade-in 0.6s ease-out;
-  }
-
-  .animate-fade-in-delay {
-    animation: fade-in-delay 1.2s ease-out;
-  }
-
-  .animate-slide-up {
-    animation: slide-up 0.4s ease-out;
-  }
-</style>
-
 <script>
   import Header from '@/components/header.vue'
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppFooter from '@/components/footer.vue'
   import RequestTimeline from '@/components/common/RequestTimeline.vue'
-  import OrbitingDots from '@/components/common/OrbitingDots.vue'
   import combinedAccessService from '@/services/combinedAccessService'
   import statusUtils from '@/utils/statusUtils'
 
@@ -688,8 +582,7 @@
       Header,
       ModernSidebar,
       AppFooter,
-      RequestTimeline,
-      OrbitingDots
+      RequestTimeline
     },
     setup() {
       return {
@@ -710,6 +603,9 @@
         },
         error: null,
         activeDropdown: null,
+        // Effects toggles
+        enableBackgroundFX: false,
+        enableTransitions: false,
         // Timeline modal state
         showTimeline: false,
         selectedRequestId: null,
@@ -747,6 +643,38 @@
           )
         }
 
+        // Ensure any approved requests (this session) stay visible even on restrictive filters
+        try {
+          const keepRaw = localStorage.getItem('keepVisibleRequests') || '[]'
+          const keepIds = JSON.parse(keepRaw)
+          if (Array.isArray(keepIds) && keepIds.length) {
+            keepIds.forEach((kid) => {
+              const keepItem = this.requests.find((r) => String(r.id) === String(kid))
+              if (keepItem && !filtered.some((r) => String(r.id) === String(kid))) {
+                filtered = [keepItem, ...filtered]
+              }
+            })
+          }
+        } catch (e) {
+          console.warn('Failed to inject kept approved requests', e)
+        }
+
+        // Override display status for kept items to 'approved' so users see the final state
+        try {
+          const keepRaw = localStorage.getItem('keepVisibleRequests') || '[]'
+          const keepIds = JSON.parse(keepRaw)
+          if (Array.isArray(keepIds) && keepIds.length) {
+            filtered = filtered.map((r) => {
+              if (keepIds.includes(String(r.id))) {
+                return { ...r, status: 'approved', hod_status: 'approved' }
+              }
+              return r
+            })
+          }
+        } catch (e) {
+          console.warn('Failed to override display status for kept items', e)
+        }
+
         // Exclude user-self-cancelled items (safety net)
         filtered = filtered.filter((r) => !this.isCancelledByUser(r))
 
@@ -764,11 +692,18 @@
     async mounted() {
       try {
         console.log('HodRequestList: Component mounted, initializing...')
-        await this.fetchRequests()
-        console.log('HodRequestList: Component initialized successfully')
+        const token = localStorage.getItem('auth_token')
+        if (!token) {
+          console.log('HodRequestList: waiting for auth-ready event before fetching...')
+          this.isLoading = true
+          window.addEventListener('auth-ready', this.onAuthReady, { once: true })
+        } else {
+          await this.fetchRequests()
+          console.log('HodRequestList: Component initialized successfully')
+        }
 
-        // Poll periodically to reflect user-side cancellations
-        this._poller = setInterval(() => this.fetchRequests(), 30000)
+        // Poll periodically to reflect user-side cancellations (silent to avoid blocking UI)
+        this._poller = setInterval(() => this.fetchRequests({ silent: true }), 30000)
 
         // Add click listener to close dropdowns when clicking outside
         document.addEventListener('click', this.closeDropdowns)
@@ -783,9 +718,15 @@
       // Clean up the click listener
       document.removeEventListener('click', this.closeDropdowns)
       if (this._poller) clearInterval(this._poller)
+      window.removeEventListener('auth-ready', this.onAuthReady)
     },
 
     methods: {
+      onAuthReady() {
+        console.log('HodRequestList: auth-ready received; fetching requests...')
+        this.fetchRequests()
+      },
+
       toggleDropdown(requestId) {
         const idStr = String(requestId)
         console.log('Toggle dropdown for request:', idStr)
@@ -889,34 +830,47 @@
         }
       },
 
-      async fetchRequests() {
-        this.isLoading = true
+      async fetchRequests(options = { silent: false }) {
+        if (!options?.silent) this.isLoading = true
         this.error = null
+        // If we arrived after an approval, default the filter to pending but keep lastApproved visible
+        if (this.$route && this.$route.query && this.$route.query.from === 'approval_done') {
+          this.statusFilter = 'pending_hod'
+        }
 
         try {
           console.log('Fetching combined access requests for HOD approval...')
 
-          const response = await combinedAccessService.getHodRequests({
-            search: this.searchQuery || undefined,
-            status: this.statusFilter || undefined,
-            per_page: 50
-          })
+          const [requestsRes, statsRes] = await Promise.all([
+            combinedAccessService.getHodRequests({
+              search: this.searchQuery || undefined,
+              status: this.statusFilter || undefined,
+              per_page: 50
+            }),
+            combinedAccessService
+              .getHodStatistics()
+              .catch((e) => ({ success: false, error: e?.message }))
+          ])
 
-          if (response.success) {
+          if (requestsRes.success) {
             // Handle the nested response structure: response.data.data.data
-            const responseData = response.data?.data || response.data || {}
+            const responseData = requestsRes.data?.data || requestsRes.data || {}
             this.requests = Array.isArray(responseData.data)
               ? responseData.data
               : Array.isArray(responseData)
                 ? responseData
                 : []
             console.log('Combined access requests loaded:', this.requests.length)
-            console.log('Raw response data:', response.data)
+            console.log('Raw response data:', requestsRes.data)
 
-            // Also fetch statistics
-            await this.fetchStatistics()
+            // Set statistics from API or fallback to local calculation
+            if (statsRes && statsRes.success) {
+              this.stats = statsRes.data
+            } else {
+              this.calculateStats()
+            }
           } else {
-            throw new Error(response.error || 'Failed to fetch requests')
+            throw new Error(requestsRes.error || 'Failed to fetch requests')
           }
         } catch (error) {
           console.error('Error fetching requests:', error)
@@ -925,7 +879,7 @@
           this.requests = []
           this.calculateStats()
         } finally {
-          this.isLoading = false
+          if (!options?.silent) this.isLoading = false
         }
       },
 
@@ -1090,20 +1044,6 @@
         await this.fetchRequests()
       },
 
-      // View Progress method
-      viewProgress(request) {
-        console.log('👁️ HodRequestList: Viewing progress for request:', request.id)
-        this.activeDropdown = null
-        // Navigate to ICT progress view (existing page)
-        this.$router.push(`/ict-dashboard/request-progress/${request.id}`)
-      },
-
-      canViewProgress(request) {
-        // HOD can view progress for requests that are beyond the pending stage
-        const status = request.hod_status || request.status
-        return !['pending_hod', 'hod_rejected', 'cancelled'].includes(status)
-      },
-
       // Helper to detect user-cancelled requests
       isCancelledByUser(request) {
         const status = request.hod_status || request.status
@@ -1143,6 +1083,46 @@
 </script>
 
 <style scoped>
+  /* Force dropdown to be visible above all content */
+  .relative {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Ensure dropdown menus are always on top */
+  .dropdown-menu {
+    /* Use fixed so it ignores ancestor overflow and aligns to viewport */
+    position: fixed !important;
+    z-index: 99999 !important;
+    /* Keep visible within viewport */
+    max-height: calc(100vh - 20px);
+    overflow: auto;
+    box-shadow:
+      0 20px 25px -5px rgba(0, 0, 0, 0.1),
+      0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+  }
+
+  /* Prevent overflow clipping in containers */
+  .table-container {
+    overflow: visible !important;
+  }
+
+  /* Dropdown portal - ensure it's above everything */
+  .dropdown-portal {
+    z-index: 100000;
+  }
+
+  .dropdown-portal > div {
+    z-index: 100000 !important;
+    position: fixed !important;
+  }
+
+  /* Pause heavy animations while loading to reduce main-thread work */
+  .is-loading * {
+    animation: none !important;
+    transition: none !important;
+  }
+
   /* Medical Glass morphism effects */
   .medical-glass-card {
     background: rgba(59, 130, 246, 0.15);
@@ -1224,8 +1204,8 @@
     box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.3);
   }
 
-  /* Smooth transitions */
-  * {
+  /* Smooth transitions (opt-in only to avoid global cost) */
+  .fx-transitions * {
     transition-property:
       color, background-color, border-color, text-decoration-color, fill, stroke, opacity,
       box-shadow, transform, filter, backdrop-filter;

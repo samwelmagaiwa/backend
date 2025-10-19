@@ -3,6 +3,8 @@
  * This replaces individual component status mapping to avoid inconsistencies
  */
 
+const DEBUG = process.env.NODE_ENV === 'development'
+
 // Status text mappings
 export const STATUS_TEXTS = {
   // Basic status
@@ -162,11 +164,12 @@ export function getStatusText(status, componentName = 'Unknown Component') {
     return `Unknown Status (${status})`
   }
 
-  console.log(`✅ [StatusUtils] Status resolved:`, {
-    status,
-    statusText,
-    componentName
-  })
+  if (DEBUG)
+    console.log(`✅ [StatusUtils] Status resolved:`, {
+      status,
+      statusText,
+      componentName
+    })
 
   return statusText
 }

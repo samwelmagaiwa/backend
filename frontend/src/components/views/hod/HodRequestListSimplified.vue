@@ -3,7 +3,7 @@
     <Header />
     <div class="flex flex-1 overflow-hidden">
       <ModernSidebar />
-      <main class="flex-1 p-4 bg-blue-900 overflow-y-auto">
+      <main :class="['flex-1 p-4 bg-blue-900 overflow-y-auto', { 'is-loading': isLoading }]">
         <div class="max-w-full mx-auto">
           <!-- Error Display -->
           <div
@@ -367,6 +367,12 @@
     overflow: visible !important;
   }
 
+  /* Pause heavy animations while loading to reduce main-thread work */
+  .is-loading * {
+    animation: none !important;
+    transition: none !important;
+  }
+
   /* Dropdown portal - ensure it's above everything */
   .dropdown-portal {
     z-index: 999999;
@@ -454,11 +460,18 @@
     async mounted() {
       try {
         console.log('HodRequestListSimplified: Component mounted, initializing...')
-        await this.fetchRequests()
-        console.log('HodRequestListSimplified: Component initialized successfully')
+        const token = localStorage.getItem('auth_token')
+        if (!token) {
+          console.log('HodRequestListSimplified: waiting for auth-ready event before fetching...')
+          this.isLoading = true
+          window.addEventListener('auth-ready', this.onAuthReady, { once: true })
+        } else {
+          await this.fetchRequests()
+          console.log('HodRequestListSimplified: Component initialized successfully')
+        }
 
-        // Poll periodically to reflect user-side cancellations
-        this._poller = setInterval(() => this.fetchRequests(), 30000)
+        // Poll periodically to reflect user-side cancellations (silent to avoid blocking UI)
+        this._poller = setInterval(() => this.fetchRequests({ silent: true }), 30000)
 
         // Add click listener to close dropdowns when clicking outside
         document.addEventListener('click', this.closeDropdowns)
@@ -473,8 +486,13 @@
       // Clean up the click listener
       document.removeEventListener('click', this.closeDropdowns)
       if (this._poller) clearInterval(this._poller)
+      window.removeEventListener('auth-ready', this.onAuthReady)
     },
     methods: {
+      onAuthReady() {
+        console.log('HodRequestListSimplified: auth-ready received; fetching...')
+        this.fetchRequests()
+      },
       toggleDropdown(requestId) {
         const idStr = String(requestId)
         console.log('Toggle dropdown for request:', idStr)
@@ -587,34 +605,43 @@
         }
       },
 
-      async fetchRequests() {
-        this.isLoading = true
+      async fetchRequests(options = { silent: false }) {
+        if (!options?.silent) this.isLoading = true
         this.error = null
 
         try {
           console.log('Fetching combined access requests for HOD approval...')
 
-          const response = await combinedAccessService.getHodRequests({
-            search: this.searchQuery || undefined,
-            status: this.statusFilter || undefined,
-            per_page: 50
-          })
+          const [requestsRes, statsRes] = await Promise.all([
+            combinedAccessService.getHodRequests({
+              search: this.searchQuery || undefined,
+              status: this.statusFilter || undefined,
+              per_page: 50
+            }),
+            combinedAccessService
+              .getHodStatistics()
+              .catch((e) => ({ success: false, error: e?.message }))
+          ])
 
-          if (response.success) {
+          if (requestsRes.success) {
             // Handle the nested response structure: response.data.data.data
-            const responseData = response.data?.data || response.data || {}
+            const responseData = requestsRes.data?.data || requestsRes.data || {}
             this.requests = Array.isArray(responseData.data)
               ? responseData.data
               : Array.isArray(responseData)
                 ? responseData
                 : []
             console.log('Combined access requests loaded:', this.requests.length)
-            console.log('Raw response data:', response.data)
+            console.log('Raw response data:', requestsRes.data)
 
-            // Also fetch statistics
-            await this.fetchStatistics()
+            // Also set statistics from API response if available
+            if (statsRes && statsRes.success) {
+              this.stats = statsRes.data
+            } else {
+              this.calculateStats()
+            }
           } else {
-            throw new Error(response.error || 'Failed to fetch requests')
+            throw new Error(requestsRes.error || 'Failed to fetch requests')
           }
         } catch (error) {
           console.error('Error fetching requests:', error)
@@ -623,7 +650,7 @@
           this.requests = []
           this.calculateStats()
         } finally {
-          this.isLoading = false
+          if (!options?.silent) this.isLoading = false
         }
       },
 

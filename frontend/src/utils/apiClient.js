@@ -69,7 +69,15 @@ apiClient.interceptors.response.use(
     return response
   },
   (error) => {
-    // Log error in debug mode
+    // Gracefully suppress logging for aborted/timeouts to avoid noisy console on refresh
+    const isAborted =
+      !error.response &&
+      (error.code === 'ECONNABORTED' || /aborted|canceled/i.test(error.message || ''))
+    if (isAborted) {
+      return Promise.reject(new Error('Request aborted'))
+    }
+
+    // Log error in debug mode (non-aborted only)
     if (typeof window !== 'undefined' && APP_CONFIG.DEBUG) {
       console.error(`❌ API Error: ${error.config?.method?.toUpperCase()} ${error.config?.url}`, {
         status: error.response?.status,
@@ -91,6 +99,14 @@ apiClient.interceptors.response.use(
       if (window.location.pathname !== '/' && window.location.pathname !== '/login') {
         window.location.href = '/'
       }
+    }
+
+    // Optional small retry once for transient 5xx
+    if (error.response?.status >= 500 && !error.config.__retriedOnce) {
+      error.config.__retriedOnce = true
+      return new Promise((resolve) => setTimeout(resolve, 400)).then(() =>
+        apiClient.request(error.config)
+      )
     }
 
     return Promise.reject(error)

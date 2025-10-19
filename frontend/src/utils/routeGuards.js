@@ -7,6 +7,8 @@ import { useAuthStore } from '@/stores/auth'
 import { useNotificationStore } from '@/stores/notification'
 import bookingService from '@/services/bookingService'
 
+const DEBUG = process.env.NODE_ENV === 'development'
+
 /**
  * Check if user has a pending booking request that should lock the booking service page
  * @param {String} userRole - User role
@@ -57,9 +59,10 @@ export async function checkRouteAccess(route) {
     const userRole = piniaAuthStore.userRole
     const userRoles = user && Array.isArray(user.roles) ? user.roles : []
 
-    console.log('🔍 Route Guard: Checking access for', route.path, {
-      final: { auth: isAuthenticated, role: userRole, roles: userRoles }
-    })
+    if (DEBUG)
+      console.log('🔍 Route Guard: Checking access for', route.path, {
+        final: { auth: isAuthenticated, role: userRole, roles: userRoles }
+      })
 
     // Check if route requires authentication
     if (route.meta?.requiresAuth !== false) {
@@ -79,14 +82,15 @@ export async function checkRouteAccess(route) {
         route.name !== 'Onboarding' &&
         route.path !== '/onboarding'
       ) {
-        console.log('🔄 Route Guard: User needs onboarding, redirecting...', {
-          userRole,
-          needs_onboarding: user.needs_onboarding,
-          targetRoute: route.path,
-          routeName: route.name,
-          userId: user.id,
-          userName: user.name
-        })
+        if (DEBUG)
+          console.log('🔄 Route Guard: User needs onboarding, redirecting...', {
+            userRole,
+            needs_onboarding: user.needs_onboarding,
+            targetRoute: route.path,
+            routeName: route.name,
+            userId: user.id,
+            userName: user.name
+          })
         return {
           hasAccess: false,
           redirectTo: '/onboarding',
@@ -101,7 +105,7 @@ export async function checkRouteAccess(route) {
         userRole !== 'admin' &&
         userRole !== 'ADMIN'
       ) {
-        console.log('✅ Route Guard: Allowing onboarding access for user who needs it')
+        if (DEBUG) console.log('✅ Route Guard: Allowing onboarding access for user who needs it')
         return {
           hasAccess: true,
           reason: 'Onboarding access granted for user who needs it'
@@ -110,20 +114,22 @@ export async function checkRouteAccess(route) {
 
       // Debug log when onboarding check passes
       if (route.name !== 'Onboarding') {
-        console.log('✅ Route Guard: Onboarding check passed', {
-          userRole,
-          needs_onboarding: user?.needs_onboarding,
-          targetRoute: route.path,
-          routeName: route.name,
-          isAdmin: userRole === 'admin' || userRole === 'ADMIN'
-        })
+        if (DEBUG)
+          console.log('✅ Route Guard: Onboarding check passed', {
+            userRole,
+            needs_onboarding: user?.needs_onboarding,
+            targetRoute: route.path,
+            routeName: route.name,
+            isAdmin: userRole === 'admin' || userRole === 'ADMIN'
+          })
       }
 
       // Additional check: if admin user is trying to access onboarding, redirect to dashboard
       if ((userRole === 'admin' || userRole === 'ADMIN') && route.name === 'Onboarding') {
-        console.log(
-          '🚫 Route Guard: Admin user trying to access onboarding, redirecting to dashboard'
-        )
+        if (DEBUG)
+          console.log(
+            '🚫 Route Guard: Admin user trying to access onboarding, redirecting to dashboard'
+          )
         return {
           hasAccess: false,
           redirectTo: '/admin-dashboard',
@@ -148,12 +154,13 @@ export async function checkRouteAccess(route) {
         userRoles.some((role) => route.meta.roles.includes(role))
 
       if (!hasRequiredRole) {
-        console.log('🚫 Route Guard: Role mismatch:', {
-          userRole,
-          userRoles,
-          requiredRoles: route.meta.roles,
-          routePath: route.path
-        })
+        if (DEBUG)
+          console.log('🚫 Route Guard: Role mismatch:', {
+            userRole,
+            userRoles,
+            requiredRoles: route.meta.roles,
+            routePath: route.path
+          })
 
         // Get default dashboard for user's role (use first role from array if primary role is missing)
         const effectiveRole = userRole || (userRoles.length > 0 ? userRoles[0] : null)
@@ -179,7 +186,8 @@ export async function checkRouteAccess(route) {
 
         // Allow access if this is the user's default dashboard
         if (route.path === userDefaultDashboard) {
-          console.log('✅ Route Guard: Allowing access to user default dashboard:', route.path)
+          if (DEBUG)
+            console.log('✅ Route Guard: Allowing access to user default dashboard:', route.path)
           return {
             hasAccess: true,
             reason: 'User accessing their default dashboard'
@@ -187,11 +195,12 @@ export async function checkRouteAccess(route) {
         }
 
         // Redirect to correct dashboard if accessing wrong one
-        console.log('🔄 Route Guard: Redirecting to correct dashboard:', {
-          requestedDashboard: route.path,
-          userDefaultDashboard,
-          userRole
-        })
+        if (DEBUG)
+          console.log('🔄 Route Guard: Redirecting to correct dashboard:', {
+            requestedDashboard: route.path,
+            userDefaultDashboard,
+            userRole
+          })
 
         return {
           hasAccess: false,
@@ -206,10 +215,11 @@ export async function checkRouteAccess(route) {
       const pendingCheck = await checkPendingBookingRequest(userRole)
 
       if (pendingCheck.hasPendingRequest) {
-        console.log(
-          '🚫 Route Guard: Blocking booking service access - user has pending request:',
-          pendingCheck.pendingRequestInfo
-        )
+        if (DEBUG)
+          console.log(
+            '🚫 Route Guard: Blocking booking service access - user has pending request:',
+            pendingCheck.pendingRequestInfo
+          )
 
         // Store pending booking info and show notification
         try {
@@ -252,7 +262,7 @@ export async function checkRouteAccess(route) {
  * @param {Object} vuexStore - Vuex store instance
  */
 export async function enhancedNavigationGuard(to, from, next) {
-  console.log('🔄 Enhanced Route Guard: Navigating from', from.path, 'to', to.path)
+  if (DEBUG) console.log('🔄 Enhanced Route Guard: Navigating from', from.path, 'to', to.path)
 
   try {
     // Wait for auth system to be fully initialized
@@ -262,13 +272,14 @@ export async function enhancedNavigationGuard(to, from, next) {
 
     const piniaAuthStore = useAuthStore()
     while (!piniaAuthStore.isInitialized && waitTime < maxWaitTime) {
-      console.log('⏳ Enhanced Route Guard: Waiting for auth initialization...', {
-        authInitialized: piniaAuthStore.isInitialized,
-        waitTime
-      })
+      if (DEBUG)
+        console.log('⏳ Enhanced Route Guard: Waiting for auth initialization...', {
+          authInitialized: piniaAuthStore.isInitialized,
+          waitTime
+        })
 
       if (!piniaAuthStore.isInitialized) {
-        console.log('⏳ Enhanced Route Guard: Initializing auth...')
+        if (DEBUG) console.log('⏳ Enhanced Route Guard: Initializing auth...')
         piniaAuthStore.initializeAuth()
       }
 
@@ -282,17 +293,18 @@ export async function enhancedNavigationGuard(to, from, next) {
 
     // Ensure Pinia auth is initialized
     if (!piniaAuthStore.isInitialized) {
-      console.log('⏳ Enhanced Route Guard: Initializing Pinia auth...')
+      if (DEBUG) console.log('⏳ Enhanced Route Guard: Initializing Pinia auth...')
       piniaAuthStore.initializeAuth()
     }
 
-    console.log('🔍 Enhanced Route Guard: Final auth state:', {
-      isAuthenticated: piniaAuthStore.isAuthenticated,
-      userRole: piniaAuthStore.userRole,
-      userName: piniaAuthStore.user?.name,
-      targetRoute: to.path,
-      authReady: piniaAuthStore.isInitialized
-    })
+    if (DEBUG)
+      console.log('🔍 Enhanced Route Guard: Final auth state:', {
+        isAuthenticated: piniaAuthStore.isAuthenticated,
+        userRole: piniaAuthStore.userRole,
+        userName: piniaAuthStore.user?.name,
+        targetRoute: to.path,
+        authReady: piniaAuthStore.isInitialized
+      })
 
     // Handle redirect query parameter - but only if user doesn't need onboarding
     if (to.query.redirect && piniaAuthStore.isAuthenticated && piniaAuthStore.userRole) {
@@ -304,29 +316,33 @@ export async function enhancedNavigationGuard(to, from, next) {
         piniaAuthStore.userRole !== 'admin' &&
         piniaAuthStore.userRole !== 'ADMIN'
       ) {
-        console.log(
-          '⏸️ Enhanced Route Guard: Skipping redirect processing - user needs onboarding first'
-        )
+        if (DEBUG)
+          console.log(
+            '⏸️ Enhanced Route Guard: Skipping redirect processing - user needs onboarding first'
+          )
         // Let the normal route access check handle the onboarding redirect
       } else {
         const redirectPath = to.query.redirect
-        console.log('🔄 Enhanced Route Guard: Processing redirect parameter:', {
-          redirectPath,
-          currentPath: to.path,
-          userRole: piniaAuthStore.userRole
-        })
+        if (DEBUG)
+          console.log('🔄 Enhanced Route Guard: Processing redirect parameter:', {
+            redirectPath,
+            currentPath: to.path,
+            userRole: piniaAuthStore.userRole
+          })
 
         // Check if user has access to the redirect path
         const redirectRoute = { path: redirectPath, meta: {} }
         const redirectAccessCheck = await checkRouteAccess(redirectRoute)
 
         if (redirectAccessCheck.hasAccess) {
-          console.log('✅ Enhanced Route Guard: Redirecting to intended path:', redirectPath)
+          if (DEBUG)
+            console.log('✅ Enhanced Route Guard: Redirecting to intended path:', redirectPath)
           return next({ path: redirectPath, replace: true })
         } else {
-          console.log(
-            '🚫 Enhanced Route Guard: User cannot access redirect path, going to default dashboard'
-          )
+          if (DEBUG)
+            console.log(
+              '🚫 Enhanced Route Guard: User cannot access redirect path, going to default dashboard'
+            )
           const { getDefaultDashboard } = await import('./permissions')
           const defaultDashboard = getDefaultDashboard(piniaAuthStore.userRole)
           return next({ path: defaultDashboard || '/login', replace: true })
@@ -344,13 +360,14 @@ export async function enhancedNavigationGuard(to, from, next) {
       const defaultDashboard = getDefaultDashboard(piniaAuthStore.userRole)
 
       if (defaultDashboard && defaultDashboard !== to.path) {
-        console.log(
-          '🔄 Enhanced Route Guard: Redirecting authenticated user to role-based dashboard:',
-          {
-            role: piniaAuthStore.userRole,
-            dashboard: defaultDashboard
-          }
-        )
+        if (DEBUG)
+          console.log(
+            '🔄 Enhanced Route Guard: Redirecting authenticated user to role-based dashboard:',
+            {
+              role: piniaAuthStore.userRole,
+              dashboard: defaultDashboard
+            }
+          )
         return next({ path: defaultDashboard, replace: true })
       }
     }
@@ -362,7 +379,8 @@ export async function enhancedNavigationGuard(to, from, next) {
       piniaAuthStore.userRole !== 'admin' &&
       piniaAuthStore.userRole !== 'ADMIN'
     ) {
-      console.log('✅ Enhanced Route Guard: Allowing access to onboarding for user who needs it')
+      if (DEBUG)
+        console.log('✅ Enhanced Route Guard: Allowing access to onboarding for user who needs it')
       return next()
     }
 
@@ -370,7 +388,7 @@ export async function enhancedNavigationGuard(to, from, next) {
     const accessCheck = await checkRouteAccess(to)
 
     if (!accessCheck.hasAccess) {
-      console.log('🚫 Enhanced Route Guard: Access denied -', accessCheck.reason)
+      if (DEBUG) console.log('🚫 Enhanced Route Guard: Access denied -', accessCheck.reason)
 
       if (accessCheck.redirectTo) {
         // Don't add redirect query if user is being redirected to their default dashboard
@@ -385,12 +403,13 @@ export async function enhancedNavigationGuard(to, from, next) {
           accessCheck.redirectTo !== '/onboarding' &&
           accessCheck.reason !== 'Onboarding required'
 
-        console.log('🔄 Enhanced Route Guard: Redirecting with access check:', {
-          redirectTo: accessCheck.redirectTo,
-          userDefaultDashboard,
-          shouldAddRedirect,
-          originalPath: to.path
-        })
+        if (DEBUG)
+          console.log('🔄 Enhanced Route Guard: Redirecting with access check:', {
+            redirectTo: accessCheck.redirectTo,
+            userDefaultDashboard,
+            shouldAddRedirect,
+            originalPath: to.path
+          })
 
         return next({
           path: accessCheck.redirectTo,
@@ -402,7 +421,7 @@ export async function enhancedNavigationGuard(to, from, next) {
       }
     }
 
-    console.log('✅ Enhanced Route Guard: Access granted -', accessCheck.reason)
+    if (DEBUG) console.log('✅ Enhanced Route Guard: Access granted -', accessCheck.reason)
     next()
   } catch (error) {
     console.error('❌ Enhanced Route Guard: Navigation error:', error)
