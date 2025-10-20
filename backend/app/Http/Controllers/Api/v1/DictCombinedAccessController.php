@@ -482,6 +482,38 @@ class DictCombinedAccessController extends Controller
 
             // ICT Director sees statistics using new granular status columns
             $baseQuery = UserAccess::query();
+
+            // Lightweight normalization: infer ict_director_status for legacy rows (no file additions)
+            try {
+                // Limit normalization per call to avoid long-running requests
+                $toNormalize = UserAccess::where('divisional_status', 'approved')
+                    ->whereNull('ict_director_status')
+                    ->limit(300)
+                    ->get(['id','status','divisional_status','ict_director_status','ict_director_approved_at','ict_director_rejection_reasons']);
+
+                foreach ($toNormalize as $row) {
+                    $inferred = null;
+                    $legacy = $row->status;
+
+                    // Map legacy/overall status to granular ict_director_status where possible
+                    if (in_array($legacy, ['dict_approved','ict_director_approved','approved'])) {
+                        $inferred = 'approved';
+                    } elseif (in_array($legacy, ['dict_rejected','ict_director_rejected','rejected'])) {
+                        $inferred = 'rejected';
+                    } else {
+                        // Default to pending when divisional is approved but no explicit ICT decision
+                        $inferred = 'pending';
+                    }
+
+                    if ($inferred) {
+                        UserAccess::where('id', $row->id)->update(['ict_director_status' => $inferred]);
+                    }
+                }
+            } catch (\Throwable $normErr) {
+                Log::warning('ICT Director stats: normalization skipped', [
+                    'error' => $normErr->getMessage()
+                ]);
+            }
             
             // Use trait method to get comprehensive statistics
             $systemStats = $this->getSystemStatistics();

@@ -6,7 +6,7 @@
         <ModernSidebar />
       </div>
       <main
-        class="flex-1 p-2 overflow-y-auto relative bg-blue-900"
+        class="flex-1 p-2 overflow-y-auto relative bg-blue-900 z-50"
         style="
           background: linear-gradient(
             135deg,
@@ -138,7 +138,7 @@
           </div>
 
           <!-- Main Content -->
-          <div class="medical-glass-card rounded-b-3xl overflow-hidden">
+          <div class="medical-glass-card rounded-b-3xl overflow-visible relative z-50">
             <div class="p-6">
               <!-- Loading State -->
               <div v-if="isLoading" class="text-center py-12">
@@ -148,7 +148,7 @@
 
               <!-- ICT Officers Table -->
               <div v-else class="overflow-hidden rounded-xl border border-blue-300/20">
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto overflow-visible relative z-50">
                   <table class="w-full">
                     <!-- Table Header -->
                     <thead
@@ -267,16 +267,13 @@
                             <!-- Dropdown menu -->
                             <div
                               v-show="openDropdownId === officer.id"
-                              class="dropdown-menu fixed bg-white rounded-lg shadow-xl border border-gray-200 py-1 min-w-max"
+                              class="dropdown-menu absolute right-0 top-full mt-2 bg-white rounded-lg shadow-xl border border-gray-200 py-1 min-w-max"
                               :style="{
                                 zIndex: 99999,
                                 minWidth: '12rem',
                                 maxWidth: '16rem',
                                 boxShadow:
-                                  '0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1)',
-                                position: 'fixed',
-                                top: dropdownPosition.top + 'px',
-                                left: dropdownPosition.left + 'px'
+                                  '0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1)'
                               }"
                               @click.stop
                             >
@@ -673,18 +670,14 @@
 
       // Dropdown management methods
       toggleDropdown(officerId, event) {
+        event?.stopPropagation()
         console.log(
           'SelectIctOfficer: Toggling dropdown for officer:',
           officerId,
           'Current open:',
           this.openDropdownId
         )
-        if (this.openDropdownId === officerId) {
-          this.openDropdownId = null
-        } else {
-          this.calculateDropdownPosition(event)
-          this.openDropdownId = officerId
-        }
+        this.openDropdownId = this.openDropdownId === officerId ? null : officerId
       },
 
       calculateDropdownPosition(event) {
@@ -752,7 +745,6 @@
         ) {
           return
         }
-        console.log('SelectIctOfficer: Closing all dropdowns')
         this.openDropdownId = null
       },
 
@@ -797,14 +789,16 @@
   /* Three-dot menu enhancements */
   .three-dot-menu {
     position: relative;
+    z-index: 100; /* ensure stacking above table/footer base */
   }
 
   /* Ensure dropdown is always visible and properly positioned */
   .dropdown-menu {
-    position: fixed !important;
-    z-index: 99999 !important;
+    position: absolute !important;
+    z-index: 2147483647 !important; /* top of stack */
     min-width: 12rem !important;
     max-width: 16rem !important;
+    will-change: transform, opacity; /* create stacking context */
   }
 
   /* Animation for dropdown appearance */

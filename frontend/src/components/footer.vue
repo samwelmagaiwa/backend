@@ -1,7 +1,7 @@
 <template>
   <footer
-    class="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white py-4 px-6 border-t border-blue-600/40 shadow-lg backdrop-blur-sm relative z-40"
-    style="position: relative; z-index: 40; margin-top: auto"
+    class="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white py-4 px-6 border-t border-blue-600/40 shadow-lg backdrop-blur-sm relative z-10"
+    style="position: relative; z-index: 10; margin-top: auto"
   >
     <div class="flex flex-col md:flex-row justify-between items-center">
       <div class="text-sm text-blue-100 flex items-center space-x-2">

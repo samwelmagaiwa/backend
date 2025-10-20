@@ -507,13 +507,18 @@
           })
 
           if (response.success) {
-            // Handle the nested response structure: response.data.data.data
-            const responseData = response.data?.data || response.data || {}
-            this.requests = Array.isArray(responseData.data)
-              ? responseData.data
-              : Array.isArray(responseData)
-                ? responseData
-                : []
+            // Normalize response to array regardless of pagination shape
+            const raw = response.data
+            let items = []
+            if (Array.isArray(raw)) {
+              items = raw
+            } else if (raw && Array.isArray(raw.data)) {
+              items = raw.data
+            } else if (raw && raw.data && Array.isArray(raw.data.data)) {
+              // Some APIs nest as { data: { data: [...] } }
+              items = raw.data.data
+            }
+            this.requests = items
             console.log('Combined access requests loaded:', this.requests.length)
             console.log('Raw response data:', response.data)
 
@@ -537,8 +542,25 @@
         try {
           const response = await dictAccessService.getDictStatistics()
 
-          if (response.success) {
-            this.stats = response.data
+          if (response.success && response.data) {
+            // Map backend keys (ict director) to UI cards explicitly
+            const d = response.data || {}
+            this.stats = {
+              pendingDict: Number(d.pendingDict ?? d.pending ?? 0),
+              dictApproved: Number(d.dictApproved ?? 0),
+              dictRejected: Number(d.dictRejected ?? 0),
+              total: Number(d.total ?? 0)
+            }
+
+            // If backend returned zeros but we have data loaded, fallback to local calculation
+            const sum =
+              (this.stats.pendingDict || 0) +
+              (this.stats.dictApproved || 0) +
+              (this.stats.dictRejected || 0) +
+              (this.stats.total || 0)
+            if (sum === 0 && Array.isArray(this.requests) && this.requests.length > 0) {
+              this.calculateStats()
+            }
           } else {
             // Fall back to calculating stats from loaded requests
             this.calculateStats()
@@ -555,25 +577,10 @@
         const requests = Array.isArray(this.requests) ? this.requests : []
 
         this.stats = {
-          // Count requests pending ICT Director approval (approved by Divisional Director)
-          pendingDict: requests.filter((r) => this.isPendingStatus(r.status)).length,
-
-          // Count requests approved by ICT Director
-          dictApproved: requests.filter(
-            (r) =>
-              r.status === 'dict_approved' ||
-              r.status === 'ict_director_approved' ||
-              r.status === 'approved' ||
-              r.status === 'implemented' ||
-              r.status === 'completed'
-          ).length,
-
-          // Count requests rejected by ICT Director
-          dictRejected: requests.filter(
-            (r) => r.status === 'dict_rejected' || r.status === 'ict_director_rejected'
-          ).length,
-
-          // Total requests relevant to ICT Director
+          // ICT Director perspective uses mapped statuses: 'pending' | 'approved' | 'rejected'
+          pendingDict: requests.filter((r) => r.status === 'pending').length,
+          dictApproved: requests.filter((r) => r.status === 'approved' || r.ict_director_status === 'approved').length,
+          dictRejected: requests.filter((r) => r.status === 'rejected' || r.ict_director_status === 'rejected').length,
           total: requests.length
         }
       },
@@ -685,13 +692,8 @@
       },
 
       isPendingStatus(status) {
-        // Define which statuses are considered "pending ICT Director approval"
-        const pendingStatuses = [
-          'divisional_approved', // Main pending status for ICT Director
-          'pending_ict_director', // Alternative pending status
-          'pending_dict' // Another possible pending status
-        ]
-        return pendingStatuses.includes(status)
+        // ICT Director perspective (controller maps ict_director_status to 'pending')
+        return status === 'pending'
       },
 
       /**
