@@ -7346,6 +7346,20 @@
       },
 
       async approveAsIctDirector() {
+        // Guard: ensure the current user has the exact ict_director role to prevent 403s
+        try {
+          const roles = (this.currentUser?.roles || []).map(r => (typeof r === 'string' ? r : r?.name)).filter(Boolean)
+          const normalized = roles.map(r => String(r).toLowerCase().replace(/[-\s]+/g, '_'))
+          const isIctDirector = normalized.includes('ict_director') || normalized.includes('dict')
+          if (!isIctDirector) {
+            this.toast = { show: true, type: 'error', message: 'You do not have ICT Director privileges for this action.' }
+            setTimeout(() => (this.toast.show = false), 4000)
+            return
+          }
+        } catch (_) {
+          // If user info missing, fall through to server-side check which will 403
+        }
+
         // Validate ICT Director fields
         const ictDirectorName = this.form.approvals.directorICT.name || this.currentUser?.name || ''
         const ictDirectorSignature = this.form.approvals.directorICT.signature

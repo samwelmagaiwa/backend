@@ -68,12 +68,14 @@ class BothServiceFormRoleMiddleware
             $requiredRoles = explode(',', $requiredRole);
             
             $roleMapping = [
-                'hod' => ['head_of_department'],
-                'divisional_director' => ['divisional_director'],
-                'dict' => ['ict_director'],
-                'head_of_it' => ['head_of_it'],
-                'ict_officer' => ['ict_officer'],
-                'admin' => ['admin'],
+                'hod' => ['head_of_department', 'head_department', 'head_of_dept'],
+                'divisional_director' => ['divisional_director', 'divisional-dir', 'divisionaldirector'],
+                // Accept common ICT Director aliases
+                'ict_director' => ['ict_director', 'ICT_DIRECTOR', 'ict-director', 'ict_director_role', 'dict'],
+                'dict' => ['ict_director', 'ICT_DIRECTOR', 'ict-director', 'ict_director_role'],
+                'head_of_it' => ['head_of_it', 'head_it', 'ict_head'],
+                'ict_officer' => ['ict_officer', 'ict-officer'],
+                'admin' => ['admin', 'super_admin'],
             ];
 
             $allowedForRoute = [];
