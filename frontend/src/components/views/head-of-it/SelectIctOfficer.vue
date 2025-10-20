@@ -6,7 +6,7 @@
         <ModernSidebar />
       </div>
       <main
-        class="flex-1 p-2 overflow-y-auto relative bg-blue-900 z-50"
+        class="flex-1 p-2 relative bg-blue-900 overflow-visible"
         style="
           background: linear-gradient(
             135deg,
@@ -19,7 +19,7 @@
         "
       >
         <!-- Medical Background Pattern -->
-        <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute inset-0 overflow-visible pointer-events-none">
           <div class="absolute inset-0 opacity-5">
             <div class="grid grid-cols-12 gap-8 h-full transform rotate-45">
               <div
@@ -138,7 +138,7 @@
           </div>
 
           <!-- Main Content -->
-          <div class="medical-glass-card rounded-b-3xl overflow-visible relative z-50">
+          <div class="medical-glass-card rounded-b-3xl overflow-visible relative">
             <div class="p-6">
               <!-- Loading State -->
               <div v-if="isLoading" class="text-center py-12">
@@ -147,8 +147,8 @@
               </div>
 
               <!-- ICT Officers Table -->
-              <div v-else class="overflow-hidden rounded-xl border border-blue-300/20">
-                <div class="overflow-x-auto overflow-visible relative z-50">
+              <div v-else class="overflow-visible rounded-xl border border-blue-300/20">
+                <div class="overflow-x-auto overflow-visible relative">
                   <table class="w-full">
                     <!-- Table Header -->
                     <thead
@@ -247,7 +247,10 @@
                         </td>
 
                         <!-- Actions -->
-                        <td class="px-6 py-4 text-center relative">
+                        <td class="px-6 py-4 text-center relative overflow-visible">
+                          <!-- Create a local stacking context without covering footer -->
+                          <div style="position: relative; z-index: 1">
+                          </div>
                           <div class="flex justify-center three-dot-menu">
                             <!-- Three-dot menu button -->
                             <button
@@ -264,54 +267,7 @@
                               </svg>
                             </button>
 
-                            <!-- Dropdown menu -->
-                            <div
-                              v-show="openDropdownId === officer.id"
-                              class="dropdown-menu absolute right-0 top-full mt-2 bg-white rounded-lg shadow-xl border border-gray-200 py-1 min-w-max"
-                              :style="{
-                                zIndex: 99999,
-                                minWidth: '12rem',
-                                maxWidth: '16rem',
-                                boxShadow:
-                                  '0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1)'
-                              }"
-                              @click.stop
-                            >
-                              <!-- Assign Task -->
-                              <button
-                                @click.stop="executeAction('assign_task', officer)"
-                                :disabled="officer.status === 'Busy' || isAssigning"
-                                class="w-full text-left px-4 py-2 text-sm bg-green-50 text-green-800 border-b border-green-200 hover:bg-green-100 focus:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset transition-all duration-200 flex items-center space-x-3 group disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500 first:rounded-t-lg"
-                              >
-                                <i
-                                  class="fas fa-user-plus text-green-600 group-hover:text-green-700 group-focus:text-green-700 w-4 h-4 flex-shrink-0 transition-colors duration-200"
-                                ></i>
-                                <span class="font-medium">Assign Task</span>
-                              </button>
-
-                              <!-- View Progress -->
-                              <button
-                                @click.stop="executeAction('view_progress', officer)"
-                                class="w-full text-left px-4 py-2 text-sm bg-blue-50 text-blue-800 border-b border-blue-200 hover:bg-blue-100 focus:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset transition-all duration-200 flex items-center space-x-3 group"
-                              >
-                                <i
-                                  class="fas fa-eye text-blue-600 group-hover:text-blue-700 group-focus:text-blue-700 w-4 h-4 flex-shrink-0 transition-colors duration-200"
-                                ></i>
-                                <span class="font-medium">View Progress</span>
-                              </button>
-
-                              <!-- Cancel Task -->
-                              <button
-                                @click.stop="executeAction('cancel_task', officer)"
-                                :disabled="officer.status !== 'Assigned'"
-                                class="w-full text-left px-4 py-2 text-sm bg-red-50 text-red-800 hover:bg-red-100 focus:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-inset transition-all duration-200 flex items-center space-x-3 group disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500 last:rounded-b-lg"
-                              >
-                                <i
-                                  class="fas fa-times text-red-600 group-hover:text-red-700 group-focus:text-red-700 w-4 h-4 flex-shrink-0 transition-colors duration-200"
-                                ></i>
-                                <span class="font-medium">Cancel Task</span>
-                              </button>
-                            </div>
+                            <!-- Dropdown menu is rendered in a fixed overlay at the end of the component -->
                           </div>
                         </td>
                       </tr>
@@ -434,6 +390,48 @@
             </div>
           </div>
         </div>
+
+        <!-- Fixed overlay dropdown portal -->
+        <div v-show="openDropdownId" class="fixed inset-0 pointer-events-none" style="z-index: 99999" @click="closeAllDropdowns">
+          <div
+            class="dropdown-menu-portal pointer-events-auto fixed bg-white rounded-lg shadow-xl border border-gray-200 py-1"
+            :style="{
+              top: dropdownCoords.top + 'px',
+              left: dropdownCoords.left + 'px',
+              zIndex: 100000,
+              minWidth: '12rem',
+              maxWidth: '16rem',
+              maxHeight: '240px',
+              overflowY: 'auto',
+              boxShadow: '0 10px 25px rgba(0,0,0,0.15), 0 4px 6px rgba(0,0,0,0.1)'
+            }"
+            @click.stop
+          >
+            <button
+              @click.stop="executeAction('assign_task', ictOfficers.find(o => o.id === openDropdownId))"
+              :disabled="(ictOfficers.find(o => o.id === openDropdownId)?.status) === 'Busy' || isAssigning"
+              class="w-full text-left px-4 py-2 text-sm bg-green-50 text-green-800 border-b border-green-200 hover:bg-green-100 focus:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset transition-all duration-200 flex items-center space-x-3 group disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500 first:rounded-t-lg"
+            >
+              <i class="fas fa-user-plus text-green-600 group-hover:text-green-700 group-focus:text-green-700 w-4 h-4 flex-shrink-0 transition-colors duration-200"></i>
+              <span class="font-medium">Assign Task</span>
+            </button>
+            <button
+              @click.stop="executeAction('view_progress', ictOfficers.find(o => o.id === openDropdownId))"
+              class="w-full text-left px-4 py-2 text-sm bg-blue-50 text-blue-800 border-b border-blue-200 hover:bg-blue-100 focus:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset transition-all duration-200 flex items-center space-x-3 group"
+            >
+              <i class="fas fa-eye text-blue-600 group-hover:text-blue-700 group-focus:text-blue-700 w-4 h-4 flex-shrink-0 transition-colors duration-200"></i>
+              <span class="font-medium">View Progress</span>
+            </button>
+            <button
+              @click.stop="executeAction('cancel_task', ictOfficers.find(o => o.id === openDropdownId))"
+              :disabled="(ictOfficers.find(o => o.id === openDropdownId)?.status) !== 'Assigned'"
+              class="w-full text-left px-4 py-2 text-sm bg-red-50 text-red-800 hover:bg-red-100 focus:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-inset transition-all duration-200 flex items-center space-x-3 group disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500 last:rounded-b-lg"
+            >
+              <i class="fas fa-times text-red-600 group-hover:text-red-700 group-focus:text-red-700 w-4 h-4 flex-shrink-0 transition-colors duration-200"></i>
+              <span class="font-medium">Cancel Task</span>
+            </button>
+          </div>
+        </div>
       </main>
     </div>
   </div>
@@ -466,7 +464,9 @@
         isAssigning: false,
         // Dropdown state management
         openDropdownId: null,
-        dropdownPosition: { top: 0, left: 0 }
+        dropdownCoords: { top: 0, left: 0 },
+        dropdownPlacement: 'below', // 'below' | 'above' based on available space
+        dropdownWidth: 192
       }
     },
     computed: {
@@ -671,13 +671,41 @@
       // Dropdown management methods
       toggleDropdown(officerId, event) {
         event?.stopPropagation()
-        console.log(
-          'SelectIctOfficer: Toggling dropdown for officer:',
-          officerId,
-          'Current open:',
-          this.openDropdownId
-        )
-        this.openDropdownId = this.openDropdownId === officerId ? null : officerId
+        const willOpen = this.openDropdownId !== officerId
+        this.openDropdownId = willOpen ? officerId : null
+        if (!willOpen) return
+
+        try {
+          const button = event?.target?.closest('.three-dot-button')
+          if (!button) {
+            this.dropdownPlacement = 'below'
+            this.dropdownCoords = { top: 0, left: 0 }
+            return
+          }
+          const rect = button.getBoundingClientRect()
+          const viewportHeight = window.innerHeight
+          const viewportWidth = window.innerWidth
+          const spaceBelow = viewportHeight - rect.bottom
+          const spaceAbove = rect.top
+          const estimatedMenuHeight = 180
+          const menuWidth = this.dropdownWidth
+
+          // Decide placement
+          this.dropdownPlacement = spaceBelow < estimatedMenuHeight && spaceAbove > spaceBelow ? 'above' : 'below'
+
+          // Compute left so that menu right aligns with button right but stays within viewport
+          let left = rect.right - menuWidth
+          left = Math.max(8, Math.min(left, viewportWidth - menuWidth - 8))
+
+          // Compute top based on placement
+          let top = this.dropdownPlacement === 'below' ? rect.bottom + 8 : rect.top - estimatedMenuHeight - 8
+          top = Math.max(8, Math.min(top, viewportHeight - 8))
+
+          this.dropdownCoords = { top, left }
+        } catch (e) {
+          this.dropdownPlacement = 'below'
+          this.dropdownCoords = { top: 0, left: 0 }
+        }
       },
 
       calculateDropdownPosition(event) {
@@ -738,7 +766,7 @@
       },
 
       closeAllDropdowns(event) {
-        // Only close if clicking outside the dropdown menu or three-dot button
+        // Only close if clicking inside menu or on button, otherwise close
         if (
           event &&
           (event.target.closest('.dropdown-menu') || event.target.closest('.three-dot-button'))
@@ -751,7 +779,7 @@
       // Execute action based on key
       executeAction(actionKey, officer) {
         console.log('SelectIctOfficer: Executing action:', actionKey, 'for officer:', officer.id)
-        this.closeAllDropdowns()
+        this.openDropdownId = null
 
         switch (actionKey) {
           case 'assign_task':
@@ -789,16 +817,23 @@
   /* Three-dot menu enhancements */
   .three-dot-menu {
     position: relative;
-    z-index: 100; /* ensure stacking above table/footer base */
+    /* no z-index by default to avoid overlaying pagination/footer */
   }
 
-  /* Ensure dropdown is always visible and properly positioned */
-  .dropdown-menu {
-    position: absolute !important;
-    z-index: 2147483647 !important; /* top of stack */
-    min-width: 12rem !important;
-    max-width: 16rem !important;
-    will-change: transform, opacity; /* create stacking context */
+  /* Removed old in-cell dropdown styling since menu is now in portal layer */
+  .dropdown-menu-portal button:hover {
+    transform: translateX(2px);
+  }
+
+  /* Ensure the footer/pagination remains above table body (unchanged) */
+  .medical-glass-card > .p-6 + div .bg-blue-800\/30 {
+    position: relative;
+    z-index: 3500;
+  }
+
+  /* Ensure table cells do not clip absolutely-positioned children */
+  td, th {
+    overflow: visible !important;
   }
 
   /* Animation for dropdown appearance */
