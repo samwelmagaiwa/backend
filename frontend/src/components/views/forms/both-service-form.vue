@@ -1282,6 +1282,30 @@
                     </div>
                   </div>
 
+          <!-- Head of IT Approval Success Modal -->
+          <div v-if="showHeadItApproveSuccessModal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-4">
+            <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
+              <div class="px-6 py-4 text-center" style="background: linear-gradient(135deg, #0f52ba 0%, #1e3a8a 100%)">
+                <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg">
+                  <i class="fas fa-check text-2xl" style="color: #0f52ba"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white">Request Approved</h3>
+                <p class="text-blue-100 text-sm mt-1">The request has been approved successfully.</p>
+              </div>
+              <div class="px-6 py-6 text-center">
+                <p class="text-gray-700 text-base mb-6">Click below to assign this task to an ICT Officer.</p>
+                <div class="flex gap-3">
+                  <button @click="redirectToAssignIctOfficer" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-semibold transition duration-200">
+                    Assign to ICT Officer
+                  </button>
+                  <button @click="showHeadItApproveSuccessModal = false" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-3 px-4 rounded-lg transition duration-200">
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
                   <!-- Approval Section -->
                   <div
                     :class="[
@@ -3928,6 +3952,8 @@
 
     data() {
       return {
+        // UI: Head of IT approval success modal
+        showHeadItApproveSuccessModal: false,
         // Signature handling
         signaturePreview: '',
         signatureFileName: '',
@@ -7348,11 +7374,21 @@
       async approveAsIctDirector() {
         // Guard: ensure the current user has the exact ict_director role to prevent 403s
         try {
-          const roles = (this.currentUser?.roles || []).map(r => (typeof r === 'string' ? r : r?.name)).filter(Boolean)
-          const normalized = roles.map(r => String(r).toLowerCase().replace(/[-\s]+/g, '_'))
+          const roles = (this.currentUser?.roles || [])
+            .map((r) => (typeof r === 'string' ? r : r?.name))
+            .filter(Boolean)
+          const normalized = roles.map((r) =>
+            String(r)
+              .toLowerCase()
+              .replace(/[-\s]+/g, '_')
+          )
           const isIctDirector = normalized.includes('ict_director') || normalized.includes('dict')
           if (!isIctDirector) {
-            this.toast = { show: true, type: 'error', message: 'You do not have ICT Director privileges for this action.' }
+            this.toast = {
+              show: true,
+              type: 'error',
+              message: 'You do not have ICT Director privileges for this action.'
+            }
             setTimeout(() => (this.toast.show = false), 4000)
             return
           }
@@ -7532,11 +7568,8 @@
             this.roleCommentsDraft || this.form.comments || 'Approved by Head of IT'
           )
 
-          this.toast = { show: true, message: 'Request approved successfully by Head of IT' }
-          setTimeout(() => {
-            this.toast.show = false
-            this.goBackToHeadItRequests()
-          }, 1500)
+          // Show approval success modal with CTA to assign ICT officer
+          this.onHeadItApproveSuccess()
         } else {
           // Handle specific error types
           let errorMessage = 'Failed to approve request'
@@ -8760,6 +8793,15 @@
           default:
             console.warn(`Unknown approval stage: ${stage}`)
         }
+      },
+      // Injected: call after successful Head of IT approval
+      onHeadItApproveSuccess() {
+        this.showHeadItApproveSuccessModal = true
+      },
+      redirectToAssignIctOfficer() {
+        this.showHeadItApproveSuccessModal = false
+        const id = this.getRequestId || this.requestData?.id || this.$route.params.id
+        if (id) this.$router.push(`/head_of_it-dashboard/select-ict-officer/${id}`)
       }
     }
   }

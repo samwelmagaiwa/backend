@@ -43,6 +43,29 @@
             </button>
           </div>
 
+          <!-- Implementation Notice Banner -->
+          <div
+            v-if="!isLoading && requestInfo && !canAssign"
+            class="medical-glass-card rounded-none border-t-0 border-b border-green-300/30"
+          >
+            <div
+              class="p-4 bg-green-600/20 border border-green-400/30 rounded-lg flex items-start gap-3"
+            >
+              <div
+                class="w-8 h-8 rounded-full bg-green-500/30 flex items-center justify-center flex-shrink-0"
+              >
+                <i class="fas fa-check text-green-300"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-lg text-green-200">Already Implemented</h3>
+                <p class="text-green-100 text-base">
+                  This request has already been implemented by the assigned ICT officer. Task
+                  assignment is disabled.
+                </p>
+              </div>
+            </div>
+          </div>
+
           <!-- Error Display -->
           <div
             v-if="error"
@@ -249,8 +272,7 @@
                         <!-- Actions -->
                         <td class="px-6 py-4 text-center relative overflow-visible">
                           <!-- Create a local stacking context without covering footer -->
-                          <div style="position: relative; z-index: 1">
-                          </div>
+                          <div style="position: relative; z-index: 1"></div>
                           <div class="flex justify-center three-dot-menu">
                             <!-- Three-dot menu button -->
                             <button
@@ -392,7 +414,12 @@
         </div>
 
         <!-- Fixed overlay dropdown portal -->
-        <div v-show="openDropdownId" class="fixed inset-0 pointer-events-none" style="z-index: 99999" @click="closeAllDropdowns">
+        <div
+          v-show="openDropdownId"
+          class="fixed inset-0 pointer-events-none"
+          style="z-index: 99999"
+          @click="closeAllDropdowns"
+        >
           <div
             class="dropdown-menu-portal pointer-events-auto fixed bg-white rounded-lg shadow-xl border border-gray-200 py-1"
             :style="{
@@ -408,26 +435,56 @@
             @click.stop
           >
             <button
-              @click.stop="executeAction('assign_task', ictOfficers.find(o => o.id === openDropdownId))"
-              :disabled="(ictOfficers.find(o => o.id === openDropdownId)?.status) === 'Busy' || isAssigning"
+              @click.stop="
+                executeAction(
+                  'assign_task',
+                  ictOfficers.find((o) => o.id === openDropdownId)
+                )
+              "
+              :disabled="
+                !canAssign ||
+                ictOfficers.find((o) => o.id === openDropdownId)?.status === 'Busy' ||
+                isAssigning
+              "
+              :title="
+                !canAssign
+                  ? 'This request has already been implemented and cannot be reassigned'
+                  : ''
+              "
               class="w-full text-left px-4 py-2 text-sm bg-green-50 text-green-800 border-b border-green-200 hover:bg-green-100 focus:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset transition-all duration-200 flex items-center space-x-3 group disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500 first:rounded-t-lg"
             >
-              <i class="fas fa-user-plus text-green-600 group-hover:text-green-700 group-focus:text-green-700 w-4 h-4 flex-shrink-0 transition-colors duration-200"></i>
+              <i
+                class="fas fa-user-plus text-green-600 group-hover:text-green-700 group-focus:text-green-700 w-4 h-4 flex-shrink-0 transition-colors duration-200"
+              ></i>
               <span class="font-medium">Assign Task</span>
             </button>
             <button
-              @click.stop="executeAction('view_progress', ictOfficers.find(o => o.id === openDropdownId))"
+              @click.stop="
+                executeAction(
+                  'view_progress',
+                  ictOfficers.find((o) => o.id === openDropdownId)
+                )
+              "
               class="w-full text-left px-4 py-2 text-sm bg-blue-50 text-blue-800 border-b border-blue-200 hover:bg-blue-100 focus:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset transition-all duration-200 flex items-center space-x-3 group"
             >
-              <i class="fas fa-eye text-blue-600 group-hover:text-blue-700 group-focus:text-blue-700 w-4 h-4 flex-shrink-0 transition-colors duration-200"></i>
+              <i
+                class="fas fa-eye text-blue-600 group-hover:text-blue-700 group-focus:text-blue-700 w-4 h-4 flex-shrink-0 transition-colors duration-200"
+              ></i>
               <span class="font-medium">View Progress</span>
             </button>
             <button
-              @click.stop="executeAction('cancel_task', ictOfficers.find(o => o.id === openDropdownId))"
-              :disabled="(ictOfficers.find(o => o.id === openDropdownId)?.status) !== 'Assigned'"
+              @click.stop="
+                executeAction(
+                  'cancel_task',
+                  ictOfficers.find((o) => o.id === openDropdownId)
+                )
+              "
+              :disabled="ictOfficers.find((o) => o.id === openDropdownId)?.status !== 'Assigned'"
               class="w-full text-left px-4 py-2 text-sm bg-red-50 text-red-800 hover:bg-red-100 focus:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-inset transition-all duration-200 flex items-center space-x-3 group disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500 last:rounded-b-lg"
             >
-              <i class="fas fa-times text-red-600 group-hover:text-red-700 group-focus:text-red-700 w-4 h-4 flex-shrink-0 transition-colors duration-200"></i>
+              <i
+                class="fas fa-times text-red-600 group-hover:text-red-700 group-focus:text-red-700 w-4 h-4 flex-shrink-0 transition-colors duration-200"
+              ></i>
               <span class="font-medium">Cancel Task</span>
             </button>
           </div>
@@ -470,6 +527,13 @@
       }
     },
     computed: {
+      // Assign is allowed only if request is not yet implemented and there is no active assignment
+      canAssign() {
+        const status = this.requestInfo?.ict_officer_status || this.requestInfo?.status
+        const isImplemented = status === 'implemented'
+        // If backend exposes latest assignment in requestInfo in future, we can check here.
+        return !isImplemented
+      },
       filteredOfficers() {
         let filtered = [...this.ictOfficers]
 
@@ -691,14 +755,18 @@
           const menuWidth = this.dropdownWidth
 
           // Decide placement
-          this.dropdownPlacement = spaceBelow < estimatedMenuHeight && spaceAbove > spaceBelow ? 'above' : 'below'
+          this.dropdownPlacement =
+            spaceBelow < estimatedMenuHeight && spaceAbove > spaceBelow ? 'above' : 'below'
 
           // Compute left so that menu right aligns with button right but stays within viewport
           let left = rect.right - menuWidth
           left = Math.max(8, Math.min(left, viewportWidth - menuWidth - 8))
 
           // Compute top based on placement
-          let top = this.dropdownPlacement === 'below' ? rect.bottom + 8 : rect.top - estimatedMenuHeight - 8
+          let top =
+            this.dropdownPlacement === 'below'
+              ? rect.bottom + 8
+              : rect.top - estimatedMenuHeight - 8
           top = Math.max(8, Math.min(top, viewportHeight - 8))
 
           this.dropdownCoords = { top, left }
@@ -832,7 +900,8 @@
   }
 
   /* Ensure table cells do not clip absolutely-positioned children */
-  td, th {
+  td,
+  th {
     overflow: visible !important;
   }
 

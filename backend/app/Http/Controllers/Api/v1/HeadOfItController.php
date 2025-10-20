@@ -413,6 +413,14 @@ class HeadOfItController extends Controller
                 ], 400);
             }
 
+            // Disallow assignment if already implemented
+            if ($accessRequest->ict_officer_status === 'implemented') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Task already implemented. Cannot reassign'
+                ], 400);
+            }
+
             // Check if task is already assigned
             $existingAssignment = \App\Models\IctTaskAssignment::where('user_access_id', $request->request_id)
                 ->whereIn('status', ['assigned', 'in_progress'])

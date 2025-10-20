@@ -579,8 +579,12 @@
         this.stats = {
           // ICT Director perspective uses mapped statuses: 'pending' | 'approved' | 'rejected'
           pendingDict: requests.filter((r) => r.status === 'pending').length,
-          dictApproved: requests.filter((r) => r.status === 'approved' || r.ict_director_status === 'approved').length,
-          dictRejected: requests.filter((r) => r.status === 'rejected' || r.ict_director_status === 'rejected').length,
+          dictApproved: requests.filter(
+            (r) => r.status === 'approved' || r.ict_director_status === 'approved'
+          ).length,
+          dictRejected: requests.filter(
+            (r) => r.status === 'rejected' || r.ict_director_status === 'rejected'
+          ).length,
           total: requests.length
         }
       },
