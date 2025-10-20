@@ -491,6 +491,16 @@ const routes = [
       refreshOnEnter: true // Force refresh when entering this route
     }
   },
+  // ICT Director review route for combined both-service form
+  {
+    path: '/dict-dashboard/both-service-form/:id',
+    name: 'DictBothServiceFormReview',
+    component: () => import('../components/views/forms/both-service-form.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: [ROLES.ICT_DIRECTOR]
+    }
+  },
 
   // Head of IT Combined Access Requests List
   {

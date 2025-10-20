@@ -583,8 +583,8 @@
       },
 
       viewAndProcessRequest(requestId) {
-        // Navigate to both-service-form.vue with populated data (same as Divisional Director)
-        this.$router.push(`/both-service-form/${requestId}`)
+        // Navigate to ICT Director-specific both-service-form review route
+        this.$router.push(`/dict-dashboard/both-service-form/${requestId}`)
       },
 
       editRequest(requestId) {
