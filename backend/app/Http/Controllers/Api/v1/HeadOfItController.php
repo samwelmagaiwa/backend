@@ -379,7 +379,8 @@ class HeadOfItController extends Controller
     {
         $request->validate([
             'request_id' => 'required|exists:user_access,id',
-            'ict_officer_id' => 'required|exists:users,id'
+            'ict_officer_id' => 'required|exists:users,id',
+            'force_reassign' => 'sometimes|boolean'
         ]);
 
         DB::beginTransaction();
@@ -421,16 +422,26 @@ class HeadOfItController extends Controller
                 ], 400);
             }
 
-            // Check if task is already assigned
+            // Check if task is already assigned and handle reassignment rules
             $existingAssignment = \App\Models\IctTaskAssignment::where('user_access_id', $request->request_id)
                 ->whereIn('status', ['assigned', 'in_progress'])
+                ->latest('assigned_at')
                 ->first();
 
             if ($existingAssignment) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Task is already assigned to another ICT Officer'
-                ], 400);
+                // If existing assignment is in progress, block reassignment
+                if ($existingAssignment->status === \App\Models\IctTaskAssignment::STATUS_IN_PROGRESS && !$request->boolean('force_reassign')) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Task is already being implemented by another ICT Officer'
+                    ], 400);
+                }
+
+                // Cancel the previous assignment (supports forced reassignment)
+                $existingAssignment->update([
+                    'status' => \App\Models\IctTaskAssignment::STATUS_CANCELLED,
+                    'cancelled_at' => now()
+                ]);
             }
 
             // Create ICT task assignment
@@ -754,7 +765,8 @@ class HeadOfItController extends Controller
         $request->validate([
             'user_access_id' => 'required|exists:user_access,id',
             'ict_officer_user_id' => 'required|exists:users,id',
-            'assignment_notes' => 'nullable|string|max:1000'
+            'assignment_notes' => 'nullable|string|max:1000',
+            'force_reassign' => 'sometimes|boolean'
         ]);
 
         DB::beginTransaction();
@@ -788,16 +800,26 @@ class HeadOfItController extends Controller
                 ], 400);
             }
 
-            // Check if task is already assigned
+            // Check if task is already assigned and handle reassignment rules
             $existingAssignment = \App\Models\IctTaskAssignment::where('user_access_id', $request->user_access_id)
                 ->whereIn('status', ['assigned', 'in_progress'])
+                ->latest('assigned_at')
                 ->first();
 
             if ($existingAssignment) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Task is already assigned to another ICT Officer'
-                ], 400);
+                // If existing assignment is in progress, block reassignment
+                if ($existingAssignment->status === \App\Models\IctTaskAssignment::STATUS_IN_PROGRESS && !$request->boolean('force_reassign')) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Task is already being implemented by another ICT Officer'
+                    ], 400);
+                }
+
+                // Cancel the previous assignment (supports forced reassignment)
+                $existingAssignment->update([
+                    'status' => \App\Models\IctTaskAssignment::STATUS_CANCELLED,
+                    'cancelled_at' => now()
+                ]);
             }
 
             // Create ICT task assignment

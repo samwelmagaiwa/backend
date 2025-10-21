@@ -609,37 +609,70 @@ class IctOfficerController extends Controller
                 'user_id' => $user->id
             ]);
 
-            // Get all requests that are approved by Head of IT and ready for ICT Officer implementation
+            // Base: requests approved by Head of IT (implementation section gate)
             $query = UserAccess::with(['department', 'ictTaskAssignments.ictOfficer'])
                 ->where('head_it_status', 'approved')
-                ->whereNotNull('head_it_approved_at')
-                ->orderBy('head_it_approved_at', 'asc'); // FIFO - First approved, first implemented
+                ->whereNotNull('head_it_approved_at');
 
-            // Apply status filter if provided
+            // Visibility rules
+            // - Completed (implemented) → visible to all ICT officers
+            // - Assigned/In progress → visible only to the assigned officer
+            // - Unassigned → hidden from ICT officer general view
             $status = $request->get('status');
+
             if ($status) {
                 if ($status === 'unassigned') {
-                    // Requests that don't have any ICT task assignments
-                    $query->whereDoesntHave('ictTaskAssignments');
+                    // Per requirement, do NOT show unassigned items to officers on this endpoint
+                    // Return empty by forcing an impossible condition
+                    $query->whereRaw('1 = 0');
                 } elseif ($status === 'assigned_to_ict') {
-                    // Requests that have ICT task assignments with 'assigned' status
-                    $query->whereHas('ictTaskAssignments', function ($q) {
-                        $q->where('status', IctTaskAssignment::STATUS_ASSIGNED);
+                    $query->whereHas('ictTaskAssignments', function ($q) use ($user) {
+                        $q->where('status', IctTaskAssignment::STATUS_ASSIGNED)
+                          ->where('ict_officer_user_id', $user->id);
                     });
                 } elseif ($status === 'implementation_in_progress') {
-                    // Requests that have ICT task assignments with 'in_progress' status
-                    $query->whereHas('ictTaskAssignments', function ($q) {
-                        $q->where('status', IctTaskAssignment::STATUS_IN_PROGRESS);
+                    $query->whereHas('ictTaskAssignments', function ($q) use ($user) {
+                        $q->where('status', IctTaskAssignment::STATUS_IN_PROGRESS)
+                          ->where('ict_officer_user_id', $user->id);
                     });
                 } elseif ($status === 'completed') {
-                    // Requests that have ICT task assignments with 'completed' status
+                    // Show completed to all ICT officers, regardless of assignee
                     $query->whereHas('ictTaskAssignments', function ($q) {
                         $q->where('status', IctTaskAssignment::STATUS_COMPLETED);
                     });
+                } else {
+                    // Unknown filter → restrict like default (see below)
+                    $status = null;
                 }
             }
 
-            $accessRequests = $query->get()->map(function ($request) {
+            if (!$status) {
+                // Default view: own assigned/in-progress + all completed
+                $query->where(function ($q) use ($user) {
+                    // own active (assigned or in_progress)
+                    $q->whereHas('ictTaskAssignments', function ($qa) use ($user) {
+                        $qa->whereIn('status', [
+                                IctTaskAssignment::STATUS_ASSIGNED,
+                                IctTaskAssignment::STATUS_IN_PROGRESS,
+                            ])
+                           ->where('ict_officer_user_id', $user->id);
+                    })
+                    // OR completed by anyone
+                    ->orWhereHas('ictTaskAssignments', function ($qc) {
+                        $qc->where('status', IctTaskAssignment::STATUS_COMPLETED);
+                    });
+                });
+            }
+
+            $query->orderBy('head_it_approved_at', 'asc'); // FIFO - First approved, first implemented
+
+            // Pagination support to speed up UI refresh after cancel
+            $perPage = (int) ($request->get('per_page', 20));
+            $page = (int) ($request->get('page', 1));
+
+            $paginated = $query->paginate($perPage, ['*'], 'page', $page);
+
+            $accessRequests = $paginated->getCollection()->map(function ($request) {
                 // Determine current status based on ICT task assignments
                 $currentStatus = 'head_of_it_approved'; // Default status
                 $latestAssignment = $request->ictTaskAssignments->sortByDesc('assigned_at')->first();
@@ -713,13 +746,15 @@ class IctOfficerController extends Controller
                 ];
             });
 
+            // Replace collection with transformed data
+            $paginated->setCollection($accessRequests);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Access requests retrieved successfully',
-                'data' => $accessRequests,
+                'data' => $paginated,
                 'meta' => [
-                    'total' => $accessRequests->count(),
-                    'filter_applied' => $status ? "Status: {$status}" : 'All requests'
+                    'filter_applied' => $status ? "Status: {$status}" : 'Default (own active + all completed)'
                 ]
             ]);
 

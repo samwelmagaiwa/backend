@@ -327,7 +327,7 @@
             <!-- Pagination -->
             <div v-if="filteredRequests.length > 0" class="px-4 py-3 border-t border-blue-300/30">
               <div class="text-blue-300 text-base">
-                Showing {{ filteredRequests.length }} of {{ accessRequests.length }} requests
+                Showing {{ filteredRequests.length }} of {{ pagination.total }} requests
               </div>
             </div>
           </div>
@@ -483,7 +483,8 @@
   </div>
 </template>
 
-<script>
+<script setup>
+  import { ref, reactive, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
   import Header from '@/components/header.vue'
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppFooter from '@/components/footer.vue'
@@ -492,233 +493,467 @@
   import { useAuth } from '@/composables/useAuth'
   import ictOfficerService from '@/services/ictOfficerService'
 
-  export default {
-    name: 'IctAccessRequests',
-    components: {
-      Header,
-      ModernSidebar,
-      AppFooter,
-      RequestTimeline,
-      UpdateProgress
-    },
-    data() {
-      return {
-        accessRequests: [],
-        searchQuery: '',
-        statusFilter: '',
-        isLoading: false,
-        stats: {
-          unassigned: 0,
-          assigned: 0,
-          inProgress: 0,
-          total: 0
-        },
-        error: null,
-        // Timeline modal
-        showTimeline: false,
-        selectedRequestId: null,
-        selectedRequest: null,
-        // Update progress modal
-        showUpdateProgress: false,
-        // Dropdown menu state
-        activeDropdown: null,
-        dropdownPosition: null
+
+  // State
+  const accessRequests = ref([])
+  const searchQuery = ref('')
+  const statusFilter = ref('')
+  const isLoading = ref(false)
+  const stats = reactive({ unassigned: 0, assigned: 0, inProgress: 0, total: 0 })
+  const error = ref(null)
+  const pagination = reactive({ total: 0, currentPage: 1, perPage: 20 })
+
+  // Timeline / dialogs
+  const showTimeline = ref(false)
+  const selectedRequestId = ref(null)
+  const selectedRequest = ref(null)
+  const showUpdateProgress = ref(false)
+
+  // Dropdown
+  const activeDropdown = ref(null)
+  const dropdownPosition = ref(null)
+
+  // Auth (called inside setup to avoid inject warnings)
+  const { ROLES, requireRole, user, userRole, ensureInitialized } = useAuth()
+
+  // Helpers
+  const isUnassigned = (status) => status === 'head_of_it_approved' || !status
+
+  const filteredRequests = computed(() => {
+    if (!Array.isArray(accessRequests.value)) {
+      console.warn('IctAccessRequests: accessRequests is not an array:', accessRequests.value)
+      return []
+    }
+
+    let filtered = accessRequests.value
+
+    if (searchQuery.value) {
+      const query = searchQuery.value.toLowerCase()
+      filtered = filtered.filter((request) =>
+        (request.staff_name || request.full_name || '').toLowerCase().includes(query) ||
+        (request.pf_number || '').toLowerCase().includes(query) ||
+        (request.department_name || request.department || '').toLowerCase().includes(query) ||
+        (request.request_id || '').toLowerCase().includes(query)
+      )
+    }
+
+    if (statusFilter.value) {
+      if (statusFilter.value === 'unassigned') {
+        filtered = filtered.filter((r) => isUnassigned(r.status))
+      } else {
+        filtered = filtered.filter((r) => r.status === statusFilter.value)
       }
-    },
+    }
 
-    computed: {
-      filteredRequests() {
-        if (!Array.isArray(this.accessRequests)) {
-          console.warn('IctAccessRequests: accessRequests is not an array:', this.accessRequests)
-          return []
+    return filtered.sort((a, b) => {
+      const aUnassigned = isUnassigned(a.status)
+      const bUnassigned = isUnassigned(b.status)
+      if (aUnassigned && !bUnassigned) return -1
+      if (!aUnassigned && bUnassigned) return 1
+
+      const getRelevantDate = (r) => new Date(r.head_of_it_approval_date || r.head_of_it_approved_at || r.created_at || 0)
+      return getRelevantDate(a) - getRelevantDate(b)
+    })
+  })
+
+  async function fetchAccessRequests() {
+    console.log('🔄 IctAccessRequests: Starting to fetch access requests...')
+    isLoading.value = true
+    error.value = null
+    try {
+      const result = await ictOfficerService.getAccessRequests()
+      if (result.success) {
+        const payload = result.data
+        const list = Array.isArray(payload) ? payload : (payload && Array.isArray(payload.data) ? payload.data : [])
+        const total = Array.isArray(payload) ? payload.length : (payload?.total ?? list.length)
+        const currentPage = payload?.current_page ?? 1
+        const perPage = payload?.per_page ?? list.length
+
+        console.log('✅ IctAccessRequests: Requests loaded successfully:', list.length, { total, currentPage, perPage })
+        accessRequests.value = list
+        pagination.total = total
+        pagination.currentPage = currentPage
+        pagination.perPage = perPage
+
+        const pendingForICT = accessRequests.value.filter((r) => isUnassigned(r.status)).length
+        stats.unassigned = pendingForICT
+        stats.assigned = accessRequests.value.filter((r) => r.status === 'assigned_to_ict').length
+        stats.inProgress = accessRequests.value.filter((r) => r.status === 'implementation_in_progress').length
+        stats.total = accessRequests.value.length
+
+        setPendingCountOverride(pendingForICT)
+        setTimeout(() => diagnoseNotificationDiscrepancy(), 1000)
+      } else {
+        console.error('❌ IctAccessRequests: Failed to load requests:', result.message)
+        error.value = result.message
+        accessRequests.value = []
+      }
+    } catch (err) {
+      console.error('❌ IctAccessRequests: Error loading requests:', err)
+      error.value = 'Network error while loading access requests. Please check your connection.'
+      accessRequests.value = []
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  async function refreshRequests() {
+    console.log('🔄 IctAccessRequests: Refreshing requests...')
+    await fetchAccessRequests()
+  }
+
+  async function viewRequest(request) {
+    console.log('👁️ IctAccessRequests: Viewing request details:', request.id)
+    try {
+      if (ensureInitialized && typeof ensureInitialized === 'function') {
+        await ensureInitialized()
+      }
+      const role = (typeof userRole === 'function' ? userRole() : userRole?.value) || user?.value?.primary_role || user?.value?.role
+      if (role !== ROLES.ICT_OFFICER) {
+        console.warn('Blocked navigation: current role is not ICT_OFFICER', { role })
+        window.location.href = '/ict-dashboard'
+        await nextTick()
+        alert('You do not have permission to process this request.')
+        return
+      }
+      const targetId = request.id
+      if (!targetId) {
+        console.warn('Missing id on request, cannot open form.', request)
+        await nextTick()
+        alert('Cannot open form: missing request id.')
+        return
+      }
+      window.location.href = `/ict-dashboard/both-service-form/${targetId}`
+    } catch (e) {
+      console.error('Failed to open request processing page:', e)
+      await nextTick()
+      alert('Unable to open the request. Please try again.')
+    }
+  }
+
+  async function assignTask(request) {
+    console.log('📋 IctAccessRequests: Assigning task for request:', request.id)
+    try {
+      const result = await ictOfficerService.assignTaskToSelf(request.id, 'Task assigned by ICT Officer')
+      if (result.success) {
+        await fetchAccessRequests()
+        refreshNotificationBadge()
+        alert('Task assigned successfully!')
+      } else {
+        alert('Failed to assign task: ' + result.message)
+      }
+    } catch (error) {
+      console.error('Error assigning task:', error)
+      alert('Network error while assigning task')
+    }
+  }
+
+  async function updateProgress(request) {
+    console.log('📈 IctAccessRequests: Updating progress for request:', request.id)
+    try {
+      const result = await ictOfficerService.updateProgress(request.id, 'implementation_in_progress', 'Implementation started')
+      if (result.success) {
+        await fetchAccessRequests()
+        refreshNotificationBadge()
+        alert('Progress updated successfully!')
+      } else {
+        alert('Failed to update progress: ' + result.message)
+      }
+    } catch (error) {
+      console.error('Error updating progress:', error)
+      alert('Network error while updating progress')
+    }
+  }
+
+  async function cancelTask(request) {
+    console.log('❌ IctAccessRequests: Canceling task for request:', request.id)
+    const reason = prompt('Please provide a reason for canceling this task:')
+    if (reason && reason.trim()) {
+      try {
+        const result = await ictOfficerService.cancelTask(request.id, reason)
+        if (result.success) {
+          await fetchAccessRequests()
+          refreshNotificationBadge()
+          alert('Task canceled successfully!')
+        } else {
+          alert('Failed to cancel task: ' + result.message)
         }
+      } catch (error) {
+        console.error('Error canceling task:', error)
+        alert('Network error while canceling task')
+      }
+    }
+  }
 
-        let filtered = this.accessRequests
+  function hasService(request, serviceType) {
+    if (serviceType === 'jeeva') {
+      return request.jeeva_access_required || (request.request_types && request.request_types.includes('jeeva'))
+    }
+    if (serviceType === 'wellsoft') {
+      return request.wellsoft_access_required || (request.request_types && request.request_types.includes('wellsoft'))
+    }
+    if (serviceType === 'internet') {
+      return request.internet_access_required || (request.request_types && request.request_types.includes('internet'))
+    }
+    return false
+  }
 
-        // Filter by search query
-        if (this.searchQuery) {
-          const query = this.searchQuery.toLowerCase()
-          filtered = filtered.filter(
-            (request) =>
-              (request.staff_name || request.full_name || '').toLowerCase().includes(query) ||
-              (request.pf_number || '').toLowerCase().includes(query) ||
-              (request.department_name || request.department || '').toLowerCase().includes(query) ||
-              (request.request_id || '').toLowerCase().includes(query)
-          )
+  function getRequestType(request) {
+    const services = []
+    if (hasService(request, 'jeeva')) services.push('Jeeva')
+    if (hasService(request, 'wellsoft')) services.push('Wellsoft')
+    if (hasService(request, 'internet')) services.push('Internet')
+    return services.length > 0 ? services.join(' + ') : 'Access Request'
+  }
+
+  function getStatusBadgeClass(status) {
+    const statusClasses = {
+      head_of_it_approved: 'bg-yellow-500 text-yellow-900',
+      assigned_to_ict: 'bg-blue-500 text-blue-900',
+      implementation_in_progress: 'bg-purple-500 text-purple-900',
+      completed: 'bg-emerald-500 text-emerald-900',
+      implemented: 'bg-green-500 text-green-900',
+      cancelled: 'bg-red-500 text-red-900'
+    }
+    return statusClasses[status] || 'bg-gray-500 text-gray-900'
+  }
+
+  function getStatusText(status) {
+    const statusTexts = {
+      head_of_it_approved: 'Available for Assignment',
+      assigned_to_ict: 'Assigned to ICT Officer',
+      implementation_in_progress: 'Implementation in Progress',
+      completed: 'Implementation Completed',
+      implemented: 'Access Granted',
+      cancelled: 'Task Cancelled'
+    }
+    return statusTexts[status] || status?.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'Unknown Status'
+  }
+
+  function viewTimeline(request) {
+    console.log('📅 IctAccessRequests: Opening timeline for request:', request.id)
+    selectedRequestId.value = request.id
+    selectedRequest.value = request
+    showTimeline.value = true
+  }
+
+  function closeTimeline() {
+    console.log('📅 IctAccessRequests: Closing timeline modal')
+    showTimeline.value = false
+    selectedRequestId.value = null
+    selectedRequest.value = null
+    showUpdateProgress.value = false
+  }
+
+  async function handleTimelineUpdate() {
+    console.log('🔄 IctAccessRequests: Timeline updated, refreshing requests list...')
+    await fetchAccessRequests()
+    refreshNotificationBadge()
+  }
+
+  function openUpdateProgress(request) {
+    console.log('📝 IctAccessRequests: Opening update progress section for request:', request?.id)
+    if (request && canShowUpdateProgress(request)) {
+      selectedRequest.value = request
+      selectedRequestId.value = request.id
+      showUpdateProgress.value = true
+    }
+  }
+
+  function closeUpdateProgress() {
+    console.log('📝 IctAccessRequests: Closing update progress section')
+    showUpdateProgress.value = false
+  }
+
+  async function handleUpdateProgressUpdate() {
+    console.log('🔄 IctAccessRequests: Progress updated, refreshing data...')
+    await fetchAccessRequests()
+    refreshNotificationBadge()
+    closeTimeline()
+    setTimeout(() => refreshNotificationBadge(), 3000)
+    setTimeout(() => refreshNotificationBadge(), 5000)
+  }
+
+  function canShowUpdateProgress(request) {
+    if (!request) return false
+    const currentUserId = user.value?.id
+    return (
+      request.ict_officer_user_id &&
+      request.ict_officer_user_id === currentUserId &&
+      !request.ict_officer_implemented_at &&
+      request.ict_officer_status !== 'implemented' &&
+      request.ict_officer_status !== 'rejected' &&
+      !['implemented', 'completed'].includes(request.status) &&
+      (request.status === 'assigned_to_ict' || request.status === 'implementation_in_progress')
+    )
+  }
+
+  function toggleDropdown(requestId, event) {
+    activeDropdown.value = activeDropdown.value === requestId ? null : requestId
+    if (activeDropdown.value === requestId && event) {
+      const button = event.target.closest('button')
+      if (button) {
+        const rect = button.getBoundingClientRect()
+        dropdownPosition.value = {
+          top: rect.bottom + window.scrollY + 4,
+          right: window.innerWidth - rect.right - window.scrollX
         }
+      }
+    }
+  }
 
-        // Filter by status
-        if (this.statusFilter) {
-          if (this.statusFilter === 'unassigned') {
-            filtered = filtered.filter((request) => this.isUnassigned(request.status))
-          } else {
-            filtered = filtered.filter((request) => request.status === this.statusFilter)
+  function getDropdownPosition() {
+    if (dropdownPosition.value) {
+      const dropdownWidth = 192
+      const dropdownHeight = 200
+      let { top, right } = dropdownPosition.value
+      if (right + dropdownWidth > window.innerWidth) {
+        right = Math.max(4, window.innerWidth - dropdownWidth - 4)
+      }
+      if (top + dropdownHeight > window.innerHeight + window.scrollY) {
+        top = Math.max(4, top - dropdownHeight - 32)
+      }
+      return { top: `${top}px`, right: `${right}px`, left: 'auto' }
+    }
+    return { top: '100%', right: '0', left: 'auto', position: 'absolute' }
+  }
+
+  function handleClickOutside(event) {
+    if (activeDropdown.value && !event.target.closest('[style*="z-index: 9999"]') && !event.target.closest('button[title*="Actions for"]')) {
+      activeDropdown.value = null
+      dropdownPosition.value = null
+    }
+  }
+
+  function handleMenuAction(action, request) {
+    activeDropdown.value = null
+    dropdownPosition.value = null
+    switch (action) {
+      case 'viewRequest':
+        viewRequest(request)
+        break
+      case 'viewTimeline':
+        viewTimeline(request)
+        break
+      case 'assignTask':
+        assignTask(request)
+        break
+      case 'updateProgress':
+        updateProgress(request)
+        break
+      case 'cancelTask':
+        cancelTask(request)
+        break
+      default:
+        console.warn('Unknown action:', action)
+    }
+  }
+
+  function formatDate(dateString) {
+    if (!dateString) return 'N/A'
+    try { return new Date(dateString).toLocaleDateString('en-GB') } catch { return 'Invalid Date' }
+  }
+
+  function formatTime(dateString) {
+    if (!dateString) return 'N/A'
+    try {
+      return new Date(dateString).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+    } catch { return 'Invalid Time' }
+  }
+
+  function refreshNotificationBadge() {
+    try {
+      console.log('🔔 AccessRequests: Triggering notification badge refresh')
+      const currentPendingCount = accessRequests.value.filter((r) => isUnassigned(r.status)).length
+      setPendingCountOverride(currentPendingCount)
+      clearNotificationCache()
+      if (window.dispatchEvent) {
+        const event = new CustomEvent('force-refresh-notifications', { detail: { source: 'AccessRequests', reason: 'request_updated', timestamp: Date.now() } })
+        window.dispatchEvent(event)
+        console.log('🚀 AccessRequests: Dispatched force-refresh-notifications event')
+      }
+      if (window.sidebarInstance && window.sidebarInstance.fetchNotificationCounts) {
+        console.log('📞 AccessRequests: Calling sidebar fetchNotificationCounts directly')
+        window.sidebarInstance.fetchNotificationCounts(true)
+      }
+    } catch (e) {
+      console.warn('Failed to refresh notification badge:', e)
+    }
+  }
+
+  function clearNotificationCache() {
+    try {
+      import('@/services/notificationService').then((m) => {
+        m.default.clearCache()
+        console.log('🗑️ AccessRequests: Cleared notification service cache')
+      })
+    } catch (e) {
+      console.warn('Failed to clear notification cache:', e)
+    }
+  }
+
+  function setPendingCountOverride(count) {
+    try {
+      console.log('🎠 AccessRequests: Setting pending count override:', count)
+      if (typeof window !== 'undefined') {
+        window.accessRequestsPendingCount = count
+      }
+      if (window.dispatchEvent) {
+        const event = new CustomEvent('ict-access-requests-pending-count', { detail: { count, source: 'AccessRequests', timestamp: Date.now() } })
+        window.dispatchEvent(event)
+      }
+      if (window.sidebarInstance && window.sidebarInstance.setNotificationCount) {
+        window.sidebarInstance.setNotificationCount('/ict-dashboard/access-requests', count)
+      }
+      console.log('📻 AccessRequests: Emitted pending count override event')
+    } catch (e) {
+      console.warn('Failed to set pending count override:', e)
+    }
+  }
+
+  async function diagnoseNotificationDiscrepancy() {
+    try {
+      console.log('🔍 DIAGNOSTIC: Comparing notification APIs...')
+      const notificationService = (await import('@/services/notificationService')).default
+      const universalResult = await notificationService.getPendingRequestsCount(true)
+      const ictResult = await ictOfficerService.getPendingRequestsCount()
+      const pageStatuses = accessRequests.value.map((r) => ({ id: r.id, status: r.status, request_id: r.request_id || `REQ-${r.id.toString().padStart(6, '0')}` }))
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔴 NOTIFICATION API COMPARISON:', {
+          universal_api: { endpoint: '/notifications/pending-count', count: universalResult.total_pending, full_response: universalResult },
+          ict_specific_api: { endpoint: '/ict-officer/pending-count', count: ictResult.total_pending || ictResult, full_response: ictResult },
+          page_data: { total_requests: accessRequests.value.length, pending_requests: accessRequests.value.filter((r) => isUnassigned(r.status)).length, completed_requests: accessRequests.value.filter((r) => ['completed', 'implemented'].includes(r.status)).length, all_statuses: pageStatuses },
+          analysis: {
+            universal_vs_ict: universalResult.total_pending === (ictResult.total_pending || ictResult) ? 'MATCH' : 'MISMATCH',
+            badge_vs_page: universalResult.total_pending === accessRequests.value.filter((r) => isUnassigned(r.status)).length ? 'CONSISTENT' : 'INCONSISTENT'
           }
-        }
-
-        // Sort: Unassigned first, then by date
-        return filtered.sort((a, b) => {
-          const aUnassigned = this.isUnassigned(a.status)
-          const bUnassigned = this.isUnassigned(b.status)
-
-          if (aUnassigned && !bUnassigned) return -1
-          if (!aUnassigned && bUnassigned) return 1
-
-          const getRelevantDate = (request) => {
-            return new Date(
-              request.head_of_it_approval_date ||
-                request.head_of_it_approved_at ||
-                request.created_at ||
-                0
-            )
-          }
-
-          const dateA = getRelevantDate(a)
-          const dateB = getRelevantDate(b)
-
-          return dateA - dateB
         })
       }
-    },
-    async mounted() {
-      try {
-        console.log('IctAccessRequests: Component mounted, initializing...')
-        const { ROLES, requireRole } = useAuth()
-        requireRole([ROLES.ICT_OFFICER])
-        await this.fetchAccessRequests()
-        console.log('IctAccessRequests: Component initialized successfully')
+    } catch (e) {
+      console.error('🚫 DIAGNOSTIC ERROR:', e)
+    }
+  }
 
-        // Refresh notification badges when component loads
-        this.refreshNotificationBadge()
+  // Lifecycle
+  onMounted(async () => {
+    try {
+      console.log('IctAccessRequests: Component mounted, initializing...')
+      requireRole([ROLES.ICT_OFFICER])
+      await fetchAccessRequests()
+      console.log('IctAccessRequests: Component initialized successfully')
+      refreshNotificationBadge()
+      document.addEventListener('click', handleClickOutside)
+    } catch (e) {
+      console.error('IctAccessRequests: Error during mount:', e)
+      error.value = 'Failed to initialize component: ' + e.message
+      isLoading.value = false
+    }
+  })
 
-        // Add click outside listener for dropdown
-        document.addEventListener('click', this.handleClickOutside)
-      } catch (error) {
-        console.error('IctAccessRequests: Error during mount:', error)
-        this.error = 'Failed to initialize component: ' + error.message
-        this.isLoading = false
-      }
-    },
-
-    async activated() {
-      // This is called when the component is activated (navigated to)
-      // Useful for refreshing data and notifications
-      console.log('IctAccessRequests: Component activated, refreshing data...')
-      await this.fetchAccessRequests()
-      this.refreshNotificationBadge()
-
-      // Ensure override is set on activation
-      setTimeout(() => {
-        const pendingCount = this.accessRequests.filter((r) => this.isUnassigned(r.status)).length
-        this.setPendingCountOverride(pendingCount)
-      }, 100)
-    },
-
-    beforeUnmount() {
-      // Remove click outside listener
-      document.removeEventListener('click', this.handleClickOutside)
-    },
-    methods: {
-      async fetchAccessRequests() {
-        console.log('🔄 IctAccessRequests: Starting to fetch access requests...')
-        this.isLoading = true
-        this.error = null
-
-        try {
-          // Fetch access requests approved by Head of IT using the service
-          const result = await ictOfficerService.getAccessRequests()
-
-          if (result.success) {
-            console.log('✅ IctAccessRequests: Requests loaded successfully:', result.data.length)
-            this.accessRequests = result.data || []
-
-            // Calculate stats
-            const pendingForICT = this.accessRequests.filter((r) =>
-              this.isUnassigned(r.status)
-            ).length
-            this.stats = {
-              unassigned: pendingForICT,
-              assigned: this.accessRequests.filter((r) => r.status === 'assigned_to_ict').length,
-              inProgress: this.accessRequests.filter(
-                (r) => r.status === 'implementation_in_progress'
-              ).length,
-              total: this.accessRequests.length
-            }
-
-            // REAL-TIME BADGE FIX: Set global pending count override for sidebar
-            this.setPendingCountOverride(pendingForICT)
-
-            // DEBUG: Log all request statuses to compare with notification API
-            const statusCounts = {}
-            this.accessRequests.forEach((request) => {
-              const status = request.status || 'no_status'
-              statusCounts[status] = (statusCounts[status] || 0) + 1
-            })
-
-            const statusBreakdown = {
-              statusCounts,
-              totalRequests: this.accessRequests.length,
-              pendingForICT: this.accessRequests.filter((r) => this.isUnassigned(r.status)).length,
-              completedImplemented: this.accessRequests.filter((r) =>
-                ['completed', 'implemented'].includes(r.status)
-              ).length,
-              allStatuses: this.accessRequests.map((r) => ({
-                id: r.id,
-                status: r.status,
-                request_id: r.request_id
-              })),
-              message:
-                'Compare this with sidebar notification count - if badge shows count > 0 but pendingForICT = 0, backend issue exists'
-            }
-            console.log('📊 ACCESS REQUESTS STATUS BREAKDOWN:', statusBreakdown)
-
-            // ENHANCED DEBUG: Clearly identify if we should expect 0 badge count
-            if (statusBreakdown.pendingForICT === 0 && statusBreakdown.totalRequests > 0) {
-              console.log(
-                '🟢 SUCCESS: No pending requests detected, badge should show 0! Override set to:',
-                pendingForICT
-              )
-            } else if (statusBreakdown.pendingForICT > 0) {
-              console.log(
-                '🔴 PENDING DETECTED:',
-                statusBreakdown.pendingForICT,
-                'requests still need attention. Override set to:',
-                pendingForICT
-              )
-            } else {
-              console.log(
-                '⚪ NO REQUESTS: Empty state, badge should show 0. Override set to:',
-                pendingForICT
-              )
-            }
-
-            // DIAGNOSTIC: Auto-run notification comparison after data loads
-            setTimeout(() => {
-              this.diagnoseNotificationDiscrepancy()
-            }, 1000)
-          } else {
-            console.error('❌ IctAccessRequests: Failed to load requests:', result.message)
-            this.error = result.message
-            this.accessRequests = []
-          }
-        } catch (err) {
-          console.error('❌ IctAccessRequests: Error loading requests:', err)
-          this.error = 'Network error while loading access requests. Please check your connection.'
-          this.accessRequests = []
-        } finally {
-          this.isLoading = false
-        }
-      },
-
-      async refreshRequests() {
-        console.log('🔄 IctAccessRequests: Refreshing requests...')
-        await this.fetchAccessRequests()
-      },
-
-      viewRequest(request) {
-        console.log('👁️ IctAccessRequests: Viewing request details:', request.id)
-        this.$router.push(`/both-service-form/${request.id}`)
-      },
+  onBeforeUnmount(() => {
+    document.removeEventListener('click', handleClickOutside)
+  })
+</script>
 
       async assignTask(request) {
         console.log('📋 IctAccessRequests: Assigning task for request:', request.id)
@@ -1192,11 +1427,6 @@
         } catch (error) {
           console.error('🚫 DIAGNOSTIC ERROR:', error)
         }
-      }
-    }
-  }
-</script>
-
 <style scoped>
   .sidebar-narrow {
     flex-shrink: 0;

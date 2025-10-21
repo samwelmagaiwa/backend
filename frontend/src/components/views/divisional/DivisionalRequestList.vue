@@ -692,7 +692,7 @@
       viewProgress(request) {
         console.log('👁️ DivisionalRequestList: Viewing progress for request:', request.id)
         // Navigate to progress view - using ICT dashboard route for consistency
-        this.$router.push(`/ict-dashboard/request-progress/${request.id}`)
+        this.$router.push(`/user-security-access/${request.user_access_id || request.id}`)
       },
 
       // Helper method to determine if separator should be shown

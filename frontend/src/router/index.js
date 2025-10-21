@@ -341,19 +341,20 @@ const routes = [
       roles: [ROLES.ICT_OFFICER]
     }
   },
+  // ICT Officer review route for combined both-service form
   {
-    path: '/ict-dashboard/access-requests',
-    name: 'IctAccessRequests',
-    component: () => import('../components/views/ict-officer/AccessRequests.vue'),
+    path: '/ict-dashboard/both-service-form/:id',
+    name: 'IctOfficerBothServiceFormReview',
+    component: () => import('../components/views/forms/both-service-form.vue'),
     meta: {
       requiresAuth: true,
       roles: [ROLES.ICT_OFFICER]
     }
   },
   {
-    path: '/ict-dashboard/request-progress/:id',
-    name: 'IctRequestProgress',
-    component: () => import('../components/views/ict-officer/RequestProgress.vue'),
+    path: '/ict-dashboard/access-requests',
+    name: 'IctAccessRequests',
+    component: () => import('../components/views/ict-officer/AccessRequests.vue'),
     meta: {
       requiresAuth: true,
       roles: [ROLES.ICT_OFFICER]

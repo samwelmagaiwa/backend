@@ -122,7 +122,7 @@ export const ROLE_PERMISSIONS = {
     routes: [
       '/ict-dashboard',
       '/ict-dashboard/access-requests',
-      '/ict-dashboard/request-progress/:id',
+      '/user-security-access/:id',
       '/ict-approval/requests',
       '/ict-approval/requests-simple',
       '/ict-approval/requests-original',
@@ -147,7 +147,7 @@ export const ROLE_PERMISSIONS = {
       'ict-approval/request/:id',
       'user-security-access/:id'
     ],
-    requestsManagement: ['ict-dashboard/access-requests', 'ict-dashboard/request-progress/:id']
+    requestsManagement: ['ict-dashboard/access-requests', 'user-security-access/:id']
   },
 
   [ROLES.HEAD_OF_IT]: {

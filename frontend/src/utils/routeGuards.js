@@ -178,6 +178,7 @@ export async function checkRouteAccess(route) {
     }
 
     // Special case: If no specific route meta but user is authenticated, allow access to dashboard routes
+    // IMPORTANT: Do not apply this dashboard-correction on routes that explicitly define meta.roles
     if (!route.meta?.roles && isAuthenticated) {
       const { isDashboardRoute, getDefaultDashboard } = await import('./permissions')
 
@@ -382,6 +383,23 @@ export async function enhancedNavigationGuard(to, from, next) {
       if (DEBUG)
         console.log('✅ Enhanced Route Guard: Allowing access to onboarding for user who needs it')
       return next()
+    }
+
+    // Stabilization for role-guarded routes (avoid bounce due to late auth role availability)
+    if (to.meta?.roles && to.meta.roles.length > 0 && !piniaAuthStore.userRole) {
+      if (DEBUG)
+        console.log(
+          '⏳ Enhanced Route Guard: Waiting briefly for userRole for role-guarded route',
+          to.path
+        )
+      let waited = 0
+      const maxWait = 500 // up to 0.5s extra
+      while (!piniaAuthStore.userRole && waited < maxWait) {
+        await new Promise((r) => setTimeout(r, 50))
+        waited += 50
+      }
+      if (DEBUG)
+        console.log('⏱️ Enhanced Route Guard: userRole after wait:', piniaAuthStore.userRole)
     }
 
     // Check route access
