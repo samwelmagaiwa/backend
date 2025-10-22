@@ -275,34 +275,17 @@
                           <template v-else-if="request.status === 'assigned_to_ict'">
                             <button
                               @click="handleMenuAction('updateProgress', request)"
-                              class="w-full text-left px-4 py-2 text-sm bg-purple-50 text-purple-800 border-b border-purple-200 hover:bg-purple-100 focus:bg-purple-100 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-inset transition-all duration-200 flex items-center group"
+                              class="w-full text-left px-4 py-2 text-sm bg-purple-50 text-purple-800 hover:bg-purple-100 focus:bg-purple-100 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
                             >
                               <i
                                 class="fas fa-tasks mr-3 text-purple-600 group-hover:text-purple-700 group-focus:text-purple-700 transition-colors duration-200"
                               ></i>
                               <span class="font-medium">Update Progress</span>
                             </button>
-                            <button
-                              @click="handleMenuAction('cancelTask', request)"
-                              class="w-full text-left px-4 py-2 text-sm bg-red-50 text-red-800 hover:bg-red-100 focus:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
-                            >
-                              <i
-                                class="fas fa-times-circle mr-3 text-red-600 group-hover:text-red-700 group-focus:text-red-700 transition-colors duration-200"
-                              ></i>
-                              <span class="font-medium">Cancel Task</span>
-                            </button>
                           </template>
 
                           <template v-else-if="request.status === 'implementation_in_progress'">
-                            <button
-                              @click="handleMenuAction('cancelTask', request)"
-                              class="w-full text-left px-4 py-2 text-sm bg-red-50 text-red-800 hover:bg-red-100 focus:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
-                            >
-                              <i
-                                class="fas fa-times-circle mr-3 text-red-600 group-hover:text-red-700 group-focus:text-red-700 transition-colors duration-200"
-                              ></i>
-                              <span class="font-medium">Cancel Task</span>
-                            </button>
+                            <!-- No cancel action allowed -->
                           </template>
                         </div>
                       </div>
@@ -493,7 +476,6 @@
   import { useAuth } from '@/composables/useAuth'
   import ictOfficerService from '@/services/ictOfficerService'
 
-
   // State
   const accessRequests = ref([])
   const searchQuery = ref('')
@@ -529,11 +511,12 @@
 
     if (searchQuery.value) {
       const query = searchQuery.value.toLowerCase()
-      filtered = filtered.filter((request) =>
-        (request.staff_name || request.full_name || '').toLowerCase().includes(query) ||
-        (request.pf_number || '').toLowerCase().includes(query) ||
-        (request.department_name || request.department || '').toLowerCase().includes(query) ||
-        (request.request_id || '').toLowerCase().includes(query)
+      filtered = filtered.filter(
+        (request) =>
+          (request.staff_name || request.full_name || '').toLowerCase().includes(query) ||
+          (request.pf_number || '').toLowerCase().includes(query) ||
+          (request.department_name || request.department || '').toLowerCase().includes(query) ||
+          (request.request_id || '').toLowerCase().includes(query)
       )
     }
 
@@ -551,7 +534,8 @@
       if (aUnassigned && !bUnassigned) return -1
       if (!aUnassigned && bUnassigned) return 1
 
-      const getRelevantDate = (r) => new Date(r.head_of_it_approval_date || r.head_of_it_approved_at || r.created_at || 0)
+      const getRelevantDate = (r) =>
+        new Date(r.head_of_it_approval_date || r.head_of_it_approved_at || r.created_at || 0)
       return getRelevantDate(a) - getRelevantDate(b)
     })
   })
@@ -564,12 +548,20 @@
       const result = await ictOfficerService.getAccessRequests()
       if (result.success) {
         const payload = result.data
-        const list = Array.isArray(payload) ? payload : (payload && Array.isArray(payload.data) ? payload.data : [])
+        const list = Array.isArray(payload)
+          ? payload
+          : payload && Array.isArray(payload.data)
+            ? payload.data
+            : []
         const total = Array.isArray(payload) ? payload.length : (payload?.total ?? list.length)
         const currentPage = payload?.current_page ?? 1
         const perPage = payload?.per_page ?? list.length
 
-        console.log('✅ IctAccessRequests: Requests loaded successfully:', list.length, { total, currentPage, perPage })
+        console.log('✅ IctAccessRequests: Requests loaded successfully:', list.length, {
+          total,
+          currentPage,
+          perPage
+        })
         accessRequests.value = list
         pagination.total = total
         pagination.currentPage = currentPage
@@ -578,7 +570,9 @@
         const pendingForICT = accessRequests.value.filter((r) => isUnassigned(r.status)).length
         stats.unassigned = pendingForICT
         stats.assigned = accessRequests.value.filter((r) => r.status === 'assigned_to_ict').length
-        stats.inProgress = accessRequests.value.filter((r) => r.status === 'implementation_in_progress').length
+        stats.inProgress = accessRequests.value.filter(
+          (r) => r.status === 'implementation_in_progress'
+        ).length
         stats.total = accessRequests.value.length
 
         setPendingCountOverride(pendingForICT)
@@ -608,7 +602,10 @@
       if (ensureInitialized && typeof ensureInitialized === 'function') {
         await ensureInitialized()
       }
-      const role = (typeof userRole === 'function' ? userRole() : userRole?.value) || user?.value?.primary_role || user?.value?.role
+      const role =
+        (typeof userRole === 'function' ? userRole() : userRole?.value) ||
+        user?.value?.primary_role ||
+        user?.value?.role
       if (role !== ROLES.ICT_OFFICER) {
         console.warn('Blocked navigation: current role is not ICT_OFFICER', { role })
         window.location.href = '/ict-dashboard'
@@ -634,7 +631,10 @@
   async function assignTask(request) {
     console.log('📋 IctAccessRequests: Assigning task for request:', request.id)
     try {
-      const result = await ictOfficerService.assignTaskToSelf(request.id, 'Task assigned by ICT Officer')
+      const result = await ictOfficerService.assignTaskToSelf(
+        request.id,
+        'Task assigned by ICT Officer'
+      )
       if (result.success) {
         await fetchAccessRequests()
         refreshNotificationBadge()
@@ -651,7 +651,11 @@
   async function updateProgress(request) {
     console.log('📈 IctAccessRequests: Updating progress for request:', request.id)
     try {
-      const result = await ictOfficerService.updateProgress(request.id, 'implementation_in_progress', 'Implementation started')
+      const result = await ictOfficerService.updateProgress(
+        request.id,
+        'implementation_in_progress',
+        'Implementation started'
+      )
       if (result.success) {
         await fetchAccessRequests()
         refreshNotificationBadge()
@@ -687,13 +691,22 @@
 
   function hasService(request, serviceType) {
     if (serviceType === 'jeeva') {
-      return request.jeeva_access_required || (request.request_types && request.request_types.includes('jeeva'))
+      return (
+        request.jeeva_access_required ||
+        (request.request_types && request.request_types.includes('jeeva'))
+      )
     }
     if (serviceType === 'wellsoft') {
-      return request.wellsoft_access_required || (request.request_types && request.request_types.includes('wellsoft'))
+      return (
+        request.wellsoft_access_required ||
+        (request.request_types && request.request_types.includes('wellsoft'))
+      )
     }
     if (serviceType === 'internet') {
-      return request.internet_access_required || (request.request_types && request.request_types.includes('internet'))
+      return (
+        request.internet_access_required ||
+        (request.request_types && request.request_types.includes('internet'))
+      )
     }
     return false
   }
@@ -727,7 +740,11 @@
       implemented: 'Access Granted',
       cancelled: 'Task Cancelled'
     }
-    return statusTexts[status] || status?.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'Unknown Status'
+    return (
+      statusTexts[status] ||
+      status?.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()) ||
+      'Unknown Status'
+    )
   }
 
   function viewTimeline(request) {
@@ -819,7 +836,11 @@
   }
 
   function handleClickOutside(event) {
-    if (activeDropdown.value && !event.target.closest('[style*="z-index: 9999"]') && !event.target.closest('button[title*="Actions for"]')) {
+    if (
+      activeDropdown.value &&
+      !event.target.closest('[style*="z-index: 9999"]') &&
+      !event.target.closest('button[title*="Actions for"]')
+    ) {
       activeDropdown.value = null
       dropdownPosition.value = null
     }
@@ -851,14 +872,23 @@
 
   function formatDate(dateString) {
     if (!dateString) return 'N/A'
-    try { return new Date(dateString).toLocaleDateString('en-GB') } catch { return 'Invalid Date' }
+    try {
+      return new Date(dateString).toLocaleDateString('en-GB')
+    } catch {
+      return 'Invalid Date'
+    }
   }
 
   function formatTime(dateString) {
     if (!dateString) return 'N/A'
     try {
-      return new Date(dateString).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
-    } catch { return 'Invalid Time' }
+      return new Date(dateString).toLocaleTimeString('en-GB', {
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    } catch {
+      return 'Invalid Time'
+    }
   }
 
   function refreshNotificationBadge() {
@@ -868,7 +898,9 @@
       setPendingCountOverride(currentPendingCount)
       clearNotificationCache()
       if (window.dispatchEvent) {
-        const event = new CustomEvent('force-refresh-notifications', { detail: { source: 'AccessRequests', reason: 'request_updated', timestamp: Date.now() } })
+        const event = new CustomEvent('force-refresh-notifications', {
+          detail: { source: 'AccessRequests', reason: 'request_updated', timestamp: Date.now() }
+        })
         window.dispatchEvent(event)
         console.log('🚀 AccessRequests: Dispatched force-refresh-notifications event')
       }
@@ -899,7 +931,9 @@
         window.accessRequestsPendingCount = count
       }
       if (window.dispatchEvent) {
-        const event = new CustomEvent('ict-access-requests-pending-count', { detail: { count, source: 'AccessRequests', timestamp: Date.now() } })
+        const event = new CustomEvent('ict-access-requests-pending-count', {
+          detail: { count, source: 'AccessRequests', timestamp: Date.now() }
+        })
         window.dispatchEvent(event)
       }
       if (window.sidebarInstance && window.sidebarInstance.setNotificationCount) {
@@ -917,15 +951,41 @@
       const notificationService = (await import('@/services/notificationService')).default
       const universalResult = await notificationService.getPendingRequestsCount(true)
       const ictResult = await ictOfficerService.getPendingRequestsCount()
-      const pageStatuses = accessRequests.value.map((r) => ({ id: r.id, status: r.status, request_id: r.request_id || `REQ-${r.id.toString().padStart(6, '0')}` }))
+      const pageStatuses = accessRequests.value.map((r) => ({
+        id: r.id,
+        status: r.status,
+        request_id: r.request_id || `REQ-${r.id.toString().padStart(6, '0')}`
+      }))
       if (process.env.NODE_ENV === 'development') {
         console.log('🔴 NOTIFICATION API COMPARISON:', {
-          universal_api: { endpoint: '/notifications/pending-count', count: universalResult.total_pending, full_response: universalResult },
-          ict_specific_api: { endpoint: '/ict-officer/pending-count', count: ictResult.total_pending || ictResult, full_response: ictResult },
-          page_data: { total_requests: accessRequests.value.length, pending_requests: accessRequests.value.filter((r) => isUnassigned(r.status)).length, completed_requests: accessRequests.value.filter((r) => ['completed', 'implemented'].includes(r.status)).length, all_statuses: pageStatuses },
+          universal_api: {
+            endpoint: '/notifications/pending-count',
+            count: universalResult.total_pending,
+            full_response: universalResult
+          },
+          ict_specific_api: {
+            endpoint: '/ict-officer/pending-count',
+            count: ictResult.total_pending || ictResult,
+            full_response: ictResult
+          },
+          page_data: {
+            total_requests: accessRequests.value.length,
+            pending_requests: accessRequests.value.filter((r) => isUnassigned(r.status)).length,
+            completed_requests: accessRequests.value.filter((r) =>
+              ['completed', 'implemented'].includes(r.status)
+            ).length,
+            all_statuses: pageStatuses
+          },
           analysis: {
-            universal_vs_ict: universalResult.total_pending === (ictResult.total_pending || ictResult) ? 'MATCH' : 'MISMATCH',
-            badge_vs_page: universalResult.total_pending === accessRequests.value.filter((r) => isUnassigned(r.status)).length ? 'CONSISTENT' : 'INCONSISTENT'
+            universal_vs_ict:
+              universalResult.total_pending === (ictResult.total_pending || ictResult)
+                ? 'MATCH'
+                : 'MISMATCH',
+            badge_vs_page:
+              universalResult.total_pending ===
+              accessRequests.value.filter((r) => isUnassigned(r.status)).length
+                ? 'CONSISTENT'
+                : 'INCONSISTENT'
           }
         })
       }
@@ -955,478 +1015,147 @@
   })
 </script>
 
-      async assignTask(request) {
-        console.log('📋 IctAccessRequests: Assigning task for request:', request.id)
-
-        try {
-          const result = await ictOfficerService.assignTaskToSelf(
-            request.id,
-            'Task assigned by ICT Officer'
-          )
-
-          if (result.success) {
-            // Refresh the requests list to show updated status
-            await this.fetchAccessRequests()
-            // Trigger notification badge refresh
-            this.refreshNotificationBadge()
-            // Show success message (you could use a toast notification here)
-            alert('Task assigned successfully!')
-          } else {
-            alert('Failed to assign task: ' + result.message)
-          }
-        } catch (error) {
-          console.error('Error assigning task:', error)
-          alert('Network error while assigning task')
-        }
-      },
-
-      async updateProgress(request) {
-        console.log('📈 IctAccessRequests: Updating progress for request:', request.id)
-
-        // For now, just set to in progress status
-        // In a real application, you might want to show a modal to capture progress details
-        try {
-          const result = await ictOfficerService.updateProgress(
-            request.id,
-            'implementation_in_progress',
-            'Implementation started'
-          )
-
-          if (result.success) {
-            // Refresh the requests list to show updated status
-            await this.fetchAccessRequests()
-            // Trigger notification badge refresh
-            this.refreshNotificationBadge()
-            alert('Progress updated successfully!')
-          } else {
-            alert('Failed to update progress: ' + result.message)
-          }
-        } catch (error) {
-          console.error('Error updating progress:', error)
-          alert('Network error while updating progress')
-        }
-      },
-
-      async cancelTask(request) {
-        console.log('❌ IctAccessRequests: Canceling task for request:', request.id)
-
-        // Show confirmation dialog and handle cancellation
-        const reason = prompt('Please provide a reason for canceling this task:')
-        if (reason && reason.trim()) {
-          try {
-            const result = await ictOfficerService.cancelTask(request.id, reason)
-
-            if (result.success) {
-              // Refresh the requests list to show updated status
-              await this.fetchAccessRequests()
-              // Trigger notification badge refresh
-              this.refreshNotificationBadge()
-              alert('Task canceled successfully!')
-            } else {
-              alert('Failed to cancel task: ' + result.message)
-            }
-          } catch (error) {
-            console.error('Error canceling task:', error)
-            alert('Network error while canceling task')
-          }
-        }
-      },
-
-      isUnassigned(status) {
-        // Status indicating request is available for assignment
-        return status === 'head_of_it_approved' || !status
-      },
-
-      hasService(request, serviceType) {
-        // Check if request includes a specific service type
-        if (serviceType === 'jeeva') {
-          return (
-            request.jeeva_access_required ||
-            (request.request_types && request.request_types.includes('jeeva'))
-          )
-        }
-        if (serviceType === 'wellsoft') {
-          return (
-            request.wellsoft_access_required ||
-            (request.request_types && request.request_types.includes('wellsoft'))
-          )
-        }
-        if (serviceType === 'internet') {
-          return (
-            request.internet_access_required ||
-            (request.request_types && request.request_types.includes('internet'))
-          )
-        }
-        return false
-      },
-
-      getRequestType(request) {
-        const services = []
-        if (this.hasService(request, 'jeeva')) services.push('Jeeva')
-        if (this.hasService(request, 'wellsoft')) services.push('Wellsoft')
-        if (this.hasService(request, 'internet')) services.push('Internet')
-        return services.length > 0 ? services.join(' + ') : 'Access Request'
-      },
-
-      getStatusBadgeClass(status) {
-        const statusClasses = {
-          head_of_it_approved: 'bg-yellow-500 text-yellow-900',
-          assigned_to_ict: 'bg-blue-500 text-blue-900',
-          implementation_in_progress: 'bg-purple-500 text-purple-900',
-          completed: 'bg-emerald-500 text-emerald-900',
-          implemented: 'bg-green-500 text-green-900', // Add styling for 'implemented' status
-          cancelled: 'bg-red-500 text-red-900'
-        }
-        return statusClasses[status] || 'bg-gray-500 text-gray-900'
-      },
-
-      getStatusText(status) {
-        const statusTexts = {
-          head_of_it_approved: 'Available for Assignment',
-          assigned_to_ict: 'Assigned to ICT Officer',
-          implementation_in_progress: 'Implementation in Progress',
-          completed: 'Implementation Completed',
-          implemented: 'Access Granted', // Add mapping for 'implemented' status
-          cancelled: 'Task Cancelled'
-        }
-        return (
-          statusTexts[status] ||
-          status?.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()) ||
-          'Unknown Status'
-        )
-      },
-
-      viewTimeline(request) {
-        console.log('📅 IctAccessRequests: Opening timeline for request:', request.id)
-        this.selectedRequestId = request.id
-        this.selectedRequest = request
-        this.showTimeline = true
-      },
-
-      closeTimeline() {
-        console.log('📅 IctAccessRequests: Closing timeline modal')
-        this.showTimeline = false
-        this.selectedRequestId = null
-        this.selectedRequest = null
-        this.showUpdateProgress = false
-      },
-
-      async handleTimelineUpdate() {
-        console.log('🔄 IctAccessRequests: Timeline updated, refreshing requests list...')
-        await this.fetchAccessRequests()
-        // Also refresh the notification badge
-        this.refreshNotificationBadge()
-      },
-
-      openUpdateProgress(request) {
-        console.log(
-          '📝 IctAccessRequests: Opening update progress section for request:',
-          request?.id
-        )
-        if (request && this.canShowUpdateProgress(request)) {
-          this.selectedRequest = request
-          this.selectedRequestId = request.id
-          this.showUpdateProgress = true
-        }
-      },
-
-      closeUpdateProgress() {
-        console.log('📝 IctAccessRequests: Closing update progress section')
-        this.showUpdateProgress = false
-      },
-
-      async handleUpdateProgressUpdate() {
-        console.log('🔄 IctAccessRequests: Progress updated, refreshing data...')
-        // Refresh the requests list
-        await this.fetchAccessRequests()
-        // Force immediate notification badge refresh
-        this.refreshNotificationBadge()
-        // Close both timeline and update progress
-        this.closeTimeline()
-
-        // Additional delayed refresh to ensure backend sync
-        setTimeout(() => {
-          console.log('⏰ IctAccessRequests: Delayed refresh after progress update')
-          this.refreshNotificationBadge()
-        }, 3000)
-
-        // Extra refresh specifically for implemented/completed status changes
-        setTimeout(() => {
-          console.log(
-            '🔄 IctAccessRequests: Final refresh to ensure implemented/completed requests are excluded from badge count'
-          )
-          this.refreshNotificationBadge()
-        }, 5000)
-      },
-
-      canShowUpdateProgress(request) {
-        // Only show update progress for ICT Officer assigned requests that are not completed
-        if (!request) return false
-
-        // Get current user from auth
-        const { user } = useAuth()
-        const currentUserId = user.value?.id
-
-        return (
-          request.ict_officer_user_id &&
-          request.ict_officer_user_id === currentUserId &&
-          !request.ict_officer_implemented_at &&
-          request.ict_officer_status !== 'implemented' &&
-          request.ict_officer_status !== 'rejected' &&
-          !['implemented', 'completed'].includes(request.status) && // Don't allow updates for completed requests
-          (request.status === 'assigned_to_ict' || request.status === 'implementation_in_progress')
-        )
-      },
-
-      // Dropdown functionality
-      toggleDropdown(requestId, event) {
-        this.activeDropdown = this.activeDropdown === requestId ? null : requestId
-
-        if (this.activeDropdown === requestId && event) {
-          // Store the button position for dropdown positioning
-          const button = event.target.closest('button')
-          if (button) {
-            const rect = button.getBoundingClientRect()
-            this.dropdownPosition = {
-              top: rect.bottom + window.scrollY + 4,
-              right: window.innerWidth - rect.right - window.scrollX
-            }
-          }
-        }
-      },
-
-      getDropdownPosition() {
-        if (this.dropdownPosition) {
-          // Check if dropdown would go off screen
-          const dropdownWidth = 192 // w-48 = 12rem = 192px
-          const dropdownHeight = 200 // estimated height for dropdown
-
-          let { top, right } = this.dropdownPosition
-
-          // Adjust horizontal position if too close to left edge
-          if (right + dropdownWidth > window.innerWidth) {
-            right = Math.max(4, window.innerWidth - dropdownWidth - 4)
-          }
-
-          // Adjust vertical position if too close to bottom
-          if (top + dropdownHeight > window.innerHeight + window.scrollY) {
-            top = Math.max(4, top - dropdownHeight - 32) // 32px for button height
-          }
-
-          return {
-            top: `${top}px`,
-            right: `${right}px`,
-            left: 'auto'
-          }
-        }
-        // Fallback positioning
-        return {
-          top: '100%',
-          right: '0',
-          left: 'auto',
-          position: 'absolute'
-        }
-      },
-
-      handleClickOutside(event) {
-        // Close dropdown if clicking outside the dropdown or three-dot button
-        if (
-          this.activeDropdown &&
-          !event.target.closest('[style*="z-index: 9999"]') &&
-          !event.target.closest('button[title*="Actions for"]')
-        ) {
-          this.activeDropdown = null
-          this.dropdownPosition = null
-        }
-      },
-
-      handleMenuAction(action, request) {
-        // Close dropdown first
-        this.activeDropdown = null
-        this.dropdownPosition = null
-
-        // Execute the appropriate action
-        switch (action) {
-          case 'viewRequest':
-            this.viewRequest(request)
-            break
-          case 'viewTimeline':
-            this.viewTimeline(request)
-            break
-          case 'assignTask':
-            this.assignTask(request)
-            break
-          case 'updateProgress':
-            this.updateProgress(request)
-            break
-          case 'cancelTask':
-            this.cancelTask(request)
-            break
-          default:
-            console.warn('Unknown action:', action)
-        }
-      },
-
-      formatDate(dateString) {
-        if (!dateString) return 'N/A'
-        try {
-          return new Date(dateString).toLocaleDateString('en-GB')
-        } catch {
-          return 'Invalid Date'
-        }
-      },
-
-      formatTime(dateString) {
-        if (!dateString) return 'N/A'
-        try {
-          return new Date(dateString).toLocaleTimeString('en-GB', {
-            hour: '2-digit',
-            minute: '2-digit'
-          })
-        } catch {
-          return 'Invalid Time'
-        }
-      },
-
-      // Refresh notification badge in sidebar
-      refreshNotificationBadge() {
-        try {
-          console.log('🔔 AccessRequests: Triggering notification badge refresh')
-
-          // Method -1: Update our override count first
-          const currentPendingCount = this.accessRequests.filter((r) =>
-            this.isUnassigned(r.status)
-          ).length
-          this.setPendingCountOverride(currentPendingCount)
-
-          // Method 0: Clear notification service cache first
-          this.clearNotificationCache()
-
-          // Method 1: Trigger force refresh event for immediate update
-          if (window.dispatchEvent) {
-            const event = new CustomEvent('force-refresh-notifications', {
-              detail: {
-                source: 'AccessRequests',
-                reason: 'request_updated',
-                timestamp: Date.now()
-              }
-            })
-            window.dispatchEvent(event)
-            console.log('🚀 AccessRequests: Dispatched force-refresh-notifications event')
-          }
-
-          // Method 2: Direct call to sidebar instance with force flag
-          if (window.sidebarInstance && window.sidebarInstance.fetchNotificationCounts) {
-            console.log('📞 AccessRequests: Calling sidebar fetchNotificationCounts directly')
-            window.sidebarInstance.fetchNotificationCounts(true) // force refresh
-          }
-        } catch (error) {
-          console.warn('Failed to refresh notification badge:', error)
-        }
-      },
-
-      // Clear notification cache to ensure fresh data
-      clearNotificationCache() {
-        try {
-          // Import and clear notification service cache dynamically
-          import('@/services/notificationService').then((module) => {
-            module.default.clearCache()
-            console.log('🗑️ AccessRequests: Cleared notification service cache')
-          })
-        } catch (error) {
-          console.warn('Failed to clear notification cache:', error)
-        }
-      },
-
-      // Set global pending count override for accurate sidebar badge
-      setPendingCountOverride(count) {
-        try {
-          console.log('🎠 AccessRequests: Setting pending count override:', count)
-
-          // Method 1: Global window variable for sidebar to read
-          if (typeof window !== 'undefined') {
-            window.accessRequestsPendingCount = count
-          }
-
-          // Method 2: Custom event for real-time updates
-          if (window.dispatchEvent) {
-            const event = new CustomEvent('ict-access-requests-pending-count', {
-              detail: {
-                count,
-                source: 'AccessRequests',
-                timestamp: Date.now()
-              }
-            })
-            window.dispatchEvent(event)
-          }
-
-          // Method 3: Direct global sidebar method call
-          if (window.sidebarInstance && window.sidebarInstance.setNotificationCount) {
-            window.sidebarInstance.setNotificationCount('/ict-dashboard/access-requests', count)
-          }
-
-          console.log('📻 AccessRequests: Emitted pending count override event')
-        } catch (error) {
-          console.warn('Failed to set pending count override:', error)
-        }
-      },
-
-      // DIAGNOSTIC: Compare notification APIs to find discrepancy
-      async diagnoseNotificationDiscrepancy() {
-        try {
-          console.log('🔍 DIAGNOSTIC: Comparing notification APIs...')
-
-          // Get universal notification count
-          const notificationService = (await import('@/services/notificationService')).default
-          const universalResult = await notificationService.getPendingRequestsCount(true)
-
-          // Get ICT Officer specific count
-          const ictResult = await ictOfficerService.getPendingRequestsCount()
-
-          // Get current page data
-          const pageStatuses = this.accessRequests.map((r) => ({
-            id: r.id,
-            status: r.status,
-            request_id: r.request_id || `REQ-${r.id.toString().padStart(6, '0')}`
-          }))
-
-          if (process.env.NODE_ENV === 'development') {
-            console.log('🔴 NOTIFICATION API COMPARISON:', {
-              universal_api: {
-                endpoint: '/notifications/pending-count',
-                count: universalResult.total_pending,
-                full_response: universalResult
-              },
-              ict_specific_api: {
-                endpoint: '/ict-officer/pending-count',
-                count: ictResult.total_pending || ictResult,
-                full_response: ictResult
-              },
-              page_data: {
-                total_requests: this.accessRequests.length,
-                pending_requests: this.accessRequests.filter((r) => this.isUnassigned(r.status))
-                  .length,
-                completed_requests: this.accessRequests.filter((r) =>
-                  ['completed', 'implemented'].includes(r.status)
-                ).length,
-                all_statuses: pageStatuses
-              },
-              analysis: {
-                universal_vs_ict:
-                  universalResult.total_pending === (ictResult.total_pending || ictResult)
-                    ? 'MATCH'
-                    : 'MISMATCH',
-                badge_vs_page:
-                  universalResult.total_pending ===
-                  this.accessRequests.filter((r) => this.isUnassigned(r.status)).length
-                    ? 'CONSISTENT'
-                    : 'INCONSISTENT'
-              }
-            })
-          }
-        } catch (error) {
-          console.error('🚫 DIAGNOSTIC ERROR:', error)
-        }
+async assignTask(request) { console.log('📋 IctAccessRequests: Assigning task for request:',
+request.id) try { const result = await ictOfficerService.assignTaskToSelf( request.id, 'Task
+assigned by ICT Officer' ) if (result.success) { // Refresh the requests list to show updated status
+await this.fetchAccessRequests() // Trigger notification badge refresh
+this.refreshNotificationBadge() // Show success message (you could use a toast notification here)
+alert('Task assigned successfully!') } else { alert('Failed to assign task: ' + result.message) } }
+catch (error) { console.error('Error assigning task:', error) alert('Network error while assigning
+task') } }, async updateProgress(request) { console.log('📈 IctAccessRequests: Updating progress for
+request:', request.id) // For now, just set to in progress status // In a real application, you
+might want to show a modal to capture progress details try { const result = await
+ictOfficerService.updateProgress( request.id, 'implementation_in_progress', 'Implementation started'
+) if (result.success) { // Refresh the requests list to show updated status await
+this.fetchAccessRequests() // Trigger notification badge refresh this.refreshNotificationBadge()
+alert('Progress updated successfully!') } else { alert('Failed to update progress: ' +
+result.message) } } catch (error) { console.error('Error updating progress:', error) alert('Network
+error while updating progress') } }, async cancelTask(request) { console.log('❌ IctAccessRequests:
+Canceling task for request:', request.id) // Show confirmation dialog and handle cancellation const
+reason = prompt('Please provide a reason for canceling this task:') if (reason && reason.trim()) {
+try { const result = await ictOfficerService.cancelTask(request.id, reason) if (result.success) { //
+Refresh the requests list to show updated status await this.fetchAccessRequests() // Trigger
+notification badge refresh this.refreshNotificationBadge() alert('Task canceled successfully!') }
+else { alert('Failed to cancel task: ' + result.message) } } catch (error) { console.error('Error
+canceling task:', error) alert('Network error while canceling task') } } }, isUnassigned(status) {
+// Status indicating request is available for assignment return status === 'head_of_it_approved' ||
+!status }, hasService(request, serviceType) { // Check if request includes a specific service type
+if (serviceType === 'jeeva') { return ( request.jeeva_access_required || (request.request_types &&
+request.request_types.includes('jeeva')) ) } if (serviceType === 'wellsoft') { return (
+request.wellsoft_access_required || (request.request_types &&
+request.request_types.includes('wellsoft')) ) } if (serviceType === 'internet') { return (
+request.internet_access_required || (request.request_types &&
+request.request_types.includes('internet')) ) } return false }, getRequestType(request) { const
+services = [] if (this.hasService(request, 'jeeva')) services.push('Jeeva') if
+(this.hasService(request, 'wellsoft')) services.push('Wellsoft') if (this.hasService(request,
+'internet')) services.push('Internet') return services.length > 0 ? services.join(' + ') : 'Access
+Request' }, getStatusBadgeClass(status) { const statusClasses = { head_of_it_approved:
+'bg-yellow-500 text-yellow-900', assigned_to_ict: 'bg-blue-500 text-blue-900',
+implementation_in_progress: 'bg-purple-500 text-purple-900', completed: 'bg-emerald-500
+text-emerald-900', implemented: 'bg-green-500 text-green-900', // Add styling for 'implemented'
+status cancelled: 'bg-red-500 text-red-900' } return statusClasses[status] || 'bg-gray-500
+text-gray-900' }, getStatusText(status) { const statusTexts = { head_of_it_approved: 'Available for
+Assignment', assigned_to_ict: 'Assigned to ICT Officer', implementation_in_progress: 'Implementation
+in Progress', completed: 'Implementation Completed', implemented: 'Access Granted', // Add mapping
+for 'implemented' status cancelled: 'Task Cancelled' } return ( statusTexts[status] ||
+status?.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'Unknown Status' ) },
+viewTimeline(request) { console.log('📅 IctAccessRequests: Opening timeline for request:',
+request.id) this.selectedRequestId = request.id this.selectedRequest = request this.showTimeline =
+true }, closeTimeline() { console.log('📅 IctAccessRequests: Closing timeline modal')
+this.showTimeline = false this.selectedRequestId = null this.selectedRequest = null
+this.showUpdateProgress = false }, async handleTimelineUpdate() { console.log('🔄 IctAccessRequests:
+Timeline updated, refreshing requests list...') await this.fetchAccessRequests() // Also refresh the
+notification badge this.refreshNotificationBadge() }, openUpdateProgress(request) { console.log( '📝
+IctAccessRequests: Opening update progress section for request:', request?.id ) if (request &&
+this.canShowUpdateProgress(request)) { this.selectedRequest = request this.selectedRequestId =
+request.id this.showUpdateProgress = true } }, closeUpdateProgress() { console.log('📝
+IctAccessRequests: Closing update progress section') this.showUpdateProgress = false }, async
+handleUpdateProgressUpdate() { console.log('🔄 IctAccessRequests: Progress updated, refreshing
+data...') // Refresh the requests list await this.fetchAccessRequests() // Force immediate
+notification badge refresh this.refreshNotificationBadge() // Close both timeline and update
+progress this.closeTimeline() // Additional delayed refresh to ensure backend sync setTimeout(() =>
+{ console.log('⏰ IctAccessRequests: Delayed refresh after progress update')
+this.refreshNotificationBadge() }, 3000) // Extra refresh specifically for implemented/completed
+status changes setTimeout(() => { console.log( '🔄 IctAccessRequests: Final refresh to ensure
+implemented/completed requests are excluded from badge count' ) this.refreshNotificationBadge() },
+5000) }, canShowUpdateProgress(request) { // Only show update progress for ICT Officer assigned
+requests that are not completed if (!request) return false // Get current user from auth const {
+user } = useAuth() const currentUserId = user.value?.id return ( request.ict_officer_user_id &&
+request.ict_officer_user_id === currentUserId && !request.ict_officer_implemented_at &&
+request.ict_officer_status !== 'implemented' && request.ict_officer_status !== 'rejected' &&
+!['implemented', 'completed'].includes(request.status) && // Don't allow updates for completed
+requests (request.status === 'assigned_to_ict' || request.status === 'implementation_in_progress') )
+}, // Dropdown functionality toggleDropdown(requestId, event) { this.activeDropdown =
+this.activeDropdown === requestId ? null : requestId if (this.activeDropdown === requestId && event)
+{ // Store the button position for dropdown positioning const button =
+event.target.closest('button') if (button) { const rect = button.getBoundingClientRect()
+this.dropdownPosition = { top: rect.bottom + window.scrollY + 4, right: window.innerWidth -
+rect.right - window.scrollX } } } }, getDropdownPosition() { if (this.dropdownPosition) { // Check
+if dropdown would go off screen const dropdownWidth = 192 // w-48 = 12rem = 192px const
+dropdownHeight = 200 // estimated height for dropdown let { top, right } = this.dropdownPosition //
+Adjust horizontal position if too close to left edge if (right + dropdownWidth > window.innerWidth)
+{ right = Math.max(4, window.innerWidth - dropdownWidth - 4) } // Adjust vertical position if too
+close to bottom if (top + dropdownHeight > window.innerHeight + window.scrollY) { top = Math.max(4,
+top - dropdownHeight - 32) // 32px for button height } return { top: `${top}px`, right:
+`${right}px`, left: 'auto' } } // Fallback positioning return { top: '100%', right: '0', left:
+'auto', position: 'absolute' } }, handleClickOutside(event) { // Close dropdown if clicking outside
+the dropdown or three-dot button if ( this.activeDropdown &&
+!event.target.closest('[style*="z-index: 9999"]') && !event.target.closest('button[title*="Actions
+for"]') ) { this.activeDropdown = null this.dropdownPosition = null } }, handleMenuAction(action,
+request) { // Close dropdown first this.activeDropdown = null this.dropdownPosition = null //
+Execute the appropriate action switch (action) { case 'viewRequest': this.viewRequest(request) break
+case 'viewTimeline': this.viewTimeline(request) break case 'assignTask': this.assignTask(request)
+break case 'updateProgress': this.updateProgress(request) break case 'cancelTask':
+this.cancelTask(request) break default: console.warn('Unknown action:', action) } },
+formatDate(dateString) { if (!dateString) return 'N/A' try { return new
+Date(dateString).toLocaleDateString('en-GB') } catch { return 'Invalid Date' } },
+formatTime(dateString) { if (!dateString) return 'N/A' try { return new
+Date(dateString).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) } catch {
+return 'Invalid Time' } }, // Refresh notification badge in sidebar refreshNotificationBadge() { try
+{ console.log('🔔 AccessRequests: Triggering notification badge refresh') // Method -1: Update our
+override count first const currentPendingCount = this.accessRequests.filter((r) =>
+this.isUnassigned(r.status) ).length this.setPendingCountOverride(currentPendingCount) // Method 0:
+Clear notification service cache first this.clearNotificationCache() // Method 1: Trigger force
+refresh event for immediate update if (window.dispatchEvent) { const event = new
+CustomEvent('force-refresh-notifications', { detail: { source: 'AccessRequests', reason:
+'request_updated', timestamp: Date.now() } }) window.dispatchEvent(event) console.log('🚀
+AccessRequests: Dispatched force-refresh-notifications event') } // Method 2: Direct call to sidebar
+instance with force flag if (window.sidebarInstance &&
+window.sidebarInstance.fetchNotificationCounts) { console.log('📞 AccessRequests: Calling sidebar
+fetchNotificationCounts directly') window.sidebarInstance.fetchNotificationCounts(true) // force
+refresh } } catch (error) { console.warn('Failed to refresh notification badge:', error) } }, //
+Clear notification cache to ensure fresh data clearNotificationCache() { try { // Import and clear
+notification service cache dynamically import('@/services/notificationService').then((module) => {
+module.default.clearCache() console.log('🗑️ AccessRequests: Cleared notification service cache') })
+} catch (error) { console.warn('Failed to clear notification cache:', error) } }, // Set global
+pending count override for accurate sidebar badge setPendingCountOverride(count) { try {
+console.log('🎠 AccessRequests: Setting pending count override:', count) // Method 1: Global window
+variable for sidebar to read if (typeof window !== 'undefined') { window.accessRequestsPendingCount
+= count } // Method 2: Custom event for real-time updates if (window.dispatchEvent) { const event =
+new CustomEvent('ict-access-requests-pending-count', { detail: { count, source: 'AccessRequests',
+timestamp: Date.now() } }) window.dispatchEvent(event) } // Method 3: Direct global sidebar method
+call if (window.sidebarInstance && window.sidebarInstance.setNotificationCount) {
+window.sidebarInstance.setNotificationCount('/ict-dashboard/access-requests', count) }
+console.log('📻 AccessRequests: Emitted pending count override event') } catch (error) {
+console.warn('Failed to set pending count override:', error) } }, // DIAGNOSTIC: Compare
+notification APIs to find discrepancy async diagnoseNotificationDiscrepancy() { try {
+console.log('🔍 DIAGNOSTIC: Comparing notification APIs...') // Get universal notification count
+const notificationService = (await import('@/services/notificationService')).default const
+universalResult = await notificationService.getPendingRequestsCount(true) // Get ICT Officer
+specific count const ictResult = await ictOfficerService.getPendingRequestsCount() // Get current
+page data const pageStatuses = this.accessRequests.map((r) => ({ id: r.id, status: r.status,
+request_id: r.request_id || `REQ-${r.id.toString().padStart(6, '0')}` })) if (process.env.NODE_ENV
+=== 'development') { console.log('🔴 NOTIFICATION API COMPARISON:', { universal_api: { endpoint:
+'/notifications/pending-count', count: universalResult.total_pending, full_response: universalResult
+}, ict_specific_api: { endpoint: '/ict-officer/pending-count', count: ictResult.total_pending ||
+ictResult, full_response: ictResult }, page_data: { total_requests: this.accessRequests.length,
+pending_requests: this.accessRequests.filter((r) => this.isUnassigned(r.status)) .length,
+completed_requests: this.accessRequests.filter((r) => ['completed',
+'implemented'].includes(r.status) ).length, all_statuses: pageStatuses }, analysis: {
+universal_vs_ict: universalResult.total_pending === (ictResult.total_pending || ictResult) ? 'MATCH'
+: 'MISMATCH', badge_vs_page: universalResult.total_pending === this.accessRequests.filter((r) =>
+this.isUnassigned(r.status)).length ? 'CONSISTENT' : 'INCONSISTENT' } }) } } catch (error) {
+console.error('🚫 DIAGNOSTIC ERROR:', error) }
 <style scoped>
   .sidebar-narrow {
     flex-shrink: 0;

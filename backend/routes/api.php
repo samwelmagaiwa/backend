@@ -493,6 +493,11 @@ Route::middleware('auth:sanctum')->group(function () {
             ->middleware('both.service.role:head_of_it')
             ->name('both-service-form.module-requests.head-of-it-reject');
         
+        // ICT Officer implementation (grant access)
+        Route::post('/module-requests/{userAccessId}/ict-officer-approve', [BothServiceFormController::class, 'approveIctOfficer'])
+            ->middleware('both.service.role:ict_officer')
+            ->name('both-service-form.module-requests.ict-officer-approve');
+        
         // TEMPORARY: Debug record data
         Route::get('/debug-record/{id}', [BothServiceFormController::class, 'debugRecord'])
             ->name('both-service-form.debug-record');

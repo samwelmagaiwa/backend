@@ -1690,6 +1690,161 @@ class BothServiceFormController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * ICT Officer implementation (grant access)
+     */
+    public function approveIctOfficer(Request $request, int $userAccessId): JsonResponse
+    {
+        try {
+            $currentUser = $request->user();
+            $userRoles = $currentUser->roles()->pluck('name')->toArray();
+
+            // Check if user is ICT Officer
+            if (!in_array('ict_officer', $userRoles)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Access denied. Only ICT Officer can perform this action.'
+                ], 403);
+            }
+
+            Log::info('🔍 ICT OFFICER IMPLEMENTATION START', [
+                'user_access_id' => $userAccessId,
+                'ict_officer_user_id' => $currentUser->id,
+                'request_method' => $request->method(),
+                'content_type' => $request->header('Content-Type'),
+                'has_files' => $request->hasFile('ict_officer_signature'),
+                'all_input_keys' => array_keys($request->all())
+            ]);
+
+            // Validation
+            $validated = $request->validate([
+                'ict_officer_name' => 'required|string|max:255',
+                'ict_officer_signature' => 'required|file|mimes:jpeg,jpg,png,pdf|max:2048',
+                'approved_date' => 'required|date',
+                'comments' => 'nullable|string|max:1000',
+                'status' => 'nullable|string|in:implemented,pending,rejected'
+            ], [
+                'ict_officer_name.required' => 'ICT Officer name is required',
+                'ict_officer_signature.required' => 'ICT Officer signature file is required',
+                'ict_officer_signature.mimes' => 'Signature must be in JPEG, JPG, PNG, or PDF format',
+                'ict_officer_signature.max' => 'Signature file must not exceed 2MB',
+                'approved_date.required' => 'Implementation date is required',
+                'approved_date.date' => 'Please provide a valid date',
+            ]);
+
+            // Get user access record
+            $userAccess = UserAccess::findOrFail($userAccessId);
+
+            // Verify request is in correct status (must be Head of IT approved)
+            if ($userAccess->head_it_status !== 'approved') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Request must be Head of IT approved before ICT Officer can implement it.'
+                ], 422);
+            }
+
+            DB::beginTransaction();
+
+            // Handle signature upload
+            $ictOfficerSignaturePath = null;
+            if ($request->hasFile('ict_officer_signature')) {
+                $signatureFile = $request->file('ict_officer_signature');
+                if (!$signatureFile->isValid()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Uploaded signature file is invalid'
+                    ], 422);
+                }
+                $signatureDir = 'signatures/ict_officer';
+                if (!Storage::disk('public')->exists($signatureDir)) {
+                    Storage::disk('public')->makeDirectory($signatureDir);
+                }
+                $filename = 'ict_officer_signature_' . $userAccess->pf_number . '_' . time() . '.' . $signatureFile->getClientOriginalExtension();
+                $ictOfficerSignaturePath = $signatureFile->storeAs($signatureDir, $filename, 'public');
+                if (!Storage::disk('public')->exists($ictOfficerSignaturePath)) {
+                    DB::rollBack();
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Failed to store signature file'
+                    ], 500);
+                }
+            }
+
+            // Update the user access record
+            $status = $validated['status'] ?? 'implemented';
+            $updateData = [
+                'ict_officer_name' => $validated['ict_officer_name'],
+                'ict_officer_signature_path' => $ictOfficerSignaturePath,
+                'ict_officer_implemented_at' => $validated['approved_date'],
+                'ict_officer_comments' => $validated['comments'] ?? null,
+                'ict_officer_status' => $status
+            ];
+            $userAccess->update($updateData);
+            $userAccess->refresh();
+
+            // Also complete the latest ICT task assignment for this request so list status reflects completion
+            try {
+                $latestAssignment = \App\Models\IctTaskAssignment::where('user_access_id', $userAccess->id)
+                    ->orderByDesc('assigned_at')
+                    ->first();
+                if ($latestAssignment && $latestAssignment->status !== \App\Models\IctTaskAssignment::STATUS_COMPLETED) {
+                    $latestAssignment->update([
+                        'status' => \App\Models\IctTaskAssignment::STATUS_COMPLETED,
+                        'started_at' => $latestAssignment->started_at ?: now(),
+                        'completed_at' => now(),
+                        'completion_notes' => $validated['comments'] ?? 'Access granted via BothServiceFormController'
+                    ]);
+                }
+            } catch (\Exception $e) {
+                Log::warning('approveIctOfficer: Failed to update latest IctTaskAssignment', [
+                    'user_access_id' => $userAccess->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
+
+            DB::commit();
+
+            // Load relationships for response
+            $userAccess->load(['user', 'department']);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'ICT Officer implementation saved successfully.',
+                'data' => [
+                    'request_id' => $userAccess->id,
+                    'status' => $userAccess->getCalculatedOverallStatus(),
+                    'ict_officer_implementation' => [
+                        'name' => $userAccess->ict_officer_name,
+                        'implemented_at' => $userAccess->ict_officer_implemented_at,
+                        'comments' => $userAccess->ict_officer_comments,
+                        'signature_url' => $userAccess->ict_officer_signature_path ? Storage::url($userAccess->ict_officer_signature_path) : null,
+                        'signature_path' => $userAccess->ict_officer_signature_path,
+                        'implementation_status' => $userAccess->ict_officer_status
+                    ],
+                    'next_step' => 'completed'
+                ]
+            ]);
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error saving ICT Officer implementation', [
+                'error' => $e->getMessage(),
+                'user_access_id' => $userAccessId,
+                'current_user_id' => $request->user()?->id
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to save ICT Officer implementation: ' . $e->getMessage()
+            ], 500);
+        }
+    }
     
     /**
      * Head of IT rejection for a user access request

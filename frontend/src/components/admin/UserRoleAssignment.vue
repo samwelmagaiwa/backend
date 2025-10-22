@@ -2258,7 +2258,10 @@
           pf_number: user.pf_number || '',
           password: '',
           password_confirmation: '',
-          department_id: user.department_id || '',
+          // Prefer nested department id if present, fallback to flat field
+          department_id:
+            user.department && user.department.id ? user.department.id : user.department_id || '',
+          // Prefer first role id if present
           primary_role: user.roles && user.roles.length > 0 ? user.roles[0].id : '',
           is_active: user.is_active !== undefined ? user.is_active : true
         }
@@ -2552,8 +2555,39 @@
           const response = await adminUserService.updateUser(editingUser.value.id, userData)
 
           if (response.success) {
+            // Patch local user to reflect department and other changes immediately
+            const idx = users.value.findIndex((u) => u.id === editingUser.value.id)
+            if (idx !== -1) {
+              const updated = { ...users.value[idx] }
+              updated.name = editUserData.value.name
+              updated.email = editUserData.value.email
+              updated.phone = editUserData.value.phone
+              updated.pf_number = editUserData.value.pf_number
+              updated.is_active = editUserData.value.is_active
+              updated.department_id = editUserData.value.department_id || null
+
+              // Update nested department object used by UI labels
+              if (editUserData.value.department_id) {
+                const sel = availableDepartments.value.find(
+                  (d) => String(d.id) === String(editUserData.value.department_id)
+                )
+                if (sel) {
+                  updated.department = {
+                    id: sel.id,
+                    name: sel.name,
+                    display_name: sel.display_name || sel.name
+                  }
+                }
+              } else {
+                updated.department = null
+              }
+
+              users.value.splice(idx, 1, updated)
+            }
+
             showSuccessMessage('User updated successfully!')
             closeEditUserModal()
+            // Optional: still refresh to stay consistent with backend
             await refreshData() // Refresh the user list
           } else {
             throw new Error(response.message || 'Failed to update user')

@@ -339,79 +339,274 @@
                       </div>
                     </div>
 
-                    <!-- Row 3: Digital Signature (Full Width) -->
-                    <div
-                      class="bg-gradient-to-r from-blue-500/10 to-blue-500/10 p-3 rounded-lg border border-blue-300/20 backdrop-blur-sm"
-                    >
-                      <div class="group">
-                        <label class="block text-lg font-bold text-blue-100 mb-2 flex items-center">
-                          <i class="fas fa-signature mr-2 text-blue-300"></i>
-                          Digital Signature
-                          <span class="text-red-400 ml-1">*</span>
-                          <span class="ml-2 text-base text-blue-300/70 font-normal"
-                            >(PNG, JPG, JPEG)</span
+                    <!-- Bottom row: Module Requested for (left), Access Rights (middle), and Signature (right) -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4 items-stretch">
+                      <!-- Module Requested for Section (Left Column) -->
+                      <div class="flex flex-col h-full">
+                        <div
+                          class="bg-white/10 rounded-lg p-2 border border-blue-300/30 backdrop-blur-sm w-full min-h-[85px] flex flex-col justify-center"
+                        >
+                          <label
+                            class="block text-base font-bold text-blue-100 mb-2 text-center flex items-center justify-center gap-2"
                           >
-                        </label>
-
-                        <div class="flex flex-col md:flex-row gap-3 items-start">
-                          <!-- Signature Display Box -->
-                          <div
-                            class="relative w-full md:w-64 h-14 border-2 border-blue-300/30 rounded-lg bg-blue-100/20 focus-within:bg-blue-100/30 focus-within:border-blue-400 overflow-hidden backdrop-blur-sm group-hover:border-blue-400/50 transition-all duration-300"
-                          >
-                            <!-- Signature Image Display -->
-                            <div
-                              v-if="signaturePreview"
-                              class="w-full h-full flex items-center justify-center p-1"
+                            <i class="fas fa-toggle-on mr-2 text-blue-300 text-base"></i>
+                            Module Requested for
+                            <span class="text-red-400">*</span>
+                          </label>
+                          <div class="flex items-center gap-4 justify-center">
+                            <label
+                              class="flex items-center cursor-pointer px-3 py-2 rounded-lg transition-all border min-w-16 hover:bg-blue-500/20 bg-white/5 border-white/10"
+                              :class="{
+                                'bg-blue-500/20 border-blue-400/40 text-blue-200 shadow-md ring-1 ring-blue-400/30':
+                                  wellsoftRequestType === 'use'
+                              }"
                             >
+                              <input
+                                v-model="wellsoftRequestType"
+                                type="radio"
+                                value="use"
+                                class="w-5 h-5 border-blue-300 focus:ring-blue-500 mr-2 text-blue-600"
+                              />
+                              <span class="text-base font-bold flex items-center text-blue-100">
+                                <i class="fas fa-plus-circle mr-2 text-base text-green-400"></i>
+                                Use
+                              </span>
+                            </label>
+                            <label
+                              class="flex items-center cursor-pointer px-3 py-2 rounded-lg transition-all border min-w-16 hover:bg-red-500/20 bg-white/5 border-white/10"
+                              :class="{
+                                'bg-red-500/20 border-red-400/40 text-red-200 shadow-md ring-1 ring-red-400/30':
+                                  wellsoftRequestType === 'revoke'
+                              }"
+                            >
+                              <input
+                                v-model="wellsoftRequestType"
+                                type="radio"
+                                value="revoke"
+                                class="w-5 h-5 border-blue-300 focus:ring-blue-500 mr-2 text-blue-600"
+                              />
+                              <span class="text-base font-bold flex items-center text-blue-100">
+                                <i class="fas fa-minus-circle mr-2 text-base text-red-400"></i>
+                                Revoke
+                              </span>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Access Rights Section (Middle) -->
+                      <div class="flex flex-col h-full">
+                        <div
+                          class="bg-white/10 rounded-lg border border-blue-300/30 p-2 w-full min-h-[85px] flex flex-col justify-center"
+                        >
+                          <label class="block text-base font-bold text-blue-100 mb-3 text-center">
+                            <i class="fas fa-clock mr-2"></i>
+                            Please Specify Access Rights:
+                          </label>
+                          <div class="space-y-2 text-left">
+                            <label class="flex items-center cursor-pointer text-base">
+                              <input
+                                v-model="accessType"
+                                type="radio"
+                                value="permanent"
+                                class="w-5 h-5 text-blue-600 mr-3"
+                              />
+                              <span class="text-blue-200 font-medium"
+                                >Permanent (until retirement)</span
+                              >
+                            </label>
+                            <label class="flex items-center cursor-pointer text-base">
+                              <input
+                                v-model="accessType"
+                                type="radio"
+                                value="temporary"
+                                class="w-5 h-5 text-blue-600 mr-3"
+                              />
+                              <span class="text-blue-200 font-medium">Temporary Until:</span>
+                              <input
+                                v-if="accessType === 'temporary'"
+                                v-model="temporaryUntil"
+                                type="date"
+                                :min="tomorrowDate"
+                                class="ml-2 px-3 py-1.5 bg-white/10 border border-blue-300/40 rounded text-base text-white focus:ring-1 focus:ring-blue-400"
+                              />
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Signature Section (Right) -->
+                      <div class="flex flex-col h-full">
+                        <div
+                          class="relative bg-white/10 rounded-lg border border-blue-300/30 p-2 w-full min-h-[85px] flex flex-col justify-center"
+                        >
+                          <label class="block text-base font-bold text-blue-100 mb-3 text-center">
+                            Signature <span class="text-red-400">*</span>
+                          </label>
+
+                          <!-- Edit mode: Show uploaded signature preview -->
+                          <div
+                            v-if="signaturePreview"
+                            class="w-full px-1 py-1 border-2 border-blue-300/40 rounded-lg bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 flex items-center justify-center relative min-h-[35px]"
+                          >
+                            <div v-if="isImage(signaturePreview)" class="text-center">
                               <img
                                 :src="signaturePreview"
                                 alt="Digital Signature"
-                                class="max-w-full max-h-full object-contain"
+                                class="max-h-[25px] max-w-full object-contain mx-auto"
                               />
+                              <p class="text-base text-blue-100 mt-1 truncate">
+                                {{ signatureFileName }}
+                              </p>
                             </div>
-
-                            <!-- Placeholder Text -->
-                            <div v-else class="w-full h-full flex items-center justify-center">
-                              <div class="text-center">
-                                <i class="fas fa-signature text-blue-400/50 text-lg mb-1"></i>
-                                <p class="text-xs text-blue-400 italic">Signature here</p>
+                            <div v-else class="text-center">
+                              <div
+                                class="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center mx-auto"
+                              >
+                                <i class="fas fa-file-pdf text-red-400 text-2xl"></i>
                               </div>
+                              <p class="text-base text-blue-100 mt-1 truncate">
+                                {{ signatureFileName }}
+                              </p>
                             </div>
 
-                            <!-- Remove Button (when signature exists) -->
-                            <button
-                              v-if="signaturePreview"
-                              type="button"
-                              @click="clearSignature"
-                              class="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition duration-200 text-xs shadow-lg"
-                              title="Remove signature"
-                            >
-                              <i class="fas fa-times"></i>
-                            </button>
+                            <div class="absolute top-1 right-1 flex gap-1">
+                              <button
+                                type="button"
+                                @click="triggerFileUpload"
+                                class="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-blue-600 transition-colors duration-200 shadow-lg"
+                                title="Change signature"
+                              >
+                                <i class="fas fa-edit"></i>
+                              </button>
+                              <button
+                                type="button"
+                                @click="clearSignature"
+                                class="w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors duration-200 shadow-lg"
+                                title="Remove signature"
+                              >
+                                <i class="fas fa-times"></i>
+                              </button>
+                            </div>
                           </div>
 
-                          <!-- Upload Button -->
-                          <div class="flex flex-col gap-1">
-                            <input
-                              ref="signatureInput"
-                              type="file"
-                              accept=".png,.jpg,.jpeg"
-                              @change="onSignatureChange"
-                              class="hidden"
-                            />
+                          <!-- Default signature upload area -->
+                          <div
+                            v-else
+                            class="w-full px-1 py-1 border-2 border-dashed border-blue-300/40 rounded-lg focus-within:border-blue-400 bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 flex items-center justify-center hover:bg-white/20 min-h-[35px]"
+                          >
+                            <div class="text-center">
+                              <i class="fas fa-signature text-blue-300 text-lg"></i>
+                              <p class="text-blue-100 text-base mt-1 font-medium">
+                                No signature uploaded
+                              </p>
+                              <button
+                                type="button"
+                                @click="triggerFileUpload"
+                                class="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-base font-bold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-2 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/50 mt-2"
+                              >
+                                <i class="fas fa-upload"></i>
+                                Press to load your signature
+                              </button>
+                            </div>
+                          </div>
 
-                            <button
-                              type="button"
-                              @click="triggerFileUpload"
-                              class="inline-flex items-center px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-medium rounded-lg hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/30"
+                          <input
+                            ref="signatureInput"
+                            type="file"
+                            accept="image/png,image/jpeg,application/pdf"
+                            @change="onSignatureChange"
+                            class="hidden"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Module Selection Section - Jeeva and Wellsoft Side by Side -->
+                    <div class="mt-4">
+                      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 relative">
+                        <!-- Vertical Divider Line -->
+                        <div
+                          class="hidden lg:block absolute left-2/3 top-0 bottom-0 w-px bg-gradient-to-b from-blue-300/30 via-blue-400/50 to-blue-300/30 transform -translate-x-px"
+                        ></div>
+
+                        <!-- Jeeva Modules (Left Side - Takes 2 columns) -->
+                        <div class="lg:col-span-2">
+                          <div
+                            class="bg-white/10 rounded-lg border border-purple-300/30 p-4 w-full h-auto"
+                          >
+                            <div class="mb-2">
+                              <label
+                                class="block text-base font-bold text-purple-200 mb-2 flex items-center justify-between"
+                              >
+                                <span>
+                                  <i class="fas fa-database mr-2 text-sm"></i>
+                                  Jeeva Modules
+                                </span>
+                                <span class="text-sm text-purple-300/70">
+                                  Selected: {{ formData.selectedJeeva?.length || 0 }} modules
+                                </span>
+                              </label>
+                            </div>
+                            <div
+                              class="grid grid-cols-4 gap-2 border border-purple-300/20 rounded p-3"
                             >
-                              <span class="flex items-center">
-                                <i class="fas fa-upload mr-1"></i>
-                                Upload Signature
-                              </span>
-                            </button>
+                              <label
+                                v-for="module in jeevaModules"
+                                :key="'jeeva-' + module"
+                                class="flex items-center cursor-pointer text-sm hover:bg-white/10 p-1 rounded transition-colors leading-tight"
+                              >
+                                <input
+                                  v-model="formData.selectedJeeva"
+                                  :value="module"
+                                  type="checkbox"
+                                  class="w-4 h-4 text-red-600 accent-red-600 mr-2 flex-shrink-0"
+                                />
+                                <span class="text-purple-100 text-sm leading-tight">{{
+                                  module
+                                }}</span>
+                              </label>
+                            </div>
+                          </div>
+                        </div>
 
-                            <p class="text-xs text-blue-200/70 italic">Max: 5MB</p>
+                        <!-- Wellsoft Modules (Right Side - Takes 1 column) -->
+                        <div class="lg:col-span-1">
+                          <div
+                            class="bg-white/10 rounded-lg border border-amber-300/30 p-4 w-full h-auto"
+                          >
+                            <div class="mb-3">
+                              <label
+                                class="block text-base font-bold text-amber-200 mb-3 flex items-center justify-between"
+                              >
+                                <span>
+                                  <i class="fas fa-hospital mr-2 text-sm"></i>
+                                  Wellsoft Modules
+                                </span>
+                                <span class="text-sm text-amber-300/70">
+                                  Selected: {{ formData.selectedWellsoft?.length || 0 }} modules
+                                </span>
+                              </label>
+                            </div>
+                            <div
+                              class="grid grid-cols-2 gap-2 border border-amber-300/20 rounded p-3"
+                            >
+                              <label
+                                v-for="module in wellsoftModules"
+                                :key="'wellsoft-' + module"
+                                class="flex items-center cursor-pointer text-sm hover:bg-white/10 p-1.5 rounded transition-colors"
+                              >
+                                <input
+                                  v-model="formData.selectedWellsoft"
+                                  :value="module"
+                                  type="checkbox"
+                                  class="w-4 h-4 text-red-600 accent-red-600 mr-2 flex-shrink-0"
+                                />
+                                <span class="text-amber-100 text-sm leading-tight">{{
+                                  module
+                                }}</span>
+                              </label>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -420,296 +615,8 @@
                 </div>
               </div>
 
-              <!-- Module Selection Section -->
+              <!-- Internet Purpose -->
               <div
-                class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-5 rounded-xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group relative overflow-hidden"
-              >
-                <!-- Animated Background Layers -->
-                <div
-                  class="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-blue-500/5 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"
-                ></div>
-                <div
-                  class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-transparent rounded-full blur-2xl group-hover:scale-150 transition-transform duration-1000"
-                ></div>
-                <div
-                  class="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-blue-400/15 to-transparent rounded-full blur-xl group-hover:scale-125 transition-transform duration-800"
-                ></div>
-
-                <div class="relative z-10">
-                  <div class="flex items-center space-x-3 mb-4">
-                    <div
-                      class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50 relative overflow-hidden"
-                    >
-                      <div
-                        class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-lg"
-                      ></div>
-                      <i
-                        class="fas fa-layer-group text-white text-lg relative z-10 drop-shadow-lg"
-                      ></i>
-                      <div
-                        class="absolute top-1 right-1 w-1 h-1 bg-white/60 rounded-full animate-ping"
-                      ></div>
-                    </div>
-                    <div>
-                      <h3 class="text-xl font-bold text-white flex items-center">
-                        <i class="fas fa-cogs mr-2 text-blue-300"></i>
-                        Select Services
-                      </h3>
-                      <p class="text-base text-blue-100/80">
-                        Choose which services you need access to
-                      </p>
-                    </div>
-                  </div>
-
-                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <!-- Jeeva Service -->
-                    <div class="relative group/service">
-                      <input
-                        v-model="formData.services.jeeva"
-                        type="checkbox"
-                        id="jeeva-service"
-                        class="sr-only"
-                      />
-                      <label
-                        for="jeeva-service"
-                        class="block p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 hover:shadow-xl backdrop-blur-sm relative overflow-hidden transform hover:scale-105"
-                        :class="
-                          formData.services.jeeva
-                            ? 'border-blue-400 bg-blue-500/20 shadow-lg shadow-blue-500/25'
-                            : 'border-white/30 bg-white/10 hover:border-blue-300/50 hover:bg-blue-500/10'
-                        "
-                      >
-                        <!-- Service Card Background Effects -->
-                        <div
-                          class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover/service:opacity-100 transition-opacity duration-300"
-                        ></div>
-                        <div
-                          class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-blue-400/20 to-transparent rounded-full blur-xl"
-                        ></div>
-
-                        <div class="relative z-10">
-                          <div class="flex items-center justify-between mb-2">
-                            <div class="flex items-center">
-                              <div
-                                class="w-10 h-10 rounded-lg flex items-center justify-center mr-3 transition-all duration-300 relative overflow-hidden"
-                                :class="
-                                  formData.services.jeeva
-                                    ? 'bg-blue-500 text-white shadow-lg'
-                                    : 'bg-white/20 text-blue-300'
-                                "
-                              >
-                                <div
-                                  v-if="formData.services.jeeva"
-                                  class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"
-                                ></div>
-                                <i class="fas fa-file-medical text-lg relative z-10"></i>
-                              </div>
-                              <div>
-                                <h4 class="font-bold text-white text-lg">Jeeva Access</h4>
-                                <p class="text-sm text-blue-200/80">Medical records system</p>
-                              </div>
-                            </div>
-                            <div
-                              class="w-5 h-5 rounded border-2 flex items-center justify-center transition-all duration-300"
-                              :class="
-                                formData.services.jeeva
-                                  ? 'border-blue-400 bg-blue-500 shadow-lg'
-                                  : 'border-white/40'
-                              "
-                            >
-                              <i
-                                v-if="formData.services.jeeva"
-                                class="fas fa-check text-white text-sm"
-                              ></i>
-                            </div>
-                          </div>
-
-                          <!-- Service Features -->
-                          <div class="space-y-1">
-                            <div class="flex items-center text-sm text-blue-100/70">
-                              <i class="fas fa-check-circle mr-1 text-blue-400"></i>
-                              Patient Records
-                            </div>
-                            <div class="flex items-center text-sm text-blue-100/70">
-                              <i class="fas fa-check-circle mr-1 text-blue-400"></i>
-                              Medical History
-                            </div>
-                          </div>
-                        </div>
-                      </label>
-                    </div>
-
-                    <!-- Wellsoft Service -->
-                    <div class="relative group/service">
-                      <input
-                        v-model="formData.services.wellsoft"
-                        type="checkbox"
-                        id="wellsoft-service"
-                        class="sr-only"
-                      />
-                      <label
-                        for="wellsoft-service"
-                        class="block p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 hover:shadow-xl backdrop-blur-sm relative overflow-hidden transform hover:scale-105"
-                        :class="
-                          formData.services.wellsoft
-                            ? 'border-blue-400 bg-blue-500/20 shadow-lg shadow-blue-500/25'
-                            : 'border-white/30 bg-white/10 hover:border-blue-300/50 hover:bg-blue-500/10'
-                        "
-                      >
-                        <!-- Service Card Background Effects -->
-                        <div
-                          class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover/service:opacity-100 transition-opacity duration-300"
-                        ></div>
-                        <div
-                          class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-blue-400/20 to-transparent rounded-full blur-xl"
-                        ></div>
-
-                        <div class="relative z-10">
-                          <div class="flex items-center justify-between mb-2">
-                            <div class="flex items-center">
-                              <div
-                                class="w-10 h-10 rounded-lg flex items-center justify-center mr-3 transition-all duration-300 relative overflow-hidden"
-                                :class="
-                                  formData.services.wellsoft
-                                    ? 'bg-blue-500 text-white shadow-lg'
-                                    : 'bg-white/20 text-blue-300'
-                                "
-                              >
-                                <div
-                                  v-if="formData.services.wellsoft"
-                                  class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"
-                                ></div>
-                                <i class="fas fa-laptop-medical text-lg relative z-10"></i>
-                              </div>
-                              <div>
-                                <h4 class="font-bold text-white text-lg">Wellsoft Access</h4>
-                                <p class="text-sm text-blue-200/80">Hospital management</p>
-                              </div>
-                            </div>
-                            <div
-                              class="w-5 h-5 rounded border-2 flex items-center justify-center transition-all duration-300"
-                              :class="
-                                formData.services.wellsoft
-                                  ? 'border-blue-400 bg-blue-500 shadow-lg'
-                                  : 'border-white/40'
-                              "
-                            >
-                              <i
-                                v-if="formData.services.wellsoft"
-                                class="fas fa-check text-white text-sm"
-                              ></i>
-                            </div>
-                          </div>
-
-                          <!-- Service Features -->
-                          <div class="space-y-1">
-                            <div class="flex items-center text-sm text-blue-100/70">
-                              <i class="fas fa-check-circle mr-1 text-blue-400"></i>
-                              Patient Management
-                            </div>
-                            <div class="flex items-center text-sm text-blue-100/70">
-                              <i class="fas fa-check-circle mr-1 text-blue-400"></i>
-                              Hospital Operations
-                            </div>
-                          </div>
-                        </div>
-                      </label>
-                    </div>
-
-                    <!-- Internet Service -->
-                    <div class="relative group/service">
-                      <input
-                        v-model="formData.services.internet"
-                        type="checkbox"
-                        id="internet-service"
-                        class="sr-only"
-                      />
-                      <label
-                        for="internet-service"
-                        class="block p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 hover:shadow-xl backdrop-blur-sm relative overflow-hidden transform hover:scale-105"
-                        :class="
-                          formData.services.internet
-                            ? 'border-blue-400 bg-blue-500/20 shadow-lg shadow-blue-500/25'
-                            : 'border-white/30 bg-white/10 hover:border-blue-300/50 hover:bg-blue-500/10'
-                        "
-                      >
-                        <!-- Service Card Background Effects -->
-                        <div
-                          class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover/service:opacity-100 transition-opacity duration-300"
-                        ></div>
-                        <div
-                          class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-blue-400/20 to-transparent rounded-full blur-xl"
-                        ></div>
-
-                        <div class="relative z-10">
-                          <div class="flex items-center justify-between mb-2">
-                            <div class="flex items-center">
-                              <div
-                                class="w-10 h-10 rounded-lg flex items-center justify-center mr-3 transition-all duration-300 relative overflow-hidden"
-                                :class="
-                                  formData.services.internet
-                                    ? 'bg-blue-500 text-white shadow-lg'
-                                    : 'bg-white/20 text-blue-300'
-                                "
-                              >
-                                <div
-                                  v-if="formData.services.internet"
-                                  class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"
-                                ></div>
-                                <i class="fas fa-wifi text-lg relative z-10"></i>
-                              </div>
-                              <div>
-                                <h4 class="font-bold text-white text-lg">Internet Access</h4>
-                                <p class="text-sm text-blue-200/80">Internet connectivity</p>
-                              </div>
-                            </div>
-                            <div
-                              class="w-5 h-5 rounded border-2 flex items-center justify-center transition-all duration-300"
-                              :class="
-                                formData.services.internet
-                                  ? 'border-blue-400 bg-blue-500 shadow-lg'
-                                  : 'border-white/40'
-                              "
-                            >
-                              <i
-                                v-if="formData.services.internet"
-                                class="fas fa-check text-white text-sm"
-                              ></i>
-                            </div>
-                          </div>
-
-                          <!-- Service Features -->
-                          <div class="space-y-1">
-                            <div class="flex items-center text-sm text-blue-100/70">
-                              <i class="fas fa-check-circle mr-1 text-blue-400"></i>
-                              Web Access
-                            </div>
-                            <div class="flex items-center text-sm text-blue-100/70">
-                              <i class="fas fa-check-circle mr-1 text-blue-400"></i>
-                              Email & Communication
-                            </div>
-                          </div>
-                        </div>
-                      </label>
-                    </div>
-                  </div>
-
-                  <!-- Service Selection Validation -->
-                  <div
-                    v-if="!hasSelectedService"
-                    class="mt-6 p-4 bg-red-500/20 border-2 border-red-400/40 rounded-xl backdrop-blur-sm"
-                  >
-                    <p class="text-red-300 text-sm font-medium flex items-center">
-                      <i class="fas fa-exclamation-triangle mr-2 text-red-400"></i>
-                      Please select at least one service to continue.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Internet Purpose Section (Only show when Internet is selected) -->
-              <div
-                v-if="formData.services.internet"
                 class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-5 rounded-xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group relative overflow-hidden"
               >
                 <!-- Animated Background Layers -->
@@ -763,7 +670,7 @@
                         type="text"
                         class="medical-input flex-1 px-3 py-2 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20"
                         :placeholder="`Purpose ${index + 1}`"
-                        :required="index === 0 && formData.services.internet"
+                        :required="index === 0"
                       />
                     </div>
                     <p class="text-sm text-blue-200 mt-2 italic">
@@ -1053,6 +960,14 @@
           internet: false
         },
         submittedInternetPurposes: [],
+        // Module data from database
+        wellsoftModules: [],
+        jeevaModules: [],
+        // Request type (use/revoke)
+        wellsoftRequestType: 'use',
+        // Access rights
+        accessType: '', // No default - user must select
+        temporaryUntil: '',
         formData: {
           // Applicant Details
           pfNumber: '',
@@ -1064,7 +979,7 @@
           services: {
             jeeva: false,
             wellsoft: false,
-            internet: false
+            internet: true
           },
           // Module Selections
           selectedWellsoft: [],
@@ -1104,6 +1019,14 @@
           return this.submittedInternetPurposes.filter((purpose) => purpose.trim() !== '')
         }
         return this.formData.internetPurposes.filter((purpose) => purpose.trim() !== '')
+      },
+      tomorrowDate() {
+        const d = new Date()
+        d.setDate(d.getDate() + 1)
+        const yyyy = d.getFullYear()
+        const mm = String(d.getMonth() + 1).padStart(2, '0')
+        const dd = String(d.getDate()).padStart(2, '0')
+        return `${yyyy}-${mm}-${dd}`
       }
     },
 
@@ -1118,11 +1041,11 @@
       // Check if in edit mode
       this.checkEditMode()
 
-      // Load both profile data and departments concurrently
+      // Load both profile data, departments, and modules concurrently
       if (this.isEditMode) {
-        await Promise.all([this.loadExistingRequest(), this.loadDepartments()])
+        await Promise.all([this.loadExistingRequest(), this.loadDepartments(), this.loadModules()])
       } else {
-        await Promise.all([this.autoPopulateUserData(), this.loadDepartments()])
+        await Promise.all([this.autoPopulateUserData(), this.loadDepartments(), this.loadModules()])
       }
 
       console.log('✅ UserCombinedAccessForm: Initialization completed')
@@ -1388,6 +1311,47 @@
       },
 
       /**
+       * Load available modules from the database
+       */
+      async loadModules() {
+        console.log('🔄 Loading Jeeva and Wellsoft modules from database...')
+        try {
+          // Load both module types in parallel
+          const [wellsoftResponse, jeevaResponse] = await Promise.all([
+            userCombinedAccessService.getWellsoftModules(),
+            userCombinedAccessService.getJeevaModules()
+          ])
+
+          // Process Wellsoft modules
+          if (
+            wellsoftResponse &&
+            wellsoftResponse.success &&
+            Array.isArray(wellsoftResponse.data)
+          ) {
+            this.wellsoftModules = wellsoftResponse.data.map((module) => module.name).sort()
+            console.log('✅ Wellsoft modules loaded:', this.wellsoftModules.length)
+          } else {
+            console.warn('⚠️ Failed to load Wellsoft modules, using empty array')
+            this.wellsoftModules = []
+          }
+
+          // Process Jeeva modules
+          if (jeevaResponse && jeevaResponse.success && Array.isArray(jeevaResponse.data)) {
+            this.jeevaModules = jeevaResponse.data.map((module) => module.name).sort()
+            console.log('✅ Jeeva modules loaded:', this.jeevaModules.length)
+          } else {
+            console.warn('⚠️ Failed to load Jeeva modules, using empty array')
+            this.jeevaModules = []
+          }
+        } catch (error) {
+          console.error('❌ Error loading modules:', error)
+          this.wellsoftModules = []
+          this.jeevaModules = []
+          this.showNotification('Failed to load module options', 'warning')
+        }
+      },
+
+      /**
        * Auto-populate user data from the authenticated user's profile
        */
       async autoPopulateUserData() {
@@ -1523,6 +1487,18 @@
           return
         }
 
+        // Validate access rights selection
+        if (!this.accessType) {
+          this.showNotification('Please specify access rights (Permanent or Temporary)', 'error')
+          return
+        }
+
+        // Validate temporary date if temporary access is selected
+        if (this.accessType === 'temporary' && !this.temporaryUntil) {
+          this.showNotification('Please specify the temporary access end date', 'error')
+          return
+        }
+
         // Note: Module selection is done by HOD during approval process
         // Users only select services, HOD selects specific modules at /both-service-form/:id
         console.log('📋 Service selections for HOD approval:', {
@@ -1596,14 +1572,38 @@
             formData.append(`request_type[${index}]`, type)
           })
 
-          // Note: Module selections are handled by HOD during approval at /both-service-form/:id
-          // User form only submits service selections (Jeeva, Wellsoft, Internet Access)
-          console.log('📝 Submitting service selections only (modules selected by HOD later):', {
+          // Add module selections (user now selects modules, HOD can edit them later)
+          console.log('📝 Submitting with module selections:', {
             jeeva: this.formData.services.jeeva,
             wellsoft: this.formData.services.wellsoft,
             internet: this.formData.services.internet,
-            requestTypes: requestTypes
+            selectedWellsoft: this.formData.selectedWellsoft,
+            selectedJeeva: this.formData.selectedJeeva,
+            requestType: this.wellsoftRequestType,
+            accessType: this.accessType,
+            temporaryUntil: this.temporaryUntil
           })
+
+          // Add Wellsoft modules if Wellsoft service is selected
+          if (this.formData.services.wellsoft && this.formData.selectedWellsoft.length > 0) {
+            this.formData.selectedWellsoft.forEach((module, index) => {
+              formData.append(`wellsoft_modules[${index}]`, module)
+            })
+            formData.append('wellsoft_request_type', this.wellsoftRequestType)
+          }
+
+          // Add Jeeva modules if Jeeva service is selected
+          if (this.formData.services.jeeva && this.formData.selectedJeeva.length > 0) {
+            this.formData.selectedJeeva.forEach((module, index) => {
+              formData.append(`jeeva_modules[${index}]`, module)
+            })
+          }
+
+          // Add access rights information
+          formData.append('access_type', this.accessType)
+          if (this.accessType === 'temporary' && this.temporaryUntil) {
+            formData.append('temporary_until', this.temporaryUntil)
+          }
 
           // Add internet purposes if internet service is selected
           if (this.formData.services.internet) {

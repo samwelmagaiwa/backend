@@ -1128,10 +1128,7 @@
                             <div
                               v-for="(comment, index) in visibleComments"
                               :key="comment.stage + '-' + index"
-                              :class="[
-                                'grid grid-cols-12 gap-0 p-0 border-b border-amber-300/20 transition-none hover:bg-amber-500/10 items-start',
-                                index === visibleComments.length - 1 ? 'border-b-0' : ''
-                              ]"
+                              :class="rowClass(comment, index)"
                             >
                               <!-- Name -->
                               <div class="col-span-2">
@@ -1267,7 +1264,11 @@
                           </div>
                           <!-- Role comment editor inside right column, flush at bottom -->
 <div class="mt-3">
-                            <div class="rounded-lg p-2 border border-blue-300/30" style="background-color: #0047ab">
+                            <div
+                              v-if="!( (getUserRole() || '').toLowerCase() === 'ict_officer' || (getUserRole() || '').toLowerCase() === 'officer_ict')"
+                              class="rounded-lg p-2 border border-blue-300/30"
+                              style="background-color: #0047ab"
+                            >
                               <textarea
                                 v-model="roleCommentsDraft"
                                 :readonly="!isRoleCommentEditable"
@@ -1281,6 +1282,38 @@
                       </div>
                     </div>
                   </div>
+
+          <!-- Grant Access Popup (ICT Officer) -->
+          <div v-if="showGrantAccessPopup" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-4">
+            <div class="bg-white/10 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-blue-300/40 backdrop-blur-md">
+              <div class="px-5 py-3" style="background-color:#0047ab">
+                <h3 class="text-white text-lg font-bold flex items-center gap-2">
+                  <i class="fas fa-user-shield"></i>
+                  Grant Access
+                </h3>
+                <p class="text-blue-100 text-xs mt-1">Provide your implementation note before granting access.</p>
+              </div>
+              <div class="px-5 py-4 bg-blue-900/20">
+                <label class="block text-blue-100 text-sm mb-1">ICT Officer Comment <span class="text-red-400">*</span></label>
+                <textarea
+                  v-model="grantAccessComment"
+                  class="w-full h-28 bg-white/10 border border-blue-300/30 rounded-lg p-2 text-white placeholder-blue-300/60 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-blue-400"
+                  placeholder="Enter implementation details..."
+                  rows="5"
+                  required
+                ></textarea>
+                <p v-if="grantAccessError" class="text-red-300 text-xs mt-1">{{ grantAccessError }}</p>
+              </div>
+              <div class="px-5 py-3 flex gap-2 justify-end bg-blue-900/30 border-t border-blue-300/30">
+                <button @click="cancelGrantAccess" type="button" class="px-3 py-1.5 rounded-lg text-white bg-gray-600 hover:bg-gray-700 text-sm">Cancel</button>
+                <button @click="confirmGrantAccess" type="button" :disabled="processing || !grantAccessComment.trim()" class="px-3 py-1.5 rounded-lg text-white text-sm border border-blue-300/50 shadow disabled:opacity-50"
+                  style="background:linear-gradient(135deg,#0f52ba 0%,#1e3a8a 100%)">
+                  <i class="fas fa-key mr-1"></i>
+                  Grant Access
+                </button>
+              </div>
+            </div>
+          </div>
 
           <!-- Head of IT Approval Success Modal -->
           <div v-if="showHeadItApproveSuccessModal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-4">
@@ -2775,7 +2808,7 @@
                           >
                             <button
                               type="button"
-                              @click="showIctOfficerConfirmation = true"
+                              @click="onIctOfficerApproveClick"
                               :disabled="isImplementationApprovalDisabled"
                               :class="[
                                 'w-full px-4 py-2 rounded-lg transition-all duration-300 font-semibold flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 text-xs',
@@ -3954,6 +3987,12 @@
       return {
         // UI: Head of IT approval success modal
         showHeadItApproveSuccessModal: false,
+        // ICT Officer Grant Access popup state
+        showGrantAccessPopup: false,
+        grantAccessComment: '',
+        grantAccessError: '',
+        // Recently added comment meta for highlight
+        lastAddedCommentMeta: null,
         // Signature handling
         signaturePreview: '',
         signatureFileName: '',
@@ -5481,6 +5520,7 @@
 
       // Check if ICT Officer implementation approval button should be disabled
       isImplementationApprovalDisabled() {
+        // ICT Officer: require signature for enabling Approve button; comment will be required in popup
         return this.processing || this.loading || !this.ictOfficerSignaturePreview
       },
 
@@ -5813,6 +5853,117 @@
       loadRoleCommentDraft() {
         this.roleCommentsDraft = this.getExistingRoleComment() || ''
       },
+
+      // Intercept ICT Officer approve click to open Grant Access popup
+      onIctOfficerApproveClick() {
+        // Only ICT Officer flow
+        const role = (this.getUserRole() || '').toLowerCase()
+        if (!['ict_officer', 'officer_ict'].includes(role)) return
+        // Require signature before proceeding
+        if (!this.ictOfficerSignaturePreview && !this.form?.implementation?.ictOfficer?.signature) {
+          this.showToast('Please upload your signature first', 'error')
+          return
+        }
+        this.grantAccessComment = (this.roleCommentsDraft || '').trim()
+        this.grantAccessError = ''
+        this.showGrantAccessPopup = true
+      },
+
+      async confirmGrantAccess() {
+        const comment = (this.grantAccessComment || '').trim()
+        if (!comment) {
+          this.grantAccessError = 'Comment is required.'
+          return
+        }
+        this.grantAccessError = ''
+        try {
+          this.processing = true
+          const fdPayload = {
+            ict_officer_name:
+              this.form?.implementation?.ictOfficer?.name || this.currentUser?.name || '',
+            ict_officer_date: new Date().toISOString().slice(0, 10),
+            ict_officer_comments: comment,
+            ict_officer_status: 'implemented',
+            ict_officer_signature:
+              this.form?.implementation?.ictOfficer?.signature ||
+              this.ictOfficerSignaturePreviewFile ||
+              null
+          }
+
+          // If signaturePreview is a data URL, we need the original File; assume we stored it during onSignatureChange
+          if (!fdPayload.ict_officer_signature) {
+            // Fallback: try to derive from ref input if available
+            const input = this.$refs.signatureInput
+            if (input && input.files && input.files[0]) {
+              fdPayload.ict_officer_signature = input.files[0]
+            }
+          }
+
+          if (!fdPayload.ict_officer_signature) {
+            this.showToast('Signature file is required before granting access', 'error')
+            this.processing = false
+            return
+          }
+
+          const res = await bothServiceFormService.ictOfficerApprove(this.getRequestId, fdPayload)
+          if (res.success) {
+            this.showGrantAccessPopup = false
+            this.showToast('Access granted successfully', 'success')
+            // Refresh request data to update review summary and lock UI
+            await this.loadRequestData()
+            // Ensure local UI reflects immediate comment display only (do not override status/dates)
+            if (this.requestData) {
+              this.requestData.ict_officer_comments = comment
+            }
+            // Mark meta to highlight ICT officer row AFTER data reload to avoid vnode mismatches
+            this.lastAddedCommentMeta = {
+              role: 'ict_officer',
+              text: comment,
+              ts: Date.now()
+            }
+            // Auto-clear highlight after a few seconds
+            setTimeout(() => {
+              this.lastAddedCommentMeta = null
+            }, 5000)
+          } else {
+            this.showToast(res.error || 'Failed to grant access', 'error')
+          }
+        } catch (e) {
+          console.error('Grant access error:', e)
+          this.showToast(e.message || 'Failed to grant access', 'error')
+        } finally {
+          this.processing = false
+        }
+      },
+
+      cancelGrantAccess() {
+        this.showGrantAccessPopup = false
+        this.grantAccessError = ''
+      },
+
+      // Helper to compute row class safely
+      rowClass(comment, index) {
+        const base =
+          'grid grid-cols-12 gap-0 p-0 border-b border-amber-300/20 transition-none hover:bg-amber-500/10 items-start'
+        const isLast = index === this.visibleComments.length - 1
+        const highlight = this.isHighlightedComment(comment)
+          ? 'ring-2 ring-green-400/60 bg-green-900/20'
+          : ''
+        return [base, highlight, isLast ? 'border-b-0' : '']
+      },
+      isHighlightedComment(comment) {
+        try {
+          if (!this.lastAddedCommentMeta) return false
+          if (!comment || typeof comment !== 'object') return false
+          if (comment.stage !== 'ict_officer') return false
+          const a = (comment.comments || '').trim()
+          const b = (this.lastAddedCommentMeta.text || '').trim()
+          return a.length > 0 && a === b
+        } catch (e) {
+          return false
+        }
+      },
+
       // ===========================================
       // MODULE LOADING METHODS WITH CACHING
       // ===========================================

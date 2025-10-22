@@ -193,6 +193,70 @@ export const userCombinedAccessService = {
         status: error.response?.status
       }
     }
+  },
+
+  /**
+   * Get all Wellsoft modules from database
+   * @returns {Promise<Object>} Response with Wellsoft modules data
+   */
+  async getWellsoftModules() {
+    try {
+      console.log('🔄 UserCombinedAccessService: Fetching Wellsoft modules...')
+
+      const response = await apiClient.get('/wellsoft-modules')
+
+      if (response.data && response.data.success) {
+        console.log(
+          '✅ UserCombinedAccessService: Wellsoft modules loaded:',
+          response.data.data?.length || 0
+        )
+        return {
+          success: true,
+          data: response.data.data
+        }
+      } else {
+        throw new Error(response.data?.message || 'Failed to load Wellsoft modules')
+      }
+    } catch (error) {
+      console.error('❌ UserCombinedAccessService: Error fetching Wellsoft modules:', error)
+      return {
+        success: false,
+        error: error.response?.data?.message || error.message || 'Failed to load Wellsoft modules',
+        data: []
+      }
+    }
+  },
+
+  /**
+   * Get all Jeeva modules from database
+   * @returns {Promise<Object>} Response with Jeeva modules data
+   */
+  async getJeevaModules() {
+    try {
+      console.log('🔄 UserCombinedAccessService: Fetching Jeeva modules...')
+
+      const response = await apiClient.get('/jeeva-modules')
+
+      if (response.data && response.data.success) {
+        console.log(
+          '✅ UserCombinedAccessService: Jeeva modules loaded:',
+          response.data.data?.length || 0
+        )
+        return {
+          success: true,
+          data: response.data.data
+        }
+      } else {
+        throw new Error(response.data?.message || 'Failed to load Jeeva modules')
+      }
+    } catch (error) {
+      console.error('❌ UserCombinedAccessService: Error fetching Jeeva modules:', error)
+      return {
+        success: false,
+        error: error.response?.data?.message || error.message || 'Failed to load Jeeva modules',
+        data: []
+      }
+    }
   }
 }
 

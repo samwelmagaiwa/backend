@@ -48,9 +48,11 @@ class DeviceInventoryController extends Controller
                 });
             }
 
-            // Sort by name by default
-            $sortBy = $request->get('sort_by', 'device_name');
-            $sortOrder = $request->get('sort_order', 'asc');
+            // Sort by validated column, default device_name
+            $allowedSorts = ['device_name', 'device_code', 'total_quantity', 'available_quantity', 'borrowed_quantity', 'created_at', 'updated_at'];
+            $requestedSort = $request->get('sort_by', 'device_name');
+            $sortBy = in_array($requestedSort, $allowedSorts, true) ? $requestedSort : 'device_name';
+            $sortOrder = $request->get('sort_order', 'asc') === 'desc' ? 'desc' : 'asc';
             $query->orderBy($sortBy, $sortOrder);
 
             // Pagination
@@ -59,8 +61,27 @@ class DeviceInventoryController extends Controller
 
             // Transform data for response
             $transformedDevices = $devices->getCollection()->map(function ($device) {
-                // Get return status information
-                $returnStatusInfo = $this->getDeviceReturnStatusInfo($device->id);
+                // Get return status information with defensive fallback if schema is missing
+                try {
+                    $returnStatusInfo = $this->getDeviceReturnStatusInfo($device->id);
+                } catch (\Illuminate\Database\QueryException $qe) {
+                    // SQLSTATE[42S22] = column not found; default to no bookings to avoid 500s
+                    if (str_contains($qe->getMessage(), '42S22')) {
+                        \Log::warning('Device return status aggregation skipped due to schema mismatch', [
+                            'device_id' => $device->id,
+                            'error' => $qe->getMessage()
+                        ]);
+                        $returnStatusInfo = [
+                            'summary' => 'no_bookings',
+                            'total_bookings' => 0,
+                            'returned_count' => 0,
+                            'compromised_count' => 0,
+                            'unreturned_count' => 0,
+                        ];
+                    } else {
+                        throw $qe;
+                    }
+                }
                 
                 return [
                     'id' => $device->id,
@@ -76,8 +97,8 @@ class DeviceInventoryController extends Controller
                     'can_borrow' => $device->isAvailable(),
                     'created_by' => $device->createdBy ? $device->createdBy->name : null,
                     'updated_by' => $device->updatedBy ? $device->updatedBy->name : null,
-                    'created_at' => $device->created_at->toISOString(),
-                    'updated_at' => $device->updated_at->toISOString(),
+                    'created_at' => optional($device->created_at)?->toISOString(),
+                    'updated_at' => optional($device->updated_at)?->toISOString(),
                     // Return status aggregated information
                     'return_status_summary' => $returnStatusInfo['summary'],
                     'unreturned_count' => $returnStatusInfo['unreturned_count'],
@@ -431,14 +452,17 @@ class DeviceInventoryController extends Controller
                     ->count(),
             ];
 
-            // Verify the formula: Available = Total - Borrowed
-            $calculatedAvailable = $totalInventory - $borrowedInventory;
-            if ($calculatedAvailable !== $availableInventory) {
+            // Verify the formula: Available = Total - Borrowed (normalize types to avoid false positives)
+            $ti = (int) $totalInventory;
+            $bi = (int) $borrowedInventory;
+            $ai = (int) $availableInventory;
+            $calculatedAvailable = $ti - $bi;
+            if ($calculatedAvailable !== $ai) {
                 Log::warning('Device inventory calculation mismatch', [
-                    'total_inventory' => $totalInventory,
-                    'borrowed_inventory' => $borrowedInventory,
+                    'total_inventory' => $ti,
+                    'borrowed_inventory' => $bi,
                     'calculated_available' => $calculatedAvailable,
-                    'actual_available' => $availableInventory
+                    'actual_available' => $ai
                 ]);
             }
 
@@ -487,6 +511,7 @@ class DeviceInventoryController extends Controller
      */
     private function getDeviceReturnStatusInfo(int $deviceId): array
     {
+        // NOTE: Use correct foreign key column name used by booking_service table
         $bookings = \App\Models\BookingService::where('device_inventory_id', $deviceId)
             ->whereIn('ict_approve', ['approved']) // Only count approved bookings
             ->get();

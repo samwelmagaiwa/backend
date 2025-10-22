@@ -832,8 +832,10 @@ class HeadOfItController extends Controller
                 'assigned_at' => now()
             ]);
 
-            // Update user access ICT Officer status to pending
+            // Update user access with assignee and assignment timestamp, and set ICT Officer status to pending
             $userAccess->update([
+                'assigned_ict_officer_id' => $request->ict_officer_user_id,
+                'task_assigned_at' => now(),
                 'ict_officer_status' => 'pending'
             ]);
 
