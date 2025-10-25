@@ -6,7 +6,7 @@
         <ModernSidebar />
       </div>
       <main class="flex-1 p-4 bg-blue-900 overflow-y-auto">
-        <div class="max-w-full mx-auto">
+        <div class="max-w-9xl mx-auto">
           <!-- Error Display -->
           <div
             v-if="error"
@@ -25,20 +25,20 @@
           <!-- Stats -->
           <div class="grid grid-cols-4 gap-4 mb-6">
             <div class="bg-yellow-600/25 border border-yellow-400/40 p-4 rounded-lg">
-              <h3 class="text-yellow-200 text-sm">Pending Divisional Approval</h3>
-              <p class="text-white text-2xl font-bold">{{ stats.pendingDivisional }}</p>
+              <h3 class="text-yellow-200 text-lg font-bold">Pending Divisional Approval</h3>
+              <p class="text-white text-4xl font-bold">{{ stats.pendingDivisional }}</p>
             </div>
             <div class="bg-green-600/25 border border-green-400/40 p-4 rounded-lg">
-              <h3 class="text-green-200 text-sm">Divisional Approved</h3>
-              <p class="text-white text-2xl font-bold">{{ stats.divisionalApproved }}</p>
+              <h3 class="text-green-200 text-lg font-bold">Divisional Approved</h3>
+              <p class="text-white text-4xl font-bold">{{ stats.divisionalApproved }}</p>
             </div>
             <div class="bg-red-600/25 border border-red-400/40 p-4 rounded-lg">
-              <h3 class="text-red-200 text-sm">Divisional Rejected</h3>
-              <p class="text-white text-2xl font-bold">{{ stats.divisionalRejected }}</p>
+              <h3 class="text-red-200 text-lg font-bold">Divisional Rejected</h3>
+              <p class="text-white text-4xl font-bold">{{ stats.divisionalRejected }}</p>
             </div>
             <div class="bg-blue-600/25 border border-blue-400/40 p-4 rounded-lg">
-              <h3 class="text-blue-200 text-sm">Total Requests</h3>
-              <p class="text-white text-2xl font-bold">{{ stats.total }}</p>
+              <h3 class="text-blue-200 text-lg font-bold">Total Requests</h3>
+              <p class="text-white text-4xl font-bold">{{ stats.total }}</p>
             </div>
           </div>
 
@@ -49,11 +49,11 @@
                 v-model="searchQuery"
                 type="text"
                 placeholder="Search by staff name, PF number, or department..."
-                class="flex-1 px-3 py-2 bg-white/20 border border-blue-300/30 rounded text-white placeholder-blue-200/60"
+                class="flex-1 px-4 py-3 bg-white/20 border border-blue-300/30 rounded text-white placeholder-blue-200/60 text-lg"
               />
               <select
                 v-model="statusFilter"
-                class="px-3 py-2 bg-white/20 border border-blue-300/30 rounded text-white"
+                class="px-4 py-3 bg-white/20 border border-blue-300/30 rounded text-white text-lg"
               >
                 <option value="">All Statuses</option>
                 <option value="pending">Pending Submission</option>
@@ -68,7 +68,7 @@
               </select>
               <button
                 @click="refreshRequests"
-                class="px-6 py-2 bg-teal-600 text-white rounded hover:bg-teal-700"
+                class="px-6 py-3 bg-teal-600 text-white rounded hover:bg-teal-700 text-lg font-bold"
               >
                 Refresh
               </button>
@@ -76,16 +76,22 @@
           </div>
 
           <!-- Requests Table -->
-          <div class="bg-white/10 rounded-lg overflow-visible relative z-50">
+          <div class="bg-white/10 rounded-lg overflow-visible relative">
             <table class="w-full">
               <thead class="bg-blue-800/50">
                 <tr>
-                  <th class="px-4 py-3 text-left text-blue-100">Request ID</th>
-                  <th class="px-4 py-3 text-left text-blue-100">Request Type</th>
-                  <th class="px-4 py-3 text-left text-blue-100">Personal Information</th>
-                  <th class="px-4 py-3 text-left text-blue-100">HOD Approval Date</th>
-                  <th class="px-4 py-3 text-left text-blue-100">Current Status</th>
-                  <th class="px-4 py-3 text-center text-blue-100">Actions</th>
+                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">Request ID</th>
+                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">Request Type</th>
+                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
+                    Personal Information
+                  </th>
+                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
+                    HOD Approval Date
+                  </th>
+                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
+                    Current Status
+                  </th>
+                  <th class="px-4 py-4 text-center text-blue-100 text-lg font-bold">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -95,31 +101,31 @@
                   class="border-t border-blue-300/20 hover:bg-blue-700/30"
                 >
                   <!-- Request ID -->
-                  <td class="px-4 py-3">
-                    <div class="text-white font-medium">
+                  <td class="px-4 py-4">
+                    <div class="text-white font-bold text-lg">
                       {{ request.request_id || `REQ-${request.id.toString().padStart(6, '0')}` }}
                     </div>
-                    <div class="text-purple-300 text-xs">ID: {{ request.id }}</div>
+                    <div class="text-purple-300 text-base">ID: {{ request.id }}</div>
                   </td>
 
                   <!-- Request Type -->
-                  <td class="px-4 py-3">
+                  <td class="px-4 py-4">
                     <div class="flex flex-wrap gap-1">
                       <span
                         v-if="hasService(request, 'jeeva')"
-                        class="px-2 py-1 rounded text-xs bg-blue-100 text-blue-800"
+                        class="px-3 py-1.5 rounded text-base font-bold bg-blue-100 text-blue-800"
                       >
                         Jeeva
                       </span>
                       <span
                         v-if="hasService(request, 'wellsoft')"
-                        class="px-2 py-1 rounded text-xs bg-green-100 text-green-800"
+                        class="px-3 py-1.5 rounded text-base font-bold bg-green-100 text-green-800"
                       >
                         Wellsoft
                       </span>
                       <span
                         v-if="hasService(request, 'internet')"
-                        class="px-2 py-1 rounded text-xs bg-cyan-100 text-cyan-800"
+                        class="px-3 py-1.5 rounded text-base font-bold bg-cyan-100 text-cyan-800"
                       >
                         Internet
                       </span>
@@ -127,39 +133,39 @@
                   </td>
 
                   <!-- Personal Information -->
-                  <td class="px-4 py-3">
-                    <div class="text-white font-medium">
+                  <td class="px-4 py-4">
+                    <div class="text-white font-bold text-lg">
                       {{ request.staff_name || request.full_name || 'Unknown User' }}
                     </div>
-                    <div class="text-blue-300 text-sm">
+                    <div class="text-blue-300 text-base">
                       {{ request.phone || request.phone_number || 'No phone' }}
                     </div>
-                    <div v-if="request.pf_number" class="text-teal-300 text-xs">
+                    <div v-if="request.pf_number" class="text-teal-300 text-base">
                       PF: {{ request.pf_number }}
                     </div>
-                    <div class="text-blue-200 text-xs">
+                    <div class="text-blue-200 text-base">
                       Dept: {{ request.department || 'Unknown' }}
                     </div>
                   </td>
 
                   <!-- HOD Approval Date -->
-                  <td class="px-4 py-3">
-                    <div class="text-white font-medium">
+                  <td class="px-4 py-4">
+                    <div class="text-white font-bold text-lg">
                       {{ formatDate(request.hod_approved_at || request.hod_approval_date) }}
                     </div>
-                    <div class="text-blue-300 text-xs">
+                    <div class="text-blue-300 text-base">
                       {{ formatTime(request.hod_approved_at || request.hod_approval_date) }}
                     </div>
                   </td>
 
                   <!-- Current Status -->
-                  <td class="px-4 py-3">
+                  <td class="px-4 py-4">
                     <div class="flex flex-col">
                       <!-- Display the exact database status -->
                       <span
                         :class="getStatusBadgeClass(request.status)"
-                        class="rounded text-xs font-medium inline-block"
-                        :style="{ padding: '2px 6px', width: 'fit-content' }"
+                        class="rounded text-base font-bold inline-block"
+                        :style="{ padding: '6px 12px', width: 'fit-content' }"
                       >
                         {{ getStatusText(request.status) }}
                       </span>
@@ -227,8 +233,8 @@
 
             <!-- Empty State -->
             <div v-if="filteredRequests.length === 0" class="text-center py-12">
-              <h3 class="text-white text-lg font-medium mb-2">No requests found</h3>
-              <p class="text-blue-300">
+              <h3 class="text-white text-2xl font-bold mb-2">No requests found</h3>
+              <p class="text-blue-300 text-lg">
                 {{
                   searchQuery || statusFilter
                     ? 'No HOD-approved requests from your department are pending your approval.'
@@ -239,7 +245,7 @@
 
             <!-- Pagination -->
             <div v-if="filteredRequests.length > 0" class="px-4 py-3 border-t border-blue-300/30">
-              <div class="text-blue-300 text-sm">
+              <div class="text-blue-300 text-lg font-bold">
                 Showing {{ filteredRequests.length }} of {{ requests.length }} requests
               </div>
             </div>
@@ -264,7 +270,7 @@
             class="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"
           ></div>
         </div>
-        <p class="text-blue-100 font-medium">Loading requests...</p>
+        <p class="text-blue-100 font-bold text-xl">Loading requests...</p>
       </div>
     </div>
 
@@ -275,6 +281,76 @@
       @close="closeTimeline"
       @updated="handleTimelineUpdate"
     />
+
+    <!-- Cancel Confirmation Modal -->
+    <div
+      v-if="showCancelModal"
+      class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4"
+      @click.self="closeCancelModal"
+    >
+      <div
+        class="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl shadow-2xl max-w-md w-full p-6 border-2 border-blue-400/40 transform transition-all duration-300 animate-scale-up"
+      >
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 bg-red-500/20 rounded-full flex items-center justify-center">
+              <i class="fas fa-exclamation-triangle text-red-300 text-xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white">Confirm Cancellation</h3>
+          </div>
+          <button
+            @click="closeCancelModal"
+            class="text-blue-200 hover:text-white transition-colors duration-200"
+          >
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+
+        <!-- Content -->
+        <div class="mb-6">
+          <p class="text-blue-100 text-lg mb-4 leading-relaxed font-medium">
+            Are you sure you want to cancel this request? This action cannot be undone.
+          </p>
+          <div class="bg-blue-800/40 rounded-lg p-3 border border-blue-400/30">
+            <label class="block text-base font-semibold text-blue-200 mb-2">
+              Cancellation Reason <span class="text-red-400">*</span>
+            </label>
+            <textarea
+              v-model="cancelReason"
+              placeholder="Please provide a reason for cancellation..."
+              class="w-full px-3 py-2 bg-white border-2 border-blue-300/50 rounded-lg focus:border-blue-400 focus:outline-none text-gray-900 placeholder-gray-400 transition-all duration-300 resize-none text-base"
+              rows="3"
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex gap-3">
+          <button
+            @click="closeCancelModal"
+            class="flex-1 px-4 py-2.5 bg-blue-800/50 text-white rounded-lg hover:bg-blue-800 transition-all duration-300 font-semibold border border-blue-400/30 text-base"
+          >
+            <i class="fas fa-arrow-left mr-2"></i>
+            Keep Request
+          </button>
+          <button
+            @click="confirmCancel"
+            :disabled="!cancelReason || cancelReason.trim() === '' || isCancelling"
+            class="flex-1 px-4 py-2.5 rounded-lg transition-all duration-300 font-semibold flex items-center justify-center text-base"
+            :class="
+              !cancelReason || cancelReason.trim() === '' || isCancelling
+                ? 'bg-gray-500 text-gray-300 cursor-not-allowed opacity-50'
+                : 'bg-red-600 text-white hover:bg-red-700 shadow-lg hover:shadow-xl transform hover:scale-105'
+            "
+          >
+            <i v-if="isCancelling" class="fas fa-spinner fa-spin mr-2"></i>
+            <i v-else class="fas fa-times-circle mr-2"></i>
+            {{ isCancelling ? 'Cancelling...' : 'Cancel Request' }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -317,8 +393,16 @@
         // Timeline modal state
         showTimeline: false,
         selectedRequestId: null,
+        // Cancel modal state
+        showCancelModal: false,
+        requestToCancel: null,
+        cancelReason: '',
+        isCancelling: false,
         // Add status utilities for consistent status handling
-        $statusUtils: statusUtils
+        $statusUtils: statusUtils,
+        // Debounce handling
+        fetchTimeout: null,
+        isFetchingData: false
       }
     },
     computed: {
@@ -359,12 +443,22 @@
     async mounted() {
       try {
         console.log('DivisionalRequestList: Component mounted, initializing...')
-        await this.fetchRequests()
+        const token = localStorage.getItem('auth_token')
+        if (!token) {
+          console.log('DivisionalRequestList: waiting for auth-ready event before fetching...')
+          this.isLoading = true
+          window.addEventListener('auth-ready', this.onAuthReady, { once: true })
+        } else {
+          await this.fetchRequests()
+          console.log('DivisionalRequestList: Component initialized successfully')
+        }
+
+        // Poll periodically to reflect user-side cancellations (silent to avoid blocking UI)
+        // Delay first poll to avoid immediate duplicate request
+        this._poller = setInterval(() => this.fetchRequests({ silent: true }), 30000)
 
         // Add click listener to close dropdowns when clicking outside
         document.addEventListener('click', this.closeAllDropdowns)
-
-        console.log('DivisionalRequestList: Component initialized successfully')
       } catch (error) {
         console.error('DivisionalRequestList: Error during mount:', error)
         this.error = 'Failed to initialize component: ' + error.message
@@ -375,11 +469,27 @@
     beforeUnmount() {
       // Clean up event listeners
       document.removeEventListener('click', this.closeAllDropdowns)
+      if (this._poller) clearInterval(this._poller)
+      window.removeEventListener('auth-ready', this.onAuthReady)
     },
     methods: {
-      async fetchRequests() {
-        this.isLoading = true
-        this.error = null
+      onAuthReady() {
+        console.log('DivisionalRequestList: auth-ready received; fetching requests...')
+        this.fetchRequests()
+      },
+
+      async fetchRequests(options = { silent: false }) {
+        // Prevent multiple simultaneous fetches
+        if (this.isFetchingData) {
+          console.log('Fetch already in progress, skipping...')
+          return
+        }
+
+        this.isFetchingData = true
+        if (!options?.silent) {
+          this.isLoading = true
+          this.error = null
+        }
 
         try {
           console.log('Fetching combined access requests for Divisional Director approval...')
@@ -407,13 +517,28 @@
             throw new Error(response.error || 'Failed to fetch requests')
           }
         } catch (error) {
+          // Ignore abort errors from rapid clicks or navigation
+          if (
+            error.message === 'Request aborted' ||
+            error.message?.includes('aborted') ||
+            error.message?.includes('canceled')
+          ) {
+            // Silently ignore aborted requests - no logging, no error display
+            this.isFetchingData = false
+            if (!options?.silent) this.isLoading = false
+            return
+          }
+
           console.error('Error fetching requests:', error)
-          this.error =
-            'Unable to load combined access requests. Please check your connection and try again.'
+          if (!options?.silent) {
+            this.error =
+              'Unable to load combined access requests. Please check your connection and try again.'
+          }
           this.requests = []
           this.calculateStats()
         } finally {
-          this.isLoading = false
+          this.isFetchingData = false
+          if (!options?.silent) this.isLoading = false
         }
       },
 
@@ -455,7 +580,14 @@
       },
 
       async refreshRequests() {
-        await this.fetchRequests()
+        // Debounce rapid refresh clicks
+        if (this.fetchTimeout) {
+          clearTimeout(this.fetchTimeout)
+        }
+
+        this.fetchTimeout = setTimeout(() => {
+          this.fetchRequests()
+        }, 300)
       },
 
       viewAndProcessRequest(requestId) {
@@ -468,32 +600,47 @@
         this.$router.push(`/divisional-dashboard/both-service-form/${requestId}?mode=edit`)
       },
 
-      async cancelRequest(requestId) {
+      cancelRequest(requestId) {
+        // Open cancel confirmation modal
+        this.requestToCancel = requestId
+        this.showCancelModal = true
+        this.cancelReason = ''
+      },
+
+      closeCancelModal() {
+        this.showCancelModal = false
+        this.requestToCancel = null
+        this.cancelReason = ''
+        this.isCancelling = false
+      },
+
+      async confirmCancel() {
+        if (!this.cancelReason || this.cancelReason.trim() === '') {
+          return
+        }
+
+        this.isCancelling = true
+
         try {
-          const confirmed = confirm(
-            'Are you sure you want to cancel this request? This action cannot be undone.'
+          console.log('Cancelling request:', this.requestToCancel)
+
+          const response = await divisionalAccessService.cancelRequest(
+            this.requestToCancel,
+            this.cancelReason.trim()
           )
-          if (!confirmed) return
-
-          const reason = prompt('Please provide a reason for cancellation:')
-          if (!reason || reason.trim() === '') {
-            alert('Cancellation reason is required')
-            return
-          }
-
-          console.log('Cancelling request:', requestId)
-
-          const response = await divisionalAccessService.cancelRequest(requestId, reason)
 
           if (response.success) {
             // Update local state
-            const requestIndex = this.requests.findIndex((r) => r.id === requestId)
+            const requestIndex = this.requests.findIndex((r) => r.id === this.requestToCancel)
             if (requestIndex !== -1) {
               this.requests[requestIndex].divisional_status = 'cancelled'
               this.requests[requestIndex].status = 'cancelled'
             }
 
             this.calculateStats()
+            this.closeCancelModal()
+
+            // Show success message
             alert('Request cancelled successfully!')
           } else {
             throw new Error(response.error || 'Failed to cancel request')
@@ -501,6 +648,7 @@
         } catch (error) {
           console.error('Error cancelling request:', error)
           alert('Error cancelling request: ' + error.message)
+          this.isCancelling = false
         }
       },
 
@@ -591,21 +739,15 @@
         const actions = []
         const status = request.status
 
-        // Main action: View & Process
+        // Main action: Approve
         actions.push({
           key: 'view_and_process',
-          label: 'View & Process',
-          icon: 'fas fa-eye'
+          label: 'Approve',
+          icon: 'fas fa-check-circle',
+          color: 'green'
         })
 
-        // Edit action for editable requests
-        if (this.canEdit(request)) {
-          actions.push({
-            key: 'edit_request',
-            label: 'Edit Request',
-            icon: 'fas fa-edit'
-          })
-        }
+        // Divisional Director cannot edit requests - removed edit action
 
         // Cancel action for cancellable requests
         if (this.canCancel(request)) {
@@ -725,18 +867,39 @@
 </script>
 
 <style scoped>
-  .sidebar-narrow {
-    /* Force the sidebar to be narrower */
-    max-width: 200px;
-  }
-
-  /* Override the sidebar width classes for this component */
+  /* Override the sidebar width for this component to be wider */
   .sidebar-narrow :deep(.sidebar-expanded) {
-    width: 200px !important;
+    width: 20.5rem !important;
   }
 
   .sidebar-narrow :deep(.sidebar-collapsed) {
     width: 64px !important;
+  }
+
+  /* Ensure sidebar maintains flexbox layout for bottom buttons */
+  .sidebar-narrow :deep(aside) {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100vh !important;
+  }
+
+  .sidebar-narrow :deep(aside > div) {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+  }
+
+  .sidebar-narrow :deep(nav) {
+    flex: 1 !important;
+    min-height: 0 !important;
+    max-height: calc(100vh - 350px) !important;
+    overflow-y: auto !important;
+  }
+
+  .sidebar-narrow :deep(.bottom-section) {
+    margin-top: auto !important;
+    flex-shrink: 0 !important;
+    padding-bottom: 1rem !important;
   }
 
   /* Three-dot menu enhancements */
@@ -814,11 +977,17 @@
     z-index: 10;
   }
 
-  /* Make sure table doesn't clip dropdown */
+  /* Make sure table doesn't clip dropdown but stays below header */
   table {
     position: relative;
     z-index: 1;
     overflow: visible;
+  }
+
+  /* Ensure main content doesn't block header dropdowns */
+  main {
+    position: relative;
+    z-index: 1;
   }
 
   @keyframes dropdownFadeIn {

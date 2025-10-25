@@ -44,6 +44,19 @@ class DivisionalAccessService {
         throw new Error(response.data?.message || 'Failed to retrieve Divisional requests')
       }
     } catch (error) {
+      // Silently ignore abort errors
+      if (
+        error.message === 'Request aborted' ||
+        error.message?.includes('aborted') ||
+        error.message?.includes('canceled')
+      ) {
+        return {
+          success: false,
+          error: 'Request aborted',
+          data: null
+        }
+      }
+
       console.error('❌ Error fetching Divisional requests:', error)
       return {
         success: false,

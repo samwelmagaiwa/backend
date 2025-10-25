@@ -420,13 +420,13 @@
                           }"
                         >
                           <label
-                            class="block text-xs font-bold text-blue-100 mb-1 text-center flex items-center justify-center gap-2"
+                            class="block text-xs font-bold text-blue-100 mb-1 text-center uppercase"
                           >
                             <i class="fas fa-toggle-on mr-1 text-blue-300 text-xs"></i>
                             Module Requested for
                             <span class="text-red-400">*</span>
                             <span
-                              v-if="isReviewMode && !hasWellsoftRequest && !hasJeevaRequest"
+                              v-if="isReviewMode && !hasWellsoftRequest && !hasJeevaRequest && !isHodApprovalEditable"
                               class="text-xs px-2 py-1 bg-gray-500/30 rounded-full text-gray-300"
                             >
                               <i class="fas fa-lock text-xs mr-1"></i>
@@ -438,7 +438,7 @@
                               class="flex items-center cursor-pointer px-2 py-1 rounded-lg transition-all border min-w-12"
                               :class="{
                                 'hover:bg-blue-500/20': !isFormSectionReadOnly,
-                                'bg-amber-500/20 border-amber-400/40 text-amber-200 shadow-md ring-1 ring-amber-400/30':
+                                'bg-red-500/30 border-2 border-red-400/50 text-white shadow-lg ring-2 ring-red-400/40':
                                   isFormSectionReadOnly && wellsoftRequestType === 'use',
                                 'bg-white/5 border-white/10 text-blue-200/80':
                                   isFormSectionReadOnly && wellsoftRequestType !== 'use',
@@ -450,8 +450,8 @@
                                 v-model="wellsoftRequestType"
                                 type="radio"
                                 value="use"
-                                :disabled="
-                                  (isReviewMode && !hasWellsoftRequest && !hasJeevaRequest) ||
+                              :disabled="
+                                  (isReviewMode && !hasWellsoftRequest && !hasJeevaRequest && !isHodApprovalEditable) ||
                                   isFormSectionReadOnly
                                 "
                                 :class="[
@@ -466,7 +466,7 @@
                               <span
                                 class="text-xs font-semibold flex items-center"
                                 :class="{
-                                  'text-amber-200':
+                                  'text-white':
                                     isFormSectionReadOnly && wellsoftRequestType === 'use',
                                   'text-blue-100':
                                     !isFormSectionReadOnly || wellsoftRequestType !== 'use'
@@ -475,7 +475,7 @@
                                 <i
                                   class="fas fa-plus-circle mr-1 text-xs"
                                   :class="{
-                                    'text-amber-400':
+                                    'text-white':
                                       isFormSectionReadOnly && wellsoftRequestType === 'use',
                                     'text-green-400':
                                       !isFormSectionReadOnly || wellsoftRequestType !== 'use'
@@ -488,7 +488,7 @@
                               class="flex items-center cursor-pointer px-2 py-1 rounded-lg transition-all border min-w-12"
                               :class="{
                                 'hover:bg-red-500/20': !isFormSectionReadOnly,
-                                'bg-amber-500/20 border-amber-400/40 text-amber-200 shadow-md ring-1 ring-amber-400/30':
+                                'bg-red-500/30 border-2 border-red-400/50 text-white shadow-lg ring-2 ring-red-400/40':
                                   isFormSectionReadOnly && wellsoftRequestType === 'revoke',
                                 'bg-white/5 border-white/10 text-blue-200/80':
                                   isFormSectionReadOnly && wellsoftRequestType !== 'revoke',
@@ -500,8 +500,8 @@
                                 v-model="wellsoftRequestType"
                                 type="radio"
                                 value="revoke"
-                                :disabled="
-                                  (isReviewMode && !hasWellsoftRequest && !hasJeevaRequest) ||
+                              :disabled="
+                                  (isReviewMode && !hasWellsoftRequest && !hasJeevaRequest && !isHodApprovalEditable) ||
                                   isFormSectionReadOnly
                                 "
                                 :class="[
@@ -516,7 +516,7 @@
                               <span
                                 class="text-xs font-semibold flex items-center"
                                 :class="{
-                                  'text-amber-200':
+                                  'text-white':
                                     isFormSectionReadOnly && wellsoftRequestType === 'revoke',
                                   'text-blue-100':
                                     !isFormSectionReadOnly || wellsoftRequestType !== 'revoke'
@@ -525,7 +525,7 @@
                                 <i
                                   class="fas fa-minus-circle mr-1 text-xs"
                                   :class="{
-                                    'text-amber-400':
+                                    'text-white':
                                       isFormSectionReadOnly && wellsoftRequestType === 'revoke',
                                     'text-red-400':
                                       !isFormSectionReadOnly || wellsoftRequestType !== 'revoke'
@@ -593,17 +593,17 @@
                           <div class="flex items-center justify-center gap-3">
                             <span
                               v-if="(requestData?.access_type || hodAccessType) === 'permanent'"
-                              class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-semibold bg-green-600/20 text-green-200 border border-green-400/30"
+                              class="inline-flex items-center px-3 py-2 rounded-lg text-xs font-bold bg-red-500/30 text-white border-2 border-red-400/50 shadow-lg ring-2 ring-red-400/40"
                             >
-                              <i class="fas fa-check-circle mr-1 text-green-300"></i>
+                              <i class="fas fa-infinity mr-1 text-white"></i>
                               Permanent (until retirement)
                             </span>
                             <span
                               v-else
-                              class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-semibold bg-amber-600/20 text-amber-200 border border-amber-400/30"
+                              class="inline-flex items-center px-3 py-2 rounded-lg text-xs font-bold bg-red-500/30 text-white border-2 border-red-400/50 shadow-lg ring-2 ring-red-400/40"
                             >
-                              <i class="fas fa-hourglass-half mr-1 text-amber-300"></i>
-                              Temporary until
+                              <i class="fas fa-hourglass-half mr-1 text-white"></i>
+                              Temporary Until:
                               <span class="ml-1 font-bold">
                                 {{ hodTemporaryUntil || formatDateForInput(requestData?.temporary_until) || 'N/A' }}
                               </span>
@@ -621,10 +621,11 @@
                             Signature <span class="text-red-400">*</span>
                           </label>
 
-                          <!-- Review mode: Show signature status from database -->
+                          <!-- Review mode: Show staff signature status -->
                           <div
                             v-if="isReviewMode"
-                            class="w-full px-1 py-1 border-2 border-blue-300/40 rounded-lg bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 flex items-center justify-center min-h-[35px]"
+                            class="w-full px-1 py-0.5 border-2 rounded-lg backdrop-blur-sm transition-all duration-300 shadow-lg flex items-center justify-center min-h-[28px]"
+                            :class="hasSignature ? 'border-green-400/50 bg-green-500/10' : 'border-blue-300/40 bg-white/15 hover:shadow-xl hover:shadow-blue-500/20'"
                           >
                             <!-- Loading state -->
                             <div v-if="loading" class="text-center">
@@ -634,19 +635,12 @@
                             <!-- Loaded state -->
                             <div v-else class="text-center">
                               <div v-if="hasSignature">
-                                <i class="fas fa-check-circle text-green-400 text-sm"></i>
-                                <p
-                                  class="text-green-300 text-xs font-semibold flex items-center justify-center gap-1 mt-0.5"
-                                >
-                                  <i class="fas fa-check text-xs"></i>
-                                  Signed
-                                </p>
-                                <p
-                                  v-if="requestData?.signature_path"
-                                  class="text-blue-200 text-xs mt-0.5 truncate"
-                                >
-                                  File: {{ getSignatureFileName(requestData.signature_path) }}
-                                </p>
+                                <div class="flex items-center justify-center gap-1">
+                                  <i class="fas fa-check-circle text-green-400 text-sm"></i>
+                                  <p class="text-green-300 text-xs font-bold">
+                                    Staff Signed
+                                  </p>
+                                </div>
                               </div>
                               <div v-else>
                                 <i class="fas fa-signature text-blue-300 text-sm"></i>
@@ -676,7 +670,7 @@
 
                           <!-- Edit mode: Show uploaded signature preview -->
                           <div
-                            v-else-if="!isReviewMode"
+                            v-else
                             class="w-full px-1 py-1 border-2 border-blue-300/40 rounded-lg bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 flex items-center justify-center relative min-h-[35px]"
                           >
                             <div v-if="isImage(signaturePreview)" class="text-center">
@@ -721,7 +715,7 @@
                           </div>
 
                           <input
-                            v-if="!isReviewMode"
+                            v-if="!isReviewMode || canUploadHodSignature"
                             ref="signatureInput"
                             type="file"
                             accept="image/png,image/jpeg,application/pdf"
@@ -733,8 +727,10 @@
                     </div>
 
                     <!-- HOD Module Selection Section - Jeeva and Wellsoft Side by Side -->
+                    <!-- Show to HOD users when they can edit OR when viewing staff's request in review mode -->
+                    <!-- Always show both Jeeva and Wellsoft sections so HOD can see all modules (selected and unselected) -->
                     <div
-                      v-if="isHodApprovalEditable && (hasJeevaRequest || hasWellsoftRequest)"
+                      v-if="isHodApprovalEditable || (isReviewMode && getUserRole()?.toLowerCase() === 'head_of_department')"
                       class="mt-2"
                     >
                       <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 relative">
@@ -744,7 +740,8 @@
                         ></div>
 
                         <!-- Jeeva Modules (Left Side - Takes 2 columns) -->
-                        <div v-if="hasJeevaRequest" class="lg:col-span-2">
+                        <!-- Always show to HOD so they can see all modules even if service wasn't selected -->
+                        <div class="lg:col-span-2">
                           <div
                             class="bg-white/10 rounded-lg border border-purple-300/30 p-4 w-full h-auto"
                           >
@@ -767,24 +764,46 @@
                               <label
                                 v-for="module in jeevaModules"
                                 :key="'jeeva-' + module"
-                                class="flex items-center cursor-pointer text-xs hover:bg-white/10 p-0.5 rounded transition-colors leading-none"
+                                :class="[
+                                  'flex items-center text-xs p-0.5 rounded transition-colors leading-none',
+                                  isFormSectionReadOnly ? 'cursor-default' : 'cursor-pointer hover:bg-white/10',
+                                  selectedJeeva.includes(module) && isFormSectionReadOnly 
+                                    ? 'bg-red-500/30 border-2 border-red-400/50 shadow-md ring-1 ring-red-400/40' 
+                                    : selectedJeeva.includes(module) 
+                                      ? 'bg-purple-500/20 border border-purple-400/30' 
+                                      : 'border border-transparent'
+                                ]"
                               >
                                 <input
                                   v-model="selectedJeeva"
                                   :value="module"
                                   type="checkbox"
+                                  :disabled="isFormSectionReadOnly"
                                   class="w-3 h-3 text-red-600 accent-red-600 mr-1 flex-shrink-0"
                                 />
-                                <span class="text-purple-100 text-xs leading-none">{{
+                                <span 
+                                  :class="[
+                                    'text-xs leading-none',
+                                    selectedJeeva.includes(module) && isFormSectionReadOnly 
+                                      ? 'text-red-100 font-semibold' 
+                                      : 'text-purple-100'
+                                  ]"
+                                >{{
                                   module
                                 }}</span>
+                                <i 
+                                  v-if="selectedJeeva.includes(module) && isFormSectionReadOnly"
+                                  class="fas fa-check-circle text-red-400 text-xs ml-auto"
+                                  title="Selected by staff"
+                                ></i>
                               </label>
                             </div>
                           </div>
                         </div>
 
                         <!-- Wellsoft Modules (Right Side - Takes 1 column) -->
-                        <div v-if="hasWellsoftRequest" class="lg:col-span-1">
+                        <!-- Always show to HOD so they can see all modules even if service wasn't selected -->
+                        <div class="lg:col-span-1">
                           <div
                             class="bg-white/10 rounded-lg border border-amber-300/30 p-4 w-full h-auto"
                           >
@@ -807,17 +826,38 @@
                               <label
                                 v-for="module in wellsoftModules"
                                 :key="'wellsoft-' + module"
-                                class="flex items-center cursor-pointer text-xs hover:bg-white/10 p-1.5 rounded transition-colors"
+                                :class="[
+                                  'flex items-center text-xs p-1.5 rounded transition-colors',
+                                  isFormSectionReadOnly ? 'cursor-default' : 'cursor-pointer hover:bg-white/10',
+                                  selectedWellsoft.includes(module) && isFormSectionReadOnly 
+                                    ? 'bg-red-500/30 border-2 border-red-400/50 shadow-md ring-1 ring-red-400/40' 
+                                    : selectedWellsoft.includes(module) 
+                                      ? 'bg-amber-500/20 border border-amber-400/30' 
+                                      : 'border border-transparent'
+                                ]"
                               >
                                 <input
                                   v-model="selectedWellsoft"
                                   :value="module"
                                   type="checkbox"
+                                  :disabled="isFormSectionReadOnly"
                                   class="w-3 h-3 text-red-600 accent-red-600 mr-2 flex-shrink-0"
                                 />
-                                <span class="text-amber-100 text-xs leading-tight">{{
+                                <span 
+                                  :class="[
+                                    'text-xs leading-tight',
+                                    selectedWellsoft.includes(module) && isFormSectionReadOnly 
+                                      ? 'text-red-100 font-semibold' 
+                                      : 'text-amber-100'
+                                  ]"
+                                >{{
                                   module
                                 }}</span>
+                                <i 
+                                  v-if="selectedWellsoft.includes(module) && isFormSectionReadOnly"
+                                  class="fas fa-check-circle text-red-400 text-xs ml-auto"
+                                  title="Selected by staff"
+                                ></i>
                               </label>
                             </div>
                           </div>
@@ -826,7 +866,9 @@
                     </div>
 
                     <!-- HOD Comments + Internet Purposes Section (with visual divider and gap) -->
-                    <div class="mt-4 mb-2" v-if="!isReviewMode || isHodApprovalEditable">
+                    <!-- Show to HOD users or when not in review mode or when HOD can edit -->
+                    <!-- Hide in strict view mode and during loading -->
+                    <div class="mt-4 mb-2" v-if="!loading && !isStrictViewMode && (!isReviewMode || isHodApprovalEditable || (isReviewMode && getUserRole()?.toLowerCase() === 'head_of_department'))">
                       <div class="medical-card bg-gradient-to-r from-blue-600/15 to-indigo-600/15 border-2 border-blue-400/40 rounded-lg p-3">
                         <div :class="['grid items-start', hasInternetRequest ? 'grid-cols-1 lg:grid-cols-2 gap-6' : 'grid-cols-1 gap-3']">
                           <!-- Left: Internet Purposes (own outer wrap) -->
@@ -855,11 +897,14 @@
                           <!-- Right: HOD Comments (own outer wrap) -->
                           <div class="h-full">
                             <div class="bg-white/5 rounded-lg border border-blue-300/20 p-3 h-full">
-                              <label class="block text-blue-100 text-sm mb-1">HOD Comments</label>
+                              <label class="block text-blue-100 text-sm mb-1">
+                                HOD Comments <span class="text-red-400">*</span>
+                              </label>
                               <textarea
                                 v-model="hodComments"
-                                :disabled="isReviewMode && !isHodApprovalEditable"
-                                class="w-full h-20 bg-white/10 border border-blue-300/30 rounded-lg p-2 text-white placeholder-blue-300/60 text-sm resize-none"
+                                :disabled="false"
+                                required
+                                class="w-full h-20 bg-white/10 border border-blue-300/30 rounded-lg p-2 text-white placeholder-blue-300/60 text-sm resize-none overflow-hidden"
                                 placeholder="HOD specify access category here..."
                                 rows="3"
                               ></textarea>
@@ -869,11 +914,11 @@
                       </div>
                     </div>
 
-                  <!-- Previous Comments Section - Show modules summary and comments for non-HOD users in review mode -->
-                  <!-- HOD users will see full module selection tabs instead -->
+                  <!-- Previous Comments Section - Show modules summary and comments for all users in review mode -->
+                  <!-- Always show Review Summary to provide visibility of what was originally requested -->
 
                   <div
-                    v-if="requestData && !loading && !isHodApprovalEditable"
+                    v-if="requestData && !loading"
                     v-show="!loading"
                     :class="[
                       'medical-card bg-gradient-to-r from-amber-600/15 to-orange-600/15 border-2 border-amber-400/40 rounded-lg backdrop-blur-sm hover:shadow-lg hover:shadow-amber-500/20 transition-all duration-300 group mb-4',
@@ -1360,15 +1405,19 @@
                           <i class="fas fa-check-circle text-white text-sm"></i>
                         </div>
                         <h3
-                          class="text-sm font-bold text-white flex items-center cursor-pointer select-none"
-                          @click="showApprovalSections = !showApprovalSections"
+                          :class="[
+                            'text-sm font-bold text-white flex items-center',
+                            isStrictViewMode ? 'select-none' : 'cursor-pointer select-none'
+                          ]"
+                          @click="!isStrictViewMode && (showApprovalSections = !showApprovalSections)"
                           :aria-expanded="showApprovalSections ? 'true' : 'false'"
                           :aria-controls="'approval-sections'"
-                          title="Toggle approval sections"
+                          :title="isStrictViewMode ? 'Approval information' : 'Toggle approval sections'"
                         >
                           <i class="fas fa-clipboard-check mr-1 text-blue-300"></i>
-<span>Click here to Approve</span>
+                          <span>{{ isStrictViewMode ? 'Approvals' : 'Click here to Approve' }}</span>
                           <i
+                            v-if="!isStrictViewMode"
                             :class="['fas', showApprovalSections ? 'fa-chevron-up' : 'fa-chevron-down']"
                             class="ml-1"
                           ></i>
@@ -1378,7 +1427,7 @@
 
                     <div
                       id="approval-sections"
-                      v-show="showApprovalSections"
+                      v-show="isStrictViewMode || showApprovalSections"
                       :class="[
                         'grid grid-cols-1 lg:grid-cols-3',
                         isDivisionalDirectorUser
@@ -1392,8 +1441,7 @@
                       <div
                         :class="[
                           'bg-white/15 rounded-lg border border-blue-300/30 backdrop-blur-sm',
-                          isDivisionalDirectorUser ? 'p-3' : isHodApprovalEditable ? 'p-3' : 'p-2',
-                          { 'opacity-50': !isHodApprovalEditable }
+                          isDivisionalDirectorUser ? 'p-3' : isHodApprovalEditable ? 'p-3' : 'p-2'
                         ]"
                       >
                         <h5
@@ -1418,14 +1466,14 @@
                         </h5>
                         <div class="space-y-3">
                           <div>
-                            <label class="block text-xs font-medium text-blue-100 mb-1">Name<span class="text-red-400">*</span></label>
+                            <label class="block text-xs font-semibold text-white mb-1">Name<span class="text-red-400">*</span></label>
                             <div class="relative">
                               <input
                                 v-model="form.approvals.hod.name"
                                 type="text"
                                 readonly
                                 :placeholder="getApprovalNamePlaceholder('hod')"
-                                class="medical-input w-full px-3 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm cursor-not-allowed"
+                                class="medical-input w-full px-3 py-2 bg-white/30 border-2 border-blue-300/50 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-100/80 backdrop-blur-sm cursor-not-allowed font-medium"
                                 :title="getApprovalNameTitle('hod')"
                               />
                               <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
@@ -1437,7 +1485,7 @@
                             </div>
                           </div>
                           <div>
-                            <label class="block text-xs font-medium text-blue-100 mb-1">Signature<span class="text-red-400">*</span></label>
+                            <label class="block text-xs font-semibold text-white mb-1">Signature<span class="text-red-400">*</span></label>
                             <div class="relative">
                               <!-- Debug: Show which template condition is active -->
                               <!-- {{ console.log('🖼️ HOD Template Debug:', { shouldShowHodSignedIndicator, shouldShowHodNoSignatureIndicator, hodSignaturePreview, isReviewMode }) }} -->
@@ -1626,8 +1674,8 @@
                                   </div>
                                 </div>
 
-                                <!-- Keep upload button section for when user can edit -->
-                                <div class="text-center mt-2">
+                                <!-- Keep upload button section for when user can edit and signature is not already uploaded -->
+                                <div v-if="requestData?.approvals?.hod?.signature_status !== 'Signed'" class="text-center mt-2">
                                   <button
                                     v-if="canUploadHodSignature"
                                     type="button"
@@ -1649,14 +1697,14 @@
                             </div>
                           </div>
                           <div>
-                            <label class="block text-xs font-medium text-blue-100 mb-1">Date (mm/dd/yyyy)<span class="text-red-400">*</span></label>
+                            <label class="block text-xs font-semibold text-white mb-1">Date (mm/dd/yyyy)<span class="text-red-400">*</span></label>
                             <div class="relative">
                               <input
                                 v-model="form.approvals.hod.date"
                                 type="date"
                                 :readonly="true"
                                 :class="[
-                                  'medical-input w-full px-3 py-2 bg-white/15 border rounded-lg focus:outline-none text-white backdrop-blur-sm cursor-not-allowed',
+                                  'medical-input w-full px-3 py-2 bg-white/30 border-2 rounded-lg focus:outline-none text-white backdrop-blur-sm cursor-not-allowed font-medium',
                                   shouldShowHodSignedIndicator
                                     ? 'border-green-400/60 ring-1 ring-green-300/40'
                                     : '',
@@ -2321,13 +2369,27 @@
                       >
                         <i class="fas fa-cogs text-white text-sm"></i>
                       </div>
-                      <h3 class="text-base font-bold text-white flex items-center">
+                      <h3 
+                        :class="[
+                          'text-base font-bold text-white flex items-center',
+                          isStrictViewMode ? 'select-none' : 'cursor-pointer select-none'
+                        ]"
+                        @click="!isStrictViewMode && (showImplementationSections = !showImplementationSections)"
+                        :aria-expanded="showImplementationSections ? 'true' : 'false'"
+                        :aria-controls="'implementation-sections'"
+                        :title="isStrictViewMode ? 'Implementation information' : 'Toggle implementation sections'"
+                      >
                         <i class="fas fa-tools mr-1 text-blue-300"></i>
                         For Implementation
+                        <i
+                          v-if="!isStrictViewMode"
+                          :class="['fas', showImplementationSections ? 'fa-chevron-up' : 'fa-chevron-down']"
+                          class="ml-2"
+                        ></i>
                       </h3>
                     </div>
 
-                    <div id="implementation-sections" v-show="showApprovalSections" :class="implementationGridClass">
+                    <div id="implementation-sections" v-show="isStrictViewMode || showImplementationSections" :class="implementationGridClass">
                       <!-- Head of IT -->
                       <div :class="headItSectionClass">
                         <h5
@@ -2796,9 +2858,10 @@
                             </div>
                           </div>
 
-                          <!-- ICT Officer Approve Request Button (after signature upload) -->
+                          <!-- ICT Officer Approve Request Button (after signature upload) - Hide in strict view mode -->
                           <div
                             v-if="
+                              !isStrictViewMode &&
                               (isIctOfficerApprovalEditable ||
                                 currentUser?.role === 'ict_officer') &&
                               ictOfficerSignaturePreview &&
@@ -2823,8 +2886,8 @@
                             </button>
                           </div>
 
-                          <!-- Select ICT Officer Button (Head IT Only - Persistent after approval) -->
-                          <div v-if="shouldShowSelectIctOfficerButton" class="mt-2">
+                          <!-- Select ICT Officer Button (Head IT Only - Persistent after approval) - Hide in strict view mode -->
+                          <div v-if="!isStrictViewMode && shouldShowSelectIctOfficerButton" class="mt-2">
                             <div
                               class="bg-yellow-500/10 border-2 border-yellow-400/30 rounded-lg p-2 backdrop-blur-sm"
                             >
@@ -2859,9 +2922,9 @@
                     </div>
                   </div>
 
-                  <!-- Action Buttons (Review Mode Only) -->
+                  <!-- Action Buttons (Review Mode Only) - Hide in strict view mode -->
                   <div
-                    v-if="isReviewMode && canApproveAtStage() && !showApprovalSuccessCard"
+                    v-if="isReviewMode && canApproveAtStage() && !showApprovalSuccessCard && !isStrictViewMode"
                     :class="actionButtonsClass"
                   >
                     <!-- Action Buttons -->
@@ -2877,11 +2940,7 @@
                             ? 'bg-gray-500 text-gray-300 cursor-not-allowed opacity-50'
                             : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 hover:shadow-xl hover:scale-105'
                         ]"
-                        :title="
-                          isSignatureRequiredForApproval
-                            ? 'Please upload your signature first'
-                            : 'Approve this request'
-                        "
+                        :title="approvalButtonTooltip"
                       >
                         <i v-if="loading || processing" class="fas fa-spinner fa-spin mr-2"></i>
                         <i v-else class="fas fa-check mr-2"></i>
@@ -4109,8 +4168,10 @@
         showApprovalSuccessCard: false,
         // ICT Officer confirmation popup
         showIctOfficerConfirmation: false,
-        // UI collapsible toggle (controls Approval + Implementation)
-        showApprovalSections: false
+        // UI collapsible toggle for Approval sections
+        showApprovalSections: false,
+        // UI collapsible toggle for Implementation sections
+        showImplementationSections: false
       }
     },
     computed: {
@@ -4289,6 +4350,31 @@
 
       // Determine if approval sections should be readonly based on current stage
       isHodApprovalEditable() {
+        // Check if edit mode is explicitly enabled via query parameter
+        const queryMode = this.$route?.query?.mode
+        const queryRole = this.$route?.query?.role
+        const queryReadonly = this.$route?.query?.readonly
+
+        // Strict view-only mode - disable all editing
+        if (queryMode === 'view' && queryReadonly === 'true') {
+          return false
+        }
+
+        // If mode=edit and role=hod in query params, allow HOD to edit
+        if (queryMode === 'edit' && queryRole === 'hod') {
+          const userRole = (this.getUserRole() || '').toLowerCase().replace(/[\s-]+/g, '_')
+          const hodRoles = ['head_of_department', 'hod']
+          if (hodRoles.includes(userRole)) {
+            console.log('🏥 HOD Edit Mode Enabled via Query Parameter')
+            return true
+          }
+        }
+
+        // If mode=readonly, disable editing
+        if (queryMode === 'readonly') {
+          return false
+        }
+
         // Active only for HOD users while reviewing at the HOD stage
         if (!this.isReviewMode || !this.requestData) return false
         const userRole = (this.getUserRole() || '').toLowerCase().replace(/[\s-]+/g, '_')
@@ -4326,7 +4412,24 @@
 
       // Allow HOD users to upload signature during HOD stage even if other gates are strict
       canUploadHodSignature() {
+        // In strict view-only mode, disable all uploads
+        const queryMode = this.$route?.query?.mode
+        const queryReadonly = this.$route?.query?.readonly
+        if (queryMode === 'view' && queryReadonly === 'true') {
+          return false
+        }
+
         if (this.isHodApprovalEditable) return true
+
+        // Allow HOD to upload signature in readonly mode
+        if (queryMode === 'readonly') {
+          const userRole = (this.getUserRole() || '').toLowerCase().replace(/[\s-]+/g, '_')
+          const hodRoles = ['head_of_department', 'hod']
+          if (hodRoles.includes(userRole)) {
+            return true
+          }
+        }
+
         if (!this.isReviewMode) return false
         const userRole = (this.getUserRole() || '').toLowerCase().replace(/[\s-]+/g, '_')
         const hodRoles = [
@@ -4450,6 +4553,25 @@
 
       // Consolidated read-only state for form sections (combines divisional director and ICT director)
       isFormSectionReadOnly() {
+        // Check if readonly mode is explicitly set via query parameter
+        const queryMode = this.$route?.query?.mode
+        const queryReadonly = this.$route?.query?.readonly
+
+        // Strict view-only mode (mode=view with readonly=true)
+        if (queryMode === 'view' && queryReadonly === 'true') {
+          if (this.isDevelopment) {
+            console.log('🔒 Form in STRICT VIEW-ONLY mode')
+          }
+          return true
+        }
+
+        if (queryMode === 'readonly') {
+          if (this.isDevelopment) {
+            console.log('🔒 Form sections are READ-ONLY via query parameter')
+          }
+          return true
+        }
+
         // If HOD can edit (initial approval or after rejection back to them), sections should be editable
         // This is the primary check - HOD users should always be able to edit when it's their turn
         if (this.isHodApprovalEditable) {
@@ -4494,6 +4616,13 @@
         }
 
         return readOnlyResult
+      },
+
+      // Check if we're in strict view-only mode (no edits or actions allowed)
+      isStrictViewMode() {
+        const queryMode = this.$route?.query?.mode
+        const queryReadonly = this.$route?.query?.readonly
+        return queryMode === 'view' && queryReadonly === 'true'
       },
 
       // Check if current user is ICT Director
@@ -5194,9 +5323,76 @@
         return completedStatuses.includes(status) || hasIctOfficerImplementation
       },
 
-      // Check if approval buttons should be disabled due to missing signature
+      // Get all validation errors for current approval stage
+      validationErrors() {
+        const errors = []
+
+        // Basic field validation
+        if (!this.form?.shared?.pfNumber?.trim()) {
+          errors.push('PF Number is required')
+        }
+        if (!this.form?.shared?.staffName?.trim()) {
+          errors.push('Staff Name is required')
+        }
+        if (!this.form?.shared?.department?.trim()) {
+          errors.push('Department is required')
+        }
+        if (!this.form?.shared?.phone?.trim()) {
+          errors.push('Contact Number is required')
+        }
+
+        // Stage-specific validation
+        const userRole = (this.getUserRole() || '').toLowerCase().replace(/[\s-]+/g, '_')
+        const hodRoles = ['head_of_department', 'hod']
+        const isHodUser = hodRoles.includes(userRole)
+        const isHodStage = this.currentApprovalStage === 'hod'
+
+        // HOD validation
+        if (isHodUser && isHodStage) {
+          if (!this.hodComments?.trim()) {
+            errors.push('HOD Comments are required')
+          }
+          // At least one module must be selected
+          const hasModules =
+            this.selectedWellsoft?.length > 0 ||
+            this.selectedJeeva?.length > 0 ||
+            this.filteredInternetPurposes?.length > 0
+          if (!hasModules) {
+            errors.push('At least one module or service must be selected')
+          }
+        }
+
+        // Signature validation for current stage
+        if (this.isSignatureRequiredForApproval) {
+          errors.push('Signature is required for approval')
+        }
+
+        return errors
+      },
+
+      // Check if approval buttons should be disabled due to missing signature or HOD comments
       areApprovalButtonsDisabled() {
+        // For HOD users, also check if HOD comments are filled
+        const userRole = (this.getUserRole() || '').toLowerCase().replace(/[\s-]+/g, '_')
+        const hodRoles = ['head_of_department', 'hod']
+        const isHodUser = hodRoles.includes(userRole)
+        const isHodStage = this.currentApprovalStage === 'hod'
+
+        // If HOD user at HOD stage, require HOD comments
+        if (isHodUser && isHodStage && !this.hodComments?.trim()) {
+          return true
+        }
+
         return this.loading || this.processing || this.isSignatureRequiredForApproval
+      },
+
+      // Get the appropriate tooltip message for approval button
+      approvalButtonTooltip() {
+        const errors = this.validationErrors
+        if (errors.length > 0) {
+          return errors.join('; ')
+        }
+        return 'Approve this request'
       },
 
       // General signature presence check for any stage
@@ -5620,6 +5816,12 @@
             isInReviewMode: this.isReviewMode,
             requestId: this.getRequestId
           })
+        }
+
+        // In strict view mode, expand sections by default
+        if (this.isStrictViewMode) {
+          this.showApprovalSections = true
+          this.showImplementationSections = true
         }
 
         if (this.isReviewMode && this.getRequestId) {

@@ -252,7 +252,7 @@ class SmsService
     }
 
     /**
-     * Make API call to SMS provider
+     * Make API call to SMS provider using cURL
      *
      * @param array $payload
      * @return array
@@ -270,40 +270,94 @@ class SmsService
                 ]);
             }
 
-            $response = Http::timeout(30)
-                ->withHeaders([
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/json'
-                ])
-                ->post($this->apiUrl, $payload);
+            // Encode credentials for Basic Auth
+            $auth = base64_encode($this->apiKey . ':' . $this->secretKey);
 
-            Log::info('SMS API Response', [
-                'status_code' => $response->status(),
-                'response_body' => $response->body(),
-                'payload' => $payload
+            // Prepare JSON body according to KODA TECH API specs
+            $apiPayload = [
+                "from" => $this->senderId,
+                "to" => $payload['recipient'],
+                "text" => $payload['message'],
+                "reference" => uniqid("ref_")
+            ];
+
+            // Initialize CURL
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $this->apiUrl);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, config('sms.timeout', 30));
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                "Authorization: Basic " . $auth,
+                "Content-Type: application/json",
+                "Accept: application/json"
             ]);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($apiPayload));
 
-            if ($response->successful()) {
-                $data = $response->json();
-                
-                // Check if the SMS provider returned success
-                if (isset($data['success']) && $data['success'] === true) {
-                    return $this->buildResponse(true, 'SMS sent successfully', $data);
-                } elseif (isset($data['status']) && $data['status'] === 'success') {
-                    return $this->buildResponse(true, 'SMS sent successfully', $data);
-                } else {
-                    return $this->buildResponse(false, 'SMS provider error: ' . ($data['message'] ?? 'Unknown error'), $data);
-                }
-            } else {
-                return $this->buildResponse(false, 'SMS API request failed: ' . $response->status() . ' - ' . $response->body());
+            // Execute request
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+
+            // Handle cURL errors
+            if ($curlError) {
+                Log::error('SMS cURL Error', [
+                    'error' => $curlError,
+                    'payload' => $apiPayload
+                ]);
+                return $this->buildResponse(false, 'Connection error: ' . $curlError);
             }
 
-        } catch (Exception $e) {
-            Log::error('SMS API connection error', [
-                'error' => $e->getMessage(),
-                'payload' => $payload
+            // Log response for debugging
+            Log::info('SMS API Response', [
+                'http_code' => $httpCode,
+                'response' => $response,
+                'payload' => $apiPayload
             ]);
-            return $this->buildResponse(false, 'SMS API connection error: ' . $e->getMessage());
+
+            // Handle non-200 HTTP responses
+            if ($httpCode !== 200) {
+                Log::error('SMS HTTP Error', [
+                    'http_code' => $httpCode,
+                    'response' => $response
+                ]);
+                return $this->buildResponse(false, 'HTTP Error: ' . $httpCode);
+            }
+
+            // Decode JSON response
+            $data = json_decode($response, true);
+            
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                Log::error('SMS JSON Decode Error', [
+                    'error' => json_last_error_msg(),
+                    'response' => $response
+                ]);
+                return $this->buildResponse(false, 'Invalid JSON response');
+            }
+
+            // Check if the response contains messages (successful submission)
+            if (isset($data['messages']) && is_array($data['messages'])) {
+                Log::info('SMS successfully sent', [
+                    'message_count' => count($data['messages']),
+                    'response' => $data
+                ]);
+                return $this->buildResponse(true, 'SMS sent successfully', $data);
+            }
+
+            // Check for error in response
+            if (isset($data['error'])) {
+                return $this->buildResponse(false, 'API Error: ' . ($data['error']['message'] ?? 'Unknown error'), $data);
+            }
+
+            return $this->buildResponse(true, 'SMS processed', $data);
+
+        } catch (Exception $e) {
+            Log::error('SMS API Exception', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return $this->buildResponse(false, 'Exception: ' . $e->getMessage());
         }
     }
 

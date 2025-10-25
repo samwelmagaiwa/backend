@@ -1,6 +1,6 @@
 <template>
   <header
-    class="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white py-3 px-6 border-b border-blue-600/40 shadow-xl backdrop-blur-sm relative z-50"
+    class="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white py-3 px-6 border-b border-blue-600/40 shadow-xl backdrop-blur-sm relative z-[1000]"
   >
     <div class="flex justify-between items-center">
       <!-- Left side - Logo and Title -->
@@ -81,7 +81,7 @@
           >
             <div
               v-if="showProfileDropdown"
-              class="profile-dropdown absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-2xl border-2 border-blue-300/60 z-[9999] overflow-hidden backdrop-blur-sm"
+              class="profile-dropdown absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-2xl border-2 border-blue-300/60 z-[10002] overflow-hidden backdrop-blur-sm"
               style="
                 box-shadow:
                   0 25px 50px -12px rgba(59, 130, 246, 0.4),
@@ -600,12 +600,12 @@
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     position: relative;
-    z-index: 50;
+    z-index: 1000;
   }
 
   /* Profile dropdown specific z-index */
   .profile-dropdown {
-    z-index: 9999 !important;
+    z-index: 10002 !important;
     position: absolute !important;
     top: 100% !important;
     right: 0 !important;
@@ -614,7 +614,7 @@
   /* Ensure dropdown container has proper stacking context */
   .relative {
     position: relative;
-    z-index: 100;
+    z-index: 1001;
   }
 
   /* Button hover effects */
@@ -687,7 +687,7 @@
 
   /* Global override for dropdown visibility */
   :deep(.profile-dropdown) {
-    z-index: 9999 !important;
+    z-index: 10002 !important;
     position: absolute !important;
   }
 </style>

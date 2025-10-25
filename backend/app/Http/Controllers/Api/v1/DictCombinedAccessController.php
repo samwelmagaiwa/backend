@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
 use App\Models\UserAccess;
+use App\Models\User;
 use App\Models\Department;
 use App\Services\StatusMigrationService;
+use App\Services\SmsModule;
 use App\Traits\HandlesStatusQueries;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -381,6 +383,44 @@ class DictCombinedAccessController extends Controller
             $userAccessRequest->update($updateData);
 
             DB::commit();
+            
+            // Send SMS notifications if approved
+            if ($approvalStatus === 'approved') {
+                try {
+                    $nextApprover = null;
+                    $smsLevel = '';
+                    
+                    if ($isHeadOfIT) {
+                        // Head of IT approved - no next approver, goes to ICT Officer
+                        $smsLevel = 'head_it';
+                    } else {
+                        // ICT Director approved - next is Head of IT
+                        $nextApprover = User::whereHas('roles', fn($q) => 
+                            $q->where('name', 'head_of_it')
+                        )->first();
+                        $smsLevel = 'ict_director';
+                    }
+                    
+                    // Send SMS notifications
+                    $sms = app(SmsModule::class);
+                    $sms->notifyRequestApproved(
+                        $userAccessRequest,
+                        auth()->user(),
+                        $smsLevel,
+                        $nextApprover
+                    );
+                    
+                    Log::info(($isHeadOfIT ? 'Head of IT' : 'ICT Director') . ' SMS notifications sent', [
+                        'request_id' => $id,
+                        'next_approver' => $nextApprover ? $nextApprover->name : 'None (ICT Officer)'
+                    ]);
+                } catch (\Exception $e) {
+                    Log::warning(($isHeadOfIT ? 'Head of IT' : 'ICT Director') . ' SMS notification failed', [
+                        'request_id' => $id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
 
             $roleName = $isHeadOfIT ? 'Head of IT' : 'ICT Director';
             $statusKey = $isHeadOfIT ? 'head_it_status' : 'dict_status';

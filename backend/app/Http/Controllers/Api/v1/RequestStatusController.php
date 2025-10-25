@@ -323,6 +323,7 @@ class RequestStatusController extends Controller
             'updated_at' => $accessRequest->updated_at->toISOString(),
             'staff_name' => $accessRequest->staff_name,
             'department' => $accessRequest->department ? $accessRequest->department->name : 'Unknown',
+            'sms_to_hod_status' => $accessRequest->sms_to_hod_status ?? 'pending',
         ];
     }
 
@@ -371,6 +372,7 @@ class RequestStatusController extends Controller
             'department' => $departmentName,
             'device_availability' => $deviceAvailabilityInfo,
             'return_status' => $booking->return_status ?? 'not_yet_returned',
+            'sms_to_hod_status' => $booking->sms_to_hod_status ?? 'pending',
         ];
     }
 

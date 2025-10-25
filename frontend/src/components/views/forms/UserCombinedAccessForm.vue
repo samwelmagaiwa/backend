@@ -47,7 +47,7 @@
 
         <div class="max-w-12xl mx-auto relative z-10">
           <!-- Header Section -->
-          <div class="medical-glass-card rounded-t-3xl p-4 mb-0 border-b border-blue-300/30">
+          <div class="medical-glass-card rounded-t-3xl p-2 mb-0 border-b border-blue-300/30">
             <div class="flex justify-between items-center">
               <!-- Left Logo -->
               <div
@@ -110,12 +110,12 @@
 
           <!-- Main Form -->
           <div class="medical-glass-card rounded-b-3xl overflow-hidden">
-            <form @submit.prevent="submitForm" class="p-4 space-y-4">
+            <form @submit.prevent="submitForm" class="p-3 space-y-3">
               <!-- Form Description -->
 
               <!-- Applicant Details Section -->
               <div
-                class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-5 rounded-xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group relative overflow-hidden"
+                class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-3 rounded-xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group relative overflow-hidden"
               >
                 <!-- Animated Background Layers -->
                 <div
@@ -129,14 +129,16 @@
                 ></div>
 
                 <div class="relative z-10">
-                  <div class="flex items-center space-x-3 mb-4">
+                  <div class="flex items-center space-x-2 mb-1.5">
                     <div
-                      class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50 relative overflow-hidden"
+                      class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50 relative overflow-hidden"
                     >
                       <div
                         class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-lg"
                       ></div>
-                      <i class="fas fa-user-md text-white text-lg relative z-10 drop-shadow-lg"></i>
+                      <i
+                        class="fas fa-user-md text-white text-base relative z-10 drop-shadow-lg"
+                      ></i>
                       <div
                         class="absolute top-1 right-1 w-1 h-1 bg-white/60 rounded-full animate-ping"
                       ></div>
@@ -146,7 +148,7 @@
                         <i class="fas fa-id-card mr-2 text-blue-300"></i>
                         Applicant Details
                       </h3>
-                      <div class="flex items-center space-x-2 mt-1">
+                      <div class="flex items-center space-x-2 mt-0.5">
                         <span
                           class="text-xs text-red-400 font-medium bg-red-500/20 px-2 py-1 rounded-full border border-red-400/30"
                         >
@@ -180,9 +182,9 @@
                   </div>
 
                   <!-- Attractive Field Layout -->
-                  <div class="space-y-3 mb-3">
+                  <div class="space-y-2 mb-2">
                     <!-- Row 1: Basic Information -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                       <!-- PF Number -->
                       <div class="group">
                         <label class="block text-lg font-bold text-blue-100 mb-2 flex items-center">
@@ -265,7 +267,7 @@
                     </div>
 
                     <!-- Row 2: Contact & Department -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                       <!-- Phone Number -->
                       <div class="group">
                         <label class="block text-lg font-bold text-blue-100 mb-2 flex items-center">
@@ -340,14 +342,14 @@
                     </div>
 
                     <!-- Bottom row: Module Requested for (left), Access Rights (middle), and Signature (right) -->
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4 items-stretch">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 mt-3 items-stretch">
                       <!-- Module Requested for Section (Left Column) -->
                       <div class="flex flex-col h-full">
                         <div
                           class="bg-white/10 rounded-lg p-2 border border-blue-300/30 backdrop-blur-sm w-full min-h-[85px] flex flex-col justify-center"
                         >
                           <label
-                            class="block text-base font-bold text-blue-100 mb-2 text-center flex items-center justify-center gap-2"
+                            class="block text-base font-bold text-blue-100 mb-1.5 text-center flex items-center justify-center gap-2"
                           >
                             <i class="fas fa-toggle-on mr-2 text-blue-300 text-base"></i>
                             Module Requested for
@@ -397,40 +399,101 @@
                       <!-- Access Rights Section (Middle) -->
                       <div class="flex flex-col h-full">
                         <div
-                          class="bg-white/10 rounded-lg border border-blue-300/30 p-2 w-full min-h-[85px] flex flex-col justify-center"
+                          class="bg-gradient-to-br from-blue-500/15 to-indigo-500/15 rounded-xl border-2 border-blue-400/40 p-2 w-full min-h-[85px] flex flex-col justify-center shadow-lg backdrop-blur-sm"
                         >
-                          <label class="block text-base font-bold text-blue-100 mb-3 text-center">
-                            <i class="fas fa-clock mr-2"></i>
-                            Please Specify Access Rights:
+                          <label
+                            class="block text-lg font-bold text-blue-100 mb-1.5 text-center flex items-center justify-center"
+                          >
+                            <i class="fas fa-clock mr-2 text-blue-300 text-lg"></i>
+                            <span
+                              class="bg-gradient-to-r from-blue-300 to-cyan-300 bg-clip-text text-transparent"
+                              >Access Rights</span
+                            >
+                            <span class="text-red-400 ml-1">*</span>
                           </label>
-                          <div class="space-y-2 text-left">
-                            <label class="flex items-center cursor-pointer text-base">
+                          <div class="space-y-1">
+                            <!-- Permanent Option -->
+                            <label
+                              class="flex items-center cursor-pointer p-1.5 rounded-lg transition-all duration-300 border-2"
+                              :class="
+                                accessType === 'permanent'
+                                  ? 'bg-green-500/20 border-green-400/50 shadow-md ring-2 ring-green-400/30'
+                                  : 'bg-white/5 border-blue-300/20 hover:bg-white/10 hover:border-blue-400/40'
+                              "
+                            >
                               <input
                                 v-model="accessType"
                                 type="radio"
                                 value="permanent"
-                                class="w-5 h-5 text-blue-600 mr-3"
+                                class="w-4 h-4 text-green-600 mr-2 accent-green-500"
                               />
-                              <span class="text-blue-200 font-medium"
-                                >Permanent (until retirement)</span
-                              >
+                              <div class="flex items-center flex-1">
+                                <i class="fas fa-infinity mr-2 text-green-400 text-base"></i>
+                                <span class="text-white font-semibold text-base">Permanent</span>
+                              </div>
                             </label>
-                            <label class="flex items-center cursor-pointer text-base">
+
+                            <!-- Temporary Option -->
+                            <label
+                              @click="accessType === 'temporary' && openDatePickerModal()"
+                              class="flex items-center cursor-pointer p-1.5 rounded-lg transition-all duration-300 border-2"
+                              :class="
+                                accessType === 'temporary'
+                                  ? 'bg-amber-500/20 border-amber-400/50 shadow-md ring-2 ring-amber-400/30'
+                                  : 'bg-white/5 border-blue-300/20 hover:bg-white/10 hover:border-blue-400/40'
+                              "
+                            >
                               <input
                                 v-model="accessType"
                                 type="radio"
                                 value="temporary"
-                                class="w-5 h-5 text-blue-600 mr-3"
+                                class="w-4 h-4 text-amber-600 mr-2 accent-amber-500"
+                                @click.stop
                               />
-                              <span class="text-blue-200 font-medium">Temporary Until:</span>
-                              <input
-                                v-if="accessType === 'temporary'"
-                                v-model="temporaryUntil"
-                                type="date"
-                                :min="tomorrowDate"
-                                class="ml-2 px-3 py-1.5 bg-white/10 border border-blue-300/40 rounded text-base text-white focus:ring-1 focus:ring-blue-400"
-                              />
+                              <div class="flex items-center flex-1 justify-between">
+                                <div class="flex items-center">
+                                  <i
+                                    class="fas fa-hourglass-half mr-2 text-amber-400 text-base"
+                                  ></i>
+                                  <span class="text-white font-semibold text-base">Temporary</span>
+                                </div>
+                                <!-- Show selected date if available -->
+                                <div
+                                  v-if="accessType === 'temporary' && formattedDateDisplay"
+                                  class="flex items-center gap-2"
+                                >
+                                  <span class="text-base text-amber-200 font-bold">{{
+                                    formattedDateDisplay
+                                  }}</span>
+                                  <button
+                                    type="button"
+                                    @click.stop="openDatePickerModal"
+                                    class="text-amber-300 hover:text-amber-100 transition-colors"
+                                    title="Change date"
+                                  >
+                                    <i class="fas fa-calendar-edit text-base"></i>
+                                  </button>
+                                </div>
+                                <button
+                                  v-else-if="accessType === 'temporary'"
+                                  type="button"
+                                  @click.stop="openDatePickerModal"
+                                  class="text-sm text-amber-300 hover:text-amber-100 font-bold underline"
+                                >
+                                  Select Date
+                                </button>
+                              </div>
                             </label>
+                            <!-- Validation error message for temporary without date -->
+                            <div
+                              v-if="accessType === 'temporary' && !temporaryUntil"
+                              class="mt-2 px-2 py-1.5 bg-red-500/20 border border-red-400/50 rounded-lg flex items-center gap-2 animate-pulse"
+                            >
+                              <i class="fas fa-exclamation-circle text-red-400 text-sm"></i>
+                              <p class="text-xs text-red-200 font-medium">
+                                End date is required for temporary access
+                              </p>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -440,7 +503,7 @@
                         <div
                           class="relative bg-white/10 rounded-lg border border-blue-300/30 p-2 w-full min-h-[85px] flex flex-col justify-center"
                         >
-                          <label class="block text-base font-bold text-blue-100 mb-3 text-center">
+                          <label class="block text-base font-bold text-blue-100 mb-1.5 text-center">
                             Signature <span class="text-red-400">*</span>
                           </label>
 
@@ -523,8 +586,8 @@
                     </div>
 
                     <!-- Module Selection Section - Jeeva and Wellsoft Side by Side -->
-                    <div class="mt-4">
-                      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 relative">
+                    <div class="mt-3">
+                      <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 relative">
                         <!-- Vertical Divider Line -->
                         <div
                           class="hidden lg:block absolute left-2/3 top-0 bottom-0 w-px bg-gradient-to-b from-blue-300/30 via-blue-400/50 to-blue-300/30 transform -translate-x-px"
@@ -533,11 +596,11 @@
                         <!-- Jeeva Modules (Left Side - Takes 2 columns) -->
                         <div class="lg:col-span-2">
                           <div
-                            class="bg-white/10 rounded-lg border border-purple-300/30 p-4 w-full h-auto"
+                            class="bg-white/10 rounded-lg border border-purple-300/30 p-3 w-full h-auto"
                           >
-                            <div class="mb-2">
+                            <div class="mb-1.5">
                               <label
-                                class="block text-base font-bold text-purple-200 mb-2 flex items-center justify-between"
+                                class="block text-base font-bold text-purple-200 mb-1.5 flex items-center justify-between"
                               >
                                 <span>
                                   <i class="fas fa-database mr-2 text-sm"></i>
@@ -549,7 +612,7 @@
                               </label>
                             </div>
                             <div
-                              class="grid grid-cols-4 gap-2 border border-purple-300/20 rounded p-3"
+                              class="grid grid-cols-4 gap-2 border border-purple-300/20 rounded p-2"
                             >
                               <label
                                 v-for="module in jeevaModules"
@@ -573,11 +636,11 @@
                         <!-- Wellsoft Modules (Right Side - Takes 1 column) -->
                         <div class="lg:col-span-1">
                           <div
-                            class="bg-white/10 rounded-lg border border-amber-300/30 p-4 w-full h-auto"
+                            class="bg-white/10 rounded-lg border border-amber-300/30 p-3 w-full h-auto"
                           >
-                            <div class="mb-3">
+                            <div class="mb-1.5">
                               <label
-                                class="block text-base font-bold text-amber-200 mb-3 flex items-center justify-between"
+                                class="block text-base font-bold text-amber-200 mb-1.5 flex items-center justify-between"
                               >
                                 <span>
                                   <i class="fas fa-hospital mr-2 text-sm"></i>
@@ -589,7 +652,7 @@
                               </label>
                             </div>
                             <div
-                              class="grid grid-cols-2 gap-2 border border-amber-300/20 rounded p-3"
+                              class="grid grid-cols-2 gap-2 border border-amber-300/20 rounded p-2"
                             >
                               <label
                                 v-for="module in wellsoftModules"
@@ -617,7 +680,7 @@
 
               <!-- Internet Purpose -->
               <div
-                class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-5 rounded-xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group relative overflow-hidden"
+                class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-3 rounded-xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group relative overflow-hidden"
               >
                 <!-- Animated Background Layers -->
                 <div
@@ -631,14 +694,14 @@
                 ></div>
 
                 <div class="relative z-10">
-                  <div class="flex items-center space-x-3 mb-4">
+                  <div class="flex items-center space-x-2 mb-1.5">
                     <div
-                      class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50 relative overflow-hidden"
+                      class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50 relative overflow-hidden"
                     >
                       <div
                         class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-lg"
                       ></div>
-                      <i class="fas fa-wifi text-white text-lg relative z-10 drop-shadow-lg"></i>
+                      <i class="fas fa-wifi text-white text-base relative z-10 drop-shadow-lg"></i>
                       <div
                         class="absolute top-1 right-1 w-1 h-1 bg-white/60 rounded-full animate-ping"
                       ></div>
@@ -654,7 +717,7 @@
                     </div>
                   </div>
 
-                  <div class="space-y-3">
+                  <div class="space-y-2">
                     <div
                       v-for="(purpose, index) in formData.internetPurposes"
                       :key="index"
@@ -670,10 +733,9 @@
                         type="text"
                         class="medical-input flex-1 px-3 py-2 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20"
                         :placeholder="`Purpose ${index + 1}`"
-                        :required="index === 0"
                       />
                     </div>
-                    <p class="text-sm text-blue-200 mt-2 italic">
+                    <p class="text-sm text-blue-200 mt-1.5 italic">
                       <i class="fas fa-info-circle mr-1"></i>
                       Please provide at least one purpose for internet access. You can add up to 4
                       purposes.
@@ -684,7 +746,7 @@
 
               <!-- Form Actions -->
               <div
-                class="medical-card bg-gradient-to-r from-indigo-600/25 to-purple-600/25 border-2 border-indigo-400/40 p-5 rounded-xl backdrop-blur-sm hover:shadow-2xl hover:shadow-indigo-500/20 transition-all duration-500 group relative overflow-hidden"
+                class="medical-card bg-gradient-to-r from-indigo-600/25 to-purple-600/25 border-2 border-indigo-400/40 p-3 rounded-xl backdrop-blur-sm hover:shadow-2xl hover:shadow-indigo-500/20 transition-all duration-500 group relative overflow-hidden"
               >
                 <!-- Animated Background Layers -->
                 <div
@@ -740,140 +802,223 @@
       </main>
     </div>
 
-    <!-- Success Modal -->
+    <!-- Date Picker Modal -->
+    <div
+      v-if="showDatePickerModal"
+      class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in"
+      @click="closeDatePickerModal"
+    >
+      <div
+        class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl shadow-2xl max-w-md w-full transform transition-all duration-300 scale-100 border-2 border-blue-300/50"
+        @click.stop
+      >
+        <!-- Modal Header -->
+        <div
+          class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 rounded-t-2xl relative overflow-hidden"
+        >
+          <div class="absolute inset-0 bg-gradient-to-r from-blue-600/90 to-blue-700/90"></div>
+          <div class="relative z-10 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div
+                class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm border border-white/30"
+              >
+                <i class="fas fa-calendar-alt text-white text-lg"></i>
+              </div>
+              <div>
+                <h3 class="text-xl font-bold text-white">Select End Date</h3>
+                <p class="text-blue-100 text-xs">Choose when access should expire</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              @click="closeDatePickerModal"
+              class="w-8 h-8 bg-white/20 hover:bg-white/30 rounded-lg flex items-center justify-center transition-colors duration-200 backdrop-blur-sm border border-white/30"
+            >
+              <i class="fas fa-times text-white"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="px-6 py-5">
+          <!-- Date Input Section -->
+          <div class="bg-white rounded-xl p-4 border-2 border-blue-300/40 shadow-inner mb-4">
+            <label class="block text-base font-bold text-blue-900 mb-3 flex items-center">
+              <i class="fas fa-hourglass-half mr-2 text-blue-600 text-lg"></i>
+              Temporary Access End Date
+            </label>
+
+            <!-- Hidden native date input for proper date handling -->
+            <input
+              ref="dateInput"
+              v-model="temporaryUntil"
+              type="date"
+              :min="tomorrowDate"
+              class="absolute opacity-0 pointer-events-none"
+              @change="updateDisplayDate"
+              style="font-size: 18px;"
+            />
+
+            <!-- Visible custom input with DD/MM/YYYY format -->
+            <div
+              @click="openDatePicker"
+              class="w-full px-4 py-4 bg-gradient-to-br from-white to-blue-50 border-2 border-blue-400/50 rounded-xl text-gray-800 font-bold shadow-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-500 transition-all duration-300 cursor-pointer hover:border-blue-500 hover:shadow-xl flex items-center justify-between group"
+            >
+              <div class="flex items-center gap-2">
+                <i class="fas fa-calendar-day text-blue-500 text-xl"></i>
+                <span :class="formattedDateDisplay ? 'text-gray-800 text-lg' : 'text-gray-400 text-base'"
+                      class="font-bold">
+                  {{ formattedDateDisplay || 'Click to select date' }}
+                </span>
+              </div>
+              <i
+                class="fas fa-chevron-down text-blue-400 group-hover:text-blue-600 transition-colors text-base"
+              ></i>
+            </div>
+
+            <p
+              class="text-sm text-blue-700 mt-2 italic flex items-center bg-blue-100/50 px-3 py-1.5 rounded-lg"
+            >
+              <i class="fas fa-info-circle mr-2"></i>
+              Access will automatically expire on the selected date
+            </p>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex gap-3">
+            <button
+              type="button"
+              @click="closeDatePickerModal"
+              class="flex-1 px-4 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2"
+            >
+              <i class="fas fa-times"></i>
+              Cancel
+            </button>
+            <button
+              type="button"
+              @click="closeDatePickerModal"
+              :disabled="!temporaryUntil"
+              class="flex-1 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <i class="fas fa-check"></i>
+              Confirm Date
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Modal - Compact & Modern -->
     <div
       v-if="showSuccessModal"
       class="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fade-in"
     >
       <div
-        class="bg-white rounded-2xl shadow-2xl max-w-lg w-full transform transition-all duration-500 scale-100 animate-scale-up border border-gray-100 relative overflow-hidden"
+        class="bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all duration-500 scale-100 animate-scale-up border border-gray-100 relative overflow-hidden"
       >
-        <!-- Header Section with Icon -->
+        <!-- Compact Header with Icon -->
         <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 text-center relative">
           <div class="absolute inset-0 bg-gradient-to-r from-blue-600/90 to-blue-700/90"></div>
-          <div class="relative z-10">
-            <div
-              class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg"
-            >
+          <div class="relative z-10 flex items-center justify-center gap-3">
+            <div class="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-lg">
               <div
-                class="w-12 h-12 bg-gradient-to-br from-green-400 to-green-500 rounded-full flex items-center justify-center relative"
+                class="w-11 h-11 bg-gradient-to-br from-green-400 to-green-500 rounded-full flex items-center justify-center relative"
               >
                 <i class="fas fa-check text-white text-xl"></i>
-                <div
-                  class="absolute inset-0 rounded-full border-2 border-green-300 animate-ping opacity-50"
-                ></div>
               </div>
             </div>
-            <h3 class="text-2xl font-bold text-white mb-1">Request Submitted!</h3>
-            <p class="text-blue-100 text-sm">Your request has been processed successfully</p>
+            <div class="text-left">
+              <h3 class="text-2xl font-bold text-white">Request Submitted!</h3>
+              <p class="text-blue-100 text-sm">Successfully processed</p>
+            </div>
           </div>
         </div>
 
-        <!-- Content Section -->
-        <div class="px-6 py-6">
+        <!-- Compact Content Section -->
+        <div class="px-6 py-4">
           <!-- Message -->
-          <div class="text-center mb-6">
-            <p class="text-gray-700 leading-relaxed">
-              Your <span class="font-semibold text-blue-600">Combined Access Request</span> has been
-              submitted successfully and is now in the approval queue.
+          <div class="text-center mb-4">
+            <p class="text-base text-gray-700 font-medium">
+              Your <span class="font-bold text-blue-600">Combined Access Request</span> is now
+              in the approval queue.
             </p>
           </div>
 
-          <!-- Services Card -->
+          <!-- Compact Services Card -->
           <div
-            class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 mb-6 border border-blue-100"
+            class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 mb-4 border border-blue-100"
           >
             <div class="flex items-center gap-2 mb-3">
-              <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <i class="fas fa-list-check text-blue-600 text-sm"></i>
-              </div>
-              <h4 class="text-sm font-semibold text-blue-800">Selected Services</h4>
+              <i class="fas fa-list-check text-blue-600 text-base"></i>
+              <h4 class="text-sm font-bold text-blue-800">Selected Services</h4>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+            <div class="flex flex-wrap gap-2">
               <div
                 v-if="submittedServices.jeeva"
-                class="bg-white rounded-lg p-3 shadow-sm border border-green-200 flex items-center gap-2 transition-transform hover:scale-105"
+                class="bg-white rounded-lg px-4 py-2.5 shadow-sm border border-green-200 flex items-center gap-2"
               >
-                <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                  <i class="fas fa-file-medical text-green-600 text-xs"></i>
-                </div>
-                <span class="text-sm font-medium text-green-800">Jeeva Access</span>
+                <i class="fas fa-file-medical text-green-600 text-sm"></i>
+                <span class="text-sm font-semibold text-green-800">Jeeva</span>
               </div>
 
               <div
                 v-if="submittedServices.wellsoft"
-                class="bg-white rounded-lg p-3 shadow-sm border border-blue-200 flex items-center gap-2 transition-transform hover:scale-105"
+                class="bg-white rounded-lg px-4 py-2.5 shadow-sm border border-blue-200 flex items-center gap-2"
               >
-                <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
-                  <i class="fas fa-laptop-medical text-blue-600 text-xs"></i>
-                </div>
-                <span class="text-sm font-medium text-blue-800">Wellsoft Access</span>
+                <i class="fas fa-laptop-medical text-blue-600 text-sm"></i>
+                <span class="text-sm font-semibold text-blue-800">Wellsoft</span>
               </div>
 
               <div
                 v-if="submittedServices.internet"
-                class="bg-white rounded-lg p-3 shadow-sm border border-teal-200 flex items-center gap-2 transition-transform hover:scale-105"
+                class="bg-white rounded-lg px-4 py-2.5 shadow-sm border border-teal-200 flex items-center gap-2"
               >
-                <div class="w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
-                  <i class="fas fa-wifi text-teal-600 text-xs"></i>
-                </div>
-                <span class="text-sm font-medium text-teal-800">Internet Access</span>
+                <i class="fas fa-wifi text-teal-600 text-sm"></i>
+                <span class="text-sm font-semibold text-teal-800">Internet</span>
               </div>
             </div>
 
-            <!-- Fallback message if no services are selected -->
-            <div v-if="!hasSelectedService" class="text-center py-4 text-gray-500 italic">
-              <i class="fas fa-exclamation-circle mr-2"></i>
-              No services selected
-            </div>
-
-            <!-- Internet Purposes -->
+            <!-- Internet Purposes - Compact -->
             <div
               v-if="submittedServices.internet && hasInternetPurposes"
-              class="mt-4 pt-4 border-t border-blue-200"
+              class="mt-3 pt-3 border-t border-blue-200"
             >
-              <div class="flex items-center gap-2 mb-3">
-                <div class="w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
-                  <i class="fas fa-globe text-teal-600 text-xs"></i>
-                </div>
-                <h5 class="text-sm font-medium text-teal-800">Internet Purposes</h5>
+              <div class="flex items-center gap-2 mb-2">
+                <i class="fas fa-globe text-teal-600 text-sm"></i>
+                <h5 class="text-sm font-bold text-teal-800">Internet Purposes:</h5>
               </div>
-              <div class="space-y-2">
+              <div class="space-y-1.5">
                 <div
-                  v-for="(purpose, index) in filledInternetPurposes"
+                  v-for="(purpose, index) in filledInternetPurposes.slice(0, 3)"
                   :key="index"
-                  class="bg-teal-50 rounded-lg p-2 flex items-center gap-2"
+                  class="text-sm text-teal-700 flex items-start gap-2 font-medium"
                 >
-                  <div
-                    class="w-5 h-5 bg-teal-500 text-white rounded-full flex items-center justify-center text-xs font-bold"
-                  >
-                    {{ index + 1 }}
-                  </div>
-                  <span class="text-sm text-teal-700">{{ purpose }}</span>
+                  <span class="text-teal-600 font-bold">{{ index + 1 }}.</span>
+                  <span class="flex-1">{{ purpose }}</span>
                 </div>
+                <p v-if="filledInternetPurposes.length > 3" class="text-sm text-gray-600 italic font-medium">
+                  +{{ filledInternetPurposes.length - 3 }} more purpose(s)
+                </p>
               </div>
             </div>
           </div>
 
-          <!-- Status Indicator -->
-          <div class="bg-gray-50 rounded-lg p-3 mb-6 flex items-center justify-center gap-2">
-            <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-            <span class="text-sm text-gray-600 font-medium"
+          <!-- Compact Status Indicator -->
+          <div class="bg-gray-50 rounded-lg p-3 mb-4 flex items-center justify-center gap-2">
+            <div class="w-2.5 h-2.5 bg-blue-500 rounded-full animate-pulse"></div>
+            <span class="text-sm text-gray-700 font-semibold"
               >Request ID will be generated shortly</span
             >
           </div>
 
-          <!-- Action Button -->
+          <!-- Compact Action Button -->
           <button
             @click="closeSuccessModal"
-            class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-200 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02] flex items-center justify-center gap-2 relative overflow-hidden group"
+            class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-6 rounded-xl font-bold hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-200 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02] flex items-center justify-center gap-2"
           >
-            <div
-              class="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-            ></div>
-            <i class="fas fa-home text-sm relative z-10"></i>
-            <span class="relative z-10">Return to Dashboard</span>
+            <i class="fas fa-home text-base"></i>
+            <span class="text-base">Return to Dashboard</span>
           </button>
         </div>
       </div>
@@ -968,6 +1113,8 @@
         // Access rights
         accessType: '', // No default - user must select
         temporaryUntil: '',
+        temporaryUntilDisplay: '', // DD/MM/YYYY format for display
+        showDatePickerModal: false,
         formData: {
           // Applicant Details
           pfNumber: '',
@@ -979,7 +1126,7 @@
           services: {
             jeeva: false,
             wellsoft: false,
-            internet: true
+            internet: false
           },
           // Module Selections
           selectedWellsoft: [],
@@ -1027,12 +1174,50 @@
         const mm = String(d.getMonth() + 1).padStart(2, '0')
         const dd = String(d.getDate()).padStart(2, '0')
         return `${yyyy}-${mm}-${dd}`
+      },
+      formattedDateDisplay() {
+        if (!this.temporaryUntil) return ''
+        const [year, month, day] = this.temporaryUntil.split('-')
+        return `${day}/${month}/${year}`
       }
     },
 
     watch: {
-      // Note: No module auto-selection needed since HOD selects modules during approval
-      // Users only select services (Jeeva, Wellsoft, Internet Access)
+      // Auto-set services based on module selections
+      'formData.selectedWellsoft': {
+        handler(newVal) {
+          // Automatically set wellsoft service to true if modules are selected
+          this.formData.services.wellsoft = newVal && newVal.length > 0
+          console.log('👁️ Wellsoft modules changed:', {
+            count: newVal?.length || 0,
+            service_enabled: this.formData.services.wellsoft
+          })
+        },
+        deep: true
+      },
+      'formData.selectedJeeva': {
+        handler(newVal) {
+          // Automatically set jeeva service to true if modules are selected
+          this.formData.services.jeeva = newVal && newVal.length > 0
+          console.log('👁️ Jeeva modules changed:', {
+            count: newVal?.length || 0,
+            service_enabled: this.formData.services.jeeva
+          })
+        },
+        deep: true
+      },
+      'formData.internetPurposes': {
+        handler(newVal) {
+          // Automatically set internet service to true if any purpose is filled
+          const hasPurpose = newVal && newVal.some((purpose) => purpose.trim() !== '')
+          this.formData.services.internet = hasPurpose
+          console.log('👁️ Internet purposes changed:', {
+            filled_count: newVal?.filter((p) => p.trim() !== '').length || 0,
+            service_enabled: this.formData.services.internet
+          })
+        },
+        deep: true
+      }
     },
 
     async mounted() {
@@ -1507,11 +1692,8 @@
           internet: this.formData.services.internet
         })
 
-        // Validate internet purposes if internet service is selected
-        if (this.formData.services.internet && !this.formData.internetPurposes[0]) {
-          this.showNotification('Please provide at least one internet purpose', 'error')
-          return
-        }
+        // Internet purposes are optional - form is dynamic and allows submission without them
+        // The purposes can be added or edited later by HOD or during approval process
 
         this.isSubmitting = true
 
@@ -1587,22 +1769,24 @@
           // Add Wellsoft modules if Wellsoft service is selected
           if (this.formData.services.wellsoft && this.formData.selectedWellsoft.length > 0) {
             this.formData.selectedWellsoft.forEach((module, index) => {
-              formData.append(`wellsoft_modules[${index}]`, module)
+              formData.append(`selectedWellsoft[${index}]`, module)
             })
-            formData.append('wellsoft_request_type', this.wellsoftRequestType)
           }
 
           // Add Jeeva modules if Jeeva service is selected
           if (this.formData.services.jeeva && this.formData.selectedJeeva.length > 0) {
             this.formData.selectedJeeva.forEach((module, index) => {
-              formData.append(`jeeva_modules[${index}]`, module)
+              formData.append(`selectedJeeva[${index}]`, module)
             })
           }
 
-          // Add access rights information
-          formData.append('access_type', this.accessType)
+          // Add module request type (use/revoke) - backend expects camelCase
+          formData.append('wellsoftRequestType', this.wellsoftRequestType)
+
+          // Add access rights information - backend expects camelCase
+          formData.append('accessType', this.accessType)
           if (this.accessType === 'temporary' && this.temporaryUntil) {
-            formData.append('temporary_until', this.temporaryUntil)
+            formData.append('temporaryUntil', this.temporaryUntil)
           }
 
           // Add internet purposes if internet service is selected
@@ -1771,6 +1955,26 @@
 
         const department = this.departments.find((dept) => dept.id == departmentId)
         return department ? department.name : `Department ID: ${departmentId}`
+      },
+
+      openDatePicker() {
+        // Trigger the hidden native date picker
+        if (this.$refs.dateInput) {
+          this.$refs.dateInput.showPicker()
+        }
+      },
+
+      openDatePickerModal() {
+        this.showDatePickerModal = true
+      },
+
+      closeDatePickerModal() {
+        this.showDatePickerModal = false
+      },
+
+      updateDisplayDate() {
+        // This is called when the date picker value changes
+        // The computed property formattedDateDisplay will automatically update
       },
 
       showNotification(message, type = 'info') {

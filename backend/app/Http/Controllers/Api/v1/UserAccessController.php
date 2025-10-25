@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Api\v1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserAccessRequest;
 use App\Models\UserAccess;
+use App\Models\User;
 use App\Models\Department;
 use App\Services\SignatureService;
 use App\Services\StatusMigrationService;
+use App\Services\SmsModule;
 use App\Traits\HandlesStatusQueries;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -390,16 +392,17 @@ class UserAccessController extends Controller
                 'wellsoftRequestType' => $request->input('wellsoftRequestType', 'use')
             ]);
             
-            // Note: Module selection is done by HOD during approval process at /both-service-form/:id
-            // User submission only includes service selections (Jeeva, Wellsoft, Internet Access)
-            // Modules will be populated by HOD during approval workflow
-            
-            Log::info('User submitted service request - modules will be selected by HOD during approval', [
+            // Store staff module selections so HOD can see what was requested
+            Log::info('✅ Storing staff module selections and access rights in database', [
                 'user_id' => $user->id,
                 'selected_services' => $selectedServices,
-                'wellsoft_modules_from_request' => $selectedWellsoft,
-                'jeeva_modules_from_request' => $selectedJeeva,
-                'note' => 'Empty module arrays are expected - HOD selects modules during approval'
+                'wellsoft_modules_selected' => $selectedWellsoft,
+                'wellsoft_modules_count' => count($selectedWellsoft),
+                'jeeva_modules_selected' => $selectedJeeva,
+                'jeeva_modules_count' => count($selectedJeeva),
+                'module_requested_for' => $request->input('wellsoftRequestType', 'use'),
+                'access_type' => $request->input('accessType', 'permanent'),
+                'temporary_until' => $request->input('temporaryUntil', null)
             ]);
             
             Log::info('Creating combined user access request', [
@@ -417,7 +420,6 @@ class UserAccessController extends Controller
                 'phone_number' => $validatedData['phone_number'],
                 'department_id' => $validatedData['department_id'],
                 'signature_path' => $signaturePath,
-'purpose' => $purposes, // Legacy alias (kept for backward compatibility)
                 'request_type' => $selectedServices, // Array stored as JSON
                 'status' => 'pending',
                 
@@ -428,11 +430,9 @@ class UserAccessController extends Controller
                 'head_it_status' => 'pending',
                 'ict_officer_status' => 'pending',
                 
-                // Module selections will be populated by HOD during approval process
-                'wellsoft_modules' => [],
-                'wellsoft_modules_selected' => [],
-                'jeeva_modules' => [],
-                'jeeva_modules_selected' => [],
+                // Store staff's module selections so HOD can see what was requested
+                'wellsoft_modules_selected' => $selectedWellsoft, // Staff selected modules
+                'jeeva_modules_selected' => $selectedJeeva, // Staff selected modules
                 'module_requested_for' => $request->input('wellsoftRequestType', 'use'),
                 'internet_purposes' => array_filter($request->input('internetPurposes', []), function($purpose) {
                     return !empty(trim($purpose));
@@ -515,8 +515,128 @@ class UserAccessController extends Controller
                 'service_count' => count($selectedServices),
                 'has_purposes' => !empty($purposes)
             ]);
+            
+            // Send SMS notification to HOD BEFORE commit
+            try {
+                $hod = User::whereHas('departmentsAsHOD', function($q) use ($userAccess) {
+                    $q->where('departments.id', $userAccess->department_id);
+                })->first();
+                
+                if ($hod && $hod->phone) {
+                    // Determine request type - handle all variations
+                    $types = [];
+                    if (in_array('jeeva_access_request', $selectedServices) || in_array('jeeva_access', $selectedServices) || in_array('jeeva', $selectedServices)) $types[] = 'Jeeva';
+                    if (in_array('wellsoft_access_request', $selectedServices) || in_array('wellsoft_access', $selectedServices) || in_array('wellsoft', $selectedServices)) $types[] = 'Wellsoft';
+                    if (in_array('internet_access_request', $selectedServices) || in_array('internet_access', $selectedServices) || in_array('internet', $selectedServices)) $types[] = 'Internet';
+                    $requestType = implode(' & ', $types) ?: 'Access';
+                    $requestId = 'MLG-REQ' . str_pad($userAccess->id, 6, '0', STR_PAD_LEFT);
+                    
+                    try {
+                        $sms = app(SmsModule::class);
+                        $message = "PENDING APPROVAL: {$requestType} request from {$userAccess->staff_name} requires your review. Ref: {$requestId}. Please check the system. - EABMS";
+                        $smsResult = $sms->sendSms($hod->phone, $message, 'pending_notification');
+                        
+                        // Update SMS status using direct DB query for immediate persistence
+                        if ($smsResult['success']) {
+                            DB::table('user_access')
+                                ->where('id', $userAccess->id)
+                                ->update([
+                                    'sms_sent_to_hod_at' => now(),
+                                    'sms_to_hod_status' => 'sent',
+                                    'updated_at' => now()
+                                ]);
+                            Log::info('SMS sent to HOD successfully', [
+                                'hod_name' => $hod->name, 
+                                'request_id' => $userAccess->id,
+                                'status_updated' => 'sent',
+                                'update_method' => 'direct_db_query'
+                            ]);
+                        } else {
+                            DB::table('user_access')
+                                ->where('id', $userAccess->id)
+                                ->update([
+                                    'sms_to_hod_status' => 'failed',
+                                    'updated_at' => now()
+                                ]);
+                            Log::warning('SMS to HOD failed', [
+                                'error' => $smsResult['message'],
+                                'status_updated' => 'failed'
+                            ]);
+                        }
+                    } catch (\Exception $smsException) {
+                        DB::table('user_access')
+                            ->where('id', $userAccess->id)
+                            ->update([
+                                'sms_to_hod_status' => 'failed',
+                                'updated_at' => now()
+                            ]);
+                        Log::warning('SMS to HOD exception', [
+                            'error' => $smsException->getMessage(),
+                            'status_updated' => 'failed'
+                        ]);
+                    }
+                }
+            } catch (\Exception $e) {
+                Log::warning('Failed to process HOD notification', [
+                    'error' => $e->getMessage(),
+                    'request_id' => $userAccess->id
+                ]);
+            }
 
             DB::commit();
+            
+            // Send database notification to HOD AFTER commit (non-critical)
+            try {
+                $hod = User::whereHas('departmentsAsHOD', function($q) use ($userAccess) {
+                    $q->where('departments.id', $userAccess->department_id);
+                })->first();
+                
+                if ($hod) {
+                    // Determine request type - handle all variations
+                    $types = [];
+                    if (in_array('jeeva_access_request', $selectedServices) || in_array('jeeva_access', $selectedServices) || in_array('jeeva', $selectedServices)) $types[] = 'Jeeva';
+                    if (in_array('wellsoft_access_request', $selectedServices) || in_array('wellsoft_access', $selectedServices) || in_array('wellsoft', $selectedServices)) $types[] = 'Wellsoft';
+                    if (in_array('internet_access_request', $selectedServices) || in_array('internet_access', $selectedServices) || in_array('internet', $selectedServices)) $types[] = 'Internet';
+                    $requestType = implode(' & ', $types) ?: 'Access';
+                    
+                    $requestId = 'MLG-REQ' . str_pad($userAccess->id, 6, '0', STR_PAD_LEFT);
+                    $department = $userAccess->department->name ?? 'Unknown';
+                    
+                    DB::table('notifications')->insert([
+                        'recipient_id' => $hod->id,
+                        'sender_id' => $userAccess->user_id,
+                        'access_request_id' => $userAccess->id,
+                        'type' => 'new_access_request',
+                        'title' => 'New Access Request',
+                        'message' => "New {$requestType} request from {$userAccess->staff_name} ({$department})",
+                        'data' => json_encode([
+                            'request_id' => $userAccess->id,
+                            'request_number' => $requestId,
+                            'staff_name' => $userAccess->staff_name,
+                            'department' => $department,
+                            'request_type' => $requestType,
+                            'status' => 'pending',
+                            'action_url' => "/hod/combined-access-requests/{$userAccess->id}",
+                        ]),
+                        'read_at' => null,
+                        'notifiable_type' => 'App\\Models\\User',
+                        'notifiable_id' => $hod->id,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                    
+                    Log::info('Database notification sent to HOD', [
+                        'hod_id' => $hod->id,
+                        'hod_name' => $hod->name,
+                        'request_id' => $userAccess->id
+                    ]);
+                }
+            } catch (\Exception $e) {
+                Log::warning('Failed to send database notification to HOD', [
+                    'error' => $e->getMessage(),
+                    'request_id' => $userAccess->id
+                ]);
+            }
 
             return response()->json([
                 'success' => true,

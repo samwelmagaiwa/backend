@@ -2,115 +2,11 @@
   <div class="flex flex-col h-screen">
     <Header />
     <div class="flex flex-1 overflow-hidden">
-      <ModernSidebar />
-      <main
-        :class="[
-          'flex-1 p-4 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative',
-          { 'is-loading': isLoading, 'fx-transitions': enableTransitions }
-        ]"
-      >
-        { 'is-loading': isLoading } ]" >
-        <!-- Medical Background Pattern -->
-        <div v-if="enableBackgroundFX" class="absolute inset-0 overflow-hidden medical-pattern">
-          <div class="absolute inset-0 opacity-5">
-            <div class="grid grid-cols-12 gap-8 h-full transform rotate-45">
-              <div
-                v-for="i in 48"
-                :key="i"
-                class="bg-white rounded-full w-2 h-2 animate-pulse"
-                :style="{ animationDelay: i * 0.1 + 's' }"
-              ></div>
-            </div>
-          </div>
-          <div class="absolute inset-0">
-            <div
-              v-for="i in 15"
-              :key="i"
-              class="absolute text-white opacity-10 animate-float"
-              :style="{
-                left: Math.random() * 100 + '%',
-                top: Math.random() * 100 + '%',
-                animationDelay: Math.random() * 3 + 's',
-                animationDuration: Math.random() * 3 + 2 + 's',
-                fontSize: Math.random() * 20 + 10 + 'px'
-              }"
-            >
-              <i
-                :class="[
-                  'fas',
-                  ['fa-heartbeat', 'fa-user-md', 'fa-hospital', 'fa-stethoscope', 'fa-plus'][
-                    Math.floor(Math.random() * 5)
-                  ]
-                ]"
-              ></i>
-            </div>
-          </div>
-        </div>
-
-        <div class="max-w-full mx-auto relative z-10">
-          <!-- Header Section -->
-          <div class="medical-glass-card rounded-t-3xl p-4 mb-0 border-b border-blue-300/30">
-            <div class="flex justify-between items-center">
-              <!-- Left Logo -->
-              <div
-                class="w-32 h-32 mr-8 transform hover:scale-110 transition-transform duration-300"
-              >
-                <div
-                  class="w-full h-full bg-gradient-to-br from-blue-500/20 to-teal-500/20 rounded-2xl backdrop-blur-sm border-2 border-blue-300/40 flex items-center justify-center shadow-2xl hover:shadow-blue-500/25"
-                >
-                  <img
-                    src="/assets/images/ngao2.png"
-                    alt="National Shield"
-                    class="max-w-28 max-h-28 object-contain"
-                    loading="lazy"
-                    decoding="async"
-                    fetchpriority="low"
-                    width="112"
-                    height="112"
-                    @error="(e) => (e.target.style.visibility = 'hidden')"
-                  />
-                </div>
-              </div>
-
-              <!-- Center Content -->
-              <div class="text-center flex-1">
-                <h1
-                  class="text-2xl font-bold text-white mb-2 tracking-wide drop-shadow-lg animate-fade-in"
-                >
-                  MUHIMBILI NATIONAL HOSPITAL
-                </h1>
-                <div class="relative inline-block mb-2">
-                  <div
-                    class="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-2 rounded-full text-lg font-bold shadow-2xl transform hover:scale-105 transition-all duration-300 border-2 border-red-400/60"
-                  >
-                    <span class="relative z-10 flex items-center gap-3">
-                      <i class="fas fa-clipboard-check text-xl"></i>
-                      ACCESS REQUESTS - HOD APPROVAL STAGE
-                    </span>
-                    <div
-                      class="absolute inset-0 bg-gradient-to-r from-red-700 to-red-800 rounded-full opacity-0 hover:opacity-100 transition-opacity duration-300"
-                    ></div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Right Logo -->
-              <div
-                class="w-32 h-32 ml-8 transform hover:scale-110 transition-transform duration-300"
-              >
-                <div
-                  class="w-full h-full bg-gradient-to-br from-teal-500/20 to-blue-500/20 rounded-2xl backdrop-blur-sm border-2 border-teal-300/40 flex items-center justify-center shadow-2xl hover:shadow-teal-500/25"
-                >
-                  <img
-                    src="/assets/images/logo2.png"
-                    alt="Muhimbili Logo"
-                    class="max-w-28 max-h-28 object-contain"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
+      <div class="sidebar-narrow">
+        <ModernSidebar />
+      </div>
+      <main class="flex-1 p-4 bg-blue-900 overflow-y-auto">
+        <div class="max-w-full mx-auto">
           <!-- Error Display -->
           <div
             v-if="error"
@@ -126,355 +22,207 @@
             </button>
           </div>
 
-          <!-- Main Content -->
-          <div class="medical-glass-card rounded-b-3xl overflow-hidden animate-slide-up">
-            <div class="p-6">
-              <!-- Stats Cards -->
-              <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                <div
-                  class="bg-gradient-to-r from-yellow-600/25 to-orange-600/25 border-2 border-yellow-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-xl hover:shadow-yellow-500/20 transition-all duration-500"
-                >
-                  <div class="flex items-center">
-                    <div
-                      class="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-lg flex items-center justify-center shadow-lg"
-                    >
-                      <i class="fas fa-clock text-white text-lg"></i>
-                    </div>
-                    <div class="ml-4">
-                      <p class="text-sm font-semibold text-yellow-200">Pending HOD Approval</p>
-                      <p class="text-2xl font-bold text-white">
-                        {{ stats.pendingHod }}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+          <!-- Stats -->
+          <div class="grid grid-cols-4 gap-4 mb-6">
+            <div class="bg-yellow-600/25 border border-yellow-400/40 p-4 rounded-lg">
+              <h3 class="text-yellow-200 text-lg font-bold">Pending HOD Approval</h3>
+              <p class="text-white text-4xl font-bold">{{ stats.pendingHod }}</p>
+            </div>
 
-                <div
-                  class="bg-gradient-to-r from-green-600/25 to-emerald-600/25 border-2 border-green-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-xl hover:shadow-green-500/20 transition-all duration-500"
-                >
-                  <div class="flex items-center">
-                    <div
-                      class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-lg"
-                    >
-                      <i class="fas fa-check-circle text-white text-lg"></i>
-                    </div>
-                    <div class="ml-4">
-                      <p class="text-sm font-semibold text-green-200">HOD Approved</p>
-                      <p class="text-2xl font-bold text-white">
-                        {{ stats.hodApproved }}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+            <div class="bg-green-600/25 border border-green-400/40 p-4 rounded-lg">
+              <h3 class="text-green-200 text-lg font-bold">HOD Approved</h3>
+              <p class="text-white text-4xl font-bold">{{ stats.hodApproved }}</p>
+            </div>
 
-                <div
-                  class="bg-gradient-to-r from-red-600/25 to-pink-600/25 border-2 border-red-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-xl hover:shadow-red-500/20 transition-all duration-500"
-                >
-                  <div class="flex items-center">
-                    <div
-                      class="w-12 h-12 bg-gradient-to-br from-red-500 to-pink-600 rounded-lg flex items-center justify-center shadow-lg"
-                    >
-                      <i class="fas fa-times-circle text-white text-lg"></i>
-                    </div>
-                    <div class="ml-4">
-                      <p class="text-sm font-semibold text-red-200">HOD Rejected</p>
-                      <p class="text-2xl font-bold text-white">
-                        {{ stats.hodRejected }}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+            <div class="bg-red-600/25 border border-red-400/40 p-4 rounded-lg">
+              <h3 class="text-red-200 text-lg font-bold">HOD Rejected</h3>
+              <p class="text-white text-4xl font-bold">{{ stats.hodRejected }}</p>
+            </div>
 
-                <div
-                  class="bg-gradient-to-r from-blue-600/25 to-indigo-600/25 border-2 border-blue-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-500"
-                >
-                  <div class="flex items-center">
-                    <div
-                      class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-lg"
-                    >
-                      <i class="fas fa-list text-white text-lg"></i>
-                    </div>
-                    <div class="ml-4">
-                      <p class="text-sm font-semibold text-blue-200">Total Requests</p>
-                      <p class="text-2xl font-bold text-white">
-                        {{ stats.total }}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Filters and Search -->
-              <div
-                class="bg-gradient-to-r from-blue-600/25 to-teal-600/25 border-2 border-blue-400/40 p-6 rounded-2xl backdrop-blur-sm mb-8"
-              >
-                <div class="flex flex-col md:flex-row gap-4 items-center">
-                  <div class="flex-1">
-                    <div class="relative">
-                      <input
-                        v-model="searchQuery"
-                        type="text"
-                        placeholder="Search by staff name, PF number, or department..."
-                        class="w-full px-4 py-3 bg-white/15 border border-blue-300/30 rounded-lg focus:border-teal-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 text-sm"
-                      />
-                      <div
-                        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-teal-300/50"
-                      >
-                        <i class="fas fa-search text-sm"></i>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="flex gap-4">
-                    <select
-                      v-model="statusFilter"
-                      class="px-4 py-3 bg-white/15 border border-blue-300/30 rounded-lg focus:border-teal-400 focus:outline-none text-white backdrop-blur-sm transition-all appearance-none cursor-pointer text-sm"
-                    >
-                      <option value="">All Statuses</option>
-                      <option value="pending">Pending Submission</option>
-                      <option value="pending_hod">Pending HOD</option>
-                      <option value="hod_approved">HOD Approved</option>
-                      <option value="hod_rejected">HOD Rejected</option>
-                      <option value="divisional_approved">Divisional Approved</option>
-                      <option value="divisional_rejected">Divisional Rejected</option>
-                      <option value="approved">Fully Approved</option>
-                      <option value="implemented">Implemented</option>
-                      <option value="completed">Completed</option>
-                      <option value="cancelled">Cancelled</option>
-                    </select>
-
-                    <button
-                      @click="refreshRequests"
-                      class="px-6 py-3 bg-gradient-to-r from-teal-600 to-blue-600 text-white rounded-lg hover:from-teal-700 hover:to-blue-700 transition-all duration-300 font-semibold flex items-center shadow-lg hover:shadow-xl transform hover:scale-105 text-sm"
-                    >
-                      <i class="fas fa-sync-alt mr-2"></i>
-                      Refresh
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Requests Table -->
-              <div
-                class="table-container bg-gradient-to-r from-blue-600/25 to-teal-600/25 border-2 border-blue-400/40 rounded-2xl backdrop-blur-sm"
-                style="overflow: visible"
-              >
-                <div class="p-6 border-b border-blue-300/30">
-                  <h3 class="text-xl font-bold text-white flex items-center">
-                    <i class="fas fa-table mr-3 text-teal-300"></i>
-                    Combined Access Requests for HOD Approval
-                  </h3>
-                </div>
-
-                <div class="overflow-x-auto" style="overflow-y: visible">
-                  <table class="w-full">
-                    <thead class="bg-blue-800/50">
-                      <tr>
-                        <th
-                          class="px-6 py-4 text-left text-sm font-semibold text-blue-100 uppercase tracking-wider"
-                        >
-                          <i class="fas fa-hashtag mr-2"></i>Request ID
-                        </th>
-                        <th
-                          class="px-6 py-4 text-left text-sm font-semibold text-blue-100 uppercase tracking-wider"
-                        >
-                          <i class="fas fa-layer-group mr-2"></i>Request Type
-                        </th>
-                        <th
-                          class="px-6 py-4 text-left text-sm font-semibold text-blue-100 uppercase tracking-wider"
-                        >
-                          <i class="fas fa-user mr-2"></i>Personal Information
-                        </th>
-                        <th
-                          class="px-6 py-4 text-left text-sm font-semibold text-blue-100 uppercase tracking-wider"
-                        >
-                          <i class="fas fa-calendar mr-2"></i>Submission Date (FIFO)
-                        </th>
-                        <th
-                          class="px-6 py-4 text-left text-sm font-semibold text-blue-100 uppercase tracking-wider"
-                        >
-                          <i class="fas fa-flag mr-2"></i>Current Status
-                        </th>
-                        <th
-                          class="px-6 py-4 text-center text-sm font-semibold text-blue-100 uppercase tracking-wider"
-                        >
-                          <div class="flex items-center justify-center">
-                            <span
-                              class="bg-blue-100/10 px-3 py-1.5 rounded-lg border border-blue-300/20"
-                            >
-                              <i class="fas fa-cogs mr-2"></i>Actions
-                            </span>
-                          </div>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody class="divide-y divide-blue-300/20">
-                      <tr
-                        v-for="request in filteredRequests"
-                        :key="request.id"
-                        class="hover:bg-blue-700/30 transition-colors duration-200"
-                      >
-                        <!-- Request ID -->
-                        <td class="px-6 py-4 whitespace-nowrap">
-                          <div class="flex items-center">
-                            <div
-                              class="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-lg mr-3"
-                            >
-                              <i class="fas fa-hashtag text-white text-sm"></i>
-                            </div>
-                            <div>
-                              <div class="text-base font-medium text-white">
-                                {{
-                                  request.request_id ||
-                                  `REQ-${request.id.toString().padStart(6, '0')}`
-                                }}
-                              </div>
-                              <div class="text-xs text-purple-300">ID: {{ request.id }}</div>
-                            </div>
-                          </div>
-                        </td>
-
-                        <!-- Request Type -->
-                        <td class="px-6 py-4 whitespace-nowrap">
-                          <div class="flex flex-wrap gap-1">
-                            <span
-                              v-if="hasService(request, 'jeeva')"
-                              class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-                            >
-                              <i class="fas fa-database mr-1"></i>Jeeva
-                            </span>
-                            <span
-                              v-if="hasService(request, 'wellsoft')"
-                              class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
-                            >
-                              <i class="fas fa-laptop-medical mr-1"></i>Wellsoft
-                            </span>
-                            <span
-                              v-if="hasService(request, 'internet')"
-                              class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-cyan-100 text-cyan-800"
-                            >
-                              <i class="fas fa-wifi mr-1"></i>Internet
-                            </span>
-                          </div>
-                          <div class="text-sm text-blue-300 mt-1">Combined Access Request</div>
-                        </td>
-
-                        <!-- Personal Information -->
-                        <td class="px-6 py-4 whitespace-nowrap">
-                          <div class="flex items-center">
-                            <div
-                              class="w-10 h-10 bg-gradient-to-br from-teal-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg mr-3"
-                            >
-                              <i class="fas fa-user text-white text-sm"></i>
-                            </div>
-                            <div>
-                              <div class="text-base font-medium text-white">
-                                {{ request.staff_name || request.full_name || 'Unknown User' }}
-                              </div>
-                              <div class="text-sm text-blue-300">
-                                {{ request.phone || request.phone_number || 'No phone' }}
-                              </div>
-                              <div v-if="request.pf_number" class="text-sm text-teal-300">
-                                PF: {{ request.pf_number }}
-                              </div>
-                              <div class="text-xs text-blue-200">
-                                Dept: {{ request.department || 'Unknown' }}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-
-                        <!-- Submission Date -->
-                        <td class="px-6 py-4 whitespace-nowrap">
-                          <div class="text-base text-white font-medium">
-                            {{ formatDate(request.created_at || request.submission_date) }}
-                          </div>
-                          <div class="text-sm text-blue-300">
-                            {{ formatTime(request.created_at || request.submission_date) }}
-                          </div>
-                        </td>
-
-                        <!-- Current Status -->
-                        <td class="px-6 py-4 whitespace-nowrap">
-                          <span
-                            :class="
-                              getStatusBadgeClass(
-                                request.hod_status || request.status || 'pending_hod'
-                              )
-                            "
-                            class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium"
-                          >
-                            <i
-                              :class="
-                                getStatusIcon(request.hod_status || request.status || 'pending_hod')
-                              "
-                              class="mr-1"
-                            ></i>
-                            {{
-                              getStatusText(request.hod_status || request.status || 'pending_hod')
-                            }}
-                          </span>
-                        </td>
-
-                        <!-- Actions -->
-                        <td class="px-6 py-4 whitespace-nowrap text-center relative">
-                          <div class="relative inline-block text-left">
-                            <!-- Three dots button -->
-                            <button
-                              @click.stop="toggleDropdown(request.id)"
-                              :data-request-id="request.id"
-                              class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-blue-600/20 hover:bg-blue-600/40 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 shadow-lg hover:shadow-xl"
-                            >
-                              <div class="flex flex-col space-y-0.5">
-                                <div class="w-1.5 h-1.5 bg-blue-100 rounded-full"></div>
-                                <div class="w-1.5 h-1.5 bg-blue-100 rounded-full"></div>
-                                <div class="w-1.5 h-1.5 bg-blue-100 rounded-full"></div>
-                              </div>
-                            </button>
-
-                            <!-- Dropdown moved to global portal -->
-                          </div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-
-                  <!-- Empty State -->
-                  <div v-if="filteredRequests.length === 0" class="text-center py-12">
-                    <div
-                      class="w-24 h-24 bg-gradient-to-br from-blue-500/20 to-teal-500/20 rounded-full flex items-center justify-center mx-auto mb-4"
-                    >
-                      <i class="fas fa-inbox text-blue-300 text-3xl"></i>
-                    </div>
-                    <h3 class="text-lg font-medium text-white mb-2">No requests found</h3>
-                    <p class="text-blue-300">
-                      {{
-                        searchQuery || statusFilter
-                          ? 'Try adjusting your filters'
-                          : 'No combined access requests have been submitted yet.'
-                      }}
-                    </p>
-                  </div>
-                </div>
-
-                <!-- Pagination -->
-                <div
-                  v-if="filteredRequests.length > 0"
-                  class="px-6 py-4 border-t border-blue-300/30 flex items-center justify-between"
-                >
-                  <div class="text-sm text-blue-300">
-                    Showing {{ filteredRequests.length }} of {{ requests.length }} requests
-                  </div>
-                  <div class="flex space-x-2">
-                    <!-- Add pagination controls here if needed -->
-                  </div>
-                </div>
-              </div>
-
-              <!-- Footer -->
-              <AppFooter />
+            <div class="bg-blue-600/25 border border-blue-400/40 p-4 rounded-lg">
+              <h3 class="text-blue-200 text-lg font-bold">Total Requests</h3>
+              <p class="text-white text-4xl font-bold">{{ stats.total }}</p>
             </div>
           </div>
+
+          <!-- Filters -->
+          <div class="bg-white/10 rounded-lg p-4 mb-6">
+            <div class="flex gap-4">
+              <input
+                v-model="searchQuery"
+                type="text"
+                placeholder="Search by staff name, PF number, or department..."
+                class="flex-1 px-4 py-3 bg-white/20 border border-blue-300/30 rounded text-white placeholder-blue-200/60 text-lg"
+              />
+              <select
+                v-model="statusFilter"
+                class="px-4 py-3 bg-white/20 border border-blue-300/30 rounded text-white text-lg"
+              >
+                <option value="">All Statuses</option>
+                <option value="pending">Pending Submission</option>
+                <option value="pending_hod">Pending HOD</option>
+                <option value="hod_approved">HOD Approved</option>
+                <option value="hod_rejected">HOD Rejected</option>
+                <option value="divisional_approved">Divisional Approved</option>
+                <option value="divisional_rejected">Divisional Rejected</option>
+                <option value="approved">Fully Approved</option>
+                <option value="implemented">Implemented</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+              <button
+                @click="refreshRequests"
+                class="px-6 py-3 bg-teal-600 text-white rounded hover:bg-teal-700 text-lg font-bold"
+              >
+                Refresh
+              </button>
+            </div>
+          </div>
+
+          <!-- Requests Table -->
+          <div class="bg-white/10 rounded-lg overflow-visible relative">
+            <table class="w-full">
+              <thead class="bg-blue-800/50">
+                <tr>
+                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">Request ID</th>
+                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">Request Type</th>
+                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
+                    Personal Information
+                  </th>
+                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
+                    Submission Date
+                  </th>
+                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
+                    Current Status
+                  </th>
+                  <th class="px-4 py-4 text-center text-blue-100 text-lg font-bold">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="request in filteredRequests"
+                  :key="request.id"
+                  class="border-t border-blue-300/20 hover:bg-blue-700/30"
+                >
+                  <!-- Request ID -->
+                  <td class="px-4 py-4">
+                    <div class="text-white font-bold text-lg">
+                      {{ request.request_id || `REQ-${request.id.toString().padStart(6, '0')}` }}
+                    </div>
+                    <div class="text-purple-300 text-base">ID: {{ request.id }}</div>
+                  </td>
+
+                  <!-- Request Type -->
+                  <td class="px-4 py-4">
+                    <div class="flex flex-wrap gap-1">
+                      <span
+                        v-if="hasService(request, 'jeeva')"
+                        class="px-3 py-1.5 rounded text-base font-bold bg-blue-100 text-blue-800"
+                      >
+                        Jeeva
+                      </span>
+                      <span
+                        v-if="hasService(request, 'wellsoft')"
+                        class="px-3 py-1.5 rounded text-base font-bold bg-green-100 text-green-800"
+                      >
+                        Wellsoft
+                      </span>
+                      <span
+                        v-if="hasService(request, 'internet')"
+                        class="px-3 py-1.5 rounded text-base font-bold bg-cyan-100 text-cyan-800"
+                      >
+                        Internet
+                      </span>
+                    </div>
+                  </td>
+
+                  <!-- Personal Information -->
+                  <td class="px-4 py-4">
+                    <div class="text-white font-bold text-lg">
+                      {{ request.staff_name || request.full_name || 'Unknown User' }}
+                    </div>
+                    <div class="text-blue-300 text-base">
+                      {{ request.phone || request.phone_number || 'No phone' }}
+                    </div>
+                    <div v-if="request.pf_number" class="text-teal-300 text-base">
+                      PF: {{ request.pf_number }}
+                    </div>
+                    <div class="text-blue-200 text-base">
+                      Dept: {{ request.department || 'Unknown' }}
+                    </div>
+                  </td>
+
+                  <!-- Submission Date -->
+                  <td class="px-4 py-4">
+                    <div class="text-white font-bold text-lg">
+                      {{ formatDate(request.created_at || request.submission_date) }}
+                    </div>
+                    <div class="text-blue-300 text-base">
+                      {{ formatTime(request.created_at || request.submission_date) }}
+                    </div>
+                  </td>
+
+                  <!-- Current Status -->
+                  <td class="px-4 py-4">
+                    <div class="flex flex-col">
+                      <span
+                        :class="
+                          getStatusBadgeClass(request.hod_status || request.status || 'pending_hod')
+                        "
+                        class="rounded text-base font-bold inline-block"
+                        :style="{ padding: '6px 12px', width: 'fit-content' }"
+                      >
+                        {{ getStatusText(request.hod_status || request.status || 'pending_hod') }}
+                      </span>
+                    </div>
+                  </td>
+
+                  <!-- Actions -->
+                  <td class="px-4 py-3 text-center relative">
+                    <div class="flex justify-center three-dot-menu">
+                      <button
+                        @click.stop="toggleDropdown(request.id)"
+                        :data-request-id="request.id"
+                        class="three-dot-button p-2 text-white hover:bg-blue-600/40 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 hover:scale-105 active:scale-95"
+                        :class="{ 'bg-blue-600/40 shadow-lg': activeDropdown === request.id }"
+                        :aria-label="
+                          'Actions for request ' +
+                          (request.request_id || 'REQ-' + request.id.toString().padStart(6, '0'))
+                        "
+                      >
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                          <path
+                            d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- Empty State -->
+            <div v-if="filteredRequests.length === 0" class="text-center py-12">
+              <h3 class="text-white text-2xl font-bold mb-2">No requests found</h3>
+              <p class="text-blue-300 text-lg">
+                {{
+                  searchQuery || statusFilter
+                    ? 'Try adjusting your filters'
+                    : 'No combined access requests have been submitted yet.'
+                }}
+              </p>
+            </div>
+
+            <!-- Pagination -->
+            <div v-if="filteredRequests.length > 0" class="px-4 py-3 border-t border-blue-300/30">
+              <div class="text-blue-300 text-lg font-bold">
+                Showing {{ filteredRequests.length }} of {{ requests.length }} requests
+              </div>
+            </div>
+          </div>
+
+          <AppFooter />
         </div>
       </main>
     </div>
@@ -514,13 +262,33 @@
       >
         <div class="py-2">
           <template v-if="activeRequest">
+            <!-- Show Approve and Edit buttons only for pending requests -->
             <button
-              v-if="!isCancelledByUser(activeRequest)"
+              v-if="!isCancelledByUser(activeRequest) && !isRequestApproved(activeRequest)"
               @click="viewAndProcessRequest(activeRequest.id)"
-              class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 hover:text-blue-700 transition-all duration-200 font-medium"
+              class="group flex items-center w-full px-4 py-3 text-sm text-green-700 hover:bg-gradient-to-r hover:from-green-50 hover:to-green-100 hover:text-green-800 transition-all duration-200 font-semibold"
             >
-              <i class="fas fa-eye mr-3 text-blue-500 group-hover:text-blue-600"></i>
-              View & Process
+              <i class="fas fa-check-circle mr-3 text-green-600 group-hover:text-green-700"></i>
+              Approve
+            </button>
+
+            <button
+              v-if="!isCancelledByUser(activeRequest) && !isRequestApproved(activeRequest)"
+              @click="editRequestForReview(activeRequest.id)"
+              class="group flex items-center w-full px-4 py-3 text-sm text-blue-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 hover:text-blue-800 transition-all duration-200 font-medium"
+            >
+              <i class="fas fa-edit mr-3 text-blue-500 group-hover:text-blue-600"></i>
+              Edit Request
+            </button>
+
+            <!-- Show View Approved Request for approved requests -->
+            <button
+              v-if="isRequestApproved(activeRequest)"
+              @click="viewApprovedRequest(activeRequest.id)"
+              class="group flex items-center w-full px-4 py-3 text-sm text-purple-700 hover:bg-gradient-to-r hover:from-purple-50 hover:to-purple-100 hover:text-purple-800 transition-all duration-200 font-semibold"
+            >
+              <i class="fas fa-eye mr-3 text-purple-600 group-hover:text-purple-700"></i>
+              View Approved Request
             </button>
 
             <button
@@ -541,10 +309,14 @@
               Edit
             </button>
 
-            <div v-if="canCancel(activeRequest)" class="border-t border-gray-100 my-1"></div>
+            <!-- Cancel button only for pending requests -->
+            <div
+              v-if="canCancel(activeRequest) && !isRequestApproved(activeRequest)"
+              class="border-t border-gray-100 my-1"
+            ></div>
 
             <button
-              v-if="canCancel(activeRequest)"
+              v-if="canCancel(activeRequest) && !isRequestApproved(activeRequest)"
               @click="cancelRequest(activeRequest.id)"
               class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-red-50 hover:to-red-100 hover:text-red-700 transition-all duration-200 font-medium"
             >
@@ -610,7 +382,10 @@
         showTimeline: false,
         selectedRequestId: null,
         // Add status utilities for consistent status handling
-        $statusUtils: statusUtils
+        $statusUtils: statusUtils,
+        // Debounce handling
+        fetchTimeout: null,
+        isFetchingData: false
       }
     },
     computed: {
@@ -643,43 +418,19 @@
           )
         }
 
-        // Ensure any approved requests (this session) stay visible even on restrictive filters
-        try {
-          const keepRaw = localStorage.getItem('keepVisibleRequests') || '[]'
-          const keepIds = JSON.parse(keepRaw)
-          if (Array.isArray(keepIds) && keepIds.length) {
-            keepIds.forEach((kid) => {
-              const keepItem = this.requests.find((r) => String(r.id) === String(kid))
-              if (keepItem && !filtered.some((r) => String(r.id) === String(kid))) {
-                filtered = [keepItem, ...filtered]
-              }
-            })
-          }
-        } catch (e) {
-          console.warn('Failed to inject kept approved requests', e)
-        }
-
-        // Override display status for kept items to 'approved' so users see the final state
-        try {
-          const keepRaw = localStorage.getItem('keepVisibleRequests') || '[]'
-          const keepIds = JSON.parse(keepRaw)
-          if (Array.isArray(keepIds) && keepIds.length) {
-            filtered = filtered.map((r) => {
-              if (keepIds.includes(String(r.id))) {
-                return { ...r, status: 'approved', hod_status: 'approved' }
-              }
-              return r
-            })
-          }
-        } catch (e) {
-          console.warn('Failed to override display status for kept items', e)
-        }
-
-        // Exclude user-self-cancelled items (safety net)
-        filtered = filtered.filter((r) => !this.isCancelledByUser(r))
-
-        // Sort by FIFO order (oldest first)
+        // Sort: pending first, then by FIFO order (oldest first)
         return filtered.sort((a, b) => {
+          const statusA = a.hod_status || a.status || 'pending_hod'
+          const statusB = b.hod_status || b.status || 'pending_hod'
+
+          // Pending requests come first
+          const isPendingA = statusA === 'pending_hod' || statusA === 'pending'
+          const isPendingB = statusB === 'pending_hod' || statusB === 'pending'
+
+          if (isPendingA && !isPendingB) return -1
+          if (!isPendingA && isPendingB) return 1
+
+          // Within same priority group, sort by FIFO (oldest first)
           const dateA = new Date(a.created_at || a.submission_date || 0)
           const dateB = new Date(b.created_at || b.submission_date || 0)
           return dateA - dateB
@@ -703,6 +454,7 @@
         }
 
         // Poll periodically to reflect user-side cancellations (silent to avoid blocking UI)
+        // Delay first poll to avoid immediate duplicate request
         this._poller = setInterval(() => this.fetchRequests({ silent: true }), 30000)
 
         // Add click listener to close dropdowns when clicking outside
@@ -831,54 +583,65 @@
       },
 
       async fetchRequests(options = { silent: false }) {
-        if (!options?.silent) this.isLoading = true
-        this.error = null
-        // If we arrived after an approval, default the filter to pending but keep lastApproved visible
-        if (this.$route && this.$route.query && this.$route.query.from === 'approval_done') {
-          this.statusFilter = 'pending_hod'
+        // Prevent multiple simultaneous fetches
+        if (this.isFetchingData) {
+          console.log('Fetch already in progress, skipping...')
+          return
+        }
+
+        this.isFetchingData = true
+        if (!options?.silent) {
+          this.isLoading = true
+          this.error = null
         }
 
         try {
           console.log('Fetching combined access requests for HOD approval...')
 
-          const [requestsRes, statsRes] = await Promise.all([
-            combinedAccessService.getHodRequests({
-              search: this.searchQuery || undefined,
-              status: this.statusFilter || undefined,
-              per_page: 50
-            }),
-            combinedAccessService
-              .getHodStatistics()
-              .catch((e) => ({ success: false, error: e?.message }))
-          ])
+          const response = await combinedAccessService.getHodRequests({
+            search: this.searchQuery || undefined,
+            status: this.statusFilter || undefined,
+            per_page: 50
+          })
 
-          if (requestsRes.success) {
+          if (response.success) {
             // Handle the nested response structure: response.data.data.data
-            const responseData = requestsRes.data?.data || requestsRes.data || {}
+            const responseData = response.data?.data || response.data || {}
             this.requests = Array.isArray(responseData.data)
               ? responseData.data
               : Array.isArray(responseData)
                 ? responseData
                 : []
             console.log('Combined access requests loaded:', this.requests.length)
-            console.log('Raw response data:', requestsRes.data)
+            console.log('Raw response data:', response.data)
 
-            // Set statistics from API or fallback to local calculation
-            if (statsRes && statsRes.success) {
-              this.stats = statsRes.data
-            } else {
-              this.calculateStats()
-            }
+            // Also fetch statistics
+            await this.fetchStatistics()
           } else {
-            throw new Error(requestsRes.error || 'Failed to fetch requests')
+            throw new Error(response.error || 'Failed to fetch requests')
           }
         } catch (error) {
+          // Ignore abort errors from rapid clicks or navigation
+          if (
+            error.message === 'Request aborted' ||
+            error.message?.includes('aborted') ||
+            error.message?.includes('canceled')
+          ) {
+            // Silently ignore aborted requests - no logging, no error display
+            this.isFetchingData = false
+            if (!options?.silent) this.isLoading = false
+            return
+          }
+
           console.error('Error fetching requests:', error)
-          this.error =
-            'Unable to load combined access requests. Please check your connection and try again.'
+          if (!options?.silent) {
+            this.error =
+              'Unable to load combined access requests. Please check your connection and try again.'
+          }
           this.requests = []
           this.calculateStats()
         } finally {
+          this.isFetchingData = false
           if (!options?.silent) this.isLoading = false
         }
       },
@@ -917,13 +680,32 @@
       },
 
       async refreshRequests() {
-        await this.fetchRequests()
+        // Debounce rapid refresh clicks
+        if (this.fetchTimeout) {
+          clearTimeout(this.fetchTimeout)
+        }
+
+        this.fetchTimeout = setTimeout(() => {
+          this.fetchRequests()
+        }, 300)
       },
 
       viewAndProcessRequest(requestId) {
         this.closeDropdowns()
-        // Navigate to HOD-specific review path
-        this.$router.push(`/hod-combined-requests/both-service-form/${requestId}`)
+        // Navigate to HOD-specific review path in read-only mode for approval
+        this.$router.push({
+          path: `/hod-combined-requests/both-service-form/${requestId}`,
+          query: { mode: 'readonly' }
+        })
+      },
+
+      editRequestForReview(requestId) {
+        this.closeDropdowns()
+        // Navigate to editable form for HOD to modify staff request
+        this.$router.push({
+          path: `/hod-combined-requests/both-service-form/${requestId}`,
+          query: { mode: 'edit', role: 'hod' }
+        })
       },
 
       editRequest(requestId) {
@@ -1077,6 +859,30 @@
           console.error('HOD delete failed:', e)
           alert('Failed to delete request: ' + e.message)
         }
+      },
+
+      // Check if request is approved by HOD
+      isRequestApproved(request) {
+        const status = request.hod_status || request.status
+        return (
+          status === 'hod_approved' ||
+          status === 'approved' ||
+          status === 'divisional_approved' ||
+          status === 'ict_director_approved' ||
+          status === 'head_it_approved' ||
+          status === 'implemented' ||
+          status === 'completed'
+        )
+      },
+
+      // View approved request in full read-only mode
+      viewApprovedRequest(requestId) {
+        this.closeDropdowns()
+        // Navigate to view-only mode with strict readonly flag
+        this.$router.push({
+          path: `/hod-combined-requests/both-service-form/${requestId}`,
+          query: { mode: 'view', readonly: 'true' }
+        })
       }
     }
   }
@@ -1093,7 +899,7 @@
   .dropdown-menu {
     /* Use fixed so it ignores ancestor overflow and aligns to viewport */
     position: fixed !important;
-    z-index: 99999 !important;
+    z-index: 10000 !important;
     /* Keep visible within viewport */
     max-height: calc(100vh - 20px);
     overflow: auto;
@@ -1109,11 +915,11 @@
 
   /* Dropdown portal - ensure it's above everything */
   .dropdown-portal {
-    z-index: 100000;
+    z-index: 10000;
   }
 
   .dropdown-portal > div {
-    z-index: 100000 !important;
+    z-index: 10000 !important;
     position: fixed !important;
   }
 
@@ -1121,6 +927,12 @@
   .is-loading * {
     animation: none !important;
     transition: none !important;
+  }
+
+  /* Ensure main content doesn't block header dropdowns */
+  main {
+    position: relative;
+    z-index: 1;
   }
 
   /* Medical Glass morphism effects */

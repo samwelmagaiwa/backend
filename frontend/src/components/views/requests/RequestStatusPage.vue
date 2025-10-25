@@ -4,7 +4,7 @@
     <div class="flex flex-1 overflow-hidden">
       <ModernSidebar />
       <main
-        class="flex-1 p-3 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative"
+        class="flex-1 p-2 bg-blue-900 overflow-y-auto relative"
       >
         <!-- Medical Background Pattern -->
         <div class="absolute inset-0 overflow-hidden">
@@ -20,12 +20,12 @@
           </div>
         </div>
 
-        <div class="max-w-12xl mx-auto relative z-10">
+        <div class="max-w-[1800px] mx-auto relative z-10">
           <!-- Header Section -->
-          <div class="medical-glass-card rounded-t-3xl p-6 mb-0 border-b border-blue-300/30">
+          <div class="bg-white/10 rounded-t-lg p-2 mb-0 border-b border-blue-300/30">
             <div class="flex justify-between items-center">
               <div class="text-center flex-1">
-                <h1 class="text-xl font-bold text-white mb-3 tracking-wide drop-shadow-lg">
+                <h1 class="text-xl font-bold text-white mb-1 tracking-wide drop-shadow-lg">
                   <i class="fas fa-clipboard-check mr-3 text-blue-300"></i>
                   REQUEST STATUS & TRACKING
                 </h1>
@@ -37,12 +37,12 @@
           </div>
 
           <!-- Main Content -->
-          <div class="medical-glass-card rounded-b-3xl overflow-hidden">
-            <div class="p-6 space-y-6">
+          <div class="bg-white/10 rounded-b-lg overflow-visible">
+            <div class="p-4 space-y-4">
               <!-- Pending Combined Access Request Restriction Message -->
               <div
                 v-if="showPendingAccessMessage"
-                class="medical-card bg-gradient-to-r from-red-600/25 to-pink-700/25 border-2 border-red-400/40 p-6 rounded-2xl mb-6"
+                class="medical-card bg-gradient-to-r from-red-600/25 to-pink-700/25 border-2 border-red-400/40 p-4 rounded-2xl mb-4"
               >
                 <div class="flex items-center space-x-4">
                   <div
@@ -98,7 +98,7 @@
               <!-- Pending Booking Restriction Message -->
               <div
                 v-if="showPendingBookingMessage"
-                class="medical-card bg-gradient-to-r from-yellow-600/25 to-orange-700/25 border-2 border-yellow-400/40 p-6 rounded-2xl mb-6"
+                class="medical-card bg-gradient-to-r from-yellow-600/25 to-orange-700/25 border-2 border-yellow-400/40 p-4 rounded-2xl mb-4"
               >
                 <div class="flex items-center space-x-4">
                   <div
@@ -146,22 +146,22 @@
               <!-- Success Message (shown after submission) -->
               <div
                 v-if="showSuccessMessage"
-                class="medical-card bg-gradient-to-r from-green-600/25 to-green-700/25 border-2 border-green-400/40 p-6 rounded-2xl"
+                class="medical-card bg-gradient-to-r from-green-600/25 to-green-700/25 border-2 border-green-400/40 p-3 rounded-2xl"
               >
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-3">
                   <div
-                    class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg"
+                    class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg"
                   >
-                    <i class="fas fa-check-circle text-white text-2xl"></i>
+                    <i class="fas fa-check-circle text-white text-xl"></i>
                   </div>
                   <div class="flex-1">
-                    <h3 class="text-xl font-bold text-white mb-2">
+                    <h3 class="text-xl font-bold text-white mb-1">
                       Request Submitted Successfully!
                     </h3>
-                    <p class="text-green-100/90 text-sm mb-3">
+                    <p class="text-green-100/90 text-sm mb-2">
                       Your {{ requestType }} has been submitted and is now in the approval process.
                     </p>
-                    <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-3">
                       <div
                         class="bg-green-500/20 px-3 py-1 rounded-full border border-green-400/30"
                       >
@@ -189,32 +189,32 @@
 
               <!-- Request List -->
               <div
-                class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-6 rounded-2xl"
+                class="bg-white/10 border border-blue-300/30 p-4 rounded-lg"
               >
-                <div class="flex items-center justify-between mb-6">
-                  <div class="flex items-center space-x-4">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center space-x-3">
                     <div
-                      class="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg"
+                      class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg"
                     >
-                      <i class="fas fa-list-alt text-white text-xl"></i>
+                      <i class="fas fa-list-alt text-white text-base"></i>
                     </div>
                     <div>
-                      <h3 class="text-3xl font-bold text-white">My Requests</h3>
-                      <p class="text-blue-100/80 text-xl">View all your submitted requests</p>
+                      <h3 class="text-xl font-bold text-white">My Requests</h3>
+                      <p class="text-blue-100/80 text-sm">View all your submitted requests</p>
                     </div>
                   </div>
                   <div class="flex items-center space-x-3">
                     <button
                       @click="refreshRequests"
                       :disabled="loading"
-                      class="px-6 py-3 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-lg text-blue-300 text-lg font-medium transition-colors"
+                      class="px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-lg text-blue-300 text-sm font-medium transition-colors"
                     >
                       <OrbitingDots v-if="loading" size="xs" class="mr-2" />
                       <i v-else class="fas fa-sync-alt mr-2"></i>
                       Refresh
                     </button>
-                    <div class="bg-blue-500/20 px-4 py-2 rounded-full border border-blue-400/30">
-                      <span class="text-blue-300 text-lg font-medium">
+                    <div class="bg-blue-500/20 px-3 py-1.5 rounded-full border border-blue-400/30">
+                      <span class="text-blue-300 text-sm font-medium">
                         Total: {{ totalRequests }}
                       </span>
                     </div>
@@ -250,22 +250,22 @@
                 </div>
 
                 <!-- Requests Table -->
-                <div v-else>
+                <div v-else class="overflow-visible">
                   <!-- Desktop Table -->
-                  <div class="hidden lg:block overflow-x-auto">
-                    <table class="w-full">
-                      <thead>
-                        <tr class="border-b border-blue-400/30">
-                          <th class="text-left py-4 px-4 text-blue-200 font-semibold text-lg">
+                  <div class="hidden lg:block bg-white/10 rounded-lg overflow-visible">
+                    <table class="w-full relative">
+                      <thead class="bg-blue-800/50">
+                        <tr class="border-b border-blue-300/20">
+                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-lg">
                             Request ID
                           </th>
-                          <th class="text-left py-4 px-4 text-blue-200 font-semibold text-lg">
+                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-lg">
                             Type
                           </th>
-                          <th class="text-left py-4 px-4 text-blue-200 font-semibold text-lg">
+                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-lg">
                             Services
                           </th>
-                          <th class="text-left py-4 px-4 font-semibold text-lg">
+                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-lg">
                             <div class="flex items-center space-x-2">
                               <span
                                 :class="
@@ -280,19 +280,22 @@
                               ></i>
                             </div>
                           </th>
-                          <th class="text-left py-4 px-4 text-blue-200 font-semibold text-lg">
+                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-lg">
                             Current Step
                           </th>
-                          <th class="text-left py-4 px-4 text-blue-200 font-semibold text-lg">
+                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-lg">
                             Submitted
                           </th>
-                          <th class="text-left py-4 px-4 text-blue-200 font-semibold text-lg">
+                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-lg">
                             Device Status
                           </th>
-                          <th class="text-left py-4 px-4 text-blue-200 font-semibold text-lg">
+                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-lg">
                             Return Status
                           </th>
-                          <th class="text-left py-4 px-4 text-blue-200 font-semibold text-lg">
+                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-lg">
+                            SMS Status
+                          </th>
+                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-lg">
                             Actions
                           </th>
                         </tr>
@@ -301,9 +304,9 @@
                         <tr
                           v-for="request in requests"
                           :key="request.id"
-                          class="border-b border-blue-400/20 hover:bg-blue-500/10 transition-colors"
+                          class="border-t border-blue-300/20 hover:bg-blue-700/30 transition-colors"
                         >
-                          <td class="py-5 px-4">
+                          <td class="py-3 px-3">
                             <div class="font-medium text-white text-lg">
                               {{ formatRequestId(request.id) }}
                             </div>
@@ -311,7 +314,7 @@
                               {{ getRequestTypeLabel(request) }}
                             </div>
                           </td>
-                          <td class="py-5 px-4">
+                          <td class="py-3 px-3">
                             <div class="flex items-center space-x-2">
                               <i
                                 :class="getRequestTypeIcon(request.type)"
@@ -322,7 +325,7 @@
                               }}</span>
                             </div>
                           </td>
-                          <td class="py-5 px-4">
+                          <td class="py-3 px-3">
                             <div class="flex flex-wrap gap-1">
                               <span
                                 v-for="service in request.services"
@@ -333,7 +336,7 @@
                               </span>
                             </div>
                           </td>
-                          <td class="py-5 px-4">
+                          <td class="py-3 px-3">
                             <div class="flex items-center space-x-2">
                               <div
                                 class="w-3 h-3 rounded-full"
@@ -354,7 +357,7 @@
                               </span>
                             </div>
                           </td>
-                          <td class="py-5 px-4">
+                          <td class="py-3 px-3">
                             <div class="text-white text-lg">
                               {{ getCurrentStepText(request.current_step, request.type) }}
                             </div>
@@ -368,7 +371,7 @@
                               <span v-else>Step {{ request.current_step }} of 6</span>
                             </div>
                           </td>
-                          <td class="py-5 px-4">
+                          <td class="py-3 px-3">
                             <div class="text-white text-lg">
                               {{ formatDate(request.created_at) }}
                             </div>
@@ -376,7 +379,7 @@
                               {{ formatTime(request.created_at) }}
                             </div>
                           </td>
-                          <td class="py-5 px-4">
+                          <td class="py-3 px-3">
                             <div
                               v-if="
                                 request.type === 'booking_service' && request.device_availability
@@ -432,7 +435,7 @@
                             </div>
                             <div v-else class="text-gray-400 text-base">N/A</div>
                           </td>
-                          <td class="py-5 px-4">
+                          <td class="py-3 px-3">
                             <div v-if="request.type === 'booking_service'">
                               <div class="flex items-center space-x-2">
                                 <div
@@ -449,33 +452,67 @@
                             </div>
                             <div v-else class="text-gray-400 text-base">N/A</div>
                           </td>
-                          <td class="py-5 px-4">
-                            <div class="flex space-x-3">
-                              <button
-                                @click="viewRequestDetails(request)"
-                                class="px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-lg text-blue-300 text-lg font-medium transition-colors flex items-center"
+                          <td class="py-3 px-3">
+                            <div class="flex items-center space-x-2">
+                              <div
+                                class="w-3 h-3 rounded-full"
+                                :class="getSmsStatusColor(request.sms_to_hod_status)"
+                              ></div>
+                              <span
+                                class="text-base font-medium"
+                                :class="getSmsStatusTextColor(request.sms_to_hod_status)"
                               >
-                                <i class="fas fa-eye mr-2"></i>
-                                View
+                                {{ getSmsStatusText(request.sms_to_hod_status) }}
+                              </span>
+                            </div>
+                          </td>
+                          <td class="py-3 px-3">
+                            <div class="relative" @click.stop>
+                              <!-- Three-dot menu button -->
+                              <button
+                                @click.stop="toggleActionsMenu(request.id)"
+                                class="px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-lg text-blue-300 transition-colors"
+                              >
+                                <i class="fas fa-ellipsis-v text-lg"></i>
                               </button>
 
-                              <button
-                                v-if="canEditRequest(request)"
-                                @click="editRequest(request)"
-                                class="px-4 py-2 bg-green-500/20 hover:bg-green-500/30 border border-green-400/30 rounded-lg text-green-300 text-lg font-medium transition-colors flex items-center"
+                              <!-- Dropdown menu -->
+                              <div
+                                v-if="activeMenuId === request.id"
+                                @click.stop
+                                class="absolute right-0 bottom-full mb-2 w-48 bg-slate-800 border-2 border-blue-400/40 rounded-xl shadow-2xl z-[9999] overflow-hidden"
                               >
-                                <i class="fas fa-edit mr-2"></i>
-                                {{ request.status === 'cancelled' ? 'Edit & Resubmit' : 'Edit' }}
-                              </button>
+                                <!-- View button -->
+                                <button
+                                  @click="viewRequestDetails(request); closeActionsMenu()"
+                                  class="w-full px-4 py-3 text-left text-blue-300 hover:bg-blue-500/20 transition-colors flex items-center space-x-3 border-b border-blue-400/20"
+                                >
+                                  <i class="fas fa-eye text-blue-400 w-5"></i>
+                                  <span class="font-medium">View Details</span>
+                                </button>
 
-                              <button
-                                v-if="canCancelRequest(request)"
-                                @click="cancelRequest(request)"
-                                class="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 rounded-lg text-red-300 text-lg font-medium transition-colors flex items-center"
-                              >
-                                <i class="fas fa-times mr-2"></i>
-                                Cancel
-                              </button>
+                                <!-- Edit button (conditional) -->
+                                <button
+                                  v-if="canEditRequest(request)"
+                                  @click="editRequest(request); closeActionsMenu()"
+                                  class="w-full px-4 py-3 text-left text-green-300 hover:bg-green-500/20 transition-colors flex items-center space-x-3 border-b border-blue-400/20"
+                                >
+                                  <i class="fas fa-edit text-green-400 w-5"></i>
+                                  <span class="font-medium">
+                                    {{ request.status === 'cancelled' ? 'Edit & Resubmit' : 'Edit' }}
+                                  </span>
+                                </button>
+
+                                <!-- Cancel button (conditional) -->
+                                <button
+                                  v-if="canCancelRequest(request)"
+                                  @click="cancelRequest(request); closeActionsMenu()"
+                                  class="w-full px-4 py-3 text-left text-red-300 hover:bg-red-500/20 transition-colors flex items-center space-x-3"
+                                >
+                                  <i class="fas fa-times text-red-400 w-5"></i>
+                                  <span class="font-medium">Cancel Request</span>
+                                </button>
+                              </div>
                             </div>
                           </td>
                         </tr>
@@ -721,6 +758,9 @@
       const showEditModal = ref(false)
       const showResubmitModal = ref(false)
       const selectedRequest = ref(null)
+      
+      // Actions menu state
+      const activeMenuId = ref(null)
 
       // Reactive data for requests
       const requests = ref([])
@@ -761,6 +801,9 @@
       // Guard this route - only staff can access
       onMounted(() => {
         requireRole([ROLES.STAFF])
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', closeActionsMenu)
 
         // Check if redirected from form submission
         if (route.query.success === 'true') {
@@ -1356,6 +1399,44 @@
           (request) => request.status === 'implemented' || request.status === 'approved'
         )
       })
+      
+      // Toggle actions menu
+      const toggleActionsMenu = (requestId) => {
+        activeMenuId.value = activeMenuId.value === requestId ? null : requestId
+      }
+      
+      // Close actions menu
+      const closeActionsMenu = () => {
+        activeMenuId.value = null
+      }
+      
+      // SMS Status methods
+      const getSmsStatusText = (smsStatus) => {
+        const statusMap = {
+          sent: 'Delivered',
+          pending: 'Pending',
+          failed: 'Failed'
+        }
+        return statusMap[smsStatus] || 'Pending'
+      }
+      
+      const getSmsStatusColor = (smsStatus) => {
+        const colorMap = {
+          sent: 'bg-green-500',
+          pending: 'bg-yellow-500',
+          failed: 'bg-red-500'
+        }
+        return colorMap[smsStatus] || 'bg-gray-400'
+      }
+      
+      const getSmsStatusTextColor = (smsStatus) => {
+        const textColorMap = {
+          sent: 'text-green-400',
+          pending: 'text-yellow-400',
+          failed: 'text-red-400'
+        }
+        return textColorMap[smsStatus] || 'text-gray-400'
+      }
 
       return {
         loading,
@@ -1376,6 +1457,7 @@
         showEditModal,
         showResubmitModal,
         selectedRequest,
+        activeMenuId,
         approvalSteps,
         bookingSteps,
         loadRequests,
@@ -1408,7 +1490,12 @@
         getReturnStatusTextColor,
         formatRequestId,
         getRequestTypeLabel,
-        hasImplementedOrApproved
+        hasImplementedOrApproved,
+        toggleActionsMenu,
+        closeActionsMenu,
+        getSmsStatusText,
+        getSmsStatusColor,
+        getSmsStatusTextColor
       }
     }
   }

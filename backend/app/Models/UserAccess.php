@@ -75,6 +75,18 @@ class UserAccess extends Model
         'cancellation_reason',
         'cancelled_by',
         'cancelled_at',
+        // SMS notification tracking
+        'sms_notifications',
+        'sms_sent_to_hod_at',
+        'sms_to_hod_status',
+        'sms_sent_to_divisional_at',
+        'sms_to_divisional_status',
+        'sms_sent_to_ict_director_at',
+        'sms_to_ict_director_status',
+        'sms_sent_to_head_it_at',
+        'sms_to_head_it_status',
+        'sms_sent_to_requester_at',
+        'sms_to_requester_status',
     ];
 
     /**
@@ -1175,7 +1187,7 @@ class UserAccess extends Model
      */
     public function getRequestIdAttribute($value)
     {
-        return $value ?? 'REQ-' . str_pad($this->id, 6, '0', STR_PAD_LEFT);
+        return $value ?? 'MLG-REQ' . str_pad($this->id, 6, '0', STR_PAD_LEFT);
     }
     
     /**
@@ -1188,7 +1200,7 @@ class UserAccess extends Model
             // Check if request_id is missing in raw attributes
             $rawRequestId = $userAccess->getAttributes()['request_id'] ?? null;
             if (empty($rawRequestId)) {
-                $generatedId = 'REQ-' . str_pad($userAccess->id, 6, '0', STR_PAD_LEFT);
+                $generatedId = 'MLG-REQ' . str_pad($userAccess->id, 6, '0', STR_PAD_LEFT);
                 $userAccess->request_id = $generatedId;
                 $userAccess->saveQuietly(); // Save without triggering events
             }

@@ -302,16 +302,9 @@ class UserAccessRequest extends FormRequest
                 }
             }
             
-            // Validate internet purposes if internet access is selected
-            if (in_array('internet_access_request', $requestTypes)) {
-                $internetPurposes = $this->input('internetPurposes', []);
-                
-                if (empty($internetPurposes) || !array_filter($internetPurposes, function($purpose) {
-                    return !empty(trim($purpose));
-                })) {
-                    $validator->errors()->add('internetPurposes', 'Internet purposes are required when internet access is selected.');
-                }
-            }
+            // Internet purposes are now optional - removed validation requirement
+            // They can be added later by HOD or during approval process
+            // This makes the form dynamic and allows submission without purposes
         });
     }
 }

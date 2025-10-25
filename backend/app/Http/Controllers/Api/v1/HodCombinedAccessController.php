@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
 use App\Models\UserAccess;
+use App\Models\User;
 use App\Models\Department;
 use App\Traits\HandlesStatusQueries;
+use App\Services\SmsModule;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -175,7 +177,13 @@ class HodCombinedAccessController extends Controller
             $transformedData = $this->transformRequestData($request);
 
             Log::info('HOD Combined Access: Request retrieved successfully', [
-                'request_id' => $id
+                'request_id' => $id,
+                'wellsoft_modules_selected' => $request->wellsoft_modules_selected,
+                'wellsoft_modules_selected_type' => gettype($request->wellsoft_modules_selected),
+                'jeeva_modules_selected' => $request->jeeva_modules_selected,
+                'jeeva_modules_selected_type' => gettype($request->jeeva_modules_selected),
+                'module_requested_for' => $request->module_requested_for,
+                'transformed_data_has_modules' => isset($transformedData['wellsoft_modules_selected']) && isset($transformedData['jeeva_modules_selected'])
             ]);
 
             return response()->json([
@@ -286,6 +294,36 @@ class HodCombinedAccessController extends Controller
             $userAccessRequest->update($updateData);
 
             DB::commit();
+
+            // Send SMS notifications if approved
+            if ($validatedData['hod_status'] === 'approved') {
+                try {
+                    // Get next approver (Divisional Director)
+                    $nextApprover = User::whereHas('roles', fn($q) => 
+                        $q->where('name', 'divisional_director')
+                    )->first();
+                    
+                    // Send SMS notifications
+                    $sms = app(SmsModule::class);
+                    $sms->notifyRequestApproved(
+                        $userAccessRequest,
+                        auth()->user(),
+                        'hod',
+                        $nextApprover
+                    );
+                    
+                    Log::info('HOD SMS notifications sent', [
+                        'request_id' => $id,
+                        'next_approver' => $nextApprover ? $nextApprover->name : 'None'
+                    ]);
+                } catch (\Exception $e) {
+                    Log::warning('HOD SMS notification failed', [
+                        'request_id' => $id,
+                        'error' => $e->getMessage()
+                    ]);
+                    // Don't fail the approval if SMS fails
+                }
+            }
 
             Log::info('HOD Combined Access: Approval updated successfully with module data', [
                 'request_id' => $id,
@@ -534,12 +572,22 @@ class HodCombinedAccessController extends Controller
                 'request_types' => $request->getRequestTypesArray(), // Array format
                 'purpose' => $request->purpose,
                 
-                // NEW: Include module data for conditional display
-                'wellsoft_modules' => $request->wellsoft_modules,
-                'jeeva_modules' => $request->jeeva_modules,
-                'wellsoft_modules_selected' => $request->wellsoft_modules_selected ?? [],
-                'jeeva_modules_selected' => $request->jeeva_modules_selected ?? [],
-                'internet_purposes' => $request->internet_purposes,
+                // NEW: Include module data for conditional display - ensure arrays are properly decoded
+                'wellsoft_modules' => is_array($request->wellsoft_modules) 
+                    ? $request->wellsoft_modules 
+                    : ($request->wellsoft_modules ? json_decode($request->wellsoft_modules, true) ?? [] : []),
+                'jeeva_modules' => is_array($request->jeeva_modules) 
+                    ? $request->jeeva_modules 
+                    : ($request->jeeva_modules ? json_decode($request->jeeva_modules, true) ?? [] : []),
+                'wellsoft_modules_selected' => is_array($request->wellsoft_modules_selected) 
+                    ? $request->wellsoft_modules_selected 
+                    : ($request->wellsoft_modules_selected ? json_decode($request->wellsoft_modules_selected, true) ?? [] : []),
+                'jeeva_modules_selected' => is_array($request->jeeva_modules_selected) 
+                    ? $request->jeeva_modules_selected 
+                    : ($request->jeeva_modules_selected ? json_decode($request->jeeva_modules_selected, true) ?? [] : []),
+                'internet_purposes' => is_array($request->internet_purposes) 
+                    ? $request->internet_purposes 
+                    : ($request->internet_purposes ? json_decode($request->internet_purposes, true) ?? [] : []),
                 'module_requested_for' => $request->module_requested_for ?? 'use',
                 'access_type' => $request->access_type,
                 'temporary_until' => $request->temporary_until?->format('Y-m-d'),

@@ -63,7 +63,7 @@ class UserCombinedAccessRequest extends UserAccess
      */
     public function getRequestIdAttribute($value)
     {
-        return $value ?? 'REQ-' . str_pad($this->id, 6, '0', STR_PAD_LEFT);
+        return $value ?? 'MLG-REQ' . str_pad($this->id, 6, '0', STR_PAD_LEFT);
     }
 
     /**

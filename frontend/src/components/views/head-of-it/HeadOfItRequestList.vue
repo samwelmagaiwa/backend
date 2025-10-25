@@ -25,20 +25,20 @@
           <!-- Stats -->
           <div class="grid grid-cols-4 gap-4 mb-6">
             <div class="bg-yellow-600/25 border border-yellow-400/40 p-4 rounded-lg">
-              <h3 class="text-yellow-200 text-lg font-semibold">Pending My Approval</h3>
-              <p class="text-white text-3xl font-bold">{{ stats.pendingHeadOfIt }}</p>
+              <h3 class="text-yellow-200 text-lg font-bold">Pending My Approval</h3>
+              <p class="text-white text-4xl font-bold">{{ stats.pendingHeadOfIt }}</p>
             </div>
             <div class="bg-green-600/25 border border-green-400/40 p-4 rounded-lg">
-              <h3 class="text-green-200 text-lg font-semibold">Approved by Me</h3>
-              <p class="text-white text-3xl font-bold">{{ stats.headOfItApproved }}</p>
+              <h3 class="text-green-200 text-lg font-bold">Approved by Me</h3>
+              <p class="text-white text-4xl font-bold">{{ stats.headOfItApproved }}</p>
             </div>
             <div class="bg-red-600/25 border border-red-400/40 p-4 rounded-lg">
-              <h3 class="text-red-200 text-lg font-semibold">Rejected by Me</h3>
-              <p class="text-white text-3xl font-bold">{{ stats.headOfItRejected }}</p>
+              <h3 class="text-red-200 text-lg font-bold">Rejected by Me</h3>
+              <p class="text-white text-4xl font-bold">{{ stats.headOfItRejected }}</p>
             </div>
             <div class="bg-blue-600/25 border border-blue-400/40 p-4 rounded-lg">
-              <h3 class="text-blue-200 text-lg font-semibold">Total Requests</h3>
-              <p class="text-white text-3xl font-bold">{{ stats.total }}</p>
+              <h3 class="text-blue-200 text-lg font-bold">Total Requests</h3>
+              <p class="text-white text-4xl font-bold">{{ stats.total }}</p>
             </div>
           </div>
 
@@ -49,11 +49,11 @@
                 v-model="searchQuery"
                 type="text"
                 placeholder="Search by staff name, PF number, or department..."
-                class="flex-1 px-3 py-2 bg-white/20 border border-blue-300/30 rounded text-white placeholder-blue-200/60 text-base"
+                class="flex-1 px-4 py-3 bg-white/20 border border-blue-300/30 rounded text-white placeholder-blue-200/60 text-lg"
               />
               <select
                 v-model="statusFilter"
-                class="px-3 py-2 bg-white/20 border border-blue-300/30 rounded text-white text-base"
+                class="px-4 py-3 bg-white/20 border border-blue-300/30 rounded text-white text-lg"
               >
                 <option value="">All My Requests</option>
                 <option value="pending">Show All Pending</option>
@@ -66,7 +66,7 @@
               </select>
               <button
                 @click="refreshRequests"
-                class="px-6 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 text-base font-medium"
+                class="px-6 py-3 bg-teal-600 text-white rounded hover:bg-teal-700 text-lg font-bold"
               >
                 Refresh
               </button>
@@ -78,24 +78,18 @@
             <table class="w-full">
               <thead class="bg-blue-800/50">
                 <tr>
-                  <th class="px-4 py-3 text-left text-blue-100 text-base font-semibold">
-                    Request ID
-                  </th>
-                  <th class="px-4 py-3 text-left text-blue-100 text-base font-semibold">
-                    Request Type
-                  </th>
-                  <th class="px-4 py-3 text-left text-blue-100 text-base font-semibold">
+                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">Request ID</th>
+                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">Request Type</th>
+                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
                     Personal Information
                   </th>
-                  <th class="px-4 py-3 text-left text-blue-100 text-base font-semibold">
+                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
                     ICT Director Approval Date
                   </th>
-                  <th class="px-4 py-3 text-left text-blue-100 text-base font-semibold">
+                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
                     Current Status
                   </th>
-                  <th class="px-4 py-3 text-center text-blue-100 text-base font-semibold">
-                    Actions
-                  </th>
+                  <th class="px-4 py-4 text-center text-blue-100 text-lg font-bold">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -223,7 +217,7 @@
                       <!-- Dropdown menu -->
                       <div
                         v-show="openDropdownId === request.id"
-                        class="dropdown-menu fixed w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-[10001] py-1 min-w-max"
+                        class="dropdown-menu fixed w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-[10000] py-1 min-w-max"
                         :style="getDropdownPositionStyle(request.id)"
                         @click.stop
                       >
@@ -1255,5 +1249,11 @@
     outline: 2px solid #3b82f6;
     outline-offset: -2px;
     background-color: #f3f4f6;
+  }
+
+  /* Ensure main content doesn't block header dropdowns */
+  main {
+    position: relative;
+    z-index: 1;
   }
 </style>

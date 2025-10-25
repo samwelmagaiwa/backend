@@ -8,8 +8,6 @@ import { enhancedNavigationGuard } from '../utils/routeGuards'
 const LoginPageWrapper = () =>
   import(/* webpackChunkName: "auth" */ '../components/LoginPageWrapper.vue')
 
-import HodRequestList from '../components/views/hod/HodRequestList.vue'
-
 const routes = [
   // Public routes
   {
@@ -406,7 +404,8 @@ const routes = [
   {
     path: '/hod-dashboard/combined-requests',
     name: 'HODCombinedRequestList',
-    component: HodRequestList,
+    component: () =>
+      import(/* webpackChunkName: "hod" */ '../components/views/hod/HodRequestList.vue'),
     meta: {
       requiresAuth: true,
       roles: [ROLES.HEAD_OF_DEPARTMENT]

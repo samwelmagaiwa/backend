@@ -2,9 +2,10 @@
   <aside
     class="min-h-full flex flex-col transition-all duration-300 ease-in-out overflow-hidden relative shadow-2xl sidebar-responsive"
     :class="[
-      isCollapsed ? 'w-16 sidebar-collapsed' : 'w-80 sidebar-expanded',
+      isCollapsed ? 'w-16 sidebar-collapsed' : 'sidebar-expanded',
       !shouldShowSidebar ? 'invisible pointer-events-none opacity-0' : 'opacity-100'
     ]"
+    :style="!isCollapsed ? 'width: 16rem;' : ''"
     aria-label="Sidebar navigation"
     style="
       background: linear-gradient(
@@ -193,7 +194,7 @@
       </div>
 
       <!-- Navigation Menu -->
-      <nav class="flex-1 space-y-1 overflow-y-auto custom-scrollbar">
+      <nav class="flex-1 min-h-0 space-y-1 overflow-y-auto custom-scrollbar">
         <!-- Dashboard Section -->
         <div v-if="filteredDashboardItems.length > 0" class="mb-2">
           <div
@@ -532,7 +533,7 @@
       </nav>
 
       <!-- Bottom Section -->
-      <div class="bottom-section space-y-2 mt-6">
+      <div class="bottom-section space-y-2 mt-auto pt-4 border-t border-blue-400/30">
         <!-- Help Center -->
         <button
           @click="showHelp"
@@ -599,12 +600,13 @@
       </div>
     </div>
 
-    <!-- Help Modal -->
-    <div
-      v-if="showHelpModal"
-      class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 backdrop-blur-sm"
-      @click="showHelpModal = false"
-    >
+    <!-- Help Modal (teleported to body to prevent backdrop covering sidebar) -->
+    <Teleport to="body">
+      <div
+        v-if="showHelpModal"
+        class="fixed inset-0 bg-black/60 flex items-center justify-center z-[10001] backdrop-blur-sm"
+        @click="showHelpModal = false"
+      >
       <div
         class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all duration-300 scale-100 overflow-hidden"
         @click.stop
@@ -719,7 +721,8 @@
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </Teleport>
   </aside>
 </template>
 
@@ -850,6 +853,17 @@
             if (DEBUG) console.log('📦 Expanding sections for Head of IT')
             _setSectionExpanded('dashboard', true)
             _setSectionExpanded('requestsManagement', true)
+          }
+        }
+
+        // Check if we're on divisional dashboard route and expand sidebar immediately
+        await nextTick()
+        if (route.path.startsWith('/divisional-dashboard')) {
+          if (isCollapsed.value) {
+            console.log('📂 [onMounted] Auto-expanding sidebar for divisional dashboard route:', route.path)
+            setCollapsed(false)
+          } else {
+            console.log('✅ [onMounted] Sidebar already expanded for:', route.path)
           }
         }
       })
@@ -1533,26 +1547,38 @@
       })
 
       // Watch for route changes and refresh notifications when entering dashboard pages
-      watch(route, (newRoute, _oldRoute) => {
-        const dashboardRoutes = [
-          '/ict-dashboard/access-requests',
-          '/hod-dashboard/request-list',
-          '/divisional-dashboard/combined-requests',
-          '/dict-dashboard/combined-requests',
-          '/head_of_it-dashboard/combined-requests'
-        ]
+      watch(
+        route,
+        (newRoute, _oldRoute) => {
+          const dashboardRoutes = [
+            '/ict-dashboard/access-requests',
+            '/hod-dashboard/request-list',
+            '/divisional-dashboard/combined-requests',
+            '/dict-dashboard/combined-requests',
+            '/head_of_it-dashboard/combined-requests'
+          ]
 
-        // If navigating to a dashboard route that shows notifications
-        if (dashboardRoutes.some((routePath) => newRoute.path.startsWith(routePath))) {
-          console.log(
-            '🗺️ Route changed to dashboard page, refreshing notifications:',
-            newRoute.path
-          )
-          setTimeout(() => {
-            fetchNotificationCounts(true) // force refresh after navigation
-          }, 1000)
-        }
-      })
+          // Auto-expand sidebar when navigating to divisional dashboard routes
+          if (newRoute.path.startsWith('/divisional-dashboard')) {
+            if (isCollapsed.value) {
+              console.log('📂 Auto-expanding sidebar for divisional dashboard route:', newRoute.path)
+              setCollapsed(false)
+            }
+          }
+
+          // If navigating to a dashboard route that shows notifications
+          if (dashboardRoutes.some((routePath) => newRoute.path.startsWith(routePath))) {
+            console.log(
+              '🗺️ Route changed to dashboard page, refreshing notifications:',
+              newRoute.path
+            )
+            setTimeout(() => {
+              fetchNotificationCounts(true) // force refresh after navigation
+            }, 1000)
+          }
+        },
+        { immediate: true }
+      )
 
       // Theme is automatically initialized by useTheme composable
 

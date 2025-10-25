@@ -398,12 +398,20 @@ class BothServiceFormController extends Controller
                 'signature_path' => $userAccess->signature_path,
                 'signature_url' => $userAccess->signature_path ? Storage::url($userAccess->signature_path) : null,
                 
-                // Proper module data
-                'wellsoft_modules_selected' => $userAccess->wellsoft_modules_selected ?? [],
-                'jeeva_modules_selected' => $userAccess->jeeva_modules_selected ?? [],
+                // Proper module data - ensure arrays are properly formatted
+                'wellsoft_modules' => $userAccess->wellsoft_modules ?? [],
+                'wellsoft_modules_selected' => is_array($userAccess->wellsoft_modules_selected) 
+                    ? $userAccess->wellsoft_modules_selected 
+                    : ($userAccess->wellsoft_modules_selected ? json_decode($userAccess->wellsoft_modules_selected, true) ?? [] : []),
+                'jeeva_modules' => $userAccess->jeeva_modules ?? [],
+                'jeeva_modules_selected' => is_array($userAccess->jeeva_modules_selected) 
+                    ? $userAccess->jeeva_modules_selected 
+                    : ($userAccess->jeeva_modules_selected ? json_decode($userAccess->jeeva_modules_selected, true) ?? [] : []),
                 'module_requested_for' => $userAccess->module_requested_for ?? 'use',
                 
-                'internet_purposes' => $userAccess->internet_purposes ?? [],
+                'internet_purposes' => is_array($userAccess->internet_purposes) 
+                    ? $userAccess->internet_purposes 
+                    : ($userAccess->internet_purposes ? json_decode($userAccess->internet_purposes, true) ?? [] : []),
                 'access_type' => $userAccess->access_type ?? 'permanent',
                 'temporary_until' => $userAccess->temporary_until,
                 'request_type' => $userAccess->request_type ?? [],
@@ -562,12 +570,20 @@ class BothServiceFormController extends Controller
                 'signature_path' => $userAccess->signature_path,
                 'signature_url' => $userAccess->signature_path ? Storage::url($userAccess->signature_path) : null,
                 
-                // Module data - ensuring arrays are properly handled
-                'wellsoft_modules_selected' => $userAccess->wellsoft_modules_selected ?? [],
-                'jeeva_modules_selected' => $userAccess->jeeva_modules_selected ?? [],
+                // Module data - ensuring arrays are properly handled and JSON strings are decoded
+                'wellsoft_modules' => $userAccess->wellsoft_modules ?? [],
+                'wellsoft_modules_selected' => is_array($userAccess->wellsoft_modules_selected) 
+                    ? $userAccess->wellsoft_modules_selected 
+                    : ($userAccess->wellsoft_modules_selected ? json_decode($userAccess->wellsoft_modules_selected, true) ?? [] : []),
+                'jeeva_modules' => $userAccess->jeeva_modules ?? [],
+                'jeeva_modules_selected' => is_array($userAccess->jeeva_modules_selected) 
+                    ? $userAccess->jeeva_modules_selected 
+                    : ($userAccess->jeeva_modules_selected ? json_decode($userAccess->jeeva_modules_selected, true) ?? [] : []),
                 'module_requested_for' => $userAccess->module_requested_for ?? 'use',
                 
-                'internet_purposes' => $userAccess->internet_purposes ?? [],
+                'internet_purposes' => is_array($userAccess->internet_purposes) 
+                    ? $userAccess->internet_purposes 
+                    : ($userAccess->internet_purposes ? json_decode($userAccess->internet_purposes, true) ?? [] : []),
                 'access_type' => $userAccess->access_type ?? 'permanent',
                 'temporary_until' => $userAccess->temporary_until,
                 'request_type' => $userAccess->request_type ?? [],
@@ -662,8 +678,13 @@ class BothServiceFormController extends Controller
                 'user_id' => $currentUser->id,
                 'calculated_status' => $userAccess->getCalculatedOverallStatus(),
                 'has_hod_signature' => !empty($userAccess->hod_signature_path),
+                'jeeva_modules_selected' => $userAccess->jeeva_modules_selected,
+                'jeeva_modules_selected_type' => gettype($userAccess->jeeva_modules_selected),
                 'jeeva_modules_count' => $this->getJsonArrayCount($userAccess->jeeva_modules_selected),
-                'wellsoft_modules_count' => $this->getJsonArrayCount($userAccess->wellsoft_modules_selected)
+                'wellsoft_modules_selected' => $userAccess->wellsoft_modules_selected,
+                'wellsoft_modules_selected_type' => gettype($userAccess->wellsoft_modules_selected),
+                'wellsoft_modules_count' => $this->getJsonArrayCount($userAccess->wellsoft_modules_selected),
+                'module_requested_for' => $userAccess->module_requested_for
             ]);
             
             return response()->json([

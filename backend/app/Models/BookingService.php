@@ -53,6 +53,18 @@ class BookingService extends Model
         'device_issued_at',
         'assessed_by',
         'assessment_notes',
+        // SMS notification tracking
+        'sms_notifications',
+        'sms_sent_to_hod_at',
+        'sms_to_hod_status',
+        'sms_sent_to_divisional_at',
+        'sms_to_divisional_status',
+        'sms_sent_to_ict_director_at',
+        'sms_to_ict_director_status',
+        'sms_sent_to_head_it_at',
+        'sms_to_head_it_status',
+        'sms_sent_to_requester_at',
+        'sms_to_requester_status',
     ];
 
     /**

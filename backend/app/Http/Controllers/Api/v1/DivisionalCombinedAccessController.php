@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
 use App\Models\UserAccess;
+use App\Models\User;
 use App\Models\Department;
 use App\Services\UserAccessWorkflowService;
+use App\Services\SmsModule;
 use App\Traits\HandlesStatusQueries;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -38,8 +40,8 @@ class DivisionalCombinedAccessController extends Controller
             ]);
 
             $query = UserAccess::with(['user', 'department'])
-                ->whereNotNull('request_type');
-                // Show ALL requests regardless of status - Divisional Directors should see the complete history
+                ->whereNotNull('request_type')
+                ->where('hod_status', 'approved'); // Only show HOD-approved requests for Divisional approval
 
             // DEPARTMENT FILTERING: Divisional Director only sees requests from their department(s)
             $currentUser = auth()->user();
@@ -263,6 +265,35 @@ class DivisionalCombinedAccessController extends Controller
             $userAccessRequest->update($updateData);
 
             DB::commit();
+            
+            // Send SMS notifications if approved
+            if ($validatedData['divisional_status'] === 'approved') {
+                try {
+                    // Get next approver (ICT Director)
+                    $nextApprover = User::whereHas('roles', fn($q) => 
+                        $q->where('name', 'ict_director')
+                    )->first();
+                    
+                    // Send SMS notifications
+                    $sms = app(SmsModule::class);
+                    $sms->notifyRequestApproved(
+                        $userAccessRequest,
+                        auth()->user(),
+                        'divisional',
+                        $nextApprover
+                    );
+                    
+                    Log::info('Divisional SMS notifications sent', [
+                        'request_id' => $id,
+                        'next_approver' => $nextApprover ? $nextApprover->name : 'None'
+                    ]);
+                } catch (\Exception $e) {
+                    Log::warning('Divisional SMS notification failed', [
+                        'request_id' => $id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
 
             Log::info('Divisional Combined Access: Approval updated successfully', [
                 'request_id' => $id,
