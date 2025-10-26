@@ -1,11 +1,11 @@
 <template>
   <aside
-    class="min-h-full flex flex-col transition-all duration-300 ease-in-out overflow-hidden relative shadow-2xl sidebar-responsive"
+    class="h-screen flex flex-col transition-all duration-300 ease-in-out overflow-hidden relative shadow-2xl sidebar-responsive"
     :class="[
       isCollapsed ? 'w-16 sidebar-collapsed' : 'sidebar-expanded',
       !shouldShowSidebar ? 'invisible pointer-events-none opacity-0' : 'opacity-100'
     ]"
-    :style="!isCollapsed ? 'width: 16rem;' : ''"
+    :style="!isCollapsed ? 'width: 20rem;' : ''"
     aria-label="Sidebar navigation"
     style="
       background: linear-gradient(
@@ -38,9 +38,9 @@
     </div>
 
     <!-- Main Content Container -->
-    <div class="relative z-10 flex flex-col h-full p-4">
+    <div class="relative z-10 flex flex-col h-full">
       <!-- Header with Menu Icon and Profile -->
-      <div class="mb-6">
+      <div class="mb-6 px-4 pt-4">
         <!-- Menu Icon and Brand -->
         <div class="flex items-center justify-between mb-4">
           <!-- Menu Toggle Button -->
@@ -194,7 +194,7 @@
       </div>
 
       <!-- Navigation Menu -->
-      <nav class="flex-1 min-h-0 space-y-1 overflow-y-auto custom-scrollbar">
+      <nav class="flex-1 min-h-0 space-y-1 overflow-y-auto custom-scrollbar px-4">
         <!-- Dashboard Section -->
         <div v-if="filteredDashboardItems.length > 0" class="mb-2">
           <div
@@ -533,7 +533,7 @@
       </nav>
 
       <!-- Bottom Section -->
-      <div class="bottom-section space-y-2 mt-auto pt-4 border-t border-blue-400/30">
+      <div class="bottom-section space-y-3 pt-4 pb-20 px-4 border-t border-blue-400/30" style="flex-shrink: 0; margin-top: auto;">
         <!-- Help Center -->
         <button
           @click="showHelp"
@@ -1647,31 +1647,31 @@
 <style scoped>
   /* Responsive Font Size Variables */
   .sidebar-responsive {
-    --brand-font-size: 0.875rem; /* 14px */
-    --profile-name-size: 0.875rem; /* 14px */
-    --profile-role-size: 0.75rem; /* 12px */
-    --section-header-size: 0.75rem; /* 12px */
-    --nav-item-size: 0.875rem; /* 14px */
-    --bottom-section-size: 0.875rem; /* 14px */
+    --brand-font-size: 1.125rem; /* 18px */
+    --profile-name-size: 1.125rem; /* 18px */
+    --profile-role-size: 1rem; /* 16px */
+    --section-header-size: 1rem; /* 16px */
+    --nav-item-size: 1.125rem; /* 18px */
+    --bottom-section-size: 1.125rem; /* 18px */
 
     /* Icon sizes */
-    --icon-size-small: 1rem; /* 16px */
-    --icon-size-medium: 1.125rem; /* 18px */
+    --icon-size-small: 1.25rem; /* 20px */
+    --icon-size-medium: 1.5rem; /* 24px */
 
     /* Transition for font sizes */
     transition: all 0.3s ease-in-out;
   }
 
   .sidebar-expanded {
-    --brand-font-size: 1rem; /* 16px */
-    --profile-name-size: 0.875rem; /* 14px */
-    --profile-role-size: 0.75rem; /* 12px */
-    --section-header-size: 0.75rem; /* 12px */
-    --nav-item-size: 0.875rem; /* 14px */
-    --bottom-section-size: 0.875rem; /* 14px */
+    --brand-font-size: 1.25rem; /* 20px */
+    --profile-name-size: 1.125rem; /* 18px */
+    --profile-role-size: 1rem; /* 16px */
+    --section-header-size: 1rem; /* 16px */
+    --nav-item-size: 1.125rem; /* 18px */
+    --bottom-section-size: 1.125rem; /* 18px */
 
-    --icon-size-small: 1.125rem; /* 18px */
-    --icon-size-medium: 1.25rem; /* 20px */
+    --icon-size-small: 1.5rem; /* 24px */
+    --icon-size-medium: 1.75rem; /* 28px */
   }
 
   .sidebar-collapsed {

@@ -5,7 +5,7 @@ const API_BASE_URL = process.env.VUE_APP_API_URL || 'http://127.0.0.1:8000/api'
 // Create axios instance with default config
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000,
+  timeout: 0, // No timeout - let backend take as long as needed
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json'

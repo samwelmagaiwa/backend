@@ -76,8 +76,8 @@
           </div>
 
           <!-- Requests Table -->
-          <div class="bg-white/10 rounded-lg overflow-visible relative">
-            <table class="w-full">
+          <div class="bg-white/10 rounded-lg relative" style="overflow: visible !important;">
+            <table class="w-full" style="overflow: visible !important;">
               <thead class="bg-blue-800/50">
                 <tr>
                   <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">Request ID</th>
@@ -91,14 +91,18 @@
                   <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
                     Current Status
                   </th>
+                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
+                    SMS Status
+                  </th>
                   <th class="px-4 py-4 text-center text-blue-100 text-lg font-bold">Actions</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody style="overflow: visible !important;">
                 <tr
                   v-for="request in filteredRequests"
                   :key="request.id"
                   class="border-t border-blue-300/20 hover:bg-blue-700/30"
+                  style="overflow: visible !important;"
                 >
                   <!-- Request ID -->
                   <td class="px-4 py-4">
@@ -172,6 +176,22 @@
                     </div>
                   </td>
 
+                  <!-- SMS Status -->
+                  <td class="px-4 py-4">
+                    <div class="flex items-center space-x-2">
+                      <div
+                        class="w-3 h-3 rounded-full"
+                        :class="getSmsStatusColor(getRelevantSmsStatus(request))"
+                      ></div>
+                      <span
+                        class="text-base font-medium"
+                        :class="getSmsStatusTextColor(getRelevantSmsStatus(request))"
+                      >
+                        {{ getSmsStatusText(getRelevantSmsStatus(request)) }}
+                      </span>
+                    </div>
+                  </td>
+
                   <!-- Actions -->
                   <td class="px-4 py-3 text-center relative">
                     <div class="flex justify-center three-dot-menu">
@@ -210,18 +230,21 @@
                         >
                           <button
                             @click.stop="executeAction(action.key, request)"
-                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200 flex items-center space-x-3 group"
-                            :class="{
-                              'border-t border-gray-100':
-                                index > 0 &&
-                                shouldShowSeparator(action, getAvailableActions(request)[index - 1])
-                            }"
+                            class="w-full text-left px-4 py-3 text-base transition-all duration-200 flex items-center space-x-3 group"
+                            :class="[
+                              getActionButtonClass(action.key),
+                              {
+                                'border-t border-gray-200':
+                                  index > 0 &&
+                                  shouldShowSeparator(action, getAvailableActions(request)[index - 1])
+                              }
+                            ]"
                           >
                             <i
-                              :class="action.icon"
-                              class="text-gray-400 group-hover:text-gray-600 w-4 h-4 flex-shrink-0 transition-colors duration-200"
+                              :class="[action.icon, getActionIconClass(action.key)]"
+                              class="w-5 h-5 flex-shrink-0 transition-colors duration-200"
                             ></i>
-                            <span class="font-medium">{{ action.label }}</span>
+                            <span class="font-semibold">{{ action.label }}</span>
                           </button>
                         </template>
                       </div>
@@ -739,41 +762,45 @@
         const actions = []
         const status = request.status
 
-        // Main action: Approve
-        actions.push({
-          key: 'view_and_process',
-          label: 'Approve',
-          icon: 'fas fa-check-circle',
-          color: 'green'
-        })
+        // Check if already approved by Divisional Director
+        const isAlreadyApproved = [
+          'divisional_approved',
+          'ict_director_approved', 
+          'dict_approved',
+          'head_it_approved',
+          'approved',
+          'assigned_to_ict',
+          'implementation_in_progress',
+          'implemented',
+          'completed'
+        ].includes(status)
 
-        // Divisional Director cannot edit requests - removed edit action
+        // Only show Approve button if NOT already approved and pending divisional approval
+        if (!isAlreadyApproved && status === 'hod_approved') {
+          actions.push({
+            key: 'view_and_process',
+            label: 'Approve',
+            icon: 'fas fa-check-circle',
+            color: 'green'
+          })
+        }
 
-        // Cancel action for cancellable requests
-        if (this.canCancel(request)) {
+        // View Approved Request - only for approved requests
+        if (isAlreadyApproved) {
+          actions.push({
+            key: 'view_approved_request',
+            label: 'View Approved Request',
+            icon: 'fas fa-eye',
+            color: 'blue'
+          })
+        }
+
+        // Cancel action for cancellable requests (not for already approved)
+        if (this.canCancel(request) && !isAlreadyApproved) {
           actions.push({
             key: 'cancel_request',
             label: 'Cancel Request',
             icon: 'fas fa-times'
-          })
-        }
-
-        // View Progress for requests that are in progress or implemented
-        if (
-          [
-            'implementation_in_progress',
-            'implemented',
-            'completed',
-            'assigned_to_ict',
-            'divisional_approved',
-            'ict_director_approved',
-            'head_it_approved'
-          ].includes(status)
-        ) {
-          actions.push({
-            key: 'view_progress',
-            label: 'View Progress',
-            icon: 'fas fa-chart-line'
           })
         }
 
@@ -795,14 +822,14 @@
           case 'view_and_process':
             this.viewAndProcessRequest(request.id)
             break
+          case 'view_approved_request':
+            this.viewApprovedRequest(request.id)
+            break
           case 'edit_request':
             this.editRequest(request.id)
             break
           case 'cancel_request':
             this.cancelRequest(request.id)
-            break
-          case 'view_progress':
-            this.viewProgress(request)
             break
           case 'view_timeline':
             this.viewTimeline(request)
@@ -810,6 +837,14 @@
           default:
             console.warn('Unknown action:', actionKey)
         }
+      },
+
+      viewApprovedRequest(requestId) {
+        // Navigate to view-only mode for approved requests
+        this.$router.push({
+          path: `/divisional-dashboard/both-service-form/${requestId}`,
+          query: { mode: 'view', readonly: 'true' }
+        })
       },
 
       // Timeline modal methods
@@ -828,13 +863,6 @@
       async handleTimelineUpdate() {
         console.log('🔄 DivisionalRequestList: Timeline updated, refreshing requests list...')
         await this.fetchRequests()
-      },
-
-      // View Progress method
-      viewProgress(request) {
-        console.log('👁️ DivisionalRequestList: Viewing progress for request:', request.id)
-        // Navigate to progress view - using ICT dashboard route for consistency
-        this.$router.push(`/user-security-access/${request.user_access_id || request.id}`)
       },
 
       // Helper method to determine if separator should be shown
@@ -861,6 +889,72 @@
         }
 
         return false
+      },
+
+      // SMS Status methods
+      getRelevantSmsStatus(request) {
+        // For Divisional Director: show SMS status for NEXT workflow step after their approval
+        const status = request.divisional_status || request.status
+        
+        // If Divisional Director has APPROVED: show ICT Director notification status
+        if (status === 'divisional_approved' || status === 'approved' || status === 'dict_approved' || status === 'implemented') {
+          return request.sms_to_ict_director_status || 'pending'
+        }
+        
+        // If PENDING Divisional approval: return 'pending' (no action notification sent yet)
+        // Don't show sms_to_divisional_status (that's the incoming notification)
+        return 'pending'
+      },
+
+      getSmsStatusText(smsStatus) {
+        const statusMap = {
+          sent: 'Delivered',
+          pending: 'Pending',
+          failed: 'Failed'
+        }
+        return statusMap[smsStatus] || 'Pending'
+      },
+
+      getSmsStatusColor(smsStatus) {
+        const colorMap = {
+          sent: 'bg-green-500',
+          pending: 'bg-yellow-500',
+          failed: 'bg-red-500'
+        }
+        return colorMap[smsStatus] || 'bg-gray-400'
+      },
+
+      getSmsStatusTextColor(smsStatus) {
+        const textColorMap = {
+          sent: 'text-green-400',
+          pending: 'text-yellow-400',
+          failed: 'text-red-400'
+        }
+        return textColorMap[smsStatus] || 'text-gray-400'
+      },
+
+      // Get button styling classes based on action type
+      getActionButtonClass(actionKey) {
+        const classMap = {
+          view_and_process: 'text-green-700 hover:bg-green-50 hover:text-green-800',
+          view_approved_request: 'text-blue-700 hover:bg-blue-50 hover:text-blue-800',
+          cancel_request: 'text-red-700 hover:bg-red-50 hover:text-red-800',
+          view_progress: 'text-blue-700 hover:bg-blue-50 hover:text-blue-800',
+          view_timeline: 'text-gray-700 hover:bg-gray-50 hover:text-gray-800'
+        }
+        return classMap[actionKey] || 'text-gray-700 hover:bg-gray-50 hover:text-gray-800'
+      },
+
+      // Get icon styling classes based on action type
+      getActionIconClass(actionKey) {
+        const classMap = {
+          view_and_process: 'text-green-600 group-hover:text-green-700',
+          view_approved_request: 'text-blue-600 group-hover:text-blue-700',
+          cancel_request: 'text-red-600 group-hover:text-red-700',
+          view_progress: 'text-blue-600 group-hover:text-blue-700',
+          view_timeline: 'text-gray-600 group-hover:text-gray-700'
+        }
+        return classMap[actionKey] || 'text-gray-600 group-hover:text-gray-700'
       }
     }
   }
@@ -910,13 +1004,21 @@
   /* Ensure dropdown is always visible and properly positioned */
   .dropdown-menu {
     position: absolute !important;
-    z-index: 10000 !important;
+    z-index: 99999 !important;
     min-width: 12rem;
     max-width: 16rem;
-    transform: translateX(-100%);
   }
 
   /* Fix for table cell positioning context */
+  tbody tr {
+    position: relative;
+  }
+
+  tbody tr td:last-child {
+    position: relative !important;
+    overflow: visible !important;
+  }
+
   .three-dot-menu {
     position: relative;
     z-index: 1;
@@ -924,9 +1026,14 @@
 
   .three-dot-menu .dropdown-menu {
     position: absolute;
-    top: 100%;
+    top: calc(100% + 4px);
     right: 0;
-    transform: translateX(0);
+  }
+
+  /* Open dropdown upward for last 2 rows to prevent clipping */
+  tbody tr:nth-last-child(-n+2) .dropdown-menu {
+    bottom: calc(100% + 4px);
+    top: auto;
   }
 
   /* Mobile responsive adjustments */

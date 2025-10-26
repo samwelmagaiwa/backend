@@ -95,6 +95,9 @@
                   <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
                     Current Status
                   </th>
+                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
+                    SMS Status
+                  </th>
                   <th class="px-4 py-4 text-center text-blue-100 text-lg font-bold">Actions</th>
                 </tr>
               </thead>
@@ -173,6 +176,22 @@
                         :style="{ padding: '6px 12px', width: 'fit-content' }"
                       >
                         {{ getStatusText(request.hod_status || request.status || 'pending_hod') }}
+                      </span>
+                    </div>
+                  </td>
+
+                  <!-- SMS Status -->
+                  <td class="px-4 py-4">
+                    <div class="flex items-center space-x-2">
+                      <div
+                        class="w-3 h-3 rounded-full"
+                        :class="getSmsStatusColor(getRelevantSmsStatus(request))"
+                      ></div>
+                      <span
+                        class="text-base font-medium"
+                        :class="getSmsStatusTextColor(getRelevantSmsStatus(request))"
+                      >
+                        {{ getSmsStatusText(getRelevantSmsStatus(request)) }}
                       </span>
                     </div>
                   </td>
@@ -883,6 +902,57 @@
           path: `/hod-combined-requests/both-service-form/${requestId}`,
           query: { mode: 'view', readonly: 'true' }
         })
+      },
+
+      // SMS Status methods
+      getRelevantSmsStatus(request) {
+        // For HOD: show SMS status for NEXT workflow step after their approval
+        const status = request.hod_status || request.status
+        
+        console.log('🔍 HOD SMS Status Check:', {
+          requestId: request.id,
+          status: status,
+          hod_status: request.hod_status,
+          sms_to_divisional_status: request.sms_to_divisional_status
+        })
+        
+        // If HOD has APPROVED: show Divisional Director notification status (next in workflow)
+        if (status === 'hod_approved' || status === 'approved' || status === 'divisional_approved' || status === 'implemented') {
+          console.log('✅ HOD approved - showing divisional SMS status')
+          return request.sms_to_divisional_status || 'pending'
+        }
+        
+        // If PENDING HOD approval or any other state: return 'pending' (no action notification sent yet)
+        // Don't show sms_to_hod_status (that's the incoming notification)
+        console.log('⏳ Pending HOD action - returning pending')
+        return 'pending'
+      },
+
+      getSmsStatusText(smsStatus) {
+        const statusMap = {
+          sent: 'Delivered',
+          pending: 'Pending',
+          failed: 'Failed'
+        }
+        return statusMap[smsStatus] || 'Pending'
+      },
+
+      getSmsStatusColor(smsStatus) {
+        const colorMap = {
+          sent: 'bg-green-500',
+          pending: 'bg-yellow-500',
+          failed: 'bg-red-500'
+        }
+        return colorMap[smsStatus] || 'bg-gray-400'
+      },
+
+      getSmsStatusTextColor(smsStatus) {
+        const textColorMap = {
+          sent: 'text-green-400',
+          pending: 'text-yellow-400',
+          failed: 'text-red-400'
+        }
+        return textColorMap[smsStatus] || 'text-gray-400'
       }
     }
   }

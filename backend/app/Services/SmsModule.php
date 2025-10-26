@@ -161,6 +161,164 @@ class SmsModule
     }
 
     /**
+     * Notify ICT Officer about task assignment
+     * Similar to notifyRequestApproved but specifically for ICT Officer assignment
+     */
+    public function notifyIctOfficerAssignment($request, User $ictOfficer, User $assignedBy): array
+    {
+        $results = ['ict_officer_notified' => false];
+
+        try {
+            // Notify ICT Officer about assignment
+            if ($ictOfficer->phone) {
+                $requesterName = $request->staff_name ?? $request->full_name ?? 'Staff';
+                $department = 'N/A';
+                if ($request->department && is_object($request->department)) {
+                    $department = $request->department->name;
+                }
+                
+                $types = $this->getRequestTypes($request);
+                $ref = $request->request_id ?? 'MLG-REQ' . str_pad($request->id, 6, '0', STR_PAD_LEFT);
+                
+                // Handle grammar: if types is 'Access', don't add 'access' again
+                $accessText = ($types === 'Access') ? $types : "{$types} access";
+                $message = "NEW TASK ASSIGNMENT: You have been assigned to implement {$accessText} for {$requesterName} ({$department}). Ref: {$ref}. Please login to system to start implementation. - EABMS";
+                
+                $result = $this->sendSms($ictOfficer->phone, $message, 'ict_officer_assignment');
+                $results['ict_officer_notified'] = $result['success'];
+                
+                // Update SMS status tracking for ICT Officer
+                try {
+                    $request->update([
+                        'sms_sent_to_ict_officer_at' => $results['ict_officer_notified'] ? now() : null,
+                        'sms_to_ict_officer_status' => $results['ict_officer_notified'] ? 'sent' : 'failed'
+                    ]);
+                } catch (Exception $e) {
+                    Log::error('Failed to update ICT Officer SMS status', [
+                        'request_id' => $request->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            } else {
+                Log::warning('No phone number for ICT Officer', [
+                    'officer_id' => $ictOfficer->id,
+                    'officer_name' => $ictOfficer->name
+                ]);
+            }
+
+            Log::info('ICT Officer assignment SMS notification sent', [
+                'request_id' => $request->id,
+                'ict_officer_id' => $ictOfficer->id,
+                'results' => $results
+            ]);
+
+        } catch (Exception $e) {
+            Log::error('Failed to send ICT Officer assignment notification', [
+                'request_id' => $request->id ?? null,
+                'ict_officer_id' => $ictOfficer->id ?? null,
+                'error' => $e->getMessage()
+            ]);
+        }
+
+        return $results;
+    }
+
+    /**
+     * Notify requester when access is granted (implementation completed)
+     * 
+     * @param mixed $request - The access request object
+     * @param User $ictOfficer - ICT Officer who granted access
+     * @param string|null $comments - Implementation notes from ICT Officer
+     */
+    public function notifyAccessGranted($request, User $ictOfficer, ?string $comments = null): array
+    {
+        $results = ['requester_notified' => false];
+
+        try {
+            // Get requester phone number
+            $phone = null;
+            $phoneSource = 'unknown';
+            
+            // Try to get from request fields first
+            if (!empty($request->phone)) {
+                $phone = $request->phone;
+                $phoneSource = 'request.phone';
+            } elseif (!empty($request->phone_number)) {
+                $phone = $request->phone_number;
+                $phoneSource = 'request.phone_number';
+            } elseif (isset($request->user) && !empty($request->user->phone)) {
+                $phone = $request->user->phone;
+                $phoneSource = 'users.phone (via relationship)';
+            }
+            
+            if (!$phone) {
+                Log::warning('No phone number for requester (access granted notification)', [
+                    'request_id' => $request->id,
+                    'user_id' => $request->user_id ?? null
+                ]);
+                return $results;
+            }
+            
+            Log::info('Access granted SMS - phone number resolved', [
+                'request_id' => $request->id,
+                'phone_source' => $phoneSource,
+                'phone_masked' => substr($phone, 0, 6) . '***'
+            ]);
+
+            // Get requester name
+            $name = $request->staff_name ?? $request->full_name ?? $request->user->name ?? 'User';
+            
+            // Get request types
+            $types = $this->getRequestTypes($request);
+            
+            // Get reference
+            $ref = $request->request_id ?? 'MLG-REQ' . str_pad($request->id, 6, '0', STR_PAD_LEFT);
+            
+            // Build message with ICT Officer's comment if provided
+            $message = "Dear {$name}, your {$types} access has been GRANTED and is now ACTIVE. Ref: {$ref}.";
+            
+            if ($comments && trim($comments) !== '') {
+                // Add ICT officer's comment to the message
+                $message .= " Note: {$comments}";
+            }
+            
+            $message .= " - EABMS";
+            
+            // Send SMS
+            $result = $this->sendSms($phone, $message, 'access_granted');
+            $results['requester_notified'] = $result['success'];
+            
+            // Update SMS status tracking
+            try {
+                $request->update([
+                    'sms_sent_to_requester_at' => $results['requester_notified'] ? now() : null,
+                    'sms_to_requester_status' => $results['requester_notified'] ? 'sent' : 'failed'
+                ]);
+            } catch (Exception $e) {
+                Log::error('Failed to update requester SMS status (access granted)', [
+                    'request_id' => $request->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
+            
+            Log::info('Access granted SMS notification sent', [
+                'request_id' => $request->id,
+                'ict_officer_id' => $ictOfficer->id,
+                'results' => $results
+            ]);
+
+        } catch (Exception $e) {
+            Log::error('Failed to send access granted notification', [
+                'request_id' => $request->id ?? null,
+                'ict_officer_id' => $ictOfficer->id ?? null,
+                'error' => $e->getMessage()
+            ]);
+        }
+
+        return $results;
+    }
+
+    /**
      * Notify requester about approval
      */
     protected function notifyRequester($request, string $approvalLevel): bool
@@ -239,7 +397,14 @@ class SmsModule
 
         // Get requester info
         $requesterName = $request->staff_name ?? $request->full_name ?? $request->user->name ?? 'Staff';
-        $department = $request->department ?? $request->user->department->name ?? 'N/A';
+        
+        // Get department name (not the whole object)
+        $department = 'N/A';
+        if ($request->department && is_object($request->department)) {
+            $department = $request->department->name;
+        } elseif (isset($request->user->department->name)) {
+            $department = $request->user->department->name;
+        }
 
         // Get request types
         $types = $this->getRequestTypes($request);
@@ -431,9 +596,25 @@ class SmsModule
     protected function getRequestTypes($request): string
     {
         $types = [];
-        if ($request->jeeva_access ?? false) $types[] = 'Jeeva';
-        if ($request->wellsoft_access ?? false) $types[] = 'Wellsoft';
-        if ($request->internet_access ?? false) $types[] = 'Internet';
+        
+        // Check various field names for Jeeva access
+        if (!empty($request->jeeva_modules_selected) || 
+            ($request->jeeva_access ?? false)) {
+            $types[] = 'Jeeva';
+        }
+        
+        // Check various field names for Wellsoft access
+        if (!empty($request->wellsoft_modules_selected) || 
+            ($request->wellsoft_access ?? false)) {
+            $types[] = 'Wellsoft';
+        }
+        
+        // Check various field names for Internet access
+        if (!empty($request->internet_purposes) || 
+            ($request->internet_access ?? false)) {
+            $types[] = 'Internet';
+        }
+        
         return implode(' & ', $types) ?: 'Access';
     }
 
@@ -584,7 +765,12 @@ class SmsModule
                     $statusField = 'sms_to_head_it_status';
                     break;
                 case 'head_it':
-                    // Head of IT is final - no next approver
+                    // Head of IT just approved, so SMS is sent to ICT Officer
+                    $timestampField = 'sms_sent_to_ict_officer_at';
+                    $statusField = 'sms_to_ict_officer_status';
+                    break;
+                case 'ict_officer':
+                    // ICT Officer is final - no next approver
                     return;
             }
 
@@ -628,6 +814,11 @@ class SmsModule
                 'status' => $request->sms_to_head_it_status ?? 'pending',
                 'sent_at' => $request->sms_sent_to_head_it_at,
                 'sent' => $request->sms_to_head_it_status === 'sent'
+            ],
+            'ict_officer' => [
+                'status' => $request->sms_to_ict_officer_status ?? 'pending',
+                'sent_at' => $request->sms_sent_to_ict_officer_at,
+                'sent' => $request->sms_to_ict_officer_status === 'sent'
             ],
             'requester' => [
                 'status' => $request->sms_to_requester_status ?? 'pending',

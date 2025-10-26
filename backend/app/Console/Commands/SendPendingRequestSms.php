@@ -208,9 +208,20 @@ class SendPendingRequestSms extends Command
             return false;
         }
         
-        $nextApprover = User::whereHas('roles', fn($q) => 
-            $q->where('name', $nextRoleName)
-        )->first();
+        // Get next approver based on the request's department
+        // IMPORTANT: For divisional_director, we must get the director assigned to
+        // the specific department of this request, since divisional directors can
+        // oversee multiple departments. We use the department relationship.
+        if ($nextRoleName === 'divisional_director' && $request->department) {
+            $nextApprover = $request->department->divisional_director_id 
+                ? User::find($request->department->divisional_director_id)
+                : User::whereHas('roles', fn($q) => $q->where('name', $nextRoleName))->first();
+        } else {
+            // For ICT Director and Head of IT, these are organization-wide roles
+            $nextApprover = User::whereHas('roles', fn($q) => 
+                $q->where('name', $nextRoleName)
+            )->first();
+        }
         
         if (!$nextApprover || !$nextApprover->phone) {
             $this->warn("  ⚠️  Next approver ({$nextRoleName}) not found or has no phone");

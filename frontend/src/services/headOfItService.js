@@ -180,11 +180,15 @@ const headOfItService = {
 
   /**
    * Get list of available ICT Officers
+   * @param {number} requestId - Optional request ID to get SMS status for assigned officers
    */
-  async getIctOfficers() {
+  async getIctOfficers(requestId = null) {
     try {
-      console.log('🔄 HeadOfItService: Fetching ICT officers...')
-      const response = await axiosInstance.get('/head-of-it/ict-officers')
+      console.log('🔄 HeadOfItService: Fetching ICT officers...', { requestId })
+      const url = requestId 
+        ? `/head-of-it/ict-officers?request_id=${requestId}`
+        : '/head-of-it/ict-officers'
+      const response = await axiosInstance.get(url)
 
       if (response.data.success) {
         console.log('✅ HeadOfItService: ICT officers loaded successfully')

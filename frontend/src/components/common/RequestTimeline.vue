@@ -640,21 +640,7 @@
           hasSignature: !!request.head_it_signature_path
         })
 
-        // 6. ICT Officer Assignment
-        const ictOfficerStatus = this.getApprovalStatus('ict_officer', request)
-        steps.push({
-          id: 'ict_officer_assignment',
-          title: 'ICT Officer Assignment',
-          status: ictOfficerStatus.assignmentStatus,
-          statusLabel: ictOfficerStatus.assignmentLabel,
-          actor: 'System', // or the person who assigned
-          position: 'Auto Assignment',
-          timestamp: request.ict_officer_assigned_at,
-          assignedOfficer: request.ict_officer_name,
-          comments: null
-        })
-
-        // 7. ICT Officer Implementation
+        // 6. ICT Officer Implementation
         let implementationStatus = 'pending'
         let implementationLabel = 'Waiting'
         let implementationTimestamp = null

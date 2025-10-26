@@ -33,7 +33,15 @@ class IctTaskAssignedNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['database', 'mail'];
+        // Send via database, mail, and SMS
+        $channels = ['database', 'mail'];
+        
+        // Add SMS channel if phone number is available
+        if ($notifiable->phone) {
+            $channels[] = '\App\Channels\SmsChannel';
+        }
+        
+        return $channels;
     }
 
     /**
@@ -100,5 +108,22 @@ class IctTaskAssignedNotification extends Notification implements ShouldQueue
             'assigned_at' => $this->taskAssignment->assigned_at,
             'action_url' => '/ict-officer/tasks/' . $this->taskAssignment->id
         ];
+    }
+
+    /**
+     * Get the SMS representation of the notification.
+     *
+     * @param object $notifiable
+     * @return string
+     */
+    public function toSms(object $notifiable): string
+    {
+        $staffName = $this->userAccess->staff_name;
+        $pfNumber = $this->userAccess->pf_number;
+        $requestTypes = is_array($this->userAccess->request_type) 
+            ? implode(', ', $this->userAccess->request_type)
+            : $this->userAccess->request_type;
+        
+        return "New ICT Task Assignment: You have been assigned to grant access for {$staffName} (PF: {$pfNumber}). Request Type: {$requestTypes}. Please log in to start implementation.";
     }
 }

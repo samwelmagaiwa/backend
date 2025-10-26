@@ -77,8 +77,9 @@
           </div>
 
           <!-- Requests Table -->
-          <div class="bg-white/10 rounded-lg overflow-hidden">
-            <table class="w-full">
+          <div class="bg-white/10 rounded-lg" style="overflow: visible;">
+            <div style="overflow-x: auto;">
+              <table class="w-full">
               <thead class="bg-blue-800/50">
                 <tr>
                   <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">Request ID</th>
@@ -91,6 +92,9 @@
                   </th>
                   <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
                     Current Status
+                  </th>
+                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
+                    SMS Status
                   </th>
                   <th class="px-4 py-4 text-center text-blue-100 text-lg font-bold">Actions</th>
                 </tr>
@@ -197,6 +201,22 @@
                     </div>
                   </td>
 
+                  <!-- SMS Status -->
+                  <td class="px-4 py-3">
+                    <div class="flex items-center space-x-2">
+                      <div
+                        class="w-3 h-3 rounded-full"
+                        :class="getSmsStatusColor(getRelevantSmsStatus(request))"
+                      ></div>
+                      <span
+                        class="text-sm font-medium"
+                        :class="getSmsStatusTextColor(getRelevantSmsStatus(request))"
+                      >
+                        {{ getSmsStatusText(getRelevantSmsStatus(request)) }}
+                      </span>
+                    </div>
+                  </td>
+
                   <!-- Actions -->
                   <td class="px-4 py-3 text-center relative">
                     <div class="flex justify-center three-dot-menu">
@@ -217,44 +237,47 @@
                         </svg>
                       </button>
 
-                      <!-- Dropdown menu -->
-                      <div
-                        v-show="openDropdownId === request.id"
-                        class="dropdown-menu absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-[10000] py-1 min-w-max"
-                        @click.stop="() => {}"
-                        style="
-                          box-shadow:
-                            0 10px 25px rgba(0, 0, 0, 0.15),
-                            0 4px 6px rgba(0, 0, 0, 0.1);
-                        "
-                      >
-                        <!-- Role-specific actions -->
-                        <template
-                          v-for="(action, index) in getAvailableActions(request)"
-                          :key="action.key"
+                      <!-- Dropdown menu (using Teleport to render at body level) -->
+                      <Teleport to="body">
+                        <div
+                          v-show="openDropdownId === request.id"
+                          :ref="'dropdown-' + request.id"
+                          class="dropdown-menu fixed w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-1 min-w-max"
+                          :style="getDropdownStyle(request.id)"
+                          @click.stop="() => {}"
                         >
-                          <button
-                            @click.stop="executeAction(action.key, request)"
-                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200 flex items-center space-x-3 group"
-                            :class="{
-                              'border-t border-gray-100':
-                                index > 0 &&
-                                shouldShowSeparator(action, getAvailableActions(request)[index - 1])
-                            }"
+                          <!-- Role-specific actions -->
+                          <template
+                            v-for="(action, index) in getAvailableActions(request)"
+                            :key="action.key"
                           >
-                            <i
-                              :class="action.icon"
-                              class="text-gray-400 group-hover:text-gray-600 w-4 h-4 flex-shrink-0 transition-colors duration-200"
-                            ></i>
-                            <span class="font-medium">{{ action.label }}</span>
-                          </button>
-                        </template>
-                      </div>
+                            <button
+                              @click.stop="executeAction(action.key, request)"
+                              class="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-all duration-200 flex items-center space-x-3 group"
+                              :class="[
+                                {
+                                  'border-t border-gray-100':
+                                    index > 0 &&
+                                    shouldShowSeparator(action, getAvailableActions(request)[index - 1])
+                                },
+                                getActionColorClass(action)
+                              ]"
+                            >
+                              <i
+                                :class="[action.icon, getActionIconColorClass(action)]"
+                                class="w-4 h-4 flex-shrink-0 transition-colors duration-200"
+                              ></i>
+                              <span class="font-medium">{{ action.label }}</span>
+                            </button>
+                          </template>
+                        </div>
+                      </Teleport>
                     </div>
                   </td>
                 </tr>
               </tbody>
-            </table>
+              </table>
+            </div>
 
             <!-- Empty State -->
             <div v-if="filteredRequests.length === 0" class="text-center py-12">
@@ -345,6 +368,7 @@
         error: null,
         // Dropdown state management
         openDropdownId: null,
+        dropdownPositions: {},
         // Timeline modal state
         showTimeline: false,
         selectedRequestId: null,
@@ -592,6 +616,11 @@
         this.$router.push(`/dict-dashboard/both-service-form/${requestId}`)
       },
 
+      viewApprovedRequest(requestId) {
+        // Navigate to view approved request (read-only mode)
+        this.$router.push(`/dict-dashboard/both-service-form/${requestId}`)
+      },
+
       editRequest(requestId) {
         // Navigate to edit mode (same as Divisional Director)
         this.$router.push(`/both-service-form/${requestId}/edit`)
@@ -817,8 +846,46 @@
         // Add a small delay to ensure the dropdown is positioned correctly
         if (this.openDropdownId === requestId) {
           this.$nextTick(() => {
+            this.positionDropdown(requestId)
             console.log('Dropdown opened for request:', requestId)
           })
+        }
+      },
+
+      positionDropdown(requestId) {
+        // Find the button element for this request
+        const button = document.querySelector(`[aria-label*="${requestId}"]`)
+        if (!button) return
+
+        const rect = button.getBoundingClientRect()
+        const viewportHeight = window.innerHeight
+        const dropdownHeight = 200 // Approximate dropdown height
+        const spaceBelow = viewportHeight - rect.bottom
+
+        // Store position info
+        if (!this.dropdownPositions) {
+          this.dropdownPositions = {}
+        }
+        
+        // Calculate position relative to viewport
+        const position = spaceBelow < dropdownHeight + 20 ? 'top' : 'bottom'
+        this.dropdownPositions[requestId] = {
+          position,
+          top: position === 'bottom' ? rect.bottom + 4 : rect.top - dropdownHeight - 4,
+          left: rect.right - 192 // 192px = 12rem (w-48)
+        }
+        this.$forceUpdate()
+      },
+
+      getDropdownStyle(requestId) {
+        const pos = this.dropdownPositions?.[requestId]
+        if (!pos) return { zIndex: 99999 }
+        
+        return {
+          top: `${pos.top}px`,
+          left: `${pos.left}px`,
+          zIndex: 99999,
+          boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1)'
         }
       },
 
@@ -884,47 +951,54 @@
         }
         // ICT Director actions (current default for this page)
         else if (userRole === ROLES.ICT_DIRECTOR) {
-          actions.push({
-            key: 'view_and_process',
-            label: 'Approve',
-            icon: 'fas fa-check-circle',
-            color: 'green'
-          })
-          if (this.canEdit(request)) {
+          // Check if already approved by ICT Director
+          const isApproved = ['ict_director_approved', 'dict_approved', 'approved', 'head_it_approved', 'assigned', 'in_progress', 'implemented', 'completed'].includes(status)
+          
+          if (isApproved) {
+            // Show view and timeline for approved requests
             actions.push({
-              key: 'edit_request',
-              label: 'Edit Request',
-              icon: 'fas fa-edit'
+              key: 'view_approved_request',
+              label: 'View Approved Request',
+              icon: 'fas fa-eye',
+              color: 'blue'
+            })
+            actions.push({
+              key: 'view_timeline',
+              label: 'View Timeline',
+              icon: 'fas fa-history',
+              color: 'gray'
+            })
+          } else {
+            // Show approve and cancel for pending requests
+            actions.push({
+              key: 'view_and_process',
+              label: 'Approve',
+              icon: 'fas fa-check-circle',
+              color: 'green'
+            })
+            if (this.canEdit(request)) {
+              actions.push({
+                key: 'edit_request',
+                label: 'Edit Request',
+                icon: 'fas fa-edit',
+                color: 'blue'
+              })
+            }
+            if (this.canCancel(request)) {
+              actions.push({
+                key: 'cancel_request',
+                label: 'Cancel Request',
+                icon: 'fas fa-times',
+                color: 'red'
+              })
+            }
+            actions.push({
+              key: 'view_timeline',
+              label: 'View Timeline',
+              icon: 'fas fa-history',
+              color: 'gray'
             })
           }
-          if (this.canCancel(request)) {
-            actions.push({
-              key: 'cancel_request',
-              label: 'Cancel Request',
-              icon: 'fas fa-times'
-            })
-          }
-          // Add View Progress for requests that are in progress or implemented
-          if (
-            [
-              'implementation_in_progress',
-              'implemented',
-              'completed',
-              'assigned_to_ict',
-              'head_it_approved'
-            ].includes(status)
-          ) {
-            actions.push({
-              key: 'view_progress',
-              label: 'View Progress',
-              icon: 'fas fa-chart-line'
-            })
-          }
-          actions.push({
-            key: 'view_timeline',
-            label: 'View Timeline',
-            icon: 'fas fa-history'
-          })
         }
         // Other roles (Divisional Director, HOD, Requester)
         else {
@@ -961,11 +1035,11 @@
           case 'view_timeline':
             this.viewTimeline(request)
             break
-          case 'view_progress':
-            this.viewProgress(request)
-            break
           case 'view_and_process':
             this.viewAndProcessRequest(request.id)
+            break
+          case 'view_approved_request':
+            this.viewApprovedRequest(request.id)
             break
           case 'edit_request':
             this.editRequest(request.id)
@@ -976,6 +1050,27 @@
           default:
             console.warn('Unknown action:', actionKey)
         }
+      },
+
+      // Helper methods for button styling
+      getActionColorClass(action) {
+        const colorMap = {
+          green: 'text-green-600 hover:text-green-700 hover:bg-green-50',
+          red: 'text-red-600 hover:text-red-700 hover:bg-red-50',
+          blue: 'text-blue-600 hover:text-blue-700 hover:bg-blue-50',
+          gray: 'text-gray-600 hover:text-gray-700'
+        }
+        return colorMap[action.color] || 'text-gray-700 hover:text-gray-900'
+      },
+
+      getActionIconColorClass(action) {
+        const iconColorMap = {
+          green: 'text-green-500 group-hover:text-green-600',
+          red: 'text-red-500 group-hover:text-red-600',
+          blue: 'text-blue-500 group-hover:text-blue-600',
+          gray: 'text-gray-400 group-hover:text-gray-600'
+        }
+        return iconColorMap[action.color] || 'text-gray-400 group-hover:text-gray-600'
       },
 
       // New action methods
@@ -997,12 +1092,6 @@
         alert(
           'Update Progress functionality would be implemented here. This might open a modal or dedicated page.'
         )
-      },
-
-      viewProgress(request) {
-        console.log('👁️ DictRequestList: Viewing progress for request:', request.id)
-        // Navigate to progress view - using ICT dashboard route for consistency
-        this.$router.push(`/user-security-access/${request.user_access_id || request.id}`)
       },
 
       viewTimeline(request) {
@@ -1046,6 +1135,48 @@
         }
 
         return false
+      },
+
+      // SMS Status methods
+      getRelevantSmsStatus(request) {
+        // For ICT Director: show SMS status for NEXT workflow step after their approval
+        const status = request.ict_director_status || request.status
+        
+        // If ICT Director has APPROVED: show Head of IT notification status
+        if (status === 'ict_director_approved' || status === 'dict_approved' || status === 'approved' || status === 'head_it_approved' || status === 'implemented') {
+          return request.sms_to_head_it_status || 'pending'
+        }
+        
+        // If PENDING ICT Director approval: return 'pending' (no action notification sent yet)
+        // Don't show sms_to_ict_director_status (that's the incoming notification)
+        return 'pending'
+      },
+
+      getSmsStatusText(smsStatus) {
+        const statusMap = {
+          sent: 'Delivered',
+          pending: 'Pending',
+          failed: 'Failed'
+        }
+        return statusMap[smsStatus] || 'Pending'
+      },
+
+      getSmsStatusColor(smsStatus) {
+        const colorMap = {
+          sent: 'bg-green-500',
+          pending: 'bg-yellow-500',
+          failed: 'bg-red-500'
+        }
+        return colorMap[smsStatus] || 'bg-gray-400'
+      },
+
+      getSmsStatusTextColor(smsStatus) {
+        const textColorMap = {
+          sent: 'text-green-400',
+          pending: 'text-yellow-400',
+          failed: 'text-red-400'
+        }
+        return textColorMap[smsStatus] || 'text-gray-400'
       }
     }
   }
@@ -1071,13 +1202,11 @@
     position: relative;
   }
 
-  /* Ensure dropdown is always visible and properly positioned */
+  /* Dropdown menu styles (now rendered via Teleport at body level) */
   .dropdown-menu {
-    position: absolute !important;
-    z-index: 9999 !important;
+    z-index: 99999 !important;
     min-width: 12rem;
     max-width: 16rem;
-    transform: translateX(-100%);
   }
 
   /* Fix for table cell positioning context */
@@ -1145,6 +1274,26 @@
   table {
     position: relative;
     z-index: 1;
+  }
+  
+  /* Ensure table container allows dropdown overflow */
+  .bg-white\/10.rounded-lg {
+    overflow: visible !important;
+  }
+  
+  /* Ensure tbody allows overflow */
+  tbody {
+    position: relative;
+  }
+  
+  /* Ensure table rows allow overflow */
+  tbody tr {
+    position: relative;
+  }
+  
+  /* Ensure Actions column allows overflow */
+  td:last-child {
+    overflow: visible !important;
   }
 
   @keyframes dropdownFadeIn {

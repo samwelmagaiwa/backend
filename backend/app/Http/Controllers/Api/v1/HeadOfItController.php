@@ -62,7 +62,13 @@ class HeadOfItController extends Controller
                     'divisional_approved_at' => $request->divisional_approved_at,
                     'ict_director_approved_at' => $request->ict_director_approved_at,
                     'head_of_it_approved_at' => $request->head_of_it_approved_at,
-                    'updated_at' => $request->updated_at
+                    'updated_at' => $request->updated_at,
+                    // SMS status tracking for ICT Officer assignment
+                    'sms_to_ict_officer_status' => $request->sms_to_ict_officer_status ?? 'pending',
+                    'sms_sent_to_ict_officer_at' => $request->sms_sent_to_ict_officer_at,
+                    // Task assignment tracking
+                    'assigned_ict_officer_id' => $request->assigned_ict_officer_id,
+                    'task_assigned_at' => $request->task_assigned_at
                 ];
             });
 
@@ -317,12 +323,13 @@ class HeadOfItController extends Controller
     }
 
     /**
-     * Get list of available ICT Officers
+     * Get list of available ICT Officers with SMS status for specific request
      */
-    public function getIctOfficers()
+    public function getIctOfficers(Request $request)
     {
         try {
-            Log::info('HeadOfItController: Getting ICT officers list');
+            $requestId = $request->query('request_id');
+            Log::info('HeadOfItController: Getting ICT officers list', ['request_id' => $requestId]);
             
             // Get users with ICT Officer role
             $ictOfficers = User::whereHas('roles', function($query) {
@@ -331,11 +338,28 @@ class HeadOfItController extends Controller
                 ->with(['department'])
                 ->where('is_active', true)
                 ->get()
-                ->map(function ($officer) {
+                ->map(function ($officer) use ($requestId) {
                     // For now, set all ICT officers as available
                     // TODO: Implement proper task assignment tracking
                     $activeAssignments = 0; // Placeholder
                     $status = 'Available'; // Default status
+                    $smsStatus = null; // Default no SMS status
+
+                    // If request_id provided, check if this officer is assigned to that request
+                    if ($requestId) {
+                        $assignment = \App\Models\IctTaskAssignment::where('user_access_id', $requestId)
+                            ->where('ict_officer_user_id', $officer->id)
+                            ->whereIn('status', ['assigned', 'in_progress'])
+                            ->latest('assigned_at')
+                            ->first();
+                        
+                        if ($assignment) {
+                            // This officer is assigned to this request
+                            $userAccess = \App\Models\UserAccess::find($requestId);
+                            $smsStatus = $userAccess->sms_to_ict_officer_status ?? 'pending';
+                            $status = 'Assigned';
+                        }
+                    }
 
                     return [
                         'id' => $officer->id,
@@ -346,6 +370,7 @@ class HeadOfItController extends Controller
                         'department' => $officer->department->name ?? 'ICT Department',
                         'position' => 'ICT Officer',
                         'status' => $status,
+                        'sms_status' => $smsStatus,
                         'active_assignments' => $activeAssignments,
                         'is_active' => $officer->is_active,
                         'created_at' => $officer->created_at
@@ -454,12 +479,34 @@ class HeadOfItController extends Controller
                 'assigned_at' => now()
             ]);
 
-            // Update user access ICT Officer status to pending
+            // Update user access ICT Officer status to pending and store assigned officer ID
             $accessRequest->update([
-                'ict_officer_status' => 'pending'
+                'ict_officer_status' => 'pending',
+                'assigned_ict_officer_id' => $request->ict_officer_id,
+                'task_assigned_at' => now()
             ]);
 
-            // Send notification to ICT Officer (if notification class exists)
+            // Send SMS notification to ICT Officer using SmsModule (same pattern as other approvals)
+            try {
+                $smsModule = app(\App\Services\SmsModule::class);
+                
+                // Notify ICT Officer about new task assignment
+                $results = $smsModule->notifyIctOfficerAssignment($accessRequest, $ictOfficer, Auth::user());
+                
+                Log::info('ICT Officer task assignment SMS notifications sent', [
+                    'request_id' => $request->request_id,
+                    'ict_officer_id' => $request->ict_officer_id,
+                    'results' => $results
+                ]);
+            } catch (\Exception $smsError) {
+                Log::warning('Failed to send ICT Officer assignment SMS notification', [
+                    'request_id' => $request->request_id,
+                    'ict_officer_id' => $request->ict_officer_id,
+                    'error' => $smsError->getMessage()
+                ]);
+            }
+            
+            // Also send notification to ICT Officer (for email/database)
             try {
                 $ictOfficer->notify(new \App\Notifications\IctTaskAssignedNotification($accessRequest, $ictTaskAssignment));
             } catch (\Exception $notificationError) {
@@ -836,10 +883,32 @@ class HeadOfItController extends Controller
             $userAccess->update([
                 'assigned_ict_officer_id' => $request->ict_officer_user_id,
                 'task_assigned_at' => now(),
-                'ict_officer_status' => 'pending'
+                'ict_officer_status' => 'pending',
+                'ict_officer_user_id' => $request->ict_officer_user_id,
+                'ict_officer_assigned_at' => now()
             ]);
 
-            // Send notification to ICT Officer (if notification class exists)
+            // Send SMS notification to ICT Officer using SmsModule (same pattern as other approvals)
+            try {
+                $smsModule = app(\App\Services\SmsModule::class);
+                
+                // Notify ICT Officer about new task assignment
+                $results = $smsModule->notifyIctOfficerAssignment($userAccess, $ictOfficer, Auth::user());
+                
+                Log::info('ICT Officer task assignment SMS notifications sent', [
+                    'user_access_id' => $userAccess->id,
+                    'ict_officer_id' => $ictOfficer->id,
+                    'results' => $results
+                ]);
+            } catch (\Exception $smsError) {
+                Log::warning('Failed to send ICT Officer assignment SMS notification', [
+                    'user_access_id' => $userAccess->id,
+                    'ict_officer_id' => $ictOfficer->id,
+                    'error' => $smsError->getMessage()
+                ]);
+            }
+
+            // Also send notification to ICT Officer (for email/database)
             try {
                 $ictOfficer->notify(new \App\Notifications\IctTaskAssignedNotification($userAccess, $ictTaskAssignment));
             } catch (\Exception $notificationError) {

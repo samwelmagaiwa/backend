@@ -508,6 +508,13 @@ class DivisionalCombinedAccessController extends Controller
             'dict_approval_status' => $this->getApprovalStatus($request, 'dict'),
             'head_it_approval_status' => $this->getApprovalStatus($request, 'head_it'),
             'ict_approval_status' => $this->getApprovalStatus($request, 'ict'),
+            
+            // SMS notification status tracking
+            'sms_to_hod_status' => $request->sms_to_hod_status ?? 'pending',
+            'sms_to_divisional_status' => $request->sms_to_divisional_status ?? 'pending',
+            'sms_to_ict_director_status' => $request->sms_to_ict_director_status ?? 'pending',
+            'sms_to_head_it_status' => $request->sms_to_head_it_status ?? 'pending',
+            'sms_to_requester_status' => $request->sms_to_requester_status ?? 'pending',
         ];
     }
 

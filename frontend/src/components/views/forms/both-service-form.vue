@@ -1318,7 +1318,7 @@
                                 v-model="roleCommentsDraft"
                                 :readonly="!isRoleCommentEditable"
                                 :placeholder="roleCommentLabel"
-                                class="w-full h-20 border border-blue-300/20 text-blue-100 placeholder-blue-200/70 rounded p-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 resize-none role-comment-textarea"
+                                class="w-full h-20 border border-blue-300/20 text-blue-100 placeholder-blue-200/70 rounded p-2 text-base focus:outline-none focus:ring-1 focus:ring-blue-400 resize-none role-comment-textarea"
                                 style="background-color: #0047ab"
                               ></textarea>
                             </div>
@@ -1330,16 +1330,16 @@
 
           <!-- Grant Access Popup (ICT Officer) -->
           <div v-if="showGrantAccessPopup" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-4">
-            <div class="bg-white/10 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-blue-300/40 backdrop-blur-md">
+            <div class="bg-white/10 rounded-2xl shadow-2xl max-w-3xl w-full overflow-hidden border border-blue-300/40 backdrop-blur-md">
               <div class="px-5 py-3" style="background-color:#0047ab">
-                <h3 class="text-white text-lg font-bold flex items-center gap-2">
+                <h3 class="text-white text-2xl font-bold flex items-center gap-2">
                   <i class="fas fa-user-shield"></i>
                   Grant Access
                 </h3>
-                <p class="text-blue-100 text-xs mt-1">Provide your implementation note before granting access.</p>
+                <p class="text-blue-100 text-base mt-1">Provide your implementation note before granting access.</p>
               </div>
               <div class="px-5 py-4 bg-blue-900/20">
-                <label class="block text-blue-100 text-sm mb-1">ICT Officer Comment <span class="text-red-400">*</span></label>
+                <label class="block text-blue-100 text-lg mb-1">ICT Officer Comment <span class="text-red-400">*</span></label>
                 <textarea
                   v-model="grantAccessComment"
                   class="w-full h-28 bg-white/10 border border-blue-300/30 rounded-lg p-2 text-white placeholder-blue-300/60 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-blue-400"
@@ -1348,6 +1348,21 @@
                   required
                 ></textarea>
                 <p v-if="grantAccessError" class="text-red-300 text-xs mt-1">{{ grantAccessError }}</p>
+                
+                <!-- SMS Preview -->
+                <div class="mt-4 p-3 bg-blue-800/40 border border-blue-300/30 rounded-lg">
+                  <div class="flex items-center gap-2 mb-2">
+                    <i class="fas fa-sms text-blue-300 text-lg"></i>
+                    <label class="text-blue-100 text-base font-semibold">SMS Preview (will be sent to requester):</label>
+                  </div>
+                  <div class="bg-blue-900/50 rounded p-2 text-base text-blue-100 font-mono leading-relaxed">
+                    {{ getSmsPreviewText() }}
+                  </div>
+                  <p class="text-blue-300/70 text-base mt-2 italic">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    This message will be sent to {{ form.staff_name || 'the requester' }} at {{ form.phone_number || 'their phone number' }}
+                  </p>
+                </div>
               </div>
               <div class="px-5 py-3 flex gap-2 justify-end bg-blue-900/30 border-t border-blue-300/30">
                 <button @click="cancelGrantAccess" type="button" class="px-3 py-1.5 rounded-lg text-white bg-gray-600 hover:bg-gray-700 text-sm">Cancel</button>
@@ -6111,22 +6126,19 @@
           if (res.success) {
             this.showGrantAccessPopup = false
             this.showToast('Access granted successfully', 'success')
-            // Refresh request data to update review summary and lock UI
-            await this.loadRequestData()
-            // Ensure local UI reflects immediate comment display only (do not override status/dates)
+            
+            // Immediately update local state to hide approve button
             if (this.requestData) {
+              this.requestData.ict_officer_status = 'implemented'
+              this.requestData.ict_officer_implemented_at = new Date().toISOString()
               this.requestData.ict_officer_comments = comment
+              this.requestData.status = 'implemented'
             }
-            // Mark meta to highlight ICT officer row AFTER data reload to avoid vnode mismatches
-            this.lastAddedCommentMeta = {
-              role: 'ict_officer',
-              text: comment,
-              ts: Date.now()
-            }
-            // Auto-clear highlight after a few seconds
+            
+            // Redirect to ICT Officer dashboard after a brief delay to show success message
             setTimeout(() => {
-              this.lastAddedCommentMeta = null
-            }, 5000)
+              this.$router.push('/ict-dashboard/access-requests')
+            }, 1500)
           } else {
             this.showToast(res.error || 'Failed to grant access', 'error')
           }
@@ -6141,6 +6153,29 @@
       cancelGrantAccess() {
         this.showGrantAccessPopup = false
         this.grantAccessError = ''
+      },
+
+      // Generate SMS preview text
+      getSmsPreviewText() {
+        const name = this.form.staff_name || 'User'
+        const ref = this.form.request_id || 'MLG-REQ' + String(this.getRequestId || '').padStart(6, '0')
+        
+        // Get access types
+        const accessTypes = []
+        if (this.form.jeeva_access_request || (this.form.jeeva_modules_selected && this.form.jeeva_modules_selected.length > 0)) {
+          accessTypes.push('Jeeva')
+        }
+        if (this.form.wellsoft_access_request || (this.form.wellsoft_modules_selected && this.form.wellsoft_modules_selected.length > 0)) {
+          accessTypes.push('Wellsoft')
+        }
+        if (this.form.internet_access_request || (this.form.internet_purposes && this.form.internet_purposes.length > 0)) {
+          accessTypes.push('Internet')
+        }
+        const types = accessTypes.length > 0 ? accessTypes.join(' & ') : 'Access'
+        
+        const comment = (this.grantAccessComment || '').trim() || '[YOUR COMMENT HERE]'
+        
+        return `Dear ${name}, your ${types} access has been GRANTED and is now ACTIVE. Ref: ${ref}. Note: ${comment} - EABMS`
       },
 
       // Helper to compute row class safely
@@ -8326,6 +8361,17 @@
           message: `${roleType} signature uploaded successfully! You can now approve or reject this request.`
         }
         setTimeout(() => (this.toast.show = false), 4000)
+      },
+
+      showToast(message, type = 'success') {
+        this.toast = {
+          show: true,
+          message: message,
+          type: type
+        }
+        setTimeout(() => {
+          this.toast.show = false
+        }, 4000)
       },
 
       // Get formatted approval date for any stage

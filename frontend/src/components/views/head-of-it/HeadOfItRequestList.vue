@@ -78,18 +78,21 @@
             <table class="w-full">
               <thead class="bg-blue-800/50">
                 <tr>
-                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">Request ID</th>
-                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">Request Type</th>
-                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
+                  <th class="px-4 py-4 text-left text-blue-100 text-2xl font-bold">Request ID</th>
+                  <th class="px-4 py-4 text-left text-blue-100 text-2xl font-bold">Request Type</th>
+                  <th class="px-4 py-4 text-left text-blue-100 text-2xl font-bold">
                     Personal Information
                   </th>
-                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
+                  <th class="px-4 py-4 text-left text-blue-100 text-2xl font-bold">
                     ICT Director Approval Date
                   </th>
-                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
+                  <th class="px-4 py-4 text-left text-blue-100 text-2xl font-bold">
                     Current Status
                   </th>
-                  <th class="px-4 py-4 text-center text-blue-100 text-lg font-bold">Actions</th>
+                  <th class="px-4 py-4 text-left text-blue-100 text-2xl font-bold">
+                    SMS Status
+                  </th>
+                  <th class="px-4 py-4 text-center text-blue-100 text-2xl font-bold">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -121,34 +124,34 @@
                         ></i>
                       </div>
                       <div>
-                        <div class="text-white font-medium text-base">
+                        <div class="text-white font-medium text-xl">
                           {{
                             request.request_id || `REQ-${request.id.toString().padStart(6, '0')}`
                           }}
                         </div>
-                        <div class="text-purple-300 text-sm">ID: {{ request.id }}</div>
+                        <div class="text-purple-300 text-lg">ID: {{ request.id }}</div>
                       </div>
                     </div>
                   </td>
 
                   <!-- Request Type -->
                   <td class="px-4 py-3">
-                    <div class="flex flex-wrap gap-1">
+                    <div class="flex flex-nowrap gap-1">
                       <span
                         v-if="hasService(request, 'jeeva')"
-                        class="px-2 py-1 rounded text-sm bg-blue-100 text-blue-800"
+                        class="px-3 py-2 rounded text-lg bg-blue-100 text-blue-800 whitespace-nowrap"
                       >
                         Jeeva
                       </span>
                       <span
                         v-if="hasService(request, 'wellsoft')"
-                        class="px-2 py-1 rounded text-sm bg-green-100 text-green-800"
+                        class="px-3 py-2 rounded text-lg bg-green-100 text-green-800 whitespace-nowrap"
                       >
                         Wellsoft
                       </span>
                       <span
                         v-if="hasService(request, 'internet')"
-                        class="px-2 py-1 rounded text-sm bg-cyan-100 text-cyan-800"
+                        class="px-3 py-2 rounded text-lg bg-cyan-100 text-cyan-800 whitespace-nowrap"
                       >
                         Internet
                       </span>
@@ -157,26 +160,26 @@
 
                   <!-- Personal Information -->
                   <td class="px-4 py-3">
-                    <div class="text-white font-medium text-base">
+                    <div class="text-white font-medium text-xl">
                       {{ request.staff_name || request.full_name || 'Unknown User' }}
                     </div>
-                    <div class="text-blue-300 text-sm">
+                    <div class="text-blue-300 text-lg">
                       {{ request.phone || request.phone_number || 'No phone' }}
                     </div>
-                    <div v-if="request.pf_number" class="text-teal-300 text-sm">
+                    <div v-if="request.pf_number" class="text-teal-300 text-lg">
                       PF: {{ request.pf_number }}
                     </div>
-                    <div class="text-blue-200 text-sm">
+                    <div class="text-blue-200 text-lg">
                       Dept: {{ request.department || 'Unknown' }}
                     </div>
                   </td>
 
                   <!-- ICT Director Approval Date -->
                   <td class="px-4 py-3">
-                    <div class="text-white font-medium text-base">
+                    <div class="text-white font-medium text-xl">
                       {{ formatDate(request.ict_director_approved_at) }}
                     </div>
-                    <div class="text-blue-300 text-sm">
+                    <div class="text-blue-300 text-lg">
                       {{ formatTime(request.ict_director_approved_at) }}
                     </div>
                   </td>
@@ -186,10 +189,26 @@
                     <div class="flex flex-col">
                       <span
                         :class="getStatusBadgeClass(request.status)"
-                        class="rounded text-base font-medium inline-block"
-                        :style="{ padding: '4px 8px', width: 'fit-content' }"
+                        class="rounded text-lg font-medium inline-block whitespace-nowrap"
+                        :style="{ padding: '6px 12px', width: 'fit-content' }"
                       >
                         {{ getStatusText(request.status) }}
+                      </span>
+                    </div>
+                  </td>
+
+                  <!-- SMS Status -->
+                  <td class="px-4 py-3">
+                    <div class="flex items-center space-x-2">
+                      <div
+                        class="w-4 h-4 rounded-full"
+                        :class="getSmsStatusColor(getRelevantSmsStatus(request))"
+                      ></div>
+                      <span
+                        class="text-lg font-medium"
+                        :class="getSmsStatusTextColor(getRelevantSmsStatus(request))"
+                      >
+                        {{ getSmsStatusText(getRelevantSmsStatus(request)) }}
                       </span>
                     </div>
                   </td>
@@ -692,19 +711,19 @@
         if (userRole === ROLES.HEAD_OF_IT || !userRole) {
           // Default to Head of IT if no role detected
 
-          // Dynamic View & Process / View Task button
+          // Dynamic Approve / View Approved Request button
           if (this.isPendingStatus(status)) {
-            // For pending requests - show "View & Process" (editable mode)
+            // For pending requests - show "Approve" (editable mode)
             actions.push({
               key: 'view_and_process',
-              label: 'View & Process',
-              icon: 'fas fa-eye'
+              label: 'Approve',
+              icon: 'fas fa-check'
             })
           } else {
-            // For processed requests - show "View Task" (read-only mode)
+            // For processed requests - show "View Approved Request" (read-only mode)
             actions.push({
               key: 'view_and_process',
-              label: 'View Task',
+              label: 'View Approved Request',
               icon: 'fas fa-eye'
             })
           }
@@ -857,22 +876,6 @@
             })
           }
 
-          // Dynamic View Progress button - only show if:
-          // 1. Task has been assigned to ICT officer
-          // 2. There's actual progress to view
-          if (
-            taskAssigned &&
-            ['assigned_to_ict', 'implementation_in_progress', 'implemented', 'completed'].includes(
-              status
-            )
-          ) {
-            actions.push({
-              key: 'view_progress',
-              label: 'View Progress',
-              icon: 'fas fa-chart-line'
-            })
-          }
-
           // Always show view timeline (universal action)
           actions.push({
             key: 'view_timeline',
@@ -934,9 +937,6 @@
             break
           case 'update_progress':
             this.updateProgress(request)
-            break
-          case 'view_progress':
-            this.viewProgress(request)
             break
           case 'view_timeline':
             this.viewTimeline(request)
@@ -1034,12 +1034,6 @@
         await this.fetchRequests()
       },
 
-      viewProgress(request) {
-        console.log('👁️ HeadOfItRequestList: Viewing progress for request:', request.id)
-        // Navigate to progress view - using ICT dashboard route for consistency
-        this.$router.push(`/user-security-access/${request.user_access_id || request.id}`)
-      },
-
       // Helper method to determine if separator should be shown
       shouldShowSeparator(currentAction, previousAction) {
         // Add separator before destructive actions or different action groups
@@ -1064,6 +1058,64 @@
         }
 
         return false
+      },
+
+      // SMS Status methods
+      getRelevantSmsStatus(request) {
+        // For Head of IT: show SMS status for NEXT workflow step after their action
+        const status = request.head_it_status || request.status
+        
+        // PRIORITY 1: If SMS has been sent to ICT Officer (regardless of status), show that
+        if (request.sms_to_ict_officer_status && request.sms_to_ict_officer_status !== 'pending') {
+          return request.sms_to_ict_officer_status
+        }
+        
+        // PRIORITY 2: If task has been assigned to ICT Officer: show ICT Officer SMS notification status
+        if (status === 'head_of_it_approved' || 
+            request.status === 'assigned_to_ict' || 
+            request.status === 'implementation_in_progress') {
+          return request.sms_to_ict_officer_status || 'pending'
+        }
+        
+        // PRIORITY 3: If COMPLETED/IMPLEMENTED: show requester notification status
+        if (status === 'implemented' || status === 'completed') {
+          return request.sms_to_requester_status || 'pending'
+        }
+        
+        // DEFAULT: If Head of IT has APPROVED but NOT yet assigned: show pending
+        if (status === 'head_it_approved' || status === 'approved') {
+          return 'pending'
+        }
+        
+        // FALLBACK: If PENDING Head of IT approval: return 'pending'
+        return 'pending'
+      },
+
+      getSmsStatusText(smsStatus) {
+        const statusMap = {
+          sent: 'Delivered',
+          pending: 'Pending',
+          failed: 'Failed'
+        }
+        return statusMap[smsStatus] || 'Pending'
+      },
+
+      getSmsStatusColor(smsStatus) {
+        const colorMap = {
+          sent: 'bg-green-500',
+          pending: 'bg-yellow-500',
+          failed: 'bg-red-500'
+        }
+        return colorMap[smsStatus] || 'bg-gray-400'
+      },
+
+      getSmsStatusTextColor(smsStatus) {
+        const textColorMap = {
+          sent: 'text-green-400',
+          pending: 'text-yellow-400',
+          failed: 'text-red-400'
+        }
+        return textColorMap[smsStatus] || 'text-gray-400'
       },
 
       // Dynamic dropdown positioning to prevent cutoff issues
@@ -1120,7 +1172,7 @@
       getActionButtonClass(actionKey, index, totalActions) {
         const baseClasses = {
           view_and_process:
-            'bg-blue-50 text-blue-800 border-b border-blue-200 hover:bg-blue-100 focus:bg-blue-100 focus:ring-blue-500',
+            'bg-green-50 text-green-800 border-b border-green-200 hover:bg-green-100 focus:bg-green-100 focus:ring-green-500',
           view_timeline:
             'bg-indigo-50 text-indigo-800 border-b border-indigo-200 hover:bg-indigo-100 focus:bg-indigo-100 focus:ring-indigo-500',
           assign_task:
@@ -1150,7 +1202,7 @@
       // Get distinct icon colors for each action type
       getActionIconClass(actionKey) {
         const iconClasses = {
-          view_and_process: 'text-blue-600 group-hover:text-blue-700 group-focus:text-blue-700',
+          view_and_process: 'text-green-600 group-hover:text-green-700 group-focus:text-green-700',
           view_timeline: 'text-indigo-600 group-hover:text-indigo-700 group-focus:text-indigo-700',
           assign_task: 'text-green-600 group-hover:text-green-700 group-focus:text-green-700',
           view_progress: 'text-orange-600 group-hover:text-orange-700 group-focus:text-orange-700',

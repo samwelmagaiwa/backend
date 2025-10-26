@@ -779,6 +779,13 @@ class DictCombinedAccessController extends Controller
                     'is_implemented' => !empty($request->ict_officer_implemented_at)
                 ], $this->formatSignatureStatus($request->ict_officer_signature_path, $request->ict_officer_implemented_at, $request->ict_officer_name, $request->ict_officer_status))
             ],
+            
+            // SMS notification status tracking
+            'sms_to_hod_status' => $request->sms_to_hod_status ?? 'pending',
+            'sms_to_divisional_status' => $request->sms_to_divisional_status ?? 'pending',
+            'sms_to_ict_director_status' => $request->sms_to_ict_director_status ?? 'pending',
+            'sms_to_head_it_status' => $request->sms_to_head_it_status ?? 'pending',
+            'sms_to_requester_status' => $request->sms_to_requester_status ?? 'pending',
         ];
     }
 

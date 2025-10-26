@@ -95,6 +95,16 @@ class RoleManagementSeeder extends Seeder
                     'is_deletable' => false,
                     'sort_order' => 4
                 ],
+                'head_of_it' => [
+                    'description' => 'Head of IT with technical authority and assignment responsibilities',
+                    'permissions' => [
+                        'view_users', 'view_all_requests', 'approve_requests', 'reject_requests',
+                        'assign_ict_officer', 'manage_implementations'
+                    ],
+                    'is_system_role' => true,
+                    'is_deletable' => false,
+                    'sort_order' => 5
+                ],
                 'ict_officer' => [
                     'description' => 'ICT officer with technical support responsibilities',
                     'permissions' => [
@@ -102,7 +112,7 @@ class RoleManagementSeeder extends Seeder
                     ],
                     'is_system_role' => true,
                     'is_deletable' => false,
-                    'sort_order' => 5
+                    'sort_order' => 6
                 ],
                 'staff' => [
                     'description' => 'Regular hospital staff member',
@@ -111,7 +121,7 @@ class RoleManagementSeeder extends Seeder
                     ],
                     'is_system_role' => true,
                     'is_deletable' => false,
-                    'sort_order' => 6
+                    'sort_order' => 7
                 ]
             ];
 

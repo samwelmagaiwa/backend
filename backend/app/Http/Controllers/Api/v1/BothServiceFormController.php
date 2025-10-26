@@ -7,6 +7,7 @@ use App\Models\UserAccess;
 use App\Models\Department;
 use App\Models\User;
 use App\Http\Controllers\NotificationController;
+use App\Services\SmsModule;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -282,6 +283,44 @@ class BothServiceFormController extends Controller
             ]);
             
             DB::commit();
+            
+            // Send SMS notifications to divisional director
+            try {
+                // Get next approver (Divisional Director for this specific department)
+                // IMPORTANT: Divisional directors can oversee multiple departments,
+                // so we must get the director assigned to THIS request's department
+                $department = $userAccess->department;
+                $nextApprover = $department && $department->divisional_director_id 
+                    ? User::find($department->divisional_director_id)
+                    : User::whereHas('roles', fn($q) => $q->where('name', 'divisional_director'))->first();
+                
+                if ($nextApprover) {
+                    // Send SMS notifications
+                    $sms = app(SmsModule::class);
+                    $sms->notifyRequestApproved(
+                        $userAccess,
+                        $currentUser,
+                        'hod',
+                        $nextApprover
+                    );
+                    
+                    Log::info('HOD SMS notifications sent', [
+                        'request_id' => $userAccess->id,
+                        'next_approver' => $nextApprover->name
+                    ]);
+                } else {
+                    Log::warning('No divisional director found for SMS notification', [
+                        'request_id' => $userAccess->id,
+                        'department_id' => $userAccess->department_id
+                    ]);
+                }
+            } catch (\Exception $e) {
+                Log::warning('HOD SMS notification failed', [
+                    'request_id' => $userAccess->id,
+                    'error' => $e->getMessage()
+                ]);
+                // Don't fail the approval if SMS fails
+            }
             
             // Load relationships for response
             $userAccess->load(['user', 'department']);
@@ -985,6 +1024,39 @@ class BothServiceFormController extends Controller
                 // Don't fail the main operation if notification fails
             }
             
+            // Send SMS notifications
+            try {
+                // Get next approver (ICT Director)
+                $nextApprover = User::whereHas('roles', fn($q) => 
+                    $q->where('name', 'ict_director')
+                )->first();
+                
+                if ($nextApprover) {
+                    $sms = app(SmsModule::class);
+                    $sms->notifyRequestApproved(
+                        $userAccess,
+                        $currentUser,
+                        'divisional',
+                        $nextApprover
+                    );
+                    
+                    Log::info('✅ SMS notifications sent for divisional approval', [
+                        'request_id' => $userAccess->id,
+                        'next_approver' => $nextApprover->name
+                    ]);
+                } else {
+                    Log::warning('⚠️ ICT Director not found for SMS notification', [
+                        'request_id' => $userAccess->id
+                    ]);
+                }
+            } catch (\Exception $e) {
+                Log::warning('❌ Failed to send SMS notifications for divisional approval', [
+                    'request_id' => $userAccess->id,
+                    'error' => $e->getMessage()
+                ]);
+                // Don't fail the main operation if SMS fails
+            }
+            
             DB::commit();
             
             // Load relationships for response
@@ -1343,6 +1415,39 @@ class BothServiceFormController extends Controller
                 // Don't fail the main operation if notification fails
             }
             
+            // Send SMS notifications
+            try {
+                // Get next approver (Head of IT)
+                $nextApprover = User::whereHas('roles', fn($q) => 
+                    $q->where('name', 'head_of_it')
+                )->first();
+                
+                if ($nextApprover) {
+                    $sms = app(SmsModule::class);
+                    $sms->notifyRequestApproved(
+                        $userAccess,
+                        $currentUser,
+                        'ict_director',
+                        $nextApprover
+                    );
+                    
+                    Log::info('✅ SMS notifications sent for ICT Director approval', [
+                        'request_id' => $userAccess->id,
+                        'next_approver' => $nextApprover->name
+                    ]);
+                } else {
+                    Log::warning('⚠️ Head of IT not found for SMS notification', [
+                        'request_id' => $userAccess->id
+                    ]);
+                }
+            } catch (\Exception $e) {
+                Log::warning('❌ Failed to send SMS notifications for ICT Director approval', [
+                    'request_id' => $userAccess->id,
+                    'error' => $e->getMessage()
+                ]);
+                // Don't fail the main operation if SMS fails
+            }
+            
             DB::commit();
             
             // Load relationships for response
@@ -1661,6 +1766,27 @@ class BothServiceFormController extends Controller
                 'calculated_status' => $userAccess->getCalculatedOverallStatus()
             ]);
             
+            // Send SMS notifications (notify requester that request is approved and awaiting ICT Officer assignment)
+            try {
+                $sms = app(SmsModule::class);
+                $sms->notifyRequestApproved(
+                    $userAccess,
+                    $currentUser,
+                    'head_it',
+                    null // No next approver - awaiting ICT Officer assignment by Head of IT
+                );
+                
+                Log::info('✅ SMS notifications sent for Head of IT approval', [
+                    'request_id' => $userAccess->id
+                ]);
+            } catch (\Exception $e) {
+                Log::warning('❌ Failed to send SMS notifications for Head of IT approval', [
+                    'request_id' => $userAccess->id,
+                    'error' => $e->getMessage()
+                ]);
+                // Don't fail the main operation if SMS fails
+            }
+            
             DB::commit();
             
             // Load relationships for response
@@ -1804,24 +1930,62 @@ class BothServiceFormController extends Controller
             $userAccess->update($updateData);
             $userAccess->refresh();
 
-            // Also complete the latest ICT task assignment for this request so list status reflects completion
-            try {
-                $latestAssignment = \App\Models\IctTaskAssignment::where('user_access_id', $userAccess->id)
-                    ->orderByDesc('assigned_at')
-                    ->first();
-                if ($latestAssignment && $latestAssignment->status !== \App\Models\IctTaskAssignment::STATUS_COMPLETED) {
-                    $latestAssignment->update([
-                        'status' => \App\Models\IctTaskAssignment::STATUS_COMPLETED,
-                        'started_at' => $latestAssignment->started_at ?: now(),
-                        'completed_at' => now(),
-                        'completion_notes' => $validated['comments'] ?? 'Access granted via BothServiceFormController'
+            // CRITICAL: Complete the ICT task assignment to update badge counts
+            // This MUST succeed for the notification badge to clear properly
+            $latestAssignment = \App\Models\IctTaskAssignment::where('user_access_id', $userAccess->id)
+                ->whereIn('status', [
+                    \App\Models\IctTaskAssignment::STATUS_ASSIGNED,
+                    \App\Models\IctTaskAssignment::STATUS_IN_PROGRESS
+                ])
+                ->orderByDesc('assigned_at')
+                ->first();
+            
+            if ($latestAssignment) {
+                $taskUpdateSuccess = $latestAssignment->update([
+                    'status' => \App\Models\IctTaskAssignment::STATUS_COMPLETED,
+                    'started_at' => $latestAssignment->started_at ?: now(),
+                    'completed_at' => now(),
+                    'completion_notes' => $validated['comments'] ?? 'Access granted via BothServiceFormController'
+                ]);
+                
+                if ($taskUpdateSuccess) {
+                    Log::info('✅ ICT task assignment marked as completed', [
+                        'assignment_id' => $latestAssignment->id,
+                        'user_access_id' => $userAccess->id,
+                        'ict_officer_id' => $currentUser->id
+                    ]);
+                } else {
+                    Log::error('❌ CRITICAL: Failed to mark task as completed - badge count will be wrong!', [
+                        'assignment_id' => $latestAssignment->id,
+                        'user_access_id' => $userAccess->id,
+                        'ict_officer_id' => $currentUser->id
                     ]);
                 }
-            } catch (\Exception $e) {
-                Log::warning('approveIctOfficer: Failed to update latest IctTaskAssignment', [
+            } else {
+                Log::warning('⚠️ No active task assignment found to complete', [
                     'user_access_id' => $userAccess->id,
-                    'error' => $e->getMessage()
+                    'ict_officer_id' => $currentUser->id,
+                    'note' => 'Badge may show stale count if assignment exists in other status'
                 ]);
+            }
+
+            // Send SMS notification to requester that access has been granted
+            try {
+                $smsModule = app(\App\Services\SmsModule::class);
+                $smsResults = $smsModule->notifyAccessGranted($userAccess, $currentUser, $validated['comments'] ?? null);
+                
+                Log::info('✅ SMS notification sent to requester for access granted', [
+                    'request_id' => $userAccessId,
+                    'ict_officer_id' => $currentUser->id,
+                    'sms_results' => $smsResults
+                ]);
+            } catch (\Exception $smsError) {
+                Log::warning('❌ Failed to send access granted SMS notification', [
+                    'request_id' => $userAccessId,
+                    'ict_officer_id' => $currentUser->id,
+                    'error' => $smsError->getMessage()
+                ]);
+                // Don't fail the main operation if SMS fails
             }
 
             DB::commit();

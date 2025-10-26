@@ -726,6 +726,10 @@ class IctOfficerController extends Controller
                     'head_of_it_approval_date' => $request->head_it_approved_at,
                     'head_of_it_approved_at' => $request->head_it_approved_at,
                     
+                    // SMS status tracking (shows SMS sent to requester when access is granted)
+                    'sms_to_requester_status' => $request->sms_to_requester_status ?? 'pending',
+                    'sms_sent_to_requester_at' => $request->sms_sent_to_requester_at,
+                    
                     // ICT task assignment info
                     'ict_task_assignments' => $request->ictTaskAssignments->map(function ($assignment) {
                         return [
@@ -1409,28 +1413,19 @@ class IctOfficerController extends Controller
                 'user_id' => $user->id
             ]);
 
-            // Count unassigned requests (available for assignment)
-            // Fixed: Exclude requests that have ANY task assignment (assigned, in_progress, completed, or cancelled)
-            $unassignedCount = UserAccess::where('head_it_status', 'approved')
-                ->whereNotNull('head_it_approved_at')
-                ->whereDoesntHave('ictTaskAssignments')
-                ->count();
-
             // Count requests assigned to this ICT Officer that need attention
+            // ICT officers can only see requests assigned to them, not unassigned requests
             $assignedToMeCount = IctTaskAssignment::where('ict_officer_user_id', $user->id)
                 ->whereIn('status', [IctTaskAssignment::STATUS_ASSIGNED, IctTaskAssignment::STATUS_IN_PROGRESS])
                 ->count();
-
-            $totalPending = $unassignedCount + $assignedToMeCount;
 
             return response()->json([
                 'success' => true,
                 'message' => 'Pending requests count retrieved successfully',
                 'data' => [
-                    'total_pending' => $totalPending,
-                    'unassigned' => $unassignedCount,
+                    'total_pending' => $assignedToMeCount,
                     'assigned_to_me' => $assignedToMeCount,
-                    'requires_attention' => $totalPending > 0
+                    'requires_attention' => $assignedToMeCount > 0
                 ]
             ]);
 
@@ -1497,34 +1492,26 @@ class IctOfficerController extends Controller
                 ], 400);
             }
 
-            // Find or create ICT task assignment
+            // Find ICT task assignment - must be assigned by Head of IT first
             $assignment = IctTaskAssignment::where('user_access_id', $requestId)
                 ->where('ict_officer_user_id', $user->id)
                 ->first();
                 
             if (!$assignment) {
-                // Create assignment if it doesn't exist (auto-assign to current officer)
-                $assignment = IctTaskAssignment::create([
-                    'user_access_id' => $requestId,
-                    'ict_officer_user_id' => $user->id,
-                    'assigned_by_user_id' => $user->id, // Self-assigned
-                    'status' => IctTaskAssignment::STATUS_COMPLETED,
-                    'assigned_at' => now(),
-                    'started_at' => now(),
-                    'completed_at' => now(),
-                    'assignment_notes' => 'Auto-assigned during access grant',
-                    'completion_notes' => $request->comments ?? 'Access granted by ICT Officer'
-                ]);
-            } else {
-                // Update existing assignment to completed
-                $assignment->update([
-                    'status' => IctTaskAssignment::STATUS_COMPLETED,
-                    'completion_notes' => $request->comments ?? 'Access granted by ICT Officer',
-                    'completed_at' => now(),
-                    // Set started_at if not already set
-                    'started_at' => $assignment->started_at ?: now()
-                ]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'This request must be assigned to you by the Head of IT before you can grant access'
+                ], 400);
             }
+            
+            // Update existing assignment to completed
+            $assignment->update([
+                'status' => IctTaskAssignment::STATUS_COMPLETED,
+                'completion_notes' => $request->comments ?? 'Access granted by ICT Officer',
+                'completed_at' => now(),
+                // Set started_at if not already set
+                'started_at' => $assignment->started_at ?: now()
+            ]);
 
             // Update user access record to indicate implementation is complete
             $userAccess->update([
@@ -1535,6 +1522,26 @@ class IctOfficerController extends Controller
                 // Update overall status to show access is granted
                 'status' => 'implemented'
             ]);
+
+            // Send SMS notification to requester using SmsModule
+            try {
+                $smsModule = app(\App\Services\SmsModule::class);
+                
+                // Notify requester that access has been granted
+                $smsResults = $smsModule->notifyAccessGranted($userAccess, $user, $request->comments);
+                
+                Log::info('Access granted SMS notification sent to requester', [
+                    'request_id' => $requestId,
+                    'ict_officer_id' => $user->id,
+                    'sms_results' => $smsResults
+                ]);
+            } catch (\Exception $smsError) {
+                Log::warning('Failed to send access granted SMS notification', [
+                    'request_id' => $requestId,
+                    'ict_officer_id' => $user->id,
+                    'error' => $smsError->getMessage()
+                ]);
+            }
 
             DB::commit();
 

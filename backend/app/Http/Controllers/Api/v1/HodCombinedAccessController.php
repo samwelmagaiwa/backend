@@ -298,10 +298,13 @@ class HodCombinedAccessController extends Controller
             // Send SMS notifications if approved
             if ($validatedData['hod_status'] === 'approved') {
                 try {
-                    // Get next approver (Divisional Director)
-                    $nextApprover = User::whereHas('roles', fn($q) => 
-                        $q->where('name', 'divisional_director')
-                    )->first();
+                    // Get next approver (Divisional Director for this specific department)
+                    // IMPORTANT: Divisional directors can oversee multiple departments,
+                    // so we must get the director assigned to THIS request's department
+                    $department = $userAccessRequest->department;
+                    $nextApprover = $department && $department->divisional_director_id 
+                        ? User::find($department->divisional_director_id)
+                        : User::whereHas('roles', fn($q) => $q->where('name', 'divisional_director'))->first();
                     
                     // Send SMS notifications
                     $sms = app(SmsModule::class);
@@ -615,6 +618,13 @@ class HodCombinedAccessController extends Controller
                 'dict_approval_status' => $this->getApprovalStatus($request, 'dict'),
                 'head_it_approval_status' => $this->getApprovalStatus($request, 'head_it'),
                 'ict_approval_status' => $this->getApprovalStatus($request, 'ict'),
+                
+                // SMS notification status tracking
+                'sms_to_hod_status' => $request->sms_to_hod_status ?? 'pending',
+                'sms_to_divisional_status' => $request->sms_to_divisional_status ?? 'pending',
+                'sms_to_ict_director_status' => $request->sms_to_ict_director_status ?? 'pending',
+                'sms_to_head_it_status' => $request->sms_to_head_it_status ?? 'pending',
+                'sms_to_requester_status' => $request->sms_to_requester_status ?? 'pending',
             ];
     }
 

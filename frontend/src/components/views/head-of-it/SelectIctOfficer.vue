@@ -33,16 +33,6 @@
         </div>
 
         <div class="max-w-full mx-auto relative z-10 px-4">
-          <!-- Back Button Only -->
-          <div class="medical-glass-card rounded-t-3xl p-4 mb-0 border-b border-blue-300/30">
-            <button
-              @click="goBack"
-              class="p-2 rounded-lg bg-teal-600/20 hover:bg-teal-600/30 transition-colors"
-            >
-              <i class="fas fa-arrow-left text-teal-300 hover:text-white"></i>
-            </button>
-          </div>
-
           <!-- Implementation Notice Banner -->
           <div
             v-if="!isLoading && requestInfo && !canAssign"
@@ -84,13 +74,24 @@
           </div>
 
           <!-- Search & Filter Controls -->
-          <div class="medical-glass-card rounded-none border-t-0 border-b border-blue-300/30">
+          <div class="medical-glass-card rounded-t-3xl border-b border-blue-300/30">
             <div class="p-4">
               <div
                 class="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between"
               >
-                <!-- Search Section -->
-                <div class="flex-1 max-w-xl">
+                <!-- Back Button + Search Section -->
+                <div class="flex gap-3 items-center flex-1 max-w-2xl">
+                  <!-- Back Button -->
+                  <button
+                    @click="goBack"
+                    class="p-2.5 rounded-lg bg-teal-600/20 hover:bg-teal-600/30 transition-colors flex-shrink-0"
+                    title="Back to request"
+                  >
+                    <i class="fas fa-arrow-left text-teal-300 hover:text-white"></i>
+                  </button>
+                  
+                  <!-- Search Box -->
+                  <div class="flex-1">
                   <div class="relative">
                     <div
                       class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
@@ -101,7 +102,7 @@
                       v-model="searchQuery"
                       type="text"
                       placeholder="Search by name, PF number, or phone number..."
-                      class="w-full pl-10 pr-4 py-2.5 bg-white/10 border border-teal-300/30 rounded-lg focus:border-teal-400 focus:outline-none text-white placeholder-teal-200/60 backdrop-blur-sm transition-colors"
+                      class="w-full pl-10 pr-4 py-3 bg-white/10 border border-teal-300/30 rounded-lg focus:border-teal-400 focus:outline-none text-white text-lg placeholder-teal-200/60 backdrop-blur-sm transition-colors"
                     />
                     <button
                       v-if="searchQuery"
@@ -111,6 +112,7 @@
                       <i class="fas fa-times"></i>
                     </button>
                   </div>
+                  </div>
                 </div>
 
                 <!-- Filter Controls -->
@@ -119,7 +121,7 @@
                   <div class="relative">
                     <select
                       v-model="statusFilter"
-                      class="appearance-none bg-white/10 border border-teal-300/30 rounded-lg px-4 py-2.5 pr-10 text-white text-sm focus:border-teal-400 focus:outline-none backdrop-blur-sm cursor-pointer"
+                      class="appearance-none bg-white/10 border border-teal-300/30 rounded-lg px-4 py-3 pr-10 text-white text-base focus:border-teal-400 focus:outline-none backdrop-blur-sm cursor-pointer"
                     >
                       <option value="" class="bg-blue-900 text-white">All Officers</option>
                       <option value="Available" class="bg-blue-900 text-white">Available</option>
@@ -138,7 +140,7 @@
                   <button
                     v-if="searchQuery || statusFilter"
                     @click="clearAllFilters"
-                    class="px-3 py-2.5 bg-red-600/30 hover:bg-red-600/50 text-red-200 rounded-lg transition-colors border border-red-400/30 text-sm flex items-center"
+                    class="px-4 py-3 bg-red-600/30 hover:bg-red-600/50 text-red-200 rounded-lg transition-colors border border-red-400/30 text-base flex items-center"
                     title="Clear all filters"
                   >
                     <i class="fas fa-times mr-1"></i>
@@ -149,7 +151,7 @@
                   <button
                     @click="refreshOfficers"
                     :disabled="isLoading"
-                    class="px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm flex items-center"
+                    class="px-5 py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-base flex items-center"
                     title="Refresh officers list"
                   >
                     <i class="fas fa-sync-alt mr-2" :class="{ 'animate-spin': isLoading }"></i>
@@ -166,7 +168,7 @@
               <!-- Loading State -->
               <div v-if="isLoading" class="text-center py-12">
                 <i class="fas fa-spinner fa-spin text-4xl text-teal-400 mb-4"></i>
-                <p class="text-white text-lg">Loading ICT Officers...</p>
+                <p class="text-white text-xl">Loading ICT Officers...</p>
               </div>
 
               <!-- ICT Officers Table -->
@@ -179,32 +181,37 @@
                     >
                       <tr>
                         <th
-                          class="px-6 py-4 text-left text-sm font-semibold text-blue-200 uppercase tracking-wider"
+                          class="px-6 py-4 text-left text-xl font-bold text-blue-200 uppercase tracking-wider"
                         >
                           <i class="fas fa-hashtag mr-2"></i>S/N
                         </th>
                         <th
-                          class="px-6 py-4 text-left text-sm font-semibold text-blue-200 uppercase tracking-wider"
+                          class="px-6 py-4 text-left text-xl font-bold text-blue-200 uppercase tracking-wider"
                         >
                           <i class="fas fa-user mr-2"></i>Full Name
                         </th>
                         <th
-                          class="px-6 py-4 text-left text-sm font-semibold text-blue-200 uppercase tracking-wider"
+                          class="px-6 py-4 text-left text-xl font-bold text-blue-200 uppercase tracking-wider"
                         >
                           <i class="fas fa-id-card mr-2"></i>PF Number
                         </th>
                         <th
-                          class="px-6 py-4 text-left text-sm font-semibold text-blue-200 uppercase tracking-wider"
+                          class="px-6 py-4 text-left text-xl font-bold text-blue-200 uppercase tracking-wider"
                         >
                           <i class="fas fa-phone mr-2"></i>Phone Number
                         </th>
                         <th
-                          class="px-6 py-4 text-left text-sm font-semibold text-blue-200 uppercase tracking-wider"
+                          class="px-6 py-4 text-left text-xl font-bold text-blue-200 uppercase tracking-wider"
                         >
                           <i class="fas fa-info-circle mr-2"></i>Status
                         </th>
                         <th
-                          class="px-6 py-4 text-center text-sm font-semibold text-blue-200 uppercase tracking-wider"
+                          class="px-6 py-4 text-left text-xl font-bold text-blue-200 uppercase tracking-wider"
+                        >
+                          <i class="fas fa-sms mr-2"></i>SMS Status
+                        </th>
+                        <th
+                          class="px-6 py-4 text-center text-xl font-bold text-blue-200 uppercase tracking-wider"
                         >
                           <i class="fas fa-cogs mr-2"></i>Actions
                         </th>
@@ -222,7 +229,7 @@
                         ]"
                       >
                         <!-- S/N -->
-                        <td class="px-6 py-4 text-white text-base font-medium">
+                        <td class="px-6 py-4 text-white text-xl font-semibold">
                           {{ index + 1 }}
                         </td>
 
@@ -230,15 +237,15 @@
                         <td class="px-6 py-4">
                           <div class="flex items-center space-x-3">
                             <div
-                              class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center"
+                              class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center"
                             >
-                              <span class="text-white font-bold text-sm">{{
+                              <span class="text-white font-bold text-base">{{
                                 getInitials(officer.name)
                               }}</span>
                             </div>
                             <div>
-                              <p class="text-white font-medium text-base">{{ officer.name }}</p>
-                              <p class="text-blue-300 text-sm">
+                              <p class="text-white font-semibold text-xl">{{ officer.name }}</p>
+                              <p class="text-blue-300 text-lg">
                                 {{ officer.position || 'ICT Officer' }}
                               </p>
                             </div>
@@ -247,14 +254,14 @@
 
                         <!-- PF Number -->
                         <td class="px-6 py-4">
-                          <span class="text-white text-base font-mono">{{
+                          <span class="text-white text-xl font-mono">{{
                             officer.pf_number || 'N/A'
                           }}</span>
                         </td>
 
                         <!-- Phone Number -->
                         <td class="px-6 py-4">
-                          <span class="text-white text-base">{{
+                          <span class="text-white text-xl">{{
                             officer.phone_number || 'N/A'
                           }}</span>
                         </td>
@@ -263,10 +270,26 @@
                         <td class="px-6 py-4">
                           <span
                             :class="getStatusBadgeClass(officer.status)"
-                            class="px-3 py-1 rounded-full text-sm font-medium"
+                            class="px-4 py-2 rounded-full text-lg font-semibold"
                           >
                             {{ officer.status || 'Available' }}
                           </span>
+                        </td>
+
+                        <!-- SMS Status -->
+                        <td class="px-6 py-4">
+                          <div class="flex items-center space-x-2">
+                            <div
+                              class="w-4 h-4 rounded-full"
+                              :class="getSmsStatusColor(officer.sms_status)"
+                            ></div>
+                            <span
+                              class="text-xl font-semibold"
+                              :class="getSmsStatusTextColor(officer.sms_status)"
+                            >
+                              {{ getSmsStatusText(officer.sms_status) }}
+                            </span>
+                          </div>
                         </td>
 
                         <!-- Actions -->
@@ -304,8 +327,8 @@
                   >
                     <i class="fas fa-users text-blue-400 text-2xl"></i>
                   </div>
-                  <h3 class="text-white text-xl font-medium mb-2">No ICT Officers Found</h3>
-                  <p class="text-blue-300 text-base">
+                  <h3 class="text-white text-3xl font-semibold mb-2">No ICT Officers Found</h3>
+                  <p class="text-blue-300 text-xl">
                     {{
                       searchQuery || statusFilter
                         ? 'No officers match your current filters.'
@@ -319,7 +342,7 @@
                   v-if="filteredOfficers.length > 0"
                   class="bg-blue-800/30 px-6 py-3 border-t border-blue-300/20"
                 >
-                  <p class="text-blue-300 text-base">
+                  <p class="text-blue-300 text-xl font-medium">
                     Showing {{ filteredOfficers.length }} of {{ ictOfficers.length }} officers
                   </p>
                 </div>
@@ -601,7 +624,7 @@
         this.error = null
 
         try {
-          const result = await headOfItService.getIctOfficers()
+          const result = await headOfItService.getIctOfficers(this.requestId)
           if (result.success) {
             this.ictOfficers = result.data || []
           } else {
@@ -639,11 +662,18 @@
             this.showConfirmModal = false
             this.showSuccessModal = true
 
-            // Update officer status locally
+            // Update officer status and SMS status locally
             const officerIndex = this.ictOfficers.findIndex((o) => o.id === this.selectedOfficer.id)
             if (officerIndex !== -1) {
               this.ictOfficers[officerIndex].status = 'Assigned'
+              // Set SMS status to 'sent' (assuming successful notification)
+              this.ictOfficers[officerIndex].sms_status = 'sent'
             }
+            
+            // Refresh officers list to get updated SMS status from backend
+            setTimeout(() => {
+              this.fetchIctOfficers()
+            }, 2000)
           } else {
             alert('Failed to assign task: ' + result.message)
           }
@@ -697,6 +727,34 @@
           Completed: 'bg-gray-500 text-gray-900'
         }
         return statusClasses[status] || statusClasses['Available']
+      },
+
+      // SMS Status methods
+      getSmsStatusText(smsStatus) {
+        const statusMap = {
+          sent: 'Delivered',
+          pending: 'Pending',
+          failed: 'Failed'
+        }
+        return statusMap[smsStatus] || 'has no task'
+      },
+
+      getSmsStatusColor(smsStatus) {
+        const colorMap = {
+          sent: 'bg-green-500',
+          pending: 'bg-yellow-500',
+          failed: 'bg-red-500'
+        }
+        return colorMap[smsStatus] || 'bg-gray-400'
+      },
+
+      getSmsStatusTextColor(smsStatus) {
+        const textColorMap = {
+          sent: 'text-green-400',
+          pending: 'text-yellow-400',
+          failed: 'text-red-400'
+        }
+        return textColorMap[smsStatus] || 'text-gray-400'
       },
 
       hasService(request, serviceType) {

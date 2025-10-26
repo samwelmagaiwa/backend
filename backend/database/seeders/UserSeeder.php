@@ -44,6 +44,7 @@ class UserSeeder extends Seeder
             'divisional_director' => Role::where('name', 'divisional_director')->first(),
             'head_of_department' => Role::where('name', 'head_of_department')->first(),
             'ict_director' => Role::where('name', 'ict_director')->first(),
+            'head_of_it' => Role::where('name', 'head_of_it')->first(),
             'ict_officer' => Role::where('name', 'ict_officer')->first(),
             'staff' => Role::where('name', 'staff')->first(),
         ];
@@ -74,6 +75,16 @@ class UserSeeder extends Seeder
                 'roles' => ['ict_director']
             ],
             [
+                'name' => 'Head of IT Services',
+                'email' => 'head.it@mnh.go.tz',
+                'phone' => '+255743519104',
+                'pf_number' => 'PF3456',
+                'department_id' => $departments['ICT']?->id,
+                'password' => Hash::make('12345678'),
+                'is_active' => true,
+                'roles' => ['head_of_it']
+            ],
+            [
                 'name' => 'Senior ICT Officer',
                 'email' => 'ict.officer@mnh.go.tz',
                 'phone' => '+255700000002',
@@ -87,7 +98,7 @@ class UserSeeder extends Seeder
                 'name' => 'ICT Support Specialist',
                 'email' => 'ict.support@mnh.go.tz',
                 'phone' => '+255700000003',
-                'pf_number' => 'PF3456',
+                'pf_number' => 'PF7890',
                 'department_id' => $departments['ICT']?->id,
                 'password' => Hash::make('12345678'),
                 'is_active' => true,
