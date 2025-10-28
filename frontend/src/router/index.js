@@ -124,21 +124,11 @@ const routes = [
   },
   {
     path: '/ict-dashboard',
-    name: 'IctDashboard',
-    component: () => import('../components/IctDashboard.vue'),
-    meta: {
-      requiresAuth: true,
-      roles: [ROLES.ICT_OFFICER]
-    }
+    redirect: '/ict-dashboard/access-requests'
   },
   {
     path: '/head_of_it-dashboard',
-    name: 'HeadOfItDashboard',
-    component: () => import('../components/HeadOfItDashboard.vue'),
-    meta: {
-      requiresAuth: true,
-      roles: [ROLES.HEAD_OF_IT]
-    }
+    redirect: '/head_of_it-dashboard/combined-requests'
   },
 
   // Onboarding flow (for first-time users)
@@ -351,7 +341,7 @@ const routes = [
   },
   {
     path: '/ict-dashboard/access-requests',
-    name: 'IctAccessRequests',
+    name: 'IctDashboard',
     component: () => import('../components/views/ict-officer/AccessRequests.vue'),
     meta: {
       requiresAuth: true,

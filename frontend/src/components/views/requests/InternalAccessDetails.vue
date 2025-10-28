@@ -321,7 +321,9 @@
                               <i :class="getHODApprovalStepIcon()" class="text-white text-sm"></i>
                             </div>
                             <div>
-                              <h4 class="text-white font-semibold text-base">Head of Department</h4>
+                              <h4 class="text-white font-semibold text-base">
+                                {{ getHODApproverName() }}
+                              </h4>
                               <p
                                 :class="getHODApprovalStatusTextClass()"
                                 class="text-sm font-medium"
@@ -414,90 +416,6 @@
                             <p class="text-gray-300 text-sm italic font-bold">
                               No comments available yet.
                             </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- HOD Comments Card -->
-                    <div
-                      v-if="getHODComment() || getHODApprovalStatus() === 'rejected'"
-                      class="mt-2"
-                    >
-                      <div
-                        :class="getHODCommentsCardClass()"
-                        class="rounded-lg p-3 backdrop-blur-sm border transition-all duration-300 hover:shadow-lg"
-                      >
-                        <!-- Header -->
-                        <div class="flex items-center justify-between mb-2">
-                          <div class="flex items-center space-x-2">
-                            <div
-                              :class="getHODCommentsIconBgClass()"
-                              class="w-8 h-8 rounded-lg flex items-center justify-center shadow-sm"
-                            >
-                              <i :class="getHODCommentsIcon()" class="text-white text-sm"></i>
-                            </div>
-                            <div>
-                              <h5 class="text-white font-semibold text-base">HOD Comments</h5>
-                              <p class="text-sm opacity-75" :class="getHODCommentsTextColor()">
-                                {{
-                                  getHODApprovalStatus() === 'rejected'
-                                    ? 'Rejection Reason'
-                                    : getHODApprovalStatus() === 'approved'
-                                      ? 'Approval Note'
-                                      : 'Review Comment'
-                                }}
-                              </p>
-                            </div>
-                          </div>
-                          <div
-                            :class="getHODCommentsStatusBadgeClass()"
-                            class="px-3 py-1.5 rounded text-base font-semibold uppercase"
-                          >
-                            {{ getHODApprovalStatus() }}
-                          </div>
-                        </div>
-
-                        <!-- Comment Content -->
-                        <div class="mb-2">
-                          <p class="text-white text-lg leading-relaxed font-bold">
-                            {{
-                              getHODComment() ||
-                              (getHODApprovalStatus() === 'rejected'
-                                ? 'No rejection reason provided.'
-                                : 'No comment available.')
-                            }}
-                          </p>
-                        </div>
-
-                        <!-- Footer -->
-                        <div
-                          class="flex justify-between items-center text-sm"
-                          :class="getHODCommentsTextColor()"
-                        >
-                          <div class="flex items-center space-x-1">
-                            <i class="fas fa-calendar-alt"></i>
-                            <span>{{
-                              requestData?.hodApproval?.approved_at ||
-                              requestData?.hod_approved_at ||
-                              requestData?.hod_rejected_at
-                                ? formatDateTime(
-                                    requestData?.hodApproval?.approved_at ||
-                                      requestData?.hod_approved_at ||
-                                      requestData?.hod_rejected_at
-                                  )
-                                : getHODApprovalStatus() === 'rejected'
-                                  ? 'Recently'
-                                  : 'Pending'
-                            }}</span>
-                          </div>
-                          <div class="flex items-center space-x-1">
-                            <i class="fas fa-user"></i>
-                            <span>{{
-                              requestData?.hodApproval?.approved_by_name ||
-                              requestData?.hod_approved_by_name ||
-                              'HOD'
-                            }}</span>
                           </div>
                         </div>
                       </div>
@@ -925,6 +843,32 @@
         return comment
       }
 
+      const getHODApproverName = () => {
+        // Get the actual approver name from the request data
+        const approverName =
+          requestData.value?.hodApproval?.approved_by_name ||
+          requestData.value?.hod_approved_by_name ||
+          requestData.value?.hod_rejected_by_name ||
+          requestData.value?.approved_by_name ||
+          requestData.value?.rejected_by_name ||
+          requestData.value?.hod_approver_name ||
+          requestData.value?.hod_name ||
+          'Head of Department' // Fallback to default
+
+        console.log('🔍 HOD Approver Name Debug:', {
+          approverName,
+          'hodApproval?.approved_by_name': requestData.value?.hodApproval?.approved_by_name,
+          hod_approved_by_name: requestData.value?.hod_approved_by_name,
+          hod_rejected_by_name: requestData.value?.hod_rejected_by_name,
+          approved_by_name: requestData.value?.approved_by_name,
+          rejected_by_name: requestData.value?.rejected_by_name,
+          hod_approver_name: requestData.value?.hod_approver_name,
+          hod_name: requestData.value?.hod_name
+        })
+
+        return approverName
+      }
+
       const getHODApprovalStepClass = () => {
         const status = getHODApprovalStatus()
         if (status === 'approved') return 'bg-gradient-to-br from-blue-500 to-blue-600'
@@ -1253,6 +1197,7 @@
         // HOD Methods
         getHODApprovalStatus,
         getHODComment,
+        getHODApproverName,
         getHODApprovalStepClass,
         getHODApprovalStepIcon,
         getHODApprovalStatusText,

@@ -1,6 +1,6 @@
 <template>
   <aside
-    class="h-screen flex flex-col transition-all duration-300 ease-in-out overflow-hidden relative shadow-2xl sidebar-responsive"
+    class="h-full flex flex-col transition-all duration-300 ease-in-out overflow-hidden relative shadow-2xl sidebar-responsive"
     :class="[
       isCollapsed ? 'w-16 sidebar-collapsed' : 'sidebar-expanded',
       !shouldShowSidebar ? 'invisible pointer-events-none opacity-0' : 'opacity-100'
@@ -533,7 +533,10 @@
       </nav>
 
       <!-- Bottom Section -->
-      <div class="bottom-section space-y-3 pt-4 pb-20 px-4 border-t border-blue-400/30" style="flex-shrink: 0; margin-top: auto;">
+      <div
+        class="bottom-section space-y-3 pt-4 pb-4 px-4 border-t border-blue-400/30"
+        style="flex-shrink: 0; margin-top: auto"
+      >
         <!-- Help Center -->
         <button
           @click="showHelp"
@@ -607,120 +610,120 @@
         class="fixed inset-0 bg-black/60 flex items-center justify-center z-[10001] backdrop-blur-sm"
         @click="showHelpModal = false"
       >
-      <div
-        class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all duration-300 scale-100 overflow-hidden"
-        @click.stop
-      >
-        <!-- Header -->
-        <div class="bg-gradient-to-r from-blue-600 to-blue-700 p-6 text-center shadow-lg">
-          <div
-            class="w-16 h-16 bg-blue-500/30 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm border border-blue-300/40 shadow-lg"
-          >
-            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
+        <div
+          class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all duration-300 scale-100 overflow-hidden"
+          @click.stop
+        >
+          <!-- Header -->
+          <div class="bg-gradient-to-r from-blue-600 to-blue-700 p-6 text-center shadow-lg">
+            <div
+              class="w-16 h-16 bg-blue-500/30 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm border border-blue-300/40 shadow-lg"
+            >
+              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">Help & Support</h3>
           </div>
-          <h3 class="text-xl font-bold text-white mb-2">Help & Support</h3>
+
+          <!-- Body -->
+          <div class="p-6">
+            <div class="space-y-4">
+              <div
+                class="flex items-center p-3 rounded-lg shadow-sm border bg-blue-50 border-blue-100"
+              >
+                <div
+                  class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3 shadow-md"
+                >
+                  <svg
+                    class="w-5 h-5 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <p class="font-medium text-gray-800">ICT Support</p>
+                  <p class="text-sm text-gray-600">+255 123 456 789</p>
+                </div>
+              </div>
+
+              <div
+                class="flex items-center p-3 rounded-lg shadow-sm border bg-blue-50 border-blue-100"
+              >
+                <div
+                  class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3 shadow-md"
+                >
+                  <svg
+                    class="w-5 h-5 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <p class="font-medium text-gray-800">Email Support</p>
+                  <p class="text-sm text-gray-600">ict@mnh.or.tz</p>
+                </div>
+              </div>
+
+              <div
+                class="flex items-center p-3 rounded-lg shadow-sm border bg-blue-50 border-blue-100"
+              >
+                <div
+                  class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3 shadow-md"
+                >
+                  <svg
+                    class="w-5 h-5 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <p class="font-medium text-gray-800">User Guide</p>
+                  <p class="text-sm text-gray-600">Access system documentation</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Close Button -->
+            <div class="mt-6">
+              <button
+                @click="showHelpModal = false"
+                class="w-full bg-blue-600 text-white py-3 px-4 rounded-xl font-medium hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+              >
+                Close
+              </button>
+            </div>
+          </div>
         </div>
-
-        <!-- Body -->
-        <div class="p-6">
-          <div class="space-y-4">
-            <div
-              class="flex items-center p-3 rounded-lg shadow-sm border bg-blue-50 border-blue-100"
-            >
-              <div
-                class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3 shadow-md"
-              >
-                <svg
-                  class="w-5 h-5 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <p class="font-medium text-gray-800">ICT Support</p>
-                <p class="text-sm text-gray-600">+255 123 456 789</p>
-              </div>
-            </div>
-
-            <div
-              class="flex items-center p-3 rounded-lg shadow-sm border bg-blue-50 border-blue-100"
-            >
-              <div
-                class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3 shadow-md"
-              >
-                <svg
-                  class="w-5 h-5 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <p class="font-medium text-gray-800">Email Support</p>
-                <p class="text-sm text-gray-600">ict@mnh.or.tz</p>
-              </div>
-            </div>
-
-            <div
-              class="flex items-center p-3 rounded-lg shadow-sm border bg-blue-50 border-blue-100"
-            >
-              <div
-                class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3 shadow-md"
-              >
-                <svg
-                  class="w-5 h-5 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                  />
-                </svg>
-              </div>
-              <div>
-                <p class="font-medium text-gray-800">User Guide</p>
-                <p class="text-sm text-gray-600">Access system documentation</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Close Button -->
-          <div class="mt-6">
-            <button
-              @click="showHelpModal = false"
-              class="w-full bg-blue-600 text-white py-3 px-4 rounded-xl font-medium hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      </div>
       </div>
     </Teleport>
   </aside>
@@ -860,7 +863,10 @@
         await nextTick()
         if (route.path.startsWith('/divisional-dashboard')) {
           if (isCollapsed.value) {
-            console.log('📂 [onMounted] Auto-expanding sidebar for divisional dashboard route:', route.path)
+            console.log(
+              '📂 [onMounted] Auto-expanding sidebar for divisional dashboard route:',
+              route.path
+            )
             setCollapsed(false)
           } else {
             console.log('✅ [onMounted] Sidebar already expanded for:', route.path)
@@ -1561,7 +1567,10 @@
           // Auto-expand sidebar when navigating to divisional dashboard routes
           if (newRoute.path.startsWith('/divisional-dashboard')) {
             if (isCollapsed.value) {
-              console.log('📂 Auto-expanding sidebar for divisional dashboard route:', newRoute.path)
+              console.log(
+                '📂 Auto-expanding sidebar for divisional dashboard route:',
+                newRoute.path
+              )
               setCollapsed(false)
             }
           }
@@ -2001,7 +2010,7 @@
   }
 
   /* Enhanced Sidebar Transitions */
-  .h-screen {
+  .h-full {
     transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
@@ -2122,7 +2131,7 @@
     }
 
     /* Faster transitions on mobile */
-    .h-screen {
+    .h-full {
       transition: width 0.3s ease-in-out;
     }
 

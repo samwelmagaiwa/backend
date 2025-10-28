@@ -64,6 +64,14 @@
           </div>
         </div>
 
+        <!-- Loading Banner -->
+        <UnifiedLoadingBanner 
+          :show="isLoading"
+          :loadingTitle="getLoadingTitle()"
+          :loadingSubtitle="getLoadingSubtitle()"
+          departmentTitle="ACCESS REQUEST APPROVAL SYSTEM"
+        />
+
         <div
           :class="[
             isReviewMode ? 'max-w-full mx-1' : 'max-w-7xl mx-auto',
@@ -1460,28 +1468,28 @@
                         ]"
                       >
                         <h5
-                          class="font-bold text-white mb-1 text-center text-xs flex items-center justify-center gap-2"
+                          class="font-bold text-white mb-1 text-center text-base flex items-center justify-center gap-2"
                         >
                           <i class="fas fa-user-tie mr-2 text-blue-300"></i>
                           HoD/BM
                           <span
                             v-if="isStageCompleted('hod')"
-                            class="text-xs px-2 py-1 bg-green-500/30 rounded-full text-green-300"
+                            class="text-base px-2 py-1 bg-green-500/30 rounded-full text-green-300"
                           >
-                            <i class="fas fa-check text-xs mr-1"></i>
+                            <i class="fas fa-check text-base mr-1"></i>
                             Completed
                           </span>
                           <span
                             v-else-if="!isHodApprovalEditable && isReviewMode"
-                            class="text-xs px-2 py-1 bg-gray-500/30 rounded-full text-gray-300"
+                            class="text-base px-2 py-1 bg-gray-500/30 rounded-full text-gray-300"
                           >
-                            <i class="fas fa-clock text-xs mr-1"></i>
+                            <i class="fas fa-clock text-base mr-1"></i>
                             Pending
                           </span>
                         </h5>
                         <div class="space-y-3">
                           <div>
-                            <label class="block text-xs font-semibold text-white mb-1">Name<span class="text-red-400">*</span></label>
+                            <label class="block text-base font-semibold text-white mb-1">Name<span class="text-red-400">*</span></label>
                             <div class="relative">
                               <input
                                 v-model="form.approvals.hod.name"
@@ -1500,7 +1508,7 @@
                             </div>
                           </div>
                           <div>
-                            <label class="block text-xs font-semibold text-white mb-1">Signature<span class="text-red-400">*</span></label>
+                            <label class="block text-base font-semibold text-white mb-1">Signature<span class="text-red-400">*</span></label>
                             <div class="relative">
                               <!-- Debug: Show which template condition is active -->
                               <!-- {{ console.log('🖼️ HOD Template Debug:', { shouldShowHodSignedIndicator, shouldShowHodNoSignatureIndicator, hodSignaturePreview, isReviewMode }) }} -->
@@ -1525,7 +1533,7 @@
                                     </div>
                                     <span
                                       :class="[
-                                        'text-sm',
+                                        'text-base',
                                         isIctDirectorApprovalActive
                                           ? 'text-green-300 font-extrabold uppercase tracking-wide'
                                           : 'text-green-400 font-semibold'
@@ -1535,8 +1543,8 @@
                                   <p
                                     :class="[
                                       isIctDirectorApprovalActive
-                                        ? 'text-green-200 font-semibold text-xs'
-                                        : 'text-green-300/80 text-xs'
+                                        ? 'text-green-200 font-semibold text-base'
+                                        : 'text-green-300/80 text-base'
                                     ]"
                                   >
                                     Approved at: {{ getApprovalDateFormatted('hod') }}
@@ -1567,9 +1575,9 @@
                                     >
                                       <i class="fas fa-times text-red-400 text-sm"></i>
                                     </div>
-                                    <span class="text-red-400 font-semibold text-sm">No signature on file</span>
+                                    <span class="text-red-400 font-semibold text-base">No signature on file</span>
                                   </div>
-                                  <p class="text-red-300/80 text-xs">HOD approval pending</p>
+                                  <p class="text-red-300/80 text-base">HOD approval pending</p>
                                 </div>
                               </div>
 
@@ -1712,7 +1720,7 @@
                             </div>
                           </div>
                           <div>
-                            <label class="block text-xs font-semibold text-white mb-1">Date (mm/dd/yyyy)<span class="text-red-400">*</span></label>
+                            <label class="block text-base font-semibold text-white mb-1">Date (mm/dd/yyyy)<span class="text-red-400">*</span></label>
                             <div class="relative">
                               <input
                                 v-model="form.approvals.hod.date"
@@ -1755,12 +1763,11 @@
                       <div
                         :class="[
                           'bg-white/15 rounded-lg border border-blue-300/30 backdrop-blur-sm',
-                          isDivisionalDirectorUser ? 'p-3' : 'p-4',
-                          { 'opacity-50': !isDivisionalApprovalEditable }
+                          isDivisionalDirectorUser ? 'p-3' : 'p-4'
                         ]"
                       >
                         <h5
-                          class="font-bold text-white mb-1 text-center text-xs flex items-center justify-center gap-2"
+                          class="font-bold text-white mb-1 text-center text-base flex items-center justify-center gap-2"
                         >
                           <i class="fas fa-user-circle mr-2 text-blue-300"></i>
                           Divisional Director
@@ -1771,9 +1778,9 @@
                               isReviewMode &&
                               requestData?.divisional_signature_path
                             "
-                            class="text-xs px-2 py-1 bg-green-500/30 rounded-full text-green-300"
+                            class="text-base px-2 py-1 bg-green-500/30 rounded-full text-green-300"
                           >
-                            <i class="fas fa-signature text-xs mr-1"></i>
+                            <i class="fas fa-signature text-base mr-1"></i>
                             Signed
                           </span>
                           <span
@@ -1782,30 +1789,30 @@
                               isReviewMode &&
                               !requestData?.divisional_signature_path
                             "
-                            class="text-xs px-2 py-1 bg-red-500/30 rounded-full text-red-300"
+                            class="text-base px-2 py-1 bg-red-500/30 rounded-full text-red-300"
                           >
-                            <i class="fas fa-times text-xs mr-1"></i>
+                            <i class="fas fa-times text-base mr-1"></i>
                             No Signature
                           </span>
                           <!-- Other roles view -->
                           <span
                             v-else-if="isStageCompleted('divisional')"
-                            class="text-xs px-2 py-1 bg-green-500/30 rounded-full text-green-300"
+                            class="text-base px-2 py-1 bg-green-500/30 rounded-full text-green-300"
                           >
-                            <i class="fas fa-check text-xs mr-1"></i>
+                            <i class="fas fa-check text-base mr-1"></i>
                             Completed
                           </span>
                           <span
                             v-else-if="!isDivisionalApprovalEditable && isReviewMode"
-                            class="text-xs px-2 py-1 bg-gray-500/30 rounded-full text-gray-300"
+                            class="text-base px-2 py-1 bg-gray-500/30 rounded-full text-gray-300"
                           >
-                            <i class="fas fa-clock text-xs mr-1"></i>
+                            <i class="fas fa-clock text-base mr-1"></i>
                             Pending
                           </span>
                         </h5>
                         <div class="space-y-3">
                           <div>
-                            <label class="block text-xs font-medium text-blue-100 mb-1">Name<span class="text-red-400">*</span></label>
+                            <label class="block text-base font-medium text-blue-100 mb-1">Name<span class="text-red-400">*</span></label>
                             <div class="relative">
                               <input
                                 v-model="form.approvals.divisionalDirector.name"
@@ -1824,7 +1831,7 @@
                             </div>
                           </div>
                           <div>
-                            <label class="block text-xs font-medium text-blue-100 mb-1">Signature<span class="text-red-400">*</span></label>
+                            <label class="block text-base font-medium text-blue-100 mb-1">Signature<span class="text-red-400">*</span></label>
                             <div class="relative">
                               <!-- Show Divisional Director signed indicator for ICT Director stage -->
                               <div
@@ -1846,7 +1853,7 @@
                                     </div>
                                     <span
                                       :class="[
-                                        'text-sm',
+                                        'text-base',
                                         isIctDirectorApprovalActive
                                           ? 'text-green-300 font-extrabold uppercase tracking-wide'
                                           : 'text-green-400 font-semibold'
@@ -1856,8 +1863,8 @@
                                   <p
                                     :class="[
                                       isIctDirectorApprovalActive
-                                        ? 'text-green-200 font-semibold text-xs'
-                                        : 'text-green-300/80 text-xs'
+                                        ? 'text-green-200 font-semibold text-base'
+                                        : 'text-green-300/80 text-base'
                                     ]"
                                   >
                                     Approved at: {{ getApprovalDateFormatted('divisional') }}
@@ -1877,9 +1884,9 @@
                                     >
                                       <i class="fas fa-times text-red-400 text-sm"></i>
                                     </div>
-                                    <span class="text-red-400 font-semibold text-sm">No signature on file</span>
+                                    <span class="text-red-400 font-semibold text-base">No signature on file</span>
                                   </div>
-                                  <p class="text-red-300/80 text-xs">
+                                  <p class="text-red-300/80 text-base">
                                     Divisional Director approval pending
                                   </p>
                                 </div>
@@ -2075,8 +2082,7 @@
                       <div
                         :class="[
                           'bg-white/15 rounded-lg border border-blue-300/30 backdrop-blur-sm',
-                          isDivisionalDirectorUser ? 'p-3' : 'p-4',
-                          { 'opacity-50': !isIctDirectorApprovalEditable }
+                          isDivisionalDirectorUser ? 'p-3' : 'p-4'
                         ]"
                       >
                         <h5
@@ -2158,9 +2164,9 @@
                                     >
                                       <i class="fas fa-check text-green-400 text-sm"></i>
                                     </div>
-                                    <span class="text-green-400 font-semibold text-sm">Signed</span>
+                                    <span class="text-green-400 font-semibold text-base">Signed</span>
                                   </div>
-                                  <p class="text-green-300/80 text-xs">
+                                  <p class="text-green-300/80 text-base">
                                     Approved at: {{ getApprovalDateFormatted('ict_director') }}
                                   </p>
                                 </div>
@@ -2178,9 +2184,9 @@
                                     >
                                       <i class="fas fa-times text-red-400 text-sm"></i>
                                     </div>
-                                    <span class="text-red-400 font-semibold text-sm">No signature on file</span>
+                                    <span class="text-red-400 font-semibold text-base">No signature on file</span>
                                   </div>
-                                  <p class="text-red-300/80 text-xs">
+                                  <p class="text-red-300/80 text-base">
                                     ICT Director approval pending
                                   </p>
                                 </div>
@@ -2408,7 +2414,7 @@
                       <!-- Head of IT -->
                       <div :class="headItSectionClass">
                         <h5
-                          class="font-bold text-white mb-0.5 text-center text-xs flex items-center justify-center gap-1"
+                          class="font-bold text-white mb-0.5 text-center text-base flex items-center justify-center gap-1"
                         >
                           <i class="fas fa-user-cog mr-2"></i>
                           Head of IT
@@ -2419,9 +2425,9 @@
                               isReviewMode &&
                               requestData?.head_it_signature_path
                             "
-                            class="text-xs px-2 py-1 bg-green-500/30 rounded-full text-green-300"
+                            class="text-base px-2 py-1 bg-green-500/30 rounded-full text-green-300"
                           >
-                            <i class="fas fa-signature text-xs mr-1"></i>
+                            <i class="fas fa-signature text-base mr-1"></i>
                             Signed
                           </span>
                           <span
@@ -2430,30 +2436,30 @@
                               isReviewMode &&
                               !requestData?.head_it_signature_path
                             "
-                            class="text-xs px-2 py-1 bg-red-500/30 rounded-full text-red-300"
+                            class="text-base px-2 py-1 bg-red-500/30 rounded-full text-red-300"
                           >
-                            <i class="fas fa-times text-xs mr-1"></i>
+                            <i class="fas fa-times text-base mr-1"></i>
                             No Signature
                           </span>
                           <!-- Other roles view -->
                           <span
                             v-else-if="isStageCompleted('head_it')"
-                            class="text-xs px-2 py-1 bg-green-500/30 rounded-full text-green-300"
+                            class="text-base px-2 py-1 bg-green-500/30 rounded-full text-green-300"
                           >
-                            <i class="fas fa-check text-xs mr-1"></i>
+                            <i class="fas fa-check text-base mr-1"></i>
                             Completed
                           </span>
                           <span
                             v-else-if="!isHeadItApprovalEditable && isReviewMode"
-                            class="text-xs px-2 py-1 bg-gray-500/30 rounded-full text-gray-300"
+                            class="text-base px-2 py-1 bg-gray-500/30 rounded-full text-gray-300"
                           >
-                            <i class="fas fa-clock text-xs mr-1"></i>
+                            <i class="fas fa-clock text-base mr-1"></i>
                             Pending
                           </span>
                         </h5>
                         <div class="space-y-0.5">
                           <div>
-                            <label class="block text-xs font-medium text-blue-100 mb-0.5">Name<span class="text-red-400">*</span></label>
+                            <label class="block text-base font-medium text-blue-100 mb-0.5">Name<span class="text-red-400">*</span></label>
                             <div class="relative">
                               <input
                                 v-model="form.implementation.headIT.name"
@@ -2501,7 +2507,7 @@
                             </div>
                           </div>
                           <div>
-                            <label class="block text-xs font-medium text-blue-100 mb-0.5">Signature<span class="text-red-400">*</span></label>
+                            <label class="block text-base font-medium text-blue-100 mb-0.5">Signature<span class="text-red-400">*</span></label>
                             <div class="relative">
                               <!-- Show Head IT signed indicator for ICT Officer stage -->
                               <div
@@ -2515,9 +2521,9 @@
                                     >
                                       <i class="fas fa-check text-green-400 text-sm"></i>
                                     </div>
-                                    <span class="text-green-400 font-semibold text-xs">Signed</span>
+                                    <span class="text-green-400 font-semibold text-base">Signed</span>
                                   </div>
-                                  <p class="text-green-300/80 text-xs">
+                                  <p class="text-green-300/80 text-base">
                                     Approved at: {{ getApprovalDateFormatted('head_it') }}
                                   </p>
                                 </div>
@@ -2535,9 +2541,9 @@
                                     >
                                       <i class="fas fa-times text-red-400 text-sm"></i>
                                     </div>
-                                    <span class="text-red-400 font-semibold text-xs">No signature on file</span>
+                                    <span class="text-red-400 font-semibold text-base">No signature on file</span>
                                   </div>
-                                  <p class="text-red-300/80 text-xs">Head IT approval pending</p>
+                                  <p class="text-red-300/80 text-base">Head IT approval pending</p>
                                 </div>
                               </div>
 
@@ -2620,7 +2626,7 @@
                             </div>
                           </div>
                           <div>
-                            <label class="block text-xs font-medium text-blue-100 mb-0.5">Date (mm/dd/yyyy)<span class="text-red-400">*</span></label>
+                            <label class="block text-base font-medium text-blue-100 mb-0.5">Date (mm/dd/yyyy)<span class="text-red-400">*</span></label>
                             <div class="relative">
                               <input
                                 v-model="form.implementation.headIT.date"
@@ -2662,7 +2668,7 @@
                       <!-- ICT Officer granting access -->
                       <div :class="ictOfficerSectionClass">
                         <h5
-                          class="font-bold text-white mb-0.5 text-center text-xs flex items-center justify-center gap-1"
+                          class="font-bold text-white mb-0.5 text-center text-base flex items-center justify-center gap-1"
                         >
                           <i class="fas fa-user-shield mr-2"></i>
                           ICT Officer granting access
@@ -2673,9 +2679,9 @@
                               isReviewMode &&
                               requestData?.ict_officer_signature_path
                             "
-                            class="text-xs px-2 py-1 bg-green-500/30 rounded-full text-green-300"
+                            class="text-base px-2 py-1 bg-green-500/30 rounded-full text-green-300"
                           >
-                            <i class="fas fa-signature text-xs mr-1"></i>
+                            <i class="fas fa-signature text-base mr-1"></i>
                             Signed
                           </span>
                           <span
@@ -2684,22 +2690,22 @@
                               isReviewMode &&
                               !requestData?.ict_officer_signature_path
                             "
-                            class="text-xs px-2 py-1 bg-red-500/30 rounded-full text-red-300"
+                            class="text-base px-2 py-1 bg-red-500/30 rounded-full text-red-300"
                           >
-                            <i class="fas fa-times text-xs mr-1"></i>
+                            <i class="fas fa-times text-base mr-1"></i>
                             No Signature
                           </span>
                           <!-- Other roles view -->
                           <span
                             v-else-if="isStageCompleted('ict_officer')"
-                            class="text-xs px-2 py-1 bg-green-500/30 rounded-full text-green-300"
+                            class="text-base px-2 py-1 bg-green-500/30 rounded-full text-green-300"
                           >
-                            <i class="fas fa-check text-xs mr-1"></i>
+                            <i class="fas fa-check text-base mr-1"></i>
                             Completed
                           </span>
                           <span
                             v-else-if="!isIctOfficerApprovalEditable && isReviewMode"
-                            class="text-xs px-2 py-1 bg-gray-500/30 rounded-full text-gray-300"
+                            class="text-base px-2 py-1 bg-gray-500/30 rounded-full text-gray-300"
                           >
                             <i class="fas fa-clock text-xs mr-1"></i>
                             Pending
@@ -3359,6 +3365,20 @@
 
   .animate-fade-in-delay {
     animation: fade-in-delay 1s ease-out 0.3s both;
+  }
+
+  /* Slide across animation for loading screen */
+  @keyframes slide-across {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  .animate-slide-across {
+    animation: slide-across 2s linear infinite;
   }
 
   /* Review mode styles */
@@ -4028,6 +4048,7 @@
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import OrbitingDots from '@/components/OrbitingDots.vue'
   import AppFooter from '@/components/footer.vue'
+  import UnifiedLoadingBanner from '@/components/common/UnifiedLoadingBanner.vue'
   import authService from '@/services/authService'
   import combinedAccessService from '@/services/combinedAccessService'
   import ictOfficerService from '@/services/ictOfficerService'
@@ -4040,7 +4061,8 @@
       Header,
       ModernSidebar,
       OrbitingDots,
-      AppFooter
+      AppFooter,
+      UnifiedLoadingBanner
     },
     inject: {
       authStore: {
@@ -4172,6 +4194,8 @@
         currentUser: null,
         // Performance optimization flags
         loadingRequestData: false,
+        // Main loading state for initial page load
+        isLoading: false,
         // Debouncing flag for approval button
         processing: false,
         // Divisional Director comments (editable for divisional director)
@@ -5695,9 +5719,7 @@
           paddingClass = 'p-2'
         }
 
-        const opacityClass = this.isHeadItApprovalEditable ? '' : 'opacity-50'
-
-        return [baseClass, paddingClass, opacityClass].filter(Boolean).join(' ')
+        return [baseClass, paddingClass].filter(Boolean).join(' ')
       },
 
       ictOfficerSectionClass() {
@@ -5712,9 +5734,7 @@
           paddingClass = 'p-2'
         }
 
-        const opacityClass = this.isIctOfficerApprovalEditable ? '' : 'opacity-50'
-
-        return [baseClass, paddingClass, opacityClass].filter(Boolean).join(' ')
+        return [baseClass, paddingClass].filter(Boolean).join(' ')
       },
 
       actionButtonsClass() {
@@ -5768,6 +5788,9 @@
     },
     async mounted() {
       console.log('🚀 Component mounted - starting initialization...')
+
+      // Show loading screen
+      this.isLoading = true
 
       // Use Promise.all for parallel loading to reduce total load time
       try {
@@ -5842,6 +5865,9 @@
         if (this.isReviewMode && this.getRequestId) {
           await this.loadRequestData()
 
+          // Hide loading screen after data is loaded
+          this.isLoading = false
+
           // Debug: Check signature indicators after data loads (development only)
           if (this.isDevelopment) {
             setTimeout(() => {
@@ -5860,9 +5886,14 @@
               })
             }, 5000)
           }
+        } else {
+          // Not in review mode, hide loading immediately
+          this.isLoading = false
         }
       } catch (error) {
         console.error('❌ Component mount error:', error)
+        // Hide loading screen on error
+        this.isLoading = false
         // Don't let mount errors cause page to disappear
         // Just log the error and continue with basic functionality
         this.error = 'Failed to fully initialize component, but continuing...'
@@ -6126,7 +6157,7 @@
           if (res.success) {
             this.showGrantAccessPopup = false
             this.showToast('Access granted successfully', 'success')
-            
+
             // Immediately update local state to hide approve button
             if (this.requestData) {
               this.requestData.ict_officer_status = 'implemented'
@@ -6134,7 +6165,7 @@
               this.requestData.ict_officer_comments = comment
               this.requestData.status = 'implemented'
             }
-            
+
             // Redirect to ICT Officer dashboard after a brief delay to show success message
             setTimeout(() => {
               this.$router.push('/ict-dashboard/access-requests')
@@ -6158,23 +6189,33 @@
       // Generate SMS preview text
       getSmsPreviewText() {
         const name = this.form.staff_name || 'User'
-        const ref = this.form.request_id || 'MLG-REQ' + String(this.getRequestId || '').padStart(6, '0')
-        
+        const ref =
+          this.form.request_id || 'MLG-REQ' + String(this.getRequestId || '').padStart(6, '0')
+
         // Get access types
         const accessTypes = []
-        if (this.form.jeeva_access_request || (this.form.jeeva_modules_selected && this.form.jeeva_modules_selected.length > 0)) {
+        if (
+          this.form.jeeva_access_request ||
+          (this.form.jeeva_modules_selected && this.form.jeeva_modules_selected.length > 0)
+        ) {
           accessTypes.push('Jeeva')
         }
-        if (this.form.wellsoft_access_request || (this.form.wellsoft_modules_selected && this.form.wellsoft_modules_selected.length > 0)) {
+        if (
+          this.form.wellsoft_access_request ||
+          (this.form.wellsoft_modules_selected && this.form.wellsoft_modules_selected.length > 0)
+        ) {
           accessTypes.push('Wellsoft')
         }
-        if (this.form.internet_access_request || (this.form.internet_purposes && this.form.internet_purposes.length > 0)) {
+        if (
+          this.form.internet_access_request ||
+          (this.form.internet_purposes && this.form.internet_purposes.length > 0)
+        ) {
           accessTypes.push('Internet')
         }
         const types = accessTypes.length > 0 ? accessTypes.join(' & ') : 'Access'
-        
+
         const comment = (this.grantAccessComment || '').trim() || '[YOUR COMMENT HERE]'
-        
+
         return `Dear ${name}, your ${types} access has been GRANTED and is now ACTIVE. Ref: ${ref}. Note: ${comment} - EABMS`
       },
 
@@ -9201,6 +9242,20 @@
         this.showHeadItApproveSuccessModal = false
         const id = this.getRequestId || this.requestData?.id || this.$route.params.id
         if (id) this.$router.push(`/head_of_it-dashboard/select-ict-officer/${id}`)
+      },
+
+      getLoadingTitle() {
+        if (this.isReviewMode) {
+          return 'Loading Request Details'
+        }
+        return 'Loading Access Request'
+      },
+
+      getLoadingSubtitle() {
+        if (this.isReviewMode) {
+          return 'Retrieving request data for review...'
+        }
+        return 'Please wait...'
       }
     }
   }

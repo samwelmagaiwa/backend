@@ -1,30 +1,32 @@
 <template>
-  <div
-    class="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 flex items-center justify-center"
-  >
-    <div class="text-center">
-      <div class="mb-8">
-        <i class="fas fa-exclamation-triangle text-6xl text-yellow-400 mb-4"></i>
-        <h1 class="text-4xl font-bold text-white mb-2">404 - Page Not Found</h1>
-        <p class="text-xl text-blue-200">The page you're looking for doesn't exist.</p>
-      </div>
-
-      <div class="space-y-4">
-        <button
-          @click="goBack"
-          class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-semibold mr-4"
-        >
-          <i class="fas fa-arrow-left mr-2"></i>
-          Go Back
-        </button>
-
-        <button
-          @click="goHome"
-          class="px-6 py-3 bg-gradient-to-r from-teal-600 to-teal-700 text-white rounded-lg hover:from-teal-700 hover:to-teal-800 transition-all duration-300 font-semibold"
-        >
-          <i class="fas fa-home mr-2"></i>
-          Go Home
-        </button>
+  <div class="min-h-screen bg-blue-900 flex items-center justify-center p-4">
+    <div class="w-full max-w-2xl">
+      <div class="bg-blue-800/40 border border-blue-400/40 rounded-2xl p-8 text-center shadow-2xl">
+        <div class="mb-4">
+          <i class="fas fa-exclamation-triangle text-5xl text-yellow-400"></i>
+        </div>
+        <h1 class="text-3xl md:text-4xl font-extrabold text-white mb-2">
+          Unable to Load Page
+        </h1>
+        <p class="text-blue-200 text-base md:text-lg mb-6">
+          The requested page could not be found. It may have been moved or the URL is incorrect.
+        </p>
+        <div class="flex flex-wrap gap-3 justify-center">
+          <button
+            @click="goBack"
+            class="px-5 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold"
+          >
+            <i class="fas fa-undo mr-2"></i>
+            Retry/Back
+          </button>
+          <button
+            @click="goHome"
+            class="px-5 py-3 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-semibold"
+          >
+            <i class="fas fa-home mr-2"></i>
+            Back to Dashboard
+          </button>
+        </div>
       </div>
     </div>
   </div>

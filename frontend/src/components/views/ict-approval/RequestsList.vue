@@ -3,9 +3,7 @@
     <Header />
     <div class="flex flex-1 overflow-hidden">
       <ModernSidebar />
-      <main
-        class="flex-1 p-4 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative"
-      >
+      <main class="flex-1 p-2 bg-blue-900 overflow-y-auto relative z-0">
         <!-- Background Pattern -->
         <div class="absolute inset-0 overflow-hidden">
           <div class="absolute inset-0">
@@ -49,15 +47,16 @@
                   class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-slide-across"
                 ></div>
                 <div
-                  class="absolute top-4 left-4 w-16 h-16 bg-blue-400/20 rounded-full animate-float"
+                  class="absolute top-4 left-4 w-16 h-16 rounded-full animate-float"
+                  style="background: rgba(255, 0, 0, 0.2)"
                 ></div>
                 <div
-                  class="absolute bottom-4 right-4 w-20 h-20 bg-teal-400/20 rounded-full animate-float"
+                  class="absolute bottom-4 right-4 w-20 h-20 bg-blue-400/20 rounded-full animate-float"
                   style="animation-delay: 1s"
                 ></div>
                 <div
-                  class="absolute top-1/2 left-8 w-12 h-12 bg-blue-300/15 rounded-full animate-float"
-                  style="animation-delay: 2s"
+                  class="absolute top-1/2 left-8 w-12 h-12 rounded-full animate-float"
+                  style="background: rgba(255, 0, 0, 0.15); animation-delay: 2s"
                 ></div>
               </div>
 
@@ -84,12 +83,35 @@
                   <div class="relative flex flex-col items-center">
                     <!-- Main Spinner -->
                     <div class="relative mb-3">
+                      <!-- Base circle -->
+                      <div class="rounded-full h-12 w-12 border-2 border-gray-300/20"></div>
+                      <!-- Red orbiting segment -->
                       <div
-                        class="animate-spin rounded-full h-12 w-12 border-4 border-teal-300/40 border-t-teal-300 shadow-lg"
+                        class="absolute inset-0 animate-spin rounded-full h-12 w-12 border-4 border-transparent shadow-lg"
+                        style="border-top-color: #ff0000; animation-duration: 2s"
                       ></div>
+                      <!-- Blue orbiting segment -->
                       <div
-                        class="absolute inset-0 animate-spin rounded-full h-12 w-12 border-4 border-transparent border-r-blue-300"
-                        style="animation-direction: reverse; animation-duration: 1.5s"
+                        class="absolute inset-0 animate-spin rounded-full h-12 w-12 border-4 border-transparent shadow-lg"
+                        style="
+                          border-bottom-color: #0000d1;
+                          animation-direction: reverse;
+                          animation-duration: 1.5s;
+                        "
+                      ></div>
+                      <!-- Additional red segment for more dynamic effect -->
+                      <div
+                        class="absolute inset-0 animate-spin rounded-full h-12 w-12 border-4 border-transparent shadow-lg"
+                        style="border-right-color: rgba(255, 0, 0, 0.7); animation-duration: 2.5s"
+                      ></div>
+                      <!-- Additional blue segment -->
+                      <div
+                        class="absolute inset-0 animate-spin rounded-full h-12 w-12 border-4 border-transparent shadow-lg"
+                        style="
+                          border-left-color: rgba(0, 0, 209, 0.7);
+                          animation-direction: reverse;
+                          animation-duration: 1.8s;
+                        "
                       ></div>
                     </div>
 
@@ -122,7 +144,10 @@
 
                 <!-- Hospital Name and Department -->
                 <div class="text-center border-t border-blue-300/30 pt-4">
-                  <div class="text-red-400 text-lg font-black tracking-widest mb-1 drop-shadow-sm">
+                  <div
+                    class="text-lg font-black tracking-widest mb-1 drop-shadow-sm"
+                    style="color: #ff0000"
+                  >
                     MUHIMBILI NATIONAL HOSPITAL
                   </div>
                   <div class="text-teal-200 text-sm font-semibold tracking-wider">
@@ -132,17 +157,20 @@
 
                 <!-- Progress Indicators -->
                 <div class="flex justify-center gap-2 mt-4">
-                  <div class="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
                   <div
-                    class="w-2 h-2 bg-teal-400 rounded-full animate-bounce"
+                    class="w-2 h-2 rounded-full animate-bounce"
+                    style="background: #ff0000"
+                  ></div>
+                  <div
+                    class="w-2 h-2 bg-blue-400 rounded-full animate-bounce"
                     style="animation-delay: 0.1s"
                   ></div>
                   <div
-                    class="w-2 h-2 bg-blue-300 rounded-full animate-bounce"
-                    style="animation-delay: 0.2s"
+                    class="w-2 h-2 rounded-full animate-bounce"
+                    style="background: #ff0000; animation-delay: 0.2s"
                   ></div>
                   <div
-                    class="w-2 h-2 bg-teal-300 rounded-full animate-bounce"
+                    class="w-2 h-2 bg-blue-300 rounded-full animate-bounce"
                     style="animation-delay: 0.3s"
                   ></div>
                 </div>
@@ -151,71 +179,7 @@
           </div>
         </div>
 
-        <div class="max-w-full mx-auto px-2 relative z-10">
-          <!-- Header Section -->
-          <div
-            class="booking-glass-card rounded-t-3xl p-6 mb-0 border-b border-blue-300/30 animate-fade-in"
-          >
-            <div class="flex justify-between items-center">
-              <!-- Left Logo -->
-              <div
-                class="w-28 h-28 mr-8 transform hover:scale-110 transition-transform duration-300"
-              >
-                <div
-                  class="w-full h-full bg-gradient-to-br from-blue-500/20 to-teal-500/20 rounded-2xl backdrop-blur-sm border-2 border-blue-300/40 flex items-center justify-center shadow-2xl hover:shadow-blue-500/25"
-                >
-                  <img
-                    src="/assets/images/ngao2.png"
-                    alt="National Shield"
-                    class="max-w-20 max-h-20 object-contain"
-                  />
-                </div>
-              </div>
-
-              <!-- Center Content -->
-              <div class="text-center flex-1">
-                <h1
-                  class="text-2xl font-bold text-white mb-4 tracking-wide drop-shadow-lg animate-fade-in"
-                >
-                  MUHIMBILI NATIONAL HOSPITAL
-                </h1>
-                <div class="relative inline-block mb-4">
-                  <div
-                    class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2 rounded-full text-base font-bold shadow-2xl transform hover:scale-105 transition-all duration-300 border-2 border-blue-400/60"
-                  >
-                    <span class="relative z-10 flex items-center gap-3">
-                      <i class="fas fa-clipboard-list text-base"></i>
-                      ICT DEVICE REQUESTS MANAGEMENT
-                    </span>
-                    <div
-                      class="absolute inset-0 bg-gradient-to-r from-blue-700 to-blue-800 rounded-full opacity-0 hover:opacity-100 transition-opacity duration-300"
-                    ></div>
-                  </div>
-                </div>
-                <h2
-                  class="text-lg font-bold text-blue-100 tracking-wide drop-shadow-md animate-fade-in-delay"
-                >
-                  ICT OFFICER DASHBOARD
-                </h2>
-              </div>
-
-              <!-- Right Logo -->
-              <div
-                class="w-28 h-28 ml-8 transform hover:scale-110 transition-transform duration-300"
-              >
-                <div
-                  class="w-full h-full bg-gradient-to-br from-teal-500/20 to-blue-500/20 rounded-2xl backdrop-blur-sm border-2 border-teal-300/40 flex items-center justify-center shadow-2xl hover:shadow-teal-500/25"
-                >
-                  <img
-                    src="/assets/images/logo2.png"
-                    alt="Muhimbili Logo"
-                    class="max-w-20 max-h-20 object-contain"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
+        <div class="max-w-full mx-auto relative z-10">
           <!-- Error Display -->
           <div
             v-if="error"
@@ -231,563 +195,374 @@
             </button>
           </div>
 
-          <!-- Main Content -->
-          <div class="booking-glass-card rounded-b-3xl overflow-hidden animate-slide-up">
-            <div class="p-6">
-              <!-- Stats Cards -->
-              <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                <div
-                  class="bg-gradient-to-r from-blue-600/25 to-teal-600/25 border-2 border-blue-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-500"
-                >
-                  <div class="flex items-center">
-                    <div
-                      class="w-12 h-12 bg-gradient-to-br from-blue-500 to-teal-600 rounded-lg flex items-center justify-center shadow-lg"
-                    >
-                      <i class="fas fa-clock text-white text-lg"></i>
-                    </div>
-                    <div class="ml-4">
-                      <p class="text-sm font-semibold text-blue-200">Pending</p>
-                      <p class="text-2xl font-bold text-white">
-                        {{ stats.pending }}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+          <!-- Stats Cards -->
+          <div class="grid grid-cols-4 gap-4 mb-6">
+            <div class="bg-yellow-600/25 border border-yellow-400/40 p-4 rounded-lg">
+              <h3 class="text-yellow-200 text-lg font-bold">Pending</h3>
+              <p class="text-white text-4xl font-bold">{{ stats.pending }}</p>
+            </div>
+            <div class="bg-green-600/25 border border-green-400/40 p-4 rounded-lg">
+              <h3 class="text-green-200 text-lg font-bold">Approved</h3>
+              <p class="text-white text-4xl font-bold">{{ stats.approved }}</p>
+            </div>
+            <div class="bg-red-600/25 border border-red-400/40 p-4 rounded-lg">
+              <h3 class="text-red-200 text-lg font-bold">Rejected</h3>
+              <p class="text-white text-4xl font-bold">{{ stats.rejected }}</p>
+            </div>
+            <div class="bg-blue-600/25 border border-blue-400/40 p-4 rounded-lg">
+              <h3 class="text-blue-200 text-lg font-bold">Total Requests</h3>
+              <p class="text-white text-4xl font-bold">{{ stats.total }}</p>
+            </div>
+          </div>
 
-                <div
-                  class="bg-gradient-to-r from-green-600/25 to-emerald-600/25 border-2 border-green-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-xl hover:shadow-green-500/20 transition-all duration-500"
-                >
-                  <div class="flex items-center">
-                    <div
-                      class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-lg"
-                    >
-                      <i class="fas fa-check-circle text-white text-lg"></i>
-                    </div>
-                    <div class="ml-4">
-                      <p class="text-sm font-semibold text-green-200">Approved</p>
-                      <p class="text-2xl font-bold text-white">
-                        {{ stats.approved }}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div
-                  class="bg-gradient-to-r from-red-600/25 to-pink-600/25 border-2 border-red-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-xl hover:shadow-red-500/20 transition-all duration-500"
-                >
-                  <div class="flex items-center">
-                    <div
-                      class="w-12 h-12 bg-gradient-to-br from-red-500 to-pink-600 rounded-lg flex items-center justify-center shadow-lg"
-                    >
-                      <i class="fas fa-times-circle text-white text-lg"></i>
-                    </div>
-                    <div class="ml-4">
-                      <p class="text-sm font-semibold text-red-200">Rejected</p>
-                      <p class="text-2xl font-bold text-white">
-                        {{ stats.rejected }}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div
-                  class="bg-gradient-to-r from-purple-600/25 to-indigo-600/25 border-2 border-purple-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-xl hover:shadow-purple-500/20 transition-all duration-500"
-                >
-                  <div class="flex items-center">
-                    <div
-                      class="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-lg"
-                    >
-                      <i class="fas fa-list text-white text-lg"></i>
-                    </div>
-                    <div class="ml-4">
-                      <p class="text-sm font-semibold text-purple-200">Total</p>
-                      <p class="text-2xl font-bold text-white">
-                        {{ stats.total }}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Filters and Search -->
-              <div
-                class="bg-gradient-to-r from-blue-600/25 to-teal-600/25 border-2 border-blue-400/40 p-6 rounded-2xl backdrop-blur-sm mb-8"
+          <!-- Search and Filters -->
+          <div class="bg-white/10 rounded-lg p-4 mb-6">
+            <div class="flex flex-col md:flex-row gap-4">
+              <input
+                v-model="searchQuery"
+                type="text"
+                placeholder="Search by borrower name, department, or device..."
+                class="flex-1 px-4 py-3 bg-white/20 border border-blue-300/30 rounded text-white placeholder-blue-200/60 text-lg"
+              />
+              <select
+                v-model="ictStatusFilter"
+                class="px-4 py-3 bg-white/20 border border-blue-300/30 rounded text-white text-lg"
               >
-                <div class="flex flex-col md:flex-row gap-4 items-center">
-                  <div class="flex-1">
-                    <div class="relative">
-                      <input
-                        v-model="searchQuery"
-                        type="text"
-                        placeholder="Search by borrower name, department, or device..."
-                        class="w-full px-4 py-3 bg-white/15 border border-blue-300/30 rounded-lg focus:border-teal-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 text-sm"
-                      />
-                      <div
-                        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-teal-300/50"
-                      >
-                        <i class="fas fa-search text-sm"></i>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="flex gap-4">
-                    <select
-                      v-model="ictStatusFilter"
-                      class="px-4 py-3 bg-white/15 border border-blue-300/30 rounded-lg focus:border-teal-400 focus:outline-none text-white backdrop-blur-sm transition-all appearance-none cursor-pointer text-sm"
-                    >
-                      <option value="">All ICT Status</option>
-                      <option value="pending">Pending ICT</option>
-                      <option value="approved">Approved</option>
-                      <option value="rejected">Rejected</option>
-                    </select>
-
-                    <button
-                      @click="refreshRequests"
-                      class="px-6 py-3 bg-gradient-to-r from-teal-600 to-blue-600 text-white rounded-lg hover:from-teal-700 hover:to-blue-700 transition-all duration-300 font-semibold flex items-center shadow-lg hover:shadow-xl transform hover:scale-105 text-sm"
-                    >
-                      <i class="fas fa-sync-alt mr-2"></i>
-                      Refresh
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Bulk Actions Toolbar -->
-              <div
-                v-if="selectedRequests.length > 0"
-                class="bg-gradient-to-r from-rose-600/25 to-red-600/25 border-2 border-red-400/40 rounded-2xl backdrop-blur-sm overflow-hidden mb-4 animate-slide-up"
+                <option value="">All ICT Status</option>
+                <option value="pending">Pending ICT</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+              </select>
+              <button
+                @click="refreshRequests"
+                class="px-6 py-3 bg-teal-600 text-white rounded hover:bg-teal-700 text-lg font-bold"
               >
-                <div class="p-4 flex items-center justify-between">
-                  <div class="flex items-center">
-                    <div
-                      class="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center mr-3"
-                    >
-                      <i class="fas fa-trash text-white"></i>
-                    </div>
-                    <div>
-                      <h3 class="text-lg font-bold text-white">
-                        {{ selectedRequests.length }} Request{{
-                          selectedRequests.length > 1 ? 's' : ''
-                        }}
-                        Selected
-                      </h3>
-                      <p class="text-sm text-red-200">Ready for bulk deletion</p>
-                    </div>
-                  </div>
-                  <div class="flex items-center space-x-3">
-                    <button
-                      @click="clearSelection"
-                      class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200 text-sm"
-                    >
-                      <i class="fas fa-times mr-2"></i>
-                      Clear Selection
-                    </button>
-                    <button
-                      @click="bulkDeleteRequests"
-                      class="px-4 py-2 bg-gradient-to-r from-red-600 to-rose-600 text-white rounded-lg hover:from-red-700 hover:to-rose-700 transition-all duration-200 text-sm font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
-                    >
-                      <i class="fas fa-trash mr-2"></i>
-                      Delete Selected ({{ selectedRequests.length }})
-                    </button>
-                  </div>
-                </div>
-              </div>
+                <i class="fas fa-sync-alt mr-2"></i>
+                Refresh
+              </button>
+            </div>
+          </div>
 
-              <!-- Requests Table -->
-              <div
-                class="bg-gradient-to-r from-blue-600/25 to-teal-600/25 border-2 border-blue-400/40 rounded-2xl backdrop-blur-sm overflow-hidden"
-              >
-                <div class="p-6 border-b border-blue-300/30">
-                  <h3 class="text-xl font-bold text-white flex items-center">
-                    <i class="fas fa-table mr-3 text-teal-300"></i>
-                    Device Borrowing Requests
-                    <span
-                      v-if="selectedRequests.length > 0"
-                      class="ml-3 px-3 py-1 bg-red-500 text-white rounded-full text-sm"
-                    >
-                      {{ selectedRequests.length }} selected
-                    </span>
+          <!-- Bulk Actions Toolbar -->
+          <div
+            v-if="selectedRequests.length > 0"
+            class="bg-gradient-to-r from-rose-600/25 to-red-600/25 border-2 border-red-400/40 rounded-2xl backdrop-blur-sm overflow-hidden mb-4 animate-slide-up"
+          >
+            <div class="p-4 flex items-center justify-between">
+              <div class="flex items-center">
+                <div class="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center mr-3">
+                  <i class="fas fa-trash text-white"></i>
+                </div>
+                <div>
+                  <h3 class="text-lg font-bold text-white">
+                    {{ selectedRequests.length }} Request{{
+                      selectedRequests.length > 1 ? 's' : ''
+                    }}
+                    Selected
                   </h3>
+                  <p class="text-sm text-red-200">Ready for bulk deletion</p>
                 </div>
+              </div>
+              <div class="flex items-center space-x-3">
+                <button
+                  @click="clearSelection"
+                  class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200 text-sm"
+                >
+                  <i class="fas fa-times mr-2"></i>
+                  Clear Selection
+                </button>
+                <button
+                  @click="bulkDeleteRequests"
+                  class="px-4 py-2 bg-gradient-to-r from-red-600 to-rose-600 text-white rounded-lg hover:from-red-700 hover:to-rose-700 transition-all duration-200 text-sm font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
+                >
+                  <i class="fas fa-trash mr-2"></i>
+                  Delete Selected ({{ selectedRequests.length }})
+                </button>
+              </div>
+            </div>
+          </div>
 
-                <div class="overflow-x-auto">
-                  <table class="w-full">
-                    <thead class="bg-blue-800/50">
-                      <tr>
-                        <th
-                          class="px-4 py-4 text-left text-sm font-semibold text-blue-100 uppercase tracking-wider"
-                        >
-                          <div class="flex items-center">
-                            <input
-                              type="checkbox"
-                              v-model="selectAll"
-                              @change="toggleSelectAll"
-                              class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 mr-3"
-                            />
-                            <i class="fas fa-check-square mr-2"></i>Select
-                          </div>
-                        </th>
-                        <th
-                          class="px-6 py-4 text-left text-sm font-semibold text-blue-100 uppercase tracking-wider"
-                        >
-                          <i class="fas fa-hashtag mr-2"></i>Request ID
-                        </th>
-                        <th
-                          class="px-6 py-4 text-left text-sm font-semibold text-blue-100 uppercase tracking-wider"
-                        >
-                          <i class="fas fa-user mr-2"></i>Borrower
-                        </th>
-                        <th
-                          class="px-6 py-4 text-left text-sm font-semibold text-blue-100 uppercase tracking-wider"
-                        >
-                          <i class="fas fa-building mr-2"></i>Department
-                        </th>
-                        <th
-                          class="px-6 py-4 text-left text-sm font-semibold text-blue-100 uppercase tracking-wider"
-                        >
-                          <i class="fas fa-laptop mr-2"></i>Device
-                        </th>
-                        <th
-                          class="px-6 py-4 text-left text-sm font-semibold text-blue-100 uppercase tracking-wider"
-                        >
-                          <i class="fas fa-calendar mr-2"></i>Booking Date
-                        </th>
-                        <th
-                          class="px-6 py-4 text-left text-sm font-semibold text-blue-100 uppercase tracking-wider"
-                        >
-                          <i class="fas fa-signature mr-2"></i>Signature
-                        </th>
-                        <th
-                          class="px-6 py-4 text-left text-sm font-semibold text-blue-100 uppercase tracking-wider"
-                        >
-                          <i class="fas fa-flag mr-2"></i>Status
-                        </th>
-                        <th
-                          class="px-6 py-4 text-left text-sm font-semibold text-blue-100 uppercase tracking-wider"
-                        >
-                          <i class="fas fa-undo mr-2"></i>Return Status
-                        </th>
-                        <th
-                          class="px-6 py-4 text-center text-sm font-semibold text-blue-100 uppercase tracking-wider"
-                        >
-                          <i class="fas fa-cogs mr-2"></i>Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody class="divide-y divide-blue-300/20">
-                      <tr
-                        v-for="request in filteredRequests"
-                        :key="request.id"
-                        class="hover:bg-blue-700/30 transition-colors duration-200"
-                        :class="{
-                          'bg-blue-600/20': selectedRequests.includes(request.id)
-                        }"
+          <!-- Requests Table -->
+          <div class="bg-white/10 rounded-lg overflow-hidden">
+            <div class="relative z-0">
+              <table class="w-full table-fixed">
+                <thead class="bg-blue-800/50">
+                  <tr>
+                    <th class="px-1 py-3 text-left text-blue-100 text-xl font-bold w-12">Select</th>
+                    <th class="px-1 py-3 text-left text-blue-100 text-xl font-bold w-24">ID</th>
+                    <th class="px-1 py-3 text-left text-blue-100 text-xl font-bold w-32">
+                      Borrower
+                    </th>
+                    <th class="px-1 py-3 text-left text-blue-100 text-xl font-bold w-24">
+                      Department
+                    </th>
+                    <th class="px-1 py-3 text-left text-blue-100 text-xl font-bold w-20">Device</th>
+                    <th class="px-1 py-3 text-left text-blue-100 text-xl font-bold w-20">Date</th>
+                    <th class="px-1 py-3 text-left text-blue-100 text-xl font-bold w-16">Sign</th>
+                    <th class="px-1 py-3 text-left text-blue-100 text-xl font-bold w-20">Status</th>
+                    <th class="px-1 py-3 text-left text-blue-100 text-xl font-bold w-20">Return</th>
+                    <th class="px-1 py-3 text-left text-blue-100 text-xl font-bold w-16">SMS</th>
+                    <th class="px-1 py-3 text-center text-blue-100 text-xl font-bold w-20">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="request in filteredRequests"
+                    :key="request.id"
+                    :data-request-id="request.id"
+                    class="border-t border-blue-300/20 hover:bg-blue-700/30 transition-colors duration-200"
+                    :class="{
+                      'bg-blue-600/20': selectedRequests.includes(request.id)
+                    }"
+                  >
+                    <td class="px-1 py-3">
+                      <div class="flex justify-center">
+                        <input
+                          type="checkbox"
+                          :value="request.id"
+                          v-model="selectedRequests"
+                          :disabled="!canDeleteRequest(request)"
+                          class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                          :class="{
+                            'opacity-50 cursor-not-allowed': !canDeleteRequest(request)
+                          }"
+                        />
+                      </div>
+                    </td>
+                    <td class="px-1 py-3 text-xl">
+                      <div class="truncate text-white font-bold">
+                        {{ request.request_id || `REQ-${request.id.toString().padStart(4, '0')}` }}
+                      </div>
+                    </td>
+                    <td class="px-1 py-3 text-xl">
+                      <div class="truncate text-white font-bold">
+                        {{ request.borrower_name || request.borrowerName || 'Unknown' }}
+                      </div>
+                      <div class="truncate text-blue-300 text-lg">
+                        {{ request.borrower_phone || request.phoneNumber || 'No phone' }}
+                      </div>
+                    </td>
+                    <td class="px-1 py-3 text-xl">
+                      <div class="truncate text-white font-bold">
+                        {{ request.department || 'Unknown' }}
+                      </div>
+                    </td>
+                    <td class="px-1 py-3 text-xl">
+                      <div class="truncate text-white font-bold">
+                        {{
+                          request.device_name ||
+                          getDeviceDisplayName(
+                            request.device_type || request.deviceType,
+                            request.custom_device || request.customDevice
+                          )
+                        }}
+                      </div>
+                    </td>
+                    <td class="px-1 py-3 text-xl">
+                      <div class="truncate text-white font-bold">
+                        {{ formatDate(request.booking_date || request.bookingDate) }}
+                      </div>
+                    </td>
+                    <td class="px-1 py-3 text-xl text-center">
+                      <i
+                        v-if="request.has_signature || request.signature"
+                        class="fas fa-check-circle text-green-400 text-2xl"
+                      ></i>
+                      <i v-else class="fas fa-times-circle text-red-400 text-2xl"></i>
+                    </td>
+                    <td class="px-1 py-3 text-xl">
+                      <span
+                        :class="getStatusBadgeClass(request.ict_approve || 'pending')"
+                        class="inline-flex items-center px-3 py-2 rounded text-lg font-bold"
                       >
-                        <td class="px-4 py-4 whitespace-nowrap">
-                          <div class="flex items-center">
-                            <input
-                              type="checkbox"
-                              :value="request.id"
-                              v-model="selectedRequests"
+                        {{ getStatusText(request.ict_approve || 'pending') }}
+                      </span>
+                    </td>
+                    <td class="px-1 py-3 text-xl">
+                      <span
+                        :class="
+                          getReturnStatusBadgeClass(request.return_status || 'not_yet_returned')
+                        "
+                        class="inline-flex items-center px-3 py-2 rounded text-lg font-bold"
+                      >
+                        {{ getReturnStatusText(request.return_status || 'not_yet_returned') }}
+                      </span>
+                    </td>
+                    <td class="px-1 py-3 text-xl text-center">
+                      <span
+                        :class="getSMSStatusBadgeClass(request.sms_status || 'not_sent')"
+                        class="inline-flex items-center px-3 py-2 rounded text-lg font-bold"
+                      >
+                        {{ getSMSStatusText(request.sms_status || 'not_sent') }}
+                      </span>
+                    </td>
+                    <td class="px-2 py-2 text-center">
+                      <div class="relative inline-block z-[100000]">
+                        <!-- Compact Actions Dropdown Button -->
+                        <button
+                          @click="toggleActionsDropdown(request.id)"
+                          class="relative inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-medium rounded-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-1 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 group overflow-hidden"
+                        >
+                          <!-- Animated Background Gradient -->
+                          <div
+                            class="absolute inset-0 bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                          ></div>
+
+                          <!-- Shimmer Effect -->
+                          <div
+                            class="absolute inset-0 -skew-x-12 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[200%] transition-transform duration-600"
+                          ></div>
+
+                          <!-- Button Content -->
+                          <div class="relative z-10 flex items-center">
+                            <i class="fas fa-eye text-sm mr-2 group-hover:animate-pulse"></i>
+                            <span class="font-medium">Actions</span>
+                            <i
+                              class="fas fa-chevron-down ml-2 text-xs transition-all duration-200 group-hover:text-cyan-200"
+                              :class="{
+                                'rotate-180 text-cyan-300': openDropdown === request.id
+                              }"
+                            ></i>
+                          </div>
+
+                          <!-- Pulse Ring Effect -->
+                          <div
+                            class="absolute inset-0 rounded-lg border border-blue-400/50 group-hover:border-cyan-400/70 transition-colors duration-200"
+                          ></div>
+                        </button>
+
+                        <!-- Enhanced Actions Dropdown Menu -->
+                        <transition
+                          enter-active-class="transition ease-out duration-300"
+                          enter-from-class="opacity-0 scale-90 translate-y-2 rotate-3"
+                          enter-to-class="opacity-100 scale-100 translate-y-0 rotate-0"
+                          leave-active-class="transition ease-in duration-200"
+                          leave-from-class="opacity-100 scale-100 translate-y-0 rotate-0"
+                          leave-to-class="opacity-0 scale-90 translate-y-2 rotate-3"
+                        >
+                          <div
+                            v-if="openDropdown === request.id"
+                            class="absolute right-full mr-2 top-0 w-52 bg-gradient-to-br from-white via-gray-50 to-blue-50 rounded-xl shadow-xl border border-blue-200/50 z-[99999] overflow-hidden backdrop-blur-sm"
+                            style="
+                              box-shadow:
+                                0 10px 25px -5px rgba(0, 0, 0, 0.15),
+                                0 0 0 1px rgba(59, 130, 246, 0.1),
+                                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+                            "
+                          >
+                            <!-- Compact View Action -->
+                            <router-link
+                              :to="`/ict-approval/request/${request.id}`"
+                              @click="closeDropdown"
+                              class="relative flex items-center px-2 py-1.5 text-sm bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 transition-all duration-200 group overflow-hidden border-b border-blue-400/30 rounded-sm"
+                            >
+                              <!-- Shimmer Effect -->
+                              <div
+                                class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[200%] transition-transform duration-500"
+                              ></div>
+
+                              <!-- Icon -->
+                              <i class="fas fa-eye text-xs mr-2 relative z-10"></i>
+
+                              <!-- Content -->
+                              <span class="font-medium relative z-10">View Details</span>
+
+                              <!-- Arrow Icon -->
+                              <i
+                                class="fas fa-arrow-right text-xs ml-auto opacity-0 group-hover:opacity-100 transition-opacity duration-200 relative z-10"
+                              ></i>
+                            </router-link>
+
+                            <!-- Compact Reject Action -->
+                            <button
+                              @click="rejectRequest(request.id)"
+                              class="relative w-full flex items-center px-2 py-1.5 text-sm bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 transition-all duration-200 group overflow-hidden border-b border-orange-400/30 rounded-sm"
+                              :disabled="request.ict_approve === 'rejected'"
+                              :class="{
+                                'opacity-50 cursor-not-allowed': request.ict_approve === 'rejected'
+                              }"
+                            >
+                              <!-- Shimmer Effect -->
+                              <div
+                                class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[200%] transition-transform duration-500"
+                              ></div>
+
+                              <!-- Icon -->
+                              <i class="fas fa-times text-xs mr-2 relative z-10"></i>
+
+                              <!-- Content -->
+                              <span class="font-medium relative z-10">Reject Request</span>
+
+                              <!-- Warning Icon -->
+                              <i
+                                class="fas fa-ban text-xs ml-auto opacity-0 group-hover:opacity-100 transition-opacity duration-200 relative z-10"
+                              ></i>
+                            </button>
+
+                            <!-- Compact Delete Action -->
+                            <button
+                              @click="deleteRequest(request.id)"
+                              class="relative w-full flex items-center px-2 py-1.5 text-sm bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 transition-all duration-200 group overflow-hidden rounded-sm"
                               :disabled="!canDeleteRequest(request)"
-                              class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                               :class="{
                                 'opacity-50 cursor-not-allowed': !canDeleteRequest(request)
                               }"
-                            />
-                          </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                          <div class="flex items-center">
-                            <div
-                              class="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-lg mr-3"
                             >
-                              <i class="fas fa-hashtag text-white text-sm"></i>
-                            </div>
-                            <div>
-                              <div class="text-base font-medium text-white">
-                                {{
-                                  request.request_id ||
-                                  `REQ-${request.id.toString().padStart(6, '0')}`
-                                }}
-                              </div>
-                              <div class="text-xs text-purple-300">ID: {{ request.id }}</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                          <div class="flex items-center">
-                            <div
-                              class="w-10 h-10 bg-gradient-to-br from-teal-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg mr-3"
-                            >
-                              <i class="fas fa-user text-white text-sm"></i>
-                            </div>
-                            <div>
-                              <div class="text-base font-medium text-white">
-                                {{
-                                  request.borrower_name || request.borrowerName || 'Unknown User'
-                                }}
-                              </div>
-                              <div class="text-sm text-blue-300">
-                                {{ request.borrower_phone || request.phoneNumber || 'No phone' }}
-                              </div>
-                              <div v-if="request.pf_number" class="text-sm text-teal-300">
-                                PF: {{ request.pf_number }}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                          <div class="text-base text-white font-medium">
-                            {{ request.department || 'Unknown Department' }}
-                          </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                          <div class="flex items-center">
-                            <i class="fas fa-laptop text-teal-300 mr-2"></i>
-                            <div class="flex flex-col">
-                              <span class="text-base text-white font-medium">{{
-                                request.device_name ||
-                                getDeviceDisplayName(
-                                  request.device_type || request.deviceType,
-                                  request.custom_device || request.customDevice
-                                )
-                              }}</span>
-                              <span
-                                v-if="
-                                  request.device_available === false && request.device_inventory_id
-                                "
-                                class="text-xs text-red-300 font-medium"
-                              >
-                                <i class="fas fa-exclamation-triangle mr-1"></i>
-                                Device No Longer Available
-                              </span>
-                            </div>
-                          </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                          <div class="text-base text-white font-medium">
-                            {{ formatDate(request.booking_date || request.bookingDate) }}
-                          </div>
-                          <div class="text-sm text-blue-300">
-                            Return:
-                            {{ formatDate(request.collection_date || request.collectionDate) }}
-                          </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                          <div class="flex items-center">
-                            <div
-                              v-if="request.has_signature || request.signature"
-                              class="flex items-center text-green-400"
-                            >
-                              <i class="fas fa-check-circle mr-2"></i>
-                              <span class="text-sm font-medium">Signed</span>
-                            </div>
-                            <div v-else class="flex items-center text-red-400">
-                              <i class="fas fa-times-circle mr-2"></i>
-                              <span class="text-sm font-medium">Not Signed</span>
-                            </div>
-                          </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                          <span
-                            :class="getStatusBadgeClass(request.ict_approve || 'pending')"
-                            class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium"
-                          >
-                            <i
-                              :class="getStatusIcon(request.ict_approve || 'pending')"
-                              class="mr-1"
-                            ></i>
-                            {{ getStatusText(request.ict_approve || 'pending') }}
-                          </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                          <span
-                            :class="
-                              getReturnStatusBadgeClass(request.return_status || 'not_yet_returned')
-                            "
-                            class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium"
-                          >
-                            <i
-                              :class="
-                                getReturnStatusIcon(request.return_status || 'not_yet_returned')
-                              "
-                              class="mr-1"
-                            ></i>
-                            {{ getReturnStatusText(request.return_status || 'not_yet_returned') }}
-                          </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                          <div class="relative inline-block">
-                            <!-- Compact Actions Dropdown Button -->
-                            <button
-                              @click="toggleActionsDropdown(request.id)"
-                              class="relative inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-medium rounded-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-1 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 group overflow-hidden"
-                            >
-                              <!-- Animated Background Gradient -->
-                              <div
-                                class="absolute inset-0 bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                              ></div>
-
                               <!-- Shimmer Effect -->
                               <div
-                                class="absolute inset-0 -skew-x-12 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[200%] transition-transform duration-600"
+                                class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[200%] transition-transform duration-500"
                               ></div>
 
-                              <!-- Button Content -->
-                              <div class="relative z-10 flex items-center">
-                                <i class="fas fa-eye text-sm mr-2 group-hover:animate-pulse"></i>
-                                <span class="font-medium">Actions</span>
-                                <i
-                                  class="fas fa-chevron-down ml-2 text-xs transition-all duration-200 group-hover:text-cyan-200"
-                                  :class="{
-                                    'rotate-180 text-cyan-300': openDropdown === request.id
-                                  }"
-                                ></i>
-                              </div>
+                              <!-- Icon -->
+                              <i class="fas fa-trash text-xs mr-2 relative z-10"></i>
 
-                              <!-- Pulse Ring Effect -->
-                              <div
-                                class="absolute inset-0 rounded-lg border border-blue-400/50 group-hover:border-cyan-400/70 transition-colors duration-200"
-                              ></div>
+                              <!-- Content -->
+                              <span class="font-medium relative z-10">Delete Request</span>
+
+                              <!-- Danger Icon -->
+                              <i
+                                class="fas fa-skull-crossbones text-xs ml-auto opacity-0 group-hover:opacity-100 transition-opacity duration-200 relative z-10"
+                              ></i>
                             </button>
-
-                            <!-- Enhanced Actions Dropdown Menu -->
-                            <transition
-                              enter-active-class="transition ease-out duration-300"
-                              enter-from-class="opacity-0 scale-90 translate-y-2 rotate-3"
-                              enter-to-class="opacity-100 scale-100 translate-y-0 rotate-0"
-                              leave-active-class="transition ease-in duration-200"
-                              leave-from-class="opacity-100 scale-100 translate-y-0 rotate-0"
-                              leave-to-class="opacity-0 scale-90 translate-y-2 rotate-3"
-                            >
-                              <div
-                                v-if="openDropdown === request.id"
-                                class="absolute right-0 mt-2 w-52 bg-gradient-to-br from-white via-gray-50 to-blue-50 rounded-xl shadow-xl border border-blue-200/50 z-50 overflow-hidden backdrop-blur-sm"
-                                style="
-                                  box-shadow:
-                                    0 10px 25px -5px rgba(0, 0, 0, 0.15),
-                                    0 0 0 1px rgba(59, 130, 246, 0.1),
-                                    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-                                "
-                              >
-                                <!-- Compact View Action -->
-                                <router-link
-                                  :to="`/ict-approval/request/${request.id}`"
-                                  @click="closeDropdown"
-                                  class="relative flex items-center px-2 py-1.5 text-xs bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 transition-all duration-200 group overflow-hidden border-b border-blue-400/30 rounded-sm"
-                                >
-                                  <!-- Shimmer Effect -->
-                                  <div
-                                    class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[200%] transition-transform duration-500"
-                                  ></div>
-
-                                  <!-- Icon -->
-                                  <i class="fas fa-eye text-xs mr-2 relative z-10"></i>
-
-                                  <!-- Content -->
-                                  <span class="font-medium relative z-10">View Details</span>
-
-                                  <!-- Arrow Icon -->
-                                  <i
-                                    class="fas fa-arrow-right text-xs ml-auto opacity-0 group-hover:opacity-100 transition-opacity duration-200 relative z-10"
-                                  ></i>
-                                </router-link>
-
-                                <!-- Compact Reject Action -->
-                                <button
-                                  @click="rejectRequest(request.id)"
-                                  class="relative w-full flex items-center px-2 py-1.5 text-xs bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 transition-all duration-200 group overflow-hidden border-b border-orange-400/30 rounded-sm"
-                                  :disabled="request.ict_approve === 'rejected'"
-                                  :class="{
-                                    'opacity-50 cursor-not-allowed':
-                                      request.ict_approve === 'rejected'
-                                  }"
-                                >
-                                  <!-- Shimmer Effect -->
-                                  <div
-                                    class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[200%] transition-transform duration-500"
-                                  ></div>
-
-                                  <!-- Icon -->
-                                  <i class="fas fa-times text-xs mr-2 relative z-10"></i>
-
-                                  <!-- Content -->
-                                  <span class="font-medium relative z-10">Reject Request</span>
-
-                                  <!-- Warning Icon -->
-                                  <i
-                                    class="fas fa-ban text-xs ml-auto opacity-0 group-hover:opacity-100 transition-opacity duration-200 relative z-10"
-                                  ></i>
-                                </button>
-
-                                <!-- Compact Delete Action -->
-                                <button
-                                  @click="deleteRequest(request.id)"
-                                  class="relative w-full flex items-center px-2 py-1.5 text-xs bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 transition-all duration-200 group overflow-hidden rounded-sm"
-                                  :disabled="!canDeleteRequest(request)"
-                                  :class="{
-                                    'opacity-50 cursor-not-allowed': !canDeleteRequest(request)
-                                  }"
-                                >
-                                  <!-- Shimmer Effect -->
-                                  <div
-                                    class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[200%] transition-transform duration-500"
-                                  ></div>
-
-                                  <!-- Icon -->
-                                  <i class="fas fa-trash text-xs mr-2 relative z-10"></i>
-
-                                  <!-- Content -->
-                                  <span class="font-medium relative z-10">Delete Request</span>
-
-                                  <!-- Danger Icon -->
-                                  <i
-                                    class="fas fa-skull-crossbones text-xs ml-auto opacity-0 group-hover:opacity-100 transition-opacity duration-200 relative z-10"
-                                  ></i>
-                                </button>
-                              </div>
-                            </transition>
                           </div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+                        </transition>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
 
-                  <!-- Empty State -->
-                  <div v-if="filteredRequests.length === 0" class="text-center py-12">
-                    <div
-                      class="w-24 h-24 bg-gradient-to-br from-blue-500/20 to-teal-500/20 rounded-full flex items-center justify-center mx-auto mb-4"
-                    >
-                      <i class="fas fa-inbox text-blue-300 text-3xl"></i>
-                    </div>
-                    <h3 class="text-lg font-medium text-white mb-2">No requests found</h3>
-                    <p class="text-blue-300">
-                      {{
-                        searchQuery || ictStatusFilter
-                          ? 'Try adjusting your filters'
-                          : 'No device borrowing requests have been submitted yet.'
-                      }}
-                    </p>
-                  </div>
-                </div>
-
-                <!-- Pagination -->
+              <!-- Empty State -->
+              <div v-if="filteredRequests.length === 0" class="text-center py-12">
                 <div
-                  v-if="filteredRequests.length > 0"
-                  class="px-6 py-4 border-t border-blue-300/30 flex items-center justify-between"
+                  class="w-24 h-24 bg-gradient-to-br from-blue-500/20 to-teal-500/20 rounded-full flex items-center justify-center mx-auto mb-4"
                 >
-                  <div class="text-sm text-blue-300">
-                    Showing {{ filteredRequests.length }} of {{ requests.length }} requests
-                  </div>
-                  <div class="flex space-x-2">
-                    <!-- Add pagination controls here if needed -->
-                  </div>
+                  <i class="fas fa-inbox text-blue-300 text-3xl"></i>
                 </div>
+                <h3 class="text-lg font-medium text-white mb-2">No requests found</h3>
+                <p class="text-blue-300">
+                  {{
+                    searchQuery || ictStatusFilter
+                      ? 'Try adjusting your filters'
+                      : 'No device borrowing requests have been submitted yet.'
+                  }}
+                </p>
               </div>
+            </div>
 
-              <!-- Footer -->
-              <AppFooter />
+            <!-- Pagination -->
+            <div
+              v-if="filteredRequests.length > 0"
+              class="px-6 py-4 border-t border-blue-300/30 flex items-center justify-between relative z-0"
+            >
+              <div class="text-sm text-blue-300">
+                Showing {{ filteredRequests.length }} of {{ requests.length }} requests
+              </div>
+              <div class="flex space-x-2">
+                <!-- Add pagination controls here if needed -->
+              </div>
             </div>
           </div>
         </div>
@@ -799,15 +574,13 @@
 <script>
   import Header from '@/components/header.vue'
   import ModernSidebar from '@/components/ModernSidebar.vue'
-  import AppFooter from '@/components/footer.vue'
   import deviceBorrowingService from '@/services/deviceBorrowingService'
 
   export default {
     name: 'RequestsList',
     components: {
       Header,
-      ModernSidebar,
-      AppFooter
+      ModernSidebar
     },
     setup() {
       // Sidebar state now managed by Pinia - no local state needed
@@ -884,6 +657,10 @@
       try {
         console.log('RequestsList: Component mounted, initializing...')
         await this.fetchRequests()
+
+        // Add click listener to close dropdowns when clicking outside
+        document.addEventListener('click', this.closeAllDropdowns)
+
         console.log('RequestsList: Component initialized successfully')
       } catch (error) {
         console.error('RequestsList: Error during mount:', error)
@@ -915,6 +692,9 @@
       if (this.searchDebounce) {
         clearTimeout(this.searchDebounce)
       }
+
+      // Clean up event listeners
+      document.removeEventListener('click', this.closeAllDropdowns)
     },
     methods: {
       async fetchRequests() {
@@ -1014,12 +794,68 @@
         return deviceBorrowingService.getReturnStatusText(status)
       },
 
+      // SMS status helpers
+      getSMSStatusBadgeClass(status) {
+        const statusClasses = {
+          sent: 'bg-green-100 text-green-800',
+          not_sent: 'bg-gray-100 text-gray-800',
+          failed: 'bg-red-100 text-red-800',
+          pending: 'bg-yellow-100 text-yellow-800'
+        }
+        return statusClasses[status] || statusClasses['not_sent']
+      },
+      getSMSStatusText(status) {
+        const statusTexts = {
+          sent: 'Sent',
+          not_sent: 'Not Sent',
+          failed: 'Failed',
+          pending: 'Pending'
+        }
+        return statusTexts[status] || 'Not Sent'
+      },
+
       // Dropdown methods
       toggleActionsDropdown(requestId) {
         this.openDropdown = this.openDropdown === requestId ? null : requestId
       },
 
+      getDropdownPositionClass(requestId) {
+        // Get the table row element for this request
+        const rowElement = document.querySelector(`tr[data-request-id="${requestId}"]`)
+        if (!rowElement) {
+          return 'top-full mt-2' // Default to below if element not found
+        }
+
+        // Get viewport and element positioning
+        const rect = rowElement.getBoundingClientRect()
+        const viewportHeight = window.innerHeight
+        const dropdownHeight = 120 // Approximate height of dropdown
+        const spaceBelow = viewportHeight - rect.bottom
+        const spaceAbove = rect.top
+
+        // If there's not enough space below and there's more space above, show above
+        if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
+          return 'bottom-full mb-2'
+        }
+
+        // Default to showing below
+        return 'top-full mt-2'
+      },
+
       closeDropdown() {
+        this.openDropdown = null
+      },
+
+      // Close all dropdowns when clicking outside
+      closeAllDropdowns(event) {
+        // Only close if clicking outside the dropdown menu or actions button
+        if (
+          event &&
+          (event.target.closest('.fixed.w-52') ||
+            event.target.closest('button[class*="from-blue-600"]'))
+        ) {
+          return
+        }
         this.openDropdown = null
       },
 
@@ -1310,5 +1146,53 @@
       box-shadow, transform, filter, backdrop-filter;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 200ms;
+  }
+
+  /* Dropdown positioning fixes */
+  .relative.inline-block {
+    position: relative !important;
+    z-index: 100000;
+  }
+
+  /* Ensure dropdown appears above all content including footer */
+  .absolute.right-0.mt-2 {
+    z-index: 100001 !important;
+    position: absolute !important;
+  }
+
+  /* Fix dropdown positioning at bottom of page */
+  .overflow-x-auto {
+    position: relative;
+    z-index: 0;
+  }
+
+  /* Ensure table rows maintain relative positioning for dropdowns */
+  tbody tr {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Table cells with dropdowns need higher z-index */
+  tbody tr td:last-child {
+    position: relative;
+    z-index: 10;
+  }
+
+  /* Pagination should have lower z-index */
+  div[class*='px-6 py-4 border-t'] {
+    position: relative;
+    z-index: 0;
+  }
+
+  /* Override any z-index issues with the main content area */
+  main {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Ensure footer doesn't interfere with dropdowns */
+  footer {
+    position: relative;
+    z-index: 0;
   }
 </style>

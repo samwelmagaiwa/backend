@@ -102,22 +102,14 @@
           <!-- Loading Screen -->
           <div
             v-if="isCheckingPendingRequests"
-            class="booking-glass-card rounded-b-3xl overflow-hidden animate-slide-up"
+            class="booking-glass-card rounded-b-3xl overflow-hidden animate-slide-up relative min-h-64"
           >
-            <div class="p-8 text-center">
-              <div class="flex flex-col items-center space-y-4">
-                <div
-                  class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg animate-bounce-gentle"
-                >
-                  <i class="fas fa-spinner fa-spin text-white text-2xl"></i>
-                </div>
-                <h3 class="text-2xl font-bold text-white">Checking Your Requests...</h3>
-                <p class="text-blue-200 text-base">
-                  Verifying if you have any pending booking requests
-                </p>
-                <p class="text-blue-300/70 text-sm mt-2 italic">This may take a few seconds...</p>
-              </div>
-            </div>
+            <UnifiedLoadingBanner
+              :show="isCheckingPendingRequests"
+              loadingTitle="Checking Your Requests"
+              loadingSubtitle="Verifying pending booking requests..."
+              departmentTitle="ICT EQUIPMENT BOOKING SYSTEM"
+            />
           </div>
 
           <!-- Main Form -->
@@ -136,7 +128,7 @@
                   >
                     <i class="fas fa-calendar-alt text-white text-lg"></i>
                   </div>
-                  <h3 class="text-xl font-bold text-white flex items-center">
+                  <h3 class="text-2xl font-bold text-white flex items-center">
                     <i class="fas fa-info-circle mr-2 text-blue-300"></i>
                     Booking Information
                   </h3>
@@ -147,7 +139,7 @@
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <!-- Name of Borrower -->
                     <div class="group">
-                      <label class="block text-lg font-bold text-blue-100 mb-1 flex items-center">
+                      <label class="block text-xl font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-user mr-2 text-blue-300"></i>
                         Name of Borrower
                         <span class="text-red-400 ml-1">*</span>
@@ -157,7 +149,7 @@
                           v-model="formData.borrowerName"
                           type="text"
                           readonly
-                          class="booking-input w-full px-3 py-2 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50 cursor-not-allowed opacity-90"
+                          class="booking-input w-full px-3 py-2 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white text-lg placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50 cursor-not-allowed opacity-90"
                           placeholder="Auto-populated from your account"
                           title="This field is automatically filled with your account name"
                           required
@@ -173,12 +165,12 @@
                       </div>
                       <div
                         v-if="errors.borrowerName"
-                        class="text-red-400 text-sm mt-1 flex items-center"
+                        class="text-red-400 text-base mt-1 flex items-center"
                       >
                         <i class="fas fa-exclamation-circle mr-1"></i>
                         {{ errors.borrowerName }}
                       </div>
-                      <p class="text-sm text-blue-200/60 mt-1 italic flex items-center">
+                      <p class="text-base text-blue-200/60 mt-1 italic flex items-center">
                         <i class="fas fa-info-circle mr-1"></i>
                         Automatically filled from your account information
                       </p>
@@ -186,7 +178,7 @@
 
                     <!-- Booking Date -->
                     <div class="group">
-                      <label class="block text-lg font-bold text-blue-100 mb-1 flex items-center">
+                      <label class="block text-xl font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-calendar mr-2 text-blue-300"></i>
                         Booking Date <span class="text-red-400 ml-1">*</span>
                       </label>
@@ -196,7 +188,7 @@
                           @input="validateBookingDate"
                           @change="validateBookingDate"
                           type="date"
-                          class="booking-input w-full px-3 py-2 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50"
+                          class="booking-input w-full px-3 py-2 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white text-lg backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50"
                           required
                         />
                         <div
@@ -217,7 +209,7 @@
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <!-- Type of Device -->
                     <div class="group">
-                      <label class="block text-lg font-bold text-blue-100 mb-1 flex items-center">
+                      <label class="block text-xl font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-laptop mr-2 text-blue-300"></i>
                         Type of Device Borrowed
                         <span class="text-red-400 ml-1">*</span>
@@ -227,7 +219,7 @@
                           v-model="formData.deviceInventoryId"
                           @change="handleDeviceTypeChange"
                           :disabled="isLoadingDevices"
-                          class="w-full px-3 py-2 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white bg-blue-600/80 focus:bg-blue-600/90 transition-all backdrop-blur-sm group-hover:border-blue-400/50 appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                          class="w-full px-3 py-2 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white text-lg bg-blue-600/80 focus:bg-blue-600/90 transition-all backdrop-blur-sm group-hover:border-blue-400/50 appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                           required
                         >
                           <option value="" class="bg-blue-800 text-blue-300">
@@ -276,33 +268,38 @@
 
                     <!-- Department -->
                     <div class="group">
-                      <label class="block text-lg font-bold text-blue-100 mb-1 flex items-center">
+                      <label class="block text-xl font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-building mr-2 text-blue-300"></i>
                         Department <span class="text-red-400 ml-1">*</span>
                       </label>
                       <div class="relative">
                         <select
                           v-model="formData.department"
-                          @change="validateDepartment"
-                          class="w-full px-3 py-2 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white bg-blue-600/80 focus:bg-blue-600/90 transition-all backdrop-blur-sm group-hover:border-blue-400/50 appearance-none cursor-pointer"
+                          readonly
+                          disabled
+                          class="w-full px-3 py-2 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white text-lg backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50 cursor-not-allowed opacity-90 appearance-none"
                           required
                         >
                           <option value="" class="bg-blue-800 text-blue-300">
-                            Select Department
+                            {{ formData.department ? '' : 'Auto-populated from your account' }}
                           </option>
                           <option
                             v-for="dept in departments"
                             :key="dept.id"
                             :value="dept.id"
                             class="bg-blue-800 text-white"
+                            :selected="formData.department == dept.id"
                           >
                             {{ dept.name }}
                           </option>
                         </select>
                         <div
-                          class="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-300/50 pointer-events-none"
+                          class="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/10 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                        ></div>
+                        <div
+                          class="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-300/50"
                         >
-                          <i class="fas fa-chevron-down"></i>
+                          <i class="fas fa-lock" title="Auto-populated from your account"></i>
                         </div>
                       </div>
                       <div
@@ -312,6 +309,10 @@
                         <i class="fas fa-exclamation-circle mr-1"></i>
                         {{ errors.department }}
                       </div>
+                      <p class="text-sm text-blue-200/60 mt-1 italic flex items-center">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Automatically filled from your account information
+                      </p>
                     </div>
                   </div>
 
@@ -357,7 +358,7 @@
                         v-model="formData.customDevice"
                         @input="validateCustomDevice"
                         type="text"
-                        class="booking-input w-full px-3 py-2 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50"
+                        class="booking-input w-full px-3 py-2 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white text-lg placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50"
                         placeholder="Please specify the device you want to borrow"
                         :required="formData.deviceInventoryId === 'others'"
                       />
@@ -378,7 +379,7 @@
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <!-- Phone Number -->
                     <div class="group">
-                      <label class="block text-lg font-bold text-blue-100 mb-1 flex items-center">
+                      <label class="block text-xl font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-phone mr-2 text-blue-300"></i>
                         Phone Number <span class="text-red-400 ml-1">*</span>
                       </label>
@@ -403,12 +404,12 @@
                       </div>
                       <div
                         v-if="errors.phoneNumber"
-                        class="text-red-400 text-sm mt-1 flex items-center"
+                        class="text-red-400 text-base mt-1 flex items-center"
                       >
                         <i class="fas fa-exclamation-circle mr-1"></i>
                         {{ errors.phoneNumber }}
                       </div>
-                      <p class="text-sm text-blue-200/60 mt-1 italic flex items-center">
+                      <p class="text-base text-blue-200/60 mt-1 italic flex items-center">
                         <i class="fas fa-info-circle mr-1"></i>
                         Automatically filled from your account information
                       </p>
@@ -427,7 +428,7 @@
                           @input="validateReturnDate"
                           @change="validateReturnDate"
                           type="date"
-                          class="booking-input w-full px-3 py-2 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50"
+                          class="booking-input w-full px-3 py-2 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white text-lg backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50"
                           required
                         />
                         <div
@@ -436,7 +437,7 @@
                       </div>
                       <div
                         v-if="errors.collectionDate"
-                        class="text-red-400 text-sm mt-1 flex items-center"
+                        class="text-red-400 text-base mt-1 flex items-center"
                       >
                         <i class="fas fa-exclamation-circle mr-1"></i>
                         {{ errors.collectionDate }}
@@ -458,7 +459,7 @@
                           @change="handleReturnTimeChange"
                           @input="validateReturnTime"
                           @click="handleReturnTimeClick"
-                          class="booking-input w-full px-3 py-2 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50 relative z-10"
+                          class="booking-input w-full px-3 py-2 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white text-lg backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50 relative z-10"
                           style="color-scheme: dark"
                           required
                         />
@@ -473,12 +474,12 @@
                       </div>
                       <div
                         v-if="errors.returnTime"
-                        class="text-red-400 text-sm mt-1 flex items-center"
+                        class="text-red-400 text-base mt-1 flex items-center"
                       >
                         <i class="fas fa-exclamation-circle mr-1"></i>
                         {{ errors.returnTime }}
                       </div>
-                      <p class="text-sm text-blue-200/60 mt-1 italic flex items-center">
+                      <p class="text-base text-blue-200/60 mt-1 italic flex items-center">
                         <i class="fas fa-info-circle mr-1"></i>
                         Select the time when you plan to return the device
                       </p>
@@ -495,10 +496,10 @@
                         >
                           <i class="fas fa-signature text-white text-sm"></i>
                         </div>
-                        <h3 class="text-base font-bold text-white">Digital Signature</h3>
+                        <h3 class="text-lg font-bold text-white">Digital Signature</h3>
                       </div>
 
-                      <label class="block text-lg font-bold text-blue-100 mb-1 flex items-center">
+                      <label class="block text-xl font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-signature mr-2 text-blue-300"></i>
                         Signature <span class="text-red-400 ml-1">*</span>
                         <span class="ml-2 text-base text-blue-300/70 font-normal"
@@ -527,7 +528,7 @@
                           <div v-else class="w-full h-full flex items-center justify-center">
                             <div class="flex items-center">
                               <i class="fas fa-signature text-blue-400/50 text-sm mr-1"></i>
-                              <p class="text-sm text-blue-400 italic">Signature</p>
+                              <p class="text-base text-blue-400 italic">Signature</p>
                             </div>
                           </div>
 
@@ -576,13 +577,13 @@
                             </span>
                           </button>
 
-                          <p class="text-sm text-blue-200/70 italic">Max: 2MB</p>
+                          <p class="text-base text-blue-200/70 italic">Max: 2MB</p>
                         </div>
                       </div>
 
                       <div
                         v-if="errors.signature"
-                        class="text-red-500 text-sm mt-1 flex items-center"
+                        class="text-red-500 text-base mt-1 flex items-center"
                       >
                         <i class="fas fa-exclamation-circle mr-1"></i>
                         {{ errors.signature }}
@@ -591,7 +592,7 @@
 
                     <!-- Reason for Borrowing Section (Right) -->
                     <div class="group">
-                      <label class="block text-lg font-bold text-blue-100 mb-1 flex items-center">
+                      <label class="block text-xl font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-comment-alt mr-2 text-blue-300"></i>
                         Reason for Borrowing
                         <span class="text-red-400 ml-1">*</span>
@@ -615,9 +616,9 @@
                         {{ errors.reason }}
                       </div>
                       <div class="flex justify-between items-center mt-0.5">
-                        <p class="text-sm text-blue-200/60 italic">Min 10 chars</p>
+                        <p class="text-base text-blue-200/60 italic">Min 10 chars</p>
                         <p
-                          class="text-sm"
+                          class="text-base"
                           :class="
                             formData.reason.length >= 10 ? 'text-green-400' : 'text-yellow-400'
                           "
@@ -1003,6 +1004,7 @@
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppFooter from '@/components/footer.vue'
   import AppHeader from '@/components/AppHeader.vue'
+  import UnifiedLoadingBanner from '@/components/common/UnifiedLoadingBanner.vue'
   import bookingService from '@/services/bookingService'
   import deviceInventoryService from '@/services/deviceInventoryService'
   import ictApprovalService from '@/services/ictApprovalService'
@@ -1014,7 +1016,8 @@
     components: {
       ModernSidebar,
       AppFooter,
-      AppHeader
+      AppHeader,
+      UnifiedLoadingBanner
     },
     setup() {
       // Get auth store for user information
@@ -1101,9 +1104,10 @@
           await this.loadDepartments()
           await this.loadAvailableDevices()
 
-          // Auto-populate borrower name and phone number from authenticated user
+          // Auto-populate borrower name, phone number, and department from authenticated user
           this.populateBorrowerName()
           this.populatePhoneNumber()
+          this.populateDepartment()
 
           // Debug: Check if time input is working
           console.log('BookingService mounted, returnTime field:', this.formData.returnTime)
@@ -1139,14 +1143,56 @@
           clearTimeout(timeoutId)
 
           if (response.data.success) {
-            this.hasPendingRequest = response.data.has_pending_request
+            // Backend may flag has_pending_request due to auxiliary flags (e.g., SMS pending)
+            // Treat only truly pending workflow states as blocking
+            const pr = response.data.pending_request || {}
+            const isWorkflowComplete = !!(
+              pr.device_received_at ||
+              /returned|completed|closed/i.test(pr.return_status || '') ||
+              /returned|completed|closed/i.test(pr.status || '')
+            )
+
+            // Consider it pending only if backend says so AND not completed
+            this.hasPendingRequest = response.data.has_pending_request && !isWorkflowComplete
 
             if (this.hasPendingRequest && response.data.pending_request) {
-              this.pendingRequestInfo = response.data.pending_request
-              this.showPendingRequestModal = true
-              console.log('🚫 User has pending request:', response.data.pending_request)
+              // Double-check server state to avoid stale flags
+              try {
+                const pendingId = response.data.pending_request.id || response.data.pending_request.request_id
+                if (pendingId) {
+                  const verify = await apiClient.get(`/booking-service/bookings/${pendingId}`)
+                  const rd = verify.data?.data || verify.data || {}
+                  const done = !!(
+                    rd.device_received_at ||
+                    /returned|completed|closed/i.test(rd.return_status || '') ||
+                    /returned|completed|closed/i.test(rd.status || '') ||
+                    (typeof rd.current_step === 'number' && rd.current_step >= 3)
+                  )
+                  if (done) {
+                    console.log('🧹 Clearing stale pending flag (booking is already returned):', pendingId)
+                    this.hasPendingRequest = false
+                    this.showPendingRequestModal = false
+                  }
+                }
+              } catch (e) {
+                if (e?.response?.status === 404) {
+                  console.log('🧹 Pending booking not found (404) — clearing stale flag')
+                  this.hasPendingRequest = false
+                  this.showPendingRequestModal = false
+                } else {
+                  console.warn('Pending verification failed (continuing with server flag):', e?.message)
+                }
+              }
+
+              if (this.hasPendingRequest) {
+                this.pendingRequestInfo = response.data.pending_request
+                this.showPendingRequestModal = true
+                console.log('🚫 User has pending request:', response.data.pending_request)
+              }
             } else {
-              console.log('✅ No pending requests found')
+              // Ignore cases where only SMS status is pending
+              console.log('✅ No blocking pending requests found (workflow complete or none)')
+              this.hasPendingRequest = false
             }
           } else {
             console.error('Failed to check pending requests:', response.data.message)
@@ -1272,6 +1318,108 @@
           }
         } catch (error) {
           console.error('❌ Error populating phone number:', error)
+        }
+      },
+
+      /**
+       * Auto-populate department dropdown based on user's department_id from authStore
+       * This method maps the user's department_id to the department list and sets the form field
+       */
+      populateDepartment() {
+        // Auto-populate department from authenticated user
+        try {
+          if (this.authStore.isAuthenticated && this.authStore.user) {
+            // Check for department_id in user data
+            const userDepartmentId = this.authStore.user.department_id
+            const userDepartment = this.authStore.user.department
+
+            console.log('🏢 Department population data:', {
+              userDepartmentId,
+              userDepartment,
+              currentFormDepartment: this.formData.department,
+              availableDepartments: this.departments.length
+            })
+
+            if (userDepartmentId && !this.formData.department) {
+              // Verify the department ID exists in our departments list
+              const matchingDept = this.departments.find((dept) => dept.id == userDepartmentId)
+              if (matchingDept) {
+                this.formData.department = parseInt(userDepartmentId)
+                console.log(
+                  '✅ Auto-populated department ID:',
+                  userDepartmentId,
+                  '-',
+                  matchingDept.name
+                )
+              } else {
+                console.warn(
+                  '⚠️ User department ID not found in available departments:',
+                  userDepartmentId
+                )
+              }
+            } else if (userDepartment && userDepartment.id && !this.formData.department) {
+              // If department is an object with id
+              const matchingDept = this.departments.find((dept) => dept.id == userDepartment.id)
+              if (matchingDept) {
+                this.formData.department = parseInt(userDepartment.id)
+                console.log(
+                  '✅ Auto-populated department from object:',
+                  userDepartment.id,
+                  '-',
+                  userDepartment.name || matchingDept.name
+                )
+              } else {
+                console.warn(
+                  '⚠️ User department object ID not found in available departments:',
+                  userDepartment.id
+                )
+              }
+            } else if (!userDepartmentId && !userDepartment) {
+              // Try to get from localStorage as fallback
+              const storedUserData = localStorage.getItem('user_data')
+              if (storedUserData) {
+                try {
+                  const userData = JSON.parse(storedUserData)
+                  const deptFromStorage = userData.department_id || userData.department?.id
+                  if (deptFromStorage) {
+                    const matchingDept = this.departments.find((dept) => dept.id == deptFromStorage)
+                    if (matchingDept) {
+                      this.formData.department = parseInt(deptFromStorage)
+                      console.log(
+                        '✅ Auto-populated department from localStorage:',
+                        deptFromStorage,
+                        '-',
+                        matchingDept.name
+                      )
+                    } else {
+                      console.warn(
+                        '⚠️ Stored department ID not found in available departments:',
+                        deptFromStorage
+                      )
+                    }
+                  }
+                } catch (parseError) {
+                  console.error('❌ Error parsing stored user data:', parseError)
+                }
+              }
+            }
+
+            // If department is populated, clear any validation errors and run validation
+            if (this.formData.department) {
+              this.errors.department = ''
+              this.validateDepartment()
+            } else {
+              console.warn(
+                '⚠️ Could not auto-populate department - user may need to select manually'
+              )
+            }
+          } else {
+            console.warn(
+              '⚠️ User not authenticated or user data not available for department population'
+            )
+          }
+        } catch (error) {
+          console.error('❌ Error populating department:', error)
         }
       },
 

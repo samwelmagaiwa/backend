@@ -185,7 +185,7 @@ const headOfItService = {
   async getIctOfficers(requestId = null) {
     try {
       console.log('🔄 HeadOfItService: Fetching ICT officers...', { requestId })
-      const url = requestId 
+      const url = requestId
         ? `/head-of-it/ict-officers?request_id=${requestId}`
         : '/head-of-it/ict-officers'
       const response = await axiosInstance.get(url)

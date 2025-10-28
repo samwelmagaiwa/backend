@@ -40,13 +40,16 @@ class FixDeviceQuantityLogic extends Command
         $fixedCount = 0;
         
         foreach ($devices as $device) {
-            // Count actually borrowed devices (approved and not yet returned)
+            // Count actually borrowed devices (issued and not yet returned)
             $actualBorrowedCount = BookingService::where('device_inventory_id', $device->id)
-                ->where('ict_approve', 'approved')
-                ->whereNotIn('return_status', ['returned', 'returned_but_compromised'])
+                ->whereNotNull('device_issued_at')
+                ->where(function($q){
+                    $q->whereNull('return_status')
+                      ->orWhere('return_status', 'not_yet_returned');
+                })
                 ->count();
                 
-            $expectedAvailable = $device->total_quantity - $actualBorrowedCount;
+            $expectedAvailable = max(0, $device->total_quantity - $actualBorrowedCount);
             $currentAvailable = $device->available_quantity;
             $currentBorrowed = $device->borrowed_quantity;
             

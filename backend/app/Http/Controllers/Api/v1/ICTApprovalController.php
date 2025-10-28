@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api\v1;
 
+use App\Models\DeviceInventory;
+
 use App\Http\Controllers\Controller;
 use App\Models\BookingService;
 use App\Models\User;
@@ -437,40 +439,15 @@ class ICTApprovalController extends Controller
                 'ict_notes' => $validatedData['ict_notes'] ?? null
             ]);
             
-            // Check if device was already issued (device_issued_at or device_condition_issuing exists)
-            $deviceAlreadyIssued = !empty($booking->device_issued_at) || !empty($booking->device_condition_issuing);
-            
-            // Only borrow device from inventory if it hasn't been issued yet
-            if ($booking->device_inventory_id && !$deviceAlreadyIssued) {
-                $deviceInventory = $booking->deviceInventory;
-                if ($deviceInventory) {
-                    if (!$deviceInventory->borrowDevice(1)) {
-                        Log::error('Unable to borrow device after approval', [
-                            'device_id' => $deviceInventory->id,
-                            'device_name' => $deviceInventory->device_name,
-                            'available_quantity' => $deviceInventory->available_quantity,
-                            'booking_id' => $booking->id
-                        ]);
-                        return response()->json([
-                            'success' => false,
-                            'message' => 'Request approved but device is no longer available. Please check device inventory.'
-                        ], 400);
-                    }
-                    
-                    Log::info('Device borrowed from inventory after approval', [
-                        'device_id' => $deviceInventory->id,
-                        'device_name' => $deviceInventory->device_name,
-                        'remaining_quantity' => $deviceInventory->available_quantity,
-                        'booking_id' => $booking->id
-                    ]);
-                }
-            } elseif ($deviceAlreadyIssued) {
-                Log::info('Device already issued, skipping inventory borrowing', [
-                    'booking_id' => $booking->id,
-                    'device_issued_at' => $booking->device_issued_at,
-                    'has_device_condition_issuing' => !empty($booking->device_condition_issuing)
-                ]);
-            }
+            // Do not borrow device at approval stage.
+            // Borrowing is performed during issuing assessment to avoid double-counting
+            // when the sequence is: approve -> issue.
+            Log::info('Approval completed without reserving inventory; issuing step will handle borrowing', [
+                'booking_id' => $booking->id,
+                'device_inventory_id' => $booking->device_inventory_id,
+                'device_issued_at' => $booking->device_issued_at,
+                'has_device_condition_issuing' => !empty($booking->device_condition_issuing)
+            ]);
 
             // Load relationships
             $booking->load(['user', 'approvedBy', 'departmentInfo']);
@@ -1070,6 +1047,11 @@ class ICTApprovalController extends Controller
                 ], 400);
             }
 
+            // Normalize notes key from frontend (accept both notes and assessment_notes)
+            if ($request->has('assessment_notes') && !$request->has('notes')) {
+                $request->merge(['notes' => $request->input('assessment_notes')]);
+            }
+
             // Validate input data
             $validatedData = $request->validate([
                 'physical_condition' => 'required|in:excellent,good,fair,poor',
@@ -1097,16 +1079,34 @@ class ICTApprovalController extends Controller
                 $deviceInventory = $booking->deviceInventory;
                 if ($deviceInventory) {
                     if (!$deviceInventory->borrowDevice(1)) {
-                        Log::error('Unable to borrow device during issuing', [
+                        Log::warning('Primary device unavailable during issuing, attempting fallback', [
                             'device_id' => $deviceInventory->id,
                             'device_name' => $deviceInventory->device_name,
                             'available_quantity' => $deviceInventory->available_quantity,
                             'booking_id' => $booking->id
                         ]);
-                        return response()->json([
-                            'success' => false,
-                            'message' => 'Device is no longer available. Please check device inventory.'
-                        ], 400);
+                        // Try to auto-reassign to an alternative available inventory of the same type/name
+                        $fallbackName = $this->getFallbackDeviceName($booking->device_type, $booking->custom_device);
+                        $alternative = DeviceInventory::active()
+                            ->where('device_name', $fallbackName)
+                            ->where('available_quantity', '>', 0)
+                            ->first();
+                        if ($alternative && $alternative->borrowDevice(1)) {
+                            // Reassign booking to this inventory
+                            $booking->device_inventory_id = $alternative->id;
+                            $booking->save();
+                            Log::info('Auto-reassigned booking to alternative inventory during issuing', [
+                                'old_device_id' => $deviceInventory->id,
+                                'new_device_id' => $alternative->id,
+                                'new_device_name' => $alternative->device_name,
+                                'booking_id' => $booking->id
+                            ]);
+                        } else {
+                            return response()->json([
+                                'success' => false,
+                                'message' => 'Device is no longer available. Please check device inventory.'
+                            ], 400);
+                        }
                     }
                     
                     Log::info('Device borrowed from inventory during issuing', [
@@ -1241,11 +1241,24 @@ class ICTApprovalController extends Controller
                 'assessed_at' => now()
             ]);
 
-            // Update booking with receiving assessment and mark as returned (for backward compatibility)
+            // Determine return status based on assessment details
+            $returnStatus = 'returned';
+            if (
+                ($validatedData['visible_damage'] ?? false) === true ||
+                ($validatedData['functionality'] ?? 'fully_functional') !== 'fully_functional' ||
+                ($validatedData['physical_condition'] ?? 'excellent') === 'poor' ||
+                ($validatedData['accessories_complete'] ?? true) === false
+            ) {
+                $returnStatus = 'returned_but_compromised';
+            }
+
+            // Update booking with receiving assessment and mark as returned so user can request again
             $booking->update([
                 'device_condition_receiving' => json_encode($assessmentData),
                 'device_received_at' => now(),
-                'return_status' => 'returned',
+                'device_returned_at' => now(),
+                'status' => 'returned',
+                'return_status' => $returnStatus,
                 'assessed_by' => $request->user()->id,
                 'assessment_notes' => $validatedData['notes'] ?? null
             ]);

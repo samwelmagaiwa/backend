@@ -6,6 +6,15 @@
       <main
         class="flex-1 p-3 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative"
       >
+        <!-- Loading Banner -->
+        <UnifiedLoadingBanner
+          :show="isLoadingProfile || isSubmitting || isLoadingModules"
+          :loadingTitle="getLoadingTitle()"
+          :loadingSubtitle="getLoadingSubtitle()"
+          departmentTitle="COMBINED ACCESS REQUEST SYSTEM"
+          :forceSpin="true"
+        />
+
         <!-- Medical Background Pattern -->
         <div class="absolute inset-0 overflow-hidden">
           <!-- Medical Cross Pattern -->
@@ -45,7 +54,7 @@
           </div>
         </div>
 
-        <div class="max-w-12xl mx-auto relative z-10">
+        <div class="max-w-13xl mx-auto relative z-10 text-[17px] md:text-[18px]">
           <!-- Header Section -->
           <div class="medical-glass-card rounded-t-3xl p-2 mb-0 border-b border-blue-300/30">
             <div class="flex justify-between items-center">
@@ -625,9 +634,7 @@
                                   type="checkbox"
                                   class="w-4 h-4 text-red-600 accent-red-600 mr-2 flex-shrink-0"
                                 />
-                                <span class="text-purple-100 text-sm leading-tight">{{
-                                  module
-                                }}</span>
+                                <span class="text-purple-100 text-base md:text-[17px] leading-tight">{{ module }}</span>
                               </label>
                             </div>
                           </div>
@@ -665,9 +672,7 @@
                                   type="checkbox"
                                   class="w-4 h-4 text-red-600 accent-red-600 mr-2 flex-shrink-0"
                                 />
-                                <span class="text-amber-100 text-sm leading-tight">{{
-                                  module
-                                }}</span>
+                                <span class="text-amber-100 text-base md:text-[17px] leading-tight">{{ module }}</span>
                               </label>
                             </div>
                           </div>
@@ -856,7 +861,7 @@
               :min="tomorrowDate"
               class="absolute opacity-0 pointer-events-none"
               @change="updateDisplayDate"
-              style="font-size: 18px;"
+              style="font-size: 18px"
             />
 
             <!-- Visible custom input with DD/MM/YYYY format -->
@@ -866,8 +871,12 @@
             >
               <div class="flex items-center gap-2">
                 <i class="fas fa-calendar-day text-blue-500 text-xl"></i>
-                <span :class="formattedDateDisplay ? 'text-gray-800 text-lg' : 'text-gray-400 text-base'"
-                      class="font-bold">
+                <span
+                  :class="
+                    formattedDateDisplay ? 'text-gray-800 text-lg' : 'text-gray-400 text-base'
+                  "
+                  class="font-bold"
+                >
                   {{ formattedDateDisplay || 'Click to select date' }}
                 </span>
               </div>
@@ -939,8 +948,8 @@
           <!-- Message -->
           <div class="text-center mb-4">
             <p class="text-base text-gray-700 font-medium">
-              Your <span class="font-bold text-blue-600">Combined Access Request</span> is now
-              in the approval queue.
+              Your <span class="font-bold text-blue-600">Combined Access Request</span> is now in
+              the approval queue.
             </p>
           </div>
 
@@ -997,7 +1006,10 @@
                   <span class="text-teal-600 font-bold">{{ index + 1 }}.</span>
                   <span class="flex-1">{{ purpose }}</span>
                 </div>
-                <p v-if="filledInternetPurposes.length > 3" class="text-sm text-gray-600 italic font-medium">
+                <p
+                  v-if="filledInternetPurposes.length > 3"
+                  class="text-sm text-gray-600 italic font-medium"
+                >
                   +{{ filledInternetPurposes.length - 3 }} more purpose(s)
                 </p>
               </div>
@@ -1031,6 +1043,7 @@
   import AppFooter from '@/components/footer.vue'
   import AppHeader from '@/components/AppHeader.vue'
   import OrbitingDots from '@/components/common/OrbitingDots.vue'
+  import UnifiedLoadingBanner from '@/components/common/UnifiedLoadingBanner.vue'
   import userCombinedAccessService from '@/services/userCombinedAccessService'
   import userProfileService from '@/services/userProfileService'
 
@@ -1040,7 +1053,8 @@
       ModernSidebar,
       AppFooter,
       AppHeader,
-      OrbitingDots
+      OrbitingDots,
+      UnifiedLoadingBanner
     },
 
     // Route guard to check for pending requests before entering the form
@@ -1092,6 +1106,8 @@
         departments: [],
         // Auto-population states
         isLoadingProfile: true,
+        // Modules loading state
+        isLoadingModules: false,
         profileLoadError: null,
         autoPopulated: false,
         // Edit mode properties
@@ -1500,6 +1516,7 @@
        */
       async loadModules() {
         console.log('🔄 Loading Jeeva and Wellsoft modules from database...')
+        this.isLoadingModules = true
         try {
           // Load both module types in parallel
           const [wellsoftResponse, jeevaResponse] = await Promise.all([
@@ -1533,6 +1550,8 @@
           this.wellsoftModules = []
           this.jeevaModules = []
           this.showNotification('Failed to load module options', 'warning')
+        } finally {
+          this.isLoadingModules = false
         }
       },
 
@@ -2005,6 +2024,38 @@
             }
           }, 300)
         }, 3000)
+      },
+
+      getLoadingTitle() {
+        if (this.isSubmitting) {
+          return 'Submitting Request'
+        }
+        if (this.isLoadingProfile && this.isEditMode) {
+          return 'Loading Request Data'
+        }
+        if (this.isLoadingProfile) {
+          return 'Loading Your Profile'
+        }
+        if (this.isLoadingModules) {
+          return 'Loading Module Lists'
+        }
+        return 'Loading Data'
+      },
+
+      getLoadingSubtitle() {
+        if (this.isSubmitting) {
+          return 'Processing your combined access request...'
+        }
+        if (this.isLoadingProfile && this.isEditMode) {
+          return 'Retrieving existing request data...'
+        }
+        if (this.isLoadingProfile) {
+          return 'Auto-populating your details...'
+        }
+        if (this.isLoadingModules) {
+          return 'Fetching Jeeva and Wellsoft modules...'
+        }
+        return 'Please wait...'
       }
     }
   }

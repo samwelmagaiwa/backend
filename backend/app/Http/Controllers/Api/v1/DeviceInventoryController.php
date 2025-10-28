@@ -555,20 +555,41 @@ class DeviceInventoryController extends Controller
             $fixedDevices = [];
             
             foreach ($devices as $device) {
-                $expectedAvailable = $device->total_quantity - $device->borrowed_quantity;
-                
+                // Recompute actual borrowed count based on devices that have actually been issued and not yet returned
+                $actualBorrowedCount = \App\Models\BookingService::where('device_inventory_id', $device->id)
+                    ->whereNotNull('device_issued_at')
+                    ->where(function($q) {
+                        $q->whereNull('return_status')
+                          ->orWhere('return_status', 'not_yet_returned');
+                    })
+                    ->count();
+
+                $expectedAvailable = max(0, $device->total_quantity - $actualBorrowedCount);
+
+                $changed = false;
+                $changes = [
+                    'device_name' => $device->device_name,
+                    'total_quantity' => $device->total_quantity,
+                    // Backward-compat: expose current borrowed as 'borrowed_quantity' for UI message
+                    'borrowed_quantity' => $actualBorrowedCount,
+                    'old_borrowed_quantity' => $device->borrowed_quantity,
+                    'new_borrowed_quantity' => $actualBorrowedCount,
+                    'old_available_quantity' => $device->available_quantity,
+                    'new_available_quantity' => $expectedAvailable,
+                ];
+
+                if ($device->borrowed_quantity !== $actualBorrowedCount) {
+                    $device->borrowed_quantity = $actualBorrowedCount;
+                    $changed = true;
+                }
                 if ($device->available_quantity !== $expectedAvailable) {
-                    $fixedDevices[] = [
-                        'device_name' => $device->device_name,
-                        'total_quantity' => $device->total_quantity,
-                        'borrowed_quantity' => $device->borrowed_quantity,
-                        'old_available_quantity' => $device->available_quantity,
-                        'new_available_quantity' => max(0, $expectedAvailable)
-                    ];
-                    
-                    $device->available_quantity = max(0, $expectedAvailable);
+                    $device->available_quantity = $expectedAvailable;
+                    $changed = true;
+                }
+
+                if ($changed) {
                     $device->save();
-                    
+                    $fixedDevices[] = $changes;
                     $fixedCount++;
                 }
             }

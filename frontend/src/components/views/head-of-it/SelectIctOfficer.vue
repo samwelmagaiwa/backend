@@ -89,29 +89,29 @@
                   >
                     <i class="fas fa-arrow-left text-teal-300 hover:text-white"></i>
                   </button>
-                  
+
                   <!-- Search Box -->
                   <div class="flex-1">
-                  <div class="relative">
-                    <div
-                      class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-                    >
-                      <i class="fas fa-search text-teal-300"></i>
+                    <div class="relative">
+                      <div
+                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                      >
+                        <i class="fas fa-search text-teal-300"></i>
+                      </div>
+                      <input
+                        v-model="searchQuery"
+                        type="text"
+                        placeholder="Search by name, PF number, or phone number..."
+                        class="w-full pl-10 pr-4 py-3 bg-white/10 border border-teal-300/30 rounded-lg focus:border-teal-400 focus:outline-none text-white text-lg placeholder-teal-200/60 backdrop-blur-sm transition-colors"
+                      />
+                      <button
+                        v-if="searchQuery"
+                        @click="clearSearch"
+                        class="absolute inset-y-0 right-0 pr-3 flex items-center text-teal-300 hover:text-white"
+                      >
+                        <i class="fas fa-times"></i>
+                      </button>
                     </div>
-                    <input
-                      v-model="searchQuery"
-                      type="text"
-                      placeholder="Search by name, PF number, or phone number..."
-                      class="w-full pl-10 pr-4 py-3 bg-white/10 border border-teal-300/30 rounded-lg focus:border-teal-400 focus:outline-none text-white text-lg placeholder-teal-200/60 backdrop-blur-sm transition-colors"
-                    />
-                    <button
-                      v-if="searchQuery"
-                      @click="clearSearch"
-                      class="absolute inset-y-0 right-0 pr-3 flex items-center text-teal-300 hover:text-white"
-                    >
-                      <i class="fas fa-times"></i>
-                    </button>
-                  </div>
                   </div>
                 </div>
 
@@ -669,7 +669,7 @@
               // Set SMS status to 'sent' (assuming successful notification)
               this.ictOfficers[officerIndex].sms_status = 'sent'
             }
-            
+
             // Refresh officers list to get updated SMS status from backend
             setTimeout(() => {
               this.fetchIctOfficers()

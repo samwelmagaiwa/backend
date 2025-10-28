@@ -176,15 +176,17 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   }
 
-  /* Dot Colors */
+  /* Dot Colors - Updated to match hospital branding */
   .dot-red {
-    background: #dc2626;
-    border: 1px solid #b91c1c;
+    background: #ff0000;
+    border: 1px solid #cc0000;
+    box-shadow: 0 2px 6px rgba(255, 0, 0, 0.25);
   }
 
   .dot-yellow {
-    background: #fbbf24;
-    border: 1px solid #f59e0b;
+    background: #0000d1;
+    border: 1px solid #0000aa;
+    box-shadow: 0 2px 6px rgba(0, 0, 209, 0.25);
   }
 
   .dot-white {

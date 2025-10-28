@@ -28,8 +28,8 @@
           <h3 class="text-lg font-semibold text-gray-800 mb-6">Implementation Workflow</h3>
 
           <!-- Head of IT Approval -->
-          <div class="mb-8 p-4 bg-indigo-50 rounded-lg">
-            <h4 class="text-md font-semibold text-indigo-800 mb-4">1. Head of IT Approval</h4>
+          <div class="mb-8 p-4 bg-indigo-100 rounded-lg border-2 border-indigo-300">
+            <h4 class="text-md font-semibold text-indigo-900 mb-4">1. Head of IT Approval</h4>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -87,8 +87,8 @@
           </div>
 
           <!-- ICT Officer Implementation -->
-          <div class="mb-6 p-4 bg-orange-50 rounded-lg">
-            <h4 class="text-md font-semibold text-orange-800 mb-4">
+          <div class="mb-6 p-4 bg-orange-100 rounded-lg border-2 border-orange-300">
+            <h4 class="text-md font-semibold text-orange-900 mb-4">
               2. ICT Officer Granting Access
             </h4>
 

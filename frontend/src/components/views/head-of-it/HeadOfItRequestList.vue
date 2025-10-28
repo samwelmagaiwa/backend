@@ -89,9 +89,7 @@
                   <th class="px-4 py-4 text-left text-blue-100 text-2xl font-bold">
                     Current Status
                   </th>
-                  <th class="px-4 py-4 text-left text-blue-100 text-2xl font-bold">
-                    SMS Status
-                  </th>
+                  <th class="px-4 py-4 text-left text-blue-100 text-2xl font-bold">SMS Status</th>
                   <th class="px-4 py-4 text-center text-blue-100 text-2xl font-bold">Actions</th>
                 </tr>
               </thead>
@@ -295,23 +293,13 @@
       </main>
     </div>
 
-    <!-- Loading Modal -->
-    <div
-      v-if="isLoading"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-    >
-      <div
-        class="rounded-xl shadow-2xl p-8 text-center border border-blue-400/40"
-        style="background: linear-gradient(90deg, #0b3a82, #0a2f6f, #0b3a82)"
-      >
-        <div class="flex justify-center mb-4">
-          <div
-            class="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"
-          ></div>
-        </div>
-        <p class="text-blue-100 font-medium">Loading requests...</p>
-      </div>
-    </div>
+    <!-- Loading Banner -->
+    <UnifiedLoadingBanner
+      :show="isLoading"
+      loadingTitle="Loading Access Requests"
+      loadingSubtitle="Fetching requests for Head of IT review..."
+      departmentTitle="HEAD OF IT REQUESTS MANAGEMENT"
+    />
 
     <!-- Timeline Modal -->
     <RequestTimeline
@@ -328,6 +316,7 @@
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppFooter from '@/components/footer.vue'
   import RequestTimeline from '@/components/common/RequestTimeline.vue'
+  import UnifiedLoadingBanner from '@/components/common/UnifiedLoadingBanner.vue'
   import headOfItService from '@/services/headOfItService'
   import statusUtils from '@/utils/statusUtils'
   import { useAuth } from '@/composables/useAuth'
@@ -338,7 +327,8 @@
       Header,
       ModernSidebar,
       AppFooter,
-      RequestTimeline
+      RequestTimeline,
+      UnifiedLoadingBanner
     },
     setup() {
       const { userRole } = useAuth()
@@ -1064,29 +1054,31 @@
       getRelevantSmsStatus(request) {
         // For Head of IT: show SMS status for NEXT workflow step after their action
         const status = request.head_it_status || request.status
-        
+
         // PRIORITY 1: If SMS has been sent to ICT Officer (regardless of status), show that
         if (request.sms_to_ict_officer_status && request.sms_to_ict_officer_status !== 'pending') {
           return request.sms_to_ict_officer_status
         }
-        
+
         // PRIORITY 2: If task has been assigned to ICT Officer: show ICT Officer SMS notification status
-        if (status === 'head_of_it_approved' || 
-            request.status === 'assigned_to_ict' || 
-            request.status === 'implementation_in_progress') {
+        if (
+          status === 'head_of_it_approved' ||
+          request.status === 'assigned_to_ict' ||
+          request.status === 'implementation_in_progress'
+        ) {
           return request.sms_to_ict_officer_status || 'pending'
         }
-        
+
         // PRIORITY 3: If COMPLETED/IMPLEMENTED: show requester notification status
         if (status === 'implemented' || status === 'completed') {
           return request.sms_to_requester_status || 'pending'
         }
-        
+
         // DEFAULT: If Head of IT has APPROVED but NOT yet assigned: show pending
         if (status === 'head_it_approved' || status === 'approved') {
           return 'pending'
         }
-        
+
         // FALLBACK: If PENDING Head of IT approval: return 'pending'
         return 'pending'
       },

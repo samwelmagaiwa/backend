@@ -447,22 +447,31 @@ class BookingService extends Model
      */
     public static function getUserActiveRequest(int $userId): ?self
     {
+        // A booking is considered "active" if:
+        // - It is pending ICT decision (status pending AND ict_approve pending)
+        // - OR it is ICT approved but NOT yet returned (i.e., not clearly marked as returned/completed)
         return self::where('user_id', $userId)
             ->where(function ($query) {
+                // Still pending at ICT
                 $query->where(function ($q) {
-                    // Pending requests (not yet processed by ICT)
                     $q->where('status', 'pending')
-                      ->where('ict_approve', 'pending');
+                      ->where(function ($qq) {
+                          $qq->whereNull('ict_approve')->orWhere('ict_approve', 'pending');
+                      });
                 })
+                // ICT approved but not returned/cleared
                 ->orWhere(function ($q) {
-                    // Approved requests (approved by ICT but not yet returned)
-                    $q->whereIn('status', ['approved', 'in_use'])
-                      ->where('ict_approve', 'approved');
-                })
-                ->orWhere(function ($q) {
-                    // Returned status but device not yet returned (status should be 'returned' but return_status is 'not_yet_returned')
                     $q->where('ict_approve', 'approved')
-                      ->where('return_status', 'not_yet_returned');
+                      ->where(function ($qq) {
+                          // Not yet returned means ALL of these are true:
+                          // - status is NOT 'returned'
+                          // - return_status is either NULL or 'not_yet_returned'
+                          // - device_received_at is NULL
+                          $qq->whereNotIn('status', ['returned'])
+                             ->orWhereNull('return_status')
+                             ->orWhere('return_status', 'not_yet_returned')
+                             ->orWhereNull('device_received_at');
+                      });
                 });
             })
             ->first();

@@ -50,11 +50,11 @@
           <div class="medical-glass-card rounded-t-3xl p-4 mb-0 border-b border-blue-300/30">
             <div class="text-center">
               <h2
-                class="text-xl font-bold text-blue-100 tracking-wide drop-shadow-md animate-fade-in-delay"
+                class="text-2xl font-bold text-blue-100 tracking-wide drop-shadow-md animate-fade-in-delay"
               >
                 Welcome, {{ userName }}
               </h2>
-              <p class="text-sm text-teal-300 mt-2">System Administrator Dashboard</p>
+              <p class="text-base text-teal-300 mt-2">System Administrator Dashboard</p>
             </div>
           </div>
 
@@ -70,11 +70,11 @@
                     <div
                       class="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50 mr-4"
                     >
-                      <i class="fas fa-users text-white text-xl"></i>
+                      <i class="fas fa-users text-white text-2xl"></i>
                     </div>
-                    <h3 class="text-lg font-semibold text-white drop-shadow-md">TOTAL USERS</h3>
+                    <h3 class="text-xl font-semibold text-white drop-shadow-md">TOTAL USERS</h3>
                   </div>
-                  <p class="text-3xl font-bold text-blue-100 drop-shadow-lg">
+                  <p class="text-4xl font-bold text-blue-100 drop-shadow-lg">
                     {{ stats.totalUsers }}
                   </p>
                 </div>
@@ -86,11 +86,11 @@
                     <div
                       class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50 mr-4"
                     >
-                      <i class="fas fa-file-alt text-white text-xl"></i>
+                      <i class="fas fa-file-alt text-white text-2xl"></i>
                     </div>
-                    <h3 class="text-lg font-semibold text-white drop-shadow-md">TOTAL REQUESTS</h3>
+                    <h3 class="text-xl font-semibold text-white drop-shadow-md">TOTAL REQUESTS</h3>
                   </div>
-                  <p class="text-3xl font-bold text-green-100 drop-shadow-lg">
+                  <p class="text-4xl font-bold text-green-100 drop-shadow-lg">
                     {{ stats.totalRequests }}
                   </p>
                 </div>
@@ -102,13 +102,13 @@
                     <div
                       class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50 mr-4"
                     >
-                      <i class="fas fa-clock text-white text-xl"></i>
+                      <i class="fas fa-clock text-white text-2xl"></i>
                     </div>
-                    <h3 class="text-lg font-semibold text-white drop-shadow-md">
+                    <h3 class="text-xl font-semibold text-white drop-shadow-md">
                       PENDING REQUESTS
                     </h3>
                   </div>
-                  <p class="text-3xl font-bold text-yellow-100 drop-shadow-lg">
+                  <p class="text-4xl font-bold text-yellow-100 drop-shadow-lg">
                     {{ stats.pendingRequests }}
                   </p>
                 </div>
@@ -116,7 +116,7 @@
 
               <!-- Quick Actions Section -->
               <div class="mb-8">
-                <h3 class="text-xl font-bold text-white mb-4 flex items-center">
+                <h3 class="text-2xl font-bold text-white mb-4 flex items-center">
                   <i class="fas fa-bolt mr-2 text-yellow-400"></i>
                   Quick Actions
                 </h3>
@@ -132,10 +132,10 @@
                       <div
                         :class="`w-12 h-12 bg-gradient-to-br ${action.gradient} rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border ${action.border} mb-3`"
                       >
-                        <i :class="`${action.icon} text-white text-xl`"></i>
+                        <i :class="`${action.icon} text-white text-2xl`"></i>
                       </div>
-                      <span class="text-white font-medium text-sm mb-1">{{ action.title }}</span>
-                      <span class="text-blue-200 text-xs">{{ action.description }}</span>
+                      <span class="text-white font-medium text-base mb-1">{{ action.title }}</span>
+                      <span class="text-blue-200 text-sm">{{ action.description }}</span>
                     </div>
                   </router-link>
                 </div>
@@ -147,7 +147,7 @@
                 <div
                   class="medical-card bg-gradient-to-r from-teal-600/25 to-cyan-600/25 border-2 border-teal-400/40 p-6 rounded-2xl backdrop-blur-sm"
                 >
-                  <h3 class="text-xl font-bold text-white mb-4 flex items-center">
+                  <h3 class="text-2xl font-bold text-white mb-4 flex items-center">
                     <i class="fas fa-users-cog mr-2 text-teal-300"></i>
                     User Management
                   </h3>
@@ -164,8 +164,8 @@
                         <i :class="`${userAction.icon} text-white`"></i>
                       </div>
                       <div class="flex-1">
-                        <div class="text-white font-medium">{{ userAction.title }}</div>
-                        <div class="text-blue-200 text-sm">{{ userAction.description }}</div>
+                        <div class="text-white font-medium text-lg">{{ userAction.title }}</div>
+                        <div class="text-blue-200 text-base">{{ userAction.description }}</div>
                       </div>
                       <i class="fas fa-chevron-right text-blue-300"></i>
                     </router-link>
@@ -176,15 +176,15 @@
                 <div
                   class="medical-card bg-gradient-to-r from-purple-600/25 to-indigo-600/25 border-2 border-purple-400/40 p-6 rounded-2xl backdrop-blur-sm"
                 >
-                  <h3 class="text-xl font-bold text-white mb-4 flex items-center">
+                  <h3 class="text-2xl font-bold text-white mb-4 flex items-center">
                     <i class="fas fa-info-circle mr-2 text-purple-300"></i>
                     System Information
                   </h3>
                   <div class="space-y-2">
-                    <div class="text-white text-sm">
+                    <div class="text-white text-base">
                       <span class="text-purple-200">Version:</span> 1.0.0
                     </div>
-                    <div class="text-white text-sm">
+                    <div class="text-white text-base">
                       <span class="text-purple-200">Last Updated:</span>
                       {{ new Date().toLocaleDateString() }}
                     </div>

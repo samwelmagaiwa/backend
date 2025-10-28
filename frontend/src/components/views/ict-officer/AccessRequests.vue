@@ -72,7 +72,7 @@
 
           <!-- Requests Table -->
           <div class="bg-white/10 rounded-lg">
-            <div class="overflow-x-auto" style="overflow-y: visible;">
+            <div class="overflow-x-auto" style="overflow-y: visible">
               <table class="w-full">
                 <thead class="bg-blue-800/50">
                   <tr>
@@ -91,9 +91,7 @@
                     <th class="px-4 py-3 text-left text-blue-100 text-lg font-semibold">
                       Head of IT Approval Date
                     </th>
-                    <th class="px-4 py-3 text-left text-blue-100 text-lg font-semibold">
-                      Status
-                    </th>
+                    <th class="px-4 py-3 text-left text-blue-100 text-lg font-semibold">Status</th>
                     <th class="px-4 py-3 text-left text-blue-100 text-lg font-semibold">
                       SMS Status
                     </th>
@@ -235,8 +233,8 @@
                     </td>
 
                     <!-- Actions -->
-                    <td class="px-4 py-3 text-center" style="overflow: visible;">
-                      <div class="relative inline-block" style="overflow: visible;">
+                    <td class="px-4 py-3 text-center" style="overflow: visible">
+                      <div class="relative inline-block" style="overflow: visible">
                         <!-- Three-dot menu button -->
                         <button
                           @click="toggleDropdown(request.id, $event, request)"
@@ -274,7 +272,6 @@
               </div>
             </div>
           </div>
-
         </div>
       </main>
     </div>
@@ -288,125 +285,132 @@
         style="z-index: 99999"
         @click.stop
       >
-            <!-- Conditional actions based on status -->
-            <template v-if="selectedRequest && isUnassigned(selectedRequest.status)">
-              <!-- Available for Assignment - show Approve and View Timeline -->
-              <button
-                @click="handleMenuAction('viewRequest', selectedRequest)"
-                class="w-full text-left px-4 py-2 text-sm bg-green-50 text-green-800 border-b border-green-200 hover:bg-green-100 focus:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset transition-all duration-200 flex items-center group first:rounded-t-lg"
-              >
-                <i
-                  class="fas fa-check mr-3 text-green-600 group-hover:text-green-700 group-focus:text-green-700 transition-colors duration-200"
-                ></i>
-                <span class="font-medium text-green-800">Approve</span>
-              </button>
+        <!-- Conditional actions based on status -->
+        <template v-if="selectedRequest && isUnassigned(selectedRequest.status)">
+          <!-- Available for Assignment - show Approve and View Timeline -->
+          <button
+            @click="handleMenuAction('viewRequest', selectedRequest)"
+            class="w-full text-left px-4 py-2 text-sm bg-green-50 text-green-800 border-b border-green-200 hover:bg-green-100 focus:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset transition-all duration-200 flex items-center group first:rounded-t-lg"
+          >
+            <i
+              class="fas fa-check mr-3 text-green-600 group-hover:text-green-700 group-focus:text-green-700 transition-colors duration-200"
+            ></i>
+            <span class="font-medium text-green-800">Approve</span>
+          </button>
 
-              <button
-                @click="handleMenuAction('viewTimeline', selectedRequest)"
-                class="w-full text-left px-4 py-2 text-sm bg-indigo-50 text-indigo-800 hover:bg-indigo-100 focus:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
-              >
-                <i
-                  class="fas fa-history mr-3 text-indigo-600 group-hover:text-indigo-700 group-focus:text-indigo-700 transition-colors duration-200"
-                ></i>
-                <span class="font-medium">View Timeline</span>
-              </button>
-            </template>
+          <button
+            @click="handleMenuAction('viewTimeline', selectedRequest)"
+            class="w-full text-left px-4 py-2 text-sm bg-indigo-50 text-indigo-800 hover:bg-indigo-100 focus:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
+          >
+            <i
+              class="fas fa-history mr-3 text-indigo-600 group-hover:text-indigo-700 group-focus:text-indigo-700 transition-colors duration-200"
+            ></i>
+            <span class="font-medium">View Timeline</span>
+          </button>
+        </template>
 
-            <template v-else-if="selectedRequest && selectedRequest.status === 'assigned_to_ict'">
-              <!-- Assigned to ICT - show Approve and View Timeline -->
-              <button
-                @click="handleMenuAction('viewRequest', selectedRequest)"
-                class="w-full text-left px-4 py-2 text-sm bg-green-50 text-green-800 border-b border-green-200 hover:bg-green-100 focus:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset transition-all duration-200 flex items-center group first:rounded-t-lg"
-              >
-                <i
-                  class="fas fa-check mr-3 text-green-600 group-hover:text-green-700 group-focus:text-green-700 transition-colors duration-200"
-                ></i>
-                <span class="font-medium text-green-800">Approve</span>
-              </button>
+        <template v-else-if="selectedRequest && selectedRequest.status === 'assigned_to_ict'">
+          <!-- Assigned to ICT - show Approve and View Timeline -->
+          <button
+            @click="handleMenuAction('viewRequest', selectedRequest)"
+            class="w-full text-left px-4 py-2 text-sm bg-green-50 text-green-800 border-b border-green-200 hover:bg-green-100 focus:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset transition-all duration-200 flex items-center group first:rounded-t-lg"
+          >
+            <i
+              class="fas fa-check mr-3 text-green-600 group-hover:text-green-700 group-focus:text-green-700 transition-colors duration-200"
+            ></i>
+            <span class="font-medium text-green-800">Approve</span>
+          </button>
 
-              <button
-                @click="handleMenuAction('viewTimeline', selectedRequest)"
-                class="w-full text-left px-4 py-2 text-sm bg-indigo-50 text-indigo-800 hover:bg-indigo-100 focus:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
-              >
-                <i
-                  class="fas fa-history mr-3 text-indigo-600 group-hover:text-indigo-700 group-focus:text-indigo-700 transition-colors duration-200"
-                ></i>
-                <span class="font-medium">View Timeline</span>
-              </button>
-            </template>
+          <button
+            @click="handleMenuAction('viewTimeline', selectedRequest)"
+            class="w-full text-left px-4 py-2 text-sm bg-indigo-50 text-indigo-800 hover:bg-indigo-100 focus:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
+          >
+            <i
+              class="fas fa-history mr-3 text-indigo-600 group-hover:text-indigo-700 group-focus:text-indigo-700 transition-colors duration-200"
+            ></i>
+            <span class="font-medium">View Timeline</span>
+          </button>
+        </template>
 
-            <template v-else-if="selectedRequest && selectedRequest.status === 'implementation_in_progress'">
-              <!-- Implementation in progress - show Approve and View Timeline -->
-              <button
-                @click="handleMenuAction('viewRequest', selectedRequest)"
-                class="w-full text-left px-4 py-2 text-sm bg-green-50 text-green-800 border-b border-green-200 hover:bg-green-100 focus:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset transition-all duration-200 flex items-center group first:rounded-t-lg"
-              >
-                <i
-                  class="fas fa-check mr-3 text-green-600 group-hover:text-green-700 group-focus:text-green-700 transition-colors duration-200"
-                ></i>
-                <span class="font-medium text-green-800">Approve</span>
-              </button>
+        <template
+          v-else-if="selectedRequest && selectedRequest.status === 'implementation_in_progress'"
+        >
+          <!-- Implementation in progress - show Approve and View Timeline -->
+          <button
+            @click="handleMenuAction('viewRequest', selectedRequest)"
+            class="w-full text-left px-4 py-2 text-sm bg-green-50 text-green-800 border-b border-green-200 hover:bg-green-100 focus:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset transition-all duration-200 flex items-center group first:rounded-t-lg"
+          >
+            <i
+              class="fas fa-check mr-3 text-green-600 group-hover:text-green-700 group-focus:text-green-700 transition-colors duration-200"
+            ></i>
+            <span class="font-medium text-green-800">Approve</span>
+          </button>
 
-              <button
-                @click="handleMenuAction('viewTimeline', selectedRequest)"
-                class="w-full text-left px-4 py-2 text-sm bg-indigo-50 text-indigo-800 hover:bg-indigo-100 focus:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
-              >
-                <i
-                  class="fas fa-history mr-3 text-indigo-600 group-hover:text-indigo-700 group-focus:text-indigo-700 transition-colors duration-200"
-                ></i>
-                <span class="font-medium">View Timeline</span>
-              </button>
-            </template>
+          <button
+            @click="handleMenuAction('viewTimeline', selectedRequest)"
+            class="w-full text-left px-4 py-2 text-sm bg-indigo-50 text-indigo-800 hover:bg-indigo-100 focus:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
+          >
+            <i
+              class="fas fa-history mr-3 text-indigo-600 group-hover:text-indigo-700 group-focus:text-indigo-700 transition-colors duration-200"
+            ></i>
+            <span class="font-medium">View Timeline</span>
+          </button>
+        </template>
 
-            <template v-else-if="selectedRequest && (selectedRequest.status === 'completed' || selectedRequest.status === 'implemented')">
-              <!-- Completed/Implemented - show View Request (read-only) and View Timeline -->
-              <button
-                @click="handleMenuAction('viewRequest', selectedRequest)"
-                class="w-full text-left px-4 py-2 text-sm bg-blue-50 text-blue-800 border-b border-blue-200 hover:bg-blue-100 focus:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset transition-all duration-200 flex items-center group first:rounded-t-lg"
-              >
-                <i
-                  class="fas fa-eye mr-3 text-blue-600 group-hover:text-blue-700 group-focus:text-blue-700 transition-colors duration-200"
-                ></i>
-                <span class="font-medium text-blue-800">View Request</span>
-              </button>
+        <template
+          v-else-if="
+            selectedRequest &&
+            (selectedRequest.status === 'completed' || selectedRequest.status === 'implemented')
+          "
+        >
+          <!-- Completed/Implemented - show View Request (read-only) and View Timeline -->
+          <button
+            @click="handleMenuAction('viewRequest', selectedRequest)"
+            class="w-full text-left px-4 py-2 text-sm bg-blue-50 text-blue-800 border-b border-blue-200 hover:bg-blue-100 focus:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset transition-all duration-200 flex items-center group first:rounded-t-lg"
+          >
+            <i
+              class="fas fa-eye mr-3 text-blue-600 group-hover:text-blue-700 group-focus:text-blue-700 transition-colors duration-200"
+            ></i>
+            <span class="font-medium text-blue-800">View Request</span>
+          </button>
 
-              <button
-                @click="handleMenuAction('viewTimeline', selectedRequest)"
-                class="w-full text-left px-4 py-2 text-sm bg-indigo-50 text-indigo-800 hover:bg-indigo-100 focus:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
-              >
-                <i
-                  class="fas fa-history mr-3 text-indigo-600 group-hover:text-indigo-700 group-focus:text-indigo-700 transition-colors duration-200"
-                ></i>
-                <span class="font-medium">View Timeline</span>
-              </button>
-            </template>
+          <button
+            @click="handleMenuAction('viewTimeline', selectedRequest)"
+            class="w-full text-left px-4 py-2 text-sm bg-indigo-50 text-indigo-800 hover:bg-indigo-100 focus:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
+          >
+            <i
+              class="fas fa-history mr-3 text-indigo-600 group-hover:text-indigo-700 group-focus:text-indigo-700 transition-colors duration-200"
+            ></i>
+            <span class="font-medium">View Timeline</span>
+          </button>
+        </template>
 
-            <template v-else-if="selectedRequest">
-              <!-- Fallback for cancelled or unknown statuses - show View Request and View Timeline -->
-              <button
-                @click="handleMenuAction('viewRequest', selectedRequest)"
-                class="w-full text-left px-4 py-2 text-sm bg-blue-50 text-blue-800 border-b border-blue-200 hover:bg-blue-100 focus:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset transition-all duration-200 flex items-center group first:rounded-t-lg"
-              >
-                <i
-                  class="fas fa-eye mr-3 text-blue-600 group-hover:text-blue-700 group-focus:text-blue-700 transition-colors duration-200"
-                ></i>
-                <span class="font-medium text-blue-800">View Request</span>
-              </button>
+        <template v-else-if="selectedRequest">
+          <!-- Fallback for cancelled or unknown statuses - show View Request and View Timeline -->
+          <button
+            @click="handleMenuAction('viewRequest', selectedRequest)"
+            class="w-full text-left px-4 py-2 text-sm bg-blue-50 text-blue-800 border-b border-blue-200 hover:bg-blue-100 focus:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset transition-all duration-200 flex items-center group first:rounded-t-lg"
+          >
+            <i
+              class="fas fa-eye mr-3 text-blue-600 group-hover:text-blue-700 group-focus:text-blue-700 transition-colors duration-200"
+            ></i>
+            <span class="font-medium text-blue-800">View Request</span>
+          </button>
 
-              <button
-                @click="handleMenuAction('viewTimeline', selectedRequest)"
-                class="w-full text-left px-4 py-2 text-sm bg-indigo-50 text-indigo-800 hover:bg-indigo-100 focus:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
-              >
-                <i
-                  class="fas fa-history mr-3 text-indigo-600 group-hover:text-indigo-700 group-focus:text-indigo-700 transition-colors duration-200"
-                ></i>
-                <span class="font-medium">View Timeline</span>
-              </button>
-            </template>
-          </div>
+          <button
+            @click="handleMenuAction('viewTimeline', selectedRequest)"
+            class="w-full text-left px-4 py-2 text-sm bg-indigo-50 text-indigo-800 hover:bg-indigo-100 focus:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
+          >
+            <i
+              class="fas fa-history mr-3 text-indigo-600 group-hover:text-indigo-700 group-focus:text-indigo-700 transition-colors duration-200"
+            ></i>
+            <span class="font-medium">View Timeline</span>
+          </button>
+        </template>
+      </div>
     </Teleport>
 
-          <AppFooter />
+    <AppFooter />
 
     <!-- Centered MNH Loading Banner -->
     <div
@@ -424,15 +428,16 @@
               class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-slide-across"
             ></div>
             <div
-              class="absolute top-4 left-4 w-16 h-16 bg-blue-400/20 rounded-full animate-float"
+              class="absolute top-4 left-4 w-16 h-16 rounded-full animate-float"
+              style="background: rgba(255, 0, 0, 0.2)"
             ></div>
             <div
-              class="absolute bottom-4 right-4 w-20 h-20 bg-teal-400/20 rounded-full animate-float"
+              class="absolute bottom-4 right-4 w-20 h-20 bg-blue-400/20 rounded-full animate-float"
               style="animation-delay: 1s"
             ></div>
             <div
-              class="absolute top-1/2 left-8 w-12 h-12 bg-blue-300/15 rounded-full animate-float"
-              style="animation-delay: 2s"
+              class="absolute top-1/2 left-8 w-12 h-12 rounded-full animate-float"
+              style="background: rgba(255, 0, 0, 0.15); animation-delay: 2s"
             ></div>
           </div>
 
@@ -459,12 +464,35 @@
               <div class="relative flex flex-col items-center">
                 <!-- Main Spinner -->
                 <div class="relative mb-3">
+                  <!-- Base circle -->
+                  <div class="rounded-full h-12 w-12 border-2 border-gray-300/20"></div>
+                  <!-- Red orbiting segment -->
                   <div
-                    class="animate-spin rounded-full h-12 w-12 border-4 border-teal-300/40 border-t-teal-300 shadow-lg"
+                    class="absolute inset-0 animate-spin rounded-full h-12 w-12 border-4 border-transparent shadow-lg"
+                    style="border-top-color: #ff0000; animation-duration: 2s"
                   ></div>
+                  <!-- Blue orbiting segment -->
                   <div
-                    class="absolute inset-0 animate-spin rounded-full h-12 w-12 border-4 border-transparent border-r-blue-300"
-                    style="animation-direction: reverse; animation-duration: 1.5s"
+                    class="absolute inset-0 animate-spin rounded-full h-12 w-12 border-4 border-transparent shadow-lg"
+                    style="
+                      border-bottom-color: #0000d1;
+                      animation-direction: reverse;
+                      animation-duration: 1.5s;
+                    "
+                  ></div>
+                  <!-- Additional red segment for more dynamic effect -->
+                  <div
+                    class="absolute inset-0 animate-spin rounded-full h-12 w-12 border-4 border-transparent shadow-lg"
+                    style="border-right-color: rgba(255, 0, 0, 0.7); animation-duration: 2.5s"
+                  ></div>
+                  <!-- Additional blue segment -->
+                  <div
+                    class="absolute inset-0 animate-spin rounded-full h-12 w-12 border-4 border-transparent shadow-lg"
+                    style="
+                      border-left-color: rgba(0, 0, 209, 0.7);
+                      animation-direction: reverse;
+                      animation-duration: 1.8s;
+                    "
                   ></div>
                 </div>
 
@@ -497,7 +525,10 @@
 
             <!-- Hospital Name and Department -->
             <div class="text-center border-t border-blue-300/30 pt-4">
-              <div class="text-red-400 text-lg font-black tracking-widest mb-1 drop-shadow-sm">
+              <div
+                class="text-lg font-black tracking-widest mb-1 drop-shadow-sm"
+                style="color: #ff0000"
+              >
                 MUHIMBILI NATIONAL HOSPITAL
               </div>
               <div class="text-teal-200 text-sm font-semibold tracking-wider">
@@ -507,18 +538,18 @@
 
             <!-- Progress Indicators -->
             <div class="flex justify-center gap-2 mt-4">
-              <div class="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
+              <div class="w-2 h-2 rounded-full animate-bounce" style="background: #ff0000"></div>
               <div
-                class="w-2 h-2 bg-teal-400 rounded-full animate-bounce"
-                style="animation-delay: 0.1s"
+                class="w-2 h-2 rounded-full animate-bounce"
+                style="background: #0000d1; animation-delay: 0.1s"
               ></div>
               <div
-                class="w-2 h-2 bg-blue-300 rounded-full animate-bounce"
-                style="animation-delay: 0.2s"
+                class="w-2 h-2 rounded-full animate-bounce"
+                style="background: #ff0000; animation-delay: 0.2s"
               ></div>
               <div
-                class="w-2 h-2 bg-teal-300 rounded-full animate-bounce"
-                style="animation-delay: 0.3s"
+                class="w-2 h-2 rounded-full animate-bounce"
+                style="background: #0000d1; animation-delay: 0.3s"
               ></div>
             </div>
           </div>
@@ -937,12 +968,12 @@
     } else {
       activeDropdown.value = requestId
       selectedRequest.value = request
-      
+
       if (event) {
         const button = event.target.closest('button')
         if (button) {
           const rect = button.getBoundingClientRect()
-          
+
           // Always show above the button
           dropdownPosition.value = {
             top: rect.top + window.scrollY,
@@ -957,14 +988,14 @@
   function getDropdownPosition() {
     if (dropdownPosition.value) {
       const dropdownWidth = 192
-      const dropdownHeight = 120  // Reduced from 200 to actual height
+      const dropdownHeight = 120 // Reduced from 200 to actual height
       let { top, right, showAbove } = dropdownPosition.value
-      
+
       // Adjust horizontal position if too close to left edge
       if (right + dropdownWidth > window.innerWidth) {
         right = Math.max(4, window.innerWidth - dropdownWidth - 4)
       }
-      
+
       // If showing above, adjust top position to be just above the button
       if (showAbove) {
         top = top - dropdownHeight
@@ -973,7 +1004,7 @@
           top = window.scrollY + 4
         }
       }
-      
+
       return { top: `${top}px`, right: `${right}px`, left: 'auto' }
     }
     return { top: '100%', right: '0', left: 'auto', position: 'absolute' }

@@ -435,7 +435,7 @@ class BothServiceFormController extends Controller
                     'phone' => $userAccess->phone_number,
                 ],
                 'signature_path' => $userAccess->signature_path,
-                'signature_url' => $userAccess->signature_path ? Storage::url($userAccess->signature_path) : null,
+                // Removed signature_url to reduce I/O operations - frontend can construct URL
                 
                 // Proper module data - ensure arrays are properly formatted
                 'wellsoft_modules' => $userAccess->wellsoft_modules ?? [],
@@ -479,11 +479,11 @@ class BothServiceFormController extends Controller
                 'ict_officer_implemented_at' => $userAccess->ict_officer_implemented_at,
                 
                 // Complete approval information with signature status indicators
+                // Removed signature_url from all approvals to reduce Storage::url() I/O calls
                 'approvals' => [
                     'hod' => array_merge([
                         'name' => $userAccess->hod_name,
                         'signature' => $userAccess->hod_signature_path,
-                        'signature_url' => $userAccess->hod_signature_path ? Storage::url($userAccess->hod_signature_path) : null,
                         'date' => $userAccess->hod_approved_at,
                         'comments' => $userAccess->hod_comments,
                         'approved_by' => $userAccess->hod_approved_by_name,
@@ -493,7 +493,6 @@ class BothServiceFormController extends Controller
                     'divisionalDirector' => array_merge([
                         'name' => $userAccess->divisional_director_name,
                         'signature' => $userAccess->divisional_director_signature_path,
-                        'signature_url' => $userAccess->divisional_director_signature_path ? Storage::url($userAccess->divisional_director_signature_path) : null,
                         'date' => $userAccess->divisional_approved_at,
                         'comments' => $userAccess->divisional_director_comments,
                         'has_signature' => !empty($userAccess->divisional_director_signature_path),
@@ -502,7 +501,6 @@ class BothServiceFormController extends Controller
                     'directorICT' => array_merge([
                         'name' => $userAccess->ict_director_name,
                         'signature' => $userAccess->ict_director_signature_path,
-                        'signature_url' => $userAccess->ict_director_signature_path ? Storage::url($userAccess->ict_director_signature_path) : null,
                         'date' => $userAccess->ict_director_approved_at,
                         'comments' => $userAccess->ict_director_comments,
                         'has_signature' => !empty($userAccess->ict_director_signature_path),
@@ -515,7 +513,6 @@ class BothServiceFormController extends Controller
                     'headIT' => array_merge([
                         'name' => $userAccess->head_it_name,
                         'signature' => $userAccess->head_it_signature_path,
-                        'signature_url' => $userAccess->head_it_signature_path ? Storage::url($userAccess->head_it_signature_path) : null,
                         'date' => $userAccess->head_it_approved_at,
                         'comments' => $userAccess->head_it_comments,
                         'has_signature' => !empty($userAccess->head_it_signature_path),
@@ -524,7 +521,6 @@ class BothServiceFormController extends Controller
                     'ictOfficer' => array_merge([
                         'name' => $userAccess->ict_officer_name,
                         'signature' => $userAccess->ict_officer_signature_path,
-                        'signature_url' => $userAccess->ict_officer_signature_path ? Storage::url($userAccess->ict_officer_signature_path) : null,
                         'date' => $userAccess->ict_officer_implemented_at,
                         'comments' => $userAccess->ict_officer_comments,
                         'implementation_comments' => $userAccess->implementation_comments,
@@ -568,8 +564,9 @@ class BothServiceFormController extends Controller
             $currentUser = $request->user();
             $userRoles = $currentUser->roles()->pluck('name')->toArray();
             
-            // Get the user access request with relationships
-            $userAccess = UserAccess::with(['user', 'department'])
+            // Get the user access request with optimized relationship loading
+            // Only load relationships that are actually used
+            $userAccess = UserAccess::with(['department:id,name'])
                 ->findOrFail($id);
             
             // Check permissions
@@ -607,7 +604,7 @@ class BothServiceFormController extends Controller
                     'phone' => $userAccess->phone_number,
                 ],
                 'signature_path' => $userAccess->signature_path,
-                'signature_url' => $userAccess->signature_path ? Storage::url($userAccess->signature_path) : null,
+                // Removed signature_url to reduce I/O operations - frontend can construct URL
                 
                 // Module data - ensuring arrays are properly handled and JSON strings are decoded
                 'wellsoft_modules' => $userAccess->wellsoft_modules ?? [],
@@ -651,11 +648,11 @@ class BothServiceFormController extends Controller
                 'ict_officer_implemented_at' => $userAccess->ict_officer_implemented_at,
                 
                 // Complete approval information with signature status indicators
+                // Removed signature_url from all approvals to reduce Storage::url() I/O calls
                 'approvals' => [
                     'hod' => array_merge([
                         'name' => $userAccess->hod_name,
                         'signature' => $userAccess->hod_signature_path,
-                        'signature_url' => $userAccess->hod_signature_path ? Storage::url($userAccess->hod_signature_path) : null,
                         'date' => $userAccess->hod_approved_at,
                         'comments' => $userAccess->hod_comments,
                         'approved_by' => $userAccess->hod_approved_by_name,
@@ -665,7 +662,6 @@ class BothServiceFormController extends Controller
                     'divisionalDirector' => array_merge([
                         'name' => $userAccess->divisional_director_name,
                         'signature' => $userAccess->divisional_director_signature_path,
-                        'signature_url' => $userAccess->divisional_director_signature_path ? Storage::url($userAccess->divisional_director_signature_path) : null,
                         'date' => $userAccess->divisional_approved_at,
                         'comments' => $userAccess->divisional_director_comments,
                         'has_signature' => !empty($userAccess->divisional_director_signature_path),
@@ -674,7 +670,6 @@ class BothServiceFormController extends Controller
                     'directorICT' => array_merge([
                         'name' => $userAccess->ict_director_name,
                         'signature' => $userAccess->ict_director_signature_path,
-                        'signature_url' => $userAccess->ict_director_signature_path ? Storage::url($userAccess->ict_director_signature_path) : null,
                         'date' => $userAccess->ict_director_approved_at,
                         'comments' => $userAccess->ict_director_comments,
                         'has_signature' => !empty($userAccess->ict_director_signature_path),
@@ -687,7 +682,6 @@ class BothServiceFormController extends Controller
                     'headIT' => array_merge([
                         'name' => $userAccess->head_it_name,
                         'signature' => $userAccess->head_it_signature_path,
-                        'signature_url' => $userAccess->head_it_signature_path ? Storage::url($userAccess->head_it_signature_path) : null,
                         'date' => $userAccess->head_it_approved_at,
                         'comments' => $userAccess->head_it_comments,
                         'has_signature' => !empty($userAccess->head_it_signature_path),
@@ -696,7 +690,6 @@ class BothServiceFormController extends Controller
                     'ictOfficer' => array_merge([
                         'name' => $userAccess->ict_officer_name,
                         'signature' => $userAccess->ict_officer_signature_path,
-                        'signature_url' => $userAccess->ict_officer_signature_path ? Storage::url($userAccess->ict_officer_signature_path) : null,
                         'date' => $userAccess->ict_officer_implemented_at,
                         'comments' => $userAccess->ict_officer_comments,
                         'implementation_comments' => $userAccess->implementation_comments,

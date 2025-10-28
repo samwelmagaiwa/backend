@@ -77,205 +77,208 @@
           </div>
 
           <!-- Requests Table -->
-          <div class="bg-white/10 rounded-lg" style="overflow: visible;">
-            <div style="overflow-x: auto;">
+          <div class="bg-white/10 rounded-lg" style="overflow: visible">
+            <div style="overflow-x: auto">
               <table class="w-full">
-              <thead class="bg-blue-800/50">
-                <tr>
-                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">Request ID</th>
-                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">Request Type</th>
-                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
-                    Personal Information
-                  </th>
-                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
-                    Divisional Approval Date
-                  </th>
-                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
-                    Current Status
-                  </th>
-                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
-                    SMS Status
-                  </th>
-                  <th class="px-4 py-4 text-center text-blue-100 text-lg font-bold">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="request in filteredRequests"
-                  :key="request.id"
-                  :class="[
-                    'border-t border-blue-300/20 hover:bg-blue-700/30 transition-colors duration-200',
-                    isPendingStatus(request.status)
-                      ? 'bg-yellow-900/20 border-l-4 border-yellow-400'
-                      : 'bg-green-900/10 border-l-4 border-green-600'
-                  ]"
-                >
-                  <!-- Request ID -->
-                  <td class="px-4 py-3">
-                    <div class="flex items-center space-x-2">
-                      <!-- Status Indicator Icon -->
-                      <div class="flex-shrink-0">
-                        <i
-                          v-if="isPendingStatus(request.status)"
-                          class="fas fa-clock text-yellow-400 text-base"
-                          title="Pending your approval"
-                        ></i>
-                        <i
-                          v-else
-                          class="fas fa-check-circle text-green-400 text-base"
-                          title="Processed by you"
-                        ></i>
-                      </div>
-                      <div>
-                        <div class="text-white font-medium text-base">
-                          {{
-                            request.request_id || `REQ-${request.id.toString().padStart(6, '0')}`
-                          }}
+                <thead class="bg-blue-800/50">
+                  <tr>
+                    <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">Request ID</th>
+                    <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
+                      Request Type
+                    </th>
+                    <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
+                      Personal Information
+                    </th>
+                    <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
+                      Divisional Approval Date
+                    </th>
+                    <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
+                      Current Status
+                    </th>
+                    <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">SMS Status</th>
+                    <th class="px-4 py-4 text-center text-blue-100 text-lg font-bold">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="request in filteredRequests"
+                    :key="request.id"
+                    :class="[
+                      'border-t border-blue-300/20 hover:bg-blue-700/30 transition-colors duration-200',
+                      isPendingStatus(request.status)
+                        ? 'bg-yellow-900/20 border-l-4 border-yellow-400'
+                        : 'bg-green-900/10 border-l-4 border-green-600'
+                    ]"
+                  >
+                    <!-- Request ID -->
+                    <td class="px-4 py-3">
+                      <div class="flex items-center space-x-2">
+                        <!-- Status Indicator Icon -->
+                        <div class="flex-shrink-0">
+                          <i
+                            v-if="isPendingStatus(request.status)"
+                            class="fas fa-clock text-yellow-400 text-base"
+                            title="Pending your approval"
+                          ></i>
+                          <i
+                            v-else
+                            class="fas fa-check-circle text-green-400 text-base"
+                            title="Processed by you"
+                          ></i>
                         </div>
-                        <div class="text-purple-300 text-sm">ID: {{ request.id }}</div>
+                        <div>
+                          <div class="text-white font-medium text-base">
+                            {{
+                              request.request_id || `REQ-${request.id.toString().padStart(6, '0')}`
+                            }}
+                          </div>
+                          <div class="text-purple-300 text-sm">ID: {{ request.id }}</div>
+                        </div>
                       </div>
-                    </div>
-                  </td>
+                    </td>
 
-                  <!-- Request Type -->
-                  <td class="px-4 py-3">
-                    <div class="flex flex-wrap gap-1">
-                      <span
-                        v-if="hasService(request, 'jeeva')"
-                        class="px-2 py-1 rounded text-sm bg-blue-100 text-blue-800"
-                      >
-                        Jeeva
-                      </span>
-                      <span
-                        v-if="hasService(request, 'wellsoft')"
-                        class="px-2 py-1 rounded text-sm bg-green-100 text-green-800"
-                      >
-                        Wellsoft
-                      </span>
-                      <span
-                        v-if="hasService(request, 'internet')"
-                        class="px-2 py-1 rounded text-sm bg-cyan-100 text-cyan-800"
-                      >
-                        Internet
-                      </span>
-                    </div>
-                  </td>
-
-                  <!-- Personal Information -->
-                  <td class="px-4 py-3">
-                    <div class="text-white font-medium text-base">
-                      {{ request.staff_name || request.full_name || 'Unknown User' }}
-                    </div>
-                    <div class="text-blue-300 text-sm">
-                      {{ request.phone || request.phone_number || 'No phone' }}
-                    </div>
-                    <div v-if="request.pf_number" class="text-teal-300 text-sm">
-                      PF: {{ request.pf_number }}
-                    </div>
-                    <div class="text-blue-200 text-sm">
-                      Dept: {{ request.department || 'Unknown' }}
-                    </div>
-                  </td>
-
-                  <!-- Divisional Approval Date -->
-                  <td class="px-4 py-3">
-                    <div class="text-white font-medium text-base">
-                      {{ formatDate(request.divisional_approved_at) }}
-                    </div>
-                    <div class="text-blue-300 text-sm">
-                      {{ formatTime(request.divisional_approved_at) }}
-                    </div>
-                  </td>
-
-                  <!-- Current Status -->
-                  <td class="px-4 py-3">
-                    <div class="flex flex-col">
-                      <!-- Display the exact database status -->
-                      <span
-                        :class="getStatusBadgeClass(request.status)"
-                        class="rounded text-base font-medium inline-block"
-                        :style="{ padding: '4px 8px', width: 'fit-content' }"
-                      >
-                        {{ getStatusText(request.status) }}
-                      </span>
-                    </div>
-                  </td>
-
-                  <!-- SMS Status -->
-                  <td class="px-4 py-3">
-                    <div class="flex items-center space-x-2">
-                      <div
-                        class="w-3 h-3 rounded-full"
-                        :class="getSmsStatusColor(getRelevantSmsStatus(request))"
-                      ></div>
-                      <span
-                        class="text-sm font-medium"
-                        :class="getSmsStatusTextColor(getRelevantSmsStatus(request))"
-                      >
-                        {{ getSmsStatusText(getRelevantSmsStatus(request)) }}
-                      </span>
-                    </div>
-                  </td>
-
-                  <!-- Actions -->
-                  <td class="px-4 py-3 text-center relative">
-                    <div class="flex justify-center three-dot-menu">
-                      <!-- Three-dot menu button -->
-                      <button
-                        @click.stop="toggleDropdown(request.id)"
-                        class="three-dot-button p-2 text-white hover:bg-blue-600/40 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 hover:scale-105 active:scale-95"
-                        :class="{ 'bg-blue-600/40 shadow-lg': openDropdownId === request.id }"
-                        :aria-label="
-                          'Actions for request ' +
-                          (request.request_id || 'REQ-' + request.id.toString().padStart(6, '0'))
-                        "
-                      >
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                          <path
-                            d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"
-                          />
-                        </svg>
-                      </button>
-
-                      <!-- Dropdown menu (using Teleport to render at body level) -->
-                      <Teleport to="body">
-                        <div
-                          v-show="openDropdownId === request.id"
-                          :ref="'dropdown-' + request.id"
-                          class="dropdown-menu fixed w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-1 min-w-max"
-                          :style="getDropdownStyle(request.id)"
-                          @click.stop="() => {}"
+                    <!-- Request Type -->
+                    <td class="px-4 py-3">
+                      <div class="flex flex-wrap gap-1">
+                        <span
+                          v-if="hasService(request, 'jeeva')"
+                          class="px-2 py-1 rounded text-sm bg-blue-100 text-blue-800"
                         >
-                          <!-- Role-specific actions -->
-                          <template
-                            v-for="(action, index) in getAvailableActions(request)"
-                            :key="action.key"
+                          Jeeva
+                        </span>
+                        <span
+                          v-if="hasService(request, 'wellsoft')"
+                          class="px-2 py-1 rounded text-sm bg-green-100 text-green-800"
+                        >
+                          Wellsoft
+                        </span>
+                        <span
+                          v-if="hasService(request, 'internet')"
+                          class="px-2 py-1 rounded text-sm bg-cyan-100 text-cyan-800"
+                        >
+                          Internet
+                        </span>
+                      </div>
+                    </td>
+
+                    <!-- Personal Information -->
+                    <td class="px-4 py-3">
+                      <div class="text-white font-medium text-base">
+                        {{ request.staff_name || request.full_name || 'Unknown User' }}
+                      </div>
+                      <div class="text-blue-300 text-sm">
+                        {{ request.phone || request.phone_number || 'No phone' }}
+                      </div>
+                      <div v-if="request.pf_number" class="text-teal-300 text-sm">
+                        PF: {{ request.pf_number }}
+                      </div>
+                      <div class="text-blue-200 text-sm">
+                        Dept: {{ request.department || 'Unknown' }}
+                      </div>
+                    </td>
+
+                    <!-- Divisional Approval Date -->
+                    <td class="px-4 py-3">
+                      <div class="text-white font-medium text-base">
+                        {{ formatDate(request.divisional_approved_at) }}
+                      </div>
+                      <div class="text-blue-300 text-sm">
+                        {{ formatTime(request.divisional_approved_at) }}
+                      </div>
+                    </td>
+
+                    <!-- Current Status -->
+                    <td class="px-4 py-3">
+                      <div class="flex flex-col">
+                        <!-- Display the exact database status -->
+                        <span
+                          :class="getStatusBadgeClass(request.status)"
+                          class="rounded text-base font-medium inline-block"
+                          :style="{ padding: '4px 8px', width: 'fit-content' }"
+                        >
+                          {{ getStatusText(request.status) }}
+                        </span>
+                      </div>
+                    </td>
+
+                    <!-- SMS Status -->
+                    <td class="px-4 py-3">
+                      <div class="flex items-center space-x-2">
+                        <div
+                          class="w-3 h-3 rounded-full"
+                          :class="getSmsStatusColor(getRelevantSmsStatus(request))"
+                        ></div>
+                        <span
+                          class="text-sm font-medium"
+                          :class="getSmsStatusTextColor(getRelevantSmsStatus(request))"
+                        >
+                          {{ getSmsStatusText(getRelevantSmsStatus(request)) }}
+                        </span>
+                      </div>
+                    </td>
+
+                    <!-- Actions -->
+                    <td class="px-4 py-3 text-center relative">
+                      <div class="flex justify-center three-dot-menu">
+                        <!-- Three-dot menu button -->
+                        <button
+                          @click.stop="toggleDropdown(request.id)"
+                          class="three-dot-button p-2 text-white hover:bg-blue-600/40 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 hover:scale-105 active:scale-95"
+                          :class="{ 'bg-blue-600/40 shadow-lg': openDropdownId === request.id }"
+                          :aria-label="
+                            'Actions for request ' +
+                            (request.request_id || 'REQ-' + request.id.toString().padStart(6, '0'))
+                          "
+                        >
+                          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                              d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"
+                            />
+                          </svg>
+                        </button>
+
+                        <!-- Dropdown menu (using Teleport to render at body level) -->
+                        <Teleport to="body">
+                          <div
+                            v-show="openDropdownId === request.id"
+                            :ref="'dropdown-' + request.id"
+                            class="dropdown-menu fixed w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-1 min-w-max"
+                            :style="getDropdownStyle(request.id)"
+                            @click.stop="() => {}"
                           >
-                            <button
-                              @click.stop="executeAction(action.key, request)"
-                              class="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-all duration-200 flex items-center space-x-3 group"
-                              :class="[
-                                {
-                                  'border-t border-gray-100':
-                                    index > 0 &&
-                                    shouldShowSeparator(action, getAvailableActions(request)[index - 1])
-                                },
-                                getActionColorClass(action)
-                              ]"
+                            <!-- Role-specific actions -->
+                            <template
+                              v-for="(action, index) in getAvailableActions(request)"
+                              :key="action.key"
                             >
-                              <i
-                                :class="[action.icon, getActionIconColorClass(action)]"
-                                class="w-4 h-4 flex-shrink-0 transition-colors duration-200"
-                              ></i>
-                              <span class="font-medium">{{ action.label }}</span>
-                            </button>
-                          </template>
-                        </div>
-                      </Teleport>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
+                              <button
+                                @click.stop="executeAction(action.key, request)"
+                                class="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-all duration-200 flex items-center space-x-3 group"
+                                :class="[
+                                  {
+                                    'border-t border-gray-100':
+                                      index > 0 &&
+                                      shouldShowSeparator(
+                                        action,
+                                        getAvailableActions(request)[index - 1]
+                                      )
+                                  },
+                                  getActionColorClass(action)
+                                ]"
+                              >
+                                <i
+                                  :class="[action.icon, getActionIconColorClass(action)]"
+                                  class="w-4 h-4 flex-shrink-0 transition-colors duration-200"
+                                ></i>
+                                <span class="font-medium">{{ action.label }}</span>
+                              </button>
+                            </template>
+                          </div>
+                        </Teleport>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
               </table>
             </div>
 
@@ -304,23 +307,13 @@
       </main>
     </div>
 
-    <!-- Loading Modal -->
-    <div
+    <!-- Unified Loading Banner -->
+    <UnifiedLoadingBanner
       v-if="isLoading"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-    >
-      <div
-        class="rounded-xl shadow-2xl p-8 text-center border border-blue-400/40"
-        style="background: linear-gradient(90deg, #0b3a82, #0a2f6f, #0b3a82)"
-      >
-        <div class="flex justify-center mb-4">
-          <div
-            class="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"
-          ></div>
-        </div>
-        <p class="text-blue-100 font-medium">Loading requests...</p>
-      </div>
-    </div>
+      :loading-title="'Loading Access Requests'"
+      :loading-subtitle="'Fetching divisional-approved requests awaiting ICT Director review...'"
+      :department-title="'ICT Director Dashboard'"
+    />
 
     <!-- Timeline Modal -->
     <RequestTimeline
@@ -337,6 +330,7 @@
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppFooter from '@/components/footer.vue'
   import RequestTimeline from '@/components/common/RequestTimeline.vue'
+  import UnifiedLoadingBanner from '@/components/common/UnifiedLoadingBanner.vue'
   import dictAccessService from '@/services/dictAccessService'
   import statusUtils from '@/utils/statusUtils'
   import { useAuth } from '@/composables/useAuth'
@@ -347,7 +341,8 @@
       Header,
       ModernSidebar,
       AppFooter,
-      RequestTimeline
+      RequestTimeline,
+      UnifiedLoadingBanner
     },
     setup() {
       const { userRole } = useAuth()
@@ -866,7 +861,7 @@
         if (!this.dropdownPositions) {
           this.dropdownPositions = {}
         }
-        
+
         // Calculate position relative to viewport
         const position = spaceBelow < dropdownHeight + 20 ? 'top' : 'bottom'
         this.dropdownPositions[requestId] = {
@@ -880,7 +875,7 @@
       getDropdownStyle(requestId) {
         const pos = this.dropdownPositions?.[requestId]
         if (!pos) return { zIndex: 99999 }
-        
+
         return {
           top: `${pos.top}px`,
           left: `${pos.left}px`,
@@ -952,8 +947,17 @@
         // ICT Director actions (current default for this page)
         else if (userRole === ROLES.ICT_DIRECTOR) {
           // Check if already approved by ICT Director
-          const isApproved = ['ict_director_approved', 'dict_approved', 'approved', 'head_it_approved', 'assigned', 'in_progress', 'implemented', 'completed'].includes(status)
-          
+          const isApproved = [
+            'ict_director_approved',
+            'dict_approved',
+            'approved',
+            'head_it_approved',
+            'assigned',
+            'in_progress',
+            'implemented',
+            'completed'
+          ].includes(status)
+
           if (isApproved) {
             // Show view and timeline for approved requests
             actions.push({
@@ -1141,12 +1145,18 @@
       getRelevantSmsStatus(request) {
         // For ICT Director: show SMS status for NEXT workflow step after their approval
         const status = request.ict_director_status || request.status
-        
+
         // If ICT Director has APPROVED: show Head of IT notification status
-        if (status === 'ict_director_approved' || status === 'dict_approved' || status === 'approved' || status === 'head_it_approved' || status === 'implemented') {
+        if (
+          status === 'ict_director_approved' ||
+          status === 'dict_approved' ||
+          status === 'approved' ||
+          status === 'head_it_approved' ||
+          status === 'implemented'
+        ) {
           return request.sms_to_head_it_status || 'pending'
         }
-        
+
         // If PENDING ICT Director approval: return 'pending' (no action notification sent yet)
         // Don't show sms_to_ict_director_status (that's the incoming notification)
         return 'pending'
@@ -1275,22 +1285,22 @@
     position: relative;
     z-index: 1;
   }
-  
+
   /* Ensure table container allows dropdown overflow */
   .bg-white\/10.rounded-lg {
     overflow: visible !important;
   }
-  
+
   /* Ensure tbody allows overflow */
   tbody {
     position: relative;
   }
-  
+
   /* Ensure table rows allow overflow */
   tbody tr {
     position: relative;
   }
-  
+
   /* Ensure Actions column allows overflow */
   td:last-child {
     overflow: visible !important;

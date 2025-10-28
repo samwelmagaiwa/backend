@@ -1,11 +1,19 @@
 <template>
-  <div class="min-h-screen flex flex-col">
+  <div class="h-screen flex flex-col">
     <Header />
-    <div class="flex flex-1">
+    <div class="flex flex-1 overflow-hidden">
       <ModernSidebar />
       <main
         class="flex-1 p-2 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto"
       >
+        <!-- Unified Loading Banner -->
+        <UnifiedLoadingBanner
+          :show="isLoading || isProcessing || isProcessingAssessment"
+          :loadingTitle="getLoadingTitle()"
+          :loadingSubtitle="getLoadingSubtitle()"
+          departmentTitle="ICT APPROVAL PANEL"
+          :forceSpin="true"
+        />
         <!-- Background Pattern -->
         <div class="absolute inset-0 overflow-hidden pointer-events-none">
           <div class="absolute inset-0">
@@ -115,65 +123,61 @@
               </div>
 
               <!-- Request Info -->
-              <div v-if="!isLoading && Object.keys(request).length > 0" class="space-y-2">
-                <h3 class="text-lg font-bold text-white">Request Information</h3>
+              <div v-if="!isLoading && Object.keys(request).length > 0" class="space-y-4">
+                <h3 class="text-2xl font-bold text-white">Request Information</h3>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label class="block text-xs font-semibold text-blue-200 mb-1">Request ID</label>
+                    <label class="block text-base font-bold text-blue-200 mb-2">Request ID</label>
                     <div
-                      class="px-2 py-1 bg-white/10 border border-blue-300/30 rounded text-white text-sm"
+                      class="px-3 py-2 bg-white/10 border border-blue-300/30 rounded text-white text-lg font-semibold"
                     >
                       {{ request.request_id || `REQ-${String(request.id).padStart(6, '0')}` }}
                     </div>
                   </div>
 
                   <div>
-                    <label class="block text-xs font-semibold text-blue-200 mb-1"
+                    <label class="block text-base font-bold text-blue-200 mb-2"
                       >Borrower Name</label
                     >
                     <div
-                      class="px-2 py-1 bg-white/10 border border-blue-300/30 rounded text-white text-sm"
+                      class="px-3 py-2 bg-white/10 border border-blue-300/30 rounded text-white text-lg font-semibold"
                     >
                       {{ request.borrower_name || request.borrowerName || 'Unknown' }}
                     </div>
                   </div>
 
                   <div>
-                    <label class="block text-xs font-semibold text-blue-200 mb-1">Department</label>
+                    <label class="block text-base font-bold text-blue-200 mb-2">Department</label>
                     <div
-                      class="px-2 py-1 bg-white/10 border border-blue-300/30 rounded text-white text-sm"
+                      class="px-3 py-2 bg-white/10 border border-blue-300/30 rounded text-white text-lg font-semibold"
                     >
                       {{ request.department || 'Unknown Department' }}
                     </div>
                   </div>
 
                   <div>
-                    <label class="block text-xs font-semibold text-blue-200 mb-1"
-                      >Phone Number</label
-                    >
+                    <label class="block text-base font-bold text-blue-200 mb-2">Phone Number</label>
                     <div
-                      class="px-2 py-1 bg-white/10 border border-blue-300/30 rounded text-white text-sm"
+                      class="px-3 py-2 bg-white/10 border border-blue-300/30 rounded text-white text-lg font-semibold"
                     >
                       {{ request.borrower_phone || request.phoneNumber || 'No phone provided' }}
                     </div>
                   </div>
 
                   <div>
-                    <label class="block text-xs font-semibold text-blue-200 mb-1">PF Number</label>
+                    <label class="block text-base font-bold text-blue-200 mb-2">PF Number</label>
                     <div
-                      class="px-2 py-1 bg-white/10 border border-blue-300/30 rounded text-white text-sm"
+                      class="px-3 py-2 bg-white/10 border border-blue-300/30 rounded text-white text-lg font-semibold"
                     >
                       {{ request.pf_number }}
                     </div>
                   </div>
 
                   <div>
-                    <label class="block text-xs font-semibold text-blue-200 mb-1"
-                      >Device Type</label
-                    >
+                    <label class="block text-base font-bold text-blue-200 mb-2">Device Type</label>
                     <div
-                      class="px-2 py-1 bg-white/10 border border-blue-300/30 rounded text-white text-sm"
+                      class="px-3 py-2 bg-white/10 border border-blue-300/30 rounded text-white text-lg font-semibold"
                     >
                       {{
                         request.device_name ||
@@ -183,33 +187,29 @@
                   </div>
 
                   <div>
-                    <label class="block text-xs font-semibold text-blue-200 mb-1"
-                      >Booking Date</label
-                    >
+                    <label class="block text-base font-bold text-blue-200 mb-2">Booking Date</label>
                     <div
-                      class="px-2 py-1 bg-white/10 border border-blue-300/30 rounded text-white text-sm"
+                      class="px-3 py-2 bg-white/10 border border-blue-300/30 rounded text-white text-lg font-semibold"
                     >
                       {{ formatDate(request.booking_date || request.bookingDate) }}
                     </div>
                   </div>
 
                   <div>
-                    <label class="block text-xs font-semibold text-blue-200 mb-1"
-                      >Return Time</label
-                    >
+                    <label class="block text-base font-bold text-blue-200 mb-2">Return Time</label>
                     <div
-                      class="px-2 py-1 bg-white/10 border border-blue-300/30 rounded text-white text-sm"
+                      class="px-3 py-2 bg-white/10 border border-blue-300/30 rounded text-white text-lg font-semibold"
                     >
                       {{ request.return_time || request.returnTime || 'No time specified' }}
                     </div>
                   </div>
 
                   <div>
-                    <label class="block text-xs font-semibold text-blue-200 mb-1"
+                    <label class="block text-base font-bold text-blue-200 mb-2"
                       >Current Status</label
                     >
                     <div
-                      class="px-2 py-1 bg-white/10 border border-blue-300/30 rounded text-sm flex items-center gap-2"
+                      class="px-3 py-2 bg-white/10 border border-blue-300/30 rounded text-lg font-semibold flex items-center gap-2"
                     >
                       <i
                         :class="
@@ -239,11 +239,9 @@
                 </div>
 
                 <div>
-                  <label class="block text-xs font-semibold text-blue-200 mb-1"
-                    >Purpose/Reason</label
-                  >
+                  <label class="block text-base font-bold text-blue-200 mb-2">Purpose/Reason</label>
                   <div
-                    class="px-2 py-1 bg-white/10 border border-blue-300/30 rounded text-white text-sm"
+                    class="px-3 py-2 bg-white/10 border border-blue-300/30 rounded text-white text-lg font-semibold"
                   >
                     {{ request.reason || request.purpose || 'No reason provided' }}
                   </div>
@@ -253,15 +251,27 @@
               <!-- Device Condition Assessment Section -->
               <div
                 v-if="!isLoading && Object.keys(request).length > 0"
-                class="bg-blue-800/30 backdrop-blur-sm rounded-lg p-3 border border-blue-600/40 animate-fade-in"
+                :class="[
+                  'bg-blue-800/30 backdrop-blur-sm rounded-lg p-3 border border-blue-600/40 animate-fade-in',
+                  isReadOnly ? 'readonly-mode' : ''
+                ]"
               >
                 <div class="flex items-center gap-2 mb-3">
+                  <div v-if="request.device_available === false && !isReadOnly" class="flex-1">
+                    <div
+                      class="px-3 py-2 rounded-md bg-red-500/20 border border-red-400/40 text-red-200 text-sm font-semibold"
+                    >
+                      <i class="fas fa-exclamation-triangle mr-2"></i>
+                      Device is no longer available. You cannot issue this request.
+                    </div>
+                  </div>
                   <div
                     class="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-700 rounded-md flex items-center justify-center"
                   >
                     <i class="fas fa-clipboard-check text-white text-sm"></i>
                   </div>
-                  <h3 class="text-base font-bold text-white">Device Condition Assessment</h3>
+                  <h3 class="text-3xl font-bold text-white">Device Condition Assessment</h3>
+                  <span v-if="isReadOnly" class="ml-auto px-3 py-1 bg-emerald-500/20 text-emerald-200 text-xs font-semibold rounded-full border border-emerald-400/30">Finalized</span>
                 </div>
 
                 <!-- Assessment Type Tabs -->
@@ -269,7 +279,7 @@
                   <button
                     @click="assessmentType = 'issuing'"
                     :class="[
-                      'flex-1 py-2 px-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-sm',
+                      'flex-1 py-2 px-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-xl',
                       assessmentType === 'issuing'
                         ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
                         : 'text-blue-200 hover:text-white hover:bg-blue-800/50'
@@ -282,7 +292,7 @@
                     @click="assessmentType = 'receiving'"
                     data-tab="receiving"
                     :class="[
-                      'flex-1 py-2 px-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-sm',
+                      'flex-1 py-2 px-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-xl',
                       assessmentType === 'receiving'
                         ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
                         : 'text-blue-200 hover:text-white hover:bg-blue-800/50'
@@ -296,7 +306,7 @@
                 <!-- Assessment Form -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-3">
                   <!-- Physical Condition -->
-                  <div class="assessment-section">
+                  <div class="assessment-section physical-section" :class="{ 'readonly-highlight': isReadOnly }">
                     <div class="assessment-header">
                       <div
                         class="assessment-icon-wrapper bg-gradient-to-br from-blue-500 to-blue-600"
@@ -304,8 +314,8 @@
                         <i class="fas fa-search-plus text-white text-xl"></i>
                       </div>
                       <div>
-                        <h4 class="text-lg font-bold text-white mb-1">Physical Condition</h4>
-                        <p class="text-blue-200 text-sm">Assess the overall physical appearance</p>
+                        <h4 class="text-3xl font-bold text-white mb-1">Physical Condition</h4>
+                        <p class="text-blue-200 text-xl">Assess the overall physical appearance</p>
                       </div>
                       <span class="optional-badge">Required</span>
                     </div>
@@ -316,9 +326,7 @@
                         :key="condition.value"
                         :class="[
                           'assessment-option',
-                          currentAssessment.physical_condition === condition.value
-                            ? 'selected'
-                            : '',
+                          selectedPhysical === condition.value ? 'selected' : '',
                           condition.value
                         ]"
                       >
@@ -326,6 +334,7 @@
                           type="radio"
                           :value="condition.value"
                           v-model="currentAssessment.physical_condition"
+                          :disabled="isReadOnly"
                           class="hidden"
                         />
                         <div class="option-content">
@@ -345,7 +354,7 @@
                   </div>
 
                   <!-- Device Functionality -->
-                  <div class="assessment-section">
+                  <div class="assessment-section functionality-section" :class="{ 'readonly-highlight': isReadOnly }">
                     <div class="assessment-header">
                       <div
                         class="assessment-icon-wrapper bg-gradient-to-br from-blue-500 to-blue-600"
@@ -353,8 +362,8 @@
                         <i class="fas fa-cogs text-white text-xl"></i>
                       </div>
                       <div>
-                        <h4 class="text-lg font-bold text-white mb-1">Device Functionality</h4>
-                        <p class="text-blue-200 text-sm">Test and verify device operations</p>
+                        <h4 class="text-3xl font-bold text-white mb-1">Device Functionality</h4>
+                        <p class="text-blue-200 text-xl">Test and verify device operations</p>
                       </div>
                       <span class="required-badge">Required</span>
                     </div>
@@ -365,7 +374,7 @@
                         :key="functionality.value"
                         :class="[
                           'assessment-option',
-                          currentAssessment.functionality === functionality.value ? 'selected' : '',
+                          selectedFunctionality === functionality.value ? 'selected' : '',
                           functionality.value.replace('_', '-')
                         ]"
                       >
@@ -373,6 +382,7 @@
                           type="radio"
                           :value="functionality.value"
                           v-model="currentAssessment.functionality"
+                          :disabled="isReadOnly"
                           class="hidden"
                         />
                         <div class="option-content">
@@ -393,44 +403,101 @@
                 </div>
 
                 <!-- Accessories and Damage Assessment -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-2 mb-2">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-3">
                   <!-- Accessories Completeness -->
-                  <div class="bg-purple-800/20 rounded-lg p-2">
-                    <label class="flex items-center gap-2 cursor-pointer">
+                  <div class="assessment-section">
+                    <div class="assessment-header">
                       <div
-                        class="w-4 h-4 bg-purple-600 rounded-sm flex items-center justify-center"
+                        class="assessment-icon-wrapper bg-gradient-to-br from-purple-500 to-purple-600"
                       >
-                        <i class="fas fa-puzzle-piece text-white text-sm"></i>
+                        <i class="fas fa-puzzle-piece text-white text-xl"></i>
                       </div>
-                      <input
-                        type="checkbox"
-                        v-model="currentAssessment.accessories_complete"
-                        class="w-3 h-3 text-purple-600 bg-purple-800/30 border-purple-600 rounded focus:ring-purple-500"
-                      />
-                      <span class="text-xs text-white">All accessories included</span>
-                    </label>
+                      <div>
+                        <h4 class="text-2xl font-bold text-white mb-1">Accessories</h4>
+                        <p class="text-blue-200 text-lg">Check accessory completeness</p>
+                      </div>
+                      <span class="optional-badge">Optional</span>
+                    </div>
+
+                    <div class="assessment-options">
+                      <label class="assessment-option checkbox-option cursor-pointer">
+                        <input
+                          type="checkbox"
+                          v-model="currentAssessment.accessories_complete"
+                          :disabled="isReadOnly"
+                          class="hidden"
+                        />
+                        <div class="option-content checkbox-content">
+                          <div class="option-icon checkbox-icon bg-purple-500/20 text-purple-400">
+                            <i class="fas fa-puzzle-piece"></i>
+                          </div>
+                          <div class="option-text">
+                            <span class="option-label">All accessories included</span>
+                            <span class="option-description"
+                              >Cables, chargers, manuals, and original packaging</span
+                            >
+                          </div>
+                          <div class="option-indicator">
+                            <div class="checkbox-custom">
+                              <i class="fas fa-check"></i>
+                            </div>
+                          </div>
+                        </div>
+                      </label>
+                    </div>
                   </div>
 
                   <!-- Damage Assessment -->
-                  <div class="bg-red-800/20 rounded-lg p-2">
-                    <label class="flex items-center gap-2 cursor-pointer mb-1">
-                      <div class="w-4 h-4 bg-red-600 rounded-sm flex items-center justify-center">
-                        <i class="fas fa-exclamation-triangle text-white text-sm"></i>
+                  <div class="assessment-section">
+                    <div class="assessment-header">
+                      <div
+                        class="assessment-icon-wrapper bg-gradient-to-br from-red-500 to-red-600"
+                      >
+                        <i class="fas fa-exclamation-triangle text-white text-xl"></i>
                       </div>
-                      <input
-                        type="checkbox"
-                        v-model="currentAssessment.visible_damage"
-                        class="w-3 h-3 text-red-600 bg-red-800/30 border-red-600 rounded focus:ring-red-500"
-                      />
-                      <span class="text-xs text-white">Device has damage/issues</span>
-                    </label>
-                    <div v-if="currentAssessment.visible_damage">
-                      <textarea
-                        v-model="currentAssessment.damage_description"
-                        rows="1"
-                        class="w-full px-1 py-1 bg-red-900/30 border border-red-600/40 rounded text-white text-sm placeholder-red-300 resize-none focus:outline-none focus:border-red-500"
-                        placeholder="Describe damage..."
-                      ></textarea>
+                      <div>
+                        <h4 class="text-2xl font-bold text-white mb-1">Damage Check</h4>
+                        <p class="text-blue-200 text-lg">Identify any visible damage or issues</p>
+                      </div>
+                      <span class="optional-badge">Optional</span>
+                    </div>
+
+                    <div class="assessment-options">
+                      <label class="assessment-option checkbox-option cursor-pointer">
+                        <input
+                          type="checkbox"
+                          v-model="currentAssessment.visible_damage"
+                          :disabled="isReadOnly"
+                          class="hidden"
+                        />
+                        <div class="option-content checkbox-content">
+                          <div class="option-icon checkbox-icon bg-red-500/20 text-red-400">
+                            <i class="fas fa-exclamation-triangle"></i>
+                          </div>
+                          <div class="option-text">
+                            <span class="option-label">Device has damage/issues</span>
+                            <span class="option-description"
+                              >Scratches, dents, cracks, or functional problems</span
+                            >
+                          </div>
+                          <div class="option-indicator">
+                            <div class="checkbox-custom">
+                              <i class="fas fa-check"></i>
+                            </div>
+                          </div>
+                        </div>
+                      </label>
+
+                      <!-- Damage Description (shown when damage is checked) -->
+                      <div v-if="currentAssessment.visible_damage" class="mt-3">
+                        <textarea
+                          v-model="currentAssessment.damage_description"
+                          rows="2"
+                          :disabled="isReadOnly"
+                          class="w-full px-3 py-2 bg-red-900/30 border-2 border-red-600/40 rounded-xl text-white text-base placeholder-red-300 resize-none focus:outline-none focus:border-red-400 focus:shadow-lg focus:shadow-red-500/20 transition-all duration-300 disabled:opacity-60"
+                          placeholder="Describe the damage or issues in detail..."
+                        ></textarea>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -441,19 +508,20 @@
                     <div class="w-4 h-4 bg-indigo-600 rounded-sm flex items-center justify-center">
                       <i class="fas fa-sticky-note text-white text-sm"></i>
                     </div>
-                    <span class="text-xs font-medium text-white">Additional Notes</span>
-                    <span class="text-xs text-indigo-300">(Optional)</span>
+                    <span class="text-lg font-bold text-white">Additional Notes</span>
+                    <span class="text-lg text-indigo-300">(Optional)</span>
                   </label>
                   <textarea
                     v-model="currentAssessmentNotes"
                     rows="1"
-                    class="w-full px-1 py-1 bg-indigo-900/30 border border-indigo-600/40 rounded text-white text-sm placeholder-indigo-300 resize-none focus:outline-none focus:border-indigo-500"
+                    :disabled="isReadOnly"
+                    class="w-full px-1 py-1 bg-indigo-900/30 border border-indigo-600/40 rounded text-white text-sm placeholder-indigo-300 resize-none focus:outline-none focus:border-indigo-500 disabled:opacity-60"
                     placeholder="Special instructions, warranty info..."
                   ></textarea>
                 </div>
 
                 <!-- Compact Button Layout -->
-                <div class="flex flex-col sm:flex-row gap-2 pt-3 border-t border-blue-600/30">
+                <div v-if="!isReadOnly" class="flex flex-col sm:flex-row gap-2 pt-3 border-t border-blue-600/30">
                   <!-- Save Issuing Assessment Button -->
                   <button
                     v-if="showIssuingAssessmentButton"
@@ -547,7 +615,7 @@
                     v-if="showReceivingButton"
                     @click="receiveDeviceNow"
                     :disabled="!canReceiveDevice"
-                    class="w-full group relative overflow-hidden px-4 py-2 bg-gradient-to-r from-green-600 via-green-700 to-green-800 text-white rounded-lg font-semibold text-sm transition-all duration-300 hover:shadow-lg hover:shadow-green-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="flex-1 group relative overflow-hidden px-6 py-3 bg-gradient-to-r from-green-600 via-green-700 to-green-800 text-white rounded-xl font-semibold text-lg transition-all duration-300 hover:shadow-xl hover:shadow-green-500/40 border border-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <!-- Background Animation -->
                     <div
@@ -557,13 +625,13 @@
                     <!-- Button Content -->
                     <div class="relative z-10 flex items-center justify-center gap-3">
                       <div
-                        class="flex items-center justify-center w-6 h-6 bg-white/20 rounded-full group-hover:bg-white/30 transition-colors duration-300"
+                        class="flex items-center justify-center w-8 h-8 bg-white/20 rounded-full group-hover:bg-white/30 transition-colors duration-300"
                       >
-                        <i class="fas fa-check-circle text-base"></i>
+                        <i class="fas fa-check-circle text-xl"></i>
                       </div>
                       <div class="flex flex-col items-start">
-                        <span class="text-xs opacity-90">Final Action</span>
-                        <span class="text-sm font-semibold">
+                        <span class="text-sm opacity-95 tracking-wide">Final Action</span>
+                        <span class="text-xl font-bold tracking-wide">
                           {{ isProcessingAssessment ? 'Processing...' : 'Receive Now' }}
                         </span>
                       </div>
@@ -579,6 +647,14 @@
                       class="absolute inset-0 -skew-x-12 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-shimmer"
                     ></div>
                   </button>
+                </div>
+
+                <!-- Read-only notice -->
+                <div v-if="isReadOnly" class="mt-3">
+                  <div class="p-2 rounded-lg border flex items-center gap-2 bg-blue-500/20 border-blue-400/40 text-blue-200">
+                    <i class="fas fa-lock text-sm"></i>
+                    <span class="font-medium">This request is completed and read-only. No further actions are available.</span>
+                  </div>
                 </div>
 
                 <!-- Assessment Status Messages -->
@@ -604,31 +680,35 @@
                 </div>
               </div>
 
-              <!-- Loading State -->
-              <div v-else-if="isLoading" class="text-center py-6">
-                <div
-                  class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"
-                ></div>
-                <p class="text-white text-lg">Loading request details...</p>
-              </div>
-
               <!-- Error State -->
-              <div v-else class="bg-red-500/20 border border-red-400/40 rounded-lg p-6">
-                <div class="text-center">
-                  <i class="fas fa-exclamation-triangle text-red-400 text-4xl mb-4"></i>
-                  <h3 class="text-red-200 text-lg font-semibold mb-2">
+              <div
+                v-else-if="!isLoading"
+                class="bg-red-500/20 border border-red-400/40 rounded-lg p-6"
+              >
+                <div class="text-center space-y-3">
+                  <i class="fas fa-exclamation-triangle text-red-400 text-4xl"></i>
+                  <h3 class="text-red-200 text-xl font-semibold">
                     Unable to Load Request Details
                   </h3>
-                  <p class="text-red-200 text-sm mb-4">
-                    There was an error loading the request data. Please try again.
+                  <p class="text-red-200 text-base">
+                    {{ loadError || 'There was an error loading the request data.' }}
                   </p>
-                  <button
-                    @click="fetchRequestDetails()"
-                    class="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200"
-                  >
-                    <i class="fas fa-redo mr-2"></i>
-                    Retry Loading
-                  </button>
+                  <div class="flex gap-3 justify-center">
+                    <button
+                      @click="fetchRequestDetails()"
+                      class="px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200"
+                    >
+                      <i class="fas fa-redo mr-2"></i>
+                      Retry
+                    </button>
+                    <button
+                      @click="$router.push('/ict-approval/requests')"
+                      class="px-5 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors duration-200"
+                    >
+                      <i class="fas fa-list mr-2"></i>
+                      Back to List
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -639,6 +719,60 @@
         </div>
       </main>
     </div>
+
+    <!-- Approval Confirmation Modal -->
+    <ApprovalConfirmationModal
+      :isVisible="showApprovalModal"
+      :requestData="{
+        request_id: request.request_id || `REQ-${String(request.id).padStart(6, '0')}`,
+        borrower: request.borrower_name || 'Unknown',
+        device:
+          request.device_name || getDeviceDisplayName(request.device_type, request.custom_device),
+        return_time: request.return_time || request.returnTime
+      }"
+      @confirm="confirmApproveRequest"
+      @cancel="() => (showApprovalModal = false)"
+    />
+
+    <PostIssuingActionModal
+      :isVisible="showPostIssuingModal && !requestApproved"
+      :requestData="{
+        request_id: request.request_id || `REQ-${String(request.id).padStart(6, '0')}`,
+        device:
+          request.device_name || getDeviceDisplayName(request.device_type, request.custom_device)
+      }"
+      @approve="
+        () => {
+          showPostIssuingModal = false
+          approveRequest()
+        }
+      "
+      @reject="
+        () => {
+          showPostIssuingModal = false
+          showRejectModal = true
+        }
+      "
+      @close="() => (showPostIssuingModal = false)"
+    />
+
+    <RejectRequestModal
+      :isVisible="showRejectModal"
+      :defaultNotes="rejectNotes"
+      @confirm="confirmReject"
+      @cancel="() => (showRejectModal = false)"
+    />
+
+    <ReceiveConfirmationModal
+      :isVisible="showReceiveModal"
+      :requestData="{
+        request_id: request.request_id || `REQ-${String(request.id).padStart(6, '0')}`,
+        device:
+          request.device_name || getDeviceDisplayName(request.device_type, request.custom_device)
+      }"
+      @confirm="confirmReceive"
+      @cancel="() => (showReceiveModal = false)"
+    />
   </div>
 </template>
 
@@ -646,20 +780,33 @@
   import Header from '@/components/header.vue'
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppFooter from '@/components/footer.vue'
+  import UnifiedLoadingBanner from '@/components/common/UnifiedLoadingBanner.vue'
+  import ApprovalConfirmationModal from '@/components/modals/ApprovalConfirmationModal.vue'
+  import PostIssuingActionModal from '@/components/modals/PostIssuingActionModal.vue'
+  import RejectRequestModal from '@/components/modals/RejectRequestModal.vue'
+  import ReceiveConfirmationModal from '@/components/modals/ReceiveConfirmationModal.vue'
   import deviceBorrowingService from '@/services/deviceBorrowingService'
+  import apiClient from '@/utils/apiClient'
+  import notificationService from '@/services/notificationService'
 
   export default {
     name: 'RequestDetails',
     components: {
       Header,
       ModernSidebar,
-      AppFooter
+      AppFooter,
+      UnifiedLoadingBanner,
+      ApprovalConfirmationModal,
+      PostIssuingActionModal,
+      RejectRequestModal,
+      ReceiveConfirmationModal
     },
     data() {
       return {
         request: {},
         isLoading: false,
         isProcessing: false,
+        loadError: null,
 
         // Assessment data
         assessmentType: 'issuing', // 'issuing' or 'receiving'
@@ -690,6 +837,13 @@
         deviceIssued: false, // Track if device has been issued
         deviceReceived: false, // Track if device has been received back
         requestApproved: false, // Track if request has been approved
+
+        // Modal state
+        showApprovalModal: false,
+        showPostIssuingModal: false,
+        showRejectModal: false,
+        rejectNotes: '',
+        showReceiveModal: false,
 
         // Assessment options
         physicalConditions: [
@@ -779,6 +933,28 @@
         return this.assessmentType === 'issuing' ? this.issuingAssessment : this.receivingAssessment
       },
 
+      // Read-only mode when request is fully completed/received or rejected
+      isReadOnly() {
+        const status = (this.request?.status || '').toLowerCase()
+        const returnStatus = (this.request?.return_status || '').toLowerCase()
+        const receivedMarkers = [
+          'returned',
+          'completed',
+          'complete',
+          'closed',
+          'done',
+          'finished'
+        ]
+        const returnMarkers = ['returned', 'returned_but_compromised']
+        return (
+          this.deviceReceived ||
+          receivedMarkers.includes(status) ||
+          returnMarkers.includes(returnStatus) ||
+          !!this.request?.device_received_at ||
+          this.requestRejected
+        )
+      },
+
       currentAssessmentNotes: {
         get() {
           return this.assessmentType === 'issuing'
@@ -801,6 +977,24 @@
         return requiredFields && damageValid
       },
 
+      // Display helpers for finalized (read-only) state
+      finalAssessment() {
+        // Prefer receiving assessment if present, otherwise issuing
+        return this.receivingAssessmentSaved ? this.receivingAssessment : this.issuingAssessment
+      },
+
+      selectedPhysical() {
+        return this.isReadOnly
+          ? this.finalAssessment?.physical_condition || ''
+          : this.currentAssessment.physical_condition
+      },
+
+      selectedFunctionality() {
+        return this.isReadOnly
+          ? this.finalAssessment?.functionality || ''
+          : this.currentAssessment.functionality
+      },
+
       isReceivingAssessmentComplete() {
         const assessment = this.receivingAssessment
         const requiredFields = assessment.physical_condition && assessment.functionality
@@ -818,7 +1012,8 @@
           this.canTakeAction &&
           this.issuingAssessmentSaved &&
           !this.requestApproved &&
-          !this.isProcessing
+          !this.isProcessing &&
+          !this.isReadOnly
 
         console.log('🔍 canApproveRequest check:', {
           canTakeAction: this.canTakeAction,
@@ -836,17 +1031,23 @@
         // 1. Assessment is complete (all required fields filled)
         // 2. Not already saved
         // 3. Request has pending ICT approval status specifically
-        // 4. Not currently processing
+        // 4. Device is available
+        // 5. Not currently processing
         const isPendingRequest =
           this.request.ict_approve === 'pending' ||
           this.request.ict_status === 'pending' ||
           (!this.request.ict_approve && !this.request.ict_status)
 
+        const isDeviceAvailable = this.request.device_available !== false
+
         const canSave =
           this.isIssuingAssessmentComplete &&
           !this.issuingAssessmentSaved &&
+          !this.deviceIssued &&
           isPendingRequest &&
-          !this.isProcessingAssessment
+          isDeviceAvailable &&
+          !this.isProcessingAssessment &&
+          !this.isReadOnly
 
         console.log('🔍 canSaveIssuingAssessment check:', {
           isComplete: this.isIssuingAssessmentComplete,
@@ -866,15 +1067,16 @@
 
       canReceiveDevice() {
         // Device can be received if:
-        // 1. Assessment is complete
-        // 2. Device has been issued (approved)
+        // 1. Receiving assessment is complete
+        // 2. Issuing assessment has been saved (device issued) OR request approved
         // 3. Not already received
         // 4. Not currently processing
         const canReceive =
           this.isReceivingAssessmentComplete &&
-          this.requestApproved &&
+          (this.issuingAssessmentSaved || this.requestApproved) &&
           !this.deviceReceived &&
-          !this.isProcessingAssessment
+          !this.isProcessingAssessment &&
+          !this.isReadOnly
 
         console.log('🔍 canReceiveDevice check:', {
           isReceivingAssessmentComplete: this.isReceivingAssessmentComplete,
@@ -891,7 +1093,7 @@
         // Show issuing assessment button only if:
         // 1. Assessment type is 'issuing'
         // 2. Device hasn't been received yet
-        return this.assessmentType === 'issuing' && !this.deviceReceived
+        return this.assessmentType === 'issuing' && !this.deviceReceived && !this.isReadOnly
       },
 
       showApprovalButton() {
@@ -902,14 +1104,16 @@
           this.canTakeAction &&
           !this.requestApproved &&
           !this.requestRejected &&
-          this.assessmentType === 'issuing'
+          this.assessmentType === 'issuing' &&
+          !this.isReadOnly
 
         const showOnReceivingTab =
           this.canTakeAction &&
           !this.requestApproved &&
           !this.requestRejected &&
           this.assessmentType === 'receiving' &&
-          this.issuingAssessmentSaved // Device has been issued but needs final approval
+          this.issuingAssessmentSaved &&
+          !this.isReadOnly // Device has been issued but request is not finalized
 
         const showButtons = showOnIssuingTab || showOnReceivingTab
 
@@ -928,11 +1132,16 @@
       },
 
       showReceivingButton() {
-        // Show receiving button only if:
+        // Show receiving button when:
         // 1. Assessment type is 'receiving'
-        // 2. Request has been approved
+        // 2. Issuing assessment saved (or request approved)
         // 3. Device hasn't been received yet
-        return this.assessmentType === 'receiving' && this.requestApproved && !this.deviceReceived
+        return (
+          this.assessmentType === 'receiving' &&
+          (this.issuingAssessmentSaved || this.requestApproved) &&
+          !this.deviceReceived &&
+          !this.isReadOnly
+        )
       },
 
       issuingAssessmentButtonState() {
@@ -942,25 +1151,45 @@
           this.request.ict_status === 'pending' ||
           (!this.request.ict_approve && !this.request.ict_status)
 
+        if (this.isReadOnly) {
+          return {
+            enabled: false,
+            text: 'Request Completed (Read-only)',
+            icon: 'fas fa-lock',
+            classes: 'bg-gray-700 text-gray-300 cursor-not-allowed opacity-60',
+            tooltip: 'This request has been completed. Actions are disabled.'
+          }
+        }
+
+        if (this.request.device_available === false) {
+          return {
+            enabled: false,
+            text: 'Device Unavailable',
+            icon: 'fas fa-ban',
+            classes: 'bg-gray-700 text-gray-300 cursor-not-allowed opacity-60',
+            tooltip: 'This device is no longer available. Please choose another request.'
+          }
+        }
+
+        if (this.deviceIssued && !this.issuingAssessmentSaved) {
+          return {
+            enabled: false,
+            text: 'Already Issued - Proceed to Receiving',
+            icon: 'fas fa-check-double',
+            classes: 'bg-blue-600 text-white shadow-lg cursor-not-allowed opacity-80',
+            tooltip:
+              'This device was already issued earlier. Switch to Device Receiving to continue.'
+          }
+        }
+
         if (this.issuingAssessmentSaved) {
-          // After assessment is saved, show approve button if not yet approved
-          if (!this.requestApproved) {
-            return {
-              enabled: true,
-              text: 'Approve Request',
-              icon: 'fas fa-check',
-              classes:
-                'bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg hover:from-green-700 hover:to-green-800',
-              tooltip: 'Approve this device borrowing request'
-            }
-          } else {
-            return {
-              enabled: false,
-              text: 'Request Approved',
-              icon: 'fas fa-check-double',
-              classes: 'bg-blue-600 text-white shadow-lg',
-              tooltip: 'This request has been approved'
-            }
+          // After assessment is saved, mute this button to prevent repeat saves
+          return {
+            enabled: false,
+            text: 'Issuing Assessment Saved',
+            icon: 'fas fa-check',
+            classes: 'bg-blue-600 text-white shadow-lg cursor-not-allowed opacity-80',
+            tooltip: 'Assessment saved. Proceed to Device Receiving on the right.'
           }
         }
 
@@ -1026,9 +1255,12 @@
       console.log('🚀 Route ID:', this.$route.params.id)
       console.log('🚀 Route object:', this.$route)
 
-      // Ensure we have a valid route ID
-      if (!this.$route.params.id || this.$route.params.id === ':id') {
-        console.error('❌ Invalid route ID:', this.$route.params.id)
+      // Ensure we have a valid, positive numeric route ID
+      const idParam = String(this.$route.params.id || '').trim()
+      const isNumeric = /^\d+$/.test(idParam)
+      if (!isNumeric || parseInt(idParam, 10) <= 0) {
+        console.error('❌ Invalid route ID:', idParam)
+        this.loadError = 'Invalid request ID in the URL.'
         this.isLoading = false
         return
       }
@@ -1043,11 +1275,12 @@
     methods: {
       async fetchRequestDetails() {
         this.isLoading = true
+        this.loadError = null
         try {
           const requestId = this.$route.params.id
           console.log('🔍 Fetching request details for ID:', requestId)
 
-          if (!requestId || requestId === ':id') {
+          if (!requestId || requestId === ':id' || !/^\d+$/.test(String(requestId))) {
             throw new Error('Invalid request ID: ' + requestId)
           }
 
@@ -1074,10 +1307,26 @@
             })
           } else {
             console.error('❌ Failed to load request details:', response)
-            throw new Error(response.message || 'Failed to load request details')
+            // Map known statuses to friendly messages without throwing
+            if (response.status === 404) {
+              this.loadError = 'Request not found. It may have been deleted or the ID is incorrect.'
+            } else if (response.status === 400) {
+              this.loadError = response.message || 'Invalid request ID.'
+            } else {
+              this.loadError = response.message || 'Failed to load request details.'
+            }
+            return
           }
         } catch (error) {
           console.error('❌ Error fetching request details:', error)
+          const status = error?.response?.status
+          if (status === 404) {
+            this.loadError = 'Request not found. It may have been deleted or the ID is incorrect.'
+          } else if (/Invalid request ID/i.test(error?.message)) {
+            this.loadError = 'Invalid request ID in the URL.'
+          } else {
+            this.loadError = error?.response?.data?.message || 'Failed to load request details.'
+          }
         } finally {
           this.isLoading = false
         }
@@ -1087,12 +1336,21 @@
         // Initialize workflow state based on request data
         this.requestApproved =
           this.request.ict_approve === 'approved' || this.request.status === 'approved'
-        this.deviceIssued = this.request.device_issued_at || this.request.device_condition_issuing
-        this.deviceReceived =
+        this.deviceIssued = !!(
+          this.request.device_issued_at ||
+          this.request.device_condition_issuing ||
+          this.request.status === 'in_use' ||
+          this.request.return_status === 'not_yet_returned'
+        )
+        this.deviceReceived = !!(
           this.request.device_received_at ||
           this.request.device_condition_receiving ||
-          this.request.status === 'returned'
-        this.issuingAssessmentSaved = !!this.request.device_condition_issuing
+          this.request.return_status ||
+          this.request.status === 'returned' ||
+          /completed|complete|closed|done|finished/i.test(this.request.status || '')
+        )
+        // Consider issued state as saved even if assessments table was not populated (backend may have set JSON/status)
+        this.issuingAssessmentSaved = !!(this.request.device_condition_issuing || this.deviceIssued)
         this.receivingAssessmentSaved = !!this.request.device_condition_receiving
 
         console.log('🔄 Workflow state initialized:', {
@@ -1102,13 +1360,52 @@
           issuingAssessmentSaved: this.issuingAssessmentSaved,
           receivingAssessmentSaved: this.receivingAssessmentSaved
         })
+
+        // Load assessment objects from request for display
+        this.loadAssessmentsFromRequest()
+
+        // If issuing assessment was already saved previously (or approved) and device not yet received,
+        // auto-switch UI to the Receiving tab and guide the user.
+        if (
+          (this.issuingAssessmentSaved || this.requestApproved || this.deviceIssued) &&
+          !this.deviceReceived
+        ) {
+          this.assessmentType = 'receiving'
+          // Show a gentle message (no redirect)
+          this.assessmentMessage = {
+            type: 'success',
+            text: 'Issuing assessment already saved. Proceed to Device Receiving.'
+          }
+          // Briefly highlight the receiving tab for visibility
+          setTimeout(() => {
+            const receivingTab = document.querySelector('[data-tab="receiving"]')
+            if (receivingTab) {
+              receivingTab.classList.add('animate-pulse')
+              setTimeout(() => receivingTab.classList.remove('animate-pulse'), 1500)
+            }
+          }, 300)
+        }
+
+        // If read-only, ensure we show the final assessment (receiving when available)
+        if (this.isReadOnly && this.receivingAssessmentSaved) {
+          this.assessmentType = 'receiving'
+        }
       },
 
       async approveRequest() {
-        if (!confirm('Are you sure you want to approve this request?')) {
+        // Guard: only allow when UI says we can approve
+        if (!this.canApproveRequest) {
+          this.showAssessmentMessage(
+            'Cannot approve: request is not pending or assessment not saved.',
+            'error'
+          )
           return
         }
+        // Open attractive confirmation modal instead of browser confirm()
+        this.showApprovalModal = true
+      },
 
+      async confirmApproveRequest() {
         this.isProcessing = true
         try {
           const requestId = this.$route.params.id
@@ -1118,7 +1415,7 @@
           )
 
           if (response.success) {
-            alert('Device borrowing request approved successfully!')
+            this.showAssessmentMessage('Device borrowing request approved successfully!', 'success')
             this.request.ict_approve = 'approved'
             this.requestApproved = true
             this.deviceIssued = true
@@ -1137,11 +1434,10 @@
             this.assessmentType = 'receiving'
 
             // Show success message but don't redirect yet
-            setTimeout(() => {
-              alert(
-                'Request approved! Now switched to Device Receiving tab. Complete the receiving assessment to finish the workflow.'
-              )
-            }, 500)
+            this.showAssessmentMessage(
+              'Request approved! Now switched to Device Receiving tab. Complete the receiving assessment to finish the workflow.',
+              'success'
+            )
 
             // Highlight the receiving tab briefly
             setTimeout(() => {
@@ -1158,30 +1454,44 @@
           }
         } catch (error) {
           console.error('Error approving request:', error)
-          alert('Error approving request: ' + (error.message || 'Please try again'))
+          const status = error?.response?.status
+          const message = error?.response?.data?.message || error?.message || ''
+          if (status === 403) {
+            this.showAssessmentMessage(
+              'You do not have permission to approve device bookings. Please contact an administrator.',
+              'error'
+            )
+          } else if (status === 400 && /pending ICT/i.test(message)) {
+            this.showAssessmentMessage(
+              'Approval allowed only for pending ICT requests. Refreshing request…',
+              'error'
+            )
+            try {
+              await this.fetchRequestDetails()
+            } catch (e) {
+              console.warn('Refresh after approval constraint failed:', e)
+            }
+            this.showApprovalModal = false
+            this.showPostIssuingModal = false
+          } else {
+            this.showAssessmentMessage(
+              'Error approving request: ' + (message || 'Please try again'),
+              'error'
+            )
+          }
         } finally {
           this.isProcessing = false
         }
       },
 
       async rejectRequest() {
-        // Get rejection reason from user
-        const rejectionReason = prompt(
-          'Please provide a reason for rejecting this request:',
-          'Request does not meet ICT approval criteria'
-        )
+        // Open styled reject modal
+        this.rejectNotes = ''
+        this.showRejectModal = true
+      },
 
-        if (!rejectionReason || rejectionReason.trim() === '') {
-          alert('Rejection reason is required.')
-          return
-        }
-
-        if (
-          !confirm('Are you sure you want to reject this request?\n\nReason: ' + rejectionReason)
-        ) {
-          return
-        }
-
+      async confirmReject(rejectionReason) {
+        this.showRejectModal = false
         this.isProcessing = true
         try {
           const requestId = this.$route.params.id
@@ -1191,7 +1501,7 @@
           )
 
           if (response.success) {
-            alert('Device borrowing request rejected successfully!')
+            this.showAssessmentMessage('Device borrowing request rejected successfully!', 'success')
             this.request.ict_approve = 'rejected'
 
             // Update the request data with rejection details
@@ -1282,6 +1592,20 @@
         event.target.style.display = 'none'
       },
 
+      getLoadingTitle() {
+        if (this.isProcessing) return 'Processing Request'
+        if (this.isProcessingAssessment) return 'Saving Assessment'
+        if (this.isLoading) return 'Loading Request Details'
+        return 'Loading'
+      },
+
+      getLoadingSubtitle() {
+        if (this.isProcessing) return 'Applying your approval action...'
+        if (this.isProcessingAssessment) return 'Persisting device assessment data...'
+        if (this.isLoading) return 'Retrieving request information...'
+        return 'Please wait...'
+      },
+
       // Assessment methods
       handleIssuingAssessmentAction() {
         // Check if we should save assessment or approve request
@@ -1300,23 +1624,43 @@
         }
 
         if (!this.isIssuingAssessmentComplete) {
-          alert('Please complete all required assessment fields before saving.')
+          this.showAssessmentMessage(
+            'Please complete all required assessment fields before saving.',
+            'error'
+          )
           return
+        }
+
+        // Preflight availability check to avoid backend 400s
+        try {
+          const inventoryId = this.request.device_inventory_id
+          if (inventoryId) {
+            const availResp = await apiClient.get(
+              `/booking-service/devices/${inventoryId}/availability`
+            )
+            const avail = availResp.data?.data || availResp.data
+            if (!availResp.data?.success || avail?.available === false) {
+              const msg = avail?.message || 'Device is currently unavailable.'
+              this.showAssessmentMessage(msg, 'error')
+              this.request.device_available = false
+              return
+            }
+          }
+        } catch (e) {
+          console.warn('Availability precheck failed (continuing to backend):', e?.message)
         }
 
         this.isProcessingAssessment = true
         try {
           const requestId = this.$route.params.id
           const assessmentData = {
-            device_condition: {
-              physical_condition: this.issuingAssessment.physical_condition,
-              functionality: this.issuingAssessment.functionality,
-              accessories_complete: this.issuingAssessment.accessories_complete,
-              visible_damage: this.issuingAssessment.visible_damage,
-              damage_description: this.issuingAssessment.visible_damage
-                ? this.issuingAssessment.damage_description
-                : null
-            },
+            physical_condition: this.issuingAssessment.physical_condition,
+            functionality: this.issuingAssessment.functionality,
+            accessories_complete: this.issuingAssessment.accessories_complete,
+            visible_damage: this.issuingAssessment.visible_damage,
+            damage_description: this.issuingAssessment.visible_damage
+              ? this.issuingAssessment.damage_description
+              : null,
             assessment_notes: this.issuingAssessmentNotes || null
           }
 
@@ -1336,16 +1680,61 @@
               this.request = { ...this.request, ...response.data }
             }
 
-            alert(
-              'Device condition assessment saved successfully! You can now approve the request to issue the device.'
-            )
-            console.log('✅ Device assessment saved successfully, approval button enabled')
+            // Switch to Receiving tab and guide the user instead of redirecting
+            this.assessmentType = 'receiving'
+            this.assessmentMessage = {
+              type: 'success',
+              text: 'Issuing assessment saved. Proceed to Device Receiving.'
+            }
+
+            // Show post-issuing action modal (approve/reject) only if request still pending
+            this.showPostIssuingModal = this.canTakeAction
+
+            // Briefly highlight the receiving tab
+            setTimeout(() => {
+              const receivingTab = document.querySelector('[data-tab="receiving"]')
+              if (receivingTab) {
+                receivingTab.classList.add('animate-pulse')
+                setTimeout(() => receivingTab.classList.remove('animate-pulse'), 1500)
+              }
+            }, 300)
+
+            console.log('✅ Device assessment saved successfully, switched to receiving phase')
           } else {
             throw new Error(response.message || 'Failed to save issuing assessment')
           }
         } catch (error) {
           console.error('❌ Error saving issuing assessment:', error)
-          alert('Error saving assessment: ' + (error.message || 'Please try again'))
+
+          const status = error?.response?.status
+          const message = error?.response?.data?.message || error?.message || ''
+
+          // Gracefully handle already-issued case (idempotency)
+          if (status === 400 && /already been issued|issue the same device twice/i.test(message)) {
+            this.deviceIssued = true
+            this.issuingAssessmentSaved = true
+            this.assessmentType = 'receiving'
+            this.showAssessmentMessage(
+              'Device already issued for this request. Proceed to Device Receiving.',
+              'success'
+            )
+            // Offer approve/reject actions since issuing is effectively complete (only if still pending)
+            this.showPostIssuingModal = this.canTakeAction
+            // Refresh request to sync latest backend state
+            try {
+              await this.fetchRequestDetails()
+            } catch (e) {
+              console.warn(
+                'Failed to refresh request details after already-issued notice:',
+                e?.message
+              )
+            }
+          } else {
+            this.showAssessmentMessage(
+              'Error saving assessment: ' + (message || 'Please try again'),
+              'error'
+            )
+          }
         } finally {
           this.isProcessingAssessment = false
         }
@@ -1363,14 +1752,12 @@
           return
         }
 
-        if (
-          !confirm(
-            'Are you sure you want to receive this device? This will complete the request and update the return status.'
-          )
-        ) {
-          return
-        }
+        // Open styled confirmation instead of browser confirm
+        this.showReceiveModal = true
+      },
 
+      async confirmReceive() {
+        this.showReceiveModal = false
         this.isProcessingAssessment = true
         try {
           const requestId = this.$route.params.id
@@ -1382,7 +1769,7 @@
             damage_description: this.receivingAssessment.visible_damage
               ? this.receivingAssessment.damage_description
               : null,
-            notes: this.receivingAssessmentNotes || null
+            assessment_notes: this.receivingAssessmentNotes || null
           }
 
           console.log('💾 Processing device receiving with assessment:', assessmentData)
@@ -1421,20 +1808,32 @@
               this.request = { ...this.request, ...response.data }
             }
 
-            alert(`${statusMessage} The request has been completed and return status updated.`)
+            // Refresh local assessment display from backend payload
+            this.loadAssessmentsFromRequest()
+
+            this.showAssessmentMessage(
+              `${statusMessage} The request has been completed and return status updated.`,
+              'success'
+            )
+            // Lock UI into read-only mode
+            this.deviceReceived = true
             console.log('✅ Device received successfully, return status updated:', {
               returnStatus,
               deviceReceived: this.deviceReceived
             })
 
-            // Automatically redirect to requests list
+            // Clear cached pending notifications and redirect
+            try { notificationService.clearCache() } catch (e) {}
             this.$router.push('/ict-approval/requests')
           } else {
             throw new Error(response.message || 'Failed to receive device')
           }
         } catch (error) {
           console.error('❌ Error receiving device:', error)
-          alert('Error receiving device: ' + (error.message || 'Please try again'))
+          this.showAssessmentMessage(
+            'Error receiving device: ' + (error.message || 'Please try again'),
+            'error'
+          )
         } finally {
           this.isProcessingAssessment = false
         }
@@ -1449,12 +1848,51 @@
             this.assessmentMessage = null
           }
         }, 5000)
+      },
+
+      // Safely map backend assessment blobs into UI state for display
+      loadAssessmentsFromRequest() {
+        const parseBlob = (blob) => {
+          if (!blob) return null
+          if (typeof blob === 'object') return blob
+          try {
+            return JSON.parse(blob)
+          } catch (_) {
+            return null
+          }
+        }
+
+        const issuing = parseBlob(this.request.device_condition_issuing)
+        if (issuing) {
+          this.issuingAssessment = {
+            physical_condition: issuing.physical_condition || this.issuingAssessment.physical_condition || '',
+            functionality: issuing.functionality || this.issuingAssessment.functionality || '',
+            accessories_complete: !!issuing.accessories_complete,
+            visible_damage: !!issuing.visible_damage,
+            damage_description: issuing.damage_description || '',
+            notes: issuing.assessment_notes || issuing.notes || ''
+          }
+          this.issuingAssessmentNotes = this.issuingAssessment.notes
+        }
+
+        const receiving = parseBlob(this.request.device_condition_receiving)
+        if (receiving) {
+          this.receivingAssessment = {
+            physical_condition: receiving.physical_condition || this.receivingAssessment.physical_condition || '',
+            functionality: receiving.functionality || this.receivingAssessment.functionality || '',
+            accessories_complete: !!receiving.accessories_complete,
+            visible_damage: !!receiving.visible_damage,
+            damage_description: receiving.damage_description || '',
+            notes: receiving.assessment_notes || receiving.notes || ''
+          }
+          this.receivingAssessmentNotes = this.receivingAssessment.notes
+        }
       }
     }
   }
 </script>
 
-<style scoped>
+<style scoped lang="postcss">
   /* Glass morphism effects */
   .booking-glass-card {
     background: rgba(59, 130, 246, 0.15);
@@ -1586,11 +2024,11 @@
   }
 
   .option-label {
-    @apply block text-white font-semibold text-sm mb-0.5;
+    @apply block text-white font-bold text-2xl mb-1;
   }
 
   .option-description {
-    @apply block text-blue-300 text-xs leading-snug;
+    @apply block text-blue-300 text-xl leading-relaxed;
   }
 
   .option-indicator {
@@ -1604,6 +2042,19 @@
   /* Selected states for different conditions */
   .assessment-option.selected .option-content {
     @apply border-emerald-400/60 bg-emerald-500/10 shadow-emerald-500/20;
+  }
+
+  /* Read-only visualization: emphasize ONLY selected choices in Physical & Functionality */
+  .readonly-mode .readonly-highlight {
+    @apply border-red-400/40;
+  }
+
+  .readonly-mode .readonly-highlight .assessment-option.selected .option-content {
+    @apply border-red-400/70 bg-red-500/10 shadow-red-500/20;
+  }
+
+  .readonly-mode .readonly-highlight .assessment-option.selected .radio-custom {
+    @apply border-red-400 bg-red-500;
   }
 
   .assessment-option.selected .radio-custom {

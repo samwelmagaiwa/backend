@@ -137,8 +137,8 @@
                       <i class="fas fa-laptop text-white text-xl"></i>
                     </div>
                     <div>
-                      <p class="text-sm font-medium text-blue-100">Total Devices</p>
-                      <p class="text-2xl font-bold text-white">
+                      <p class="text-lg md:text-xl font-bold text-blue-100">Total Devices</p>
+                      <p class="text-4xl md:text-5xl font-extrabold text-white">
                         {{ statistics.total_devices || 0 }}
                       </p>
                     </div>
@@ -155,8 +155,8 @@
                       <i class="fas fa-check-circle text-white text-xl"></i>
                     </div>
                     <div>
-                      <p class="text-sm font-medium text-green-100">Available</p>
-                      <p class="text-2xl font-bold text-white">
+                      <p class="text-lg md:text-xl font-bold text-green-100">Available</p>
+                      <p class="text-4xl md:text-5xl font-extrabold text-white">
                         {{ statistics.available_inventory || 0 }}
                       </p>
                     </div>
@@ -173,8 +173,8 @@
                       <i class="fas fa-hand-holding text-white text-xl"></i>
                     </div>
                     <div>
-                      <p class="text-sm font-medium text-yellow-100">Borrowed</p>
-                      <p class="text-2xl font-bold text-white">
+                      <p class="text-lg md:text-xl font-bold text-yellow-100">Borrowed</p>
+                      <p class="text-4xl md:text-5xl font-extrabold text-white">
                         {{ statistics.borrowed_inventory || 0 }}
                       </p>
                     </div>
@@ -191,8 +191,8 @@
                       <i class="fas fa-exclamation-triangle text-white text-xl"></i>
                     </div>
                     <div>
-                      <p class="text-sm font-medium text-red-100">Out of Stock</p>
-                      <p class="text-2xl font-bold text-white">
+                      <p class="text-lg md:text-xl font-bold text-red-100">Out of Stock</p>
+                      <p class="text-4xl md:text-5xl font-extrabold text-white">
                         {{ statistics.out_of_stock_devices || 0 }}
                       </p>
                     </div>
@@ -211,7 +211,7 @@
                         v-model="searchQuery"
                         type="text"
                         placeholder="Search devices..."
-                        class="w-full px-4 py-2 pl-10 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm"
+                        class="w-full px-4 py-2 pl-10 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm text-lg md:text-xl"
                       />
                       <i
                         class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-300/50"
@@ -221,7 +221,7 @@
                   <div class="flex gap-2">
                     <select
                       v-model="statusFilter"
-                      class="px-4 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm"
+                      class="px-4 py-2 bg-white/15 border border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm text-lg md:text-xl"
                     >
                       <option value="">All Status</option>
                       <option value="available">Available</option>
@@ -254,7 +254,7 @@
                 class="medical-card bg-gradient-to-r from-blue-600/25 to-cyan-600/25 border-2 border-blue-400/40 rounded-xl backdrop-blur-sm overflow-hidden"
               >
                 <div class="p-4 border-b border-blue-300/30">
-                  <h3 class="text-lg font-bold text-white flex items-center">
+                  <h3 class="text-3xl md:text-4xl font-extrabold text-white flex items-center">
                     <i class="fas fa-list mr-2 text-blue-300"></i>
                     Device Inventory
                   </h3>
@@ -265,42 +265,42 @@
                     <thead class="bg-blue-600/30">
                       <tr>
                         <th
-                          class="px-4 py-3 text-left text-xs font-medium text-blue-100 uppercase tracking-wider"
+                          class="px-4 py-3 text-left text-base md:text-lg font-semibold text-blue-100 uppercase tracking-wider"
                         >
                           Device Name
                         </th>
                         <th
-                          class="px-4 py-3 text-left text-xs font-medium text-blue-100 uppercase tracking-wider"
+                          class="px-4 py-3 text-left text-base md:text-lg font-semibold text-blue-100 uppercase tracking-wider"
                         >
                           Code
                         </th>
                         <th
-                          class="px-4 py-3 text-left text-xs font-medium text-blue-100 uppercase tracking-wider"
+                          class="px-4 py-3 text-left text-base md:text-lg font-semibold text-blue-100 uppercase tracking-wider"
                         >
                           Total
                         </th>
                         <th
-                          class="px-4 py-3 text-left text-xs font-medium text-blue-100 uppercase tracking-wider"
+                          class="px-4 py-3 text-left text-base md:text-lg font-semibold text-blue-100 uppercase tracking-wider"
                         >
                           Available
                         </th>
                         <th
-                          class="px-4 py-3 text-left text-xs font-medium text-blue-100 uppercase tracking-wider"
+                          class="px-4 py-3 text-left text-base md:text-lg font-semibold text-blue-100 uppercase tracking-wider"
                         >
                           Borrowed
                         </th>
                         <th
-                          class="px-4 py-3 text-left text-xs font-medium text-blue-100 uppercase tracking-wider"
+                          class="px-4 py-3 text-left text-base md:text-lg font-semibold text-blue-100 uppercase tracking-wider"
                         >
                           Status
                         </th>
                         <th
-                          class="px-4 py-3 text-left text-xs font-medium text-blue-100 uppercase tracking-wider"
+                          class="px-4 py-3 text-left text-base md:text-lg font-semibold text-blue-100 uppercase tracking-wider"
                         >
                           Return Status
                         </th>
                         <th
-                          class="px-4 py-3 text-left text-xs font-medium text-blue-100 uppercase tracking-wider"
+                          class="px-4 py-3 text-left text-base md:text-lg font-semibold text-blue-100 uppercase tracking-wider"
                         >
                           Actions
                         </th>
@@ -314,38 +314,38 @@
                       >
                         <td class="px-4 py-3">
                           <div>
-                            <div class="text-base font-medium text-white">
+                            <div class="text-xl md:text-2xl font-bold text-white">
                               {{ device.device_name }}
                             </div>
-                            <div class="text-xs text-blue-200" v-if="device.description">
+                            <div class="text-base text-blue-200" v-if="device.description">
                               {{ device.description }}
                             </div>
                           </div>
                         </td>
                         <td class="px-4 py-3">
-                          <span class="text-sm text-blue-200 font-mono">{{
+                          <span class="text-lg text-blue-200 font-mono">{{
                             device.device_code
                           }}</span>
                         </td>
                         <td class="px-4 py-3">
-                          <span class="text-base font-medium text-white">{{
+                          <span class="text-xl font-bold text-white">{{
                             device.total_quantity
                           }}</span>
                         </td>
                         <td class="px-4 py-3">
-                          <span class="text-sm font-medium text-green-300">{{
+                          <span class="text-xl font-bold text-green-300">{{
                             device.available_quantity
                           }}</span>
                         </td>
                         <td class="px-4 py-3">
-                          <span class="text-sm font-medium text-yellow-300">{{
+                          <span class="text-xl font-bold text-yellow-300">{{
                             device.borrowed_quantity
                           }}</span>
                         </td>
                         <td class="px-4 py-3">
                           <span
                             :class="getStatusClass(device.availability_status)"
-                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium"
                           >
                             <i :class="getStatusIcon(device.availability_status)" class="mr-1"></i>
                             {{ getStatusText(device.availability_status) }}
@@ -354,7 +354,7 @@
                         <td class="px-4 py-3">
                           <span
                             :class="getReturnStatusClass(device.return_status_summary)"
-                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium"
                           >
                             <i
                               :class="getReturnStatusIcon(device.return_status_summary)"

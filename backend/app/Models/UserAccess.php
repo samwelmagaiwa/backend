@@ -18,6 +18,16 @@ class UserAccess extends Model
      * The table associated with the model.
      */
     protected $table = 'user_access';
+    
+    /**
+     * Cached StatusMigrationService instance to avoid creating multiple instances per request
+     */
+    private static $statusMigrationService = null;
+    
+    /**
+     * Cached calculated status to avoid recalculating multiple times per request
+     */
+    private $cachedCalculatedStatus = null;
 
     /**
      * The attributes that are mass assignable.
@@ -415,11 +425,16 @@ class UserAccess extends Model
     }
 
     /**
-     * Get the calculated overall status from new status columns
+     * Get the calculated overall status from new status columns (with caching)
      */
     public function getCalculatedOverallStatus(): string
     {
-        $migrationService = new \App\Services\StatusMigrationService();
+        // Return cached value if available
+        if ($this->cachedCalculatedStatus !== null) {
+            return $this->cachedCalculatedStatus;
+        }
+        
+        $migrationService = $this->getStatusMigrationService();
         
         $statusColumns = [
             'hod_status' => $this->hod_status,
@@ -429,7 +444,20 @@ class UserAccess extends Model
             'ict_officer_status' => $this->ict_officer_status
         ];
         
-        return $migrationService->calculateOverallStatus($statusColumns);
+        // Cache the result
+        $this->cachedCalculatedStatus = $migrationService->calculateOverallStatus($statusColumns);
+        return $this->cachedCalculatedStatus;
+    }
+    
+    /**
+     * Get or create a shared StatusMigrationService instance
+     */
+    private function getStatusMigrationService(): \App\Services\StatusMigrationService
+    {
+        if (self::$statusMigrationService === null) {
+            self::$statusMigrationService = new \App\Services\StatusMigrationService();
+        }
+        return self::$statusMigrationService;
     }
 
     /**
@@ -437,7 +465,7 @@ class UserAccess extends Model
      */
     public function getNextPendingStageFromColumns(): ?string
     {
-        $migrationService = new \App\Services\StatusMigrationService();
+        $migrationService = $this->getStatusMigrationService();
         
         $statusColumns = [
             'hod_status' => $this->hod_status,
@@ -455,7 +483,7 @@ class UserAccess extends Model
      */
     public function isWorkflowCompleteByColumns(): bool
     {
-        $migrationService = new \App\Services\StatusMigrationService();
+        $migrationService = $this->getStatusMigrationService();
         
         $statusColumns = [
             'hod_status' => $this->hod_status,
@@ -473,7 +501,7 @@ class UserAccess extends Model
      */
     public function hasRejectionsInColumns(): bool
     {
-        $migrationService = new \App\Services\StatusMigrationService();
+        $migrationService = $this->getStatusMigrationService();
         
         $statusColumns = [
             'hod_status' => $this->hod_status,
@@ -491,7 +519,7 @@ class UserAccess extends Model
      */
     public function getWorkflowProgressFromColumns(): int
     {
-        $migrationService = new \App\Services\StatusMigrationService();
+        $migrationService = $this->getStatusMigrationService();
         
         $statusColumns = [
             'hod_status' => $this->hod_status,

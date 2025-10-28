@@ -477,6 +477,24 @@ export const deviceBorrowingService = {
     const isBooking = this.isBookingRequest(request)
     const phoneNumber = this.getPhoneNumber(request)
 
+    // Safely parse assessment blobs if present
+    const parseAssessment = (blob) => {
+      if (!blob) return null
+      if (typeof blob === 'object') return blob
+      try {
+        return JSON.parse(blob)
+      } catch (_) {
+        return null
+      }
+    }
+
+    const issuingAssessment = parseAssessment(
+      request.device_condition_issuing || request.issuing_assessment || request.assessment_issuing
+    )
+    const receivingAssessment = parseAssessment(
+      request.device_condition_receiving || request.receiving_assessment || request.assessment_receiving
+    )
+
     return {
       // Core request data
       id: request.id,
@@ -503,6 +521,8 @@ export const deviceBorrowingService = {
       custom_device: request.custom_device,
       device_name: this.getDeviceDisplayName(request.device_type, request.custom_device),
       device_inventory_id: request.device_inventory_id,
+      device_available:
+        typeof request.device_available !== 'undefined' ? request.device_available : null,
 
       // Booking details
       booking_date: request.booking_date,
@@ -526,6 +546,14 @@ export const deviceBorrowingService = {
 
       // Return status
       return_status: request.return_status || 'not_yet_returned',
+
+      // Assessment timestamps/state
+      device_issued_at: request.device_issued_at,
+      device_received_at: request.device_received_at,
+
+      // Normalized assessment blobs (kept as objects if possible)
+      device_condition_issuing: issuingAssessment,
+      device_condition_receiving: receivingAssessment,
 
       // Admin approval (separate from ICT approval)
       admin_approved_by: request.approved_by,
@@ -720,11 +748,14 @@ export const deviceBorrowingService = {
         )
         console.log('✅ Successfully saved via ICT approval endpoint')
       } catch (ictError) {
-        console.log(
-          '⚠️ ICT approval endpoint failed, trying booking service endpoint:',
-          ictError.response?.status
-        )
-
+        const status = ictError.response?.status
+        console.log('⚠️ ICT approval endpoint failed:', status, ictError.response?.data?.message)
+        // Only fallback for missing/not-implemented routes; surface business/validation errors
+        const shouldFallback = !status || [404, 405, 501].includes(status)
+        if (!shouldFallback) {
+          throw ictError
+        }
+        console.log('↩️ Falling back to booking-service endpoint...')
         // Fallback to booking service endpoint
         response = await apiClient.post(
           `/booking-service/bookings/${requestId}/assessment/issuing`,
@@ -775,11 +806,13 @@ export const deviceBorrowingService = {
         )
         console.log('✅ Successfully saved via ICT approval endpoint')
       } catch (ictError) {
-        console.log(
-          '⚠️ ICT approval endpoint failed, trying booking service endpoint:',
-          ictError.response?.status
-        )
-
+        const status = ictError.response?.status
+        console.log('⚠️ ICT approval endpoint failed:', status, ictError.response?.data?.message)
+        const shouldFallback = !status || [404, 405, 501].includes(status)
+        if (!shouldFallback) {
+          throw ictError
+        }
+        console.log('↩️ Falling back to booking-service endpoint...')
         // Fallback to booking service endpoint
         response = await apiClient.post(
           `/booking-service/bookings/${requestId}/assessment/receiving`,

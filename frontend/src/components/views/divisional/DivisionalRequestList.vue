@@ -76,8 +76,8 @@
           </div>
 
           <!-- Requests Table -->
-          <div class="bg-white/10 rounded-lg relative" style="overflow: visible !important;">
-            <table class="w-full" style="overflow: visible !important;">
+          <div class="bg-white/10 rounded-lg relative" style="overflow: visible !important">
+            <table class="w-full" style="overflow: visible !important">
               <thead class="bg-blue-800/50">
                 <tr>
                   <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">Request ID</th>
@@ -91,18 +91,16 @@
                   <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
                     Current Status
                   </th>
-                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
-                    SMS Status
-                  </th>
+                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">SMS Status</th>
                   <th class="px-4 py-4 text-center text-blue-100 text-lg font-bold">Actions</th>
                 </tr>
               </thead>
-              <tbody style="overflow: visible !important;">
+              <tbody style="overflow: visible !important">
                 <tr
                   v-for="request in filteredRequests"
                   :key="request.id"
                   class="border-t border-blue-300/20 hover:bg-blue-700/30"
-                  style="overflow: visible !important;"
+                  style="overflow: visible !important"
                 >
                   <!-- Request ID -->
                   <td class="px-4 py-4">
@@ -236,7 +234,10 @@
                               {
                                 'border-t border-gray-200':
                                   index > 0 &&
-                                  shouldShowSeparator(action, getAvailableActions(request)[index - 1])
+                                  shouldShowSeparator(
+                                    action,
+                                    getAvailableActions(request)[index - 1]
+                                  )
                               }
                             ]"
                           >
@@ -279,23 +280,13 @@
       </main>
     </div>
 
-    <!-- Loading Modal -->
-    <div
+    <!-- Unified Loading Banner -->
+    <UnifiedLoadingBanner
       v-if="isLoading"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-    >
-      <div
-        class="rounded-xl shadow-2xl p-8 text-center border border-blue-400/40"
-        style="background: linear-gradient(90deg, #0b3a82, #0a2f6f, #0b3a82)"
-      >
-        <div class="flex justify-center mb-4">
-          <div
-            class="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"
-          ></div>
-        </div>
-        <p class="text-blue-100 font-bold text-xl">Loading requests...</p>
-      </div>
-    </div>
+      :loading-title="'Loading Access Requests'"
+      :loading-subtitle="'Fetching HOD-approved requests awaiting divisional review...'"
+      :department-title="'Divisional Director Dashboard'"
+    />
 
     <!-- Timeline Modal -->
     <RequestTimeline
@@ -382,6 +373,7 @@
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppFooter from '@/components/footer.vue'
   import RequestTimeline from '@/components/common/RequestTimeline.vue'
+  import UnifiedLoadingBanner from '@/components/common/UnifiedLoadingBanner.vue'
   import divisionalAccessService from '@/services/divisionalAccessService'
   import statusUtils from '@/utils/statusUtils'
   import { useAuth } from '@/composables/useAuth'
@@ -392,7 +384,8 @@
       Header,
       ModernSidebar,
       AppFooter,
-      RequestTimeline
+      RequestTimeline,
+      UnifiedLoadingBanner
     },
     setup() {
       const { userRole } = useAuth()
@@ -765,7 +758,7 @@
         // Check if already approved by Divisional Director
         const isAlreadyApproved = [
           'divisional_approved',
-          'ict_director_approved', 
+          'ict_director_approved',
           'dict_approved',
           'head_it_approved',
           'approved',
@@ -895,12 +888,17 @@
       getRelevantSmsStatus(request) {
         // For Divisional Director: show SMS status for NEXT workflow step after their approval
         const status = request.divisional_status || request.status
-        
+
         // If Divisional Director has APPROVED: show ICT Director notification status
-        if (status === 'divisional_approved' || status === 'approved' || status === 'dict_approved' || status === 'implemented') {
+        if (
+          status === 'divisional_approved' ||
+          status === 'approved' ||
+          status === 'dict_approved' ||
+          status === 'implemented'
+        ) {
           return request.sms_to_ict_director_status || 'pending'
         }
-        
+
         // If PENDING Divisional approval: return 'pending' (no action notification sent yet)
         // Don't show sms_to_divisional_status (that's the incoming notification)
         return 'pending'
@@ -1031,7 +1029,7 @@
   }
 
   /* Open dropdown upward for last 2 rows to prevent clipping */
-  tbody tr:nth-last-child(-n+2) .dropdown-menu {
+  tbody tr:nth-last-child(-n + 2) .dropdown-menu {
     bottom: calc(100% + 4px);
     top: auto;
   }

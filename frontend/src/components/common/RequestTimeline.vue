@@ -971,7 +971,7 @@
 
       getStatusClasses(status) {
         const s = (status || '').toString().toLowerCase()
-        if (['completed', 'approved', 'assigned'].includes(s)) {
+        if (['completed', 'approved', 'assigned', 'implemented'].includes(s)) {
           return 'bg-green-600 text-white'
         }
         if (['rejected', 'cancelled'].includes(s)) {

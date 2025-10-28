@@ -425,15 +425,15 @@
   /* Red from central oval, Gold from torch, White from background/text */
 
   .orbit-dot.logo-red {
-    background: linear-gradient(45deg, #dc143c, #b91c1c);
-    box-shadow: 0 0 20px rgba(220, 20, 60, 1);
-    border: 1px solid rgba(220, 20, 60, 0.8);
+    background: linear-gradient(45deg, #ff0000, #cc0000);
+    box-shadow: 0 0 20px rgba(255, 0, 0, 1);
+    border: 1px solid rgba(255, 0, 0, 0.8);
   }
 
   .orbit-dot.logo-gold {
-    background: linear-gradient(45deg, #ffd700, #f59e0b);
-    box-shadow: 0 0 20px rgba(255, 215, 0, 1);
-    border: 1px solid rgba(255, 215, 0, 0.8);
+    background: linear-gradient(45deg, #0000d1, #0000aa);
+    box-shadow: 0 0 20px rgba(0, 0, 209, 1);
+    border: 1px solid rgba(0, 0, 209, 0.8);
   }
 
   .orbit-dot.logo-white {

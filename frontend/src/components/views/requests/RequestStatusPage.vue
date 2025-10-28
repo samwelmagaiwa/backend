@@ -1,11 +1,16 @@
 <template>
   <div class="flex flex-col h-screen">
     <AppHeader />
-    <div class="flex flex-1 overflow-hidden">
+    <div class="flex flex-1 overflow-visible">
       <ModernSidebar />
-      <main
-        class="flex-1 p-2 bg-blue-900 overflow-y-auto relative"
-      >
+      <main class="flex-1 p-2 bg-blue-900 min-h-screen overflow-y-auto relative">
+        <UnifiedLoadingBanner
+          :show="loading"
+          loadingTitle="Loading Requests"
+          loadingSubtitle="Fetching your requests..."
+          departmentTitle="REQUEST STATUS & TRACKING"
+          :forceSpin="true"
+        />
         <!-- Medical Background Pattern -->
         <div class="absolute inset-0 overflow-hidden">
           <div class="absolute inset-0 opacity-5">
@@ -20,7 +25,7 @@
           </div>
         </div>
 
-        <div class="max-w-[1800px] mx-auto relative z-10">
+        <div class="max-w-13xl mx-auto relative z-10">
           <!-- Header Section -->
           <div class="bg-white/10 rounded-t-lg p-2 mb-0 border-b border-blue-300/30">
             <div class="flex justify-between items-center">
@@ -188,9 +193,7 @@
               </div>
 
               <!-- Request List -->
-              <div
-                class="bg-white/10 border border-blue-300/30 p-4 rounded-lg"
-              >
+              <div class="bg-white/10 border border-blue-300/30 p-4 rounded-lg">
                 <div class="flex items-center justify-between mb-3">
                   <div class="flex items-center space-x-3">
                     <div
@@ -259,9 +262,7 @@
                           <th class="text-left py-3 px-3 text-blue-100 font-bold text-lg">
                             Request ID
                           </th>
-                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-lg">
-                            Type
-                          </th>
+                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-lg">Type</th>
                           <th class="text-left py-3 px-3 text-blue-100 font-bold text-lg">
                             Services
                           </th>
@@ -484,7 +485,7 @@
                               >
                                 <!-- View button -->
                                 <button
-                                  @click="viewRequestDetails(request); closeActionsMenu()"
+                                  @click="handleViewMenuAction(request)"
                                   class="w-full px-4 py-3 text-left text-blue-300 hover:bg-blue-500/20 transition-colors flex items-center space-x-3 border-b border-blue-400/20"
                                 >
                                   <i class="fas fa-eye text-blue-400 w-5"></i>
@@ -494,19 +495,21 @@
                                 <!-- Edit button (conditional) -->
                                 <button
                                   v-if="canEditRequest(request)"
-                                  @click="editRequest(request); closeActionsMenu()"
+                                  @click="handleEditMenuAction(request)"
                                   class="w-full px-4 py-3 text-left text-green-300 hover:bg-green-500/20 transition-colors flex items-center space-x-3 border-b border-blue-400/20"
                                 >
                                   <i class="fas fa-edit text-green-400 w-5"></i>
                                   <span class="font-medium">
-                                    {{ request.status === 'cancelled' ? 'Edit & Resubmit' : 'Edit' }}
+                                    {{
+                                      request.status === 'cancelled' ? 'Edit & Resubmit' : 'Edit'
+                                    }}
                                   </span>
                                 </button>
 
                                 <!-- Cancel button (conditional) -->
                                 <button
                                   v-if="canCancelRequest(request)"
-                                  @click="cancelRequest(request); closeActionsMenu()"
+                                  @click="handleCancelMenuAction(request)"
                                   class="w-full px-4 py-3 text-left text-red-300 hover:bg-red-500/20 transition-colors flex items-center space-x-3"
                                 >
                                   <i class="fas fa-times text-red-400 w-5"></i>
@@ -721,7 +724,7 @@
   import AppHeader from '@/components/AppHeader.vue'
   import EditRequestModal from '@/components/modals/EditRequestModal.vue'
   import ResubmitConfirmationModal from '@/components/modals/ResubmitConfirmationModal.vue'
-  import OrbitingDots from '@/components/common/OrbitingDots.vue'
+  import UnifiedLoadingBanner from '@/components/common/UnifiedLoadingBanner.vue'
   import { useAuth } from '@/composables/useAuth'
   import { useAuthStore } from '@/stores/auth'
   import requestStatusService from '@/services/requestStatusService'
@@ -734,7 +737,7 @@
       AppHeader,
       EditRequestModal,
       ResubmitConfirmationModal,
-      OrbitingDots
+      UnifiedLoadingBanner
     },
     setup() {
       const router = useRouter()
@@ -758,7 +761,7 @@
       const showEditModal = ref(false)
       const showResubmitModal = ref(false)
       const selectedRequest = ref(null)
-      
+
       // Actions menu state
       const activeMenuId = ref(null)
 
@@ -801,7 +804,7 @@
       // Guard this route - only staff can access
       onMounted(() => {
         requireRole([ROLES.STAFF])
-        
+
         // Close dropdown when clicking outside
         document.addEventListener('click', closeActionsMenu)
 
@@ -1399,17 +1402,33 @@
           (request) => request.status === 'implemented' || request.status === 'approved'
         )
       })
-      
+
       // Toggle actions menu
       const toggleActionsMenu = (requestId) => {
         activeMenuId.value = activeMenuId.value === requestId ? null : requestId
       }
-      
+
       // Close actions menu
       const closeActionsMenu = () => {
         activeMenuId.value = null
       }
-      
+
+      // Action menu button handlers to run multiple operations on click
+      const handleViewMenuAction = (request) => {
+        viewRequestDetails(request)
+        closeActionsMenu()
+      }
+
+      const handleEditMenuAction = (request) => {
+        editRequest(request)
+        closeActionsMenu()
+      }
+
+      const handleCancelMenuAction = (request) => {
+        cancelRequest(request)
+        closeActionsMenu()
+      }
+
       // SMS Status methods
       const getSmsStatusText = (smsStatus) => {
         const statusMap = {
@@ -1419,7 +1438,7 @@
         }
         return statusMap[smsStatus] || 'Pending'
       }
-      
+
       const getSmsStatusColor = (smsStatus) => {
         const colorMap = {
           sent: 'bg-green-500',
@@ -1428,7 +1447,7 @@
         }
         return colorMap[smsStatus] || 'bg-gray-400'
       }
-      
+
       const getSmsStatusTextColor = (smsStatus) => {
         const textColorMap = {
           sent: 'text-green-400',
@@ -1495,7 +1514,10 @@
         closeActionsMenu,
         getSmsStatusText,
         getSmsStatusColor,
-        getSmsStatusTextColor
+        getSmsStatusTextColor,
+        handleViewMenuAction,
+        handleEditMenuAction,
+        handleCancelMenuAction
       }
     }
   }

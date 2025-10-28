@@ -7,7 +7,9 @@ use App\Models\BookingService;
 use App\Models\Department;
 use App\Models\DeviceInventory;
 use App\Models\DeviceAssessment;
+use App\Models\User;
 use App\Services\SignatureService;
+use App\Services\SmsModule;
 use App\Http\Requests\BookingServiceRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -16,6 +18,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Carbon\Carbon;
 
 class BookingServiceController extends Controller
 {
@@ -113,13 +116,35 @@ class BookingServiceController extends Controller
             }
             
             $validatedData = $request->validated();
-            Log::info('Validation passed successfully');
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            Log::error('Validation failed', [
-                'errors' => $e->errors(),
-                'message' => $e->getMessage()
+            Log::info('Validation passed successfully', [
+                'user_id' => $request->user()->id,
+                'validated_fields' => array_keys($validatedData)
             ]);
-            throw $e;
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('BookingService validation failed', [
+                'user_id' => $request->user()->id,
+                'errors' => $e->errors(),
+                'message' => $e->getMessage(),
+                'input_data' => $request->except(['signature', 'password'])
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error('Unexpected error during validation', [
+                'user_id' => $request->user()->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Server error during form validation',
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal validation error'
+            ], 500);
         }
         
         try {
@@ -202,49 +227,251 @@ class BookingServiceController extends Controller
                 }
             }
 
-            // Handle signature upload
+            // Handle signature upload with enhanced error handling
             if ($request->hasFile('signature')) {
-                $signaturePath = $this->handleSignatureUpload($request->file('signature'), $validatedData['borrower_name']);
-                $validatedData['signature_path'] = $signaturePath;
+                try {
+                    $signatureFile = $request->file('signature');
+                    
+                    // Validate signature file before processing
+                    if (!$signatureFile->isValid()) {
+                        Log::error('Invalid signature file uploaded', [
+                            'user_id' => $user->id,
+                            'file_error' => $signatureFile->getError(),
+                            'file_size' => $signatureFile->getSize(),
+                            'file_type' => $signatureFile->getMimeType()
+                        ]);
+                        
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Invalid signature file uploaded',
+                            'error' => 'File upload error'
+                        ], 400);
+                    }
+                    
+                    // Additional file validation
+                    $allowedMimes = ['image/png', 'image/jpg', 'image/jpeg'];
+                    $maxSize = 2 * 1024 * 1024; // 2MB
+                    
+                    if (!in_array($signatureFile->getMimeType(), $allowedMimes)) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Invalid file type. Only PNG, JPG, and JPEG files are allowed.',
+                            'error' => 'Invalid file type'
+                        ], 400);
+                    }
+                    
+                    if ($signatureFile->getSize() > $maxSize) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'File size too large. Maximum size is 2MB.',
+                            'error' => 'File too large'
+                        ], 400);
+                    }
+                    
+                    $signaturePath = $this->handleSignatureUpload($signatureFile, $validatedData['borrower_name']);
+                    $validatedData['signature_path'] = $signaturePath;
+                    
+                    Log::info('Signature uploaded successfully', [
+                        'user_id' => $user->id,
+                        'file_path' => $signaturePath,
+                        'file_size' => $signatureFile->getSize(),
+                        'file_type' => $signatureFile->getMimeType()
+                    ]);
+                    
+                } catch (\Exception $e) {
+                    Log::error('Signature upload failed', [
+                        'user_id' => $user->id,
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
+                    ]);
+                    
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Failed to upload signature file',
+                        'error' => config('app.debug') ? $e->getMessage() : 'File upload error'
+                    ], 500);
+                }
+            } else {
+                Log::warning('No signature file provided', [
+                    'user_id' => $user->id,
+                    'has_file' => $request->hasFile('signature'),
+                    'all_files' => $request->allFiles()
+                ]);
             }
 
-            // Create the booking
-            $booking = BookingService::create($validatedData);
+            // Create the booking with enhanced error handling
+            try {
+                Log::info('Attempting to create booking record', [
+                    'user_id' => $user->id,
+                    'data_keys' => array_keys($validatedData),
+                    'device_type' => $validatedData['device_type'] ?? 'not_set',
+                    'department' => $validatedData['department'] ?? 'not_set'
+                ]);
+                
+                $booking = BookingService::create($validatedData);
+                
+                if (!$booking || !$booking->id) {
+                    Log::error('Booking creation returned null or invalid object', [
+                        'user_id' => $user->id,
+                        'booking_result' => $booking
+                    ]);
+                    
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Failed to create booking record',
+                        'error' => 'Database insertion failed'
+                    ], 500);
+                }
+                
+                Log::info('Booking record created successfully', [
+                    'booking_id' => $booking->id,
+                    'user_id' => $user->id
+                ]);
+                
+            } catch (\Illuminate\Database\QueryException $e) {
+                Log::error('Database error during booking creation', [
+                    'user_id' => $user->id,
+                    'sql_error' => $e->getMessage(),
+                    'sql_code' => $e->getCode(),
+                    'sql_state' => $e->errorInfo[0] ?? 'unknown',
+                    'data' => $validatedData
+                ]);
+                
+                // Check for specific database errors
+                if ($e->getCode() == '23000') {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Database constraint violation. Please check your input data.',
+                        'error' => 'Constraint violation'
+                    ], 400);
+                }
+                
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Database error occurred while creating booking',
+                    'error' => config('app.debug') ? $e->getMessage() : 'Database operation failed'
+                ], 500);
+                
+            } catch (\Exception $e) {
+                Log::error('Unexpected error during booking creation', [
+                    'user_id' => $user->id,
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                    'data' => $validatedData
+                ]);
+                
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error creating booking record',
+                    'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
+                ], 500);
+            }
 
             // Load relationships for response
             $booking->load(['user', 'departmentInfo', 'deviceInventory']);
 
-            Log::info('Booking service created successfully', [
-                'booking_id' => $booking->id,
+                Log::info('Booking service created successfully', [
+                    'booking_id' => $booking->id,
+                    'user_id' => $request->user()->id,
+                    'device_type' => $booking->device_type,
+                    'device_inventory_id' => $booking->device_inventory_id
+                ]);
+
+                // Trigger SMS to all ICT Officers about pending booking request
+                try {
+                    $smsModule = app(SmsModule::class);
+
+                    // Fetch active ICT officers with phone numbers
+                    $ictOfficers = User::active()->withRole('ict_officer')->get(['id','name','phone']);
+                    $phoneNumbers = $ictOfficers->pluck('phone')->filter()->values()->all();
+
+                    if (!empty($phoneNumbers)) {
+                        $deviceName = $booking->getDeviceDisplayNameAttribute();
+                        $departmentName = $booking->departmentInfo->name ?? 'N/A';
+                        $ref = 'BOOK-' . str_pad($booking->id, 6, '0', STR_PAD_LEFT);
+
+                        $message = "PENDING DEVICE BOOKING: {$booking->borrower_name} ({$departmentName}) requested {$deviceName}. Ref: {$ref}. Please review in the system. - ICT";
+
+                        $bulkResult = $smsModule->sendBulkSms($phoneNumbers, $message, 'device_booking_pending');
+                        $anySent = (($bulkResult['sent'] ?? 0) > 0);
+
+                        // Update SMS status used by /request-status UI
+                        $booking->update([
+                            'sms_sent_to_hod_at' => $anySent ? now() : null,
+                            'sms_to_hod_status' => $anySent ? 'sent' : 'failed',
+                        ]);
+
+                        Log::info('ICT Officers SMS dispatch result for booking', [
+                            'booking_id' => $booking->id,
+                            'officers_count' => count($phoneNumbers),
+                            'result' => $bulkResult
+                        ]);
+                    } else {
+                        Log::warning('No ICT officers with phone numbers found for SMS notification');
+                    }
+                } catch (\Exception $e) {
+                    Log::error('Failed to send SMS to ICT officers for booking', [
+                        'booking_id' => $booking->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+                
+                // Prepare response message and data
+                $responseMessage = 'Booking submitted successfully! Your request is now pending approval.';
+                $responseData = [
+                    'booking' => $booking,
+                    'queued' => false,
+                ];
+                
+                // If device was out of stock, include availability info in response
+                if ($deviceAvailabilityInfo && !$deviceAvailabilityInfo['available']) {
+                    $responseMessage = 'Booking submitted successfully! ' . $deviceAvailabilityInfo['message'];
+                    $responseData['availability_info'] = $deviceAvailabilityInfo;
+                    $responseData['queued'] = true;
+                }
+
+                return response()->json([
+                    'success' => true,
+                    'data' => $responseData,
+                    'message' => $responseMessage
+                ], 201);
+
+        } catch (\Illuminate\Database\QueryException $e) {
+            Log::error('Final database error in booking creation', [
                 'user_id' => $request->user()->id,
-                'device_type' => $booking->device_type,
-                'device_inventory_id' => $booking->device_inventory_id
+                'sql_error' => $e->getMessage(),
+                'sql_code' => $e->getCode(),
+                'request_data' => $request->except(['signature', 'password'])
             ]);
-
-            // Prepare response message and data
-            $responseMessage = 'Booking submitted successfully! Your request is now pending approval.';
-            $responseData = [
-                'booking' => $booking,
-                'queued' => false,
-            ];
             
-            // If device was out of stock, include availability info in response
-            if ($deviceAvailabilityInfo && !$deviceAvailabilityInfo['available']) {
-                $responseMessage = 'Booking submitted successfully! ' . $deviceAvailabilityInfo['message'];
-                $responseData['availability_info'] = $deviceAvailabilityInfo;
-                $responseData['queued'] = true;
-            }
-
             return response()->json([
-                'success' => true,
-                'data' => $responseData,
-                'message' => $responseMessage
-            ], 201);
-
-        } catch (\Exception $e) {
-            Log::error('Error creating booking: ' . $e->getMessage(), [
+                'success' => false,
+                'message' => 'Database error occurred while processing your booking request',
+                'error' => config('app.debug') ? $e->getMessage() : 'Database operation failed'
+            ], 500);
+            
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Late validation error in booking creation', [
                 'user_id' => $request->user()->id,
-                'request_data' => $request->except(['signature'])
+                'validation_errors' => $e->errors(),
+                'request_data' => $request->except(['signature', 'password'])
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation error occurred',
+                'errors' => $e->errors()
+            ], 422);
+            
+        } catch (\Exception $e) {
+            Log::error('Unexpected error in booking creation process', [
+                'user_id' => $request->user()->id,
+                'error_type' => get_class($e),
+                'error_message' => $e->getMessage(),
+                'error_file' => $e->getFile(),
+                'error_line' => $e->getLine(),
+                'request_data' => $request->except(['signature', 'password']),
+                'trace' => $e->getTraceAsString()
             ]);
 
             // No need to return device since we don't reserve it during booking creation
@@ -252,8 +479,9 @@ class BookingServiceController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error submitting booking request',
-                'error' => $e->getMessage()
+                'message' => 'An unexpected error occurred while submitting your booking request. Please try again.',
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+                'error_type' => config('app.debug') ? get_class($e) : null
             ], 500);
         }
     }
@@ -1040,6 +1268,50 @@ class BookingServiceController extends Controller
                 'deviceInventory:id,device_name,device_code,description',
                 'ictApprovedBy:id,name'
             ]);
+
+            // Send SMS to requester informing approval and collection instructions
+            try {
+                $smsModule = app(SmsModule::class);
+
+                // Determine recipient phone (prefer users table)
+                $recipientPhone = $bookingService->user->phone ?? $bookingService->phone_number;
+
+                if ($recipientPhone) {
+                    $name = $bookingService->borrower_name ?: ($bookingService->user->name ?? 'User');
+                    $deviceName = $bookingService->getDeviceDisplayNameAttribute();
+                    $ref = 'BOOK-' . str_pad($bookingService->id, 6, '0', STR_PAD_LEFT);
+
+                    // Build return deadline text
+                    $deadlineDate = $bookingService->return_date ? Carbon::parse($bookingService->return_date)->format('Y-m-d') : null;
+                    $deadlineTime = $bookingService->return_time ? Carbon::parse($bookingService->return_time)->format('H:i') : null;
+                    $deadline = trim(($deadlineDate ?? '') . ($deadlineTime ? ' ' . $deadlineTime : ''));
+
+                    $message = "Dear {$name}, your device booking for {$deviceName} has been APPROVED. Ref: {$ref}. Please collect the device from ICT. Remember to return it on time by {$deadline}. - ICT";
+
+                    $sendResult = $smsModule->sendSms($recipientPhone, $message, 'device_booking_approved');
+
+                    // Update requester SMS status tracking
+                    $bookingService->update([
+                        'sms_sent_to_requester_at' => $sendResult['success'] ? now() : null,
+                        'sms_to_requester_status' => $sendResult['success'] ? 'sent' : 'failed',
+                    ]);
+
+                    Log::info('Requester SMS dispatch result for booking approval', [
+                        'booking_id' => $bookingService->id,
+                        'result' => $sendResult
+                    ]);
+                } else {
+                    Log::warning('No phone number found for requester when sending approval SMS', [
+                        'booking_id' => $bookingService->id,
+                        'user_id' => $bookingService->user_id
+                    ]);
+                }
+            } catch (\Exception $e) {
+                Log::error('Failed to send approval SMS to requester', [
+                    'booking_id' => $bookingService->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
 
             Log::info('Booking ICT approved and main status updated', [
                 'booking_id' => $bookingService->id,
