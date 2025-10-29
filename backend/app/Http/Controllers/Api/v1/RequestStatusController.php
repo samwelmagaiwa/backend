@@ -372,7 +372,11 @@ class RequestStatusController extends Controller
             'department' => $departmentName,
             'device_availability' => $deviceAvailabilityInfo,
             'return_status' => $booking->return_status ?? 'not_yet_returned',
+            // expose both raw statuses
             'sms_to_hod_status' => $booking->sms_to_hod_status ?? 'pending',
+            'sms_to_requester_status' => $booking->sms_to_requester_status ?? 'pending',
+            // normalized sms status for UI: prefer requester status when available
+            'sms_status' => ($booking->sms_to_requester_status ?? null) ?: ($booking->sms_to_hod_status ?? 'pending'),
         ];
     }
 

@@ -381,16 +381,21 @@ class BookingServiceController extends Controller
                 try {
                     $smsModule = app(SmsModule::class);
 
-                    // Fetch active ICT officers with phone numbers
-                    $ictOfficers = User::active()->withRole('ict_officer')->get(['id','name','phone']);
-                    $phoneNumbers = $ictOfficers->pluck('phone')->filter()->values()->all();
+                    // Fetch active ICT officers ONLY (exclude HOD/Divisional/ICT Director/Head of IT/Admin even if they also have ict_officer role)
+                    $ictOfficers = User::active()
+                        ->withRole('ict_officer')
+                        ->whereDoesntHave('roles', function ($q) {
+                            $q->whereIn('name', ['head_of_department', 'divisional_director', 'ict_director', 'head_of_it', 'admin']);
+                        })
+                        ->get(['id','name','phone']);
+                    $phoneNumbers = $ictOfficers->pluck('phone')->filter()->unique()->values()->all();
 
                     if (!empty($phoneNumbers)) {
                         $deviceName = $booking->getDeviceDisplayNameAttribute();
                         $departmentName = $booking->departmentInfo->name ?? 'N/A';
                         $ref = 'BOOK-' . str_pad($booking->id, 6, '0', STR_PAD_LEFT);
 
-                        $message = "PENDING DEVICE BOOKING: {$booking->borrower_name} ({$departmentName}) requested {$deviceName}. Ref: {$ref}. Please review in the system. - ICT";
+                        $message = "PENDING DEVICE BOOKING: {$booking->borrower_name} ({$departmentName}) requested {$deviceName}. Ref: {$ref}. Please review in the system. - EARBMS";
 
                         $bulkResult = $smsModule->sendBulkSms($phoneNumbers, $message, 'device_booking_pending');
                         $anySent = (($bulkResult['sent'] ?? 0) > 0);
@@ -1266,7 +1271,8 @@ class BookingServiceController extends Controller
                 'user.department:id,name,code',
                 'departmentInfo:id,name,code',
                 'deviceInventory:id,device_name,device_code,description',
-                'ictApprovedBy:id,name'
+                'ictApprovedBy:id,name',
+                'assessedBy:id,name'
             ]);
 
             // Send SMS to requester informing approval and collection instructions
@@ -1286,7 +1292,51 @@ class BookingServiceController extends Controller
                     $deadlineTime = $bookingService->return_time ? Carbon::parse($bookingService->return_time)->format('H:i') : null;
                     $deadline = trim(($deadlineDate ?? '') . ($deadlineTime ? ' ' . $deadlineTime : ''));
 
-                    $message = "Dear {$name}, your device booking for {$deviceName} has been APPROVED. Ref: {$ref}. Please collect the device from ICT. Remember to return it on time by {$deadline}. - ICT";
+                    // Build concise device condition summary from issuing assessment (if available)
+                    $conditionSummary = '';
+                    $issuing = $bookingService->device_condition_issuing ?? null;
+                    if ($issuing && is_string($issuing)) {
+                        $decoded = json_decode($issuing, true);
+                        if (json_last_error() === JSON_ERROR_NONE) { $issuing = $decoded; }
+                    }
+                    if (is_array($issuing) && !empty($issuing)) {
+                        $labels = [
+                            'physical_condition' => [
+                                'excellent' => 'Excellent',
+                                'good' => 'Good',
+                                'fair' => 'Fair',
+                                'poor' => 'Poor',
+                            ],
+                            'functionality' => [
+                                'fully_functional' => 'Fully functional',
+                                'partially_functional' => 'Partially functional',
+                                'not_functional' => 'Not functional',
+                            ],
+                        ];
+                        $parts = [];
+                        if (!empty($issuing['physical_condition'])) {
+                            $parts[] = 'Physical: ' . ($labels['physical_condition'][$issuing['physical_condition']] ?? ucfirst(str_replace('_',' ', $issuing['physical_condition'])));
+                        }
+                        if (!empty($issuing['functionality'])) {
+                            $parts[] = 'Function: ' . ($labels['functionality'][$issuing['functionality']] ?? ucfirst(str_replace('_',' ', $issuing['functionality'])));
+                        }
+                        if (isset($issuing['accessories_complete'])) {
+                            $parts[] = 'Accessories: ' . ($issuing['accessories_complete'] ? 'Complete' : 'Incomplete');
+                        }
+                        if (isset($issuing['visible_damage'])) {
+                            if ($issuing['visible_damage'] && !empty($issuing['damage_description'])) {
+                                $parts[] = 'Damage: ' . trim($issuing['damage_description']);
+                            } else {
+                                $parts[] = 'Damage: ' . ($issuing['visible_damage'] ? 'Yes' : 'None');
+                            }
+                        }
+                        if (!empty($parts)) {
+                            $conditionSummary = ' Condition at issuing - ' . implode('; ', $parts) . '.';
+                        }
+                    }
+
+                    $assessorName = $bookingService->assessedBy->name ?? $bookingService->ictApprovedBy->name ?? 'ICT Officer';
+                    $message = "Dear {$name}, your device booking for {$deviceName} has been APPROVED. Ref: {$ref}. Please collect the device from ICT Office floor number 3. Return by {$deadline}. Assessed by {$assessorName}.{$conditionSummary} - ICT Office";
 
                     $sendResult = $smsModule->sendSms($recipientPhone, $message, 'device_booking_approved');
 
@@ -1980,11 +2030,11 @@ class BookingServiceController extends Controller
             $returnStatus = 'returned';
             $deviceCondition = $request->device_condition;
             
-            // Mark as compromised if device has issues
-            if ($deviceCondition['physical_condition'] === 'poor' || 
-                $deviceCondition['functionality'] !== 'fully_functional' ||
-                $deviceCondition['visible_damage'] === true ||
-                !$deviceCondition['accessories_complete']) {
+            // Mark as compromised only for critical issues
+            // Accessories alone being incomplete should not flag as compromised
+            if (($deviceCondition['physical_condition'] ?? '') === 'poor' || 
+                ($deviceCondition['functionality'] ?? '') !== 'fully_functional' ||
+                ($deviceCondition['visible_damage'] ?? false) === true) {
                 $returnStatus = 'returned_but_compromised';
             }
 

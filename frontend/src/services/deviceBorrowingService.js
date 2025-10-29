@@ -180,24 +180,25 @@ export const deviceBorrowingService = {
     try {
       console.log('✅ Approving request ID:', requestId, 'with notes:', notes)
 
-      // Try ICT approval endpoint first
+      // Prefer booking-service endpoint (implemented), then fallback to ICT endpoint
       let response
       try {
-        response = await apiClient.post(`/ict-approval/device-requests/${requestId}/approve`, {
-          ict_notes: notes
-        })
-        console.log('✅ Successfully approved via ICT approval endpoint')
-      } catch (ictError) {
-        console.log(
-          '⚠️ ICT approval endpoint failed, trying booking service endpoint:',
-          ictError.response?.status
-        )
-
-        // Fallback to booking service endpoint
         response = await apiClient.post(`/booking-service/bookings/${requestId}/ict-approve`, {
           ict_notes: notes
         })
         console.log('✅ Successfully approved via booking service endpoint')
+      } catch (bsError) {
+        const status = bsError.response?.status
+        console.log('⚠️ Booking-service endpoint failed:', status, bsError.response?.data?.message)
+        // Fallback to ICT approval endpoint only for missing/not-implemented routes
+        const shouldFallback = !status || [404, 405, 501].includes(status)
+        if (!shouldFallback) {
+          throw bsError
+        }
+        response = await apiClient.post(`/ict-approval/device-requests/${requestId}/approve`, {
+          ict_notes: notes
+        })
+        console.log('✅ Successfully approved via ICT approval endpoint (fallback)')
       }
 
       return {
@@ -492,7 +493,9 @@ export const deviceBorrowingService = {
       request.device_condition_issuing || request.issuing_assessment || request.assessment_issuing
     )
     const receivingAssessment = parseAssessment(
-      request.device_condition_receiving || request.receiving_assessment || request.assessment_receiving
+      request.device_condition_receiving ||
+        request.receiving_assessment ||
+        request.assessment_receiving
     )
 
     return {

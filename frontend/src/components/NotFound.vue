@@ -5,9 +5,7 @@
         <div class="mb-4">
           <i class="fas fa-exclamation-triangle text-5xl text-yellow-400"></i>
         </div>
-        <h1 class="text-3xl md:text-4xl font-extrabold text-white mb-2">
-          Unable to Load Page
-        </h1>
+        <h1 class="text-3xl md:text-4xl font-extrabold text-white mb-2">Unable to Load Page</h1>
         <p class="text-blue-200 text-base md:text-lg mb-6">
           The requested page could not be found. It may have been moved or the URL is incorrect.
         </p>

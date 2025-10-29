@@ -6,6 +6,14 @@
       <main
         class="flex-1 p-3 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative"
       >
+        <!-- Global Loading Banner -->
+        <UnifiedLoadingBanner
+          :show="globalLoading"
+          :loadingTitle="loadingBannerTitle"
+          :loadingSubtitle="loadingBannerSubtitle"
+          departmentTitle="ICT EQUIPMENT BOOKING SYSTEM"
+          :forceSpin="true"
+        />
         <!-- Background Pattern -->
         <div class="absolute inset-0 overflow-hidden">
           <!-- Floating geometric shapes -->
@@ -99,18 +107,8 @@
             </div>
           </div>
 
-          <!-- Loading Screen -->
-          <div
-            v-if="isCheckingPendingRequests"
-            class="booking-glass-card rounded-b-3xl overflow-hidden animate-slide-up relative min-h-64"
-          >
-            <UnifiedLoadingBanner
-              :show="isCheckingPendingRequests"
-              loadingTitle="Checking Your Requests"
-              loadingSubtitle="Verifying pending booking requests..."
-              departmentTitle="ICT EQUIPMENT BOOKING SYSTEM"
-            />
-          </div>
+          <!-- Loading Screen (kept for layout spacing while banner overlays) -->
+          <div v-if="isCheckingPendingRequests" class="min-h-64"></div>
 
           <!-- Main Form -->
           <div
@@ -1094,6 +1092,24 @@
         await this.initializeForm()
       }
     },
+    computed: {
+      globalLoading() {
+        return this.isCheckingPendingRequests || this.isSubmitting || this.isLoadingDevices
+      },
+      loadingBannerTitle() {
+        if (this.isCheckingPendingRequests) return 'Checking Your Requests'
+        if (this.isLoadingDevices) return 'Loading Devices'
+        if (this.isSubmitting) return 'Submitting Booking Request'
+        return 'Loading'
+      },
+      loadingBannerSubtitle() {
+        if (this.isCheckingPendingRequests) return 'Verifying pending booking requests...'
+        if (this.isLoadingDevices) return 'Fetching available devices...'
+        if (this.isSubmitting) return 'Please wait while we submit your booking...'
+        return 'Please wait...'
+      }
+    },
+
     methods: {
       /**
        * Initialize form data and load required dependencies
@@ -1158,7 +1174,8 @@
             if (this.hasPendingRequest && response.data.pending_request) {
               // Double-check server state to avoid stale flags
               try {
-                const pendingId = response.data.pending_request.id || response.data.pending_request.request_id
+                const pendingId =
+                  response.data.pending_request.id || response.data.pending_request.request_id
                 if (pendingId) {
                   const verify = await apiClient.get(`/booking-service/bookings/${pendingId}`)
                   const rd = verify.data?.data || verify.data || {}
@@ -1169,7 +1186,10 @@
                     (typeof rd.current_step === 'number' && rd.current_step >= 3)
                   )
                   if (done) {
-                    console.log('🧹 Clearing stale pending flag (booking is already returned):', pendingId)
+                    console.log(
+                      '🧹 Clearing stale pending flag (booking is already returned):',
+                      pendingId
+                    )
                     this.hasPendingRequest = false
                     this.showPendingRequestModal = false
                   }
@@ -1180,7 +1200,10 @@
                   this.hasPendingRequest = false
                   this.showPendingRequestModal = false
                 } else {
-                  console.warn('Pending verification failed (continuing with server flag):', e?.message)
+                  console.warn(
+                    'Pending verification failed (continuing with server flag):',
+                    e?.message
+                  )
                 }
               }
 

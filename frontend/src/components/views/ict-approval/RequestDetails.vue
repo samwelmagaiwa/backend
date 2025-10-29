@@ -271,7 +271,11 @@
                     <i class="fas fa-clipboard-check text-white text-sm"></i>
                   </div>
                   <h3 class="text-3xl font-bold text-white">Device Condition Assessment</h3>
-                  <span v-if="isReadOnly" class="ml-auto px-3 py-1 bg-emerald-500/20 text-emerald-200 text-xs font-semibold rounded-full border border-emerald-400/30">Finalized</span>
+                  <span
+                    v-if="isReadOnly"
+                    class="ml-auto px-3 py-1 bg-emerald-500/20 text-emerald-200 text-xs font-semibold rounded-full border border-emerald-400/30"
+                    >Finalized</span
+                  >
                 </div>
 
                 <!-- Assessment Type Tabs -->
@@ -306,7 +310,10 @@
                 <!-- Assessment Form -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-3">
                   <!-- Physical Condition -->
-                  <div class="assessment-section physical-section" :class="{ 'readonly-highlight': isReadOnly }">
+                  <div
+                    class="assessment-section physical-section"
+                    :class="{ 'readonly-highlight': isReadOnly }"
+                  >
                     <div class="assessment-header">
                       <div
                         class="assessment-icon-wrapper bg-gradient-to-br from-blue-500 to-blue-600"
@@ -354,7 +361,10 @@
                   </div>
 
                   <!-- Device Functionality -->
-                  <div class="assessment-section functionality-section" :class="{ 'readonly-highlight': isReadOnly }">
+                  <div
+                    class="assessment-section functionality-section"
+                    :class="{ 'readonly-highlight': isReadOnly }"
+                  >
                     <div class="assessment-header">
                       <div
                         class="assessment-icon-wrapper bg-gradient-to-br from-blue-500 to-blue-600"
@@ -521,7 +531,10 @@
                 </div>
 
                 <!-- Compact Button Layout -->
-                <div v-if="!isReadOnly" class="flex flex-col sm:flex-row gap-2 pt-3 border-t border-blue-600/30">
+                <div
+                  v-if="!isReadOnly"
+                  class="flex flex-col sm:flex-row gap-2 pt-3 border-t border-blue-600/30"
+                >
                   <!-- Save Issuing Assessment Button -->
                   <button
                     v-if="showIssuingAssessmentButton"
@@ -651,9 +664,14 @@
 
                 <!-- Read-only notice -->
                 <div v-if="isReadOnly" class="mt-3">
-                  <div class="p-2 rounded-lg border flex items-center gap-2 bg-blue-500/20 border-blue-400/40 text-blue-200">
+                  <div
+                    class="p-2 rounded-lg border flex items-center gap-2 bg-blue-500/20 border-blue-400/40 text-blue-200"
+                  >
                     <i class="fas fa-lock text-sm"></i>
-                    <span class="font-medium">This request is completed and read-only. No further actions are available.</span>
+                    <span class="font-medium"
+                      >This request is completed and read-only. No further actions are
+                      available.</span
+                    >
                   </div>
                 </div>
 
@@ -687,9 +705,7 @@
               >
                 <div class="text-center space-y-3">
                   <i class="fas fa-exclamation-triangle text-red-400 text-4xl"></i>
-                  <h3 class="text-red-200 text-xl font-semibold">
-                    Unable to Load Request Details
-                  </h3>
+                  <h3 class="text-red-200 text-xl font-semibold">Unable to Load Request Details</h3>
                   <p class="text-red-200 text-base">
                     {{ loadError || 'There was an error loading the request data.' }}
                   </p>
@@ -937,14 +953,7 @@
       isReadOnly() {
         const status = (this.request?.status || '').toLowerCase()
         const returnStatus = (this.request?.return_status || '').toLowerCase()
-        const receivedMarkers = [
-          'returned',
-          'completed',
-          'complete',
-          'closed',
-          'done',
-          'finished'
-        ]
+        const receivedMarkers = ['returned', 'completed', 'complete', 'closed', 'done', 'finished']
         const returnMarkers = ['returned', 'returned_but_compromised']
         return (
           this.deviceReceived ||
@@ -1066,14 +1075,14 @@
       },
 
       canReceiveDevice() {
-        // Device can be received if:
+        // Device can be received ONLY after approval and when:
         // 1. Receiving assessment is complete
-        // 2. Issuing assessment has been saved (device issued) OR request approved
+        // 2. Request is approved
         // 3. Not already received
         // 4. Not currently processing
         const canReceive =
           this.isReceivingAssessmentComplete &&
-          (this.issuingAssessmentSaved || this.requestApproved) &&
+          this.requestApproved &&
           !this.deviceReceived &&
           !this.isProcessingAssessment &&
           !this.isReadOnly
@@ -1132,13 +1141,13 @@
       },
 
       showReceivingButton() {
-        // Show receiving button when:
+        // Show receiving button only after approval when:
         // 1. Assessment type is 'receiving'
-        // 2. Issuing assessment saved (or request approved)
+        // 2. Request approved
         // 3. Device hasn't been received yet
         return (
           this.assessmentType === 'receiving' &&
-          (this.issuingAssessmentSaved || this.requestApproved) &&
+          this.requestApproved &&
           !this.deviceReceived &&
           !this.isReadOnly
         )
@@ -1336,16 +1345,18 @@
         // Initialize workflow state based on request data
         this.requestApproved =
           this.request.ict_approve === 'approved' || this.request.status === 'approved'
+        // Device is considered issued only when explicitly issued or in use
         this.deviceIssued = !!(
           this.request.device_issued_at ||
           this.request.device_condition_issuing ||
-          this.request.status === 'in_use' ||
-          this.request.return_status === 'not_yet_returned'
+          this.request.status === 'in_use'
         )
+        // Device is considered received only on explicit receive markers
+        const returnMarkers = ['returned', 'returned_but_compromised']
         this.deviceReceived = !!(
           this.request.device_received_at ||
           this.request.device_condition_receiving ||
-          this.request.return_status ||
+          returnMarkers.includes((this.request.return_status || '').toLowerCase()) ||
           this.request.status === 'returned' ||
           /completed|complete|closed|done|finished/i.test(this.request.status || '')
         )
@@ -1366,24 +1377,9 @@
 
         // If issuing assessment was already saved previously (or approved) and device not yet received,
         // auto-switch UI to the Receiving tab and guide the user.
-        if (
-          (this.issuingAssessmentSaved || this.requestApproved || this.deviceIssued) &&
-          !this.deviceReceived
-        ) {
+        // Only switch to Device Receiving after approval, not merely after issuing save
+        if (this.requestApproved && !this.deviceReceived) {
           this.assessmentType = 'receiving'
-          // Show a gentle message (no redirect)
-          this.assessmentMessage = {
-            type: 'success',
-            text: 'Issuing assessment already saved. Proceed to Device Receiving.'
-          }
-          // Briefly highlight the receiving tab for visibility
-          setTimeout(() => {
-            const receivingTab = document.querySelector('[data-tab="receiving"]')
-            if (receivingTab) {
-              receivingTab.classList.add('animate-pulse')
-              setTimeout(() => receivingTab.classList.remove('animate-pulse'), 1500)
-            }
-          }, 300)
         }
 
         // If read-only, ensure we show the final assessment (receiving when available)
@@ -1430,25 +1426,9 @@
               deviceIssued: this.deviceIssued
             })
 
-            // Switch to receiving tab for next phase of workflow
-            this.assessmentType = 'receiving'
-
-            // Show success message but don't redirect yet
-            this.showAssessmentMessage(
-              'Request approved! Now switched to Device Receiving tab. Complete the receiving assessment to finish the workflow.',
-              'success'
-            )
-
-            // Highlight the receiving tab briefly
-            setTimeout(() => {
-              const receivingTab = document.querySelector('[data-tab="receiving"]')
-              if (receivingTab) {
-                receivingTab.classList.add('animate-pulse')
-                setTimeout(() => {
-                  receivingTab.classList.remove('animate-pulse')
-                }, 2000)
-              }
-            }, 1000)
+            // Redirect back to requests list promptly after success
+            this.showApprovalModal = false
+            this.$router.push('/ict-approval/requests')
           } else {
             throw new Error(response.message || 'Failed to approve request')
           }
@@ -1680,24 +1660,14 @@
               this.request = { ...this.request, ...response.data }
             }
 
-            // Switch to Receiving tab and guide the user instead of redirecting
-            this.assessmentType = 'receiving'
+            // Keep on Issuing tab until approval; prompt user to approve first
             this.assessmentMessage = {
               type: 'success',
-              text: 'Issuing assessment saved. Proceed to Device Receiving.'
+              text: 'Issuing assessment saved. Please approve the request to continue to Device Receiving.'
             }
 
             // Show post-issuing action modal (approve/reject) only if request still pending
             this.showPostIssuingModal = this.canTakeAction
-
-            // Briefly highlight the receiving tab
-            setTimeout(() => {
-              const receivingTab = document.querySelector('[data-tab="receiving"]')
-              if (receivingTab) {
-                receivingTab.classList.add('animate-pulse')
-                setTimeout(() => receivingTab.classList.remove('animate-pulse'), 1500)
-              }
-            }, 300)
 
             console.log('✅ Device assessment saved successfully, switched to receiving phase')
           } else {
@@ -1823,7 +1793,12 @@
             })
 
             // Clear cached pending notifications and redirect
-            try { notificationService.clearCache() } catch (e) {}
+            try {
+              notificationService.clearCache()
+            } catch (e) {
+              // Non-blocking: cache clear failure should not stop navigation
+              console.warn('Notification cache clear failed:', e?.message || e)
+            }
             this.$router.push('/ict-approval/requests')
           } else {
             throw new Error(response.message || 'Failed to receive device')
@@ -1865,7 +1840,8 @@
         const issuing = parseBlob(this.request.device_condition_issuing)
         if (issuing) {
           this.issuingAssessment = {
-            physical_condition: issuing.physical_condition || this.issuingAssessment.physical_condition || '',
+            physical_condition:
+              issuing.physical_condition || this.issuingAssessment.physical_condition || '',
             functionality: issuing.functionality || this.issuingAssessment.functionality || '',
             accessories_complete: !!issuing.accessories_complete,
             visible_damage: !!issuing.visible_damage,
@@ -1878,7 +1854,8 @@
         const receiving = parseBlob(this.request.device_condition_receiving)
         if (receiving) {
           this.receivingAssessment = {
-            physical_condition: receiving.physical_condition || this.receivingAssessment.physical_condition || '',
+            physical_condition:
+              receiving.physical_condition || this.receivingAssessment.physical_condition || '',
             functionality: receiving.functionality || this.receivingAssessment.functionality || '',
             accessories_complete: !!receiving.accessories_complete,
             visible_damage: !!receiving.visible_damage,

@@ -634,7 +634,10 @@
                                   type="checkbox"
                                   class="w-4 h-4 text-red-600 accent-red-600 mr-2 flex-shrink-0"
                                 />
-                                <span class="text-purple-100 text-base md:text-[17px] leading-tight">{{ module }}</span>
+                                <span
+                                  class="text-purple-100 text-base md:text-[17px] leading-tight"
+                                  >{{ module }}</span
+                                >
                               </label>
                             </div>
                           </div>
@@ -672,7 +675,10 @@
                                   type="checkbox"
                                   class="w-4 h-4 text-red-600 accent-red-600 mr-2 flex-shrink-0"
                                 />
-                                <span class="text-amber-100 text-base md:text-[17px] leading-tight">{{ module }}</span>
+                                <span
+                                  class="text-amber-100 text-base md:text-[17px] leading-tight"
+                                  >{{ module }}</span
+                                >
                               </label>
                             </div>
                           </div>
