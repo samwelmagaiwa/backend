@@ -11,6 +11,7 @@ use App\Services\SignatureService;
 use App\Services\StatusMigrationService;
 use App\Services\SmsModule;
 use App\Traits\HandlesStatusQueries;
+use App\Models\Signature;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -362,11 +363,9 @@ class UserAccessController extends Controller
             
             $validatedData = $request->validated();
             
-            // Upload and store the digital signature
-            $signaturePath = $this->storeSignature(
-                $request->file('signature'),
-                $validatedData['pf_number']
-            );
+            // Digital-only signatures: do not accept file uploads here.
+            // Signature presence is validated in the FormRequest via signatures table.
+            $signaturePath = null;
 
             // Get selected services directly from request_type
             $selectedServices = $validatedData['request_type'];
@@ -419,7 +418,7 @@ class UserAccessController extends Controller
                 'staff_name' => $validatedData['staff_name'],
                 'phone_number' => $validatedData['phone_number'],
                 'department_id' => $validatedData['department_id'],
-                'signature_path' => $signaturePath,
+'signature_path' => $signaturePath, // legacy field kept for response shape, set to null
                 'request_type' => $selectedServices, // Array stored as JSON
                 'status' => 'pending',
                 
@@ -471,6 +470,20 @@ class UserAccessController extends Controller
                 'implementation_comments' => $request->input('implementationComments')
             ]);
             
+            // Move pre-signed digital signature from synthetic doc id to real request id (if exists)
+            try {
+                $syntheticDocId = 900000000 + (int) $user->id;
+                Signature::where('document_id', $syntheticDocId)
+                    ->where('user_id', $user->id)
+                    ->update(['document_id' => $userAccess->id]);
+            } catch (\Exception $e) {
+                Log::warning('Failed to rebind digital signature to real document id', [
+                    'user_id' => $user->id,
+                    'request_id' => $userAccess->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
+
             // Refresh the model to get actual stored values
             $userAccess->refresh();
             

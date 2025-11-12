@@ -544,11 +544,21 @@
                               </div>
                             </template>
                             <template v-else>
-                              <div class="flex items-center gap-2 text-green-200 font-bold text-base">
+                              <div
+                                class="flex items-center gap-2 text-green-200 font-bold text-base"
+                              >
                                 <i class="fas fa-check-circle text-green-400"></i>
                                 <span>
                                   Digitally signed
-                                  <span v-if="lastSignedAt" class="opacity-80">at {{ new Date(lastSignedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }}</span>
+                                  <span v-if="lastSignedAt" class="opacity-80"
+                                    >at
+                                    {{
+                                      new Date(lastSignedAt).toLocaleTimeString([], {
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                      })
+                                    }}</span
+                                  >
                                 </span>
                               </div>
                             </template>
@@ -580,15 +590,17 @@
                           >
                             <div class="text-center space-y-2">
                               <i class="fas fa-signature text-blue-300 text-lg"></i>
-                              <p class="text-blue-100 text-base font-medium">
-                                No signature yet
-                              </p>
+                              <p class="text-blue-100 text-base font-medium">No signature yet</p>
                               <div class="flex items-center justify-center">
                                 <button
                                   type="button"
                                   @click="signCurrentDocument"
                                   :disabled="isSigning || !editRequestId"
-                                  :title="editRequestId ? 'Digitally sign this request' : 'Submit first to generate a Request ID, then return to sign'"
+                                  :title="
+                                    editRequestId
+                                      ? 'Digitally sign this request'
+                                      : 'Submit first to generate a Request ID, then return to sign'
+                                  "
                                   class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-600 text-white text-base font-bold rounded-lg hover:from-emerald-600 hover:to-green-700 transition-all duration-300 flex items-center gap-2 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-emerald-400/50 disabled:opacity-60 disabled:cursor-not-allowed"
                                 >
                                   <OrbitingDots v-if="isSigning" size="xs" />
@@ -598,7 +610,6 @@
                               </div>
                             </div>
                           </div>
-
                         </div>
                       </div>
                     </div>
@@ -1262,7 +1273,9 @@
       // Check if in edit mode
       this.checkEditMode()
 
-      const isSynthetic = this.isSyntheticDocId?.() || (this.editRequestId && !/^\d+$/.test(String(this.editRequestId)))
+      const isSynthetic =
+        this.isSyntheticDocId?.() ||
+        (this.editRequestId && !/^\d+$/.test(String(this.editRequestId)))
 
       // Load data: if editing a real request id, fetch it; otherwise just load user data and modules
       if (this.isEditMode && !isSynthetic) {
@@ -1719,7 +1732,6 @@
           return
         }
 
-
         if (!this.hasSelectedService) {
           this.showNotification('Please select at least one service', 'error')
           return
@@ -1864,12 +1876,16 @@
           })
 
           // Submit to API (update or create)
-          const response = this.isEditMode
+          const isSynthetic =
+            this.isSyntheticDocId?.() ||
+            (this.editRequestId && !/^\d+$/.test(String(this.editRequestId)))
+          const doUpdate = this.isEditMode && !isSynthetic
+          const response = doUpdate
             ? await userCombinedAccessService.updateRequest(this.editRequestId, formData)
             : await userCombinedAccessService.submitCombinedRequest(formData)
 
           if (response.success) {
-            const actionText = this.isEditMode ? 'updated and resubmitted' : 'submitted'
+            const actionText = doUpdate ? 'updated and resubmitted' : 'submitted'
             console.log(`Combined access request ${actionText} successfully:`, response.data)
 
             // Preserve service selections for success modal display
@@ -1995,7 +2011,10 @@
           if (this.isSigning) return
           const documentId = this.editRequestId || this.$route.query.id
           if (!documentId) {
-            this.showNotification('Cannot sign until the request exists. Save/submit first or use upload.', 'error')
+            this.showNotification(
+              'Cannot sign until the request exists. Save/submit first or use upload.',
+              'error'
+            )
             return
           }
           this.isSigning = true
@@ -2003,7 +2022,10 @@
           if (res && (res.success || res.data)) {
             this.hasUserSigned = true
             this.lastSignedAt = res?.data?.signed_at || res?.signed_at || new Date().toISOString()
-            this.showNotification(`Document signed on ${new Date(this.lastSignedAt).toLocaleString()}`, 'success')
+            this.showNotification(
+              `Document signed on ${new Date(this.lastSignedAt).toLocaleString()}`,
+              'success'
+            )
           } else {
             this.showNotification(res?.message || 'Failed to sign document', 'error')
           }

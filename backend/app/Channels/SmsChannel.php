@@ -2,20 +2,20 @@
 
 namespace App\Channels;
 
-use App\Services\SmsService;
+use App\Services\SmsModule;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
 
 class SmsChannel
 {
-    protected $smsService;
+    protected $smsModule;
 
     /**
      * Create a new SMS channel instance.
      */
-    public function __construct(SmsService $smsService)
+    public function __construct(SmsModule $smsModule)
     {
-        $this->smsService = $smsService;
+        $this->smsModule = $smsModule;
     }
 
     /**
@@ -68,7 +68,7 @@ class SmsChannel
 
         // Send SMS
         try {
-            $result = $this->smsService->sendSms($phoneNumber, $message, 'notification');
+            $result = $this->smsModule->sendSms($phoneNumber, $message, 'notification');
             
             if ($result['success']) {
                 Log::info('SMS Channel: SMS sent successfully', [

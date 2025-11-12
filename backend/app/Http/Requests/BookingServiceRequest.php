@@ -6,6 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use App\Models\BookingService;
 use App\Models\Department;
+use App\Models\Signature;
 
 class BookingServiceRequest extends FormRequest
 {
@@ -87,12 +88,7 @@ class BookingServiceRequest extends FormRequest
                 'min:10',
                 'max:1000'
             ],
-            'signature' => [
-                'required',
-                'file',
-                'mimes:png,jpg,jpeg',
-                'max:2048' // 2MB max
-            ]
+            // No file-based signature rules; digital signature is validated in withValidator()
         ];
     }
 
@@ -135,11 +131,9 @@ class BookingServiceRequest extends FormRequest
             'reason.required' => 'Reason for borrowing is required.',
             'reason.min' => 'Reason must be at least 10 characters.',
             'reason.max' => 'Reason cannot exceed 1000 characters.',
-            
-            'signature.required' => 'Digital signature is required.',
-            'signature.file' => 'Signature must be a valid file.',
-            'signature.mimes' => 'Signature must be a PNG, JPG, or JPEG image.',
-            'signature.max' => 'Signature file size cannot exceed 2MB.'
+
+            // Digital signature messages
+            'digital_signature.required' => 'Digital signature is required. Please click “Sign Document” before submitting.'
         ];
     }
 
@@ -158,7 +152,6 @@ class BookingServiceRequest extends FormRequest
             'return_date' => 'return date',
             'return_time' => 'return time',
             'reason' => 'reason for borrowing',
-            'signature' => 'digital signature'
         ];
     }
 
@@ -224,6 +217,26 @@ class BookingServiceRequest extends FormRequest
             
             // Validate device type
             $this->validateDeviceType($validator);
+
+            // Enforce presence of a digital signature pre-signed for booking_service token
+            try {
+                $userId = optional($this->user())->id;
+                if ($userId) {
+                    $syntheticDocId = 910000000 + (int) $userId; // booking_service synthetic document id
+                    $hasSignature = Signature::where('document_id', $syntheticDocId)
+                        ->where('user_id', $userId)
+                        ->exists();
+                    if (!$hasSignature) {
+                        $validator->errors()->add('digital_signature', 'Digital signature is required. Please click “Sign Document” before submitting.');
+                    }
+                }
+            } catch (\Exception $e) {
+                \Log::error('Error checking digital signature for booking_service token', [
+                    'error' => $e->getMessage()
+                ]);
+                // Fail closed if we cannot verify
+                $validator->errors()->add('digital_signature', 'Digital signature verification failed. Please try signing again.');
+            }
             
             // Additional validation for return date/time combination
             if ($this->has(['return_date', 'return_time'])) {

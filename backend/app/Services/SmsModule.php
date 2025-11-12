@@ -45,10 +45,34 @@ class SmsModule
     public function sendSms(string $phoneNumber, string $message, string $type = 'notification'): array
     {
         try {
-            // Check if SMS is enabled
+            // In test mode, simulate success (do not block flows or mark as failed)
+            if ($this->testMode) {
+                Log::info('SMS TEST MODE: would send SMS', [
+                    'phone' => $phoneNumber,
+                    'message_preview' => substr($message, 0, 50),
+                    'type' => $type
+                ]);
+                // Still log a synthetic SMS entry for traceability
+                $this->logSms($this->formatPhoneNumber($phoneNumber), $message, $type, true, [
+                    'success' => true,
+                    'message' => 'SMS sent (test mode)'
+                ]);
+                return $this->buildResponse(true, 'SMS sent successfully (test mode)', ['test_mode' => true]);
+            }
+
+            // If service is disabled, do not treat as an error (avoid marking as failed in DB)
             if (!$this->enabled) {
-                Log::info('SMS disabled - would have sent', ['phone' => $phoneNumber, 'message' => substr($message, 0, 50)]);
-                return $this->buildResponse(false, 'SMS service is disabled');
+                Log::info('SMS disabled - skipping send', [
+                    'phone' => $phoneNumber,
+                    'message_preview' => substr($message, 0, 50),
+                    'type' => $type
+                ]);
+                // Log as informational without error state
+                $this->logSms($this->formatPhoneNumber($phoneNumber), $message, $type, true, [
+                    'success' => true,
+                    'message' => 'SMS skipped (service disabled)'
+                ]);
+                return $this->buildResponse(true, 'SMS skipped (service disabled)', ['disabled' => true]);
             }
 
             // Format and validate phone number

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Carbon\Carbon;
 
 class BookingService extends Model
@@ -215,6 +216,14 @@ class BookingService extends Model
     public function assessedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assessed_by');
+    }
+
+    /**
+     * Digital signatures linked to this booking (document_id = booking_service.id)
+     */
+    public function signatures(): HasMany
+    {
+        return $this->hasMany(Signature::class, 'document_id', 'id');
     }
 
     /**

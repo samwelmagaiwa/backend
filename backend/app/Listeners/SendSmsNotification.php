@@ -4,7 +4,7 @@ namespace App\Listeners;
 
 use App\Events\ApprovalStatusChanged;
 use App\Events\ApprovalRequestSubmitted;
-use App\Services\SmsService;
+use App\Services\SmsModule;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
@@ -13,16 +13,16 @@ class SendSmsNotification implements ShouldQueue
 {
     use InteractsWithQueue;
 
-    protected $smsService;
+    protected $sms;
 
     /**
      * Create the event listener.
      *
-     * @param SmsService $smsService
+     * @param SmsModule $sms
      */
-    public function __construct(SmsService $smsService)
+    public function __construct(SmsModule $sms)
     {
-        $this->smsService = $smsService;
+        $this->sms = $sms;
     }
 
     /**
@@ -42,7 +42,7 @@ class SendSmsNotification implements ShouldQueue
         } catch (\Exception $e) {
             Log::error('SMS Notification Listener Error: ' . $e->getMessage(), [
                 'event' => get_class($event),
-                'event_data' => $event->toArray()
+                'event_data' => method_exists($event, 'toArray') ? $event->toArray() : []
             ]);
 
             // Re-throw to ensure the job fails and can be retried
@@ -64,28 +64,30 @@ class SendSmsNotification implements ShouldQueue
             'user_id' => $event->user->id
         ]);
 
+        $reference = $event->request->reference ?? $event->request->id;
+
         // Notify the requester that their request has been submitted
-        $this->smsService->sendApprovalNotification(
-            $event->user,
-            $event->requestType,
-            'pending',
-            [
-                'reference' => $event->request->reference ?? $event->request->id,
-                'submitted_at' => $event->request->created_at->format('Y-m-d H:i')
-            ]
-        );
+        if ($event->user && $event->user->phone) {
+            $message = $this->buildApprovalMessage($event->user->name ?? 'User', $event->requestType, 'pending', [
+                'reference' => $reference,
+                'reason' => null
+            ]);
+            $this->sms->sendSms($event->user->phone, $message, 'approval');
+        } else {
+            Log::warning('Requester has no phone number for submission SMS', [
+                'user_id' => $event->user->id ?? null
+            ]);
+        }
 
         // Notify approvers about the new request
         if (!empty($event->approvers)) {
-            $this->smsService->notifyApprovers(
-                $event->approvers,
+            $approverMessage = $this->buildApproverNotificationMessage(
                 $event->requestType,
-                $event->user,
-                [
-                    'reference' => $event->request->reference ?? $event->request->id,
-                    'submitted_at' => $event->request->created_at->format('Y-m-d H:i')
-                ]
+                $event->user->name ?? 'User',
+                $event->user->department->name ?? ($event->request->department->name ?? 'N/A'),
+                $reference
             );
+            $this->sms->sendBulkSms($event->approvers, $approverMessage, 'approval_notification');
         }
     }
 
@@ -105,29 +107,35 @@ class SendSmsNotification implements ShouldQueue
             'user_id' => $event->user->id
         ]);
 
-        // Notify the requester about the status change
-        $additionalData = [
-            'reference' => $event->request->reference ?? $event->request->id,
-            'updated_at' => now()->format('Y-m-d H:i'),
-            'reason' => $event->reason ?? 'Not specified'
-        ];
+        $reference = $event->request->reference ?? $event->request->id;
 
-        $this->smsService->sendApprovalNotification(
-            $event->user,
-            $event->requestType,
-            $event->newStatus,
-            $additionalData
-        );
+        // Notify the requester about the status change
+        if ($event->user && $event->user->phone) {
+            $message = $this->buildApprovalMessage(
+                $event->user->name ?? 'User',
+                $event->requestType,
+                $event->newStatus,
+                [
+                    'reference' => $reference,
+                    'reason' => $event->reason ?? 'Not specified'
+                ]
+            );
+            $this->sms->sendSms($event->user->phone, $message, 'approval');
+        } else {
+            Log::warning('Requester has no phone number for status change SMS', [
+                'user_id' => $event->user->id ?? null
+            ]);
+        }
 
         // If approved and there are additional stakeholders to notify
         if ($event->newStatus === 'approved' && !empty($event->additionalNotifyUsers)) {
             $message = $this->buildAdditionalApprovalMessage(
                 $event->user,
                 $event->requestType,
-                $additionalData
+                [ 'reference' => $reference ]
             );
 
-            $this->smsService->sendBulkSms(
+            $this->sms->sendBulkSms(
                 $event->additionalNotifyUsers,
                 $message,
                 'approval_notification'
@@ -155,6 +163,46 @@ class SendSmsNotification implements ShouldQueue
             $user->name,
             ucfirst(str_replace('_', ' ', $requestType)),
             $additionalData['reference']
+        ], $template);
+    }
+
+    /**
+     * Build requester approval message (pending/approved/rejected)
+     */
+    protected function buildApprovalMessage(string $name, string $requestType, string $status, array $additionalData): string
+    {
+        $templates = [
+            'pending' => "Dear {name}, your {type} request has been submitted and is pending approval. Reference: {ref}. You will be notified once reviewed. - MNH IT",
+            'approved' => "Dear {name}, your {type} request has been APPROVED. Reference: {ref}. You can now proceed with access. - MNH IT",
+            'rejected' => "Dear {name}, your {type} request has been REJECTED. Reference: {ref}. Reason: {reason}. Contact IT for assistance. - MNH IT"
+        ];
+
+        $template = $templates[$status] ?? $templates['pending'];
+
+        return str_replace([
+            '{name}', '{type}', '{ref}', '{reason}'
+        ], [
+            $name,
+            ucfirst(str_replace('_', ' ', $requestType)),
+            $additionalData['reference'] ?? 'N/A',
+            $additionalData['reason'] ?? 'Not specified'
+        ], $template);
+    }
+
+    /**
+     * Build approver notification message
+     */
+    protected function buildApproverNotificationMessage(string $requestType, string $requesterName, string $department, string $reference): string
+    {
+        $template = "New {type} request from {requester} ({department}) requires your approval. Reference: {ref}. Please review in the system. - MNH IT";
+
+        return str_replace([
+            '{type}', '{requester}', '{department}', '{ref}'
+        ], [
+            ucfirst(str_replace('_', ' ', $requestType)),
+            $requesterName,
+            $department,
+            $reference
         ], $template);
     }
 

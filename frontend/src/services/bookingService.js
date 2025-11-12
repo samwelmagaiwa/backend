@@ -10,13 +10,9 @@ export const bookingService = {
    * @param {FormData} formData - Form data including signature file
    * @returns {Promise<Object>} - API response
    */
-  async submitBooking(formData) {
+  async submitBooking(payload) {
     try {
-      const response = await apiClient.post('/booking-service/bookings', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      })
+      const response = await apiClient.post('/booking-service/bookings', payload)
       return {
         success: true,
         data: response.data
@@ -84,13 +80,9 @@ export const bookingService = {
    * @param {FormData} formData - Updated form data
    * @returns {Promise<Object>} - API response
    */
-  async updateBooking(bookingId, formData) {
+  async updateBooking(bookingId, payload) {
     try {
-      const response = await apiClient.post(`/booking-service/bookings/${bookingId}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      })
+      const response = await apiClient.post(`/booking-service/bookings/${bookingId}`, payload)
       return {
         success: true,
         data: response.data

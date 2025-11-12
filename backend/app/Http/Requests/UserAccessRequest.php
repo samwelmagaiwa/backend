@@ -45,12 +45,8 @@ class UserAccessRequest extends FormRequest
                 'integer',
                 'exists:departments,id',
             ],
-            'signature' => [
-                'required',
-                'file',
-                'mimes:png,jpg,jpeg',
-                'max:5120', // 5MB max
-            ],
+            // Digital-only signatures: no file upload required
+            // 'signature' field is ignored; presence is validated against signatures table in withValidator()
             'request_type' => [
                 'required',
                 'array',
@@ -133,9 +129,7 @@ class UserAccessRequest extends FormRequest
             'phone_number.min' => 'Phone number must be at least 10 digits.',
             'department_id.required' => 'Department selection is required.',
             'department_id.exists' => 'Selected department does not exist.',
-            'signature.required' => 'Digital signature is required.',
-            'signature.mimes' => 'Digital signature must be a PNG, JPG, or JPEG file.',
-            'signature.max' => 'Digital signature file size must not exceed 5MB.',
+'digital_signature.required' => 'Digital signature is required. Please click “Sign Document” before submitting.',
             'request_type.required' => 'At least one service must be selected.',
             'request_type.min' => 'At least one service must be selected.',
             'request_type.*.required' => 'Service type is required.',
@@ -305,6 +299,26 @@ class UserAccessRequest extends FormRequest
             // Internet purposes are now optional - removed validation requirement
             // They can be added later by HOD or during approval process
             // This makes the form dynamic and allows submission without purposes
+
+            // Enforce presence of a digital signature pre-signed for combined_access token
+            try {
+                $userId = optional($this->user())->id;
+                if ($userId) {
+                    $syntheticDocId = 900000000 + (int) $userId; // combined_access synthetic document id
+                    $hasSignature = \App\Models\Signature::where('document_id', $syntheticDocId)
+                        ->where('user_id', $userId)
+                        ->exists();
+                    if (!$hasSignature) {
+                        $validator->errors()->add('digital_signature', 'Digital signature is required. Please click “Sign Document” before submitting.');
+                    }
+                }
+            } catch (\Exception $e) {
+                \Log::error('Error checking digital signature for combined_access token', [
+                    'error' => $e->getMessage()
+                ]);
+                // Fail closed if we cannot verify
+                $validator->errors()->add('digital_signature', 'Digital signature verification failed. Please try signing again.');
+            }
         });
     }
 }

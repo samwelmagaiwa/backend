@@ -1091,7 +1091,10 @@
           })
         } else {
           // No pending combined requests, proceed to combined form in editable pre-sign mode
-          router.push({ path: '/user-combined-form', query: { mode: 'edit', id: 'combined_access' } })
+          router.push({
+            path: '/user-combined-form',
+            query: { mode: 'edit', id: 'combined_access' }
+          })
         }
       }
 

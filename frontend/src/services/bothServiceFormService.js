@@ -554,45 +554,29 @@ class BothServiceFormService {
         payload
       )
 
-      const fd = new FormData()
-
-      // Required HOD fields
-      fd.append('hod_name', payload.hodName || '')
-      fd.append('approved_date', payload.approvedDate || new Date().toISOString().slice(0, 10))
-      // Send comments using both keys for maximum backend compatibility
+      // Build JSON payload (digital signature only)
       const hodComments = payload.hodComments || payload.comments || ''
-      fd.append('comments', hodComments)
-      fd.append('hod_comments', hodComments)
-
-      if (payload.hodSignature) {
-        fd.append('hod_signature', payload.hodSignature)
-      } else {
-        throw new Error('HOD signature file is required')
-      }
-
-      // Access rights (default to permanent if not provided)
-      fd.append('access_type', payload.accessType || 'permanent')
-      if (payload.accessType === 'temporary' && payload.temporaryUntil) {
-        fd.append('temporary_until', payload.temporaryUntil)
-      }
-
-      // Module selections
       const wellsoft = Array.isArray(payload.selectedWellsoft) ? payload.selectedWellsoft : []
       const jeeva = Array.isArray(payload.selectedJeeva) ? payload.selectedJeeva : []
 
-      wellsoft.forEach((m, i) => fd.append(`wellsoft_modules_selected[${i}]`, m))
-      jeeva.forEach((m, i) => fd.append(`jeeva_modules_selected[${i}]`, m))
-
-      // Requested for: use/revoke
-      if (payload.moduleRequestedFor) {
-        fd.append('module_requested_for', payload.moduleRequestedFor)
+      const data = {
+        hod_name: payload.hodName || '',
+        approved_date: payload.approvedDate || new Date().toISOString().slice(0, 10),
+        comments: hodComments,
+        access_type: payload.accessType || 'permanent',
+        temporary_until:
+          payload.accessType === 'temporary' && payload.temporaryUntil
+            ? payload.temporaryUntil
+            : null,
+        wellsoft_modules_selected: wellsoft,
+        jeeva_modules_selected: jeeva,
+        module_requested_for: payload.moduleRequestedFor || undefined
       }
 
       // POST to HOD approve endpoint under both-service-form
       const res = await apiClient.post(
         `/both-service-form/module-requests/${requestId}/hod-approve`,
-        fd,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
+        data
       )
 
       if (res.data?.success) {
@@ -620,24 +604,17 @@ class BothServiceFormService {
     try {
       console.log('🔄 Divisional Director approving request:', requestId, payload)
 
-      const fd = new FormData()
-
-      // Required Divisional Director fields
-      fd.append('divisional_director_name', payload.divisionalDirectorName || '')
-      fd.append('approved_date', payload.approvedDate || new Date().toISOString().slice(0, 10))
-      fd.append('comments', payload.comments || '')
-
-      if (payload.divisionalDirectorSignature) {
-        fd.append('divisional_director_signature', payload.divisionalDirectorSignature)
-      } else {
-        throw new Error('Divisional Director signature file is required')
+      // Build JSON payload (digital signature only)
+      const data = {
+        divisional_director_name: payload.divisionalDirectorName || '',
+        approved_date: payload.approvedDate || new Date().toISOString().slice(0, 10),
+        comments: payload.comments || ''
       }
 
       // POST to Divisional Director approve endpoint
       const res = await apiClient.post(
         `/both-service-form/module-requests/${requestId}/divisional-approve`,
-        fd,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
+        data
       )
 
       if (res.data?.success) {
@@ -708,24 +685,17 @@ class BothServiceFormService {
     try {
       console.log('🔄 ICT Director approving request:', requestId, payload)
 
-      const fd = new FormData()
-
-      // Required ICT Director fields
-      fd.append('ict_director_name', payload.ictDirectorName || '')
-      fd.append('approved_date', payload.approvedDate || new Date().toISOString().slice(0, 10))
-      fd.append('comments', payload.comments || '')
-
-      if (payload.ictDirectorSignature) {
-        fd.append('ict_director_signature', payload.ictDirectorSignature)
-      } else {
-        throw new Error('ICT Director signature file is required')
+      // Build JSON payload (digital signature only)
+      const data = {
+        ict_director_name: payload.ictDirectorName || '',
+        approved_date: payload.approvedDate || new Date().toISOString().slice(0, 10),
+        comments: payload.comments || ''
       }
 
       // POST to ICT Director approve endpoint
       const res = await apiClient.post(
         `/both-service-form/module-requests/${requestId}/ict-director-approve`,
-        fd,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
+        data
       )
 
       if (res.data?.success) {
@@ -792,24 +762,17 @@ class BothServiceFormService {
     try {
       console.log('🔄 Head IT approving request:', requestId, payload)
 
-      const fd = new FormData()
-
-      // Required Head IT fields
-      fd.append('head_it_name', payload.headItName || '')
-      fd.append('approved_date', payload.approvedDate || new Date().toISOString().slice(0, 10))
-      fd.append('comments', payload.comments || '')
-
-      if (payload.headItSignature) {
-        fd.append('head_it_signature', payload.headItSignature)
-      } else {
-        throw new Error('Head IT signature file is required')
+      // Build JSON payload (digital signature only)
+      const data = {
+        head_it_name: payload.headItName || '',
+        approved_date: payload.approvedDate || new Date().toISOString().slice(0, 10),
+        comments: payload.comments || ''
       }
 
       // POST to Head IT approve endpoint
       const res = await apiClient.post(
         `/both-service-form/module-requests/${requestId}/head-of-it-approve`,
-        fd,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
+        data
       )
 
       if (res.data?.success) {
@@ -874,25 +837,21 @@ class BothServiceFormService {
     try {
       console.log('🔄 ICT Officer implementing request:', requestId, payload)
 
-      const fd = new FormData()
-
-      // Required ICT Officer fields
-      fd.append('ict_officer_name', payload.ict_officer_name || '')
-      fd.append('approved_date', payload.ict_officer_date || new Date().toISOString().slice(0, 10))
-      fd.append('comments', payload.ict_officer_comments || '')
-      fd.append('status', payload.ict_officer_status || 'implemented')
-
-      if (payload.ict_officer_signature) {
-        fd.append('ict_officer_signature', payload.ict_officer_signature)
-      } else {
-        throw new Error('ICT Officer signature file is required')
+      // Build JSON payload (digital signature only)
+      const data = {
+        ict_officer_name: payload.ict_officer_name || '',
+        approved_date:
+          payload.approved_date ||
+          payload.ict_officer_date ||
+          new Date().toISOString().slice(0, 10),
+        comments: payload.comments || payload.ict_officer_comments || '',
+        status: payload.status || payload.ict_officer_status || 'implemented'
       }
 
       // POST to ICT Officer approve endpoint
       const res = await apiClient.post(
         `/both-service-form/module-requests/${requestId}/ict-officer-approve`,
-        fd,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
+        data
       )
 
       if (res.data?.success) {

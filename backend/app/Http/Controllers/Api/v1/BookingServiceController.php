@@ -227,77 +227,7 @@ class BookingServiceController extends Controller
                 }
             }
 
-            // Handle signature upload with enhanced error handling
-            if ($request->hasFile('signature')) {
-                try {
-                    $signatureFile = $request->file('signature');
-                    
-                    // Validate signature file before processing
-                    if (!$signatureFile->isValid()) {
-                        Log::error('Invalid signature file uploaded', [
-                            'user_id' => $user->id,
-                            'file_error' => $signatureFile->getError(),
-                            'file_size' => $signatureFile->getSize(),
-                            'file_type' => $signatureFile->getMimeType()
-                        ]);
-                        
-                        return response()->json([
-                            'success' => false,
-                            'message' => 'Invalid signature file uploaded',
-                            'error' => 'File upload error'
-                        ], 400);
-                    }
-                    
-                    // Additional file validation
-                    $allowedMimes = ['image/png', 'image/jpg', 'image/jpeg'];
-                    $maxSize = 2 * 1024 * 1024; // 2MB
-                    
-                    if (!in_array($signatureFile->getMimeType(), $allowedMimes)) {
-                        return response()->json([
-                            'success' => false,
-                            'message' => 'Invalid file type. Only PNG, JPG, and JPEG files are allowed.',
-                            'error' => 'Invalid file type'
-                        ], 400);
-                    }
-                    
-                    if ($signatureFile->getSize() > $maxSize) {
-                        return response()->json([
-                            'success' => false,
-                            'message' => 'File size too large. Maximum size is 2MB.',
-                            'error' => 'File too large'
-                        ], 400);
-                    }
-                    
-                    $signaturePath = $this->handleSignatureUpload($signatureFile, $validatedData['borrower_name']);
-                    $validatedData['signature_path'] = $signaturePath;
-                    
-                    Log::info('Signature uploaded successfully', [
-                        'user_id' => $user->id,
-                        'file_path' => $signaturePath,
-                        'file_size' => $signatureFile->getSize(),
-                        'file_type' => $signatureFile->getMimeType()
-                    ]);
-                    
-                } catch (\Exception $e) {
-                    Log::error('Signature upload failed', [
-                        'user_id' => $user->id,
-                        'error' => $e->getMessage(),
-                        'trace' => $e->getTraceAsString()
-                    ]);
-                    
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Failed to upload signature file',
-                        'error' => config('app.debug') ? $e->getMessage() : 'File upload error'
-                    ], 500);
-                }
-            } else {
-                Log::warning('No signature file provided', [
-                    'user_id' => $user->id,
-                    'has_file' => $request->hasFile('signature'),
-                    'all_files' => $request->allFiles()
-                ]);
-            }
+            // Digital-only signatures: no file uploads. Presence is enforced in BookingServiceRequest.
 
             // Create the booking with enhanced error handling
             try {

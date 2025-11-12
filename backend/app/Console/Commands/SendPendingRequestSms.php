@@ -32,9 +32,9 @@ class SendPendingRequestSms extends Command
         $this->info('🚀 Starting SMS notification process...');
         $sms = app(SmsModule::class);
         
-        // Check if SMS is enabled
-        if (!$sms->isEnabled()) {
-            $this->warn('⚠️  SMS is disabled in configuration. Enable SMS_ENABLED=true in .env');
+        // Check if SMS is enabled (allow running in test mode even if disabled)
+        if (!$sms->isEnabled() && !$sms->isTestMode()) {
+            $this->warn('⚠️  SMS is disabled in configuration. Enable SMS_ENABLED=true in .env or set SMS_TEST_MODE=true to simulate sending.');
             return 1;
         }
         

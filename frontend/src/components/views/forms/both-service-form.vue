@@ -646,10 +646,10 @@
                                 <i class="fas fa-check-circle text-green-400 text-sm"></i>
                                 <p class="text-green-300 text-xs font-bold">
                                   Digitally signed
-                                  <span v-if="hasUserSigned">by {{ currentUser?.name || 'You' }}</span>
+                                  <span v-if="signatureDisplay?.name"> by {{ signatureDisplay.name }}</span>
                                 </p>
-                                <p v-if="lastSignedAt" class="text-green-200 text-[10px]">
-                                  on {{ new Date(lastSignedAt).toLocaleString() }}
+                                <p v-if="signatureDisplay?.at" class="text-green-200 text-[10px]">
+                                  on {{ formatDateTime(signatureDisplay.at) }}
                                 </p>
                               </div>
                               <div v-else class="flex flex-col items-center">
@@ -1636,7 +1636,7 @@
                                 </div>
 
                                 <!-- Keep upload button section for when user can edit and signature is not already uploaded -->
-                                <div v-if="requestData?.approvals?.hod?.signature_status !== 'Signed'" class="text-center mt-2">
+                                <div v-if="requestData?.approvals?.hod?.signature_status !== 'Signed' && !hasUserSigned && !(currentUser?.name && historyHasSigner(currentUser.name))" class="text-center mt-2">
                                   <button
                                     v-if="canUploadHodSignature"
                                     type="button"
@@ -1899,7 +1899,7 @@
                                 <!-- Keep upload button section for when user can edit -->
                                 <div class="text-center mt-2">
                                   <button
-                                    v-if="isDivisionalApprovalEditable"
+                                    v-if="isDivisionalApprovalEditable && !(hasUserSigned || (currentUser?.name && historyHasSigner(currentUser.name)))"
                                     type="button"
                                     @click="signCurrentDocument"
                                     :disabled="isSigning || !isReviewMode"
@@ -2144,7 +2144,7 @@
                                 <!-- Keep upload button section for when user can edit -->
                                 <div class="text-center mt-2">
                                   <button
-                                    v-if="isIctDirectorApprovalEditable"
+                                    v-if="isIctDirectorApprovalEditable && !(hasUserSigned || (currentUser?.name && historyHasSigner(currentUser.name)))"
                                     type="button"
                                     @click="signCurrentDocument"
                                     :disabled="isSigning || !isReviewMode"
@@ -2381,7 +2381,7 @@
                                     <p class="text-blue-100 text-xs">No signature</p>
                                   </div>
                                   <button
-                                    v-if="isHeadItApprovalEditable"
+                                    v-if="isHeadItApprovalEditable && !(hasUserSigned || (currentUser?.name && historyHasSigner(currentUser.name)))"
                                     type="button"
                                     @click="signCurrentDocument"
                                     :disabled="isSigning || !isReviewMode"
@@ -2520,7 +2520,8 @@
                                     v-if="
                                       (isIctOfficerApprovalEditable ||
                                         currentUser?.role === 'ict_officer') &&
-                                      !isImplementationAlreadyCompleted
+                                      !isImplementationAlreadyCompleted &&
+                                      !(hasUserSigned || (currentUser?.name && historyHasSigner(currentUser.name)))
                                     "
                                     type="button"
                                     @click="signCurrentDocument"
@@ -3994,6 +3995,57 @@
         return `${yyyy}-${mm}-${dd}`
       },
 
+      signatureDisplay() {
+        // Staff/applicant signature display for the top Signature card
+        try {
+          const staff = (this.requesterName || '').trim().toLowerCase()
+          const list = Array.isArray(this.signatureHistory) ? this.signatureHistory : []
+          const getTs = (s) => s?.signed_at || s?.created_at || s?.timestamp
+
+          // 1) Prefer exact match with staff/applicant name
+          const staffEntry = list.find(
+            (s) =>
+              String(s.user_name || s.name || '')
+                .trim()
+                .toLowerCase() === staff
+          )
+          if (staffEntry) {
+            return {
+              name: staffEntry.user_name || staffEntry.name,
+              at: getTs(staffEntry)
+            }
+          }
+
+          // 2) Fall back to earliest signature (usually staff signed first)
+          if (list.length > 0) {
+            const sortedAsc = [...list]
+              .filter((s) => !!getTs(s))
+              .sort((a, b) => new Date(getTs(a)) - new Date(getTs(b)))
+            const first = sortedAsc[0] || list[0]
+            return { name: first.user_name || first.name, at: getTs(first) }
+          }
+
+          return null
+        } catch (_) {
+          return null
+        }
+      },
+
+      requesterName() {
+        // Resolve the applicant (staff) name from available fields
+        try {
+          return (
+            this.form?.shared?.staffName ||
+            this.requestData?.shared?.staffName ||
+            this.requestData?.staff_name ||
+            this.requestData?.full_name ||
+            ''
+          )
+        } catch {
+          return ''
+        }
+      },
+
       summaryErrors() {
         const list = []
         // Defensive guards for shared
@@ -4015,22 +4067,33 @@
 
       // Check if signature exists in the database
       hasSignature() {
-        const hasData = !!this.requestData
-        const hasPath = this.requestData && !!this.requestData.signature_path
-        const pathNotEmpty = hasPath && this.requestData.signature_path.trim() !== ''
+        const rd = this.requestData || {}
+        const hasData = !!rd
+        const hasPath = !!rd.signature_path
+        const pathNotEmpty = hasPath && String(rd.signature_path).trim() !== ''
+        const digitalFlag = rd.digitalSignature === true || rd.digital_signature === true
+        const signatureCounts = Number(rd.signatures_count || rd.signature_count || 0) > 0
+        const historyHasAny =
+          Array.isArray(this.signatureHistory) && this.signatureHistory.length > 0
+        const staffMatch = this.historyHasSigner(this.requesterName)
 
-        // Debug signature status (development only)
+        // Prefer any positive digital signal, but prioritize staff match
+        const result =
+          hasData && (pathNotEmpty || digitalFlag || signatureCounts || staffMatch || historyHasAny)
+
         if (this.isDevelopment) {
           console.log('hasSignature debug:', {
-            hasData,
-            hasPath,
-            signaturePath: this.requestData?.signature_path,
-            pathNotEmpty,
-            result: hasData && hasPath && pathNotEmpty
+            signaturePath: rd.signature_path,
+            digitalFlag,
+            signatureCounts: rd.signatures_count || rd.signature_count,
+            historyCount: (this.signatureHistory || []).length,
+            staffMatch,
+            staffName: this.requesterName,
+            result
           })
         }
 
-        return hasData && hasPath && pathNotEmpty
+        return result
       },
 
       // Get request types from loaded data
@@ -4723,55 +4786,32 @@
         }
       },
 
-      // Check if required signature is uploaded for current approval stage
+      // Check if a digital signature (by current user) is required for the current stage
       isSignatureRequiredForApproval() {
         if (!this.isReviewMode || !this.requestData) return false
 
         const stage = this.currentApprovalStage
-        const userRole = (this.getUserRole() || '').toLowerCase()
-
-        // Helper to treat preview as valid while file is in memory
-        const has = (v) => !!v && (typeof v === 'string' || typeof v === 'object')
-
-        // For HOD stage, check HOD signature
-        if (
-          stage === 'hod' &&
-          [
+        const userRole = (this.getUserRole() || '').toLowerCase().replace(/[\s-]+/g, '_')
+        const roleMap = {
+          hod: [
             'head_of_department',
             'hod',
             'department_head',
             'head_department',
             'hod_user',
             'head_of_dept'
-          ].includes(userRole)
-        ) {
-          return !(has(this.form.approvals.hod.signature) || has(this.hodSignaturePreview))
+          ],
+          divisional: ['divisional_director'],
+          ict_director: ['ict_director', 'dict'],
+          head_it: ['head_it', 'head_of_it']
         }
 
-        // For Divisional Director stage, check Divisional Director signature
-        if (stage === 'divisional' && ['divisional_director'].includes(userRole)) {
-          return !(
-            has(this.form.approvals.divisionalDirector.signature) ||
-            has(this.divDirectorSignaturePreview)
-          )
-        }
+        const requiresSignature = !!roleMap[stage] && roleMap[stage].includes(userRole)
+        if (!requiresSignature) return false
 
-        // For ICT Director stage, check ICT Director signature
-        if (stage === 'ict_director' && ['ict_director', 'dict'].includes(userRole)) {
-          return !(
-            has(this.form.approvals.directorICT.signature) || has(this.directorICTSignaturePreview)
-          )
-        }
-
-        // For Head IT stage, check Head IT signature
-        if (stage === 'head_it' && ['head_it', 'head_of_it'].includes(userRole)) {
-          return !(
-            has(this.form.implementation.headIT.signature) || has(this.headITSignaturePreview)
-          )
-        }
-
-        // For other stages, assume no signature required for now
-        return false
+        const currentUserName = this.currentUser?.name || ''
+        const hasDigital = !!this.hasUserSigned || this.historyHasSigner(currentUserName)
+        return !hasDigital
       },
 
       // Get HOD comments from requestData for display in review mode
@@ -5132,17 +5172,7 @@
 
       // Check if approval buttons should be disabled due to missing signature or HOD comments
       areApprovalButtonsDisabled() {
-        // For HOD users, also check if HOD comments are filled
-        const userRole = (this.getUserRole() || '').toLowerCase().replace(/[\s-]+/g, '_')
-        const hodRoles = ['head_of_department', 'hod']
-        const isHodUser = hodRoles.includes(userRole)
-        const isHodStage = this.currentApprovalStage === 'hod'
-
-        // If HOD user at HOD stage, require HOD comments
-        if (isHodUser && isHodStage && !this.hodComments?.trim()) {
-          return true
-        }
-
+        // Enable once digital signature exists; keep disabled only for loading/processing/signature-missing
         return this.loading || this.processing || this.isSignatureRequiredForApproval
       },
 
@@ -5296,26 +5326,35 @@
 
       // Should show signed indicators for the previous stage while current stage is pending
       shouldShowHodSignedIndicator() {
-        const baseResult =
+        // Show as signed when:
+        // 1) Viewer is after HOD stage and HOD stage is signed (original behaviour), OR
+        // 2) Viewer IS the HOD and they have digitally signed (in this session or history), OR
+        // 3) Divisional Director fallback when legacy hod_signature_path exists
+        const afterStage =
           this.isReviewMode && this.viewerAfter('hod') && this.hasStageSigned('hod')
+        const isHodViewer = this.viewerStage() === 'hod'
+        const hasDigital =
+          !!this.hasUserSigned ||
+          (this.currentUser?.name && this.historyHasSigner(this.currentUser.name))
+        const hodSelf = this.isReviewMode && isHodViewer && hasDigital
 
         // Explicit fallback: if user is divisional director and hod_signature_path exists, show signed
-        const isDivisionalDirector = this.getUserRole()?.toLowerCase() === 'divisional_director'
+        const isDivisionalDirector =
+          (this.getUserRole() || '').toLowerCase() === 'divisional_director'
         const hodSignatureExists = !!this.requestData?.hod_signature_path
         const fallbackResult = this.isReviewMode && isDivisionalDirector && hodSignatureExists
 
-        const result = baseResult || fallbackResult
+        const result = afterStage || hodSelf || fallbackResult
 
         if (this.isDevelopment) {
           console.log('\ud83d\udfe2 shouldShowHodSignedIndicator:', {
             isReviewMode: this.isReviewMode,
             viewerAfter_hod: this.viewerAfter('hod'),
             hasStageSigned_hod: this.hasStageSigned('hod'),
+            isHodViewer,
+            hasDigital,
             isDivisionalDirector,
             hodSignatureExists,
-            hod_signature_path: this.requestData?.hod_signature_path,
-            baseResult,
-            fallbackResult,
             result
           })
         }
@@ -5820,6 +5859,15 @@
       }
     },
     methods: {
+      formatDateTime(ts) {
+        try {
+          const d = typeof ts === 'string' ? new Date(ts) : ts
+          if (isNaN(d?.getTime?.())) return ''
+          return d.toLocaleString()
+        } catch {
+          return ''
+        }
+      },
       normalizePhoneNumber(input) {
         if (!input) return ''
         let v = String(input).trim().replace(/\s|-/g, '')
@@ -5849,6 +5897,45 @@
               show: true,
               message: `Document successfully signed by ${signer} on ${new Date(this.lastSignedAt).toLocaleString()}`
             }
+            // Refresh local signature history so indicators update without reload
+            await this.fetchSignatureHistory().catch(() => {})
+            // Optimistically reflect signed status for current stage to hide buttons immediately
+            try {
+              const stage = this.viewerStage()
+              if (this.requestData) {
+                this.requestData.approvals = this.requestData.approvals || {}
+                if (stage === 'hod') {
+                  this.requestData.approvals.hod = {
+                    ...(this.requestData.approvals.hod || {}),
+                    signature_status: 'Signed',
+                    signature_display: 'Digitally signed'
+                  }
+                } else if (stage === 'divisional') {
+                  this.requestData.approvals.divisionalDirector = {
+                    ...(this.requestData.approvals.divisionalDirector || {}),
+                    signature_status: 'Signed',
+                    signature_display: 'Digitally signed'
+                  }
+                } else if (stage === 'ict_director') {
+                  this.requestData.approvals.directorICT = {
+                    ...(this.requestData.approvals.directorICT || {}),
+                    signature_status: 'Signed',
+                    signature_display: 'Digitally signed'
+                  }
+                } else if (stage === 'head_it') {
+                  this.requestData.implementation = this.requestData.implementation || {}
+                  this.requestData.implementation.headIT = {
+                    ...(this.requestData.implementation.headIT || {}),
+                    signature_status: 'Signed',
+                    signature_display: 'Digitally signed'
+                  }
+                }
+              }
+            } catch (err) {
+              // Ensure UI updates even if optimistic local patch fails
+              console.warn('Signature optimistic update failed:', err)
+            }
+            this.$forceUpdate()
             setTimeout(() => (this.toast.show = false), 4000)
           } else {
             this.showToast(res?.message || 'Failed to sign document', 'error')
@@ -5961,9 +6048,11 @@
         // Only ICT Officer flow
         const role = (this.getUserRole() || '').toLowerCase()
         if (!['ict_officer', 'officer_ict'].includes(role)) return
-        // Require signature before proceeding
-        if (!this.ictOfficerSignaturePreview && !this.form?.implementation?.ictOfficer?.signature) {
-          this.showToast('Please upload your signature first', 'error')
+        // Require digital signature before proceeding
+        const currentUserName = this.currentUser?.name || ''
+        const hasDigital = !!this.hasUserSigned || this.historyHasSigner(currentUserName)
+        if (!hasDigital) {
+          this.showToast('Please digitally sign the request first', 'error')
           return
         }
         this.grantAccessComment = (this.roleCommentsDraft || '').trim()
@@ -7366,24 +7455,20 @@
           return
         }
 
-        // Check if signature is required but missing
+        // Check if a digital signature is required but missing
         if (this.isSignatureRequiredForApproval) {
-          const stage = this.currentApprovalStage
-          let message = 'Please upload your signature before approving this request.'
-
-          if (stage === 'divisional') {
-            message =
-              'Please upload your Divisional Director signature before approving this request.'
-          } else if (stage === 'hod') {
-            message = 'Please upload your HOD signature before approving this request.'
-          } else if (stage === 'ict_director') {
-            message = 'Please upload your ICT Director signature before approving this request.'
-          }
-
           this.toast = {
             show: true,
-            message
+            message: 'Please digitally sign this request before approving.'
           }
+          setTimeout(() => (this.toast.show = false), 4000)
+          return
+        }
+
+        // Gentle validation gate: if we still have validation errors (e.g., HOD comments), prompt and stop
+        const errs = this.validationErrors
+        if (errs && errs.length) {
+          this.toast = { show: true, message: errs[0] }
           setTimeout(() => (this.toast.show = false), 4000)
           return
         }
@@ -7434,16 +7519,7 @@
         // Validate minimal HOD fields
         const hodName = this.form.approvals.hod.name || this.currentUser?.name || ''
         const hodDate = this.form.approvals.hod.date || new Date().toISOString().slice(0, 10)
-        const hodSignature = this.form.approvals.hod.signature
-
-        if (!hodSignature) {
-          this.toast = {
-            show: true,
-            message: 'Please upload your HOD signature before approving'
-          }
-          setTimeout(() => (this.toast.show = false), 4000)
-          return
-        }
+        // Digital signature required will be enforced by backend; proceed if comments are valid
 
         // Validate access rights (HOD-only)
         this.hodTemporaryUntilError = ''
@@ -7469,8 +7545,7 @@
         const payload = {
           hodName,
           approvedDate: hodDate,
-          hodSignature,
-          comments: this.form.comments || 'Approved by HOD',
+          comments: this.hodComments || this.form.comments || 'Approved by HOD',
           selectedWellsoft: this.selectedWellsoft,
           selectedJeeva: this.selectedJeeva,
           moduleRequestedFor: this.wellsoftRequestType || 'use',
@@ -7542,16 +7617,7 @@
           this.form.approvals.divisionalDirector.name || this.currentUser?.name || ''
         const divisionalDate =
           this.form.approvals.divisionalDirector.date || new Date().toISOString().slice(0, 10)
-        const divisionalDirectorSignature = this.form.approvals.divisionalDirector.signature
-
-        if (!divisionalDirectorSignature) {
-          this.toast = {
-            show: true,
-            message: 'Please upload your Divisional Director signature before approving'
-          }
-          setTimeout(() => (this.toast.show = false), 4000)
-          return
-        }
+        // Digital signature required will be enforced by backend
 
         // Use role comment draft as the authoritative comments input
         const roleComment = (this.roleCommentsDraft || '').trim()
@@ -7567,7 +7633,6 @@
         const payload = {
           divisionalDirectorName,
           approvedDate: divisionalDate,
-          divisionalDirectorSignature,
           comments: roleComment
         }
 
@@ -7615,11 +7680,11 @@
           return
         }
 
-        // Check if signature is required but missing
+        // Check if a digital signature is required but missing
         if (this.isSignatureRequiredForApproval) {
           this.toast = {
             show: true,
-            message: 'Please upload your ICT Director signature before approving this request.'
+            message: 'Please digitally sign this request before approving.'
           }
           setTimeout(() => (this.toast.show = false), 4000)
           return
@@ -7686,16 +7751,7 @@
 
         // Validate ICT Director fields
         const ictDirectorName = this.form.approvals.directorICT.name || this.currentUser?.name || ''
-        const ictDirectorSignature = this.form.approvals.directorICT.signature
-
-        if (!ictDirectorSignature) {
-          this.toast = {
-            show: true,
-            message: 'Please upload your ICT Director signature before approving'
-          }
-          setTimeout(() => (this.toast.show = false), 4000)
-          return
-        }
+        // Digital signature required will be enforced by backend
 
         // Validate ICT Director comments (from role comment editor)
         const roleComment = (this.roleCommentsDraft || '').trim()
@@ -7714,7 +7770,6 @@
         const payload = {
           ictDirectorName: ictDirectorName,
           approvedDate: ictDirectorDate,
-          ictDirectorSignature: ictDirectorSignature,
           comments: roleComment
         }
 
@@ -7776,15 +7831,7 @@
           return
         }
 
-        // Check if signature is required but missing
-        if (!this.form.implementation.headIT.signature) {
-          this.toast = {
-            show: true,
-            message: 'Please upload your Head of IT signature before approving this request.'
-          }
-          setTimeout(() => (this.toast.show = false), 4000)
-          return
-        }
+        // Digital signature required will be enforced by backend
 
         try {
           this.processing = true
@@ -7823,16 +7870,7 @@
       async approveAsHeadIt() {
         // Validate Head IT fields
         const headItName = this.form.implementation.headIT.name || this.currentUser?.name || ''
-        const headItSignature = this.form.implementation.headIT.signature
-
-        if (!headItSignature) {
-          this.toast = {
-            show: true,
-            message: 'Please upload your Head of IT signature before approving'
-          }
-          setTimeout(() => (this.toast.show = false), 4000)
-          return
-        }
+        // Digital signature required will be enforced by backend
 
         // Auto-populate date if not set
         const headItDate =
@@ -7842,7 +7880,6 @@
         const payload = {
           headItName: headItName,
           approvedDate: headItDate,
-          headItSignature: headItSignature,
           comments: this.roleCommentsDraft || this.form.comments || 'Approved by Head of IT'
         }
 
@@ -7920,23 +7957,11 @@
       },
 
       async rejectRequest() {
-        // Check if signature is required but missing
+        // Check if a digital signature is required but missing
         if (this.isSignatureRequiredForApproval) {
-          const stage = this.currentApprovalStage
-          let message = 'Please upload your signature before rejecting this request.'
-
-          if (stage === 'divisional') {
-            message =
-              'Please upload your Divisional Director signature before rejecting this request.'
-          } else if (stage === 'hod') {
-            message = 'Please upload your HOD signature before rejecting this request.'
-          } else if (stage === 'ict_director') {
-            message = 'Please upload your ICT Director signature before rejecting this request.'
-          }
-
           this.toast = {
             show: true,
-            message
+            message: 'Please digitally sign this request before rejecting.'
           }
           setTimeout(() => (this.toast.show = false), 4000)
           return
@@ -8299,7 +8324,58 @@
             this.requestData.ict_officer_approved_at
         }
 
-        const at = dateMap[stage]
+        let at = dateMap[stage]
+
+        // Fallback: derive from digital signature history for that approver if available
+        if (!at) {
+          try {
+            const approverNameMap = {
+              hod: this.requestData.approvals?.hod?.name || this.requestData.hod_name,
+              divisional:
+                this.requestData.approvals?.divisionalDirector?.name ||
+                this.requestData.divisional_director_name,
+              ict_director:
+                this.requestData.approvals?.directorICT?.name || this.requestData.dict_name,
+              head_it:
+                this.requestData.implementation?.headIT?.name || this.requestData.head_it_name,
+              ict_officer:
+                this.requestData.implementation?.ictOfficer?.name ||
+                this.requestData.ict_officer_name
+            }
+            const approver = String(approverNameMap[stage] || '')
+              .trim()
+              .toLowerCase()
+            const getTs = (s) => s?.signed_at || s?.created_at || s?.timestamp
+            let entry = (this.signatureHistory || []).find(
+              (s) =>
+                String(s.user_name || s.name || '')
+                  .trim()
+                  .toLowerCase() === approver
+            )
+
+            // Additional fallback: if viewer is at this stage and has signed, use current user entry
+            if (!entry) {
+              const viewerIsStage = this.viewerStage() === stage
+              const viewerName = (this.currentUser?.name || '').trim().toLowerCase()
+              if (viewerIsStage && viewerName) {
+                entry = (this.signatureHistory || []).find(
+                  (s) =>
+                    String(s.user_name || s.name || '')
+                      .trim()
+                      .toLowerCase() === viewerName
+                )
+                if (!entry && this.hasUserSigned && this.lastSignedAt) {
+                  // Construct a synthetic entry from local state
+                  at = this.lastSignedAt
+                }
+              }
+            }
+            if (!at && entry) at = getTs(entry)
+          } catch (_) {
+            /* no-op */
+          }
+        }
+
         if (!at) return 'Date unavailable'
         try {
           const date = new Date(at)

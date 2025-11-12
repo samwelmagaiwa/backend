@@ -400,7 +400,7 @@ class RequestStatusController extends Controller
             'staffName' => $accessRequest->staff_name,
             'pfNumber' => $accessRequest->pf_number,
             'department' => $accessRequest->department ? $accessRequest->department->name : 'Unknown',
-            'digitalSignature' => !empty($accessRequest->signature_path),
+'digitalSignature' => $accessRequest->signatures()->exists(),
             'moduleRequestedFor' => 'Use', // Default value
             'selectedModules' => $services,
             'accessType' => 'Permanent (until retirement)', // Default value
@@ -517,7 +517,7 @@ class RequestStatusController extends Controller
                 'staffName' => $booking->borrower_name,
                 'pfNumber' => $booking->user ? $booking->user->pf_number : 'Unknown',
                 'department' => $departmentName,
-                'digitalSignature' => !empty($booking->signature_path),
+'digitalSignature' => method_exists($booking, 'signatures') ? $booking->signatures()->exists() : (\App\Models\Signature::where('document_id', $booking->id)->exists()),
                 'deviceType' => $deviceDisplayName,
                 'bookingDate' => $booking->booking_date ? $booking->booking_date->format('Y-m-d') : null,
                 'returnDate' => $booking->return_date ? $booking->return_date->format('Y-m-d') : null,

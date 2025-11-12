@@ -500,91 +500,67 @@
                       <label class="block text-xl font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-signature mr-2 text-blue-300"></i>
                         Signature <span class="text-red-400 ml-1">*</span>
-                        <span class="ml-2 text-base text-blue-300/70 font-normal"
-                          >(PNG, JPG, JPEG)</span
-                        >
+                        <span class="ml-2 text-base text-blue-300/70 font-normal">Digital</span>
                       </label>
 
-                      <div class="flex flex-col gap-1 items-start">
-                        <!-- Signature Display Box -->
+                      <div class="flex flex-col gap-2 items-start w-full">
+                        <!-- Digital Signature Status -->
                         <div
-                          class="relative w-full h-12 border-2 border-blue-300/30 rounded-lg bg-blue-100/20 focus-within:bg-blue-100/30 focus-within:border-blue-400 overflow-hidden backdrop-blur-sm group-hover:border-blue-400/50 transition-all duration-300"
+                          class="w-full p-3 border-2 border-blue-300/30 rounded-lg bg-blue-100/10 backdrop-blur-sm"
                         >
-                          <!-- Signature Image Display -->
-                          <div
-                            v-if="signaturePreview"
-                            class="w-full h-full flex items-center justify-center p-1"
-                          >
-                            <img
-                              :src="signaturePreview"
-                              alt="Digital Signature"
-                              class="max-w-full max-h-full object-contain"
-                            />
-                          </div>
-
-                          <!-- Placeholder Text -->
-                          <div v-else class="w-full h-full flex items-center justify-center">
-                            <div class="flex items-center">
-                              <i class="fas fa-signature text-blue-400/50 text-sm mr-1"></i>
-                              <p class="text-base text-blue-400 italic">Signature</p>
+                          <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                              <i
+                                :class="
+                                  hasUserSigned
+                                    ? 'fas fa-check-circle text-green-400'
+                                    : 'fas fa-exclamation-circle text-yellow-300'
+                                "
+                              ></i>
+                              <span class="text-blue-100">
+                                {{
+                                  hasUserSigned
+                                    ? 'You have signed this document'
+                                    : 'You have not signed yet'
+                                }}
+                              </span>
                             </div>
-                          </div>
-
-                          <!-- Remove Button (when signature exists) -->
-                          <button
-                            v-if="signaturePreview"
-                            type="button"
-                            @click="removeSignature"
-                            class="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition duration-200 text-xs shadow-lg"
-                            title="Remove signature"
-                          >
-                            <i class="fas fa-times text-xs"></i>
-                          </button>
-                        </div>
-
-                        <!-- Upload Button and Max Size -->
-                        <div class="flex items-center gap-2 w-full">
-                          <input
-                            ref="signatureInput"
-                            type="file"
-                            accept=".png,.jpg,.jpeg"
-                            @change="handleSignatureUpload"
-                            class="hidden"
-                          />
-
-                          <button
-                            type="button"
-                            @click="$refs.signatureInput.click()"
-                            :disabled="uploadProgress > 0 && uploadProgress < 100"
-                            class="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-medium rounded-lg hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/30"
-                          >
-                            <span v-if="uploadProgress === 0" class="flex items-center">
-                              <i class="fas fa-upload mr-1"></i>
-                              Upload
-                            </span>
-                            <span
-                              v-else-if="uploadProgress > 0 && uploadProgress < 100"
-                              class="flex items-center"
+                            <button
+                              type="button"
+                              @click="signDocument"
+                              :disabled="hasUserSigned || isSubmitting"
+                              class="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-medium rounded-lg hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/30"
                             >
-                              <i class="fas fa-spinner fa-spin mr-1"></i>
-                              {{ uploadProgress }}%
-                            </span>
-                            <span v-else class="flex items-center">
-                              <i class="fas fa-check mr-1"></i>
-                              Change
-                            </span>
-                          </button>
-
-                          <p class="text-base text-blue-200/70 italic">Max: 2MB</p>
+                              <i
+                                :class="
+                                  hasUserSigned ? 'fas fa-check mr-1' : 'fas fa-pen-fancy mr-1'
+                                "
+                              ></i>
+                              {{ hasUserSigned ? 'Signed' : 'Sign Document' }}
+                            </button>
+                          </div>
+                          <div v-if="signatures.length" class="mt-2 text-blue-200 text-sm">
+                            <span class="opacity-75">Signatures:</span>
+                            <ul class="list-disc ml-5 mt-1">
+                              <li v-for="s in signatures" :key="s.id">
+                                {{ s.user_name }} — {{ s.signed_at }}
+                              </li>
+                            </ul>
+                          </div>
                         </div>
-                      </div>
 
-                      <div
-                        v-if="errors.signature"
-                        class="text-red-500 text-base mt-1 flex items-center"
-                      >
-                        <i class="fas fa-exclamation-circle mr-1"></i>
-                        {{ errors.signature }}
+                        <div
+                          v-if="errors.digital_signature"
+                          class="text-red-500 text-base mt-1 flex items-center"
+                        >
+                          <i class="fas fa-exclamation-circle mr-1"></i>
+                          {{ errors.digital_signature }}
+                        </div>
+
+                        <p class="text-sm text-blue-300/80 italic mt-1">
+                          Click “Sign Document” to digitally sign before submitting. No file upload
+                          is required.
+                        </p>
                       </div>
                     </div>
 
@@ -1006,6 +982,7 @@
   import bookingService from '@/services/bookingService'
   import deviceInventoryService from '@/services/deviceInventoryService'
   import ictApprovalService from '@/services/ictApprovalService'
+  import signatureService from '@/services/signatureService'
   import { useAuthStore } from '@/stores/auth'
   import apiClient from '@/utils/apiClient'
 
@@ -1042,15 +1019,12 @@
           conditionBeforeIssues: '',
           conditionReturned: '',
           conditionReturnedIssues: '',
-          status: '',
-          signature: null
+          status: ''
         },
         selectedDeviceInfo: null, // Store selected device info for display
         errors: {},
         isSubmitting: false,
         showSuccessModal: false,
-        uploadProgress: 0,
-        signaturePreview: null,
         departments: [],
         availableDevices: [],
         isLoadingDevices: false,
@@ -1059,7 +1033,10 @@
         hasPendingRequest: false, // Track if user has pending request
         pendingRequestInfo: null, // Store pending request details
         showPendingRequestModal: false, // Show modal for pending request
-        isCheckingPendingRequests: true // Show loading while checking for pending requests
+        isCheckingPendingRequests: true, // Show loading while checking for pending requests
+        // Digital signature state
+        signatures: [],
+        hasUserSigned: false
       }
     },
     async mounted() {
@@ -1136,6 +1113,9 @@
 
           // Initialize real-time validation
           this.initializeValidation()
+
+          // Load digital signatures for this booking document context
+          await this.loadSignatures()
         } catch (error) {
           console.error('Error initializing form:', error)
         }
@@ -1455,14 +1435,6 @@
         }
       },
 
-      validateSignature() {
-        if (!this.formData.signature) {
-          this.errors.signature = 'Digital signature is required'
-        } else {
-          this.errors.signature = ''
-        }
-      },
-
       initializeValidation() {
         // Run initial validation to show red messages for empty required fields
         this.validateBookingDate()
@@ -1471,7 +1443,6 @@
         this.validateReturnDate()
         this.validateReturnTime()
         this.validateReason()
-        this.validateSignature()
         // Phone number validation removed since it's auto-populated
       },
 
@@ -1800,64 +1771,32 @@
         }
       },
 
-      handleSignatureUpload(event) {
-        const file = event.target.files[0]
-        this.validateAndSetSignature(file)
+      // Digital Signatures
+      computeDocumentId() {
+        // Synthetic pre-sign token id for booking_service: 910,000,000 + userId
+        const uid = this.authStore?.user?.id || 0
+        return 910000000 + Number(uid)
       },
-
-      validateAndSetSignature(file) {
-        if (!file) return
-
-        // Validate file type
-        const allowedTypes = ['image/png', 'image/jpg', 'image/jpeg']
-        if (!allowedTypes.includes(file.type)) {
-          this.errors.signature = 'Please upload a PNG or JPG image file only'
-          return
+      async loadSignatures() {
+        try {
+          const docId = this.computeDocumentId()
+          const res = await signatureService.list(docId)
+          this.signatures = Array.isArray(res.data) ? res.data : res
+          const uid = this.authStore?.user?.id
+          this.hasUserSigned = !!(this.signatures || []).find((s) => s.user_id === uid)
+        } catch (e) {
+          this.signatures = []
+          this.hasUserSigned = false
         }
-
-        // Validate file size (2MB max)
-        if (file.size > 2 * 1024 * 1024) {
-          this.errors.signature = 'File size must be less than 2MB'
-          return
-        }
-
-        // Simulate upload progress
-        this.uploadProgress = 0
-        const interval = setInterval(() => {
-          this.uploadProgress += 20
-          if (this.uploadProgress >= 100) {
-            clearInterval(interval)
-            setTimeout(() => {
-              this.uploadProgress = 0
-            }, 500)
-          }
-        }, 150)
-
-        // Create image preview
-        const reader = new FileReader()
-        reader.onload = (e) => {
-          this.signaturePreview = e.target.result
-        }
-        reader.readAsDataURL(file)
-
-        this.formData.signature = file
-        this.errors.signature = ''
-
-        // Run real-time validation
-        this.validateSignature()
       },
-
-      removeSignature() {
-        this.formData.signature = null
-        this.signaturePreview = null
-        this.errors.signature = ''
-        this.uploadProgress = 0
-        if (this.$refs.signatureInput) {
-          this.$refs.signatureInput.value = ''
+      async signDocument() {
+        try {
+          const docId = 'booking_service' // resolveDocumentId will map per current user
+          await signatureService.sign(docId)
+          await this.loadSignatures()
+        } catch (e) {
+          alert('Failed to sign document. Please try again.')
         }
-
-        // Run real-time validation
-        this.validateSignature()
       },
 
       validateForm() {
@@ -1932,10 +1871,9 @@
         // Validate phone number (auto-populated from user account)
         this.validatePhoneNumber()
 
-        // Remove condition validation as these fields are not in the current form
-
-        if (!this.formData.signature) {
-          this.errors.signature = 'Digital signature is required'
+        // Require digital signature (frontend hint; backend enforces too)
+        if (!this.hasUserSigned) {
+          this.errors.digital_signature = 'Please sign the document before submitting.'
         }
 
         // Filter out empty error messages for more accurate validation
@@ -1989,46 +1927,37 @@
             // Continue with submission if pending check fails
           }
 
-          // Prepare form data for API submission
-          const formData = new FormData()
-
-          // Add all form fields
-          formData.append('booking_date', this.formData.bookingDate)
-          formData.append('borrower_name', this.formData.borrowerName)
-          formData.append('device_type', this.formData.deviceType)
+          // Prepare JSON payload for API submission
+          const payload = {
+            booking_date: this.formData.bookingDate,
+            borrower_name: this.formData.borrowerName,
+            device_type: this.formData.deviceType,
+            department: this.formData.department,
+            phone_number: this.normalizePhoneNumber(this.formData.phoneNumber),
+            return_date: this.formData.collectionDate, // Note: collectionDate is actually return_date
+            return_time: this.formData.returnTime,
+            reason: this.formData.reason
+          }
 
           // Add device inventory ID if selected from inventory
           if (this.formData.deviceInventoryId && this.formData.deviceInventoryId !== 'others') {
-            formData.append('device_inventory_id', this.formData.deviceInventoryId)
+            payload.device_inventory_id = this.formData.deviceInventoryId
           }
 
           if (this.formData.deviceInventoryId === 'others' && this.formData.customDevice) {
-            formData.append('custom_device', this.formData.customDevice)
+            payload.custom_device = this.formData.customDevice
           }
-
-          formData.append('department', this.formData.department)
-          formData.append('phone_number', this.normalizePhoneNumber(this.formData.phoneNumber))
-          formData.append('return_date', this.formData.collectionDate) // Note: collectionDate is actually return_date
-          formData.append('return_time', this.formData.returnTime)
-          formData.append('reason', this.formData.reason)
-          formData.append('signature', this.formData.signature)
 
           console.log('Submitting booking request:', {
             borrowerName: this.formData.borrowerName,
             deviceType: this.formData.deviceType,
             deviceInventoryId: this.formData.deviceInventoryId,
             department: this.formData.department,
-            hasSignature: !!this.formData.signature
+            hasUserSigned: this.hasUserSigned
           })
 
-          // Debug: Log all form data being sent
-          console.log('FormData contents:')
-          for (let [key, value] of formData.entries()) {
-            console.log(key, ':', value)
-          }
-
           // Submit to API
-          const response = await bookingService.submitBooking(formData)
+          const response = await bookingService.submitBooking(payload)
 
           if (response.success) {
             console.log('Booking submitted successfully:', response.data)
@@ -2101,11 +2030,11 @@
           conditionBeforeIssues: '',
           conditionReturned: '',
           conditionReturnedIssues: '',
-          status: '',
-          signature: null
+          status: ''
         }
-        this.removeSignature()
         this.selectedDeviceInfo = null
+        this.signatures = []
+        this.hasUserSigned = false
       },
 
       getDeviceDisplayName() {
