@@ -442,3 +442,42 @@ body {
   border-color: rgba(59, 130, 246, 0.2) !important;
   border-top-color: #3b82f6 !important;
 }
+
+/* Compact spacing overrides (reduce gaps between sections) */
+.swagger-ui .topbar { margin-bottom: 0.5rem !important; padding: 0.5rem 0 !important; }
+.swagger-ui .wrapper { padding: 0.75rem 0.75rem !important; }
+.scheme-container { padding: 0.5rem !important; margin-bottom: 0.5rem !important; }
+.swagger-ui .opblock { margin-bottom: 0.5rem !important; }
+.swagger-ui .opblock-section { padding: 0.75rem !important; }
+.swagger-ui .opblock-section-header { padding: 0 0 0.5rem 0 !important; }
+.swagger-ui .opblock .opblock-summary { padding: 0.75rem 1rem !important; }
+.swagger-ui .opblock-tag-section { margin-bottom: 0.75rem !important; }
+
+/* Hide the default large search bar; use our compact View Options search */
+.swagger-ui .filter,
+.swagger-ui .operation-filter,
+.swagger-ui .operation-filter-input {
+  display: none !important;
+}
+
+/* View Options: arrange servers + authorize + search in one row */
+.view-options-card .view-options-row,
+.view-options-right { display: flex; align-items: center; gap: 0.5rem 0.75rem; flex-wrap: wrap; }
+
+/* Flatten scheme container when placed in the View Options toolbar */
+.view-options-card .scheme-container,
+.view-options-right .scheme-container {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+.view-options-card .scheme-container .servers,
+.view-options-right .scheme-container .servers { display: inline-flex; align-items: center; gap: 0.5rem; }
+.view-options-card .scheme-container .servers-title,
+.view-options-right .scheme-container .servers-title { margin: 0 0.5rem 0 0 !important; display: inline-block !important; }
+.view-options-card .scheme-container .servers select,
+.view-options-right .scheme-container .servers select { min-width: 340px; }
+.view-options-card .scheme-container .auth-wrapper,
+.view-options-right .scheme-container .auth-wrapper { margin-left: 0.5rem; }

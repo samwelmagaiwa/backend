@@ -81,10 +81,10 @@
                   ></div>
                 </div>
                 <div>
-                  <h2 class="text-3xl font-bold text-white mb-2 drop-shadow-lg">
+                  <h2 class="text-4xl font-bold text-white mb-2 drop-shadow-lg">
                     Welcome to ICT Access Portal
                   </h2>
-                  <p class="text-blue-100 text-lg drop-shadow-sm opacity-90">
+                  <p class="text-blue-100 text-xl drop-shadow-sm opacity-90">
                     Streamline your system access and equipment requests
                   </p>
                 </div>
@@ -113,9 +113,9 @@
                     <div
                       class="w-8 h-8 bg-blue-400/40 rounded-lg flex items-center justify-center mr-3 group-hover/btn:scale-110 transition-transform duration-300"
                     >
-                      <i class="fas fa-list-alt text-white text-lg drop-shadow-sm" />
+                      <i class="fas fa-list-alt text-white text-xl drop-shadow-sm" />
                     </div>
-                    <span class="text-lg drop-shadow-sm">Track My Applications</span>
+                    <span class="text-xl drop-shadow-sm">Track My Applications</span>
                   </div>
                 </button>
 
@@ -167,15 +167,15 @@
                     >
                       <i
                         v-if="isCheckingPendingRequests"
-                        class="fas fa-spinner fa-spin text-white text-lg drop-shadow-sm"
+                        class="fas fa-spinner fa-spin text-white text-xl drop-shadow-sm"
                       />
                       <i
                         v-else-if="hasPendingBookingRequest || hasPendingCombinedRequest"
-                        class="fas fa-eye text-white text-lg drop-shadow-sm"
+                        class="fas fa-eye text-white text-xl drop-shadow-sm"
                       />
-                      <i v-else class="fas fa-plus text-white text-lg drop-shadow-sm" />
+                      <i v-else class="fas fa-plus text-white text-xl drop-shadow-sm" />
                     </div>
-                    <span class="text-lg drop-shadow-sm">
+                    <span class="text-xl drop-shadow-sm">
                       <template v-if="isCheckingPendingRequests">Checking...</template>
                       <template v-else-if="hasPendingBookingRequest || hasPendingCombinedRequest"
                         >View Pending Request</template
@@ -320,7 +320,7 @@
                         style="background-color: rgba(255, 0, 0, 0.8)"
                       ></div>
                       <span
-                        class="text-xs font-medium tracking-wide"
+                        class="text-sm font-medium tracking-wide"
                         style="color: rgba(255, 255, 255, 0.9)"
                         >Processing</span
                       >
@@ -335,7 +335,7 @@
 
                 <!-- Enhanced Title -->
                 <h3
-                  class="text-2xl font-bold text-white mb-4 drop-shadow-lg transition-colors duration-300"
+                  class="text-3xl font-bold text-white mb-4 drop-shadow-lg transition-colors duration-300"
                 >
                   Under Review
                 </h3>
@@ -539,7 +539,7 @@
                         style="background-color: rgba(37, 99, 235, 0.8)"
                       ></div>
                       <span
-                        class="text-xs font-medium tracking-wide"
+                        class="text-sm font-medium tracking-wide"
                         style="color: rgba(255, 255, 255, 0.9)"
                         >Completed</span
                       >
@@ -554,7 +554,7 @@
 
                 <!-- Enhanced Title -->
                 <h3
-                  class="text-2xl font-bold text-white mb-4 drop-shadow-lg transition-colors duration-300"
+                  class="text-3xl font-bold text-white mb-4 drop-shadow-lg transition-colors duration-300"
                 >
                   Granted Access
                 </h3>
@@ -762,7 +762,7 @@
                         style="background-color: rgba(220, 38, 38, 0.8)"
                       ></div>
                       <span
-                        class="text-xs font-medium tracking-wide"
+                        class="text-sm font-medium tracking-wide"
                         style="color: rgba(255, 255, 255, 0.9)"
                         >Reviewed</span
                       >
@@ -777,7 +777,7 @@
 
                 <!-- Enhanced Title -->
                 <h3
-                  class="text-2xl font-bold text-white mb-4 drop-shadow-lg transition-colors duration-300"
+                  class="text-3xl font-bold text-white mb-4 drop-shadow-lg transition-colors duration-300"
                 >
                   Needs Revision
                 </h3>
@@ -1090,8 +1090,8 @@
             }
           })
         } else {
-          // No pending combined requests, proceed to combined form
-          router.push('/user-combined-form')
+          // No pending combined requests, proceed to combined form in editable pre-sign mode
+          router.push({ path: '/user-combined-form', query: { mode: 'edit', id: 'combined_access' } })
         }
       }
 
@@ -1133,8 +1133,8 @@
             }
           })
         } else {
-          // No pending request, proceed to booking service
-          router.push('/booking-service')
+          // No pending request, proceed to booking service in editable pre-sign mode
+          router.push({ path: '/booking-service', query: { mode: 'edit', id: 'booking_service' } })
         }
       }
 

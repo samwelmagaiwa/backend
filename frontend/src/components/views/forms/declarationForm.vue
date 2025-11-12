@@ -429,11 +429,11 @@
                 <div class="text-blue-100 leading-relaxed text-lg space-y-3 text-justify">
                   <p>
                     I
-                    <strong class="text-blue-300">{{
+                    <strong class="text-red-500">{{
                       formData.fullName || '______________________'
                     }}</strong>
                     PF No.
-                    <strong class="text-blue-300">{{ formData.pfNumber || '______' }}</strong>
+                    <strong class="text-red-500">{{ formData.pfNumber || '______' }}</strong>
                     acknowledge that Muhimbili National Hospital acceptable ICT use policy has been
                     made available to me for adequate review and understanding.
                   </p>

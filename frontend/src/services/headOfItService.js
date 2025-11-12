@@ -216,14 +216,47 @@ const headOfItService = {
   /**
    * Assign a task to an ICT Officer
    */
-  async assignTaskToIctOfficer(requestId, ictOfficerId) {
+  async assignTaskToIctOfficer(requestId, ictOfficerId, notifyPhone = null) {
     try {
-      console.log('🔄 HeadOfItService: Assigning task to ICT officer:', { requestId, ictOfficerId })
-
-      const response = await axiosInstance.post('/head-of-it/assign-task', {
-        request_id: requestId,
-        ict_officer_id: ictOfficerId
+      console.log('🔄 HeadOfItService: Assigning task to ICT officer:', {
+        requestId,
+        ictOfficerId,
+        notifyPhone
       })
+
+      // Normalize phone for best compatibility while preserving raw
+      const normalizePhone = (p) => {
+        if (!p) return null
+        const s = String(p).trim()
+        const keepPlus = s.startsWith('+')
+        const digits = s.replace(/[^\d]/g, '')
+        return keepPlus ? `+${digits}` : digits
+      }
+      const rawPhone = notifyPhone || null
+      const normalizedPhone = normalizePhone(rawPhone)
+
+      // Use legacy assign endpoint and include explicit notify flags so backend sends SMS
+      const payload = {
+        request_id: requestId,
+        ict_officer_id: ictOfficerId,
+        // Common key used by some backends
+        notify_phone: rawPhone || undefined,
+        // Additional compatibility keys (ignored if not recognized)
+        ict_officer_phone: normalizedPhone || undefined,
+        recipient_phone: normalizedPhone || undefined,
+        destination_phone: normalizedPhone || undefined,
+        phone_number: normalizedPhone || undefined,
+        msisdn: normalizedPhone || undefined,
+        officer_phone: normalizedPhone || undefined,
+        contact_phone: normalizedPhone || undefined,
+        // Hint flags for systems that gate notifications; harmless if ignored
+        send_sms: true,
+        send_sms_to_ict_officer: true,
+        notify_ict_officer: true,
+        notification_channel: 'sms'
+      }
+
+      const response = await axiosInstance.post('/head-of-it/assign-task', payload)
 
       if (response.data.success) {
         console.log('✅ HeadOfItService: Task assigned successfully')

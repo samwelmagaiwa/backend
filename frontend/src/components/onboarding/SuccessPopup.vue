@@ -4,7 +4,7 @@
     style="backdrop-filter: blur(12px)"
   >
     <div
-      class="bg-gradient-to-br from-blue-700 via-blue-600 to-blue-800 rounded-2xl max-w-sm w-full transform transition-all duration-500 scale-100 animate-slideUp border border-blue-300/30 shadow-2xl"
+      class="bg-gradient-to-br from-blue-700 via-blue-600 to-blue-800 rounded-none w-full max-w-xl min-h-[520px] transform transition-all duration-500 scale-100 animate-slideUp border border-blue-300/30 shadow-2xl"
       style="
         box-shadow:
           0 25px 50px -12px rgba(29, 78, 216, 0.6),
@@ -14,74 +14,74 @@
       "
     >
       <!-- Header -->
-      <div class="text-center p-5 relative overflow-hidden">
+      <div class="text-center p-8 relative overflow-hidden">
         <!-- Trophy Icon -->
         <div
-          class="w-10 h-10 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg animate-pulse"
+          class="w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-md flex items-center justify-center mx-auto mb-4 shadow-lg animate-pulse"
         >
-          <i class="fas fa-trophy text-white text-sm drop-shadow-lg"></i>
+          <i class="fas fa-trophy text-white text-xl drop-shadow-lg"></i>
         </div>
 
-        <h2 class="text-lg font-bold text-white mb-1 drop-shadow-lg">Congratulations!</h2>
-        <p class="text-blue-100 text-xs font-medium drop-shadow-sm">{{ userRoleDisplay }}</p>
+        <h2 class="text-3xl font-bold text-white mb-2 drop-shadow-lg">Congratulations!</h2>
+        <p class="text-blue-100 text-lg font-medium drop-shadow-sm">{{ userRoleDisplay }}</p>
       </div>
 
       <!-- Body -->
-      <div class="px-5 pb-5">
+      <div class="px-8 pb-8">
         <!-- User Name -->
-        <div class="text-center mb-4">
-          <h3 class="text-sm font-bold text-white mb-2 drop-shadow-sm">
+        <div class="text-center mb-6">
+          <h3 class="text-2xl font-bold text-white mb-3 drop-shadow-sm">
             {{ userName }}
           </h3>
-          <p class="text-blue-100 text-xs leading-relaxed font-medium opacity-90">
+          <p class="text-blue-100 text-lg leading-relaxed font-medium opacity-90">
             You have successfully completed the onboarding process. Now you can proceed with your
             requests.
           </p>
         </div>
 
         <!-- Progress Steps - Compact -->
-        <div class="space-y-2 mb-4">
+        <div class="space-y-3 mb-6">
           <div
-            class="flex items-center space-x-2 p-2 bg-white/10 rounded-lg border border-white/20 backdrop-blur-sm"
+            class="flex items-center space-x-3 p-3 bg-white/10 border border-white/20 backdrop-blur-sm"
           >
             <div
-              class="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0"
+              class="w-5 h-5 bg-green-500 rounded-sm flex items-center justify-center flex-shrink-0"
             >
-              <i class="fas fa-check text-white text-xs"></i>
+              <i class="fas fa-check text-white text-sm"></i>
             </div>
-            <span class="text-white font-medium text-xs">Terms of Service Accepted</span>
+            <span class="text-white font-medium text-base">Terms of Service Accepted</span>
           </div>
 
           <div
-            class="flex items-center space-x-2 p-2 bg-white/10 rounded-lg border border-white/20 backdrop-blur-sm"
+            class="flex items-center space-x-3 p-3 bg-white/10 border border-white/20 backdrop-blur-sm"
           >
             <div
-              class="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0"
+              class="w-5 h-5 bg-green-500 rounded-sm flex items-center justify-center flex-shrink-0"
             >
-              <i class="fas fa-check text-white text-xs"></i>
+              <i class="fas fa-check text-white text-sm"></i>
             </div>
-            <span class="text-white font-medium text-xs">ICT Policy Acknowledged</span>
+            <span class="text-white font-medium text-base">ICT Policy Acknowledged</span>
           </div>
 
           <div
-            class="flex items-center space-x-2 p-2 bg-white/10 rounded-lg border border-white/20 backdrop-blur-sm"
+            class="flex items-center space-x-3 p-3 bg-white/10 border border-white/20 backdrop-blur-sm"
           >
             <div
-              class="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0"
+              class="w-5 h-5 bg-green-500 rounded-sm flex items-center justify-center flex-shrink-0"
             >
-              <i class="fas fa-check text-white text-xs"></i>
+              <i class="fas fa-check text-white text-sm"></i>
             </div>
-            <span class="text-white font-medium text-xs">Declaration Form Submitted</span>
+            <span class="text-white font-medium text-base">Declaration Form Submitted</span>
           </div>
         </div>
 
         <!-- Action Button -->
         <button
           @click="handleContinue"
-          class="w-full bg-gradient-to-r from-white/20 to-white/10 hover:from-white/30 hover:to-white/20 text-white py-2.5 px-4 rounded-lg font-semibold text-sm transition-all duration-300 transform hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-white/50 border border-white/30 backdrop-blur-sm relative overflow-hidden group"
+          class="w-full bg-gradient-to-r from-white/20 to-white/10 hover:from-white/30 hover:to-white/20 text-white py-4 px-6 rounded-none font-semibold text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-white/50 border border-white/30 backdrop-blur-sm relative overflow-hidden group"
         >
           <div class="relative z-10 flex items-center justify-center">
-            <i class="fas fa-arrow-right mr-2 text-sm"></i>
+            <i class="fas fa-arrow-right mr-2 text-lg"></i>
             <span>Continue to Dashboard</span>
           </div>
         </button>
@@ -158,20 +158,20 @@
 
   /* Responsive design */
   @media (max-width: 640px) {
-    .max-w-sm {
+    .max-w-xl {
       max-width: 95vw;
     }
 
-    .px-5 {
+    .px-8 {
       padding-left: 1rem;
       padding-right: 1rem;
     }
 
-    .pb-5 {
+    .pb-8 {
       padding-bottom: 1rem;
     }
 
-    .p-5 {
+    .p-8 {
       padding: 1rem;
     }
   }

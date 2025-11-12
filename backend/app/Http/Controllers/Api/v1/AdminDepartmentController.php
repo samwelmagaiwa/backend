@@ -43,6 +43,11 @@ class AdminDepartmentController extends Controller
                 $query->where('is_active', $request->boolean('is_active'));
             }
 
+            // Filter by has_divisional_director flag
+            if ($request->has('has_divisional_director')) {
+                $query->where('has_divisional_director', $request->boolean('has_divisional_director'));
+            }
+
             // Sorting
             $sortBy = $request->get('sort_by', 'name');
             $sortOrder = $request->get('sort_order', 'asc');

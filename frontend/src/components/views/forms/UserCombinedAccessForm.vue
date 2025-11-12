@@ -518,31 +518,42 @@
 
                           <!-- Edit mode: Show uploaded signature preview -->
                           <div
-                            v-if="signaturePreview"
+                            v-if="signaturePreview || hasUserSigned"
                             class="w-full px-1 py-1 border-2 border-blue-300/40 rounded-lg bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 flex items-center justify-center relative min-h-[35px]"
                           >
-                            <div v-if="isImage(signaturePreview)" class="text-center">
-                              <img
-                                :src="signaturePreview"
-                                alt="Digital Signature"
-                                class="max-h-[25px] max-w-full object-contain mx-auto"
-                              />
-                              <p class="text-base text-blue-100 mt-1 truncate">
-                                {{ signatureFileName }}
-                              </p>
-                            </div>
-                            <div v-else class="text-center">
-                              <div
-                                class="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center mx-auto"
-                              >
-                                <i class="fas fa-file-pdf text-red-400 text-2xl"></i>
+                            <template v-if="signaturePreview">
+                              <div v-if="isImage(signaturePreview)" class="text-center">
+                                <img
+                                  :src="signaturePreview"
+                                  alt="Digital Signature"
+                                  class="max-h-[25px] max-w-full object-contain mx-auto"
+                                />
+                                <p class="text-base text-blue-100 mt-1 truncate">
+                                  {{ signatureFileName }}
+                                </p>
                               </div>
-                              <p class="text-base text-blue-100 mt-1 truncate">
-                                {{ signatureFileName }}
-                              </p>
-                            </div>
+                              <div v-else class="text-center">
+                                <div
+                                  class="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center mx-auto"
+                                >
+                                  <i class="fas fa-file-pdf text-red-400 text-2xl"></i>
+                                </div>
+                                <p class="text-base text-blue-100 mt-1 truncate">
+                                  {{ signatureFileName }}
+                                </p>
+                              </div>
+                            </template>
+                            <template v-else>
+                              <div class="flex items-center gap-2 text-green-200 font-bold text-base">
+                                <i class="fas fa-check-circle text-green-400"></i>
+                                <span>
+                                  Digitally signed
+                                  <span v-if="lastSignedAt" class="opacity-80">at {{ new Date(lastSignedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }}</span>
+                                </span>
+                              </div>
+                            </template>
 
-                            <div class="absolute top-1 right-1 flex gap-1">
+                            <div class="absolute top-1 right-1 flex gap-1" v-if="signaturePreview">
                               <button
                                 type="button"
                                 @click="triggerFileUpload"
@@ -562,34 +573,32 @@
                             </div>
                           </div>
 
-                          <!-- Default signature upload area -->
+                          <!-- Default signature area -->
                           <div
                             v-else
-                            class="w-full px-1 py-1 border-2 border-dashed border-blue-300/40 rounded-lg focus-within:border-blue-400 bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 flex items-center justify-center hover:bg-white/20 min-h-[35px]"
+                            class="w-full px-1 py-2 border-2 border-dashed border-blue-300/40 rounded-lg focus-within:border-blue-400 bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 flex items-center justify-center hover:bg-white/20 min-h-[50px]"
                           >
-                            <div class="text-center">
+                            <div class="text-center space-y-2">
                               <i class="fas fa-signature text-blue-300 text-lg"></i>
-                              <p class="text-blue-100 text-base mt-1 font-medium">
-                                No signature uploaded
+                              <p class="text-blue-100 text-base font-medium">
+                                No signature yet
                               </p>
-                              <button
-                                type="button"
-                                @click="triggerFileUpload"
-                                class="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-base font-bold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-2 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/50 mt-2"
-                              >
-                                <i class="fas fa-upload"></i>
-                                Press to load your signature
-                              </button>
+                              <div class="flex items-center justify-center">
+                                <button
+                                  type="button"
+                                  @click="signCurrentDocument"
+                                  :disabled="isSigning || !editRequestId"
+                                  :title="editRequestId ? 'Digitally sign this request' : 'Submit first to generate a Request ID, then return to sign'"
+                                  class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-600 text-white text-base font-bold rounded-lg hover:from-emerald-600 hover:to-green-700 transition-all duration-300 flex items-center gap-2 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-emerald-400/50 disabled:opacity-60 disabled:cursor-not-allowed"
+                                >
+                                  <OrbitingDots v-if="isSigning" size="xs" />
+                                  <i v-else class="fas fa-file-signature"></i>
+                                  Digitally Sign Document
+                                </button>
+                              </div>
                             </div>
                           </div>
 
-                          <input
-                            ref="signatureInput"
-                            type="file"
-                            accept="image/png,image/jpeg,application/pdf"
-                            @change="onSignatureChange"
-                            class="hidden"
-                          />
                         </div>
                       </div>
                     </div>
@@ -929,31 +938,31 @@
       class="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fade-in"
     >
       <div
-        class="bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all duration-500 scale-100 animate-scale-up border border-gray-100 relative overflow-hidden"
+        class="bg-white rounded-2xl shadow-2xl w-[680px] h-[680px] max-w-none transform transition-all duration-500 scale-100 animate-scale-up border border-gray-100 relative overflow-hidden flex flex-col"
       >
         <!-- Compact Header with Icon -->
         <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 text-center relative">
           <div class="absolute inset-0 bg-gradient-to-r from-blue-600/90 to-blue-700/90"></div>
-          <div class="relative z-10 flex items-center justify-center gap-3">
-            <div class="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-lg">
+          <div class="relative z-10 flex items-center justify-center gap-4">
+            <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg">
               <div
-                class="w-11 h-11 bg-gradient-to-br from-green-400 to-green-500 rounded-full flex items-center justify-center relative"
+                class="w-16 h-16 bg-gradient-to-br from-green-400 to-green-500 rounded-full flex items-center justify-center relative"
               >
-                <i class="fas fa-check text-white text-xl"></i>
+                <i class="fas fa-check text-white text-3xl"></i>
               </div>
             </div>
             <div class="text-left">
-              <h3 class="text-2xl font-bold text-white">Request Submitted!</h3>
-              <p class="text-blue-100 text-sm">Successfully processed</p>
+              <h3 class="text-3xl font-extrabold text-white">Request Submitted!</h3>
+              <p class="text-blue-100 text-lg">Successfully processed</p>
             </div>
           </div>
         </div>
 
         <!-- Compact Content Section -->
-        <div class="px-6 py-4">
+        <div class="px-6 py-5 flex-1 overflow-y-auto">
           <!-- Message -->
-          <div class="text-center mb-4">
-            <p class="text-base text-gray-700 font-medium">
+          <div class="text-center mb-5">
+            <p class="text-xl text-gray-700 font-semibold">
               Your <span class="font-bold text-blue-600">Combined Access Request</span> is now in
               the approval queue.
             </p>
@@ -961,60 +970,60 @@
 
           <!-- Compact Services Card -->
           <div
-            class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 mb-4 border border-blue-100"
+            class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 mb-5 border border-blue-100"
           >
-            <div class="flex items-center gap-2 mb-3">
-              <i class="fas fa-list-check text-blue-600 text-base"></i>
-              <h4 class="text-sm font-bold text-blue-800">Selected Services</h4>
+            <div class="flex items-center gap-3 mb-4">
+              <i class="fas fa-list-check text-blue-600 text-2xl"></i>
+              <h4 class="text-xl font-extrabold text-blue-800">Selected Services</h4>
             </div>
 
             <div class="flex flex-wrap gap-2">
               <div
                 v-if="submittedServices.jeeva"
-                class="bg-white rounded-lg px-4 py-2.5 shadow-sm border border-green-200 flex items-center gap-2"
+                class="bg-white rounded-lg px-5 py-3 shadow-sm border border-green-200 flex items-center gap-3"
               >
-                <i class="fas fa-file-medical text-green-600 text-sm"></i>
-                <span class="text-sm font-semibold text-green-800">Jeeva</span>
+                <i class="fas fa-file-medical text-green-600 text-lg"></i>
+                <span class="text-lg font-bold text-green-800">Jeeva</span>
               </div>
 
               <div
                 v-if="submittedServices.wellsoft"
-                class="bg-white rounded-lg px-4 py-2.5 shadow-sm border border-blue-200 flex items-center gap-2"
+                class="bg-white rounded-lg px-5 py-3 shadow-sm border border-blue-200 flex items-center gap-3"
               >
-                <i class="fas fa-laptop-medical text-blue-600 text-sm"></i>
-                <span class="text-sm font-semibold text-blue-800">Wellsoft</span>
+                <i class="fas fa-laptop-medical text-blue-600 text-lg"></i>
+                <span class="text-lg font-bold text-blue-800">Wellsoft</span>
               </div>
 
               <div
                 v-if="submittedServices.internet"
-                class="bg-white rounded-lg px-4 py-2.5 shadow-sm border border-teal-200 flex items-center gap-2"
+                class="bg-white rounded-lg px-5 py-3 shadow-sm border border-teal-200 flex items-center gap-3"
               >
-                <i class="fas fa-wifi text-teal-600 text-sm"></i>
-                <span class="text-sm font-semibold text-teal-800">Internet</span>
+                <i class="fas fa-wifi text-teal-600 text-lg"></i>
+                <span class="text-lg font-bold text-teal-800">Internet</span>
               </div>
             </div>
 
             <!-- Internet Purposes - Compact -->
             <div
               v-if="submittedServices.internet && hasInternetPurposes"
-              class="mt-3 pt-3 border-t border-blue-200"
+              class="mt-4 pt-4 border-t border-blue-200"
             >
-              <div class="flex items-center gap-2 mb-2">
-                <i class="fas fa-globe text-teal-600 text-sm"></i>
-                <h5 class="text-sm font-bold text-teal-800">Internet Purposes:</h5>
+              <div class="flex items-center gap-3 mb-3">
+                <i class="fas fa-globe text-teal-600 text-xl"></i>
+                <h5 class="text-xl font-extrabold text-teal-800">Internet Purposes:</h5>
               </div>
-              <div class="space-y-1.5">
+              <div class="space-y-2">
                 <div
                   v-for="(purpose, index) in filledInternetPurposes.slice(0, 3)"
                   :key="index"
-                  class="text-sm text-teal-700 flex items-start gap-2 font-medium"
+                  class="text-lg text-teal-700 flex items-start gap-3 font-semibold"
                 >
                   <span class="text-teal-600 font-bold">{{ index + 1 }}.</span>
                   <span class="flex-1">{{ purpose }}</span>
                 </div>
                 <p
                   v-if="filledInternetPurposes.length > 3"
-                  class="text-sm text-gray-600 italic font-medium"
+                  class="text-base text-gray-600 italic font-medium"
                 >
                   +{{ filledInternetPurposes.length - 3 }} more purpose(s)
                 </p>
@@ -1023,9 +1032,9 @@
           </div>
 
           <!-- Compact Status Indicator -->
-          <div class="bg-gray-50 rounded-lg p-3 mb-4 flex items-center justify-center gap-2">
-            <div class="w-2.5 h-2.5 bg-blue-500 rounded-full animate-pulse"></div>
-            <span class="text-sm text-gray-700 font-semibold"
+          <div class="bg-gray-50 rounded-lg p-4 mb-6 flex items-center justify-center gap-3">
+            <div class="w-3.5 h-3.5 bg-blue-500 rounded-full animate-pulse"></div>
+            <span class="text-lg text-gray-700 font-bold"
               >Request ID will be generated shortly</span
             >
           </div>
@@ -1033,10 +1042,10 @@
           <!-- Compact Action Button -->
           <button
             @click="closeSuccessModal"
-            class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-6 rounded-xl font-bold hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-200 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02] flex items-center justify-center gap-2"
+            class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 px-8 rounded-xl font-extrabold hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-200 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02] flex items-center justify-center gap-3"
           >
-            <i class="fas fa-home text-base"></i>
-            <span class="text-base">Return to Dashboard</span>
+            <i class="fas fa-home text-xl"></i>
+            <span class="text-xl">Return to Dashboard</span>
           </button>
         </div>
       </div>
@@ -1052,6 +1061,7 @@
   import UnifiedLoadingBanner from '@/components/common/UnifiedLoadingBanner.vue'
   import userCombinedAccessService from '@/services/userCombinedAccessService'
   import userProfileService from '@/services/userProfileService'
+  import signatureService from '@/services/signatureService'
 
   export default {
     name: 'UserCombinedAccessForm',
@@ -1109,6 +1119,10 @@
         showSuccessModal: false,
         signaturePreview: '',
         signatureFileName: '',
+        // Digital signature state
+        isSigning: false,
+        hasUserSigned: false,
+        lastSignedAt: null,
         departments: [],
         // Auto-population states
         isLoadingProfile: true,
@@ -1248,8 +1262,10 @@
       // Check if in edit mode
       this.checkEditMode()
 
-      // Load both profile data, departments, and modules concurrently
-      if (this.isEditMode) {
+      const isSynthetic = this.isSyntheticDocId?.() || (this.editRequestId && !/^\d+$/.test(String(this.editRequestId)))
+
+      // Load data: if editing a real request id, fetch it; otherwise just load user data and modules
+      if (this.isEditMode && !isSynthetic) {
         await Promise.all([this.loadExistingRequest(), this.loadDepartments(), this.loadModules()])
       } else {
         await Promise.all([this.autoPopulateUserData(), this.loadDepartments(), this.loadModules()])
@@ -1259,6 +1275,21 @@
     },
 
     methods: {
+      isSyntheticDocId() {
+        const id = this.editRequestId || this.$route.query.id
+        if (!id) return false
+        // Treat known tokens and any non-numeric id as synthetic
+        const known = ['combined_access', 'booking_service', 'combined_access_form']
+        return known.includes(String(id)) || !/^\d+$/.test(String(id))
+      },
+      normalizePhoneNumber(input) {
+        if (!input) return ''
+        let v = String(input).trim().replace(/\s|-/g, '')
+        if (v.startsWith('+255')) return v
+        if (v.startsWith('255')) return '+' + v
+        if (v.startsWith('0')) return '+255' + v.slice(1)
+        return v
+      },
       /**
        * Check if the component is in edit mode by examining route query parameters
        */
@@ -1343,8 +1374,9 @@
           data.employee_name ||
           data.applicant_name ||
           ''
-        this.formData.phoneNumber =
+        this.formData.phoneNumber = this.normalizePhoneNumber(
           data.phone_number || data.phoneNumber || data.phone || data.mobile || data.contact || ''
+        )
         this.formData.department =
           data.department_id ||
           data.departmentId ||
@@ -1578,7 +1610,7 @@
             // Auto-populate form fields
             this.formData.pfNumber = result.data.pfNumber || ''
             this.formData.staffName = result.data.staffName || ''
-            this.formData.phoneNumber = result.data.phoneNumber || ''
+            this.formData.phoneNumber = this.normalizePhoneNumber(result.data.phoneNumber || '')
             this.formData.department = result.data.departmentId || ''
 
             this.autoPopulated = true
@@ -1632,7 +1664,7 @@
               this.formData.staffName = result.data.staffName || ''
             }
             if (missingFields.includes('Phone Number') && !this.formData.phoneNumber) {
-              this.formData.phoneNumber = result.data.phoneNumber || ''
+              this.formData.phoneNumber = this.normalizePhoneNumber(result.data.phoneNumber || '')
             }
             if (!this.formData.department) {
               this.formData.department = result.data.departmentId || ''
@@ -1687,10 +1719,6 @@
           return
         }
 
-        if (!this.formData.signature) {
-          this.showNotification('Please upload your signature', 'error')
-          return
-        }
 
         if (!this.hasSelectedService) {
           this.showNotification('Please select at least one service', 'error')
@@ -1754,7 +1782,9 @@
           formData.append('staff_name', this.formData.staffName)
           formData.append('phone_number', this.formData.phoneNumber)
           formData.append('department_id', this.formData.department)
-          formData.append('signature', this.formData.signature)
+          if (this.formData.signature) {
+            formData.append('signature', this.formData.signature)
+          }
 
           // Debug: Log what's being appended to FormData
           console.log('🔍 DEBUG: FormData entries being sent to API:')
@@ -1901,48 +1931,6 @@
         this.showNotification('Form has been reset', 'info')
       },
 
-      triggerFileUpload() {
-        this.$refs.signatureInput.click()
-      },
-
-      onSignatureChange(e) {
-        const file = e.target.files[0]
-        this.formData.signature = file || null
-
-        if (!file) {
-          this.signaturePreview = ''
-          this.signatureFileName = ''
-          return
-        }
-
-        // Validate file type
-        const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf']
-        if (!allowedTypes.includes(file.type)) {
-          this.showNotification('Please select a valid file (PNG, JPG, or PDF)', 'error')
-          this.clearSignature()
-          return
-        }
-
-        // Validate file size (max 5MB)
-        if (file.size > 5 * 1024 * 1024) {
-          this.showNotification('File size must be less than 5MB', 'error')
-          this.clearSignature()
-          return
-        }
-
-        this.signatureFileName = file.name
-
-        if (file.type.startsWith('image/')) {
-          const reader = new FileReader()
-          reader.onload = () => {
-            this.signaturePreview = reader.result
-          }
-          reader.readAsDataURL(file)
-        } else {
-          this.signaturePreview = 'pdf'
-        }
-      },
-
       isImage(preview) {
         return typeof preview === 'string' && preview !== 'pdf'
       },
@@ -2000,6 +1988,31 @@
       updateDisplayDate() {
         // This is called when the date picker value changes
         // The computed property formattedDateDisplay will automatically update
+      },
+
+      async signCurrentDocument() {
+        try {
+          if (this.isSigning) return
+          const documentId = this.editRequestId || this.$route.query.id
+          if (!documentId) {
+            this.showNotification('Cannot sign until the request exists. Save/submit first or use upload.', 'error')
+            return
+          }
+          this.isSigning = true
+          const res = await signatureService.sign(documentId)
+          if (res && (res.success || res.data)) {
+            this.hasUserSigned = true
+            this.lastSignedAt = res?.data?.signed_at || res?.signed_at || new Date().toISOString()
+            this.showNotification(`Document signed on ${new Date(this.lastSignedAt).toLocaleString()}`, 'success')
+          } else {
+            this.showNotification(res?.message || 'Failed to sign document', 'error')
+          }
+        } catch (e) {
+          console.error('Sign error:', e)
+          this.showNotification(e.message || 'Failed to sign document', 'error')
+        } finally {
+          this.isSigning = false
+        }
       },
 
       showNotification(message, type = 'info') {

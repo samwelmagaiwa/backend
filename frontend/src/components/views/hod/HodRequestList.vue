@@ -56,7 +56,7 @@
               />
               <select
                 v-model="statusFilter"
-                class="px-4 py-3 bg-white/20 border border-blue-300/30 rounded text-white text-lg"
+                class="px-4 py-3 bg-white/20 border border-blue-300/30 rounded text-white text-lg status-select"
               >
                 <option value="">All Statuses</option>
                 <option value="pending">Pending Submission</option>
@@ -167,6 +167,13 @@
                   <td class="px-4 py-4">
                     <div class="flex flex-col">
                       <span
+                        v-if="request.divisional_status === 'skipped'"
+                        class="mb-1 rounded text-sm font-semibold inline-block bg-red-900/30 text-red-300 border border-red-500/40 px-2 py-1"
+                        :style="{ width: 'fit-content' }"
+                      >
+                        No Divisional Director — Stage Skipped
+                      </span>
+                      <span
                         :class="
                           getStatusBadgeClass(request.hod_status || request.status || 'pending_hod')
                         "
@@ -174,6 +181,12 @@
                         :style="{ padding: '6px 12px', width: 'fit-content' }"
                       >
                         {{ getStatusText(request.hod_status || request.status || 'pending_hod') }}
+                      </span>
+                      <span
+                        v-if="request.has_signature || request.signature"
+                        class="mt-1 px-2 py-0.5 rounded text-xs font-semibold bg-emerald-900/30 text-emerald-300 border border-emerald-500/40 w-fit"
+                      >
+                        Digitally signed
                       </span>
                     </div>
                   </td>
@@ -190,6 +203,22 @@
                         :class="getSmsStatusTextColor(getRelevantSmsStatus(request))"
                       >
                         {{ getSmsStatusText(getRelevantSmsStatus(request)) }}
+                      </span>
+                      <button
+                        v-if="['failed', 'pending'].includes(getRelevantSmsStatus(request))"
+                        @click.stop="retrySendSms(request)"
+                        :disabled="isRetrying(request.id)"
+                        class="ml-2 px-2 py-1 text-xs rounded border border-blue-300/50 text-blue-100 hover:bg-blue-700/40 disabled:opacity-50"
+                        title="Retry sending SMS"
+                      >
+                        <span v-if="!isRetrying(request.id)">Retry</span>
+                        <span v-else><i class="fas fa-spinner fa-spin mr-1"></i>Retrying</span>
+                      </button>
+                      <span
+                        v-if="getRetryAttempts(request.id) > 0"
+                        class="text-xs text-blue-200 ml-1"
+                      >
+                        ({{ getRetryAttempts(request.id) }})
                       </span>
                     </div>
                   </td>
@@ -283,18 +312,20 @@
             <button
               v-if="!isCancelledByUser(activeRequest) && !isRequestApproved(activeRequest)"
               @click="viewAndProcessRequest(activeRequest.id)"
-              class="group flex items-center w-full px-4 py-3 text-sm text-green-700 hover:bg-gradient-to-r hover:from-green-50 hover:to-green-100 hover:text-green-800 transition-all duration-200 font-semibold"
+              class="group flex items-center w-full px-4 py-3 text-xl text-green-700 hover:bg-gradient-to-r hover:from-green-50 hover:to-green-100 hover:text-green-800 transition-all duration-200 font-semibold"
             >
-              <i class="fas fa-check-circle mr-3 text-green-600 group-hover:text-green-700"></i>
+              <i
+                class="fas fa-check-circle mr-3 text-green-600 group-hover:text-green-700 text-xl"
+              ></i>
               Approve
             </button>
 
             <button
               v-if="!isCancelledByUser(activeRequest) && !isRequestApproved(activeRequest)"
               @click="editRequestForReview(activeRequest.id)"
-              class="group flex items-center w-full px-4 py-3 text-sm text-blue-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 hover:text-blue-800 transition-all duration-200 font-medium"
+              class="group flex items-center w-full px-4 py-3 text-xl text-blue-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 hover:text-blue-800 transition-all duration-200 font-semibold"
             >
-              <i class="fas fa-edit mr-3 text-blue-500 group-hover:text-blue-600"></i>
+              <i class="fas fa-edit mr-3 text-blue-500 group-hover:text-blue-600 text-xl"></i>
               Edit Request
             </button>
 
@@ -302,27 +333,27 @@
             <button
               v-if="isRequestApproved(activeRequest)"
               @click="viewApprovedRequest(activeRequest.id)"
-              class="group flex items-center w-full px-4 py-3 text-sm text-purple-700 hover:bg-gradient-to-r hover:from-purple-50 hover:to-purple-100 hover:text-purple-800 transition-all duration-200 font-semibold"
+              class="group flex items-center w-full px-4 py-3 text-xl text-purple-700 hover:bg-gradient-to-r hover:from-purple-50 hover:to-purple-100 hover:text-purple-800 transition-all duration-200 font-semibold"
             >
-              <i class="fas fa-eye mr-3 text-purple-600 group-hover:text-purple-700"></i>
+              <i class="fas fa-eye mr-3 text-purple-600 group-hover:text-purple-700 text-xl"></i>
               View Approved Request
             </button>
 
             <button
               v-if="isCancelledByUser(activeRequest)"
               @click="deleteRequest(activeRequest.id)"
-              class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-red-50 hover:to-red-100 hover:text-red-700 transition-all duration-200 font-medium"
+              class="group flex items-center w-full px-4 py-3 text-xl text-gray-700 hover:bg-gradient-to-r hover:from-red-50 hover:to-red-100 hover:text-red-700 transition-all duration-200 font-semibold"
             >
-              <i class="fas fa-trash mr-3 text-red-500 group-hover:text-red-600"></i>
+              <i class="fas fa-trash mr-3 text-red-500 group-hover:text-red-600 text-xl"></i>
               Delete
             </button>
 
             <button
               v-if="canEdit(activeRequest)"
               @click="editRequest(activeRequest.id)"
-              class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-amber-50 hover:to-amber-100 hover:text-amber-700 transition-all duration-200 font-medium"
+              class="group flex items-center w-full px-4 py-3 text-xl text-gray-700 hover:bg-gradient-to-r hover:from-amber-50 hover:to-amber-100 hover:text-amber-700 transition-all duration-200 font-semibold"
             >
-              <i class="fas fa-edit mr-3 text-amber-500 group-hover:text-amber-600"></i>
+              <i class="fas fa-edit mr-3 text-amber-500 group-hover:text-amber-600 text-xl"></i>
               Edit
             </button>
 
@@ -335,9 +366,9 @@
             <button
               v-if="canCancel(activeRequest) && !isRequestApproved(activeRequest)"
               @click="cancelRequest(activeRequest.id)"
-              class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-red-50 hover:to-red-100 hover:text-red-700 transition-all duration-200 font-medium"
+              class="group flex items-center w-full px-4 py-3 text-xl text-gray-700 hover:bg-gradient-to-r hover:from-red-50 hover:to-red-100 hover:text-red-700 transition-all duration-200 font-semibold"
             >
-              <i class="fas fa-ban mr-3 text-red-500 group-hover:text-red-600"></i>
+              <i class="fas fa-ban mr-3 text-red-500 group-hover:text-red-600 text-xl"></i>
               Cancel
             </button>
 
@@ -345,9 +376,11 @@
 
             <button
               @click="viewTimeline(activeRequest)"
-              class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-indigo-100 hover:text-indigo-700 transition-all duration-200 font-medium"
+              class="group flex items-center w-full px-4 py-3 text-xl text-gray-700 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-indigo-100 hover:text-indigo-700 transition-all duration-200 font-semibold"
             >
-              <i class="fas fa-history mr-3 text-indigo-500 group-hover:text-indigo-600"></i>
+              <i
+                class="fas fa-history mr-3 text-indigo-500 group-hover:text-indigo-600 text-xl"
+              ></i>
               View Timeline
             </button>
           </template>
@@ -364,6 +397,7 @@
   import RequestTimeline from '@/components/common/RequestTimeline.vue'
   import combinedAccessService from '@/services/combinedAccessService'
   import statusUtils from '@/utils/statusUtils'
+  import notificationService from '@/services/notificationService'
 
   export default {
     name: 'HodRequestList',
@@ -402,7 +436,12 @@
         $statusUtils: statusUtils,
         // Debounce handling
         fetchTimeout: null,
-        isFetchingData: false
+        isFetchingData: false,
+        // Retry state
+        retryAttempts: {},
+        retryTimers: {},
+        maxRetryAttempts: 5,
+        retryDelays: [3000, 7000, 15000, 30000, 60000]
       }
     },
     computed: {
@@ -634,6 +673,8 @@
 
             // Also fetch statistics
             await this.fetchStatistics()
+            // Initialize auto-retry for pending/failed SMS (to Divisional Director)
+            this.initAutoRetryForList()
           } else {
             throw new Error(response.error || 'Failed to fetch requests')
           }
@@ -902,6 +943,65 @@
         })
       },
 
+      // SMS retry helpers (HOD -> Divisional Director)
+      getRetryAttempts(id) {
+        return this.retryAttempts[id] || 0
+      },
+      isRetrying(id) {
+        return !!this.retryTimers[id]
+      },
+      async retrySendSms(request) {
+        if (!request) return
+        const id = request.id
+        if (!this.retryAttempts[id]) this.retryAttempts[id] = 0
+        if (this.isRetrying(id)) return
+        try {
+          this.retryTimers[id] = setTimeout(() => {}, 0)
+          await notificationService.resendSmsGeneric({
+            requestId: id,
+            role: 'hod',
+            target: 'divisional_director'
+          })
+          setTimeout(async () => {
+            await this.fetchRequests({ silent: true })
+            clearTimeout(this.retryTimers[id])
+            delete this.retryTimers[id]
+            const latest = (this.requests || []).find((r) => r.id === id) || request
+            const status = this.getRelevantSmsStatus(latest)
+            if (status !== 'sent') {
+              this.scheduleNextRetry(id, request)
+            } else {
+              this.retryAttempts[id] = 0
+            }
+          }, 1200)
+        } catch (e) {
+          clearTimeout(this.retryTimers[id])
+          delete this.retryTimers[id]
+          this.scheduleNextRetry(id, request)
+        }
+      },
+      scheduleNextRetry(id, request) {
+        this.retryAttempts[id] = (this.retryAttempts[id] || 0) + 1
+        if (this.retryAttempts[id] > this.maxRetryAttempts) return
+        const delay =
+          this.retryDelays[Math.min(this.retryAttempts[id] - 1, this.retryDelays.length - 1)]
+        this.retryTimers[id] = setTimeout(async () => {
+          clearTimeout(this.retryTimers[id])
+          delete this.retryTimers[id]
+          await this.retrySendSms(request)
+        }, delay)
+      },
+      initAutoRetryForList() {
+        ;(this.requests || []).forEach((r) => {
+          const st = this.getRelevantSmsStatus(r)
+          if (['failed', 'pending'].includes(st)) {
+            if (!this.retryTimers[r.id] && (this.retryAttempts[r.id] || 0) === 0) {
+              this.scheduleNextRetry(r.id, r)
+            }
+          }
+        })
+      },
+
       // SMS Status methods
       getRelevantSmsStatus(request) {
         // For HOD: show SMS status for NEXT workflow step after their approval
@@ -1096,5 +1196,21 @@
       box-shadow, transform, filter, backdrop-filter;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 200ms;
+  }
+  /* Status filter dropdown styling */
+  .status-select {
+    background-color: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    border-color: rgba(147, 197, 253, 0.4);
+  }
+  .status-select:focus {
+    outline: none;
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.35);
+  }
+  .status-select option,
+  .status-select optgroup {
+    background-color: #1e3a8a;
+    color: #ffffff;
   }
 </style>

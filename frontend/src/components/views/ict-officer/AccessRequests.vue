@@ -53,7 +53,7 @@
               />
               <select
                 v-model="statusFilter"
-                class="px-3 py-2 bg-white/20 border border-blue-300/30 rounded text-white text-lg"
+                class="px-3 py-2 bg-white/20 border border-blue-300/30 rounded text-white text-lg status-select"
               >
                 <option value="">All Requests</option>
                 <option value="unassigned">Available for Assignment</option>
@@ -229,6 +229,27 @@
                         >
                           {{ getSmsStatusText(getRelevantSmsStatus(request)) }}
                         </span>
+                        <!-- Retry button shown for failed or pending -->
+                        <button
+                          v-if="
+                            ['failed', 'pending'].includes(getRelevantSmsStatus(request)) &&
+                            ['implemented', 'completed'].includes(request.status)
+                          "
+                          @click="retrySendSms(request)"
+                          :disabled="isRetrying(request.id)"
+                          class="ml-2 px-2 py-1 text-xs rounded border border-blue-300/50 text-blue-100 hover:bg-blue-700/40 disabled:opacity-50"
+                          title="Retry sending SMS to requester"
+                        >
+                          <span v-if="!isRetrying(request.id)">Retry</span>
+                          <span v-else> <i class="fas fa-spinner fa-spin mr-1"></i>Retrying </span>
+                        </button>
+                        <!-- Attempts badge -->
+                        <span
+                          v-if="getRetryAttempts(request.id) > 0"
+                          class="text-xs text-blue-200 ml-1"
+                        >
+                          ({{ getRetryAttempts(request.id) }})
+                        </span>
                       </div>
                     </td>
 
@@ -280,7 +301,7 @@
     <Teleport to="body">
       <div
         v-if="activeDropdown !== null"
-        class="fixed w-48 bg-white rounded-lg shadow-2xl border border-gray-200 py-1"
+        class="fixed w-56 bg-white rounded-lg shadow-2xl border border-gray-200 py-1"
         :style="getDropdownPosition()"
         style="z-index: 99999"
         @click.stop
@@ -290,22 +311,22 @@
           <!-- Available for Assignment - show Approve and View Timeline -->
           <button
             @click="handleMenuAction('viewRequest', selectedRequest)"
-            class="w-full text-left px-4 py-2 text-sm bg-green-50 text-green-800 border-b border-green-200 hover:bg-green-100 focus:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset transition-all duration-200 flex items-center group first:rounded-t-lg"
+            class="w-full text-left px-4 py-3 text-lg bg-green-50 text-green-800 border-b border-green-200 hover:bg-green-100 focus:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset transition-all duration-200 flex items-center group first:rounded-t-lg"
           >
             <i
-              class="fas fa-check mr-3 text-green-600 group-hover:text-green-700 group-focus:text-green-700 transition-colors duration-200"
+              class="fas fa-check mr-3 text-green-600 group-hover:text-green-700 group-focus:text-green-700 transition-colors duration-200 text-lg"
             ></i>
-            <span class="font-medium text-green-800">Approve</span>
+            <span class="font-semibold text-green-800">Approve</span>
           </button>
 
           <button
             @click="handleMenuAction('viewTimeline', selectedRequest)"
-            class="w-full text-left px-4 py-2 text-sm bg-indigo-50 text-indigo-800 hover:bg-indigo-100 focus:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
+            class="w-full text-left px-4 py-3 text-lg bg-indigo-50 text-indigo-800 hover:bg-indigo-100 focus:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
           >
             <i
-              class="fas fa-history mr-3 text-indigo-600 group-hover:text-indigo-700 group-focus:text-indigo-700 transition-colors duration-200"
+              class="fas fa-history mr-3 text-indigo-600 group-hover:text-indigo-700 group-focus:text-indigo-700 transition-colors duration-200 text-lg"
             ></i>
-            <span class="font-medium">View Timeline</span>
+            <span class="font-semibold">View Timeline</span>
           </button>
         </template>
 
@@ -313,22 +334,22 @@
           <!-- Assigned to ICT - show Approve and View Timeline -->
           <button
             @click="handleMenuAction('viewRequest', selectedRequest)"
-            class="w-full text-left px-4 py-2 text-sm bg-green-50 text-green-800 border-b border-green-200 hover:bg-green-100 focus:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset transition-all duration-200 flex items-center group first:rounded-t-lg"
+            class="w-full text-left px-4 py-3 text-lg bg-green-50 text-green-800 border-b border-green-200 hover:bg-green-100 focus:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset transition-all duration-200 flex items-center group first:rounded-t-lg"
           >
             <i
-              class="fas fa-check mr-3 text-green-600 group-hover:text-green-700 group-focus:text-green-700 transition-colors duration-200"
+              class="fas fa-check mr-3 text-green-600 group-hover:text-green-700 group-focus:text-green-700 transition-colors duration-200 text-lg"
             ></i>
-            <span class="font-medium text-green-800">Approve</span>
+            <span class="font-semibold text-green-800">Approve</span>
           </button>
 
           <button
             @click="handleMenuAction('viewTimeline', selectedRequest)"
-            class="w-full text-left px-4 py-2 text-sm bg-indigo-50 text-indigo-800 hover:bg-indigo-100 focus:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
+            class="w-full text-left px-4 py-3 text-lg bg-indigo-50 text-indigo-800 hover:bg-indigo-100 focus:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
           >
             <i
-              class="fas fa-history mr-3 text-indigo-600 group-hover:text-indigo-700 group-focus:text-indigo-700 transition-colors duration-200"
+              class="fas fa-history mr-3 text-indigo-600 group-hover:text-indigo-700 group-focus:text-indigo-700 transition-colors duration-200 text-lg"
             ></i>
-            <span class="font-medium">View Timeline</span>
+            <span class="font-semibold">View Timeline</span>
           </button>
         </template>
 
@@ -338,22 +359,22 @@
           <!-- Implementation in progress - show Approve and View Timeline -->
           <button
             @click="handleMenuAction('viewRequest', selectedRequest)"
-            class="w-full text-left px-4 py-2 text-sm bg-green-50 text-green-800 border-b border-green-200 hover:bg-green-100 focus:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset transition-all duration-200 flex items-center group first:rounded-t-lg"
+            class="w-full text-left px-4 py-3 text-lg bg-green-50 text-green-800 border-b border-green-200 hover:bg-green-100 focus:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset transition-all duration-200 flex items-center group first:rounded-t-lg"
           >
             <i
-              class="fas fa-check mr-3 text-green-600 group-hover:text-green-700 group-focus:text-green-700 transition-colors duration-200"
+              class="fas fa-check mr-3 text-green-600 group-hover:text-green-700 group-focus:text-green-700 transition-colors duration-200 text-lg"
             ></i>
-            <span class="font-medium text-green-800">Approve</span>
+            <span class="font-semibold text-green-800">Approve</span>
           </button>
 
           <button
             @click="handleMenuAction('viewTimeline', selectedRequest)"
-            class="w-full text-left px-4 py-2 text-sm bg-indigo-50 text-indigo-800 hover:bg-indigo-100 focus:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
+            class="w-full text-left px-4 py-3 text-lg bg-indigo-50 text-indigo-800 hover:bg-indigo-100 focus:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
           >
             <i
-              class="fas fa-history mr-3 text-indigo-600 group-hover:text-indigo-700 group-focus:text-indigo-700 transition-colors duration-200"
+              class="fas fa-history mr-3 text-indigo-600 group-hover:text-indigo-700 group-focus:text-indigo-700 transition-colors duration-200 text-lg"
             ></i>
-            <span class="font-medium">View Timeline</span>
+            <span class="font-semibold">View Timeline</span>
           </button>
         </template>
 
@@ -366,22 +387,22 @@
           <!-- Completed/Implemented - show View Request (read-only) and View Timeline -->
           <button
             @click="handleMenuAction('viewRequest', selectedRequest)"
-            class="w-full text-left px-4 py-2 text-sm bg-blue-50 text-blue-800 border-b border-blue-200 hover:bg-blue-100 focus:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset transition-all duration-200 flex items-center group first:rounded-t-lg"
+            class="w-full text-left px-4 py-3 text-lg bg-blue-50 text-blue-800 border-b border-blue-200 hover:bg-blue-100 focus:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset transition-all duration-200 flex items-center group first:rounded-t-lg"
           >
             <i
               class="fas fa-eye mr-3 text-blue-600 group-hover:text-blue-700 group-focus:text-blue-700 transition-colors duration-200"
             ></i>
-            <span class="font-medium text-blue-800">View Request</span>
+            <span class="font-semibold text-blue-800">View Request</span>
           </button>
 
           <button
             @click="handleMenuAction('viewTimeline', selectedRequest)"
-            class="w-full text-left px-4 py-2 text-sm bg-indigo-50 text-indigo-800 hover:bg-indigo-100 focus:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
+            class="w-full text-left px-4 py-3 text-lg bg-indigo-50 text-indigo-800 hover:bg-indigo-100 focus:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
           >
             <i
               class="fas fa-history mr-3 text-indigo-600 group-hover:text-indigo-700 group-focus:text-indigo-700 transition-colors duration-200"
             ></i>
-            <span class="font-medium">View Timeline</span>
+            <span class="font-semibold">View Timeline</span>
           </button>
         </template>
 
@@ -389,22 +410,22 @@
           <!-- Fallback for cancelled or unknown statuses - show View Request and View Timeline -->
           <button
             @click="handleMenuAction('viewRequest', selectedRequest)"
-            class="w-full text-left px-4 py-2 text-sm bg-blue-50 text-blue-800 border-b border-blue-200 hover:bg-blue-100 focus:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset transition-all duration-200 flex items-center group first:rounded-t-lg"
+            class="w-full text-left px-4 py-3 text-lg bg-blue-50 text-blue-800 border-b border-blue-200 hover:bg-blue-100 focus:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset transition-all duration-200 flex items-center group first:rounded-t-lg"
           >
             <i
               class="fas fa-eye mr-3 text-blue-600 group-hover:text-blue-700 group-focus:text-blue-700 transition-colors duration-200"
             ></i>
-            <span class="font-medium text-blue-800">View Request</span>
+            <span class="font-semibold text-blue-800">View Request</span>
           </button>
 
           <button
             @click="handleMenuAction('viewTimeline', selectedRequest)"
-            class="w-full text-left px-4 py-2 text-sm bg-indigo-50 text-indigo-800 hover:bg-indigo-100 focus:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
+            class="w-full text-left px-4 py-3 text-lg bg-indigo-50 text-indigo-800 hover:bg-indigo-100 focus:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
           >
             <i
               class="fas fa-history mr-3 text-indigo-600 group-hover:text-indigo-700 group-focus:text-indigo-700 transition-colors duration-200"
             ></i>
-            <span class="font-medium">View Timeline</span>
+            <span class="font-semibold">View Timeline</span>
           </button>
         </template>
       </div>
@@ -713,6 +734,7 @@
   async function refreshRequests() {
     console.log('🔄 IctAccessRequests: Refreshing requests...')
     await fetchAccessRequests()
+    initAutoRetryForList()
   }
 
   async function viewRequest(request) {
@@ -870,7 +892,62 @@
   function getRelevantSmsStatus(request) {
     // Only show SMS status if access has been granted (implemented/completed)
     if (request.status === 'implemented' || request.status === 'completed') {
-      return request.sms_to_requester_status || 'pending'
+      // Accept broader fields and values
+      const normalize = (val) => {
+        if (val === undefined || val === null) return null
+        if (typeof val === 'boolean') return val ? 'sent' : 'pending'
+        if (typeof val === 'number') return val === 1 ? 'sent' : val === 0 ? 'pending' : null
+        const v = String(val).toLowerCase().trim()
+        if (
+          [
+            'sent',
+            'delivered',
+            'success',
+            'successful',
+            'ok',
+            'delivrd',
+            'delivery_ok',
+            'submitted',
+            'accepted',
+            'done',
+            'complete',
+            'completed'
+          ].includes(v)
+        )
+          return 'sent'
+        if (
+          [
+            'failed',
+            'fail',
+            'error',
+            'undelivered',
+            'rejected',
+            'expired',
+            'blocked',
+            'blacklisted'
+          ].includes(v)
+        )
+          return 'failed'
+        if (['queued', 'queue', 'processing', 'pending', 'in_progress'].includes(v))
+          return 'pending'
+        return v || null
+      }
+      const ts =
+        request.requester_sms_sent_at ||
+        request.sms_to_requester_at ||
+        request.sms_delivered_to_requester_at
+      if (ts) return 'sent'
+      const candidates = [
+        request.sms_to_requester_status,
+        request.sms_to_requester,
+        request.requester_sms_status,
+        request.sms_delivery_status_to_requester,
+        request.sms_status
+      ]
+        .map(normalize)
+        .filter(Boolean)
+      if (candidates.length) return candidates.find((s) => s !== 'pending') || candidates[0]
+      return 'pending'
     }
     // Otherwise, show pending (access not yet granted)
     return 'pending'
@@ -942,6 +1019,7 @@
     console.log('🔄 IctAccessRequests: Progress updated, refreshing data...')
     await fetchAccessRequests()
     refreshNotificationBadge()
+    initAutoRetryForList()
     closeTimeline()
     setTimeout(() => refreshNotificationBadge(), 3000)
     setTimeout(() => refreshNotificationBadge(), 5000)
@@ -1170,6 +1248,76 @@
   }
 
   // Lifecycle
+  // Retry state
+  const retryAttempts = reactive({}) // requestId -> count
+  const retryTimers = reactive({}) // requestId -> timer id
+  const maxRetryAttempts = 5
+  const retryDelays = [3000, 7000, 15000, 30000, 60000]
+
+  function getRetryAttempts(id) {
+    return retryAttempts[id] || 0
+  }
+  function isRetrying(id) {
+    return !!retryTimers[id]
+  }
+
+  async function retrySendSms(request) {
+    if (!request) return
+    const id = request.id
+    if (!retryAttempts[id]) retryAttempts[id] = 0
+
+    // Guard against spamming
+    if (isRetrying(id)) return
+
+    try {
+      retryTimers[id] = setTimeout(() => {}, 0) // mark busy
+      const phone = request.phone_number || request.phone || null
+      await ictOfficerService.resendRequesterSms(id, phone)
+      // Short delay to allow backend to update, then refresh
+      setTimeout(async () => {
+        await fetchAccessRequests()
+        clearTimeout(retryTimers[id])
+        delete retryTimers[id]
+        const status = getRelevantSmsStatus(
+          accessRequests.value.find((r) => r.id === id) || request
+        )
+        if (status !== 'sent') {
+          // schedule next retry if allowed
+          scheduleNextRetry(id, request)
+        } else {
+          retryAttempts[id] = 0
+        }
+      }, 1200)
+    } catch (e) {
+      clearTimeout(retryTimers[id])
+      delete retryTimers[id]
+      scheduleNextRetry(id, request)
+    }
+  }
+
+  function scheduleNextRetry(id, request) {
+    retryAttempts[id] = (retryAttempts[id] || 0) + 1
+    if (retryAttempts[id] > maxRetryAttempts) return
+    const delay = retryDelays[Math.min(retryAttempts[id] - 1, retryDelays.length - 1)]
+    retryTimers[id] = setTimeout(() => {
+      clearTimeout(retryTimers[id])
+      delete retryTimers[id]
+      retrySendSms(request)
+    }, delay)
+  }
+
+  function initAutoRetryForList() {
+    for (const r of accessRequests.value) {
+      const st = getRelevantSmsStatus(r)
+      if (['failed', 'pending'].includes(st) && ['implemented', 'completed'].includes(r.status)) {
+        // start gentle auto-retry only if not already running
+        if (!retryTimers[r.id] && (retryAttempts[r.id] || 0) === 0) {
+          scheduleNextRetry(r.id, r)
+        }
+      }
+    }
+  }
+
   onMounted(async () => {
     try {
       console.log('IctAccessRequests: Component mounted, initializing...')
@@ -1177,6 +1325,7 @@
       await fetchAccessRequests()
       console.log('IctAccessRequests: Component initialized successfully')
       refreshNotificationBadge()
+      initAutoRetryForList()
       document.addEventListener('click', handleClickOutside)
     } catch (e) {
       console.error('IctAccessRequests: Error during mount:', e)
@@ -1378,5 +1527,21 @@ console.error('🚫 DIAGNOSTIC ERROR:', error) }
 
   .animate-slide-across {
     animation: slide-across 2.5s ease-in-out infinite;
+  }
+  /* Status filter dropdown styling */
+  .status-select {
+    background-color: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    border-color: rgba(147, 197, 253, 0.4);
+  }
+  .status-select:focus {
+    outline: none;
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.35);
+  }
+  .status-select option,
+  .status-select optgroup {
+    background-color: #1e3a8a;
+    color: #ffffff;
   }
 </style>

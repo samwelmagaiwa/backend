@@ -366,19 +366,35 @@
                       </div>
                     </td>
                     <td class="px-1 py-3 text-xl text-center">
-                      <i
-                        v-if="request.has_signature || request.signature"
-                        class="fas fa-check-circle text-green-400 text-2xl"
-                      ></i>
-                      <i v-else class="fas fa-times-circle text-red-400 text-2xl"></i>
+                      <div class="flex flex-col items-center space-y-1">
+                        <i
+                          v-if="request.has_signature || request.signature"
+                          class="fas fa-check-circle text-green-400 text-2xl"
+                        ></i>
+                        <i v-else class="fas fa-times-circle text-red-400 text-2xl"></i>
+                        <span
+                          v-if="request.has_signature || request.signature"
+                          class="px-2 py-0.5 rounded text-xs font-semibold bg-emerald-900/30 text-emerald-300 border border-emerald-500/40"
+                        >
+                          Digitally signed
+                        </span>
+                      </div>
                     </td>
                     <td class="px-1 py-3 text-xl">
-                      <span
-                        :class="getStatusBadgeClass(request.ict_approve || 'pending')"
-                        class="inline-flex items-center px-3 py-2 rounded text-lg font-bold"
-                      >
-                        {{ getStatusText(request.ict_approve || 'pending') }}
-                      </span>
+                      <div class="flex flex-col space-y-1">
+                        <span
+                          v-if="request.divisional_status === 'skipped'"
+                          class="inline-flex items-center px-2 py-1 rounded text-base font-semibold bg-red-900/30 text-red-300 border border-red-500/40"
+                        >
+                          No Divisional Director — Stage Skipped
+                        </span>
+                        <span
+                          :class="getStatusBadgeClass(request.ict_approve || 'pending')"
+                          class="inline-flex items-center px-3 py-2 rounded text-lg font-bold"
+                        >
+                          {{ getStatusText(request.ict_approve || 'pending') }}
+                        </span>
+                      </div>
                     </td>
                     <td class="px-1 py-3 text-xl">
                       <span

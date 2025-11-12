@@ -205,16 +205,20 @@
                         <div class="text-center">
                           <div class="mb-3">
                             <i class="fas fa-signature text-teal-300 text-3xl mb-2"></i>
-                            <p class="text-blue-100 text-sm">No signature uploaded</p>
+                            <p class="text-blue-100 text-sm">No signature on file</p>
                           </div>
                           <button
                             type="button"
-                            @click="triggerFileUpload"
+                            @click="signCurrentDocument"
+                            :disabled="isSigning || !isReviewMode"
                             class="px-4 py-2 bg-gradient-to-r from-teal-500 to-blue-600 text-white text-sm font-semibold rounded-lg hover:from-teal-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-2 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-teal-400/50"
                           >
-                            <i class="fas fa-upload"></i>
-                            Load Signature
+                            <i class="fas fa-pen-alt"></i>
+                            Sign Document
                           </button>
+                          <p v-if="!isReviewMode" class="text-xs text-blue-200 mt-1">
+                            Available after submitting the request
+                          </p>
                         </div>
                       </div>
 
@@ -1101,6 +1105,7 @@
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppFooter from '@/components/footer.vue'
   import { useAuth } from '@/composables/useAuth'
+  import signatureService from '@/services/signatureService'
 
   export default {
     name: 'WellSoftAccessForm',
@@ -1133,6 +1138,10 @@
       return {
         signaturePreview: '',
         signatureFileName: '',
+        // Digital signature state
+        isSigning: false,
+        hasUserSigned: false,
+        lastSignedAt: null,
         // Approval signatures
         hodSignaturePreview: '',
         hodSignatureFileName: '',
@@ -1203,6 +1212,32 @@
       }
     },
     methods: {
+      async signCurrentDocument() {
+        try {
+          if (this.isSigning) return
+          const documentId = this.requestId || this.$route.params.id
+          if (!documentId) {
+            this.showNotification('Cannot sign until the request is created. Please submit first.')
+            return
+          }
+          this.isSigning = true
+          const res = await signatureService.sign(documentId)
+          if (res && (res.success || res.data)) {
+            this.hasUserSigned = true
+            this.lastSignedAt = res?.data?.signed_at || res?.signed_at || new Date().toISOString()
+            this.showNotification(
+              `Document signed on ${new Date(this.lastSignedAt).toLocaleString()}`
+            )
+          } else {
+            this.showNotification(res?.message || 'Failed to sign document')
+          }
+        } catch (e) {
+          console.error('Sign error:', e)
+          this.showNotification(e.message || 'Failed to sign document')
+        } finally {
+          this.isSigning = false
+        }
+      },
       submitForm() {
         // Validate required fields
         if (!this.formData.pfNumber || !this.formData.staffName) {

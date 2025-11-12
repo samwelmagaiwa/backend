@@ -24,21 +24,21 @@
 
           <!-- Stats -->
           <div class="grid grid-cols-4 gap-4 mb-6">
-            <div class="bg-yellow-600/25 border border-yellow-400/40 p-4 rounded-lg">
-              <h3 class="text-yellow-200 text-lg font-bold">Pending My Approval</h3>
-              <p class="text-white text-4xl font-bold">{{ stats.pendingDict }}</p>
+            <div class="bg-yellow-600/25 border border-yellow-400/40 p-6 rounded-xl">
+              <h3 class="text-yellow-200 text-2xl font-extrabold">Pending My Approval</h3>
+              <p class="text-white text-5xl font-extrabold mt-1">{{ stats.pendingDict }}</p>
             </div>
-            <div class="bg-green-600/25 border border-green-400/40 p-4 rounded-lg">
-              <h3 class="text-green-200 text-lg font-bold">Approved by Me</h3>
-              <p class="text-white text-4xl font-bold">{{ stats.dictApproved }}</p>
+            <div class="bg-green-600/25 border border-green-400/40 p-6 rounded-xl">
+              <h3 class="text-green-200 text-2xl font-extrabold">Approved by Me</h3>
+              <p class="text-white text-5xl font-extrabold mt-1">{{ stats.dictApproved }}</p>
             </div>
-            <div class="bg-red-600/25 border border-red-400/40 p-4 rounded-lg">
-              <h3 class="text-red-200 text-lg font-bold">Rejected by Me</h3>
-              <p class="text-white text-4xl font-bold">{{ stats.dictRejected }}</p>
+            <div class="bg-red-600/25 border border-red-400/40 p-6 rounded-xl">
+              <h3 class="text-red-200 text-2xl font-extrabold">Rejected by Me</h3>
+              <p class="text-white text-5xl font-extrabold mt-1">{{ stats.dictRejected }}</p>
             </div>
-            <div class="bg-blue-600/25 border border-blue-400/40 p-4 rounded-lg">
-              <h3 class="text-blue-200 text-lg font-bold">Total Requests</h3>
-              <p class="text-white text-4xl font-bold">{{ stats.total }}</p>
+            <div class="bg-blue-600/25 border border-blue-400/40 p-6 rounded-xl">
+              <h3 class="text-blue-200 text-2xl font-extrabold">Total Requests</h3>
+              <p class="text-white text-5xl font-extrabold mt-1">{{ stats.total }}</p>
             </div>
           </div>
 
@@ -49,11 +49,11 @@
                 v-model="searchQuery"
                 type="text"
                 placeholder="Search by staff name, PF number, or department..."
-                class="flex-1 px-4 py-3 bg-white/20 border border-blue-300/30 rounded text-white placeholder-blue-200/60 text-lg"
+                class="flex-1 px-5 py-4 bg-white/20 border-2 border-blue-300/40 rounded-lg text-white placeholder-blue-200/60 text-xl"
               />
               <select
                 v-model="statusFilter"
-                class="px-4 py-3 bg-white/20 border border-blue-300/30 rounded text-white text-lg"
+                class="px-5 py-4 bg-white/20 border-2 border-blue-300/40 rounded-lg text-white text-xl status-select"
               >
                 <option value="">All My Requests</option>
                 <option value="pending">Show All Pending</option>
@@ -69,7 +69,7 @@
               </select>
               <button
                 @click="refreshRequests"
-                class="px-6 py-3 bg-teal-600 text-white rounded hover:bg-teal-700 text-lg font-bold"
+                class="px-8 py-4 bg-teal-600 text-white rounded-xl hover:bg-teal-700 text-xl font-extrabold"
               >
                 Refresh
               </button>
@@ -82,21 +82,27 @@
               <table class="w-full">
                 <thead class="bg-blue-800/50">
                   <tr>
-                    <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">Request ID</th>
-                    <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
+                    <th class="px-4 py-5 text-left text-blue-100 text-xl font-extrabold">
+                      Request ID
+                    </th>
+                    <th class="px-4 py-5 text-left text-blue-100 text-xl font-extrabold">
                       Request Type
                     </th>
-                    <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
+                    <th class="px-4 py-5 text-left text-blue-100 text-xl font-extrabold">
                       Personal Information
                     </th>
-                    <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
+                    <th class="px-4 py-5 text-left text-blue-100 text-xl font-extrabold">
                       Divisional Approval Date
                     </th>
-                    <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
+                    <th class="px-4 py-5 text-left text-blue-100 text-xl font-extrabold">
                       Current Status
                     </th>
-                    <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">SMS Status</th>
-                    <th class="px-4 py-4 text-center text-blue-100 text-lg font-bold">Actions</th>
+                    <th class="px-4 py-5 text-left text-blue-100 text-xl font-extrabold">
+                      SMS Status
+                    </th>
+                    <th class="px-4 py-5 text-center text-blue-100 text-xl font-extrabold">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -127,34 +133,34 @@
                           ></i>
                         </div>
                         <div>
-                          <div class="text-white font-medium text-base">
+                          <div class="text-white font-semibold text-xl">
                             {{
                               request.request_id || `REQ-${request.id.toString().padStart(6, '0')}`
                             }}
                           </div>
-                          <div class="text-purple-300 text-sm">ID: {{ request.id }}</div>
+                          <div class="text-purple-300 text-lg">ID: {{ request.id }}</div>
                         </div>
                       </div>
                     </td>
 
                     <!-- Request Type -->
                     <td class="px-4 py-3">
-                      <div class="flex flex-wrap gap-1">
+                      <div class="flex flex-wrap gap-2">
                         <span
                           v-if="hasService(request, 'jeeva')"
-                          class="px-2 py-1 rounded text-sm bg-blue-100 text-blue-800"
+                          class="px-3 py-1.5 rounded text-base bg-blue-100 text-blue-800"
                         >
                           Jeeva
                         </span>
                         <span
                           v-if="hasService(request, 'wellsoft')"
-                          class="px-2 py-1 rounded text-sm bg-green-100 text-green-800"
+                          class="px-3 py-1.5 rounded text-base bg-green-100 text-green-800"
                         >
                           Wellsoft
                         </span>
                         <span
                           v-if="hasService(request, 'internet')"
-                          class="px-2 py-1 rounded text-sm bg-cyan-100 text-cyan-800"
+                          class="px-3 py-1.5 rounded text-base bg-cyan-100 text-cyan-800"
                         >
                           Internet
                         </span>
@@ -163,26 +169,26 @@
 
                     <!-- Personal Information -->
                     <td class="px-4 py-3">
-                      <div class="text-white font-medium text-base">
+                      <div class="text-white font-semibold text-xl">
                         {{ request.staff_name || request.full_name || 'Unknown User' }}
                       </div>
-                      <div class="text-blue-300 text-sm">
+                      <div class="text-blue-300 text-lg">
                         {{ request.phone || request.phone_number || 'No phone' }}
                       </div>
-                      <div v-if="request.pf_number" class="text-teal-300 text-sm">
+                      <div v-if="request.pf_number" class="text-teal-300 text-lg">
                         PF: {{ request.pf_number }}
                       </div>
-                      <div class="text-blue-200 text-sm">
+                      <div class="text-blue-200 text-lg">
                         Dept: {{ request.department || 'Unknown' }}
                       </div>
                     </td>
 
                     <!-- Divisional Approval Date -->
                     <td class="px-4 py-3">
-                      <div class="text-white font-medium text-base">
+                      <div class="text-white font-semibold text-xl">
                         {{ formatDate(request.divisional_approved_at) }}
                       </div>
-                      <div class="text-blue-300 text-sm">
+                      <div class="text-blue-300 text-lg">
                         {{ formatTime(request.divisional_approved_at) }}
                       </div>
                     </td>
@@ -190,29 +196,58 @@
                     <!-- Current Status -->
                     <td class="px-4 py-3">
                       <div class="flex flex-col">
+                        <span
+                          v-if="request.divisional_status === 'skipped'"
+                          class="mb-1 rounded text-lg font-semibold inline-block bg-red-900/30 text-red-300 border border-red-500/40 px-2 py-1"
+                          :style="{ width: 'fit-content' }"
+                        >
+                          No Divisional Director — Stage Skipped
+                        </span>
                         <!-- Display the exact database status -->
                         <span
                           :class="getStatusBadgeClass(request.status)"
-                          class="rounded text-base font-medium inline-block"
-                          :style="{ padding: '4px 8px', width: 'fit-content' }"
+                          class="rounded text-xl font-semibold inline-block"
+                          :style="{ padding: '6px 12px', width: 'fit-content' }"
                         >
                           {{ getStatusText(request.status) }}
+                        </span>
+                        <span
+                          v-if="request.has_signature || request.signature"
+                          class="mt-1 px-2 py-0.5 rounded text-xs font-semibold bg-emerald-900/30 text-emerald-300 border border-emerald-500/40 w-fit"
+                        >
+                          Digitally signed
                         </span>
                       </div>
                     </td>
 
                     <!-- SMS Status -->
                     <td class="px-4 py-3">
-                      <div class="flex items-center space-x-2">
+                      <div class="flex items-center space-x-3">
                         <div
-                          class="w-3 h-3 rounded-full"
+                          class="w-4 h-4 rounded-full"
                           :class="getSmsStatusColor(getRelevantSmsStatus(request))"
                         ></div>
                         <span
-                          class="text-sm font-medium"
+                          class="text-xl font-semibold"
                           :class="getSmsStatusTextColor(getRelevantSmsStatus(request))"
                         >
                           {{ getSmsStatusText(getRelevantSmsStatus(request)) }}
+                        </span>
+                        <button
+                          v-if="['failed', 'pending'].includes(getRelevantSmsStatus(request))"
+                          @click.stop="retrySendSms(request)"
+                          :disabled="isRetrying(request.id)"
+                          class="ml-2 px-2 py-1 text-xs rounded border border-blue-300/50 text-blue-100 hover:bg-blue-700/40 disabled:opacity-50"
+                          title="Retry sending SMS"
+                        >
+                          <span v-if="!isRetrying(request.id)">Retry</span>
+                          <span v-else><i class="fas fa-spinner fa-spin mr-1"></i>Retrying</span>
+                        </button>
+                        <span
+                          v-if="getRetryAttempts(request.id) > 0"
+                          class="text-xs text-blue-200 ml-1"
+                        >
+                          ({{ getRetryAttempts(request.id) }})
                         </span>
                       </div>
                     </td>
@@ -253,7 +288,7 @@
                             >
                               <button
                                 @click.stop="executeAction(action.key, request)"
-                                class="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-all duration-200 flex items-center space-x-3 group"
+                                class="w-full text-left px-4 py-3 text-lg hover:bg-gray-50 transition-all duration-200 flex items-center space-x-3 group"
                                 :class="[
                                   {
                                     'border-t border-gray-100':
@@ -268,9 +303,9 @@
                               >
                                 <i
                                   :class="[action.icon, getActionIconColorClass(action)]"
-                                  class="w-4 h-4 flex-shrink-0 transition-colors duration-200"
+                                  class="flex-shrink-0 transition-colors duration-200 text-lg"
                                 ></i>
-                                <span class="font-medium">{{ action.label }}</span>
+                                <span class="font-semibold">{{ action.label }}</span>
                               </button>
                             </template>
                           </div>
@@ -334,6 +369,7 @@
   import dictAccessService from '@/services/dictAccessService'
   import statusUtils from '@/utils/statusUtils'
   import { useAuth } from '@/composables/useAuth'
+  import notificationService from '@/services/notificationService'
 
   export default {
     name: 'DictRequestList',
@@ -367,6 +403,11 @@
         // Timeline modal state
         showTimeline: false,
         selectedRequestId: null,
+        // Retry state for SMS to Head of IT
+        retryAttempts: {},
+        retryTimers: {},
+        maxRetryAttempts: 5,
+        retryDelays: [3000, 7000, 15000, 30000, 60000],
         // Add status utilities for consistent status handling
         $statusUtils: statusUtils
       }
@@ -534,6 +575,9 @@
             this.requests = items
             console.log('Combined access requests loaded:', this.requests.length)
             console.log('Raw response data:', response.data)
+
+            // Initialize auto-retry on freshly loaded list
+            this.$nextTick(() => this.initAutoRetryForList())
 
             // Also fetch statistics
             await this.fetchStatistics()
@@ -1113,6 +1157,7 @@
       async handleTimelineUpdate() {
         console.log('🔄 DictRequestList: Timeline updated, refreshing requests list...')
         await this.fetchRequests()
+        this.initAutoRetryForList()
       },
 
       // Helper method to determine if separator should be shown
@@ -1139,6 +1184,66 @@
         }
 
         return false
+      },
+
+      // SMS retry helpers (ICT Director -> Head of IT)
+      getRetryAttempts(id) {
+        return this.retryAttempts[id] || 0
+      },
+      isRetrying(id) {
+        return !!this.retryTimers[id]
+      },
+      async retrySendSms(request) {
+        if (!request) return
+        const id = request.id
+        if (!this.retryAttempts[id]) this.retryAttempts[id] = 0
+        if (this.isRetrying(id)) return
+        try {
+          this.retryTimers[id] = setTimeout(() => {}, 0)
+          await notificationService.resendSmsGeneric({
+            requestId: id,
+            role: 'ict_director',
+            target: 'head_of_it'
+          })
+          setTimeout(async () => {
+            await this.fetchRequests()
+            clearTimeout(this.retryTimers[id])
+            delete this.retryTimers[id]
+            const status = this.getRelevantSmsStatus(
+              (this.requests || []).find((r) => r.id === id) || request
+            )
+            if (status !== 'sent') {
+              this.scheduleNextRetry(id, request)
+            } else {
+              this.retryAttempts[id] = 0
+            }
+          }, 1200)
+        } catch (e) {
+          clearTimeout(this.retryTimers[id])
+          delete this.retryTimers[id]
+          this.scheduleNextRetry(id, request)
+        }
+      },
+      scheduleNextRetry(id, request) {
+        this.retryAttempts[id] = (this.retryAttempts[id] || 0) + 1
+        if (this.retryAttempts[id] > this.maxRetryAttempts) return
+        const delay =
+          this.retryDelays[Math.min(this.retryAttempts[id] - 1, this.retryDelays.length - 1)]
+        this.retryTimers[id] = setTimeout(async () => {
+          clearTimeout(this.retryTimers[id])
+          delete this.retryTimers[id]
+          await this.retrySendSms(request)
+        }, delay)
+      },
+      initAutoRetryForList() {
+        ;(this.requests || []).forEach((r) => {
+          const st = this.getRelevantSmsStatus(r)
+          if (['failed', 'pending'].includes(st)) {
+            if (!this.retryTimers[r.id] && (this.retryAttempts[r.id] || 0) === 0) {
+              this.scheduleNextRetry(r.id, r)
+            }
+          }
+        })
       },
 
       // SMS Status methods
@@ -1338,5 +1443,21 @@
   main {
     position: relative;
     z-index: 1;
+  }
+  /* Status filter dropdown styling */
+  .status-select {
+    background-color: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    border-color: rgba(147, 197, 253, 0.4);
+  }
+  .status-select:focus {
+    outline: none;
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.35);
+  }
+  .status-select option,
+  .status-select optgroup {
+    background-color: #1e3a8a;
+    color: #ffffff;
   }
 </style>

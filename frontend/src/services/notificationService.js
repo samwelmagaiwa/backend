@@ -53,6 +53,128 @@ const notificationCache = {
 
 const notificationService = {
   /**
+   * Resend/notify SMS generically across roles with broad endpoint fallbacks.
+   */
+  async resendSmsGeneric({ requestId, role = null, target = null, phone = null, channel = 'sms' }) {
+    // Build normalization helpers
+    const normalizePhone = (p) => {
+      if (!p) return null
+      const s = String(p).trim()
+      const keepPlus = s.startsWith('+')
+      const digits = s.replace(/[^\d]/g, '')
+      return keepPlus ? `+${digits}` : digits
+    }
+    const rawPhone = phone || null
+    const normalized = normalizePhone(rawPhone)
+
+    // Payload with many compatibility flags and keys
+    const payload = {
+      request_id: requestId,
+      role,
+      target,
+      notification_type: 'generic_sms',
+      resend_only: true,
+      force: true,
+      force_resend: true,
+      resend_sms: true,
+      send_sms: true,
+      notification_channel: channel,
+      // Phone variants
+      phone: rawPhone || undefined,
+      phone_number: normalized || undefined,
+      recipient_phone: normalized || undefined,
+      destination_phone: normalized || undefined,
+      msisdn: normalized || undefined,
+      contact_phone: normalized || undefined,
+      requester_phone: rawPhone || undefined,
+      requester_phone_number: rawPhone || undefined,
+      staff_phone: rawPhone || undefined,
+      staff_phone_number: rawPhone || undefined
+    }
+
+    // Endpoint candidates (generic + role-based + request-scoped)
+    const roleBases = []
+    if (role) {
+      // map a few known synonyms
+      const aliases = {
+        head_of_it: ['head-of-it', 'head_it'],
+        hod: ['hod', 'head-of-department', 'head_of_department'],
+        divisional_director: ['divisional', 'divisional-director'],
+        ict_director: ['ict-director', 'dict', 'ict_director'],
+        ict_officer: ['ict-officer', 'ict_officer'],
+        staff: ['staff', 'user', 'requester']
+      }[role] || [role]
+      roleBases.push(...aliases)
+    }
+
+    const endpoints = []
+    // Generic
+    endpoints.push(`/notifications/resend`)
+    endpoints.push(`/notifications/send`)
+    if (requestId) {
+      endpoints.push(`/requests/${requestId}/notify`)
+      endpoints.push(`/requests/${requestId}/resend-sms`)
+      endpoints.push(`/requests/${requestId}/send-notification`)
+    }
+    // Role-scoped
+    for (const base of roleBases) {
+      if (requestId) {
+        endpoints.push(`/${base}/requests/${requestId}/notify`)
+        endpoints.push(`/${base}/requests/${requestId}/resend-sms`)
+        endpoints.push(`/${base}/requests/${requestId}/send-notification`)
+        // Some modules use resource names
+        endpoints.push(`/${base}/access-requests/${requestId}/notify`)
+        endpoints.push(`/${base}/access-requests/${requestId}/resend-sms`)
+        endpoints.push(`/${base}/access-requests/${requestId}/send-notification`)
+      }
+      endpoints.push(`/${base}/notify`)
+      endpoints.push(`/${base}/resend-sms`)
+      endpoints.push(`/${base}/send-notification`)
+    }
+
+    let response
+    let lastError
+    for (let i = 0; i < endpoints.length; i++) {
+      try {
+        if (process.env.NODE_ENV === 'development') {
+          console.log(
+            `🔄 NotificationService: Trying resend endpoint ${i + 1}/${endpoints.length}:`,
+            endpoints[i]
+          )
+        }
+        response = await notificationAxiosInstance.post(endpoints[i], payload)
+        if (process.env.NODE_ENV === 'development') {
+          console.log('✅ NotificationService: Resend success via', endpoints[i])
+        }
+        return {
+          success: !!response.data?.success,
+          data: response.data?.data,
+          message: response.data?.message
+        }
+      } catch (e) {
+        lastError = e
+        if (process.env.NODE_ENV === 'development') {
+          console.warn(
+            '❌ NotificationService: Endpoint failed:',
+            endpoints[i],
+            e.response?.status,
+            e.response?.data?.message || e.message
+          )
+        }
+        continue
+      }
+    }
+
+    return {
+      success: false,
+      message:
+        lastError?.response?.data?.message ||
+        lastError?.message ||
+        'Failed to retry SMS via any endpoint'
+    }
+  },
+
+  /**
    * Get count of pending requests for notification badge (Universal for all roles)
    */
   async getPendingRequestsCount(forceRefresh = false) {

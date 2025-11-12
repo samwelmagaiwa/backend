@@ -216,6 +216,7 @@
                           class="medical-input w-full px-4 py-4 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50"
                           :class="{ 'cursor-not-allowed': !editMode }"
                           placeholder="Enter your phone number"
+                          @blur="profileData.phone = normalizePhoneNumber(profileData.phone)"
                         />
                         <div
                           class="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-300/50"
@@ -606,7 +607,7 @@
           profileData.value = {
             name: user.value.name || '',
             email: user.value.email || '',
-            phone: user.value.phone || '',
+            phone: normalizePhoneNumber(user.value.phone || ''),
             department: user.value.department || 'Not specified',
             emailNotifications: user.value.email_notifications ?? true
           }
@@ -614,9 +615,21 @@
       })
 
       // Methods
+      const normalizePhoneNumber = (input) => {
+        if (!input) return ''
+        let v = String(input).trim().replace(/\s|-/g, '')
+        if (v.startsWith('+255')) return v
+        if (v.startsWith('255')) return '+' + v
+        if (v.startsWith('0')) return '+255' + v.slice(1)
+        return v
+      }
+
       const saveProfile = async () => {
         isSaving.value = true
         try {
+          // Normalize phone before save
+          profileData.value.phone = normalizePhoneNumber(profileData.value.phone)
+
           // Simulate API call
           await new Promise((resolve) => setTimeout(resolve, 1000))
 
@@ -705,7 +718,8 @@
         changePassword,
         exportProfile,
         goBack,
-        showNotification
+        showNotification,
+        normalizePhoneNumber
       }
     }
   }

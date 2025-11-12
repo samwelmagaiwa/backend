@@ -265,9 +265,10 @@ class UserAccessWorkflowController extends Controller
                 ], 403);
             }
 
-            // Validate using new granular status columns - ICT Director can only approve if HOD and Divisional approved, ICT Director is pending
+            // Validate using new granular status columns - ICT Director can only approve if HOD approved and (Divisional approved OR skipped), and ICT Director is pending
+            $divisionalOk = in_array($userAccess->divisional_status, ['approved', 'skipped'], true);
             if ($userAccess->hod_status !== 'approved' || 
-                $userAccess->divisional_status !== 'approved' || 
+                !$divisionalOk || 
                 $userAccess->ict_director_status !== 'pending') {
                 return response()->json([
                     'success' => false,
@@ -319,9 +320,10 @@ class UserAccessWorkflowController extends Controller
                 ], 403);
             }
 
-            // Validate using new granular status columns - Head IT can only approve if all previous stages approved and Head IT is pending
+            // Validate using new granular status columns - Head IT can only approve if previous stages approved (Divisional may be skipped) and Head IT is pending
+            $divisionalOk = in_array($userAccess->divisional_status, ['approved', 'skipped'], true);
             if ($userAccess->hod_status !== 'approved' || 
-                $userAccess->divisional_status !== 'approved' || 
+                !$divisionalOk || 
                 $userAccess->ict_director_status !== 'approved' || 
                 $userAccess->head_it_status !== 'pending') {
                 return response()->json([
@@ -374,9 +376,10 @@ class UserAccessWorkflowController extends Controller
                 ], 403);
             }
 
-            // Validate using new granular status columns - ICT Officer can only implement if all previous stages approved and ICT Officer is pending
+            // Validate using new granular status columns - ICT Officer can only implement if previous stages approved (Divisional may be skipped) and ICT Officer is pending
+            $divisionalOk = in_array($userAccess->divisional_status, ['approved', 'skipped'], true);
             if ($userAccess->hod_status !== 'approved' || 
-                $userAccess->divisional_status !== 'approved' || 
+                !$divisionalOk || 
                 $userAccess->ict_director_status !== 'approved' || 
                 $userAccess->head_it_status !== 'approved' || 
                 $userAccess->ict_officer_status !== 'pending') {

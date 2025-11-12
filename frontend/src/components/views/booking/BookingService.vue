@@ -1266,6 +1266,15 @@
         this.$router.push('/user-dashboard')
       },
 
+      normalizePhoneNumber(input) {
+        if (!input) return ''
+        let v = String(input).trim().replace(/\s|-/g, '')
+        if (v.startsWith('+255')) return v
+        if (v.startsWith('255')) return '+' + v
+        if (v.startsWith('0')) return '+255' + v.slice(1)
+        return v
+      },
+
       async checkDeviceAvailability(deviceInventoryId) {
         try {
           // Use apiClient instead of fetch to ensure correct base URL
@@ -1326,7 +1335,7 @@
           if (this.authStore.isAuthenticated && this.authStore.user) {
             const userPhone = this.authStore.user.phone || this.authStore.user.phone_number
             if (userPhone && !this.formData.phoneNumber) {
-              this.formData.phoneNumber = userPhone
+              this.formData.phoneNumber = this.normalizePhoneNumber(userPhone)
             } else if (!userPhone) {
               // Try to get from localStorage as fallback
               const storedUserData = localStorage.getItem('user_data')
@@ -1334,7 +1343,7 @@
                 const userData = JSON.parse(storedUserData)
                 const phoneFromStorage = userData.phone || userData.phone_number
                 if (phoneFromStorage) {
-                  this.formData.phoneNumber = phoneFromStorage
+                  this.formData.phoneNumber = this.normalizePhoneNumber(phoneFromStorage)
                 }
               }
             }
@@ -1998,7 +2007,7 @@
           }
 
           formData.append('department', this.formData.department)
-          formData.append('phone_number', this.formData.phoneNumber)
+          formData.append('phone_number', this.normalizePhoneNumber(this.formData.phoneNumber))
           formData.append('return_date', this.formData.collectionDate) // Note: collectionDate is actually return_date
           formData.append('return_time', this.formData.returnTime)
           formData.append('reason', this.formData.reason)

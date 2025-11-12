@@ -53,7 +53,7 @@
               />
               <select
                 v-model="statusFilter"
-                class="px-4 py-3 bg-white/20 border border-blue-300/30 rounded text-white text-lg"
+                class="px-4 py-3 bg-white/20 border border-blue-300/30 rounded text-white text-lg status-select"
               >
                 <option value="">All My Requests</option>
                 <option value="pending">Show All Pending</option>
@@ -186,11 +186,24 @@
                   <td class="px-4 py-3">
                     <div class="flex flex-col">
                       <span
+                        v-if="request.divisional_status === 'skipped'"
+                        class="mb-1 rounded text-sm font-semibold inline-block bg-red-900/30 text-red-300 border border-red-500/40 px-2 py-1"
+                        :style="{ width: 'fit-content' }"
+                      >
+                        No Divisional Director — Stage Skipped
+                      </span>
+                      <span
                         :class="getStatusBadgeClass(request.status)"
                         class="rounded text-lg font-medium inline-block whitespace-nowrap"
                         :style="{ padding: '6px 12px', width: 'fit-content' }"
                       >
                         {{ getStatusText(request.status) }}
+                      </span>
+                      <span
+                        v-if="request.has_signature || request.signature"
+                        class="mt-1 px-2 py-0.5 rounded text-xs font-semibold bg-emerald-900/30 text-emerald-300 border border-emerald-500/40 w-fit"
+                      >
+                        Digitally signed
                       </span>
                     </div>
                   </td>
@@ -207,6 +220,22 @@
                         :class="getSmsStatusTextColor(getRelevantSmsStatus(request))"
                       >
                         {{ getSmsStatusText(getRelevantSmsStatus(request)) }}
+                      </span>
+                      <button
+                        v-if="['failed', 'pending'].includes(getRelevantSmsStatus(request))"
+                        @click="retrySendSms(request)"
+                        :disabled="isRetrying(request.id)"
+                        class="ml-2 px-2 py-1 text-xs rounded border border-blue-300/50 text-blue-100 hover:bg-blue-700/40 disabled:opacity-50"
+                        title="Retry sending SMS"
+                      >
+                        <span v-if="!isRetrying(request.id)">Retry</span>
+                        <span v-else><i class="fas fa-spinner fa-spin mr-1"></i>Retrying</span>
+                      </button>
+                      <span
+                        v-if="getRetryAttempts(request.id) > 0"
+                        class="text-xs text-blue-200 ml-1"
+                      >
+                        ({{ getRetryAttempts(request.id) }})
                       </span>
                     </div>
                   </td>
@@ -246,7 +275,7 @@
                           <button
                             @click.stop="executeAction(action.key, request)"
                             :class="[
-                              'w-full text-left px-4 py-2 text-sm transition-all duration-200 flex items-center space-x-3 group focus:outline-none focus:ring-2 focus:ring-inset',
+                              'w-full text-left px-4 py-3 text-lg transition-all duration-200 flex items-center space-x-3 group focus:outline-none focus:ring-2 focus:ring-inset',
                               getActionButtonClass(
                                 action.key,
                                 index,
@@ -256,9 +285,9 @@
                           >
                             <i
                               :class="[action.icon, getActionIconClass(action.key)]"
-                              class="w-4 h-4 flex-shrink-0 transition-colors duration-200"
+                              class="flex-shrink-0 transition-colors duration-200 text-lg"
                             ></i>
-                            <span class="font-medium">{{ action.label }}</span>
+                            <span class="font-semibold">{{ action.label }}</span>
                           </button>
                         </template>
                       </div>
@@ -320,6 +349,7 @@
   import headOfItService from '@/services/headOfItService'
   import statusUtils from '@/utils/statusUtils'
   import { useAuth } from '@/composables/useAuth'
+  import notificationService from '@/services/notificationService'
 
   export default {
     name: 'HeadOfItRequestList',
@@ -354,7 +384,14 @@
         selectedRequestId: null,
         $statusUtils: statusUtils,
         // Session-based tracking for assigned tasks (with sessionStorage persistence)
-        assignedRequestsThisSession: new Set()
+        assignedRequestsThisSession: new Set(),
+        // Cache last known SMS status by request to avoid downgrading from Delivered -> Pending
+        lastSmsStatusCache: {},
+        // Retry state for SMS to ICT Officer
+        retryAttempts: {}, // id -> count
+        retryTimers: {}, // id -> timer
+        maxRetryAttempts: 5,
+        retryDelays: [3000, 7000, 15000, 30000, 60000]
       }
     },
     computed: {
@@ -446,9 +483,16 @@
               Array.from(this.assignedRequestsThisSession)
             )
           }
+          // Restore last known SMS statuses
+          const storedSmsCache = sessionStorage.getItem('headOfIt_smsStatusCache')
+          if (storedSmsCache) {
+            this.lastSmsStatusCache = JSON.parse(storedSmsCache) || {}
+            console.log('📦 Restored SMS status cache from session:', this.lastSmsStatusCache)
+          }
         } catch (error) {
-          console.error('⚠️ Failed to restore assigned requests from session:', error)
+          console.error('⚠️ Failed to restore assigned requests/SMS cache from session:', error)
           this.assignedRequestsThisSession = new Set()
+          this.lastSmsStatusCache = {}
         }
       },
 
@@ -460,6 +504,17 @@
           console.log('💾 Persisted assigned requests to session:', assignedIds)
         } catch (error) {
           console.error('⚠️ Failed to persist assigned requests to session:', error)
+        }
+      },
+      // Persist last known SMS statuses
+      persistSmsCache() {
+        try {
+          sessionStorage.setItem(
+            'headOfIt_smsStatusCache',
+            JSON.stringify(this.lastSmsStatusCache || {})
+          )
+        } catch (e) {
+          // Ignore storage errors
         }
       },
       async fetchRequests() {
@@ -502,6 +557,7 @@
       async refreshRequests() {
         console.log('🔄 HeadOfItRequestList: Refreshing requests...')
         await this.fetchRequests()
+        this.initAutoRetryForList()
       },
 
       viewAndProcessRequest(requestId) {
@@ -1022,6 +1078,7 @@
       async handleTimelineUpdate() {
         console.log('🔄 HeadOfItRequestList: Timeline updated, refreshing requests list...')
         await this.fetchRequests()
+        this.initAutoRetryForList()
       },
 
       // Helper method to determine if separator should be shown
@@ -1050,37 +1107,221 @@
         return false
       },
 
+      // SMS retry helpers (Head of IT -> ICT Officer)
+      getRetryAttempts(id) {
+        return this.retryAttempts[id] || 0
+      },
+      isRetrying(id) {
+        return !!this.retryTimers[id]
+      },
+      async retrySendSms(request) {
+        if (!request) return
+        const id = request.id
+        if (!this.retryAttempts[id]) this.retryAttempts[id] = 0
+        if (this.isRetrying(id)) return
+        try {
+          this.retryTimers[id] = setTimeout(() => {}, 0)
+          const phone = request.ict_officer_phone || request.assigned_officer_phone || null
+          await notificationService.resendSmsGeneric({
+            requestId: id,
+            role: 'head_of_it',
+            target: 'ict_officer',
+            phone
+          })
+          setTimeout(async () => {
+            await this.fetchRequests()
+            clearTimeout(this.retryTimers[id])
+            delete this.retryTimers[id]
+            const status = this.getRelevantSmsStatus(
+              this.requests.find((r) => r.id === id) || request
+            )
+            if (status !== 'sent') {
+              this.scheduleNextRetry(id, request)
+            } else {
+              this.retryAttempts[id] = 0
+            }
+          }, 1200)
+        } catch (e) {
+          clearTimeout(this.retryTimers[id])
+          delete this.retryTimers[id]
+          this.scheduleNextRetry(id, request)
+        }
+      },
+      scheduleNextRetry(id, request) {
+        this.retryAttempts[id] = (this.retryAttempts[id] || 0) + 1
+        if (this.retryAttempts[id] > this.maxRetryAttempts) return
+        const delay =
+          this.retryDelays[Math.min(this.retryAttempts[id] - 1, this.retryDelays.length - 1)]
+        this.retryTimers[id] = setTimeout(async () => {
+          clearTimeout(this.retryTimers[id])
+          delete this.retryTimers[id]
+          await this.retrySendSms(request)
+        }, delay)
+      },
+      initAutoRetryForList() {
+        ;(this.requests || []).forEach((r) => {
+          const st = this.getRelevantSmsStatus(r)
+          if (['failed', 'pending'].includes(st)) {
+            if (!this.retryTimers[r.id] && (this.retryAttempts[r.id] || 0) === 0) {
+              this.scheduleNextRetry(r.id, r)
+            }
+          }
+        })
+      },
+
       // SMS Status methods
       getRelevantSmsStatus(request) {
         // For Head of IT: show SMS status for NEXT workflow step after their action
         const status = request.head_it_status || request.status
+        // Last known status cache (prevents flicker to Pending after Delivered)
+        const cachedSms = this.lastSmsStatusCache && this.lastSmsStatusCache[request.id]
 
-        // PRIORITY 1: If SMS has been sent to ICT Officer (regardless of status), show that
-        if (request.sms_to_ict_officer_status && request.sms_to_ict_officer_status !== 'pending') {
-          return request.sms_to_ict_officer_status
+        // Helper: normalize various status values coming from API
+        const normalize = (val) => {
+          if (val === undefined || val === null) return null
+          if (typeof val === 'boolean') return val ? 'sent' : 'pending'
+          if (typeof val === 'number') return val === 1 ? 'sent' : val === 0 ? 'pending' : null
+          if (typeof val === 'object') {
+            // Try common object shapes { status, state, result, delivered_at }
+            const s = val.status || val.state || val.result || null
+            if (s) return normalize(s)
+            if (val.delivered_at || val.sent_at) return 'sent'
+            return null
+          }
+          const v = String(val).toLowerCase().trim()
+          // Numeric-like strings
+          if (v === '1' || v === 'true' || v === 'yes' || v === 'y') return 'sent'
+          if (v === '0' || v === 'false' || v === 'no' || v === 'n') return 'pending'
+          // Common success synonyms including SMSC DLR values
+          if (
+            [
+              'sent',
+              'delivered',
+              'successful',
+              'success',
+              'ok',
+              'delivrd',
+              'delivery_ok',
+              'submitted',
+              'accepted',
+              'done',
+              'complete',
+              'completed'
+            ].includes(v)
+          )
+            return 'sent'
+          // Common failure synonyms
+          if (
+            [
+              'failed',
+              'fail',
+              'error',
+              'undelivered',
+              'rejected',
+              'expired',
+              'blocked',
+              'blacklisted'
+            ].includes(v)
+          )
+            return 'failed'
+          // Pending/processing synonyms
+          if (['queued', 'queue', 'processing', 'pending', 'in_progress'].includes(v))
+            return 'pending'
+          return v || null
         }
 
-        // PRIORITY 2: If task has been assigned to ICT Officer: show ICT Officer SMS notification status
+        // Read from multiple possible API fields (different backends use different naming)
+        // If any explicit 'sent at' timestamp exists, treat as sent regardless of status text
+        const sentAtTS =
+          request.sms_sent_to_ict_officer_at ||
+          request.sms_to_ict_officer_at ||
+          request.ict_officer_sms_sent_at ||
+          request.sms_sent_to_officer_at ||
+          request.officer_sms_sent_at ||
+          request.sms_to_officer_at ||
+          request.sms_delivered_to_officer_at ||
+          request.sms_to_ict_officer_delivered_at ||
+          request.ict_officer_sms_delivered_at ||
+          request.sms_delivered_at ||
+          request.delivered_to_officer_at ||
+          request.officer_sms_delivery_at ||
+          null
+        if (sentAtTS) {
+          if (this.lastSmsStatusCache[request.id] !== 'sent') {
+            this.lastSmsStatusCache[request.id] = 'sent'
+            this.persistSmsCache()
+          }
+          return 'sent'
+        }
+
+        const rawCandidates = [
+          request.sms_to_ict_officer_status,
+          request.sms_to_ict_officer,
+          request.sms_status_to_ict_officer,
+          request.ict_officer_sms_status,
+          request.sms_to_ict_status,
+          request.sms_status,
+          // Additional possible keys observed across installs
+          request.sms_status_to_officer,
+          request.sms_to_officer_status,
+          request.officer_sms_status,
+          request.sms_ict_officer_status,
+          request.ict_sms_status,
+          request.sms_delivery_status_to_officer,
+          request.delivery_status,
+          request.delivery_state,
+          request.delivery_report_status,
+          request.dlr_status,
+          request.sms_dlr_status,
+          request.sms_delivery_report_status
+        ]
+
+        // Normalize string/boolean/number and simple object shapes
+        const candidateStatuses = rawCandidates
+          .map((val) => {
+            if (typeof val === 'object' && val) {
+              const possible =
+                val.status || val.state || val.result || (val.delivered_at ? 'delivered' : null)
+              return normalize(possible)
+            }
+            return normalize(val)
+          })
+          .filter(Boolean)
+
+        if (candidateStatuses.length) {
+          // Prioritize a non-pending value if present
+          const nonPending = candidateStatuses.find((s) => s !== 'pending')
+          const resolved = nonPending || candidateStatuses[0]
+          if (resolved !== 'pending') {
+            if (this.lastSmsStatusCache[request.id] !== resolved) {
+              this.lastSmsStatusCache[request.id] = resolved
+              this.persistSmsCache()
+            }
+          }
+          return resolved
+        }
+
+        // If task has been assigned or is in progress, show ICT Officer notification status (default pending)
         if (
           status === 'head_of_it_approved' ||
           request.status === 'assigned_to_ict' ||
           request.status === 'implementation_in_progress'
         ) {
-          return request.sms_to_ict_officer_status || 'pending'
+          // Prefer cached non-pending status to avoid regressions
+          return cachedSms || 'pending'
         }
 
-        // PRIORITY 3: If COMPLETED/IMPLEMENTED: show requester notification status
+        // If COMPLETED/IMPLEMENTED: show requester notification status if available
+        const requesterSms = normalize(request.sms_to_requester_status)
         if (status === 'implemented' || status === 'completed') {
-          return request.sms_to_requester_status || 'pending'
+          // Cache only if non-pending (not strictly necessary for officer status)
+          if (requesterSms && requesterSms !== 'pending')
+            this.lastSmsStatusCache[request.id] = requesterSms
+          return requesterSms || cachedSms || 'pending'
         }
 
-        // DEFAULT: If Head of IT has APPROVED but NOT yet assigned: show pending
-        if (status === 'head_it_approved' || status === 'approved') {
-          return 'pending'
-        }
-
-        // FALLBACK: If PENDING Head of IT approval: return 'pending'
-        return 'pending'
+        // Default: prefer cached status if available
+        return cachedSms || 'pending'
       },
 
       getSmsStatusText(smsStatus) {
@@ -1299,5 +1540,21 @@
   main {
     position: relative;
     z-index: 1;
+  }
+  /* Status filter dropdown styling */
+  .status-select {
+    background-color: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    border-color: rgba(147, 197, 253, 0.4);
+  }
+  .status-select:focus {
+    outline: none;
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.35);
+  }
+  .status-select option,
+  .status-select optgroup {
+    background-color: #1e3a8a;
+    color: #ffffff;
   }
 </style>

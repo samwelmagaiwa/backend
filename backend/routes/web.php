@@ -3,28 +3,15 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SwaggerController;
 
+// Load additional web routes (Swagger docs)
+require_once __DIR__ . '/swagger.php';
+
 Route::get('/', function () {
     return response()->json(['message' => 'Laravel API Server is running', 'timestamp' => now()]);
 });
 
-// Modern Swagger API Documentation Routes
-// Alternative route for testing modern theme
-Route::get('/api-docs-modern', function () {
-    $data = [
-        'documentation' => 'default',
-        'documentationTitle' => 'MNH API Documentation',
-        'urlsToDocs' => ['MNH API Documentation' => url('/api/test-docs.json')],
-        'useAbsolutePath' => true,
-        'operationsSorter' => null,
-        'configUrl' => null,
-        'validatorUrl' => null,
-    ];
+// Unified API docs are served from routes/swagger.php at /api-docs-modern
 
-    return view('l5-swagger::modern-index', $data);
-})->name('swagger.test');
-
-// Test documentation JSON
-Route::get('/api/test-docs.json', function () {
     $testDocs = [
         'openapi' => '3.0.0',
         'info' => [
@@ -888,5 +875,3 @@ Route::get('/api/test-docs.json', function () {
 
     return response()->json($testDocs)
         ->header('Access-Control-Allow-Origin', '*');
-});
-Route::get('/debug-swagger-urls', [App\Http\Controllers\DebugSwaggerController::class, 'debugUrls'])->name('debug.swagger.urls');

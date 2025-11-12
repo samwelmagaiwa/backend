@@ -381,7 +381,7 @@
                   <button
                     @click="assignTask"
                     :disabled="isAssigning"
-                    class="flex-1 bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 disabled:opacity-50 transition duration-200 text-base font-medium flex items-center justify-center"
+                    class="flex-1 bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 disabled:opacity-50 transition duration-200 text-xl font-semibold flex items-center justify-center"
                   >
                     <i v-if="isAssigning" class="fas fa-spinner fa-spin mr-2"></i>
                     <i v-else class="fas fa-check mr-2"></i>
@@ -390,7 +390,7 @@
                   <button
                     @click="showConfirmModal = false"
                     :disabled="isAssigning"
-                    class="flex-1 bg-gray-500 text-white py-3 px-4 rounded-lg hover:bg-gray-600 transition duration-200 text-base font-medium"
+                    class="flex-1 bg-gray-500 text-white py-3 px-4 rounded-lg hover:bg-gray-600 transition duration-200 text-xl font-semibold"
                   >
                     Cancel
                   </button>
@@ -474,12 +474,12 @@
                   ? 'This request has already been implemented and cannot be reassigned'
                   : ''
               "
-              class="w-full text-left px-4 py-2 text-sm bg-green-50 text-green-800 border-b border-green-200 hover:bg-green-100 focus:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset transition-all duration-200 flex items-center space-x-3 group disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500 first:rounded-t-lg"
+              class="w-full text-left px-4 py-3 text-xl bg-green-50 text-green-800 border-b border-green-200 hover:bg-green-100 focus:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset transition-all duration-200 flex items-center space-x-3 group disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500 first:rounded-t-lg"
             >
               <i
-                class="fas fa-user-plus text-green-600 group-hover:text-green-700 group-focus:text-green-700 w-4 h-4 flex-shrink-0 transition-colors duration-200"
+                class="fas fa-user-plus text-green-600 group-hover:text-green-700 group-focus:text-green-700 w-4 h-4 flex-shrink-0 transition-colors duration-200 text-xl"
               ></i>
-              <span class="font-medium">Assign Task</span>
+              <span class="font-semibold">Assign Task</span>
             </button>
             <button
               @click.stop="
@@ -488,12 +488,12 @@
                   ictOfficers.find((o) => o.id === openDropdownId)
                 )
               "
-              class="w-full text-left px-4 py-2 text-sm bg-blue-50 text-blue-800 border-b border-blue-200 hover:bg-blue-100 focus:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset transition-all duration-200 flex items-center space-x-3 group"
+              class="w-full text-left px-4 py-3 text-xl bg-blue-50 text-blue-800 border-b border-blue-200 hover:bg-blue-100 focus:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset transition-all duration-200 flex items-center space-x-3 group"
             >
               <i
-                class="fas fa-eye text-blue-600 group-hover:text-blue-700 group-focus:text-blue-700 w-4 h-4 flex-shrink-0 transition-colors duration-200"
+                class="fas fa-eye text-blue-600 group-hover:text-blue-700 group-focus:text-blue-700 w-4 h-4 flex-shrink-0 transition-colors duration-200 text-xl"
               ></i>
-              <span class="font-medium">View Progress</span>
+              <span class="font-semibold">View Progress</span>
             </button>
             <button
               @click.stop="
@@ -503,12 +503,12 @@
                 )
               "
               :disabled="ictOfficers.find((o) => o.id === openDropdownId)?.status !== 'Assigned'"
-              class="w-full text-left px-4 py-2 text-sm bg-red-50 text-red-800 hover:bg-red-100 focus:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-inset transition-all duration-200 flex items-center space-x-3 group disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500 last:rounded-b-lg"
+              class="w-full text-left px-4 py-3 text-xl bg-red-50 text-red-800 hover:bg-red-100 focus:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-inset transition-all duration-200 flex items-center space-x-3 group disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500 last:rounded-b-lg"
             >
               <i
-                class="fas fa-times text-red-600 group-hover:text-red-700 group-focus:text-red-700 w-4 h-4 flex-shrink-0 transition-colors duration-200"
+                class="fas fa-times text-red-600 group-hover:text-red-700 group-focus:text-red-700 w-4 h-4 flex-shrink-0 transition-colors duration-200 text-xl"
               ></i>
-              <span class="font-medium">Cancel Task</span>
+              <span class="font-semibold">Cancel Task</span>
             </button>
           </div>
         </div>
@@ -654,13 +654,25 @@
         try {
           const result = await headOfItService.assignTaskToIctOfficer(
             this.requestId,
-            this.selectedOfficer.id
+            this.selectedOfficer.id,
+            this.selectedOfficer?.phone_number || this.selectedOfficer?.phone || null
           )
 
           if (result.success) {
             this.assignedOfficer = this.selectedOfficer
             this.showConfirmModal = false
             this.showSuccessModal = true
+
+            // Persist last known SMS status for Head of IT list to avoid Pending regression on refresh
+            try {
+              const cacheRaw = sessionStorage.getItem('headOfIt_smsStatusCache')
+              const cache = cacheRaw ? JSON.parse(cacheRaw) : {}
+              cache[this.requestId] = 'sent'
+              sessionStorage.setItem('headOfIt_smsStatusCache', JSON.stringify(cache))
+            } catch (e) {
+              // Non-fatal: caching to sessionStorage failed; continue without blocking UX
+              console.warn('HeadOfIT: failed to persist SMS status cache', e)
+            }
 
             // Update officer status and SMS status locally
             const officerIndex = this.ictOfficers.findIndex((o) => o.id === this.selectedOfficer.id)

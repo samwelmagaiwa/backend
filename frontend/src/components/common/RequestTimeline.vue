@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="show"
-    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000]"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[12000]"
     @click.self="close"
   >
     <div
@@ -73,7 +73,21 @@
         <div v-else-if="timelineData" class="relative">
           <!-- Request Information -->
           <div class="mb-4 p-3 bg-blue-800 text-white rounded-lg border border-blue-400/50">
-            <h3 class="font-medium text-white mb-1 text-sm">Request Details</h3>
+            <div class="flex items-center justify-between mb-1">
+              <h3 class="font-medium text-white text-sm">Request Details</h3>
+              <button
+                v-if="normalizedRequest?.id && !hasUserSigned"
+                @click="handleSignDocument"
+                :disabled="isSigning"
+                class="px-2 py-1 text-xs rounded bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50"
+                title="Digitally sign this document"
+              >
+                {{ isSigning ? 'Signing…' : 'Sign Document' }}
+              </button>
+              <span v-else-if="hasUserSigned" class="text-emerald-300 text-xs"
+                >You signed this document</span
+              >
+            </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
               <div>
                 <span class="font-medium">Staff Name:</span>
@@ -99,6 +113,21 @@
                 <span class="font-medium">Submitted:</span>
                 {{ formatDateTime(normalizedRequest?.created_at) }}
               </div>
+            </div>
+
+            <!-- Digital Signature History -->
+            <div
+              v-if="signatures && signatures.length"
+              class="mt-3 pt-2 border-t border-blue-600/40"
+            >
+              <h4 class="text-xs font-medium text-white mb-1">Digital Signatures</h4>
+              <ul class="space-y-1">
+                <li v-for="s in signatures" :key="s.id" class="text-[11px] text-blue-100">
+                  <span class="text-emerald-300">Signed by</span> {{ s.user_name || 'Unknown' }}
+                  <span class="text-emerald-300">at</span> {{ s.signed_at || '—' }}
+                  <span class="text-emerald-300">Signature</span>: {{ s.signature_preview }}…
+                </li>
+              </ul>
             </div>
           </div>
 
@@ -179,31 +208,58 @@
 
                   <!-- Step Details -->
                   <div class="space-y-1 text-xs">
-                    <div v-if="step.actor" class="flex items-center">
-                      <span class="font-medium text-white w-16 text-xs">Actor:</span>
-                      <span class="text-xs text-white">{{ step.actor }}</span>
-                      <span v-if="step.position" class="text-blue-200 ml-1 text-xs"
+                    <div v-if="step.actor" class="flex items-center gap-2">
+                      <span class="font-medium text-white w-28 text-xs">Actor:</span>
+                      <span class="text-xs text-white leading-relaxed">{{ step.actor }}</span>
+                      <span v-if="step.position" class="text-blue-200 text-xs"
                         >({{ step.position }})</span
                       >
                     </div>
 
-                    <div v-if="step.timestamp" class="flex items-center">
-                      <span class="font-medium text-white w-16 text-xs">Date:</span>
-                      <span class="text-xs text-white">{{ formatDateTime(step.timestamp) }}</span>
+                    <div v-if="step.timestamp" class="flex items-center gap-2">
+                      <span class="font-medium text-white w-28 text-xs">Date:</span>
+                      <span class="text-xs text-white leading-relaxed">{{
+                        formatDateTime(step.timestamp)
+                      }}</span>
                     </div>
 
-                    <div v-if="step.comments" class="flex items-start">
-                      <span class="font-medium text-white w-16 flex-shrink-0 text-xs"
+                    <div v-if="step.comments" class="flex items-start gap-2">
+                      <span class="font-medium text-white w-28 flex-shrink-0 text-xs"
                         >Comments:</span
                       >
-                      <span class="text-white text-xs leading-tight">{{ step.comments }}</span>
+                      <span
+                        class="text-white text-xs leading-relaxed whitespace-pre-wrap break-words"
+                        >{{ step.comments }}</span
+                      >
+                    </div>
+
+                    <!-- Divisional signature area: show red 'Stage Skipped' badge when applicable -->
+                    <div
+                      v-if="
+                        step.id === 'divisional' &&
+                        (timelineData?.request?.divisional_status === 'skipped' ||
+                          step.statusLabel === 'Skipped')
+                      "
+                      class="flex items-center gap-2"
+                    >
+                      <span class="font-medium text-white w-28 text-xs">Signature:</span>
+                      <span
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-red-900/30 text-red-300 border border-red-500/40"
+                      >
+                        No Divisional Director — Stage Skipped
+                      </span>
+                    </div>
+
+                    <div v-else-if="step.hasSignature" class="flex items-center gap-2">
+                      <span class="font-medium text-white w-28 text-xs">Signature:</span>
+                      <span class="text-green-300 text-xs">✓ Signed</span>
                     </div>
 
                     <div
-                      v-if="step.rejectionReasons && step.rejectionReasons.length > 0"
-                      class="flex items-start"
+                      v-if="step.rejectionReasons && step.rejectionReasons.length"
+                      class="flex items-start gap-2"
                     >
-                      <span class="font-medium text-white w-16 flex-shrink-0 text-xs"
+                      <span class="font-medium text-white w-28 flex-shrink-0 text-xs"
                         >Reasons:</span
                       >
                       <div class="space-y-0.5">
@@ -217,13 +273,8 @@
                       </div>
                     </div>
 
-                    <div v-if="step.hasSignature" class="flex items-center">
-                      <span class="font-medium text-white w-16 text-xs">Signature:</span>
-                      <span class="text-green-300 text-xs">✓ Signed</span>
-                    </div>
-
                     <div v-if="step.assignedOfficer" class="flex items-center">
-                      <span class="font-medium text-white w-16 text-xs">Officer:</span>
+                      <span class="font-medium text-white w-28 text-xs">Officer:</span>
                       <span class="text-xs text-white">{{ step.assignedOfficer }}</span>
                     </div>
                   </div>
@@ -439,6 +490,10 @@
         loading: false,
         error: null,
         timelineData: null,
+        // Digital signatures
+        signatures: [],
+        hasUserSigned: false,
+        isSigning: false,
         // ICT Officer update form
         showUpdateForm: false,
         updateForm: {
@@ -599,44 +654,84 @@
 
         // 3. Divisional Director Approval
         const divStatus = this.getApprovalStatus('divisional', request)
+        const divisionalActor =
+          request.divisional_director_name ||
+          request.divisional_name ||
+          request.divisional_approved_by_name ||
+          request.approved_by_name ||
+          'Divisional Director'
+        const divisionalTimestamp =
+          request.divisional_approved_at ||
+          request.divisional_rejected_at ||
+          request.updated_at ||
+          request.created_at ||
+          null
+        const divisionalComments =
+          request.divisional_director_comments || request.divisional_comments || null
         steps.push({
           id: 'divisional',
           title: 'Divisional Director Approval',
           status: divStatus.status,
           statusLabel: divStatus.label,
-          actor: request.divisional_director_name,
+          actor: divisionalActor,
           position: 'Divisional Director',
-          timestamp: request.divisional_approved_at,
-          comments: request.divisional_director_comments,
+          timestamp: divisionalTimestamp,
+          comments: divisionalComments,
           hasSignature: !!request.divisional_director_signature_path
         })
 
         // 4. ICT Director Approval
         const ictDirStatus = this.getApprovalStatus('ict_director', request)
+        const ictDirectorActor =
+          request.ict_director_name ||
+          request.dict_director_name ||
+          request.ict_director_approved_by_name ||
+          request.approved_by_name ||
+          'ICT Director'
+        const ictDirectorTimestamp =
+          request.ict_director_approved_at ||
+          request.dict_approved_at ||
+          request.updated_at ||
+          request.created_at ||
+          null
+        const ictDirectorComments = request.ict_director_comments || request.dict_comments || null
         steps.push({
           id: 'ict_director',
           title: 'ICT Director Approval',
           status: ictDirStatus.status,
           statusLabel: ictDirStatus.label,
-          actor: request.ict_director_name,
+          actor: ictDirectorActor,
           position: 'ICT Director',
-          timestamp: request.ict_director_approved_at,
-          comments: request.ict_director_comments,
-          hasSignature: !!request.ict_director_signature_path,
+          timestamp: ictDirectorTimestamp,
+          comments: ictDirectorComments,
+          hasSignature: !!request.dict_signature_path,
           rejectionReasons: request.ict_director_rejection_reasons || []
         })
 
         // 5. Head of IT Approval
         const headItStatus = this.getApprovalStatus('head_it', request)
+        const headItActor =
+          request.head_it_name ||
+          request.head_of_it_name ||
+          request.head_it_approved_by_name ||
+          request.approved_by_name ||
+          'Head of IT'
+        const headItTimestamp =
+          request.head_it_approved_at ||
+          request.head_it_rejected_at ||
+          request.updated_at ||
+          request.created_at ||
+          null
+        const headItComments = request.head_it_comments || null
         steps.push({
           id: 'head_it',
           title: 'Head of IT Approval',
           status: headItStatus.status,
           statusLabel: headItStatus.label,
-          actor: request.head_it_name,
+          actor: headItActor,
           position: 'Head of IT',
-          timestamp: request.head_it_approved_at,
-          comments: request.head_it_comments,
+          timestamp: headItTimestamp,
+          comments: headItComments,
           hasSignature: !!request.head_it_signature_path
         })
 
@@ -666,15 +761,53 @@
           implementationTimestamp = this.getValidTimestamp(request.ict_officer_assigned_at)
         }
 
+        // Fallback to overall progress: if request is approved/implemented/completed, mark as completed
+        const overallIndex = this.getOverallProgressIndex(request)
+        if (overallIndex >= 6 || (overallIndex >= 5 && implementationStatus !== 'rejected')) {
+          implementationStatus = 'completed'
+          implementationLabel = 'Implemented'
+          if (!implementationTimestamp) {
+            implementationTimestamp =
+              this.getValidTimestamp(request.ict_officer_implemented_at) ||
+              this.getValidTimestamp(request.updated_at) ||
+              this.getValidTimestamp(request.head_it_approved_at)
+          }
+        }
+
+        // Build robust officer name, comments, and timestamp fallbacks so details always display
+        const officerName =
+          request.ict_officer_name ||
+          (request.assigned_ict_officer && request.assigned_ict_officer.name) ||
+          request.assigned_ict_officer ||
+          request.ict_officer ||
+          'ICT Department'
+
+        const officerComments =
+          request.implementation_comments ||
+          request.ict_officer_comments ||
+          request.ict_implementation_comments ||
+          request.ict_implementation_comment ||
+          request.ict_implementation_details ||
+          '—'
+
+        const officerTimestamp =
+          implementationTimestamp ||
+          this.getValidTimestamp(request.ict_officer_implemented_at) ||
+          this.getValidTimestamp(request.ict_officer_rejected_at) ||
+          this.getValidTimestamp(request.ict_officer_started_at) ||
+          this.getValidTimestamp(request.ict_officer_assigned_at) ||
+          this.getValidTimestamp(request.updated_at) ||
+          this.getValidTimestamp(request.created_at)
+
         steps.push({
           id: 'ict_officer_implementation',
           title: 'ICT Officer Implementation',
           status: implementationStatus,
           statusLabel: implementationLabel,
-          actor: request.ict_officer_name,
+          actor: officerName,
           position: 'ICT Officer',
-          timestamp: implementationTimestamp,
-          comments: request.implementation_comments || request.ict_officer_comments,
+          timestamp: officerTimestamp,
+          comments: officerComments,
           hasSignature: !!request.ict_officer_signature_path
         })
 
@@ -794,6 +927,22 @@
           if (!loaded) throw lastError || new Error('Failed to load timeline')
 
           console.log('✅ RequestTimeline: Timeline loaded successfully')
+
+          // Load digital signature history for this document id
+          try {
+            const docId = this.timelineData?.request?.id || this.timelineData?.request_info?.id
+            if (docId) {
+              const svc = (await import('@/services/signatureService')).default
+              const res = await svc.list(docId)
+              this.signatures = Array.isArray(res?.data) ? res.data : []
+              const me = this.currentUser?.id
+              this.hasUserSigned = !!this.signatures.find((s) => s.user_id === me)
+            }
+          } catch (e) {
+            // Non-fatal
+            console.warn('Failed to load digital signatures', e)
+            this.signatures = []
+          }
         } catch (error) {
           console.error('❌ RequestTimeline: Error loading timeline:', error)
           this.error =
@@ -805,6 +954,26 @@
 
       close() {
         this.$emit('close')
+      },
+
+      async handleSignDocument() {
+        try {
+          this.isSigning = true
+          const docId = this.timelineData?.request?.id || this.timelineData?.request_info?.id
+          if (!docId) return
+          const svc = (await import('@/services/signatureService')).default
+          const res = await svc.sign(docId)
+          if (res?.data?.success) {
+            // Refresh list
+            const list = await svc.list(docId)
+            this.signatures = Array.isArray(list?.data) ? list.data : []
+            this.hasUserSigned = true
+          }
+        } catch (e) {
+          console.error('Digital sign failed', e)
+        } finally {
+          this.isSigning = false
+        }
       },
 
       openUpdateProgress() {
@@ -905,16 +1074,47 @@
 
         if (status === 'rejected') {
           result = { status: 'rejected', label: 'Rejected' }
+        } else if (status === 'skipped' && stage === 'divisional') {
+          // Divisional stage was intentionally skipped (no divisional director for this department)
+          result = { status: 'completed', label: 'Skipped' }
         } else if (
           status === 'approved' ||
           (stage === 'ict_officer' && status === 'implemented') ||
           approvedAt
         ) {
-          result = { status: 'completed', label: 'Approved' }
-        } else if (this.isPreviousStageComplete(stage, request)) {
-          result = { status: 'active', label: 'Pending' }
+          result = {
+            status: 'completed',
+            label: stage === 'ict_officer' ? 'Implemented' : 'Approved'
+          }
         } else {
-          result = { status: 'pending', label: 'Waiting' }
+          // Fallback to overall progress when per-stage fields are missing
+          const progress = this.getOverallProgressIndex(request)
+          const stageIndexMap = {
+            hod: 1,
+            divisional: 2,
+            ict_director: 3,
+            head_it: 4,
+            ict_officer: 5
+          }
+          const stageIndex = stageIndexMap[stage] || 0
+
+          if (progress > stageIndex) {
+            result = {
+              status: 'completed',
+              label: stage === 'ict_officer' ? 'Implemented' : 'Approved'
+            }
+          } else if (progress === stageIndex) {
+            // Active stage
+            const activeLabel =
+              stage === 'ict_officer' && request.ict_officer_status === 'implementation_in_progress'
+                ? 'In Progress'
+                : 'Pending'
+            result = { status: 'active', label: activeLabel }
+          } else if (this.isPreviousStageComplete(stage, request)) {
+            result = { status: 'active', label: 'Pending' }
+          } else {
+            result = { status: 'pending', label: 'Waiting' }
+          }
         }
 
         // For ICT Officer assignment status
@@ -932,6 +1132,31 @@
         }
 
         return result
+      },
+
+      getOverallProgressIndex(request) {
+        const s = (request.status || '').toString()
+        // Map overall status to a stage index
+        // 0: submitted, 1: HOD approved, 2: Divisional approved, 3: ICT Director approved,
+        // 4: Head IT approved, 5: ICT Officer stage, 6: Final approved/completed
+        const map = {
+          pending: 0,
+          pending_hod: 0,
+          hod_approved: 1,
+          pending_divisional: 1,
+          divisional_approved: 2,
+          pending_ict_director: 2,
+          ict_director_approved: 3,
+          dict_approved: 3,
+          pending_head_it: 3,
+          head_it_approved: 4,
+          pending_ict_officer: 4,
+          implementation_in_progress: 5,
+          implemented: 5,
+          approved: 6,
+          completed: 6
+        }
+        return map[s] ?? 0
       },
 
       isPreviousStageComplete(currentStage, request) {
@@ -1054,24 +1279,25 @@
   }
   /* Typography scale for timeline modal */
   .timeline-typography {
-    font-size: 0.95rem;
+    font-size: 1.05rem;
   }
   .timeline-typography .text-xs {
-    font-size: 0.9rem !important;
+    font-size: 1.1rem !important;
+    line-height: 1.5 !important;
   }
   .timeline-typography .text-sm {
-    font-size: 1rem !important;
+    font-size: 1.25rem !important;
   }
   .timeline-typography .text-base {
-    font-size: 1.125rem !important;
+    font-size: 1.375rem !important;
   }
   .timeline-typography h2 {
-    font-size: 1.35rem !important;
+    font-size: 1.8rem !important;
   }
   .timeline-typography h3 {
-    font-size: 1.05rem !important;
+    font-size: 1.5rem !important;
   }
   .timeline-typography h4 {
-    font-size: 1rem !important;
+    font-size: 1.375rem !important;
   }
 </style>

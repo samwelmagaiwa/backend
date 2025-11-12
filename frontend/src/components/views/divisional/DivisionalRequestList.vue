@@ -6,7 +6,7 @@
         <ModernSidebar />
       </div>
       <main class="flex-1 p-4 bg-blue-900 overflow-y-auto">
-        <div class="max-w-9xl mx-auto">
+        <div class="max-w-13 mx-auto">
           <!-- Error Display -->
           <div
             v-if="error"
@@ -53,7 +53,7 @@
               />
               <select
                 v-model="statusFilter"
-                class="px-4 py-3 bg-white/20 border border-blue-300/30 rounded text-white text-lg"
+                class="px-4 py-3 bg-white/20 border border-blue-300/30 rounded text-white text-lg status-select"
               >
                 <option value="">All Statuses</option>
                 <option value="pending">Pending Submission</option>
@@ -163,6 +163,13 @@
                   <!-- Current Status -->
                   <td class="px-4 py-4">
                     <div class="flex flex-col">
+                      <span
+                        v-if="request.divisional_status === 'skipped'"
+                        class="mb-1 rounded text-sm font-semibold inline-block bg-red-900/30 text-red-300 border border-red-500/40 px-2 py-1"
+                        :style="{ width: 'fit-content' }"
+                      >
+                        No Divisional Director — Stage Skipped
+                      </span>
                       <!-- Display the exact database status -->
                       <span
                         :class="getStatusBadgeClass(request.status)"
@@ -170,6 +177,12 @@
                         :style="{ padding: '6px 12px', width: 'fit-content' }"
                       >
                         {{ getStatusText(request.status) }}
+                      </span>
+                      <span
+                        v-if="request.has_signature || request.signature"
+                        class="mt-1 px-2 py-0.5 rounded text-xs font-semibold bg-emerald-900/30 text-emerald-300 border border-emerald-500/40 w-fit"
+                      >
+                        Digitally signed
                       </span>
                     </div>
                   </td>
@@ -186,6 +199,22 @@
                         :class="getSmsStatusTextColor(getRelevantSmsStatus(request))"
                       >
                         {{ getSmsStatusText(getRelevantSmsStatus(request)) }}
+                      </span>
+                      <button
+                        v-if="['failed', 'pending'].includes(getRelevantSmsStatus(request))"
+                        @click.stop="retrySendSms(request)"
+                        :disabled="isRetrying && isRetrying(request.id)"
+                        class="ml-2 px-2 py-1 text-xs rounded border border-blue-300/50 text-blue-100 hover:bg-blue-700/40 disabled:opacity-50"
+                        title="Retry sending SMS"
+                      >
+                        <span v-if="!(isRetrying && isRetrying(request.id))">Retry</span>
+                        <span v-else><i class="fas fa-spinner fa-spin mr-1"></i>Retrying</span>
+                      </button>
+                      <span
+                        v-if="getRetryAttempts && getRetryAttempts(request.id) > 0"
+                        class="text-xs text-blue-200 ml-1"
+                      >
+                        ({{ getRetryAttempts(request.id) }})
                       </span>
                     </div>
                   </td>
@@ -228,7 +257,7 @@
                         >
                           <button
                             @click.stop="executeAction(action.key, request)"
-                            class="w-full text-left px-4 py-3 text-base transition-all duration-200 flex items-center space-x-3 group"
+                            class="w-full text-left px-4 py-3 text-lg transition-all duration-200 flex items-center space-x-3 group"
                             :class="[
                               getActionButtonClass(action.key),
                               {
@@ -243,7 +272,7 @@
                           >
                             <i
                               :class="[action.icon, getActionIconClass(action.key)]"
-                              class="w-5 h-5 flex-shrink-0 transition-colors duration-200"
+                              class="flex-shrink-0 transition-colors duration-200 text-lg"
                             ></i>
                             <span class="font-semibold">{{ action.label }}</span>
                           </button>
@@ -406,6 +435,11 @@
         error: null,
         // Dropdown state management
         openDropdownId: null,
+        // Retry state for SMS to ICT Director
+        retryAttempts: {},
+        retryTimers: {},
+        maxRetryAttempts: 5,
+        retryDelays: [3000, 7000, 15000, 30000, 60000],
         // Timeline modal state
         showTimeline: false,
         selectedRequestId: null,
@@ -529,6 +563,8 @@
 
             // Also fetch statistics
             await this.fetchStatistics()
+            // Initialize auto-retry for pending/failed SMS (to ICT Director)
+            if (typeof this.initAutoRetryForList === 'function') this.initAutoRetryForList()
           } else {
             throw new Error(response.error || 'Failed to fetch requests')
           }
@@ -959,6 +995,22 @@
 </script>
 
 <style scoped>
+  /* Unified styling for status filter dropdown to match header blue */
+  .status-select {
+    background-color: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    border-color: rgba(147, 197, 253, 0.4);
+  }
+  .status-select:focus {
+    outline: none;
+    border-color: #60a5fa; /* blue-400 */
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.35);
+  }
+  .status-select option,
+  .status-select optgroup {
+    background-color: #1e3a8a; /* blue-800 */
+    color: #ffffff;
+  }
   /* Override the sidebar width for this component to be wider */
   .sidebar-narrow :deep(.sidebar-expanded) {
     width: 20.5rem !important;

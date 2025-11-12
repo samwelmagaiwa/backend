@@ -21,7 +21,7 @@
                   REQUEST DETAILS
                 </div>
               </div>
-              <h2 class="text-base font-bold text-blue-100 tracking-wide drop-shadow-md mt-1">
+              <h2 class="text-lg font-bold text-blue-100 tracking-wide drop-shadow-md mt-1">
                 Internal Access Management
               </h2>
             </div>
@@ -53,7 +53,7 @@
                     >
                       <i class="fas fa-route text-white text-sm"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-white flex items-center">
+                    <h3 class="text-3xl font-bold text-white flex items-center">
                       <i class="fas fa-clipboard-check mr-2 text-blue-300"></i>
                       Approval Trail
                     </h3>
@@ -74,10 +74,10 @@
                             <i :class="getApprovalStepIcon('ict')" class="text-white text-sm"></i>
                           </div>
                           <div>
-                            <h4 class="text-white font-semibold text-base">ICT Officer</h4>
+                            <h4 class="text-white font-semibold text-lg">ICT Officer</h4>
                             <p
                               :class="getApprovalStatusTextClass('ict')"
-                              class="text-sm font-medium"
+                              class="text-base font-medium"
                             >
                               {{ getApprovalStatusText('ict') }}
                             </p>
@@ -179,7 +179,7 @@
                   <div v-else class="space-y-4">
                     <!-- Request Status Overview -->
                     <div class="mb-4 p-3 bg-white/10 rounded-xl border border-emerald-300/30">
-                      <h4 class="text-base font-bold text-blue-100 mb-2">
+                      <h4 class="text-3xl font-bold text-blue-100 mb-2">
                         {{ formattedRequestType }} - Status Overview
                       </h4>
                       <div class="grid grid-cols-1 md:grid-cols-5 gap-2">
@@ -205,7 +205,7 @@
                               class="text-white text-sm"
                             ></i>
                           </div>
-                          <p class="text-sm text-white">HOD</p>
+                          <p class="text-2xl text-white">HOD</p>
                         </div>
                         <div class="text-center">
                           <div
@@ -229,7 +229,7 @@
                               class="text-white text-sm"
                             ></i>
                           </div>
-                          <p class="text-sm text-white">Divisional</p>
+                          <p class="text-2xl text-white">Divisional</p>
                         </div>
                         <div class="text-center">
                           <div
@@ -253,7 +253,7 @@
                               class="text-white text-sm"
                             ></i>
                           </div>
-                          <p class="text-sm text-white">DICT</p>
+                          <p class="text-2xl text-white">DICT</p>
                         </div>
                         <div class="text-center">
                           <div
@@ -277,7 +277,7 @@
                               class="text-white text-sm"
                             ></i>
                           </div>
-                          <p class="text-sm text-white">Head IT</p>
+                          <p class="text-2xl text-white">Head IT</p>
                         </div>
                         <div class="text-center">
                           <div
@@ -301,7 +301,7 @@
                               class="text-white text-sm"
                             ></i>
                           </div>
-                          <p class="text-sm text-white">ICT Officer</p>
+                          <p class="text-2xl text-white">ICT Officer</p>
                         </div>
                       </div>
                     </div>
@@ -321,12 +321,12 @@
                               <i :class="getHODApprovalStepIcon()" class="text-white text-sm"></i>
                             </div>
                             <div>
-                              <h4 class="text-white font-semibold text-base">
+                              <h4 class="text-white font-semibold text-lg">
                                 {{ getHODApproverName() }}
                               </h4>
                               <p
                                 :class="getHODApprovalStatusTextClass()"
-                                class="text-sm font-medium"
+                                class="text-base font-medium"
                               >
                                 {{ getHODApprovalStatusText() }}
                               </p>
@@ -368,20 +368,20 @@
                               ></i>
                             </div>
                             <div>
-                              <h4 class="text-white font-semibold text-base">ICT Officer</h4>
-                              <p class="text-gray-300 text-xs" v-if="getCombinedIctOfficerName()">
+                              <h4 class="text-white font-semibold text-lg">ICT Officer</h4>
+                              <p class="text-gray-300 text-xl" v-if="getCombinedIctOfficerName()">
                                 {{ getCombinedIctOfficerName() }}
                               </p>
                               <p
                                 :class="getCombinedIctOfficerStatusTextClass()"
-                                class="text-sm font-medium"
+                                class="text-xl font-semibold"
                               >
                                 {{ getCombinedIctOfficerStatusText() }}
                               </p>
                             </div>
                           </div>
                           <div class="text-right">
-                            <p class="text-base text-teal-300">
+                            <p class="text-xl text-teal-300">
                               {{
                                 requestData?.ict_officer_approved_at ||
                                 requestData?.ict_officer_rejected_at
@@ -389,9 +389,13 @@
                                       requestData?.ict_officer_approved_at ||
                                         requestData?.ict_officer_rejected_at
                                     )
-                                  : getCombinedIctOfficerStatus() === 'in_progress'
-                                    ? 'In Progress'
-                                    : 'Pending'
+                                  : getCombinedIctOfficerStatus() === 'approved'
+                                    ? 'Approved'
+                                    : getCombinedIctOfficerStatus() === 'rejected'
+                                      ? 'Rejected'
+                                      : getCombinedIctOfficerStatus() === 'in_progress'
+                                        ? 'In Progress'
+                                        : 'Pending'
                               }}
                             </p>
                           </div>
@@ -404,7 +408,7 @@
                             class="bg-teal-500/10 rounded-lg p-3 border border-teal-400/20 flex-1"
                           >
                             <p
-                              class="text-white text-lg leading-relaxed font-extrabold tracking-wide"
+                              class="text-white text-2xl leading-relaxed font-extrabold tracking-wide"
                             >
                               {{ getCombinedIctOfficerComment() }}
                             </p>
@@ -413,7 +417,7 @@
                             v-else
                             class="bg-gray-500/10 rounded-lg p-3 border border-gray-400/20 flex-1 flex items-center justify-center"
                           >
-                            <p class="text-gray-300 text-sm italic font-bold">
+                            <p class="text-gray-300 text-xl italic font-bold">
                               No comments available yet.
                             </p>
                           </div>
@@ -427,25 +431,25 @@
                 <div
                   class="bg-gradient-to-br from-blue-600/30 to-blue-700/30 border-2 border-blue-400/60 shadow-blue-500/25 p-4 rounded-2xl backdrop-blur-sm"
                 >
-                  <h3 class="text-2xl font-bold text-white mb-2">Request Information</h3>
+                  <h3 class="text-3xl font-bold text-white mb-2">Request Information</h3>
                   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-white">
                     <div>
-                      <p class="text-blue-200 text-base">Request ID:</p>
-                      <p class="font-semibold text-lg">{{ formattedRequestId }}</p>
+                      <p class="text-blue-200 text-lg">Request ID:</p>
+                      <p class="font-semibold text-xl">{{ formattedRequestId }}</p>
                     </div>
                     <div>
-                      <p class="text-blue-200 text-base">Request Type:</p>
-                      <p class="font-semibold text-lg">{{ formattedRequestType }}</p>
+                      <p class="text-blue-200 text-lg">Request Type:</p>
+                      <p class="font-semibold text-xl">{{ formattedRequestType }}</p>
                     </div>
                     <div>
-                      <p class="text-blue-200 text-base">Status:</p>
-                      <p class="font-semibold text-lg" :class="getCurrentStatusTextClass()">
+                      <p class="text-blue-200 text-lg">Status:</p>
+                      <p class="font-semibold text-xl" :class="getCurrentStatusTextClass()">
                         {{ formattedCurrentStatus }}
                       </p>
                     </div>
                     <div>
-                      <p class="text-blue-200 text-base">ICT Status:</p>
-                      <p class="font-semibold text-lg">{{ requestData?.ictStatus || 'Pending' }}</p>
+                      <p class="text-blue-200 text-lg">ICT Status:</p>
+                      <p class="font-semibold text-xl">{{ requestData?.ictStatus || 'Pending' }}</p>
                     </div>
                     <!-- Return Status for Booking Service -->
                     <div v-if="isBookingService">
@@ -457,7 +461,7 @@
                               requestData?.return_status || 'not_yet_returned'
                             )
                           "
-                          class="px-2 py-1 rounded-full text-xs font-medium border"
+                          class="px-2 py-1 rounded-full text-sm font-medium border"
                         >
                           <i
                             :class="

@@ -408,6 +408,7 @@
                             class="medical-input personal-info-input w-full px-2 py-1 bg-white/15 border-2 border-blue-300/30 rounded-lg focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 text-xs"
                             :class="{ 'font-bold': form.shared.phone }"
                             placeholder="e.g. 0712 000 000"
+                            @blur="form.shared.phone = normalizePhoneNumber(form.shared.phone)"
                             required
                           />
                           <div
@@ -629,11 +630,10 @@
                             Signature <span class="text-red-400">*</span>
                           </label>
 
-                          <!-- Review mode: Show staff signature status -->
+                          <!-- Unified digital signature status and action (review and edit) -->
                           <div
-                            v-if="isReviewMode"
                             class="w-full px-1 py-0.5 border-2 rounded-lg backdrop-blur-sm transition-all duration-300 shadow-lg flex items-center justify-center min-h-[28px]"
-                            :class="hasSignature ? 'border-green-400/50 bg-green-500/10' : 'border-blue-300/40 bg-white/15 hover:shadow-xl hover:shadow-blue-500/20'"
+                            :class="(hasSignature || hasUserSigned) ? 'border-green-400/50 bg-green-500/10' : 'border-blue-300/40 bg-white/15 hover:shadow-xl hover:shadow-blue-500/20'"
                           >
                             <!-- Loading state -->
                             <div v-if="loading" class="text-center">
@@ -642,94 +642,31 @@
                             </div>
                             <!-- Loaded state -->
                             <div v-else class="text-center">
-                              <div v-if="hasSignature">
-                                <div class="flex items-center justify-center gap-1">
-                                  <i class="fas fa-check-circle text-green-400 text-sm"></i>
-                                  <p class="text-green-300 text-xs font-bold">
-                                    Staff Signed
-                                  </p>
-                                </div>
+                              <div v-if="hasSignature || hasUserSigned" class="flex flex-col items-center gap-0.5">
+                                <i class="fas fa-check-circle text-green-400 text-sm"></i>
+                                <p class="text-green-300 text-xs font-bold">
+                                  Digitally signed
+                                  <span v-if="hasUserSigned">by {{ currentUser?.name || 'You' }}</span>
+                                </p>
+                                <p v-if="lastSignedAt" class="text-green-200 text-[10px]">
+                                  on {{ new Date(lastSignedAt).toLocaleString() }}
+                                </p>
                               </div>
-                              <div v-else>
+                              <div v-else class="flex flex-col items-center">
                                 <i class="fas fa-signature text-blue-300 text-sm"></i>
-                                <p class="text-blue-100 text-xs mt-0.5">No signature uploaded</p>
+                                <p class="text-blue-100 text-xs mt-0.5">No signature yet</p>
+                                <button
+                                  type="button"
+                                  @click="signCurrentDocument"
+                                  :disabled="isSigning"
+                                  class="px-2 py-0.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/50 mt-1"
+                                >
+                                  <i class="fas fa-pen-alt"></i>
+                                  Sign Document
+                                </button>
                               </div>
                             </div>
                           </div>
-
-                          <!-- Edit mode: Show signature upload interface -->
-                          <div
-                            v-else-if="!signaturePreview"
-                            class="w-full px-1 py-1 border-2 border-dashed border-blue-300/40 rounded-lg focus-within:border-blue-400 bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 flex items-center justify-center hover:bg-white/20 min-h-[35px]"
-                          >
-                            <div class="text-center">
-                              <i class="fas fa-signature text-blue-300 text-sm"></i>
-                              <p class="text-blue-100 text-xs mt-0.5">No signature uploaded</p>
-                              <button
-                                type="button"
-                                @click="triggerFileUpload"
-                                class="px-2 py-0.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/50 mt-1"
-                              >
-                                <i class="fas fa-upload"></i>
-                                Press to load your signature
-                              </button>
-                            </div>
-                          </div>
-
-                          <!-- Edit mode: Show uploaded signature preview -->
-                          <div
-                            v-else
-                            class="w-full px-1 py-1 border-2 border-blue-300/40 rounded-lg bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 flex items-center justify-center relative min-h-[35px]"
-                          >
-                            <div v-if="isImage(signaturePreview)" class="text-center">
-                              <img
-                                :src="signaturePreview"
-                                alt="Digital Signature"
-                                class="max-h-[25px] max-w-full object-contain mx-auto"
-                              />
-                              <p class="text-xs text-blue-100 mt-0.5 truncate">
-                                {{ signatureFileName }}
-                              </p>
-                            </div>
-                            <div v-else class="text-center">
-                              <div
-                                class="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center mx-auto"
-                              >
-                                <i class="fas fa-file-pdf text-red-400 text-2xl"></i>
-                              </div>
-                              <p class="text-sm text-blue-100 mt-0.5 truncate">
-                                {{ signatureFileName }}
-                              </p>
-                            </div>
-
-                            <div class="absolute top-1 right-1 flex gap-1">
-                              <button
-                                type="button"
-                                @click="triggerFileUpload"
-                                class="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-blue-600 transition-colors duration-200 shadow-lg"
-                                title="Change signature"
-                              >
-                                <i class="fas fa-edit"></i>
-                              </button>
-                              <button
-                                type="button"
-                                @click="clearSignature"
-                                class="w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors duration-200 shadow-lg"
-                                title="Remove signature"
-                              >
-                                <i class="fas fa-times"></i>
-                              </button>
-                            </div>
-                          </div>
-
-                          <input
-                            v-if="!isReviewMode || canUploadHodSignature"
-                            ref="signatureInput"
-                            type="file"
-                            accept="image/png,image/jpeg,application/pdf"
-                            @change="onSignatureChange"
-                            class="hidden"
-                          />
                         </div>
                       </div>
                     </div>
@@ -1339,7 +1276,7 @@
           <!-- Grant Access Popup (ICT Officer) -->
           <div v-if="showGrantAccessPopup" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-4">
             <div class="bg-white/10 rounded-2xl shadow-2xl max-w-3xl w-full overflow-hidden border border-blue-300/40 backdrop-blur-md">
-              <div class="px-5 py-3" style="background-color:#0047ab">
+              <div class="px-5 py-3" style="background-color:red">
                 <h3 class="text-white text-2xl font-bold flex items-center gap-2">
                   <i class="fas fa-user-shield"></i>
                   Grant Access
@@ -1523,6 +1460,7 @@
                                     ? 'ring-1 ring-green-300/40 shadow-xl'
                                     : ''
                                 ]"
+                                :title="getSignedByYouTooltip('hod')"
                               >
                                 <div class="text-center">
                                   <div class="flex items-center justify-center space-x-2 mb-1">
@@ -1702,21 +1640,16 @@
                                   <button
                                     v-if="canUploadHodSignature"
                                     type="button"
-                                    @click="triggerHodSignatureUpload"
+                                    @click="signCurrentDocument"
+                                    :disabled="isSigning || !isReviewMode"
                                     class="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/50"
                                   >
-                                    <i class="fas fa-upload"></i>
-                                    Upload Signature
+                                    <i class="fas fa-pen-alt"></i>
+                                    Sign Document
                                   </button>
+                                  <p v-if="!isReviewMode" class="text-xs text-blue-200 mt-1">Available after submitting the request</p>
                                 </div>
                               </div>
-                              <input
-                                ref="hodSignatureInput"
-                                type="file"
-                                accept="image/png,image/jpeg,application/pdf"
-                                @change="onHodSignatureChange"
-                                class="hidden"
-                              />
                             </div>
                           </div>
                           <div>
@@ -1843,6 +1776,7 @@
                                     ? 'ring-1 ring-green-300/40 shadow-xl'
                                     : ''
                                 ]"
+                                :title="getSignedByYouTooltip('divisional')"
                               >
                                 <div class="text-center">
                                   <div class="flex items-center justify-center space-x-2 mb-1">
@@ -1967,73 +1901,17 @@
                                   <button
                                     v-if="isDivisionalApprovalEditable"
                                     type="button"
-                                    @click="triggerDivDirectorSignatureUpload"
+                                    @click="signCurrentDocument"
+                                    :disabled="isSigning || !isReviewMode"
                                     class="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/50"
                                   >
-                                    <i class="fas fa-upload"></i>
-                                    Upload Signature
+                                    <i class="fas fa-pen-alt"></i>
+                                    Sign Document
                                   </button>
+                                  <p v-if="!isReviewMode" class="text-xs text-blue-200 mt-1">Available after submitting the request</p>
                                 </div>
                               </div>
 
-                              <div
-                                v-else
-                                class="w-full px-3 py-2 border-2 border-emerald-300/40 rounded-xl bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-emerald-500/20 min-h-[35px] flex items-center justify-center relative"
-                              >
-                                <div
-                                  v-if="isImage(divDirectorSignaturePreview)"
-                                  class="text-center"
-                                >
-                                  <img
-                                    :src="divDirectorSignaturePreview"
-                                    alt="Divisional Director Signature"
-                                    class="max-h-[50px] max-w-full object-contain mx-auto mb-1"
-                                  />
-                                  <p class="text-xs text-blue-100">
-                                    {{ divDirectorSignatureFileName }}
-                                  </p>
-                                </div>
-                                <div v-else class="text-center">
-                                  <div
-                                    class="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-1"
-                                  >
-                                    <i class="fas fa-file-pdf text-red-400 text-lg"></i>
-                                  </div>
-                                  <p class="text-xs text-blue-100">
-                                    {{ divDirectorSignatureFileName }}
-                                  </p>
-                                </div>
-
-                                <div
-                                  v-if="isDivisionalApprovalEditable"
-                                  class="absolute top-2 right-2 flex gap-1"
-                                >
-                                  <button
-                                    type="button"
-                                    @click="triggerDivDirectorSignatureUpload"
-                                    class="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-blue-600 transition-colors duration-200 shadow-lg"
-                                    title="Change signature"
-                                  >
-                                    <i class="fas fa-edit"></i>
-                                  </button>
-                                  <button
-                                    type="button"
-                                    @click="clearDivDirectorSignature"
-                                    class="w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors duration-200 shadow-lg"
-                                    title="Remove signature"
-                                  >
-                                    <i class="fas fa-times"></i>
-                                  </button>
-                                </div>
-                              </div>
-
-                              <input
-                                ref="divDirectorSignatureInput"
-                                type="file"
-                                accept="image/png,image/jpeg,application/pdf"
-                                @change="onDivDirectorSignatureChange"
-                                class="hidden"
-                              />
                             </div>
                           </div>
                           <div>
@@ -2156,6 +2034,7 @@
                               <div
                                 v-if="shouldShowIctDirectorSignedIndicator"
                                 class="w-full px-3 py-2 border-2 border-green-400/50 rounded-xl bg-green-500/10 backdrop-blur-sm transition-all duration-300 shadow-lg min-h-[35px] flex items-center justify-center"
+                                :title="getSignedByYouTooltip('ict_director')"
                               >
                                 <div class="text-center">
                                   <div class="flex items-center justify-center space-x-2 mb-1">
@@ -2267,73 +2146,17 @@
                                   <button
                                     v-if="isIctDirectorApprovalEditable"
                                     type="button"
-                                    @click="triggerDirectorICTSignatureUpload"
+                                    @click="signCurrentDocument"
+                                    :disabled="isSigning || !isReviewMode"
                                     class="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/50"
                                   >
-                                    <i class="fas fa-upload"></i>
-                                    Upload Signature
+                                    <i class="fas fa-pen-alt"></i>
+                                    Sign Document
                                   </button>
+                                  <p v-if="!isReviewMode" class="text-xs text-blue-200 mt-1">Available after submitting the request</p>
                                 </div>
                               </div>
 
-                              <div
-                                v-else
-                                class="w-full px-3 py-2 border-2 border-emerald-300/40 rounded-xl bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-emerald-500/20 min-h-[35px] flex items-center justify-center relative"
-                              >
-                                <div
-                                  v-if="isImage(directorICTSignaturePreview)"
-                                  class="text-center"
-                                >
-                                  <img
-                                    :src="directorICTSignaturePreview"
-                                    alt="Director ICT Signature"
-                                    class="max-h-[50px] max-w-full object-contain mx-auto mb-1"
-                                  />
-                                  <p class="text-xs text-blue-100">
-                                    {{ directorICTSignatureFileName }}
-                                  </p>
-                                </div>
-                                <div v-else class="text-center">
-                                  <div
-                                    class="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-1"
-                                  >
-                                    <i class="fas fa-file-pdf text-red-400 text-lg"></i>
-                                  </div>
-                                  <p class="text-xs text-blue-100">
-                                    {{ directorICTSignatureFileName }}
-                                  </p>
-                                </div>
-
-                                <div
-                                  v-if="isIctDirectorApprovalEditable"
-                                  class="absolute top-2 right-2 flex gap-1"
-                                >
-                                  <button
-                                    type="button"
-                                    @click="triggerDirectorICTSignatureUpload"
-                                    class="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-blue-600 transition-colors duration-200 shadow-lg"
-                                    title="Change signature"
-                                  >
-                                    <i class="fas fa-edit"></i>
-                                  </button>
-                                  <button
-                                    type="button"
-                                    @click="clearDirectorICTSignature"
-                                    class="w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors duration-200 shadow-lg"
-                                    title="Remove signature"
-                                  >
-                                    <i class="fas fa-times"></i>
-                                  </button>
-                                </div>
-                              </div>
-
-                              <input
-                                ref="directorICTSignatureInput"
-                                type="file"
-                                accept="image/png,image/jpeg,application/pdf"
-                                @change="onDirectorICTSignatureChange"
-                                class="hidden"
-                              />
                             </div>
                           </div>
                           <div>
@@ -2513,6 +2336,7 @@
                               <div
                                 v-if="shouldShowHeadITSignedIndicator"
                                 class="w-full px-2 py-1 border-2 border-green-400/50 rounded-lg bg-green-500/10 backdrop-blur-sm transition-all duration-300 shadow-lg min-h-[25px] flex items-center justify-center"
+                                :title="getSignedByYouTooltip('head_it')"
                               >
                                 <div class="text-center">
                                   <div class="flex items-center justify-center space-x-2 mb-1">
@@ -2559,70 +2383,17 @@
                                   <button
                                     v-if="isHeadItApprovalEditable"
                                     type="button"
-                                    @click="triggerHeadITSignatureUpload"
+                                    @click="signCurrentDocument"
+                                    :disabled="isSigning || !isReviewMode"
                                     class="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors duration-200 flex items-center gap-1 mx-auto"
                                   >
-                                    <i class="fas fa-upload"></i>
-                                    Upload your signature
+                                    <i class="fas fa-pen-alt"></i>
+                                    Sign Document
                                   </button>
+                                  <p v-if="!isReviewMode" class="text-[10px] text-blue-200 mt-0.5">Available after submitting the request</p>
                                 </div>
                               </div>
 
-                              <div
-                                v-else
-                                class="w-full px-2 py-2 border border-blue-300/30 rounded-lg bg-blue-500/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 min-h-[30px] flex items-center justify-center relative"
-                              >
-                                <div v-if="isImage(headITSignaturePreview)" class="text-center">
-                                  <img
-                                    :src="headITSignaturePreview"
-                                    alt="Head IT Signature"
-                                    class="max-h-[35px] max-w-full object-contain mx-auto mb-1"
-                                  />
-                                  <p class="text-xs text-blue-100">
-                                    {{ headITSignatureFileName }}
-                                  </p>
-                                </div>
-                                <div v-else class="text-center">
-                                  <div
-                                    class="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center mx-auto mb-1"
-                                  >
-                                    <i class="fas fa-file-pdf text-red-400 text-sm"></i>
-                                  </div>
-                                  <p class="text-xs text-blue-100">
-                                    {{ headITSignatureFileName }}
-                                  </p>
-                                </div>
-
-                                <div
-                                  v-if="isHeadItApprovalEditable"
-                                  class="absolute top-1 right-1 flex gap-1"
-                                >
-                                  <button
-                                    type="button"
-                                    @click="triggerHeadITSignatureUpload"
-                                    class="w-5 h-5 bg-teal-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-teal-600 transition-colors duration-200"
-                                    title="Change signature"
-                                  >
-                                    <i class="fas fa-edit"></i>
-                                  </button>
-                                  <button
-                                    type="button"
-                                    @click="clearHeadITSignature"
-                                    class="w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors duration-200"
-                                    title="Remove signature"
-                                  >
-                                    <i class="fas fa-times"></i>
-                                  </button>
-                                </div>
-                              </div>
-
-                              <input
-                                ref="headITSignatureInput"
-                                type="file"
-                                accept="image/png,image/jpeg,application/pdf"
-                                @change="onHeadITSignatureChange"
-                                class="hidden"
-                              />
                             </div>
                           </div>
                           <div>
@@ -2752,12 +2523,14 @@
                                       !isImplementationAlreadyCompleted
                                     "
                                     type="button"
-                                    @click="triggerIctOfficerSignatureUpload"
+                                    @click="signCurrentDocument"
+                                    :disabled="isSigning || !isReviewMode"
                                     class="px-2 py-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/50"
                                   >
-                                    <i class="fas fa-upload"></i>
-                                    Upload Signature
+                                    <i class="fas fa-pen-alt"></i>
+                                    Sign Document
                                   </button>
+                                  <p v-if="!isReviewMode" class="text-[10px] text-blue-200 mt-0.5">Available after submitting the request</p>
                                 </div>
                               </div>
 
@@ -2765,6 +2538,7 @@
                               <div
                                 v-else-if="shouldShowIctOfficerSignedIndicator"
                                 class="w-full px-3 py-2 border-2 border-green-300/40 rounded-xl bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-green-500/20 min-h-[35px] flex items-center justify-center relative"
+                                :title="getSignedByYouTooltip('ict_officer')"
                               >
                                 <div class="text-center">
                                   <div class="flex items-center justify-center space-x-2 mb-1">
@@ -2807,65 +2581,6 @@
                               </div>
 
                               <!-- Show uploaded signature preview -->
-                              <div
-                                v-else-if="ictOfficerSignaturePreview"
-                                class="w-full px-3 py-2 border-2 border-purple-300/40 rounded-xl bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-purple-500/20 min-h-[35px] flex items-center justify-center relative"
-                              >
-                                <div v-if="isImage(ictOfficerSignaturePreview)" class="text-center">
-                                  <img
-                                    :src="ictOfficerSignaturePreview"
-                                    alt="ICT Officer Signature"
-                                    class="max-h-[50px] max-w-full object-contain mx-auto mb-1"
-                                  />
-                                  <p class="text-xs text-blue-100">
-                                    {{ ictOfficerSignatureFileName }}
-                                  </p>
-                                </div>
-                                <div v-else class="text-center">
-                                  <div
-                                    class="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-1"
-                                  >
-                                    <i class="fas fa-file-pdf text-red-400 text-lg"></i>
-                                  </div>
-                                  <p class="text-xs text-blue-100">
-                                    {{ ictOfficerSignatureFileName }}
-                                  </p>
-                                </div>
-
-                                <div
-                                  v-if="
-                                    (isIctOfficerApprovalEditable ||
-                                      currentUser?.role === 'ict_officer') &&
-                                    !isImplementationAlreadyCompleted
-                                  "
-                                  class="absolute top-2 right-2 flex gap-1"
-                                >
-                                  <button
-                                    type="button"
-                                    @click="triggerIctOfficerSignatureUpload"
-                                    class="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-blue-600 transition-colors duration-200 shadow-lg"
-                                    title="Change signature"
-                                  >
-                                    <i class="fas fa-edit"></i>
-                                  </button>
-                                  <button
-                                    type="button"
-                                    @click="clearIctOfficerSignature"
-                                    class="w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors duration-200 shadow-lg"
-                                    title="Remove signature"
-                                  >
-                                    <i class="fas fa-times"></i>
-                                  </button>
-                                </div>
-                              </div>
-
-                              <input
-                                ref="ictOfficerSignatureInput"
-                                type="file"
-                                accept="image/png,image/jpeg,application/pdf"
-                                @change="onIctOfficerSignatureChange"
-                                class="hidden"
-                              />
                             </div>
                           </div>
                           <div>
@@ -2883,9 +2598,8 @@
                           <div
                             v-if="
                               !isStrictViewMode &&
-                              (isIctOfficerApprovalEditable ||
-                                currentUser?.role === 'ict_officer') &&
-                              ictOfficerSignaturePreview &&
+                              (isIctOfficerApprovalEditable || currentUser?.role === 'ict_officer') &&
+                              (shouldShowIctOfficerSignedIndicator || hasUserSigned) &&
                               !isImplementationAlreadyCompleted
                             "
                             class="mt-3"
@@ -4053,6 +3767,7 @@
   import combinedAccessService from '@/services/combinedAccessService'
   import ictOfficerService from '@/services/ictOfficerService'
   import bothServiceFormService from '@/services/bothServiceFormService'
+  import signatureService from '@/services/signatureService'
   import { useAuthStore } from '@/stores/auth'
 
   export default {
@@ -4182,11 +3897,17 @@
 
         confirm: { key: '', label: '' },
         toast: { show: false, message: '' },
+        // Digital signature state
+        isSigning: false,
+        hasUserSigned: false,
+        lastSignedAt: null,
         errors: { pfNumber: '', staffName: '' },
         // Review mode data
         requestData: null,
         loading: false,
         error: null,
+        // Digital signature history for this document
+        signatureHistory: [],
         // Rejection modal data
         showRejectionModal: false,
         rejectionReason: '',
@@ -5511,13 +5232,15 @@
           // Also check if this stage is completed based on request status
           const isStageCompleted = this.isStageCompleted(stage)
 
-          // A stage is considered signed if:
-          // 1. It has signature file AND date AND name, OR
-          // 2. The stage is marked as completed AND has a name AND date, OR
-          // 3. For HOD specifically: hod_signature_path exists (simplified check)
+          // A stage is considered signed if ANY of these are true:
+          // A) Legacy: It has signature file AND date AND name
+          // B) Legacy: Stage is completed AND has a name AND date
+          // C) Legacy: For HOD specifically, hod_signature_path exists
+          // D) Digital: Signature history contains a signature by the stage's approver name
+          // E) Digital: Current viewer is that stage role and has signed (history contains currentUser.name)
           let result = (hasSig && hasDate && hasName) || (isStageCompleted && hasName && hasDate)
 
-          // Special case for HOD: if hod_signature_path exists, consider it signed
+          // C) Special case for HOD (legacy file path)
           if (stage === 'hod' && this.requestData?.hod_signature_path) {
             result = true
             if (this.isDevelopment) {
@@ -5526,6 +5249,30 @@
                 this.requestData.hod_signature_path
               )
             }
+          }
+
+          // D) Digital: Check signature history for matching approver name
+          if (!result && hasName && this.historyHasSigner(e.name)) {
+            result = true
+          }
+
+          // E) Digital: If viewer is that stage role and history has current user name
+          const roleMap = {
+            hod: ['head_of_department', 'hod'],
+            divisional: ['divisional_director'],
+            ict_director: ['ict_director', 'dict'],
+            head_it: ['head_it', 'head_of_it'],
+            ict_officer: ['ict_officer', 'officer_ict']
+          }
+          const viewerRole = (this.getUserRole() || '').toLowerCase().replace(/[\s-]+/g, '_')
+          if (
+            !result &&
+            roleMap[stage] &&
+            roleMap[stage].includes(viewerRole) &&
+            this.currentUser?.name &&
+            this.historyHasSigner(this.currentUser.name)
+          ) {
+            result = true
           }
 
           // Debug logging for signature detection (development only)
@@ -6073,6 +5820,113 @@
       }
     },
     methods: {
+      normalizePhoneNumber(input) {
+        if (!input) return ''
+        let v = String(input).trim().replace(/\s|-/g, '')
+        if (v.startsWith('+255')) return v
+        if (v.startsWith('255')) return '+' + v
+        if (v.startsWith('0')) return '+255' + v.slice(1)
+        return v
+      },
+      async signCurrentDocument() {
+        try {
+          if (this.isSigning) return
+          const documentId = this.getRequestId || this.requestData?.id || this.$route.params.id
+          if (!documentId) {
+            this.showToast(
+              'Cannot sign until the request is created. Please submit first.',
+              'error'
+            )
+            return
+          }
+          this.isSigning = true
+          const res = await signatureService.sign(documentId)
+          if (res && (res.success || res.data)) {
+            this.hasUserSigned = true
+            this.lastSignedAt = res?.data?.signed_at || res?.signed_at || new Date().toISOString()
+            const signer = this.currentUser?.name || 'you'
+            this.toast = {
+              show: true,
+              message: `Document successfully signed by ${signer} on ${new Date(this.lastSignedAt).toLocaleString()}`
+            }
+            setTimeout(() => (this.toast.show = false), 4000)
+          } else {
+            this.showToast(res?.message || 'Failed to sign document', 'error')
+          }
+        } catch (e) {
+          console.error('Sign error:', e)
+          this.showToast(e.message || 'Failed to sign document', 'error')
+        } finally {
+          this.isSigning = false
+        }
+      },
+      // ===========================================
+      // DIGITAL SIGNATURE HISTORY
+      // ===========================================
+      async fetchSignatureHistory() {
+        try {
+          const id = this.getRequestId || this.requestData?.id || this.$route.params.id
+          if (!id) return
+          const res = await signatureService.list(id)
+          // Accept either {data: [...] } or direct array
+          this.signatureHistory = Array.isArray(res?.data)
+            ? res.data
+            : Array.isArray(res)
+              ? res
+              : []
+        } catch (e) {
+          console.warn('Failed to load signature history:', e?.message || e)
+          this.signatureHistory = []
+        }
+      },
+
+      // Helper: does history contain a signature by this exact person name (case-insensitive)?
+      historyHasSigner(name) {
+        if (!name) return false
+        const n = String(name).trim().toLowerCase()
+        return (this.signatureHistory || []).some(
+          (s) =>
+            String(s.user_name || s.name || '')
+              .trim()
+              .toLowerCase() === n
+        )
+      },
+
+      // Return a hover tooltip like "Signed by You at HH:MM" for the given stage if current user signed
+      getSignedByYouTooltip(stage) {
+        try {
+          const userName = this.currentUser?.name
+          if (!userName) return ''
+          // Only show when the viewer's role matches the stage role
+          const roleMap = {
+            hod: ['head_of_department', 'hod'],
+            divisional: ['divisional_director'],
+            ict_director: ['ict_director', 'dict'],
+            head_it: ['head_it', 'head_of_it'],
+            ict_officer: ['ict_officer', 'officer_ict']
+          }
+          const viewerRole = (this.getUserRole() || '').toLowerCase().replace(/[\s-]+/g, '_')
+          if (!roleMap[stage] || !roleMap[stage].includes(viewerRole)) return ''
+
+          // Find current user's signature entry
+          const entry = (this.signatureHistory || []).find(
+            (s) =>
+              String(s.user_name || s.name || '')
+                .trim()
+                .toLowerCase() === String(userName).trim().toLowerCase()
+          )
+          if (!entry) return ''
+          const ts = entry.signed_at || entry.created_at || entry.timestamp
+          if (!ts) return 'Signed by You'
+          const d = new Date(ts)
+          if (isNaN(d.getTime())) return 'Signed by You'
+          const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          return `Signed by You at ${time}`
+        } catch {
+          return ''
+        }
+      },
+
       // ===========================================
       // ROLE COMMENT HELPERS
       // ===========================================
@@ -6216,7 +6070,7 @@
 
         const comment = (this.grantAccessComment || '').trim() || '[YOUR COMMENT HERE]'
 
-        return `Dear ${name}, your ${types} access has been GRANTED and is now ACTIVE. Ref: ${ref}. Note: ${comment} - EABMS`
+        return `Dear ${name}, your ${types} has been GRANTED and is now ACTIVE. Ref: ${ref}. Note: ${comment} - EABMS`
       },
 
       // Helper to compute row class safely
@@ -6699,11 +6553,11 @@
           }
         }
 
-        // Check if signature is provided
-        if (!this.signaturePreview) {
+        // Check if signature is provided (accept either uploaded file or digital signature)
+        if (!this.signaturePreview && !this.hasUserSigned) {
           this.toast = {
             show: true,
-            message: 'Please upload your digital signature before submitting'
+            message: 'Please sign the document before submitting'
           }
           setTimeout(() => (this.toast.show = false), 5000)
           return
@@ -7122,6 +6976,9 @@
               console.warn('Mapping approvals to form failed:', e)
             }
 
+            // After mapping, load digital signature history for this request
+            await this.fetchSignatureHistory()
+
             // Check if data is in the 'shared' object (as returned by backend API)
             if (this.requestData.shared) {
               if (this.isDevelopment) {
@@ -7131,7 +6988,7 @@
                 pfNumber: this.requestData.shared.pfNumber || '',
                 staffName: this.requestData.shared.staffName || '',
                 department: this.requestData.shared.department || '',
-                phone: this.requestData.shared.phone || ''
+                phone: this.normalizePhoneNumber(this.requestData.shared.phone || '')
               }
             } else {
               // Fallback to direct properties (legacy support)
@@ -7142,7 +6999,9 @@
                 pfNumber: this.requestData.pf_number || '',
                 staffName: this.requestData.staff_name || this.requestData.full_name || '',
                 department: this.requestData.department || this.requestData.department_name || '',
-                phone: this.requestData.phone || this.requestData.phone_number || ''
+                phone: this.normalizePhoneNumber(
+                  this.requestData.phone || this.requestData.phone_number || ''
+                )
               }
             }
 
@@ -8250,12 +8109,10 @@
         try {
           const payload = {
             ict_officer_name: this.currentUser?.name || 'ICT Officer',
-            ict_officer_signature:
-              this.form.implementation.ictOfficer.signature || this.ictOfficerSignaturePreview,
-            ict_officer_date:
+            approved_date:
               this.form.implementation.ictOfficer.date || new Date().toISOString().slice(0, 10),
-            ict_officer_comments: this.form.comments || '',
-            ict_officer_status: 'implemented'
+            comments: this.form.comments || '',
+            status: 'implemented'
           }
 
           const result = await bothServiceFormService.ictOfficerApprove(this.getRequestId, payload)

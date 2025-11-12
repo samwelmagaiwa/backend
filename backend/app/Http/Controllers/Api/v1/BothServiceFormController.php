@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api\v1;
 
+use App\Models\Signature;
+
 use App\Http\Controllers\Controller;
 use App\Models\UserAccess;
 use App\Models\Department;
@@ -95,10 +97,9 @@ class BothServiceFormController extends Controller
                 'all_input_keys' => array_keys($request->all())
             ]);
             
-            // Enhanced validation with better error messages
+            // Enhanced validation (digital signature; no file upload)
             $validated = $request->validate([
                 'hod_name' => 'required|string|max:255',
-                'hod_signature' => 'required|file|mimes:jpeg,jpg,png,pdf|max:2048',
                 'approved_date' => 'required|date',
                 'comments' => 'nullable|string|max:1000',
                 'access_type' => 'required|in:permanent,temporary',
@@ -111,9 +112,6 @@ class BothServiceFormController extends Controller
                 'module_requested_for' => 'sometimes|string|in:use,revoke',
             ], [
                 'hod_name.required' => 'HOD name is required',
-                'hod_signature.required' => 'HOD signature file is required',
-                'hod_signature.mimes' => 'Signature must be in JPEG, JPG, PNG, or PDF format',
-                'hod_signature.max' => 'Signature file must not exceed 2MB',
                 'approved_date.required' => 'Approval date is required',
                 'approved_date.date' => 'Please provide a valid approval date',
                 'access_type.required' => 'Access type (permanent/temporary) is required',
@@ -123,8 +121,7 @@ class BothServiceFormController extends Controller
             ]);
             
             Log::info('✅ Validation passed', [
-                'validated_data' => Arr::except($validated, ['hod_signature']),
-                'has_signature_file' => isset($validated['hod_signature'])
+                'validated_data' => $validated
             ]);
             
             // Get user access record
@@ -147,74 +144,22 @@ class BothServiceFormController extends Controller
             
             DB::beginTransaction();
             
-            // Handle signature upload with proper error handling
-            $hodSignaturePath = null;
-            if ($request->hasFile('hod_signature')) {
-                try {
-                    $hodSignatureFile = $request->file('hod_signature');
-                    
-                    // Validate file before processing
-                    if (!$hodSignatureFile->isValid()) {
-                        throw new \Exception('Uploaded signature file is invalid');
-                    }
-                    
-                    // Create directory if it doesn't exist
-                    $signatureDir = 'signatures/hod';
-                    if (!Storage::disk('public')->exists($signatureDir)) {
-                        Storage::disk('public')->makeDirectory($signatureDir);
-                    }
-                    
-                    // Generate unique filename
-                    $filename = 'hod_signature_' . $userAccess->pf_number . '_' . time() . '.' . $hodSignatureFile->getClientOriginalExtension();
-                    
-                    // Store the file
-                    $hodSignaturePath = $hodSignatureFile->storeAs($signatureDir, $filename, 'public');
-                    
-                    // Verify file was actually stored
-                    if (!Storage::disk('public')->exists($hodSignaturePath)) {
-                        throw new \Exception('Failed to store signature file');
-                    }
-                    
-                    Log::info('✅ HOD signature uploaded successfully', [
-                        'original_name' => $hodSignatureFile->getClientOriginalName(),
-                        'stored_path' => $hodSignaturePath,
-                        'file_size' => $hodSignatureFile->getSize(),
-                        'mime_type' => $hodSignatureFile->getMimeType()
-                    ]);
-                    
-                } catch (\Exception $e) {
-                    Log::error('❌ HOD signature upload failed', [
-                        'error' => $e->getMessage(),
-                        'file_info' => [
-                            'name' => $request->file('hod_signature')->getClientOriginalName(),
-                            'size' => $request->file('hod_signature')->getSize(),
-                            'mime' => $request->file('hod_signature')->getMimeType()
-                        ]
-                    ]);
-                    
-                    DB::rollBack();
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Failed to upload HOD signature: ' . $e->getMessage()
-                    ], 500);
-                }
-            } else {
-                Log::error('❌ No HOD signature file provided', [
-                    'has_file' => $request->hasFile('hod_signature'),
-                    'files' => $request->allFiles()
-                ]);
-                
+            // Require digital signature by HOD
+            $hasDigitalSignature = Signature::where('document_id', $userAccessId)
+                ->where('user_id', $currentUser->id)
+                ->exists();
+            if (!$hasDigitalSignature) {
                 DB::rollBack();
                 return response()->json([
                     'success' => false,
-                    'message' => 'HOD signature file is required'
+                    'message' => 'Please digitally sign this request before approving.'
                 ], 422);
             }
             
             // Process module selections properly
             $updateData = [
                 'hod_name' => $validated['hod_name'],
-                'hod_signature_path' => $hodSignaturePath,
+                'hod_signature_path' => null, // legacy removed; use digital signature
                 'hod_approved_at' => $validated['approved_date'],
                 'hod_comments' => $validated['comments'] ?? null,
                 'hod_approved_by' => $currentUser->id,
@@ -873,17 +818,13 @@ class BothServiceFormController extends Controller
                 'all_input_keys' => array_keys($request->all())
             ]);
             
-            // Validation
+            // Validation (digital signature flow — no file upload)
             $validated = $request->validate([
                 'divisional_director_name' => 'required|string|max:255',
-                'divisional_director_signature' => 'required|file|mimes:jpeg,jpg,png,pdf|max:2048',
                 'approved_date' => 'required|date',
                 'comments' => 'nullable|string|max:1000',
             ], [
                 'divisional_director_name.required' => 'Divisional Director name is required',
-                'divisional_director_signature.required' => 'Divisional Director signature file is required',
-                'divisional_director_signature.mimes' => 'Signature must be in JPEG, JPG, PNG, or PDF format',
-                'divisional_director_signature.max' => 'Signature file must not exceed 2MB',
                 'approved_date.required' => 'Approval date is required',
                 'approved_date.date' => 'Please provide a valid approval date',
             ]);
@@ -906,7 +847,18 @@ class BothServiceFormController extends Controller
             
             DB::beginTransaction();
             
-            // Handle signature upload
+            // Require digital signature by the approver
+            $hasDigitalSignature = Signature::where('document_id', $userAccessId)
+                ->where('user_id', $currentUser->id)
+                ->exists();
+            if (!$hasDigitalSignature) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please digitally sign this request before approving.'
+                ], 422);
+            }
+
+            // Legacy upload removed — digital signature is the source of truth
             $divisionalSignaturePath = null;
             if ($request->hasFile('divisional_director_signature')) {
                 try {
@@ -956,7 +908,7 @@ class BothServiceFormController extends Controller
             // Update the user access record
             $updateData = [
                 'divisional_director_name' => $validated['divisional_director_name'],
-                'divisional_director_signature_path' => $divisionalSignaturePath,
+                'divisional_director_signature_path' => null, // legacy removed; use digital signature
                 'divisional_approved_at' => $validated['approved_date'],
                 'divisional_director_comments' => $validated['comments'] ?? null,
                 'divisional_status' => 'approved' // Set the new divisional_status column
@@ -1288,17 +1240,13 @@ class BothServiceFormController extends Controller
                 'all_input_keys' => array_keys($request->all())
             ]);
             
-            // Validation
+            // Validation (digital signature flow — no file upload)
             $validated = $request->validate([
                 'ict_director_name' => 'required|string|max:255',
-                'ict_director_signature' => 'required|file|mimes:jpeg,jpg,png,pdf|max:2048',
                 'approved_date' => 'required|date',
                 'comments' => 'nullable|string|max:1000',
             ], [
                 'ict_director_name.required' => 'ICT Director name is required',
-                'ict_director_signature.required' => 'ICT Director signature file is required',
-                'ict_director_signature.mimes' => 'Signature must be in JPEG, JPG, PNG, or PDF format',
-                'ict_director_signature.max' => 'Signature file must not exceed 2MB',
                 'approved_date.required' => 'Approval date is required',
                 'approved_date.date' => 'Please provide a valid approval date',
             ]);
@@ -1321,7 +1269,18 @@ class BothServiceFormController extends Controller
             
             DB::beginTransaction();
             
-            // Handle signature upload
+            // Require digital signature
+            $hasDigitalSignature = Signature::where('document_id', $userAccessId)
+                ->where('user_id', $currentUser->id)
+                ->exists();
+            if (!$hasDigitalSignature) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please digitally sign this request before approving.'
+                ], 422);
+            }
+
+            // Legacy upload removed — digital signature is the source of truth
             $ictDirectorSignaturePath = null;
             if ($request->hasFile('ict_director_signature')) {
                 try {
@@ -1371,7 +1330,7 @@ class BothServiceFormController extends Controller
             // Update the user access record
             $updateData = [
                 'ict_director_name' => $validated['ict_director_name'],
-                'ict_director_signature_path' => $ictDirectorSignaturePath,
+'ict_director_signature_path' => null,
                 'ict_director_approved_at' => $validated['approved_date'],
                 'ict_director_comments' => $validated['comments'] ?? null,
                 'ict_director_status' => 'approved' // Set the new ict_director_status column
@@ -1655,14 +1614,10 @@ class BothServiceFormController extends Controller
             // Validation
             $validated = $request->validate([
                 'head_it_name' => 'required|string|max:255',
-                'head_it_signature' => 'required|file|mimes:jpeg,jpg,png,pdf|max:2048',
                 'approved_date' => 'required|date',
                 'comments' => 'nullable|string|max:1000',
             ], [
                 'head_it_name.required' => 'Head of IT name is required',
-                'head_it_signature.required' => 'Head of IT signature file is required',
-                'head_it_signature.mimes' => 'Signature must be in JPEG, JPG, PNG, or PDF format',
-                'head_it_signature.max' => 'Signature file must not exceed 2MB',
                 'approved_date.required' => 'Approval date is required',
                 'approved_date.date' => 'Please provide a valid approval date',
             ]);
@@ -1685,7 +1640,18 @@ class BothServiceFormController extends Controller
             
             DB::beginTransaction();
             
-            // Handle signature upload
+            // Require digital signature
+            $hasDigitalSignature = Signature::where('document_id', $userAccessId)
+                ->where('user_id', $currentUser->id)
+                ->exists();
+            if (!$hasDigitalSignature) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please digitally sign this request before approving.'
+                ], 422);
+            }
+
+            // Legacy upload removed — digital signature is the source of truth
             $headItSignaturePath = null;
             if ($request->hasFile('head_it_signature')) {
                 try {
@@ -1735,7 +1701,7 @@ class BothServiceFormController extends Controller
             // Update the user access record
             $updateData = [
                 'head_it_name' => $validated['head_it_name'],
-                'head_it_signature_path' => $headItSignaturePath,
+'head_it_signature_path' => null,
                 'head_it_approved_at' => $validated['approved_date'],
                 'head_it_comments' => $validated['comments'] ?? null,
                 'head_it_status' => 'approved',
@@ -1911,11 +1877,22 @@ class BothServiceFormController extends Controller
                 }
             }
 
+            // Require digital signature
+            $hasDigitalSignature = Signature::where('document_id', $userAccessId)
+                ->where('user_id', $currentUser->id)
+                ->exists();
+            if (!$hasDigitalSignature) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please digitally sign this request before finalizing implementation.'
+                ], 422);
+            }
+
             // Update the user access record
             $status = $validated['status'] ?? 'implemented';
             $updateData = [
                 'ict_officer_name' => $validated['ict_officer_name'],
-                'ict_officer_signature_path' => $ictOfficerSignaturePath,
+                'ict_officer_signature_path' => null,
                 'ict_officer_implemented_at' => $validated['approved_date'],
                 'ict_officer_comments' => $validated['comments'] ?? null,
                 'ict_officer_status' => $status

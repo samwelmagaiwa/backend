@@ -464,6 +464,102 @@ const ictOfficerService = {
         throw new Error('Network error while loading pending count')
       }
     }
+  },
+
+  /**
+   * Retry or (re)send SMS notification to the requester for a given access request
+   * Backend-agnostic: sends multiple compatible phone keys and hint flags.
+   */
+  async resendRequesterSms(requestId, requesterPhone = null) {
+    try {
+      console.log('🔄 IctOfficerService: Retrying requester SMS for:', {
+        requestId,
+        requesterPhone
+      })
+
+      const normalizePhone = (p) => {
+        if (!p) return null
+        const s = String(p).trim()
+        const keepPlus = s.startsWith('+')
+        const digits = s.replace(/[^\d]/g, '')
+        return keepPlus ? `+${digits}` : digits
+      }
+
+      const rawPhone = requesterPhone || null
+      const normalized = normalizePhone(rawPhone)
+
+      const payload = {
+        request_id: requestId,
+        role: 'ict_officer',
+        notification_type: 'requester_access_granted',
+        resend_only: true,
+        force: true,
+        force_resend: true,
+        resend_sms: true,
+        send_sms: true,
+        send_sms_to_requester: true,
+        notification_channel: 'sms',
+        // Phone compatibility keys (ignored if not recognized)
+        requester_phone: rawPhone || undefined,
+        requester_phone_number: rawPhone || undefined,
+        requester_msisdn: normalized || undefined,
+        staff_phone: rawPhone || undefined,
+        staff_phone_number: rawPhone || undefined,
+        recipient_phone: normalized || undefined,
+        destination_phone: normalized || undefined,
+        phone_number: normalized || undefined,
+        msisdn: normalized || undefined,
+        contact_phone: normalized || undefined
+      }
+
+      // Try multiple endpoints in order of preference
+      let response
+      const endpoints = [
+        `/ict-officer/access-requests/${requestId}/notify`,
+        `/ict-officer/access-requests/${requestId}/resend-sms`,
+        `/ict-officer/access-requests/${requestId}/send-notification`,
+        `/ict-officer/access-requests/${requestId}/grant-access`,
+        `/ict-officer/notify`,
+        `/ict-officer/resend-sms`
+      ]
+
+      let lastError
+      for (let i = 0; i < endpoints.length; i++) {
+        try {
+          console.log(`🔄 Trying endpoint ${i + 1}/${endpoints.length}: ${endpoints[i]}`)
+          response = await axiosInstance.post(endpoints[i], payload)
+          console.log(`✅ Success with endpoint: ${endpoints[i]}`)
+          break
+        } catch (e) {
+          console.warn(
+            `❌ Endpoint ${endpoints[i]} failed:`,
+            e.response?.status,
+            e.response?.data?.message || e.message
+          )
+          lastError = e
+          if (i === endpoints.length - 1) {
+            console.error('🚫 All endpoints failed for SMS retry')
+            throw lastError
+          }
+        }
+      }
+
+      if (response.data?.success) {
+        console.log('✅ IctOfficerService: Requester SMS retry triggered successfully')
+        return { success: true, data: response.data.data, message: response.data.message }
+      }
+
+      return {
+        success: false,
+        message: response.data?.message || 'Failed to trigger SMS retry'
+      }
+    } catch (error) {
+      console.error('❌ IctOfficerService: Error retrying requester SMS:', error)
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Network error while retrying SMS'
+      }
+    }
   }
 }
 

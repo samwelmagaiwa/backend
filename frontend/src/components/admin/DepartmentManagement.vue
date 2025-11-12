@@ -21,19 +21,6 @@
         </div>
 
         <div class="max-w-13xl mx-auto relative z-10">
-          <!-- Header Section -->
-          <div class="medical-glass-card rounded-t-3xl p-6 mb-0 border-b border-blue-300/30">
-            <div class="text-center">
-              <h1 class="text-4xl font-bold text-white mb-2 tracking-wide drop-shadow-lg">
-                <i class="fas fa-building mr-3 text-blue-300"></i>
-                Department Management System
-              </h1>
-              <p class="text-blue-100 text-xl">
-                Manage departments, HODs, and divisional directors
-              </p>
-            </div>
-          </div>
-
           <!-- Main Content -->
           <div class="medical-glass-card rounded-b-3xl overflow-hidden">
             <div class="p-6 space-y-8">
@@ -233,6 +220,23 @@
                       </div>
                     </div>
                   </div>
+
+                  <div class="flex flex-col items-center">
+                    <label class="block text-xl font-bold text-blue-100 mb-2 text-center"
+                      >Reports</label
+                    >
+                    <div class="flex items-center justify-center space-x-3 h-full w-full">
+                      <input
+                        v-model="onlyWithoutDivisionalDirector"
+                        type="checkbox"
+                        @change="applyFiltersAndRefetch"
+                        class="w-5 h-5 text-red-600 border-red-300 rounded focus:ring-red-500 focus:ring-2"
+                      />
+                      <span class="text-red-200 text-base text-center"
+                        >Show departments without Divisional Director</span
+                      >
+                    </div>
+                  </div>
                 </div>
 
                 <!-- Departments List -->
@@ -279,6 +283,12 @@
                           ]"
                         >
                           {{ department.is_active ? 'Active' : 'Inactive' }}
+                        </span>
+                        <span
+                          v-if="!department.has_divisional_director"
+                          class="px-2 py-1 rounded text-base font-medium bg-red-900/30 text-red-200 border border-red-500/40"
+                        >
+                          Needs Divisional Director
                         </span>
                       </div>
                     </div>
@@ -811,6 +821,9 @@
         active_departments: 0
       })
 
+      // Report filter: only departments without divisional director
+      const onlyWithoutDivisionalDirector = ref(false)
+
       // Filters
       const searchQuery = ref('')
       const filterStatus = ref('')
@@ -905,7 +918,11 @@
       const fetchDepartments = async () => {
         try {
           console.log('Fetching departments...')
-          const response = await departmentService.getDepartments()
+          const params = {}
+          if (onlyWithoutDivisionalDirector.value) {
+            params.has_divisional_director = false
+          }
+          const response = await departmentService.getDepartments(params)
           console.log('Departments response:', response)
           if (response.success) {
             departments.value = response.data.data || []
@@ -953,7 +970,7 @@
           total_departments: departments.value.length,
           departments_with_hod: departments.value.filter((d) => d.hod).length,
           departments_with_divisional_director: departments.value.filter(
-            (d) => d.divisional_director
+            (d) => d.has_divisional_director || d.divisional_director
           ).length,
           active_departments: departments.value.filter((d) => d.is_active).length
         }
@@ -969,6 +986,11 @@
 
       const applyFilters = () => {
         // Filters are handled by computed property
+      }
+
+      const applyFiltersAndRefetch = async () => {
+        await fetchDepartments()
+        calculateStatistics()
       }
 
       // Dialog methods
@@ -1164,6 +1186,7 @@
         refreshData,
         debouncedSearch,
         applyFilters,
+        applyFiltersAndRefetch,
         openCreateDialog,
         openEditDialog,
         closeDialog,
@@ -1171,7 +1194,10 @@
         confirmDelete,
         deleteDepartment,
         toggleDepartmentStatus,
-        getInitials
+        getInitials,
+
+        // Report filter
+        onlyWithoutDivisionalDirector
       }
     }
   }

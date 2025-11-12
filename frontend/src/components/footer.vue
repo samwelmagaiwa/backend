@@ -4,11 +4,11 @@
     style="position: relative; z-index: 1; margin-top: auto"
   >
     <div class="flex flex-col md:flex-row justify-between items-center">
-      <div class="text-sm text-blue-100 flex items-center space-x-2">
+      <div class="text-base text-blue-100 flex items-center space-x-2">
         <div
           class="w-6 h-6 bg-blue-600/30 rounded-full flex items-center justify-center border border-blue-500/40"
         >
-          <i class="fas fa-hospital text-blue-300 text-xs"></i>
+          <i class="fas fa-hospital text-blue-300 text-sm"></i>
         </div>
         <p class="font-medium">
           &copy; {{ currentYear }} Muhimbili National Hospital. All rights reserved.

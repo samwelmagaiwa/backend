@@ -589,6 +589,7 @@
                     type="tel"
                     class="medical-input w-full px-5 py-4 text-lg bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm"
                     placeholder="Enter phone number"
+                    @blur="newUser.phone = normalizePhoneNumber(newUser.phone)"
                     required
                   />
                   <p v-if="userFormErrors.phone" class="text-red-400 text-base mt-1">
@@ -596,7 +597,7 @@
                   </p>
                 </div>
                 <div>
-                  <label class="block text-lg font-bold text-blue-100 mb-3">PF Number</label>
+                  <label class="block text-lg font-bold text-blue-100 mb-3">PF Number *</label>
                   <input
                     v-model="newUser.pf_number"
                     type="text"
@@ -606,7 +607,8 @@
                         ? 'border-red-400/70 focus:border-red-400'
                         : 'border-blue-300/30 focus:border-blue-400'
                     ]"
-                    placeholder="Enter PF number (optional)"
+                    placeholder="Enter PF number"
+                    required
                   />
                   <p
                     v-if="userFormErrors.pf_number"
@@ -875,6 +877,7 @@
                     type="tel"
                     class="medical-input w-full px-5 py-4 text-lg bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white placeholder-blue-200/60 backdrop-blur-sm"
                     placeholder="Enter phone number"
+                    @blur="editUserData.phone = normalizePhoneNumber(editUserData.phone)"
                     required
                   />
                   <p v-if="editUserFormErrors.phone" class="text-red-400 text-base mt-1">
@@ -2259,7 +2262,7 @@
         editUserData.value = {
           name: user.name || '',
           email: user.email || '',
-          phone: user.phone || '',
+          phone: normalizePhoneNumber(user.phone || ''),
           pf_number: user.pf_number || '',
           password: '',
           password_confirmation: '',
@@ -2392,11 +2395,8 @@
         creatingUser.value = true
         userFormErrors.value = {}
 
-        // Client-side validation for password confirmation
-        if (newUser.value.password !== newUser.value.password_confirmation) {
-          userFormErrors.value = {
-            password_confirmation: ['Passwords do not match.']
-          }
+        // Full client-side validation
+        if (!validateCreateUserForm()) {
           creatingUser.value = false
           return
         }
@@ -2405,8 +2405,8 @@
           const userData = {
             name: newUser.value.name.trim(),
             email: newUser.value.email.trim().toLowerCase(),
-            phone: newUser.value.phone.trim(),
-            pf_number: newUser.value.pf_number.trim() || null,
+            phone: normalizePhoneNumber(newUser.value.phone.trim()),
+            pf_number: newUser.value.pf_number.trim(),
             password: newUser.value.password,
             password_confirmation: newUser.value.password_confirmation,
             department_id: newUser.value.department_id || null,
@@ -2540,7 +2540,7 @@
           const userData = {
             name: editUserData.value.name.trim(),
             email: editUserData.value.email.trim().toLowerCase(),
-            phone: editUserData.value.phone.trim(),
+            phone: normalizePhoneNumber(editUserData.value.phone.trim()),
             pf_number: editUserData.value.pf_number.trim() || null,
             department_id: editUserData.value.department_id || null,
             is_active: editUserData.value.is_active
@@ -2566,7 +2566,7 @@
               const updated = { ...users.value[idx] }
               updated.name = editUserData.value.name
               updated.email = editUserData.value.email
-              updated.phone = editUserData.value.phone
+              updated.phone = normalizePhoneNumber(editUserData.value.phone)
               updated.pf_number = editUserData.value.pf_number
               updated.is_active = editUserData.value.is_active
               updated.department_id = editUserData.value.department_id || null
@@ -2637,6 +2637,55 @@
         } finally {
           updatingUser.value = false
         }
+      }
+
+      // Validation and formatting helpers
+      const normalizePhoneNumber = (input) => {
+        if (!input) return ''
+        let v = String(input).trim()
+        // remove spaces and dashes
+        v = v.replace(/\s|-/g, '')
+        // if already starts with +255, keep as is
+        if (v.startsWith('+255')) return v
+        // if starts with 255 without +, add +
+        if (v.startsWith('255')) return '+' + v
+        // if starts with 0, convert to +255 + remaining digits
+        if (v.startsWith('0')) return '+255' + v.slice(1)
+        return v
+      }
+
+      const validateCreateUserForm = () => {
+        const errors = {}
+        if (!newUser.value.name || !newUser.value.name.trim()) {
+          errors.name = 'Name is required.'
+        }
+        if (!newUser.value.email || !newUser.value.email.trim()) {
+          errors.email = 'Email is required.'
+        } else {
+          const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newUser.value.email.trim())
+          if (!emailOk) errors.email = 'Enter a valid email address.'
+        }
+        // normalize then validate phone
+        newUser.value.phone = normalizePhoneNumber(newUser.value.phone)
+        if (!newUser.value.phone || !newUser.value.phone.trim()) {
+          errors.phone = 'Phone number is required.'
+        } else {
+          const phoneOk = /^\+255\d{9}$/.test(newUser.value.phone)
+          if (!phoneOk) errors.phone = 'Phone must be in the format +255XXXXXXXXX.'
+        }
+        if (!newUser.value.pf_number || !newUser.value.pf_number.trim()) {
+          errors.pf_number = 'PF number is required.'
+        }
+        if (!newUser.value.password) {
+          errors.password = 'Password is required.'
+        }
+        if (!newUser.value.password_confirmation) {
+          errors.password_confirmation = 'Please confirm the password.'
+        } else if (newUser.value.password !== newUser.value.password_confirmation) {
+          errors.password_confirmation = 'Passwords do not match.'
+        }
+        userFormErrors.value = errors
+        return Object.keys(errors).length === 0
       }
 
       // Utility methods
@@ -3081,6 +3130,7 @@
         applyFilters,
         getInitials,
         getRoleColorClasses,
+        normalizePhoneNumber,
         fetchRoles,
         fetchDepartments,
         openAssignRolesDialog,

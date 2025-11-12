@@ -145,8 +145,24 @@ class UserAccessWorkflowService
             if ($request->action === 'approve') {
                 // Update specific HOD status column
                 $data['hod_status'] = 'approved';
-                // Keep legacy status for backward compatibility during transition
-                $data['status'] = 'pending_divisional';
+
+                // Decide next stage: Divisional Director if department has one, otherwise skip to ICT Director
+                $dept = $userAccess->department; // may be null
+                $hasDivisional = false;
+                if ($dept) {
+                    $hasDivisional = (bool) ($dept->has_divisional_director ?? false) || !empty($dept->divisional_director_id);
+                }
+
+                if ($hasDivisional) {
+                    // Normal path → Divisional Director
+                    $data['status'] = 'pending_divisional';
+                    // Ensure divisional stage is marked pending if not already set
+                    $data['divisional_status'] = $userAccess->divisional_status ?: 'pending';
+                } else {
+                    // Skip divisional stage → go straight to ICT Director
+                    $data['divisional_status'] = 'skipped';
+                    $data['status'] = 'pending_ict_director';
+                }
             } else {
                 // Update specific HOD status column
                 $data['hod_status'] = 'rejected';
@@ -170,7 +186,13 @@ class UserAccessWorkflowService
                 $user = $freshUserAccess->user;
                 $approver = auth()->user();
                 $oldStatus = 'hod_approved';
-                $newStatus = $request->action === 'approve' ? 'divisional_approved' : 'divisional_rejected';
+
+                // Derive the next workflow label based on where we routed
+                if ($request->action === 'approve') {
+                    $newStatus = $freshUserAccess->status; // 'pending_divisional' or 'pending_ict_director'
+                } else {
+                    $newStatus = 'hod_rejected';
+                }
                 
                 // Get additional users to notify (next approvers if approved)
                 $additionalNotifyUsers = [];

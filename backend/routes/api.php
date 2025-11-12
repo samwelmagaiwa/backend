@@ -30,6 +30,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Api\SwaggerController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\v1\DocumentController;
 
 Route::get('/', function () {
     return response()->json([
@@ -60,12 +61,6 @@ Route::get('/documentation', [SwaggerController::class, 'documentation'])->name(
 Route::get('/api-docs', [SwaggerController::class, 'apiDocs'])->name('api.docs');
 Route::get('/docs.json', [SwaggerController::class, 'apiDocs'])->name('api.docs.json');
 Route::get('/postman-collection', [SwaggerController::class, 'postmanCollection'])->name('api.postman-collection');
-Route::get('/swagger-test', [SwaggerController::class, 'test'])->name('api.swagger.test');
-
-// Simple test route - should work if routing is functioning
-Route::get('/test-simple', function () {
-    return response()->json(['message' => 'Test route working', 'timestamp' => now()]);
-});
 
 // Public routes
 // Health check endpoint
@@ -103,22 +98,11 @@ Route::get('/health/detailed', function () {
     ]);
 });
 
-// CORS test endpoints
-Route::get('/cors-test', [HealthController::class, 'corsTest'])->name('api.cors-test');
-Route::options('/cors-test', [HealthController::class, 'corsTest'])->name('api.cors-test.options');
 
 // Authentication routes
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login')->name('login');
 Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:register')->name('register');
 
-// Security Test Routes (for testing security implementations)
-Route::prefix('security-test')->group(function () {
-    Route::get('/test', [SecurityTestController::class, 'test'])->name('security-test.basic');
-    Route::get('/health', [SecurityTestController::class, 'healthCheck'])->name('security-test.health');
-    Route::get('/rate-limit', [SecurityTestController::class, 'rateLimitTest'])->name('security-test.rate-limit');
-    Route::post('/sanitization', [SecurityTestController::class, 'sanitizationTest'])->name('security-test.sanitization');
-    Route::post('/xss', [SecurityTestController::class, 'xssTest'])->name('security-test.xss');
-});
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -219,6 +203,11 @@ Route::middleware('auth:sanctum')->group(function () {
             ], 500);
         }
     })->name('jeeva-modules.index');
+
+    // Digital Signature routes
+    Route::post('/documents/sign', [DocumentController::class, 'signDocument']);
+    Route::get('/documents/{id}/signatures', [DocumentController::class, 'listDocumentSignatures']);
+    Route::get('/signatures/{signature}/verify', [DocumentController::class, 'verifySignature']);
 
     // Onboarding routes
     Route::prefix('onboarding')->group(function () {
@@ -332,7 +321,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/statistics', [\App\Http\Controllers\Api\v1\RequestStatusController::class, 'statistics'])->name('request-status.statistics');
         Route::get('/types', [\App\Http\Controllers\Api\v1\RequestStatusController::class, 'getRequestTypes'])->name('request-status.types');
         Route::get('/statuses', [\App\Http\Controllers\Api\v1\RequestStatusController::class, 'getStatusOptions'])->name('request-status.statuses');
-        Route::get('/debug', [\App\Http\Controllers\Api\v1\RequestStatusController::class, 'debug'])->name('request-status.debug');
     });
 
     // Booking Service routes
@@ -347,8 +335,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('device-types', [BookingServiceController::class, 'getDeviceTypes'])->name('booking-service.device-types');
         Route::get('departments', [BookingServiceController::class, 'getDepartments'])->name('booking-service.departments');
         Route::get('statistics', [BookingServiceController::class, 'getStatistics'])->name('booking-service.statistics');
-        Route::get('debug-departments', [BookingServiceController::class, 'debugDepartments'])->name('booking-service.debug-departments');
-        Route::get('debug-assessment-schema', [BookingServiceController::class, 'debugAssessmentSchema'])->name('booking-service.debug-assessment-schema');
         Route::post('seed-departments', [BookingServiceController::class, 'seedDepartments'])->name('booking-service.seed-departments');
 
 
@@ -391,10 +377,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // ICT Approval routes (ICT Officer only)
     Route::prefix('ict-approval')->middleware('role:ict_officer,admin,ict_director')->group(function () {
-        // Debug endpoint (must be before parameterized routes)
-        Route::get('debug', [ICTApprovalController::class, 'debugICTApprovalSystem'])->name('ict-approval.debug');
-
-        // Statistics (must be before parameterized routes)
+// Statistics (must be before parameterized routes)
         Route::get('device-requests/statistics', [ICTApprovalController::class, 'getDeviceBorrowingStatistics'])->name('ict-approval.statistics');
 
         // Device borrowing requests management
@@ -439,7 +422,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/user/info', [BothServiceFormController::class, 'getUserInfo'])->name('both-service-form.user-info');
         Route::get('/departments/list', [BothServiceFormController::class, 'getDepartments'])->name('both-service-form.departments');
 
-        Route::get('/debug-hod', [BothServiceFormController::class, 'debugHodAssignments'])->name('both-service-form.debug-hod');
         Route::get('/{id}/export-pdf', [BothServiceFormController::class, 'exportPdf'])->name('both-service-form.export-pdf');
 
         // Personal information routes from user_access table
@@ -498,9 +480,6 @@ Route::middleware('auth:sanctum')->group(function () {
             ->middleware('both.service.role:ict_officer')
             ->name('both-service-form.module-requests.ict-officer-approve');
         
-        // TEMPORARY: Debug record data
-        Route::get('/debug-record/{id}', [BothServiceFormController::class, 'debugRecord'])
-            ->name('both-service-form.debug-record');
 
         // Role-based approval routes with specific role requirements
         Route::post('/{id}/approve/hod', [BothServiceFormController::class, 'approveAsHOD'])
@@ -593,10 +572,6 @@ Route::prefix('hod')->middleware('role:head_of_department,divisional_director,ic
         ->middleware('role:head_of_department')
         ->name('hod.divisional-recommendations.resubmit');
     
-    // Debug route for HOD recommendations
-    Route::get('debug-recommendations', [\App\Http\Controllers\Api\v1\DebugHodRecommendationsController::class, 'debugHodRecommendations'])
-        ->middleware('role:head_of_department')
-        ->name('hod.debug-recommendations');
 });
 
     // Divisional Director Combined Access Request routes (Divisional Director only)

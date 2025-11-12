@@ -175,12 +175,44 @@
 
         /* Footer */
         .modern-footer {
-            margin-top: 4rem;
-            padding: 2rem 0;
+            margin-top: 1.5rem;
+            padding: 1rem 0;
             border-top: 1px solid #e2e8f0;
             text-align: center;
             color: #64748b;
             font-size: 0.875rem;
+        }
+
+        /* View Options compact card */
+        .view-options-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 0.5rem 0.75rem;
+            margin: 0.5rem 0;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        }
+        .view-options-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem 0.75rem;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .view-options-left,
+        .view-options-right {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .view-search-input {
+            border: 1px solid #cbd5e1;
+            background: #f8fafc;
+            padding: 0.375rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            min-width: 240px;
         }
 
         @if(config('l5-swagger.defaults.ui.display.dark_mode'))
@@ -238,18 +270,18 @@
                 🚀 {{ $documentationTitle }}
                 <span class="version-badge">v2.0.0</span>
             </h1>
-            <p>🎯 Comprehensive API Documentation - All 336+ Endpoints with Complete CRUD & System Management</p>
+            <p>🎯 Comprehensive API Documentation - All <span id="headerTotalEndpoints">0</span> Endpoints with Complete CRUD & System Management</p>
             
             <!-- API Statistics Dashboard -->
             <div class="api-stats" style="margin-top: 1.5rem; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;">
                 <div class="stat-badge" style="background: rgba(255, 255, 255, 0.15); padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.875rem;">
-                    <span style="font-weight: 600;">📊 336</span> Total Endpoints
+                    <span style="font-weight: 600;">📊 <span id="statTotalEndpoints">0</span></span> Total Endpoints
                 </div>
                 <div class="stat-badge" style="background: rgba(255, 255, 255, 0.15); padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.875rem;">
-                    <span style="font-weight: 600;">🏗️ 65</span> Categories
+                    <span style="font-weight: 600;">🏗️ <span id="statCategories">0</span></span> Categories
                 </div>
                 <div class="stat-badge" style="background: rgba(255, 255, 255, 0.15); padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.875rem;">
-                    <span style="font-weight: 600;">🔧 287</span> Paths
+                    <span style="font-weight: 600;">🔧 <span id="statPaths">0</span></span> Paths
                 </div>
                 <div class="stat-badge" style="background: rgba(255, 255, 255, 0.15); padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.875rem;">
                     <span style="font-weight: 600;">🎯 ✅</span> Complete CRUD
@@ -259,19 +291,19 @@
             <!-- HTTP Method Distribution -->
             <div class="method-stats" style="margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;">
                 <div class="method-badge get" style="background: #61affe; color: white; padding: 0.375rem 0.75rem; border-radius: 6px; font-size: 0.8rem; font-weight: 500;">
-                    GET 181 (54%)
+                    <span id="badgeGet">GET 0 (0%)</span>
                 </div>
                 <div class="method-badge post" style="background: #49cc90; color: white; padding: 0.375rem 0.75rem; border-radius: 6px; font-size: 0.8rem; font-weight: 500;">
-                    POST 108 (32%)
+                    <span id="badgePost">POST 0 (0%)</span>
                 </div>
                 <div class="method-badge put" style="background: #fca130; color: white; padding: 0.375rem 0.75rem; border-radius: 6px; font-size: 0.8rem; font-weight: 500;">
-                    PUT 23 (7%)
+                    <span id="badgePut">PUT 0 (0%)</span>
                 </div>
                 <div class="method-badge patch" style="background: #50e3c2; color: white; padding: 0.375rem 0.75rem; border-radius: 6px; font-size: 0.8rem; font-weight: 500;">
-                    PATCH 5 (1%)
+                    <span id="badgePatch">PATCH 0 (0%)</span>
                 </div>
                 <div class="method-badge delete" style="background: #f93e3e; color: white; padding: 0.375rem 0.75rem; border-radius: 6px; font-size: 0.8rem; font-weight: 500;">
-                    DELETE 19 (6%)
+                    <span id="badgeDelete">DELETE 0 (0%)</span>
                 </div>
             </div>
         </div>
@@ -286,7 +318,7 @@
                 <div class="server-url" id="currentServer">{{ config('app.url') ?? 'http://localhost:8000' }}</div>
             </div>
             <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                <a href="{{ url('/api/api-docs') }}" target="_blank" class="download-btn" style="text-decoration: none;">
+                <a href="{{ url('/api/docs') }}" target="_blank" class="download-btn" style="text-decoration: none;">
                     View JSON
                 </a>
                 <a href="{{ url('/api/postman-collection') }}" target="_blank" class="download-btn" style="text-decoration: none; background:#0ea5e9;">
@@ -295,6 +327,19 @@
                 <a href="{{ url('/api/documentation') }}" target="_blank" class="download-btn" style="text-decoration: none; background:#16a34a;">
                     Classic UI
                 </a>
+            </div>
+        </div>
+
+        <!-- View Options (Servers + Authorize + Search) -->
+        <div class="view-options-card" id="viewOptions">
+            <div class="view-options-row">
+                <div class="view-options-left" id="viewOptionsLeft">
+                    <!-- The Swagger scheme-container (servers + authorize) will be moved here after UI loads -->
+                </div>
+                <div class="view-options-right">
+                    <input id="viewSearch" class="view-search-input" type="text" placeholder="Search endpoints..." aria-label="Search endpoints" />
+                    <button id="viewAuthorizeBtn" type="button" class="download-btn" style="background:#16a34a;">Authorize</button>
+                </div>
             </div>
         </div>
 
@@ -328,7 +373,7 @@
             }, 500);
 
             // Force use of comprehensive API docs URL only
-            const comprehensiveApiUrl = "{{ url('/api/api-docs') }}";
+            const comprehensiveApiUrl = "{{ url('/api/docs') }}";
             
             const urls = [
                 {name: "Comprehensive API Docs (All 336 Endpoints)", url: comprehensiveApiUrl}
@@ -422,11 +467,13 @@
 
             // Custom enhancements function
             function enhanceSwaggerUI() {
-                // Add method count badges
+                // Add method count badges and dynamic header stats
                 setTimeout(function() {
                     addMethodCountBadges();
                     addCustomFeatures();
-                }, 1000);
+                    setupViewOptionsToolbar();
+                    updateHeaderStats();
+                }, 800);
             }
 
             function addMethodCountBadges() {
@@ -452,6 +499,45 @@
                         tagHeader.appendChild(countBadge);
                     }
                 });
+            }
+
+            async function updateHeaderStats() {
+                try {
+                    const res = await fetch(comprehensiveApiUrl, { cache: 'no-store' });
+                    const spec = await res.json();
+                    const paths = spec.paths || {};
+                    const tags = new Set((spec.tags || []).map(t => t.name));
+                    let totalOps = 0;
+                    const methodCounts = { get:0, post:0, put:0, patch:0, delete:0 };
+                    Object.keys(paths).forEach(p => {
+                        const ops = paths[p] || {};
+                        Object.keys(ops).forEach(m => {
+                            const lm = m.toLowerCase();
+                            if (methodCounts.hasOwnProperty(lm)) {
+                                methodCounts[lm]++;
+                                totalOps++;
+                                // collect tags if spec.tags not provided
+                                const op = ops[m] || {};
+                                (op.tags || []).forEach(t => tags.add(t));
+                            }
+                        });
+                    });
+                    const totalPaths = Object.keys(paths).length;
+                    // Update header counters
+                    const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+                    setText('headerTotalEndpoints', totalOps);
+                    setText('statTotalEndpoints', totalOps);
+                    setText('statCategories', tags.size);
+                    setText('statPaths', totalPaths);
+                    function pct(n){ return totalOps ? Math.round((n/totalOps)*100) : 0; }
+                    setText('badgeGet', `GET ${methodCounts.get} (${pct(methodCounts.get)}%)`);
+                    setText('badgePost', `POST ${methodCounts.post} (${pct(methodCounts.post)}%)`);
+                    setText('badgePut', `PUT ${methodCounts.put} (${pct(methodCounts.put)}%)`);
+                    setText('badgePatch', `PATCH ${methodCounts.patch} (${pct(methodCounts.patch)}%)`);
+                    setText('badgeDelete', `DELETE ${methodCounts.delete} (${pct(methodCounts.delete)}%)`);
+                } catch (e) {
+                    console.warn('Failed to compute header stats', e);
+                }
             }
 
             function addCustomFeatures() {
@@ -500,6 +586,98 @@
                             currentServerDiv.textContent = this.value;
                         }
                     });
+                }
+            }
+
+            // Build compact toolbar with Servers + Authorize + Search
+            function setupViewOptionsToolbar() {
+                const toolbarCard = document.getElementById('viewOptions');
+                const toolbarLeft = document.getElementById('viewOptionsLeft');
+                const viewSearch = document.getElementById('viewSearch');
+
+                // Helper to connect our search box to Swagger's native filter
+                function wireSearchBox() {
+                    const filterInput = document.querySelector('.operation-filter-input');
+                    if (filterInput && viewSearch) {
+                        viewSearch.addEventListener('input', function () {
+                            filterInput.value = viewSearch.value;
+                            filterInput.dispatchEvent(new Event('input', { bubbles: true }));
+                        });
+                        return true;
+                    }
+                    return false;
+                }
+
+                // Try to locate Swagger's native "View Options" block and inject our controls there
+                const headings = Array.from(document.querySelectorAll('.swagger-ui h3, .swagger-ui h4'));
+                const viewHeading = headings.find(h => /view options/i.test(h.textContent || ''));
+                let injectedIntoNative = false;
+                if (viewHeading) {
+                    // Create a right-side container inside the native section
+                    const nativeContainer = document.createElement('div');
+                    nativeContainer.className = 'view-options-right';
+                    nativeContainer.style.marginLeft = 'auto';
+
+                    // Move scheme-container into native block (Servers + Authorize)
+                    const schemeContainer = document.querySelector('.scheme-container');
+                    if (schemeContainer) {
+                        // Place our container just after the heading
+                        viewHeading.parentElement.appendChild(nativeContainer);
+                        nativeContainer.appendChild(schemeContainer);
+                        schemeContainer.style.margin = '0';
+                        injectedIntoNative = true;
+                    }
+
+                    // Add Authorize proxy
+                    const proxyAuthorizeBtn = document.createElement('button');
+                    proxyAuthorizeBtn.id = 'viewAuthorizeBtn';
+                    proxyAuthorizeBtn.type = 'button';
+                    proxyAuthorizeBtn.className = 'download-btn';
+                    proxyAuthorizeBtn.style.background = '#16a34a';
+                    proxyAuthorizeBtn.textContent = 'Authorize';
+                    nativeContainer.appendChild(proxyAuthorizeBtn);
+
+                    // Link proxy to native authorize
+                    const nativeAuthorizeBtn = document.querySelector('.auth-wrapper .authorize, .scheme-container .authorize');
+                    if (nativeAuthorizeBtn) {
+                        proxyAuthorizeBtn.addEventListener('click', function () { nativeAuthorizeBtn.click(); });
+                    } else {
+                        proxyAuthorizeBtn.style.display = 'none';
+                    }
+
+                    // Add search box
+                    const nativeSearch = document.createElement('input');
+                    nativeSearch.id = 'viewSearch';
+                    nativeSearch.className = 'view-search-input';
+                    nativeSearch.type = 'text';
+                    nativeSearch.placeholder = 'Search endpoints...';
+                    nativeContainer.appendChild(nativeSearch);
+
+                    // Wire it
+                    wireSearchBox();
+                }
+
+                // Fallback: use our custom card if we couldn't inject into native
+                if (!injectedIntoNative && toolbarLeft) {
+                    const schemeContainer = document.querySelector('.scheme-container');
+                    if (schemeContainer) {
+                        toolbarLeft.appendChild(schemeContainer);
+                        schemeContainer.style.margin = '0';
+                    }
+
+                    // Wire Authorize button
+                    const nativeAuthorizeBtn = document.querySelector('.auth-wrapper .authorize, .scheme-container .authorize');
+                    const proxyAuthorizeBtn = document.getElementById('viewAuthorizeBtn');
+                    if (nativeAuthorizeBtn && proxyAuthorizeBtn) {
+                        proxyAuthorizeBtn.addEventListener('click', function () { nativeAuthorizeBtn.click(); });
+                    } else if (proxyAuthorizeBtn) {
+                        proxyAuthorizeBtn.style.display = 'none';
+                    }
+
+                    wireSearchBox();
+                } else if (injectedIntoNative && toolbarCard) {
+                    // Hide our fallback card if we successfully injected into native block
+                    toolbarCard.style.display = 'none';
                 }
             }
         };

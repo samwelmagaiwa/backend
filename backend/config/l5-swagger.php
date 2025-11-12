@@ -50,8 +50,9 @@ return [
                 /*
                  * Absolute paths to directory containing the swagger annotations are stored.
                  */
-                'annotations' => [
-                    base_path('app'),
+'annotations' => [
+                    // Restrict scanning to the consolidated spec to avoid duplicate/merge issues
+                    base_path('app/OpenApi.php'),
                 ],
             ],
         ],

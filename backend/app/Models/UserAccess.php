@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Signature;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -200,6 +202,41 @@ class UserAccess extends Model
     {
         return $this->belongsToMany(JeevaModule::class, 'jeeva_modules_selected', 'user_access_id', 'module_id')
                     ->withTimestamps();
+    }
+
+    /**
+     * Digital signatures linked to this request (document_id = user_access.id)
+     */
+    public function signatures(): HasMany
+    {
+        return $this->hasMany(Signature::class, 'document_id', 'id');
+    }
+
+    /**
+     * Check if digital signatures contain an entry by user name (case-insensitive)
+     */
+    public function historyHasSignerByName(?string $name): bool
+    {
+        if (!$name) {
+            return false;
+        }
+        $n = mb_strtolower(trim($name));
+        return $this->signatures()
+            ->whereHas('user', function ($q) use ($n) {
+                $q->whereRaw('LOWER(name) = ?', [$n]);
+            })
+            ->exists();
+    }
+
+    /**
+     * Check if digital signatures contain an entry by user id
+     */
+    public function historyHasSignerByUserId(?int $userId): bool
+    {
+        if (!$userId) {
+            return false;
+        }
+        return $this->signatures()->where('user_id', $userId)->exists();
     }
 
     /**
@@ -784,35 +821,35 @@ class UserAccess extends Model
             'hod' => [
                 'name' => 'HOD/BM',
                 'completed' => !empty($this->hod_approved_at),
-                'has_signature' => !empty($this->hod_signature_path),
+                'has_signature' => (!empty($this->hod_signature_path)) || $this->historyHasSignerByName($this->hod_name),
                 'approved_by' => $this->hod_name,
                 'approved_at' => $this->hod_approved_at
             ],
             'divisional' => [
                 'name' => 'Divisional Director',
                 'completed' => !empty($this->divisional_approved_at),
-                'has_signature' => !empty($this->divisional_director_signature_path),
+                'has_signature' => (!empty($this->divisional_director_signature_path)) || $this->historyHasSignerByName($this->divisional_director_name),
                 'approved_by' => $this->divisional_director_name,
                 'approved_at' => $this->divisional_approved_at
             ],
             'ict_director' => [
                 'name' => 'ICT Director',
                 'completed' => !empty($this->ict_director_approved_at),
-                'has_signature' => !empty($this->ict_director_signature_path),
+                'has_signature' => (!empty($this->ict_director_signature_path)) || $this->historyHasSignerByName($this->ict_director_name),
                 'approved_by' => $this->ict_director_name,
                 'approved_at' => $this->ict_director_approved_at
             ],
             'head_it' => [
                 'name' => 'Head IT',
                 'completed' => !empty($this->head_it_approved_at),
-                'has_signature' => !empty($this->head_it_signature_path),
+                'has_signature' => (!empty($this->head_it_signature_path)) || $this->historyHasSignerByName($this->head_it_name),
                 'approved_by' => $this->head_it_name,
                 'approved_at' => $this->head_it_approved_at
             ],
             'ict_officer' => [
                 'name' => 'ICT Officer',
                 'completed' => !empty($this->ict_officer_implemented_at),
-                'has_signature' => !empty($this->ict_officer_signature_path),
+                'has_signature' => (!empty($this->ict_officer_signature_path)) || $this->historyHasSignerByName($this->ict_officer_name) || $this->historyHasSignerByUserId($this->ict_officer_user_id),
                 'implemented_by' => $this->ict_officer_name,
                 'implemented_at' => $this->ict_officer_implemented_at
             ]
@@ -929,7 +966,7 @@ class UserAccess extends Model
                 'status' => !empty($this->hod_approved_at) ? 'completed' : 'pending',
                 'approved_at' => $this->hod_approved_at,
                 'approved_by' => $this->hod_name,
-                'has_signature' => !empty($this->hod_signature_path),
+                'has_signature' => (!empty($this->hod_signature_path)) || $this->historyHasSignerByName($this->hod_name),
                 'order' => 1
             ],
             'divisional_director' => [
@@ -938,7 +975,7 @@ class UserAccess extends Model
                            (!empty($this->hod_approved_at) ? 'pending' : 'locked'),
                 'approved_at' => $this->divisional_approved_at,
                 'approved_by' => $this->divisional_director_name,
-                'has_signature' => !empty($this->divisional_director_signature_path),
+                'has_signature' => (!empty($this->divisional_director_signature_path)) || $this->historyHasSignerByName($this->divisional_director_name),
                 'order' => 2
             ],
             'ict_director' => [
@@ -947,7 +984,7 @@ class UserAccess extends Model
                            (!empty($this->divisional_approved_at) ? 'pending' : 'locked'),
                 'approved_at' => $this->ict_director_approved_at,
                 'approved_by' => $this->ict_director_name,
-                'has_signature' => !empty($this->ict_director_signature_path),
+                'has_signature' => (!empty($this->ict_director_signature_path)) || $this->historyHasSignerByName($this->ict_director_name),
                 'order' => 3
             ],
             'head_it' => [
@@ -956,7 +993,7 @@ class UserAccess extends Model
                            (!empty($this->ict_director_approved_at) ? 'pending' : 'locked'),
                 'approved_at' => $this->head_it_approved_at,
                 'approved_by' => $this->head_it_name,
-                'has_signature' => !empty($this->head_it_signature_path),
+                'has_signature' => (!empty($this->head_it_signature_path)) || $this->historyHasSignerByName($this->head_it_name),
                 'order' => 4,
                 'section' => 'implementation'
             ],
@@ -966,7 +1003,7 @@ class UserAccess extends Model
                            (!empty($this->head_it_approved_at) ? 'pending' : 'locked'),
                 'implemented_at' => $this->ict_officer_implemented_at,
                 'implemented_by' => $this->ict_officer_name,
-                'has_signature' => !empty($this->ict_officer_signature_path),
+                'has_signature' => (!empty($this->ict_officer_signature_path)) || $this->historyHasSignerByName($this->ict_officer_name) || $this->historyHasSignerByUserId($this->ict_officer_user_id),
                 'order' => 5,
                 'section' => 'implementation'
             ]

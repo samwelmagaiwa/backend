@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Route as RouteFacade;
+use Illuminate\Support\Str;
 use L5Swagger\Http\Controllers\SwaggerController as BaseSwaggerController;
 
 class SwaggerController extends BaseSwaggerController
@@ -152,6 +154,13 @@ class SwaggerController extends BaseSwaggerController
         if (is_array($docs)) {
             $docs = $this->enhanceDocumentation($docs);
             $content = json_encode($docs, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+
+            // Persist the enhanced document so other consumers (e.g. Postman, JSON view) see it
+            try {
+                File::put($jsonFile, $content);
+            } catch (\Throwable $e) {
+                // Non-fatal: continue serving the enhanced content
+            }
         }
 
         return response($content)
@@ -261,6 +270,9 @@ class SwaggerController extends BaseSwaggerController
             ];
         }
 
+        // Merge in any Laravel routes missing in the spec
+        $docs = $this->mergeLaravelRoutes($docs);
+
         // Sort paths alphabetically for better organization
         if (isset($docs['paths'])) {
             ksort($docs['paths']);
@@ -288,6 +300,139 @@ class SwaggerController extends BaseSwaggerController
             $docs['tags'] = $tags;
         }
 
+        return $docs;
+    }
+
+    /**
+     * Merge Laravel routes into the OpenAPI document for any missing endpoints.
+     * This keeps the docs in sync without requiring annotations for every route.
+     */
+    private function mergeLaravelRoutes(array $docs): array
+    {
+        $paths = $docs['paths'] ?? [];
+
+        $publicPaths = [
+            '/api/login',
+            '/api/register',
+            '/api/health',
+            '/api/health/detailed',
+            '/api/cors-test',
+        ];
+
+        $excludePrefixes = [
+            '/api/docs', '/api/documentation', '/documentation', '/l5-swagger', '/_ignition', '/telescope', '/sanctum/csrf-cookie'
+        ];
+
+        // Build a lookup of existing documented operations
+        $documented = [];
+        foreach ($paths as $p => $ops) {
+            foreach ($ops as $m => $_) {
+                $documented[strtolower($m) . ' ' . $p] = true;
+            }
+        }
+
+        $routeCollection = RouteFacade::getRoutes();
+        $actualPaths = [];
+
+        foreach ($routeCollection as $route) {
+            $uri = '/' . ltrim($route->uri(), '/');
+            if (!Str::startsWith($uri, '/api/')) {
+                continue; // only document API routes
+            }
+
+            // Skip excluded prefixes
+            $skip = false;
+            foreach ($excludePrefixes as $prefix) {
+                if (Str::startsWith($uri, $prefix)) { $skip = true; break; }
+            }
+            if ($skip) { continue; }
+
+            $methods = array_diff($route->methods(), ['HEAD', 'OPTIONS']);
+            $actualPaths[$uri] = true;
+
+            // Determine a tag from the first segment after /api/
+            $segments = explode('/', trim(Str::after($uri, '/api/'), '/'));
+            $tagBase = $segments[0] ?? 'General';
+            if ($tagBase === 'v1' && isset($segments[1])) { $tagBase = $segments[1]; }
+            $tag = ucwords(str_replace(['-', '_'], ' ', $tagBase));
+
+            // Extract path params
+            preg_match_all('/\{([^}]+)\}/', $uri, $matches);
+            $paramNames = $matches[1] ?? [];
+            $parameters = [];
+            foreach ($paramNames as $name) {
+                $parameters[] = [
+                    'name' => $name,
+                    'in' => 'path',
+                    'required' => true,
+                    'schema' => ['type' => 'string']
+                ];
+            }
+
+            foreach ($methods as $method) {
+                $m = strtolower($method);
+                if (!in_array($m, ['get','post','put','patch','delete'])) { continue; }
+
+                if (!isset($paths[$uri])) { $paths[$uri] = []; }
+                if (isset($paths[$uri][$m])) { continue; } // already documented
+
+                $isPublic = in_array($uri, $publicPaths, true);
+
+                $operation = [
+                    'tags' => [$tag],
+                    'summary' => ucfirst(strtolower($method)) . ' ' . $uri,
+                    'responses' => [
+                        ($m === 'post' ? '201' : '200') => [ 'description' => $m === 'post' ? 'Created' : 'OK' ],
+                        '500' => [ 'description' => 'Server Error' ]
+                    ],
+                ];
+
+                if (!$isPublic) {
+                    $operation['security'] = [['bearerAuth' => []]];
+                    $operation['responses']['401'] = [ 'description' => 'Unauthorized' ];
+                }
+
+                if (in_array($m, ['post','put','patch'])) {
+                    $operation['requestBody'] = [
+                        'required' => false,
+                        'content' => [
+                            'application/json' => [ 'schema' => ['type' => 'object'] ]
+                        ]
+                    ];
+                    $operation['responses']['422'] = [ 'description' => 'Validation error' ];
+                }
+
+                if (!empty($parameters)) {
+                    $operation['parameters'] = $parameters;
+                }
+
+                $paths[$uri][$m] = $operation;
+            }
+        }
+
+        // Remove any paths that should not be visible in docs
+        $purgeRegex = [
+            '/\\bdebug\\b/i',
+            '/\\btest\\b/i',
+            '/cors-test/i',
+            '/security-test/i'
+        ];
+
+        foreach ($paths as $p => $ops) {
+            $shouldRemove = false;
+            if (!isset($actualPaths[$p])) {
+                $shouldRemove = true; // not a real route anymore
+            } else {
+                foreach ($purgeRegex as $rx) {
+                    if (preg_match($rx, $p)) { $shouldRemove = true; break; }
+                }
+            }
+            if ($shouldRemove) {
+                unset($paths[$p]);
+            }
+        }
+
+        $docs['paths'] = $paths;
         return $docs;
     }
 }

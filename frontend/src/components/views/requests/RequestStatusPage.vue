@@ -30,11 +30,11 @@
           <div class="bg-white/10 rounded-t-lg p-2 mb-0 border-b border-blue-300/30">
             <div class="flex justify-between items-center">
               <div class="text-center flex-1">
-                <h1 class="text-xl font-bold text-white mb-1 tracking-wide drop-shadow-lg">
+                <h1 class="text-3xl font-bold text-white mb-1 tracking-wide drop-shadow-lg">
                   <i class="fas fa-clipboard-check mr-3 text-blue-300"></i>
                   REQUEST STATUS & TRACKING
                 </h1>
-                <p class="text-blue-100/80 text-sm">
+                <p class="text-blue-100/80 text-lg">
                   Track your submitted requests and view approval status
                 </p>
               </div>
@@ -56,11 +56,11 @@
                     <i class="fas fa-ban text-white text-2xl"></i>
                   </div>
                   <div class="flex-1">
-                    <h3 class="text-xl font-bold text-white mb-2">
+                    <h3 class="text-2xl font-bold text-white mb-2">
                       <i class="fas fa-layer-group mr-2 text-red-300"></i>
                       Access Request Blocked
                     </h3>
-                    <p class="text-red-100/90 text-sm mb-3">
+                    <p class="text-red-100/90 text-base mb-3">
                       {{
                         blockMessage ||
                         'You cannot submit a new Combined Access request while you have a pending request that needs to be processed.'
@@ -71,12 +71,12 @@
                         v-if="pendingAccessRequestId"
                         class="bg-red-500/20 px-3 py-1 rounded-full border border-red-400/30"
                       >
-                        <span class="text-red-300 text-sm font-medium">
+                        <span class="text-red-300 text-base font-medium">
                           Pending Request: {{ pendingAccessRequestId }}
                         </span>
                       </div>
                       <div class="bg-red-500/20 px-3 py-1 rounded-full border border-red-400/30">
-                        <span class="text-red-300 text-sm font-medium">
+                        <span class="text-red-300 text-base font-medium">
                           Policy: One pending access request at a time
                         </span>
                       </div>
@@ -85,7 +85,7 @@
                   <div class="flex flex-col space-y-2">
                     <button
                       @click="refreshRequests"
-                      class="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 rounded-lg text-red-300 text-sm font-medium transition-colors"
+                      class="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 rounded-lg text-red-300 text-base font-medium transition-colors"
                     >
                       <i class="fas fa-sync-alt mr-1"></i>
                       Refresh Status
@@ -112,10 +112,10 @@
                     <i class="fas fa-exclamation-triangle text-white text-2xl"></i>
                   </div>
                   <div class="flex-1">
-                    <h3 class="text-xl font-bold text-white mb-2">
+                    <h3 class="text-2xl font-bold text-white mb-2">
                       Pending Booking Request Restriction
                     </h3>
-                    <p class="text-yellow-100/90 text-sm mb-3">
+                    <p class="text-yellow-100/90 text-base mb-3">
                       You cannot submit a new booking request because you already have a pending
                       booking request that needs to be processed.
                     </p>
@@ -123,7 +123,7 @@
                       <div
                         class="bg-yellow-500/20 px-3 py-1 rounded-full border border-yellow-400/30"
                       >
-                        <span class="text-yellow-300 text-sm font-medium">
+                        <span class="text-yellow-300 text-base font-medium">
                           Policy: One pending booking at a time
                         </span>
                       </div>
@@ -133,7 +133,7 @@
                     <button
                       v-if="pendingBookingId"
                       @click="viewPendingBookingDetails"
-                      class="px-4 py-2 bg-yellow-500/20 hover:bg-yellow-500/30 border border-yellow-400/30 rounded-lg text-yellow-300 text-sm font-medium transition-colors"
+                      class="px-4 py-2 bg-yellow-500/20 hover:bg-yellow-500/30 border border-yellow-400/30 rounded-lg text-yellow-300 text-base font-medium transition-colors"
                     >
                       <i class="fas fa-eye mr-1"></i>
                       View Pending Request
@@ -160,24 +160,24 @@
                     <i class="fas fa-check-circle text-white text-xl"></i>
                   </div>
                   <div class="flex-1">
-                    <h3 class="text-xl font-bold text-white mb-1">
+                    <h3 class="text-2xl font-bold text-white mb-1">
                       Request Submitted Successfully!
                     </h3>
-                    <p class="text-green-100/90 text-sm mb-2">
+                    <p class="text-green-100/90 text-base mb-2">
                       Your {{ requestType }} has been submitted and is now in the approval process.
                     </p>
                     <div class="flex items-center space-x-3">
                       <div
                         class="bg-green-500/20 px-3 py-1 rounded-full border border-green-400/30"
                       >
-                        <span class="text-green-300 text-sm font-medium">
+                        <span class="text-green-300 text-base font-medium">
                           Request ID: #{{ latestRequestId }}
                         </span>
                       </div>
                       <div
                         class="bg-green-500/20 px-3 py-1 rounded-full border border-green-400/30"
                       >
-                        <span class="text-green-300 text-sm font-medium">
+                        <span class="text-green-300 text-base font-medium">
                           Status: Pending Review
                         </span>
                       </div>
@@ -202,22 +202,22 @@
                       <i class="fas fa-list-alt text-white text-base"></i>
                     </div>
                     <div>
-                      <h3 class="text-xl font-bold text-white">My Requests</h3>
-                      <p class="text-blue-100/80 text-sm">View all your submitted requests</p>
+                      <h3 class="text-2xl font-bold text-white">My Requests</h3>
+                      <p class="text-blue-100/80 text-lg">View all your submitted requests</p>
                     </div>
                   </div>
                   <div class="flex items-center space-x-3">
                     <button
                       @click="refreshRequests"
                       :disabled="loading"
-                      class="px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-lg text-blue-300 text-sm font-medium transition-colors"
+                      class="px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-lg text-blue-300 text-lg font-medium transition-colors"
                     >
                       <OrbitingDots v-if="loading" size="xs" class="mr-2" />
                       <i v-else class="fas fa-sync-alt mr-2"></i>
                       Refresh
                     </button>
                     <div class="bg-blue-500/20 px-3 py-1.5 rounded-full border border-blue-400/30">
-                      <span class="text-blue-300 text-sm font-medium">
+                      <span class="text-blue-300 text-lg font-medium">
                         Total: {{ totalRequests }}
                       </span>
                     </div>
@@ -239,8 +239,8 @@
                   >
                     <i class="fas fa-inbox text-blue-400 text-2xl"></i>
                   </div>
-                  <h4 class="text-lg font-semibold text-white mb-2">No Requests Found</h4>
-                  <p class="text-blue-200/80 text-sm mb-6">
+                  <h4 class="text-xl font-semibold text-white mb-2">No Requests Found</h4>
+                  <p class="text-blue-200/80 text-base mb-6">
                     You haven't submitted any requests yet.
                   </p>
                   <button
@@ -259,11 +259,11 @@
                     <table class="w-full relative">
                       <thead class="bg-blue-800/50">
                         <tr class="border-b border-blue-300/20">
-                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-lg">
+                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-xl">
                             Request ID
                           </th>
-                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-lg">Type</th>
-                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-lg">
+                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-xl">Type</th>
+                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-xl">
                             Services
                           </th>
                           <th class="text-left py-3 px-3 text-blue-100 font-bold text-lg">
@@ -281,22 +281,22 @@
                               ></i>
                             </div>
                           </th>
-                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-lg">
+                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-xl">
                             Current Step
                           </th>
-                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-lg">
+                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-xl">
                             Submitted
                           </th>
-                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-lg">
+                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-xl">
                             Device Status
                           </th>
-                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-lg">
+                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-xl">
                             Return Status
                           </th>
-                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-lg">
+                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-xl">
                             SMS Status
                           </th>
-                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-lg">
+                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-xl">
                             Actions
                           </th>
                         </tr>
@@ -308,10 +308,10 @@
                           class="border-t border-blue-300/20 hover:bg-blue-700/30 transition-colors"
                         >
                           <td class="py-3 px-3">
-                            <div class="font-medium text-white text-lg">
+                            <div class="font-medium text-white text-2xl">
                               {{ formatRequestId(request.id) }}
                             </div>
-                            <div class="text-blue-300 text-base mt-1">
+                            <div class="text-blue-300 text-xl mt-1">
                               {{ getRequestTypeLabel(request) }}
                             </div>
                           </td>
@@ -321,7 +321,7 @@
                                 :class="getRequestTypeIcon(request.type)"
                                 class="text-blue-400 text-lg"
                               ></i>
-                              <span class="text-white text-lg">{{
+                              <span class="text-white text-2xl">{{
                                 getRequestTypeName(request.type)
                               }}</span>
                             </div>
@@ -331,7 +331,7 @@
                               <span
                                 v-for="service in request.services"
                                 :key="service"
-                                class="px-3 py-1 bg-blue-500/20 text-blue-300 text-base rounded-full border border-blue-400/30"
+                                class="px-3 py-1 bg-blue-500/20 text-blue-300 text-xl rounded-full border border-blue-400/30"
                               >
                                 {{ service }}
                               </span>
@@ -344,7 +344,7 @@
                                 :class="getStatusColor(request.status)"
                               ></div>
                               <span
-                                class="text-lg font-medium flex items-center space-x-2"
+                                class="text-2xl font-semibold flex items-center space-x-2"
                                 :class="getStatusTextColor(request.status)"
                               >
                                 <span>{{ getStatusText(request.status) }}</span>
@@ -359,10 +359,10 @@
                             </div>
                           </td>
                           <td class="py-3 px-3">
-                            <div class="text-white text-lg">
+                            <div class="text-white text-2xl">
                               {{ getCurrentStepText(request.current_step, request.type) }}
                             </div>
-                            <div class="text-blue-300 text-base">
+                            <div class="text-blue-300 text-xl">
                               <span v-if="request.current_step === 0"
                                 >Waiting from another user</span
                               >
@@ -373,10 +373,10 @@
                             </div>
                           </td>
                           <td class="py-3 px-3">
-                            <div class="text-white text-lg">
+                            <div class="text-white text-2xl">
                               {{ formatDate(request.created_at) }}
                             </div>
-                            <div class="text-blue-300 text-base">
+                            <div class="text-blue-300 text-xl">
                               {{ formatTime(request.created_at) }}
                             </div>
                           </td>
@@ -391,7 +391,7 @@
                                 class="flex items-center space-x-2"
                               >
                                 <div class="w-3 h-3 rounded-full bg-green-500"></div>
-                                <span class="text-green-300 text-base font-medium">Available</span>
+                                <span class="text-green-300 text-xl font-semibold">Available</span>
                               </div>
                               <div
                                 v-else-if="request.device_availability.status === 'out_of_stock'"
@@ -399,14 +399,14 @@
                               >
                                 <div class="flex items-center space-x-2">
                                   <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
-                                  <span class="text-yellow-300 text-base font-medium">In Use</span>
+                                  <span class="text-yellow-300 text-xl font-semibold">In Use</span>
                                 </div>
                                 <div
                                   v-if="
                                     request.device_availability.current_users &&
                                     request.device_availability.current_users.length > 0
                                   "
-                                  class="text-base text-blue-200"
+                                  class="text-xl text-blue-200"
                                 >
                                   By:
                                   {{
@@ -417,7 +417,7 @@
                                 </div>
                                 <div
                                   v-if="request.device_availability.nearest_return"
-                                  class="text-base text-orange-300"
+                                  class="text-xl text-orange-300"
                                 >
                                   Available:
                                   {{ request.device_availability.nearest_return.relative_time }}
@@ -431,10 +431,10 @@
                               </div>
                               <div v-else class="flex items-center space-x-2">
                                 <div class="w-3 h-3 rounded-full bg-red-500"></div>
-                                <span class="text-red-300 text-base font-medium">Unavailable</span>
+                                <span class="text-red-300 text-xl font-semibold">Unavailable</span>
                               </div>
                             </div>
-                            <div v-else class="text-gray-400 text-base">N/A</div>
+                            <div v-else class="text-gray-400 text-xl">N/A</div>
                           </td>
                           <td class="py-3 px-3">
                             <div v-if="request.type === 'booking_service'">
@@ -444,14 +444,14 @@
                                   :class="getReturnStatusColor(request.return_status)"
                                 ></div>
                                 <span
-                                  class="text-base font-medium"
+                                  class="text-xl font-semibold"
                                   :class="getReturnStatusTextColor(request.return_status)"
                                 >
                                   {{ getReturnStatusText(request.return_status) }}
                                 </span>
                               </div>
                             </div>
-                            <div v-else class="text-gray-400 text-base">N/A</div>
+                            <div v-else class="text-gray-400 text-xl">N/A</div>
                           </td>
                           <td class="py-3 px-3">
                             <div class="flex items-center space-x-2">
@@ -460,10 +460,28 @@
                                 :class="getSmsStatusColor(request.sms_to_hod_status)"
                               ></div>
                               <span
-                                class="text-base font-medium"
+                                class="text-xl font-semibold"
                                 :class="getSmsStatusTextColor(request.sms_to_hod_status)"
                               >
                                 {{ getSmsStatusText(request.sms_to_hod_status) }}
+                              </span>
+                              <button
+                                v-if="['failed', 'pending'].includes(request.sms_to_hod_status)"
+                                @click.stop="retrySendSms(request)"
+                                :disabled="isRetrying(request.id)"
+                                class="ml-2 px-2 py-1 text-xs rounded border border-blue-300/50 text-blue-100 hover:bg-blue-700/40 disabled:opacity-50"
+                                title="Retry sending SMS to HOD"
+                              >
+                                <span v-if="!isRetrying(request.id)">Retry</span>
+                                <span v-else
+                                  ><i class="fas fa-spinner fa-spin mr-1"></i>Retrying</span
+                                >
+                              </button>
+                              <span
+                                v-if="getRetryAttempts(request.id) > 0"
+                                class="text-xs text-blue-200 ml-1"
+                              >
+                                ({{ getRetryAttempts(request.id) }})
                               </span>
                             </div>
                           </td>
@@ -532,7 +550,7 @@
                     >
                       <div class="flex items-center justify-between mb-3">
                         <div class="font-medium text-white">{{ formatRequestId(request.id) }}</div>
-                        <div class="text-blue-300 text-xs">{{ getRequestTypeLabel(request) }}</div>
+                        <div class="text-blue-300 text-sm">{{ getRequestTypeLabel(request) }}</div>
                         <div class="flex items-center space-x-2">
                           <div
                             class="w-2 h-2 rounded-full"
@@ -729,6 +747,7 @@
   import { useAuthStore } from '@/stores/auth'
   import requestStatusService from '@/services/requestStatusService'
   import apiClient from '@/services/apiClient'
+  import notificationService from '@/services/notificationService'
 
   export default {
     name: 'RequestStatusPage',
@@ -771,6 +790,12 @@
       const currentPage = ref(1)
       const perPage = ref(15)
       const lastPage = ref(1)
+
+      // Retry state (Staff -> HOD SMS)
+      const retryAttempts = ref({})
+      const retryTimers = ref({})
+      const maxRetryAttempts = 5
+      const retryDelays = [3000, 7000, 15000, 30000, 60000]
 
       // Standard approval steps (for access requests) - Updated to 6 steps
       const approvalSteps = [
@@ -857,6 +882,9 @@
             totalRequests.value = response.data.total || 0
             currentPage.value = response.data.current_page || 1
             lastPage.value = response.data.last_page || 1
+
+            // initialize auto-retry for any failed/pending SMS to HOD
+            initAutoRetryForList()
 
             console.log('✅ Requests loaded successfully:', {
               total: totalRequests.value,
@@ -1429,6 +1457,60 @@
         closeActionsMenu()
       }
 
+      // SMS retry helpers (Staff -> HOD)
+      const getRetryAttempts = (id) => retryAttempts.value[id] || 0
+      const isRetrying = (id) => !!retryTimers.value[id]
+      const scheduleNextRetry = (id, request) => {
+        retryAttempts.value[id] = (retryAttempts.value[id] || 0) + 1
+        if (retryAttempts.value[id] > maxRetryAttempts) return
+        const delay = retryDelays[Math.min(retryAttempts.value[id] - 1, retryDelays.length - 1)]
+        retryTimers.value[id] = setTimeout(async () => {
+          clearTimeout(retryTimers.value[id])
+          delete retryTimers.value[id]
+          await retrySendSms(request)
+        }, delay)
+      }
+      const retrySendSms = async (request) => {
+        if (!request) return
+        const id = request.id
+        if (!retryAttempts.value[id]) retryAttempts.value[id] = 0
+        if (isRetrying(id)) return
+        try {
+          retryTimers.value[id] = setTimeout(() => {}, 0)
+          await notificationService.resendSmsGeneric({
+            requestId: id,
+            role: 'staff',
+            target: 'hod'
+          })
+          setTimeout(async () => {
+            await loadRequests(currentPage.value)
+            clearTimeout(retryTimers.value[id])
+            delete retryTimers.value[id]
+            const updated = (requests.value || []).find((r) => r.id === id) || request
+            const status = updated.sms_to_hod_status || 'pending'
+            if (!['sent'].includes(status)) {
+              scheduleNextRetry(id, updated)
+            } else {
+              retryAttempts.value[id] = 0
+            }
+          }, 1200)
+        } catch (e) {
+          clearTimeout(retryTimers.value[id])
+          delete retryTimers.value[id]
+          scheduleNextRetry(id, request)
+        }
+      }
+      const initAutoRetryForList = () => {
+        ;(requests.value || []).forEach((r) => {
+          const st = r.sms_to_hod_status || 'pending'
+          if (['failed', 'pending'].includes(st)) {
+            if (!retryTimers.value[r.id] && (retryAttempts.value[r.id] || 0) === 0) {
+              scheduleNextRetry(r.id, r)
+            }
+          }
+        })
+      }
+
       // SMS Status methods
       const getSmsStatusText = (smsStatus) => {
         const statusMap = {
@@ -1517,7 +1599,11 @@
         getSmsStatusTextColor,
         handleViewMenuAction,
         handleEditMenuAction,
-        handleCancelMenuAction
+        handleCancelMenuAction,
+        // retry helpers
+        getRetryAttempts,
+        isRetrying,
+        retrySendSms
       }
     }
   }
