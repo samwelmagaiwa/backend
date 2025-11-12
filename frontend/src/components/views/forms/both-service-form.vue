@@ -77,6 +77,7 @@
             isReviewMode ? 'max-w-full mx-1' : 'max-w-7xl mx-auto',
             'relative z-10',
             isReviewMode ? 'review-mode-compact' : '',
+            isReviewMode && isHeadItUser ? 'head-it-compact' : '',
             !isReviewMode && isDivisionalDirectorUser ? 'divisional-director-compact' : '',
             !isReviewMode && isIctDirectorUser ? 'ict-director-compact' : '',
             !isReviewMode && isHodApprovalEditable ? 'hod-compact' : ''
@@ -3530,6 +3531,55 @@
 
   .ict-director-compact .text-xl {
     font-size: 1.5rem !important; /* Extra large text */
+  }
+
+  /* Head of IT readable layout - larger typography for review mode */
+  .head-it-compact {
+    font-size: 1.25rem; /* 20px base */
+    line-height: 1.75;
+  }
+  .head-it-compact .text-xs {
+    font-size: 1.125rem !important;
+  }
+  .head-it-compact .text-sm {
+    font-size: 1.25rem !important;
+  }
+  .head-it-compact .text-base {
+    font-size: 1.375rem !important;
+  }
+  .head-it-compact .text-lg {
+    font-size: 1.5rem !important;
+  }
+  .head-it-compact .text-xl {
+    font-size: 1.75rem !important;
+  }
+  .head-it-compact input,
+  .head-it-compact select,
+  .head-it-compact textarea {
+    padding: 1rem 1.125rem !important;
+    font-size: 1.25rem !important;
+  }
+  .head-it-compact label,
+  .head-it-compact .label {
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+  }
+  .head-it-compact h1,
+  .head-it-compact h2,
+  .head-it-compact h3 {
+    font-size: 1.75rem !important;
+  }
+  .head-it-compact h4,
+  .head-it-compact h5 {
+    font-size: 1.5rem !important;
+  }
+  .head-it-compact p,
+  .head-it-compact span,
+  .head-it-compact li,
+  .head-it-compact td,
+  .head-it-compact th {
+    font-size: 1.25rem !important;
+    line-height: 1.7;
   }
 
   /* Padding and margin adjustments for ICT director */

@@ -224,39 +224,55 @@ const headOfItService = {
         notifyPhone
       })
 
-      // Normalize phone for best compatibility while preserving raw
-      const normalizePhone = (p) => {
-        if (!p) return null
-        const s = String(p).trim()
-        const keepPlus = s.startsWith('+')
-        const digits = s.replace(/[^\d]/g, '')
-        return keepPlus ? `+${digits}` : digits
-      }
-      const rawPhone = notifyPhone || null
-      const normalizedPhone = normalizePhone(rawPhone)
-
-      // Use legacy assign endpoint and include explicit notify flags so backend sends SMS
-      const payload = {
-        request_id: requestId,
-        ict_officer_id: ictOfficerId,
-        // Common key used by some backends
-        notify_phone: rawPhone || undefined,
-        // Additional compatibility keys (ignored if not recognized)
-        ict_officer_phone: normalizedPhone || undefined,
-        recipient_phone: normalizedPhone || undefined,
-        destination_phone: normalizedPhone || undefined,
-        phone_number: normalizedPhone || undefined,
-        msisdn: normalizedPhone || undefined,
-        officer_phone: normalizedPhone || undefined,
-        contact_phone: normalizedPhone || undefined,
-        // Hint flags for systems that gate notifications; harmless if ignored
-        send_sms: true,
-        send_sms_to_ict_officer: true,
-        notify_ict_officer: true,
-        notification_channel: 'sms'
+      // Prefer new endpoint (UserAccess system). Fallback to legacy if unavailable
+      const tryNewEndpoint = async () => {
+        const payloadNew = {
+          user_access_id: requestId,
+          ict_officer_user_id: ictOfficerId,
+          // Optional flags; backend ignores if not used
+          force_reassign: false
+        }
+        return axiosInstance.post('/head-of-it/assign-ict-task', payloadNew, { timeout: 20000 })
       }
 
-      const response = await axiosInstance.post('/head-of-it/assign-task', payload)
+      const tryLegacyEndpoint = async () => {
+        // Normalize phone for compatibility (optional; backend ignores unknown keys)
+        const normalizePhone = (p) => {
+          if (!p) return null
+          const s = String(p).trim()
+          const keepPlus = s.startsWith('+')
+          const digits = s.replace(/[^\d]/g, '')
+          return keepPlus ? `+${digits}` : digits
+        }
+        const rawPhone = notifyPhone || null
+        const normalizedPhone = normalizePhone(rawPhone)
+
+        const payloadLegacy = {
+          request_id: requestId,
+          ict_officer_id: ictOfficerId,
+          notify_phone: rawPhone || undefined,
+          ict_officer_phone: normalizedPhone || undefined,
+          send_sms: true,
+          send_sms_to_ict_officer: true,
+          notify_ict_officer: true,
+          notification_channel: 'sms'
+        }
+        return axiosInstance.post('/head-of-it/assign-task', payloadLegacy, { timeout: 20000 })
+      }
+
+      let response
+      try {
+        response = await tryNewEndpoint()
+      } catch (err) {
+        const status = err?.response?.status
+        // Fallback on 404/405/501 style errors (route not found or not allowed)
+        if (status === 404 || status === 405 || status === 501) {
+          console.warn('HeadOfItService: New assignment endpoint unavailable, falling back to legacy')
+          response = await tryLegacyEndpoint()
+        } else {
+          throw err
+        }
+      }
 
       if (response.data.success) {
         console.log('✅ HeadOfItService: Task assigned successfully')
@@ -274,9 +290,16 @@ const headOfItService = {
       }
     } catch (error) {
       console.error('❌ HeadOfItService: Error assigning task:', error)
+      // Surface validation errors if present
+      const validationErrors = error.response?.data?.errors
+      const message =
+        (validationErrors && Object.values(validationErrors).flat().join(' ')) ||
+        error.response?.data?.message ||
+        error.message ||
+        'Network error while assigning task'
       return {
         success: false,
-        message: error.response?.data?.message || 'Network error while assigning task'
+        message
       }
     }
   },

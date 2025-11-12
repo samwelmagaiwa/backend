@@ -99,6 +99,9 @@ class UserAccess extends Model
         'sms_to_head_it_status',
         'sms_sent_to_requester_at',
         'sms_to_requester_status',
+        // ICT Officer SMS tracking
+        'sms_sent_to_ict_officer_at',
+        'sms_to_ict_officer_status',
     ];
 
     /**

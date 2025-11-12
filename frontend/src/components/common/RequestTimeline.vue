@@ -5,15 +5,15 @@
     @click.self="close"
   >
     <div
-      class="rounded-lg max-w-4xl w-full mx-4 h-[90vh] overflow-hidden bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white flex flex-col timeline-typography"
+      class="rounded-lg max-w-6xl w-full mx-6 h-[95vh] overflow-hidden bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white flex flex-col timeline-typography"
     >
       <!-- Modal Header -->
       <div
         class="flex items-center justify-between p-6 border-b border-blue-600/40 bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white"
       >
         <div>
-          <h2 class="text-xl font-semibold text-white">Request Timeline</h2>
-          <p class="text-sm text-blue-200" v-if="normalizedRequest">
+          <h2 class="text-2xl font-semibold text-white">Request Timeline</h2>
+          <p class="text-base text-blue-200" v-if="normalizedRequest">
             Request #{{ normalizedRequest.display_id }} - {{ normalizedRequest.staff_name || '—' }}
           </p>
         </div>
@@ -88,7 +88,7 @@
                 >You signed this document</span
               >
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
               <div>
                 <span class="font-medium">Staff Name:</span>
                 {{ normalizedRequest?.staff_name || '—' }}
@@ -120,12 +120,18 @@
               v-if="signatures && signatures.length"
               class="mt-3 pt-2 border-t border-blue-600/40"
             >
-              <h4 class="text-xs font-medium text-white mb-1">Digital Signatures</h4>
-              <ul class="space-y-1">
-                <li v-for="s in signatures" :key="s.id" class="text-[11px] text-blue-100">
-                  <span class="text-emerald-300">Signed by</span> {{ s.user_name || 'Unknown' }}
-                  <span class="text-emerald-300">at</span> {{ s.signed_at || '—' }}
-                  <span class="text-emerald-300">Signature</span>: {{ s.signature_preview }}…
+              <h4 class="text-sm font-semibold text-white mb-2">Digital Signatures</h4>
+              <ul class="space-y-1.5">
+                <li
+                  v-for="s in signatures"
+                  :key="s.id"
+                  class="text-sm text-blue-100 leading-relaxed"
+                >
+                  <span class="text-emerald-300 font-medium">Signed by</span>
+                  {{ s.user_name || 'Unknown' }}
+                  <span class="text-emerald-300 font-medium">at</span> {{ s.signed_at || '—' }}
+                  <span class="text-emerald-300 font-medium">Signature</span>:
+                  {{ s.signature_preview }}…
                 </li>
               </ul>
             </div>
