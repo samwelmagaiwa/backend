@@ -61,7 +61,7 @@
       <img src="{!! $leftSrc !!}" style="height:80px;" />
     @endif
   </div>
-  <div class="col hcol hdr-center-bottom">
+  <div class="col hcol hdr-center-middle">
     <div class="hdr-title">MINISTRY OF HEALTH</div>
     <div class="hdr-sub">MUHIMBILI NATIONAL HOSPITAL</div>
     <div class="hdr-sub">MLOGANZILA</div>

@@ -44,7 +44,7 @@
     .hdr .hcol { width:33.33%; }
     .hdr-title { font-weight:700; font-size:13px; text-align:center; }
     .hdr-sub { font-weight:700; font-size:12px; text-align:center; }
-    .hdr-center-bottom { vertical-align: bottom !important; padding-bottom: 0; }
+    .hdr-center-middle { vertical-align: middle !important; padding-bottom: 0; }
     /* Header separator lines */
     .rule { width:100%; }
     .rule-top { margin-top:0; border-top:1px solid #000; height:0; }
@@ -53,7 +53,7 @@
     /* Checkbox styles */
     .cb { display:inline-block; width:14px; height:14px; border:1px solid #000; vertical-align:middle; margin:0 6px; text-align:center; line-height:14px; font-weight:700; font-size:12px; font-family: 'Times New Roman', Times, serif, 'DejaVu Sans', Arial, Helvetica, sans-serif; }
     .cb-checked { font-weight:900; font-size:16px; font-family: 'Times New Roman', Times, serif, 'DejaVu Sans', Arial, Helvetica, sans-serif; }
-    .tick { font-weight:900; font-size:12px; font-family: 'DejaVu Sans', Arial, Helvetica, sans-serif; }
+    .tick { font-family: 'DejaVu Sans', Arial, Helvetica, sans-serif; font-weight:700; }
   </style>
 </head>
 <body>
@@ -75,8 +75,8 @@
 
       <div class="row mb-2">
         <div class="col"><strong>Module Requested for:</strong></div>
-        <div class=\"col\">Use {!! $checkbox(($moduleRequestedFor==='use')) !!} @if($moduleRequestedFor==='use') <span class=\"tick\">&#10003;</span> @endif</div>
-        <div class=\"col\">Revoke {!! $checkbox(($moduleRequestedFor==='revoke')) !!} @if($moduleRequestedFor==='revoke') <span class=\"tick\">&#10003;</span> @endif</div>
+      <div class="col">Use {!! $checkbox(($moduleRequestedFor==='use')) !!} @if($moduleRequestedFor==='use') <span class="tick">&#10003;</span> @endif</div>
+      <div class="col">Revoke {!! $checkbox(($moduleRequestedFor==='revoke')) !!} @if($moduleRequestedFor==='revoke') <span class="tick">&#10003;</span> @endif</div>
       </div>
 
       <div class="mb-2 subtitle">Modules</div>
@@ -85,7 +85,7 @@
         @foreach($jeeCols as $col)
           <div class="gcol">
             @foreach($col as $m)
-              {!! $checkbox(in_array($m,$selectedJeeva??[])) !!} {{ $m }} @if(in_array($m,$selectedJeeva??[])) <span class=\"tick\">&#10003;</span> @endif<br/>
+              {!! $checkbox(in_array($m,$selectedJeeva??[])) !!} {{ $m }} @if(in_array($m,$selectedJeeva??[])) <span class="tick">&#10003;</span> @endif<br/>
             @endforeach
           </div>
         @endforeach
@@ -95,14 +95,13 @@
       <div class="p-2 border" style="min-height:32px; text-align:center;">{{ $hodComments }}</div>
 
       <div class="row mt-3 small">
-        <div class="col">{!! $checkbox(($accessType==='permanent')) !!} Permanent (until retirement)</div>
-        <div class="col">{!! $checkbox(($accessType==='temporary')) !!} Temporary: Start ______ End ______ @if($accessType==='temporary' && $temporaryUntil) (<strong>{{ $fmtDate($temporaryUntil) }}</strong>) @endif</div>
+        <div class="col">{!! $checkbox(($accessType==='permanent')) !!} Permanent (until retirement) @if($accessType==='permanent') <span class="tick">&#10003;</span> @endif</div>
+        <div class="col">{!! $checkbox(($accessType==='temporary')) !!} Temporary: Start ______ End ______ @if($accessType==='temporary') <span class="tick">&#10003;</span> @endif @if($accessType==='temporary' && $temporaryUntil) (<strong>{{ $fmtDate($temporaryUntil) }}</strong>) @endif</div>
       </div>
 
-      @include('pdf.both-service-form.shared_approvals', ['r'=>$r, 'fmtDate'=>$fmtDate, 'sigShorts' => $sigShorts ?? []])
-
-      <div class="footer"><span class="left">Directorate of ICT</span><span class="right">IT and Telephone Department</span></div>
+      @include('pdf.both-service-form.shared_approvals', ['r'=>$r, 'fmtDate'=>$fmtDate])
     </div>
+    <div class="footer"><span class="left">Directorate of ICT</span><span class="right">IT and Telephone Department</span></div>
     <div class="page-break"></div>
   @endif
 
@@ -124,8 +123,8 @@
 
       <div class="row mb-2">
         <div class="col"><strong>Module Requested for:</strong></div>
-        <div class=\"col\">Use {!! $checkbox(($moduleRequestedFor==='use')) !!} @if($moduleRequestedFor==='use') <span class=\"tick\">&#10003;</span> @endif</div>
-        <div class=\"col\">Revoke {!! $checkbox(($moduleRequestedFor==='revoke')) !!} @if($moduleRequestedFor==='revoke') <span class=\"tick\">&#10003;</span> @endif</div>
+      <div class="col">Use {!! $checkbox(($moduleRequestedFor==='use')) !!} @if($moduleRequestedFor==='use') <span class="tick">&#10003;</span> @endif</div>
+      <div class="col">Revoke {!! $checkbox(($moduleRequestedFor==='revoke')) !!} @if($moduleRequestedFor==='revoke') <span class="tick">&#10003;</span> @endif</div>
       </div>
 
       @php
@@ -142,7 +141,7 @@
         @foreach($wcols as $col)
           <div class="gcol">
             @foreach($col as $m)
-              {!! $checkbox(in_array($m,$selectedWellsoft??[])) !!} {{ $m }} @if(in_array($m,$selectedWellsoft??[])) <span class=\"tick\">&#10003;</span> @endif<br/>
+              {!! $checkbox(in_array($m,$selectedWellsoft??[])) !!} {{ $m }} @if(in_array($m,$selectedWellsoft??[])) <span class="tick">&#10003;</span> @endif<br/>
             @endforeach
           </div>
         @endforeach
@@ -158,14 +157,13 @@
       <div class="p-2 border" style="min-height:32px; text-align:center;">{{ $hodComments }}</div>
 
       <div class="row mt-3 small">
-        <div class="col">{!! $checkbox(($accessType==='permanent')) !!} Permanent (Until retirement)</div>
-        <div class="col">{!! $checkbox(($accessType==='temporary')) !!} Temporary: Start ______ End ______ @if($accessType==='temporary' && $temporaryUntil) (<strong>{{ $fmtDate($temporaryUntil) }}</strong>) @endif</div>
+        <div class="col">{!! $checkbox(($accessType==='permanent')) !!} Permanent (Until retirement) @if($accessType==='permanent') <span class="tick">&#10003;</span> @endif</div>
+        <div class="col">{!! $checkbox(($accessType==='temporary')) !!} Temporary: Start ______ End ______ @if($accessType==='temporary') <span class="tick">&#10003;</span> @endif @if($accessType==='temporary' && $temporaryUntil) (<strong>{{ $fmtDate($temporaryUntil) }}</strong>) @endif</div>
       </div>
 
-      @include('pdf.both-service-form.shared_approvals', ['r'=>$r, 'fmtDate'=>$fmtDate, 'sigShorts' => $sigShorts ?? []])
-
-      <div class="footer"><span class="left">Directorate of ICT</span><span class="right">IT and Telephone Department</span></div>
+      @include('pdf.both-service-form.shared_approvals', ['r'=>$r, 'fmtDate'=>$fmtDate])
     </div>
+    <div class="footer"><span class="left">Directorate of ICT</span><span class="right">IT and Telephone Department</span></div>
   @endif
 
   @php $renderSeparateInternet = $showInternet && !$showWellsoft; @endphp
@@ -187,8 +185,8 @@
 
       <div class="row mb-2">
         <div class="col"><strong>Module Requested for:</strong></div>
-        <div class=\"col\">Use {!! $checkbox(($moduleRequestedFor==='use')) !!} @if($moduleRequestedFor==='use') <span class=\"tick\">&#10003;</span> @endif</div>
-        <div class=\"col\">Revoke {!! $checkbox(($moduleRequestedFor==='revoke')) !!} @if($moduleRequestedFor==='revoke') <span class=\"tick\">&#10003;</span> @endif</div>
+      <div class="col">Use {!! $checkbox(($moduleRequestedFor==='use')) !!} @if($moduleRequestedFor==='use') <span class="tick">&#10003;</span> @endif</div>
+      <div class="col">Revoke {!! $checkbox(($moduleRequestedFor==='revoke')) !!} @if($moduleRequestedFor==='revoke') <span class="tick">&#10003;</span> @endif</div>
       </div>
 
       <div class="mb-2 subtitle center">Purposes</div>
@@ -198,14 +196,13 @@
       <div class="p-2 border" style="min-height:32px; text-align:center;">{{ $hodComments }}</div>
 
       <div class="row mt-3 small">
-        <div class="col">{!! $checkbox(($accessType==='permanent')) !!} Permanent (until retirement)</div>
-        <div class="col">{!! $checkbox(($accessType==='temporary')) !!} Temporary: Start ______ End ______ @if($accessType==='temporary' && $temporaryUntil) (<strong>{{ $fmtDate($temporaryUntil) }}</strong>) @endif</div>
+        <div class="col">{!! $checkbox(($accessType==='permanent')) !!} Permanent (until retirement) @if($accessType==='permanent') <span class="tick">&#10003;</span> @endif</div>
+        <div class="col">{!! $checkbox(($accessType==='temporary')) !!} Temporary: Start ______ End ______ @if($accessType==='temporary') <span class="tick">&#10003;</span> @endif @if($accessType==='temporary' && $temporaryUntil) (<strong>{{ $fmtDate($temporaryUntil) }}</strong>) @endif</div>
       </div>
 
-      @include('pdf.both-service-form.shared_approvals', ['r'=>$r, 'fmtDate'=>$fmtDate, 'sigShorts' => $sigShorts ?? []])
-
-      <div class="footer"><span class="left">Directorate of ICT</span><span class="right">IT and Telephone Department</span></div>
+      @include('pdf.both-service-form.shared_approvals', ['r'=>$r, 'fmtDate'=>$fmtDate])
     </div>
+    <div class="footer"><span class="left">Directorate of ICT</span><span class="right">IT and Telephone Department</span></div>
   @endif
 </body>
 </html>
