@@ -73,6 +73,39 @@
             </div>
           </div>
 
+          <!-- Current Assignment Banner -->
+          <div
+            v-if="!isLoading && requestInfo?.assigned_ict_officer_id"
+            class="medical-glass-card rounded-none border-t-0 border-b border-blue-300/30"
+          >
+            <div class="p-4 bg-blue-600/20 border border-blue-400/30 rounded-lg flex items-start gap-3">
+              <div class="w-8 h-8 rounded-full bg-blue-500/30 flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-user-check text-blue-300"></i>
+              </div>
+              <div class="flex-1">
+                <h3 class="font-bold text-lg text-blue-200">Currently assigned to</h3>
+                <p class="text-blue-100 text-base">
+                  <span class="font-semibold">{{ currentAssignee?.name || 'ICT Officer #' + requestInfo.assigned_ict_officer_id }}</span>
+                  <span v-if="currentAssignee?.pf_number" class="ml-2 text-blue-200/80">(PF: {{ currentAssignee.pf_number }})</span>
+                  <span v-if="requestInfo.task_assigned_at" class="ml-2">— since {{ new Date(requestInfo.task_assigned_at).toLocaleString('en-GB') }}</span>
+                </p>
+              </div>
+              <div>
+                <button
+                  @click="openCancelModal(currentAssignee)
+                  "
+                  :disabled="isAssigning"
+                  class="px-4 py-2 bg-red-600/30 hover:bg-red-600/50 text-red-100 rounded-lg transition-colors border border-red-400/30 text-base flex items-center"
+                  title="Cancel current assignment"
+                >
+                  <i v-if="isAssigning" class="fas fa-spinner fa-spin mr-2"></i>
+                  <i v-else class="fas fa-times mr-2"></i>
+                  Cancel Task
+                </button>
+              </div>
+            </div>
+          </div>
+
           <!-- Search & Filter Controls -->
           <div class="medical-glass-card rounded-t-3xl border-b border-blue-300/30">
             <div class="p-4">
@@ -436,6 +469,50 @@
           </div>
         </div>
 
+        <!-- Cancel Confirmation Modal (Help & Support card style) -->
+        <div
+          v-if="showCancelModal"
+          class="fixed inset-0 bg-black/60 flex items-center justify-center z-[10002] backdrop-blur-sm"
+        >
+          <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-red-600 via-red-700 to-red-800 p-6 text-center shadow-lg">
+              <div
+                class="w-16 h-16 bg-red-500/30 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm border border-red-300/40 shadow-lg"
+              >
+                <i class="fas fa-exclamation-triangle text-white text-2xl"></i>
+              </div>
+              <h3 class="text-xl font-bold text-white mb-2">Cancel Task Assignment</h3>
+            </div>
+
+            <!-- Body -->
+            <div class="p-6 text-center">
+              <p class="text-gray-700 text-lg mb-6">
+                Are you sure you want to cancel the task assigned to
+                <span class="font-semibold text-red-600">{{ cancelTarget?.name || 'Current ICT Officer' }}</span>?
+              </p>
+
+              <div class="flex gap-3">
+                <button
+                  @click="cancelTask(cancelTarget)"
+                  :disabled="isCancelling"
+                  class="flex-1 bg-red-600 text-white py-3 px-4 rounded-xl font-semibold hover:bg-red-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+                >
+                  <i v-if="isCancelling" class="fas fa-spinner fa-spin mr-2"></i>
+                  Confirm Cancel
+                </button>
+                <button
+                  @click="showCancelModal = false"
+                  :disabled="isCancelling"
+                  class="flex-1 bg-gray-200 text-gray-800 py-3 px-4 rounded-xl font-semibold hover:bg-gray-300 transition-all duration-200"
+                >
+                  Keep Assignment
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Fixed overlay dropdown portal -->
         <div
           v-show="openDropdownId"
@@ -458,6 +535,11 @@
             @click.stop
           >
             <button
+              v-if="
+                // Show Assign only when there is no current assignee
+                !requestInfo?.assigned_ict_officer_id &&
+                ictOfficers.find((o) => o.id === openDropdownId)?.status !== 'Assigned'
+              "
               @click.stop="
                 executeAction(
                   'assign_task',
@@ -482,28 +564,17 @@
               <span class="font-semibold">Assign Task</span>
             </button>
             <button
-              @click.stop="
-                executeAction(
-                  'view_progress',
-                  ictOfficers.find((o) => o.id === openDropdownId)
-                )
-              "
-              class="w-full text-left px-4 py-3 text-xl bg-blue-50 text-blue-800 border-b border-blue-200 hover:bg-blue-100 focus:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset transition-all duration-200 flex items-center space-x-3 group"
+              v-if="hasActiveIctAssignment && ictOfficers.find((o) => o.id === openDropdownId)?.status !== 'Assigned'"
+              @click.stop="confirmAssignTask(ictOfficers.find((o) => o.id === openDropdownId), { reassign: true })"
+              class="w-full text-left px-4 py-3 text-xl bg-amber-50 text-amber-800 border-b border-amber-200 hover:bg-amber-100 focus:bg-amber-100 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-inset transition-all duration-200 flex items-center space-x-3 group"
             >
-              <i
-                class="fas fa-eye text-blue-600 group-hover:text-blue-700 group-focus:text-blue-700 w-4 h-4 flex-shrink-0 transition-colors duration-200 text-xl"
-              ></i>
-              <span class="font-semibold">View Progress</span>
+              <i class="fas fa-exchange-alt text-amber-600 w-4 h-4"></i>
+              <span class="font-semibold">Reassign Task</span>
             </button>
             <button
-              @click.stop="
-                executeAction(
-                  'cancel_task',
-                  ictOfficers.find((o) => o.id === openDropdownId)
-                )
-              "
-              :disabled="ictOfficers.find((o) => o.id === openDropdownId)?.status !== 'Assigned'"
-              class="w-full text-left px-4 py-3 text-xl bg-red-50 text-red-800 hover:bg-red-100 focus:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-inset transition-all duration-200 flex items-center space-x-3 group disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500 last:rounded-b-lg"
+              v-if="ictOfficers.find((o) => o.id === openDropdownId)?.status === 'Assigned'"
+              @click.stop="openCancelModal(ictOfficers.find((o) => o.id === openDropdownId))"
+              class="w-full text-left px-4 py-3 text-xl bg-red-50 text-red-800 hover:bg-red-100 focus:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-inset transition-all duration-200 flex items-center space-x-3 group last:rounded-b-lg"
             >
               <i
                 class="fas fa-times text-red-600 group-hover:text-red-700 group-focus:text-red-700 w-4 h-4 flex-shrink-0 transition-colors duration-200 text-xl"
@@ -542,11 +613,17 @@
         selectedOfficer: null,
         assignedOfficer: null,
         isAssigning: false,
+        // Cancel modal state
+        showCancelModal: false,
+        cancelTarget: null,
+        isCancelling: false,
         // Dropdown state management
         openDropdownId: null,
         dropdownCoords: { top: 0, left: 0 },
         dropdownPlacement: 'below', // 'below' | 'above' based on available space
-        dropdownWidth: 192
+        dropdownWidth: 192,
+        // Track whether current assignment intent is a reassignment
+        isReassign: false
       }
     },
     computed: {
@@ -554,8 +631,20 @@
       canAssign() {
         const status = this.requestInfo?.ict_officer_status || this.requestInfo?.status
         const isImplemented = status === 'implemented'
-        // If backend exposes latest assignment in requestInfo in future, we can check here.
         return !isImplemented
+      },
+      currentAssignee() {
+        if (!this.requestInfo?.assigned_ict_officer_id) {
+          // Fallback: infer from officers list
+          const inferred = this.ictOfficers.find((o) => o.status === 'Assigned')
+          return inferred || null
+        }
+        return (
+          this.ictOfficers.find((o) => o.id === this.requestInfo.assigned_ict_officer_id) || null
+        )
+      },
+      hasActiveIctAssignment() {
+        return !!(this.requestInfo?.assigned_ict_officer_id || this.ictOfficers.some((o) => o.status === 'Assigned'))
       },
       filteredOfficers() {
         let filtered = [...this.ictOfficers]
@@ -641,8 +730,9 @@
         await this.fetchIctOfficers()
       },
 
-      confirmAssignTask(officer) {
+      confirmAssignTask(officer, options = {}) {
         this.selectedOfficer = officer
+        this.isReassign = options.reassign === true
         this.showConfirmModal = true
       },
 
@@ -655,13 +745,25 @@
           const result = await headOfItService.assignTaskToIctOfficer(
             this.requestId,
             this.selectedOfficer.id,
-            this.selectedOfficer?.phone_number || this.selectedOfficer?.phone || null
+            this.selectedOfficer?.phone_number || this.selectedOfficer?.phone || null,
+            this.isReassign
           )
 
           if (result.success) {
             this.assignedOfficer = this.selectedOfficer
             this.showConfirmModal = false
             this.showSuccessModal = true
+            this.isReassign = false
+
+            // Ensure UI knows there is an active assignment
+            this.requestInfo = {
+              ...(this.requestInfo || {}),
+              assigned_ict_officer_id: this.selectedOfficer.id,
+              task_assigned_at: new Date().toISOString()
+            }
+
+            // Toast success
+            this.showToast('Task assigned successfully', 'success')
 
             // Persist last known SMS status for Head of IT list to avoid Pending regression on refresh
             try {
@@ -701,23 +803,52 @@
         alert(`Viewing progress for ${officer.name} - Feature coming soon!`)
       },
 
+      showToast(message, type = 'success') {
+        const container = document.createElement('div')
+        container.className = 'fixed top-4 right-4 toast-notification'
+        container.style.zIndex = 9999
+        const color = type === 'error' ? 'bg-red-600' : 'bg-green-600'
+        container.innerHTML = `
+          <div class="${color} text-white px-4 py-3 rounded-xl shadow-xl font-semibold">
+            ${message}
+          </div>
+        `
+        document.body.appendChild(container)
+        setTimeout(() => {
+          container.remove()
+        }, 2500)
+      },
+
+      openCancelModal(officer) {
+        this.cancelTarget = officer || { id: this.requestInfo?.assigned_ict_officer_id, name: 'Current ICT Officer' }
+        this.showCancelModal = true
+      },
+
       async cancelTask(officer) {
-        if (confirm(`Are you sure you want to cancel the task assigned to ${officer.name}?`)) {
-          try {
-            const result = await headOfItService.cancelTaskAssignment(this.requestId)
-            if (result.success) {
-              // Update officer status locally
+        try {
+          this.isCancelling = true
+          const result = await headOfItService.cancelTaskAssignment(this.requestId)
+          if (result.success) {
+            // Update local state
+            if (officer?.id) {
               const officerIndex = this.ictOfficers.findIndex((o) => o.id === officer.id)
-              if (officerIndex !== -1) {
-                this.ictOfficers[officerIndex].status = 'Available'
-              }
-              alert('Task assignment cancelled successfully')
-            } else {
-              alert('Failed to cancel task: ' + result.message)
+              if (officerIndex !== -1) this.ictOfficers[officerIndex].status = 'Available'
             }
-          } catch (error) {
-            alert('Error cancelling task: ' + error.message)
+            this.requestInfo = {
+              ...(this.requestInfo || {}),
+              assigned_ict_officer_id: null,
+              task_assigned_at: null
+            }
+            this.showCancelModal = false
+            // Toast success
+            this.showToast('Task assignment cancelled', 'success')
+          } else {
+            this.showToast('Failed to cancel task: ' + result.message, 'error')
           }
+        } catch (error) {
+          this.showToast('Error cancelling task: ' + (error.message || 'Network error'), 'error')
+        } finally {
+          this.isCancelling = false
         }
       },
 

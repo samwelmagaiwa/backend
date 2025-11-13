@@ -2508,14 +2508,16 @@
                             <div class="relative">
                               <div
                                 v-if="
-                                  !ictOfficerSignaturePreview && !isImplementationAlreadyCompleted
+                                  !ictOfficerSignaturePreview &&
+                                  !isImplementationAlreadyCompleted &&
+                                  !(hasUserSigned || (currentUser?.name && historyHasSigner(currentUser.name)) || shouldShowIctOfficerSignedIndicator)
                                 "
                                 class="w-full px-2 py-1 border-2 border-dashed border-blue-300/40 rounded-lg focus-within:border-blue-400 bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 min-h-[20px] flex items-center justify-center hover:bg-white/20"
                               >
                                 <div class="text-center">
                                   <div class="mb-0.5">
                                     <i class="fas fa-signature text-blue-300 text-sm mb-0.5"></i>
-                                    <p class="text-blue-100 text-xs">No signature uploaded</p>
+                                    <p class="text-blue-100 text-xs">No signature yet</p>
                                   </div>
                                   <button
                                     v-if="
@@ -2536,9 +2538,9 @@
                                 </div>
                               </div>
 
-                              <!-- Show existing signature when implementation is completed -->
+                              <!-- Show existing signature when implementation is completed or when digitally signed -->
                               <div
-                                v-else-if="shouldShowIctOfficerSignedIndicator"
+                                v-else-if="shouldShowIctOfficerSignedIndicator || hasUserSigned || (currentUser?.name && historyHasSigner(currentUser.name))"
                                 class="w-full px-3 py-2 border-2 border-green-300/40 rounded-xl bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-green-500/20 min-h-[35px] flex items-center justify-center relative"
                                 :title="getSignedByYouTooltip('ict_officer')"
                               >
@@ -2549,13 +2551,10 @@
                                     >
                                       <i class="fas fa-check text-green-400 text-sm"></i>
                                     </div>
-                                    <span class="text-green-400 font-semibold text-sm">Signed</span>
+                                    <span class="text-green-300 font-extrabold text-base uppercase tracking-wide">Signed</span>
                                   </div>
-                                  <p class="text-xs text-green-200/80">Implementation completed</p>
-                                  <p class="text-xs text-blue-100 opacity-80">
-                                    {{
-                                      getSignatureFileName(requestData.ict_officer_signature_path)
-                                    }}
+                                  <p class="text-green-200 font-semibold text-sm">
+                                    Approved at: {{ getApprovalDateFormatted('ict_officer') }}
                                   </p>
                                 </div>
                                 <!-- Optional: Show signature preview icon -->
@@ -5587,8 +5586,12 @@
 
       // Check if ICT Officer implementation approval button should be disabled
       isImplementationApprovalDisabled() {
-        // ICT Officer: require signature for enabling Approve button; comment will be required in popup
-        return this.processing || this.loading || !this.ictOfficerSignaturePreview
+        // ICT Officer: enable when a digital signature exists (no legacy file required)
+        const hasDigital =
+          !!this.hasUserSigned ||
+          (this.currentUser?.name && this.historyHasSigner(this.currentUser.name)) ||
+          this.shouldShowIctOfficerSignedIndicator
+        return this.processing || this.loading || !hasDigital
       },
 
       // Check if the implementation is already completed
@@ -6119,31 +6122,13 @@
         this.grantAccessError = ''
         try {
           this.processing = true
+          // Digital signature flow: no legacy file required
           const fdPayload = {
             ict_officer_name:
               this.form?.implementation?.ictOfficer?.name || this.currentUser?.name || '',
             ict_officer_date: new Date().toISOString().slice(0, 10),
             ict_officer_comments: comment,
-            ict_officer_status: 'implemented',
-            ict_officer_signature:
-              this.form?.implementation?.ictOfficer?.signature ||
-              this.ictOfficerSignaturePreviewFile ||
-              null
-          }
-
-          // If signaturePreview is a data URL, we need the original File; assume we stored it during onSignatureChange
-          if (!fdPayload.ict_officer_signature) {
-            // Fallback: try to derive from ref input if available
-            const input = this.$refs.signatureInput
-            if (input && input.files && input.files[0]) {
-              fdPayload.ict_officer_signature = input.files[0]
-            }
-          }
-
-          if (!fdPayload.ict_officer_signature) {
-            this.showToast('Signature file is required before granting access', 'error')
-            this.processing = false
-            return
+            ict_officer_status: 'implemented'
           }
 
           const res = await bothServiceFormService.ictOfficerApprove(this.getRequestId, fdPayload)

@@ -63,6 +63,9 @@ class HeadOfItController extends Controller
                     'ict_director_approved_at' => $request->ict_director_approved_at,
                     'head_of_it_approved_at' => $request->head_of_it_approved_at,
                     'updated_at' => $request->updated_at,
+                    // SMS to requester on Head of IT approval
+                    'sms_to_requester_status' => $request->sms_to_requester_status ?? 'pending',
+                    'sms_sent_to_requester_at' => $request->sms_sent_to_requester_at,
                     // SMS status tracking for ICT Officer assignment
                     'sms_to_ict_officer_status' => $request->sms_to_ict_officer_status ?? 'pending',
                     'sms_sent_to_ict_officer_at' => $request->sms_sent_to_ict_officer_at,
@@ -135,8 +138,26 @@ class HeadOfItController extends Controller
                 'divisional_approved_at' => $request->divisional_approved_at,
                 'ict_director_approved_at' => $request->ict_director_approved_at,
                 'head_of_it_approved_at' => $request->head_of_it_approved_at,
-                'updated_at' => $request->updated_at
+                'updated_at' => $request->updated_at,
+                // Assignment info for UI logic
+                'assigned_ict_officer_id' => $request->assigned_ict_officer_id,
+                'ict_officer_status' => $request->ict_officer_status,
+                'task_assigned_at' => $request->task_assigned_at
             ];
+
+            // If combined record doesn't have assignment info, infer from ICT task assignments (NEW system)
+            if (empty($requestData['assigned_ict_officer_id'])) {
+                $activeAssignment = \App\Models\IctTaskAssignment::where('user_access_id', $id)
+                    ->whereIn('status', ['assigned', 'in_progress'])
+                    ->latest('assigned_at')
+                    ->first();
+                if ($activeAssignment) {
+                    $requestData['assigned_ict_officer_id'] = $activeAssignment->ict_officer_user_id;
+                    $requestData['task_assigned_at'] = $activeAssignment->assigned_at;
+                    // Prefer explicit ICT officer status from UserAccess if available, else set pending
+                    $requestData['ict_officer_status'] = $request->ict_officer_status ?? 'pending';
+                }
+            }
 
             return response()->json([
                 'success' => true,
@@ -454,15 +475,16 @@ class HeadOfItController extends Controller
                 ->first();
 
             if ($existingAssignment) {
-                // If existing assignment is in progress, block reassignment
-                if ($existingAssignment->status === \App\Models\IctTaskAssignment::STATUS_IN_PROGRESS && !$request->boolean('force_reassign')) {
+                // If existing assignment exists and no force_reassign requested, block with clear message
+                if (!$request->boolean('force_reassign')) {
+                    $currentName = optional($existingAssignment->ictOfficer)->name ?? 'another ICT Officer';
                     return response()->json([
                         'success' => false,
-                        'message' => 'Task is already being implemented by another ICT Officer'
+                        'message' => 'Request is already assigned to ' . $currentName . '. You cannot assign twice. Use Reassign to move it.'
                     ], 400);
                 }
 
-                // Cancel the previous assignment (supports forced reassignment)
+                // If reassignment explicitly requested, cancel the previous assignment
                 $existingAssignment->update([
                     'status' => \App\Models\IctTaskAssignment::STATUS_CANCELLED,
                     'cancelled_at' => now()
@@ -854,15 +876,16 @@ class HeadOfItController extends Controller
                 ->first();
 
             if ($existingAssignment) {
-                // If existing assignment is in progress, block reassignment
-                if ($existingAssignment->status === \App\Models\IctTaskAssignment::STATUS_IN_PROGRESS && !$request->boolean('force_reassign')) {
+                // If existing assignment exists and force_reassign not set, block with helpful message
+                if (!$request->boolean('force_reassign')) {
+                    $currentName = optional($existingAssignment->ictOfficer)->name ?? 'another ICT Officer';
                     return response()->json([
                         'success' => false,
-                        'message' => 'Task is already being implemented by another ICT Officer'
+                        'message' => 'Request is already assigned to ' . $currentName . '. You cannot assign twice. Use Reassign to move it.'
                     ], 400);
                 }
 
-                // Cancel the previous assignment (supports forced reassignment)
+                // Proceed with reassignment: cancel previous assignment
                 $existingAssignment->update([
                     'status' => \App\Models\IctTaskAssignment::STATUS_CANCELLED,
                     'cancelled_at' => now()
@@ -1049,9 +1072,11 @@ class HeadOfItController extends Controller
                 'cancelled_at' => now()
             ]);
 
-            // Update user access ICT Officer status back to pending
+            // Update user access ICT Officer status back to pending and clear assignee so it is open for reassignment
             $userAccess->update([
-                'ict_officer_status' => 'pending'
+                'ict_officer_status' => 'pending',
+                'assigned_ict_officer_id' => null,
+                'task_assigned_at' => null
             ]);
 
             DB::commit();

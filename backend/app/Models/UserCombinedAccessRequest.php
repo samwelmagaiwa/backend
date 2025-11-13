@@ -38,7 +38,13 @@ class UserCombinedAccessRequest extends UserAccess
         'head_of_it_rejection_reason',
         'head_of_it_comments',
         'assigned_ict_officer_id',
-        'task_assigned_at'
+        'task_assigned_at',
+        
+        // SMS tracking fields surfaced on Head of IT dashboard
+        'sms_sent_to_ict_officer_at',
+        'sms_to_ict_officer_status',
+        'sms_sent_to_requester_at',
+        'sms_to_requester_status'
     ];
 
     // Additional casts for Head of IT workflow

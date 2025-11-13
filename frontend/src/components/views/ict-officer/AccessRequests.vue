@@ -321,12 +321,20 @@
 
           <button
             @click="handleMenuAction('viewTimeline', selectedRequest)"
-            class="w-full text-left px-4 py-3 text-lg bg-indigo-50 text-indigo-800 hover:bg-indigo-100 focus:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
+            class="w-full text-left px-4 py-3 text-lg bg-indigo-50 text-indigo-800 border-b border-indigo-200 hover:bg-indigo-100 focus:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset transition-all duration-200 flex items-center group"
           >
             <i
               class="fas fa-history mr-3 text-indigo-600 group-hover:text-indigo-700 group-focus:text-indigo-700 transition-colors duration-200 text-lg"
             ></i>
             <span class="font-semibold">View Timeline</span>
+          </button>
+
+          <button
+            @click="handleMenuAction('downloadPdf', selectedRequest)"
+            class="w-full text-left px-4 py-3 text-lg bg-rose-50 text-rose-800 hover:bg-rose-100 focus:bg-rose-100 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
+          >
+            <i class="fas fa-file-pdf mr-3 text-rose-600 group-hover:text-rose-700 group-focus:text-rose-700 transition-colors duration-200 text-lg"></i>
+            <span class="font-semibold">Download PDF</span>
           </button>
         </template>
 
@@ -344,12 +352,20 @@
 
           <button
             @click="handleMenuAction('viewTimeline', selectedRequest)"
-            class="w-full text-left px-4 py-3 text-lg bg-indigo-50 text-indigo-800 hover:bg-indigo-100 focus:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
+            class="w-full text-left px-4 py-3 text-lg bg-indigo-50 text-indigo-800 border-b border-indigo-200 hover:bg-indigo-100 focus:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset transition-all duration-200 flex items-center group"
           >
             <i
               class="fas fa-history mr-3 text-indigo-600 group-hover:text-indigo-700 group-focus:text-indigo-700 transition-colors duration-200 text-lg"
             ></i>
             <span class="font-semibold">View Timeline</span>
+          </button>
+
+          <button
+            @click="handleMenuAction('downloadPdf', selectedRequest)"
+            class="w-full text-left px-4 py-3 text-lg bg-rose-50 text-rose-800 hover:bg-rose-100 focus:bg-rose-100 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
+          >
+            <i class="fas fa-file-pdf mr-3 text-rose-600 group-hover:text-rose-700 group-focus:text-rose-700 transition-colors duration-200 text-lg"></i>
+            <span class="font-semibold">Download PDF</span>
           </button>
         </template>
 
@@ -369,12 +385,20 @@
 
           <button
             @click="handleMenuAction('viewTimeline', selectedRequest)"
-            class="w-full text-left px-4 py-3 text-lg bg-indigo-50 text-indigo-800 hover:bg-indigo-100 focus:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
+            class="w-full text-left px-4 py-3 text-lg bg-indigo-50 text-indigo-800 border-b border-indigo-200 hover:bg-indigo-100 focus:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset transition-all duration-200 flex items-center group"
           >
             <i
               class="fas fa-history mr-3 text-indigo-600 group-hover:text-indigo-700 group-focus:text-indigo-700 transition-colors duration-200 text-lg"
             ></i>
             <span class="font-semibold">View Timeline</span>
+          </button>
+
+          <button
+            @click="handleMenuAction('downloadPdf', selectedRequest)"
+            class="w-full text-left px-4 py-3 text-lg bg-rose-50 text-rose-800 hover:bg-rose-100 focus:bg-rose-100 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
+          >
+            <i class="fas fa-file-pdf mr-3 text-rose-600 group-hover:text-rose-700 group-focus:text-rose-700 transition-colors duration-200 text-lg"></i>
+            <span class="font-semibold">Download PDF</span>
           </button>
         </template>
 
@@ -397,12 +421,20 @@
 
           <button
             @click="handleMenuAction('viewTimeline', selectedRequest)"
-            class="w-full text-left px-4 py-3 text-lg bg-indigo-50 text-indigo-800 hover:bg-indigo-100 focus:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
+            class="w-full text-left px-4 py-3 text-lg bg-indigo-50 text-indigo-800 border-b border-indigo-200 hover:bg-indigo-100 focus:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset transition-all duration-200 flex items-center group"
           >
             <i
               class="fas fa-history mr-3 text-indigo-600 group-hover:text-indigo-700 group-focus:text-indigo-700 transition-colors duration-200"
             ></i>
             <span class="font-semibold">View Timeline</span>
+          </button>
+
+          <button
+            @click="handleMenuAction('downloadPdf', selectedRequest)"
+            class="w-full text-left px-4 py-3 text-lg bg-rose-50 text-rose-800 hover:bg-rose-100 focus:bg-rose-100 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
+          >
+            <i class="fas fa-file-pdf mr-3 text-rose-600 group-hover:text-rose-700 group-focus:text-rose-700 transition-colors duration-200"></i>
+            <span class="font-semibold">Download PDF</span>
           </button>
         </template>
 
@@ -615,6 +647,7 @@
   import UpdateProgress from '@/components/common/UpdateProgress.vue'
   import { useAuth } from '@/composables/useAuth'
   import ictOfficerService from '@/services/ictOfficerService'
+  import apiClient from '@/services/apiClient'
 
   // State
   const accessRequests = ref([])
@@ -1099,6 +1132,30 @@
     }
   }
 
+  async function downloadPdf(request) {
+    try {
+      if (!request?.id) {
+        alert('Missing request id')
+        return
+      }
+      const res = await apiClient.get(`/both-service-form/${request.id}/export-pdf`, {
+        responseType: 'blob'
+      })
+      const blob = new Blob([res.data], { type: 'application/pdf' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `access-request-${request.id}.pdf`
+      document.body.appendChild(link)
+      link.click()
+      URL.revokeObjectURL(url)
+      link.remove()
+    } catch (e) {
+      console.error('Failed to download PDF:', e)
+      alert('Failed to download PDF. Please try again.')
+    }
+  }
+
   function handleMenuAction(action, request) {
     activeDropdown.value = null
     dropdownPosition.value = null
@@ -1108,6 +1165,9 @@
         break
       case 'viewTimeline':
         viewTimeline(request)
+        break
+      case 'downloadPdf':
+        downloadPdf(request)
         break
       case 'assignTask':
         assignTask(request)

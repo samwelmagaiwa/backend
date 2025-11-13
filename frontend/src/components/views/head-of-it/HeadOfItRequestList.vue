@@ -1172,7 +1172,7 @@
       // SMS Status methods
       getRelevantSmsStatus(request) {
         // For Head of IT: show SMS status for NEXT workflow step after their action
-        const status = request.head_it_status || request.status
+        const status = request.status || request.head_it_status
         // Last known status cache (prevents flicker to Pending after Delivered)
         const cachedSms = this.lastSmsStatusCache && this.lastSmsStatusCache[request.id]
 
@@ -1230,8 +1230,34 @@
           return v || null
         }
 
+        // If the current row is in Head of IT approved state, prefer requester SMS status
+        if (
+          status === 'head_of_it_approved' ||
+          (request.head_it_status && String(request.head_it_status).toLowerCase() === 'approved')
+        ) {
+          const requesterSentTs =
+            request.sms_sent_to_requester_at ||
+            request.requester_sms_sent_at ||
+            null
+          if (requesterSentTs) {
+            if (this.lastSmsStatusCache[request.id] !== 'sent') {
+              this.lastSmsStatusCache[request.id] = 'sent'
+              this.persistSmsCache()
+            }
+            return 'sent'
+          }
+          const rq = normalize(request.sms_to_requester_status)
+          if (rq) {
+            if (rq !== 'pending') {
+              this.lastSmsStatusCache[request.id] = rq
+              this.persistSmsCache()
+            }
+            return rq
+          }
+        }
+
         // Read from multiple possible API fields (different backends use different naming)
-        // If any explicit 'sent at' timestamp exists, treat as sent regardless of status text
+        // If any explicit 'sent at' timestamp exists for ICT Officer, treat as sent regardless of status text
         const sentAtTS =
           request.sms_sent_to_ict_officer_at ||
           request.sms_to_ict_officer_at ||

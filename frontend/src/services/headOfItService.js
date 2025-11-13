@@ -216,12 +216,13 @@ const headOfItService = {
   /**
    * Assign a task to an ICT Officer
    */
-  async assignTaskToIctOfficer(requestId, ictOfficerId, notifyPhone = null) {
+  async assignTaskToIctOfficer(requestId, ictOfficerId, notifyPhone = null, forceReassign = false) {
     try {
       console.log('🔄 HeadOfItService: Assigning task to ICT officer:', {
         requestId,
         ictOfficerId,
-        notifyPhone
+        notifyPhone,
+        forceReassign
       })
 
       // Prefer new endpoint (UserAccess system). Fallback to legacy if unavailable
@@ -230,7 +231,7 @@ const headOfItService = {
           user_access_id: requestId,
           ict_officer_user_id: ictOfficerId,
           // Optional flags; backend ignores if not used
-          force_reassign: false
+          force_reassign: !!forceReassign
         }
         return axiosInstance.post('/head-of-it/assign-ict-task', payloadNew, { timeout: 20000 })
       }
@@ -255,7 +256,8 @@ const headOfItService = {
           send_sms: true,
           send_sms_to_ict_officer: true,
           notify_ict_officer: true,
-          notification_channel: 'sms'
+          notification_channel: 'sms',
+          force_reassign: !!forceReassign
         }
         return axiosInstance.post('/head-of-it/assign-task', payloadLegacy, { timeout: 20000 })
       }
@@ -342,7 +344,22 @@ const headOfItService = {
     try {
       console.log('🔄 HeadOfItService: Canceling task assignment for request:', requestId)
 
-      const response = await axiosInstance.post(`/head-of-it/tasks/${requestId}/cancel`)
+      // Try new endpoint first (UserAccess system), fallback to legacy
+      const tryNewEndpoint = () => axiosInstance.post(`/head-of-it/ict-tasks/${requestId}/cancel`, null, { timeout: 15000 })
+      const tryLegacyEndpoint = () => axiosInstance.post(`/head-of-it/tasks/${requestId}/cancel`, null, { timeout: 15000 })
+
+      let response
+      try {
+        response = await tryNewEndpoint()
+      } catch (err) {
+        const status = err?.response?.status
+        if (status === 404 || status === 405 || status === 501) {
+          console.warn('HeadOfItService: New cancel endpoint unavailable, falling back to legacy')
+          response = await tryLegacyEndpoint()
+        } else {
+          throw err
+        }
+      }
 
       if (response.data.success) {
         console.log('✅ HeadOfItService: Task assignment canceled successfully')

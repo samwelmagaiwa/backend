@@ -1826,13 +1826,13 @@ class BothServiceFormController extends Controller
             // Validation
             $validated = $request->validate([
                 'ict_officer_name' => 'required|string|max:255',
-                'ict_officer_signature' => 'required|file|mimes:jpeg,jpg,png,pdf|max:2048',
+                // Legacy file-based signature is now optional; digital signature token is enforced below
+                'ict_officer_signature' => 'nullable|file|mimes:jpeg,jpg,png,pdf|max:2048',
                 'approved_date' => 'required|date',
                 'comments' => 'nullable|string|max:1000',
                 'status' => 'nullable|string|in:implemented,pending,rejected'
             ], [
                 'ict_officer_name.required' => 'ICT Officer name is required',
-                'ict_officer_signature.required' => 'ICT Officer signature file is required',
                 'ict_officer_signature.mimes' => 'Signature must be in JPEG, JPG, PNG, or PDF format',
                 'ict_officer_signature.max' => 'Signature file must not exceed 2MB',
                 'approved_date.required' => 'Implementation date is required',
@@ -1999,6 +1999,165 @@ class BothServiceFormController extends Controller
                 'message' => 'Failed to save ICT Officer implementation: ' . $e->getMessage()
             ], 500);
         }
+    }
+    
+    /**
+     * Export a printable PDF for a combined access request (Jeeva/Wellsoft/Internet)
+     */
+    public function exportPdf(int $id)
+    {
+        $request = \App\Models\UserAccess::with(['department'])->findOrFail($id);
+
+        // Normalize request types to an array of slugs
+        $types = [];
+        if (is_array($request->request_type)) {
+            $types = $request->request_type;
+        } elseif (!empty($request->request_type)) {
+            $types = array_filter(array_map('trim', is_string($request->request_type) ? explode(',', $request->request_type) : []));
+        }
+
+        // Master module lists (order arranged to match legacy printed form)
+        $jeevaModulesMaster = [
+            'FINANCIAL ACCOUNTING','DOCTOR CONSULTATION','MEDICAL RECORDS','OUTPATIENT','NURSING STATION','INPATIENT',
+            'IP CASHIER','HIV','LINEN & LAUNDRY','FIXED ASSETS','PMTCT','PHARMACY','BILL NOTE','BLOOD BANK','ORDER MANAGEMENT',
+            'PRIVATE CREDIT','LABORATORY','GENERAL STORE','IP BILLING','RADIOLOGY','PURCHASE','SCROLLING','OPERATION THEATRE','CSSD',
+            'WEB INDENT','MORTUARY','GENERAL MAINTANANCE','PERSONNEL','CMS','MAINTANANCE','PAYROLL','MIS STATISTICS'
+        ];
+
+        // Wellsoft module labels can vary between deployments; present selected modules emphasized below Jeeva
+        $wellsoftModulesMaster = [
+            // Common Wellsoft functional areas; any additional selected modules will still be rendered
+            'Emergency (ED)','OPD','IPD','Pharmacy','Laboratory','Radiology','CSSD','Theatre','Billing','Stores'
+        ];
+
+        // Selected modules (already cast to array at the model level)
+        $selectedJeeva = (array) ($request->jeeva_modules_selected ?? []);
+        $selectedWellsoft = (array) ($request->wellsoft_modules_selected ?? []);
+
+        // Merge in any unknown items so they still appear as checked
+        foreach ($selectedJeeva as $m) {
+            if ($m && !in_array($m, $jeevaModulesMaster, true)) $jeevaModulesMaster[] = $m;
+        }
+        foreach ($selectedWellsoft as $m) {
+            if ($m && !in_array($m, $wellsoftModulesMaster, true)) $wellsoftModulesMaster[] = $m;
+        }
+
+        // Access type info (decided by HOD)
+        $accessType = $request->access_type ?: 'permanent';
+        $temporaryUntil = $request->temporary_until;
+
+        // Comments area (HOD specifies access rights here)
+        $hodComments = $request->hod_comments ?? '';
+
+        // Module requested for (Use/Revoke) – shared setting
+        $moduleRequestedFor = strtolower((string)($request->module_requested_for ?? 'use'));
+
+        // Requester digital signature (first 10 chars) and date
+        $sig = \App\Models\Signature::where('document_id', $request->id)
+            ->where('user_id', $request->user_id)
+            ->orderByDesc('signed_at')
+            ->first();
+        if (!$sig) {
+            $sig = \App\Models\Signature::where('document_id', $request->id)
+                ->orderByDesc('signed_at')
+                ->first();
+        }
+        $applicantSigShort = $sig? substr($sig->signature_hash ?? '', 0, 10): null;
+        $applicantSignedAt = $sig? ($sig->signed_at ? $sig->signed_at->format('d/m/Y H:i') : null) : null;
+
+        // Approver signature excerpts (first 10 chars) with robust matching
+        $sigShortBy = function($userId = null, $roleNames = [], $name = null, $date = null) use ($request) {
+            // Base query scoped to this document
+            $base = \App\Models\Signature::where('document_id', $request->id);
+
+            // 1) Exact user id (strongest)
+            if ($userId) {
+                $candidate = (clone $base)->where('user_id', $userId);
+                if (!empty($date)) {
+                    try {
+                        $dateStr = \Illuminate\Support\Carbon::parse($date)->toDateString();
+                        $hit = (clone $candidate)->whereDate('signed_at', $dateStr)->orderByDesc('signed_at')->first();
+                        if ($hit) return substr($hit->signature_hash ?? '', 0, 10);
+                    } catch (\Throwable $e) {}
+                }
+                $hit = $candidate->orderByDesc('signed_at')->first();
+                if ($hit) return substr($hit->signature_hash ?? '', 0, 10);
+            }
+
+            // 2) Match by role name(s)
+            if (!empty($roleNames)) {
+                $candidate = (clone $base)->whereHas('user.roles', function($q) use ($roleNames) {
+                    $q->whereIn('name', (array)$roleNames);
+                });
+                if (!empty($date)) {
+                    try {
+                        $dateStr = \Illuminate\Support\Carbon::parse($date)->toDateString();
+                        $hit = (clone $candidate)->whereDate('signed_at', $dateStr)->orderByDesc('signed_at')->first();
+                        if ($hit) return substr($hit->signature_hash ?? '', 0, 10);
+                    } catch (\Throwable $e) {}
+                }
+                $hit = $candidate->orderByDesc('signed_at')->first();
+                if ($hit) return substr($hit->signature_hash ?? '', 0, 10);
+            }
+
+            // 3) Fuzzy match by name tokens
+            if (!empty($name)) {
+                $tokens = array_values(array_filter(preg_split('/\s+/', mb_strtolower(trim($name))) ?: []));
+                if (!empty($tokens)) {
+                    $candidate = (clone $base)->whereHas('user', function($q) use ($tokens) {
+                        $q->where(function($qq) use ($tokens) {
+                            foreach ($tokens as $t) {
+                                $qq->whereRaw('LOWER(name) LIKE ?', ['%'.$t.'%']);
+                            }
+                        });
+                    });
+                    if (!empty($date)) {
+                        try {
+                            $dateStr = \Illuminate\Support\Carbon::parse($date)->toDateString();
+                            $hit = (clone $candidate)->whereDate('signed_at', $dateStr)->orderByDesc('signed_at')->first();
+                            if ($hit) return substr($hit->signature_hash ?? '', 0, 10);
+                        } catch (\Throwable $e) {}
+                    }
+                    $hit = $candidate->orderByDesc('signed_at')->first();
+                    if ($hit) return substr($hit->signature_hash ?? '', 0, 10);
+                }
+            }
+
+            // 4) Fallback: latest signature for the document
+            $sig = $base->orderByDesc('signed_at')->first();
+            return $sig ? substr($sig->signature_hash ?? '', 0, 10) : null;
+        };
+
+        $sigShorts = [
+            'hod' => $sigShortBy($request->hod_approved_by ?? null, ['head_of_department'], $request->hod_approved_by_name ?? $request->hod_name ?? null, $request->hod_approved_at),
+            'divisional' => $sigShortBy(null, ['divisional_director'], $request->divisional_director_name ?? null, $request->divisional_approved_at),
+            'ict_director' => $sigShortBy(null, ['ict_director','dict'], $request->ict_director_name ?? null, $request->ict_director_approved_at),
+            'head_it' => $sigShortBy(null, ['head_of_it'], $request->head_it_name ?? null, $request->head_it_approved_at),
+            'ict_officer' => $sigShortBy(null, ['ict_officer'], $request->ict_officer_name ?? null, $request->ict_officer_implemented_at),
+        ];
+
+        $data = [
+            'r' => $request,
+            'types' => $types,
+            'jeevaModulesMaster' => $jeevaModulesMaster,
+            'wellsoftModulesMaster' => $wellsoftModulesMaster,
+            'selectedJeeva' => array_map('strval', $selectedJeeva),
+            'selectedWellsoft' => array_map('strval', $selectedWellsoft),
+            'accessType' => $accessType,
+            'temporaryUntil' => $temporaryUntil,
+            'hodComments' => $hodComments,
+            'moduleRequestedFor' => $moduleRequestedFor,
+            'internetPurposes' => (array) ($request->internet_purposes ?? []),
+            'applicantSigShort' => $applicantSigShort,
+            'applicantSignedAt' => $applicantSignedAt,
+            'sigShorts' => $sigShorts,
+        ];
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.both-service-form.multi_form', $data)
+            ->setPaper('A4')
+            ->setOptions(['isRemoteEnabled' => true, 'isHtml5ParserEnabled' => true]);
+        $filename = 'access-request-'.$request->id.'.pdf';
+        return $pdf->download($filename);
     }
     
     /**
