@@ -3,6 +3,7 @@ import { h } from 'vue'
 import { ROLES } from '../utils/permissions'
 import { preloadRouteBasedImages } from '../utils/imagePreloader'
 import { enhancedNavigationGuard } from '../utils/routeGuards'
+import combinedAccessService from '../services/combinedAccessService'
 
 // Lazy load LoginPageWrapper as well for better initial bundle size
 const LoginPageWrapper = () =>
@@ -92,7 +93,7 @@ const routes = [
     component: () => import('../components/UserDashboard.vue'),
     meta: {
       requiresAuth: true,
-      roles: [ROLES.STAFF]
+      roles: [ROLES.STAFF, ROLES.ICT_OFFICER]
     }
   },
   {
@@ -279,7 +280,7 @@ const routes = [
     component: () => import('../components/views/forms/UserCombinedAccessForm.vue'),
     meta: {
       requiresAuth: true,
-      roles: [ROLES.STAFF]
+      roles: [ROLES.STAFF, ROLES.ICT_OFFICER]
     }
   },
   {
@@ -288,7 +289,7 @@ const routes = [
     component: () => import('../components/views/booking/BookingService.vue'),
     meta: {
       requiresAuth: true,
-      roles: [ROLES.STAFF]
+      roles: [ROLES.STAFF, ROLES.ICT_OFFICER]
     }
   },
   {
@@ -297,7 +298,7 @@ const routes = [
     component: () => import('../components/views/booking/EditBookingRequest.vue'),
     meta: {
       requiresAuth: true,
-      roles: [ROLES.STAFF]
+      roles: [ROLES.STAFF, ROLES.ICT_OFFICER]
     }
   },
   {
@@ -306,7 +307,7 @@ const routes = [
     component: () => import('../components/views/requests/RequestStatusPage.vue'),
     meta: {
       requiresAuth: true,
-      roles: [ROLES.STAFF]
+      roles: [ROLES.STAFF, ROLES.ICT_OFFICER]
     }
   },
   {
@@ -315,7 +316,7 @@ const routes = [
     component: () => import('../components/views/requests/InternalAccessDetails.vue'),
     meta: {
       requiresAuth: true,
-      roles: [ROLES.STAFF]
+      roles: [ROLES.STAFF, ROLES.ICT_OFFICER]
     }
   },
 
@@ -343,6 +344,15 @@ const routes = [
     path: '/ict-dashboard/access-requests',
     name: 'IctDashboard',
     component: () => import('../components/views/ict-officer/AccessRequests.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: [ROLES.ICT_OFFICER]
+    }
+  },
+  {
+    path: '/ict-dashboard/access-service',
+    name: 'IctAccessService',
+    redirect: '/user-dashboard',
     meta: {
       requiresAuth: true,
       roles: [ROLES.ICT_OFFICER]
@@ -757,6 +767,36 @@ router.onError((error) => {
     router.push('/').catch(() => {
       window.location.href = '/'
     })
+  }
+})
+
+// Prevent navigation to non-existent both-service-form IDs and keep showing current request
+router.beforeEach(async (to, from, next) => {
+  try {
+    const isBothServiceForm = to.path.includes('/both-service-form/')
+    if (!isBothServiceForm) return next()
+
+    // Avoid loops
+    if (to.fullPath === from.fullPath) return next()
+
+    // Extract id from params or path
+    const id = to.params?.id || to.path.match(/both-service-form\/(\d+)/)?.[1]
+    if (!id) return next()
+
+    // Validate existence with a short timeout to avoid hanging navigation
+    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 6000))
+    const res = await Promise.race([combinedAccessService.getRequestById(id), timeout])
+
+    const ok = res && res.success && res.data
+    if (ok) return next()
+
+    // If invalid, keep showing current request (cancel navigation), or redirect to a safe page
+    if (from && from.path && from.path.includes('/both-service-form/')) return next(false)
+    return next('/ict-dashboard/access-requests')
+  } catch (e) {
+    // On error, prefer to keep user on existing page
+    if (from && from.path && from.path.includes('/both-service-form/')) return next(false)
+    return next('/ict-dashboard/access-requests')
   }
 })
 

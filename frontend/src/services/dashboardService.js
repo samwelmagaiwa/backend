@@ -42,13 +42,59 @@ class DashboardService {
         throw new Error(response.data?.message || 'Failed to fetch dashboard statistics')
       }
     } catch (error) {
-      console.error('❌ Error fetching dashboard stats:', error)
-
-      // Return mock data as fallback to prevent UI breaking
-      return {
-        success: false,
-        error: error.message || 'Failed to fetch dashboard statistics',
-        data: this.getMockStats()
+      console.error(
+        '❌ Error fetching user dashboard stats, trying ICT Officer stats as fallback...',
+        error
+      )
+      // Attempt ICT Officer statistics for officer role
+      try {
+        const resp2 = await apiClient.get('/ict-officer/statistics')
+        if (resp2.data && resp2.data.success) {
+          const s = resp2.data.data || {}
+          const total = (s.all_time?.total ?? 0) || 0
+          const assigned = s.all_time?.assigned ?? 0
+          const inProgress = s.all_time?.in_progress ?? 0
+          const completed = s.all_time?.completed ?? 0
+          const processing = assigned + inProgress
+          return {
+            success: true,
+            data: {
+              processing,
+              underReview: processing,
+              completed,
+              grantedAccess: completed,
+              revision: 0,
+              needsRevision: 0,
+              total: total || processing + completed,
+              processingPercentage: this.calculatePercentage(
+                processing,
+                total || processing + completed || 1
+              ),
+              completedPercentage: this.calculatePercentage(
+                completed,
+                total || processing + completed || 1
+              ),
+              revisionPercentage: 0
+            }
+          }
+        }
+        throw new Error(resp2.data?.message || 'ICT Officer stats unavailable')
+      } catch (e2) {
+        console.error('❌ ICT Officer stats fallback failed:', e2)
+        // Final fallback: zeros (no mock numbers)
+        const zeros = {
+          processing: 0,
+          underReview: 0,
+          completed: 0,
+          grantedAccess: 0,
+          revision: 0,
+          needsRevision: 0,
+          total: 0,
+          processingPercentage: 0,
+          completedPercentage: 0,
+          revisionPercentage: 0
+        }
+        return { success: false, error: e2.message || error.message, data: zeros }
       }
     }
   }

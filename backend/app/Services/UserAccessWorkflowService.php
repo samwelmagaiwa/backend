@@ -603,7 +603,7 @@ class UserAccessWorkflowService
             'temporary_until' => 'required_if:access_type,temporary|nullable|date|after:today',
         ]);
 
-        return [
+        $base = [
             'user_id' => auth()->id(),
             'pf_number' => $request->pf_number,
             'staff_name' => $request->staff_name,
@@ -615,15 +615,40 @@ class UserAccessWorkflowService
             'internet_purposes' => $request->internet_purposes,
             'access_type' => $request->access_type,
             'temporary_until' => $request->temporary_until,
-            // Keep legacy status for backward compatibility during transition
+            // Defaults: normal staff flow starts at HOD
             'status' => 'pending_hod',
-            // Initialize new status columns
             'hod_status' => 'pending',
             'divisional_status' => 'pending',
             'ict_director_status' => 'pending',
             'head_it_status' => 'pending',
             'ict_officer_status' => 'pending',
         ];
+
+        // Special case: if submitter is ICT Officer, skip HOD and Divisional and start at ICT Director
+        try {
+            $user = auth()->user();
+            $isIctOfficer = false;
+            if ($user) {
+                // Check multiple shapes of role storage
+                if (method_exists($user, 'roles')) {
+                    $isIctOfficer = $user->roles()->where('name', 'ict_officer')->exists();
+                }
+                if (!$isIctOfficer && isset($user->role) && isset($user->role->name)) {
+                    $isIctOfficer = strtolower($user->role->name) === 'ict_officer';
+                }
+            }
+
+            if ($isIctOfficer) {
+                $base['status'] = 'pending_ict_director';
+                $base['hod_status'] = 'skipped';
+                $base['divisional_status'] = 'skipped';
+                $base['ict_director_status'] = 'pending';
+            }
+        } catch (\Throwable $e) {
+            // Fallback to default flow on any error determining role
+        }
+
+        return $base;
     }
 
     /**

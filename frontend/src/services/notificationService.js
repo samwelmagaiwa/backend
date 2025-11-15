@@ -44,6 +44,30 @@ const addAuthInterceptor = (instance) => {
 addAuthInterceptor(axiosInstance)
 addAuthInterceptor(notificationAxiosInstance)
 
+// Add anti-cache headers and cache-busting param for GET requests
+const addNoCacheInterceptor = (instance) => {
+  instance.interceptors.request.use(
+    (config) => {
+      if (config.method && config.method.toLowerCase() === 'get') {
+        try {
+          const url = new URL(config.url, config.baseURL)
+          url.searchParams.set('_cb', String(Date.now()))
+          config.url = url.pathname + url.search
+        } catch (e) {
+          // Fallback: append naïve query if URL constructor fails
+          const sep = (config.url || '').includes('?') ? '&' : '?'
+          config.url = `${config.url}${sep}_cb=${Date.now()}`
+        }
+      }
+      return config
+    },
+    (error) => Promise.reject(error)
+  )
+}
+
+addNoCacheInterceptor(axiosInstance)
+addNoCacheInterceptor(notificationAxiosInstance)
+
 // Simple cache to reduce frequent API calls
 const notificationCache = {
   data: null,
@@ -51,11 +75,37 @@ const notificationCache = {
   maxAge: 15000 // 15 seconds cache
 }
 
+const ENABLE_RESEND =
+  String(process.env.VUE_APP_ENABLE_SMS_RESEND || 'false').toLowerCase() === 'true'
+
 const notificationService = {
   /**
+   * Expose feature flag so UIs can disable retry loops when resend is off
+   */
+  isResendEnabled() {
+    return ENABLE_RESEND
+  },
+
+  /**
    * Resend/notify SMS generically across roles with broad endpoint fallbacks.
+   * NOTE: Backend does not expose any resend/notify endpoints in this project.
+   * We short-circuit to avoid spamming non-existent routes (405/404 floods).
    */
   async resendSmsGeneric({ requestId, role = null, target = null, phone = null, channel = 'sms' }) {
+    // Feature flag: allow enabling later without code changes
+
+    if (!ENABLE_RESEND) {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn(
+          '🚫 NotificationService: SMS resend is disabled (no backend endpoints). Skipping network calls.'
+        )
+      }
+      return {
+        success: false,
+        message: 'SMS resend not supported by backend; skipped'
+      }
+    }
+
     // Build normalization helpers
     const normalizePhone = (p) => {
       if (!p) return null
@@ -92,45 +142,8 @@ const notificationService = {
       staff_phone_number: rawPhone || undefined
     }
 
-    // Endpoint candidates (generic + role-based + request-scoped)
-    const roleBases = []
-    if (role) {
-      // map a few known synonyms
-      const aliases = {
-        head_of_it: ['head-of-it', 'head_it'],
-        hod: ['hod', 'head-of-department', 'head_of_department'],
-        divisional_director: ['divisional', 'divisional-director'],
-        ict_director: ['ict-director', 'dict', 'ict_director'],
-        ict_officer: ['ict-officer', 'ict_officer'],
-        staff: ['staff', 'user', 'requester']
-      }[role] || [role]
-      roleBases.push(...aliases)
-    }
-
+    // Minimal, explicit allowlist (kept empty until backend adds endpoints)
     const endpoints = []
-    // Generic
-    endpoints.push(`/notifications/resend`)
-    endpoints.push(`/notifications/send`)
-    if (requestId) {
-      endpoints.push(`/requests/${requestId}/notify`)
-      endpoints.push(`/requests/${requestId}/resend-sms`)
-      endpoints.push(`/requests/${requestId}/send-notification`)
-    }
-    // Role-scoped
-    for (const base of roleBases) {
-      if (requestId) {
-        endpoints.push(`/${base}/requests/${requestId}/notify`)
-        endpoints.push(`/${base}/requests/${requestId}/resend-sms`)
-        endpoints.push(`/${base}/requests/${requestId}/send-notification`)
-        // Some modules use resource names
-        endpoints.push(`/${base}/access-requests/${requestId}/notify`)
-        endpoints.push(`/${base}/access-requests/${requestId}/resend-sms`)
-        endpoints.push(`/${base}/access-requests/${requestId}/send-notification`)
-      }
-      endpoints.push(`/${base}/notify`)
-      endpoints.push(`/${base}/resend-sms`)
-      endpoints.push(`/${base}/send-notification`)
-    }
 
     let response
     let lastError
@@ -168,9 +181,7 @@ const notificationService = {
     return {
       success: false,
       message:
-        lastError?.response?.data?.message ||
-        lastError?.message ||
-        'Failed to retry SMS via any endpoint'
+        lastError?.response?.data?.message || lastError?.message || 'No resend endpoints configured'
     }
   },
 

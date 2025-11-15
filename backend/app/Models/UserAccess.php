@@ -110,7 +110,7 @@ class UserAccess extends Model
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'request_type' => 'array',
+        // 'request_type' intentionally NOT cast here to avoid JSON decode errors on legacy values
         'wellsoft_modules_selected' => 'array',
         'jeeva_modules_selected' => 'array',
         'internet_purposes' => 'array',
@@ -879,25 +879,12 @@ class UserAccess extends Model
     }
 
     /**
-     * Get all request types as an array.
+     * Get all request types as an array (robust against legacy formats).
      */
     public function getRequestTypesArray(): array
     {
-        if (empty($this->request_type)) {
-            return [];
-        }
-        
-        // If it's already an array (JSON decoded)
-        if (is_array($this->request_type)) {
-            return $this->request_type;
-        }
-        
-        // If it's a comma-separated string
-        if (is_string($this->request_type)) {
-            return array_filter(array_map('trim', explode(',', $this->request_type)));
-        }
-        
-        return [];
+        $val = $this->request_type; // will use accessor below
+        return is_array($val) ? $val : [];
     }
 
     /**
@@ -1256,6 +1243,83 @@ class UserAccess extends Model
     public function getRequestIdAttribute($value)
     {
         return $value ?? 'MLG-REQ' . str_pad($this->id, 6, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Robust accessor for request_type supporting JSON, CSV, or legacy formats.
+     */
+    public function getRequestTypeAttribute($value)
+    {
+        if (is_array($value)) {
+            return array_values(array_filter($value, fn($v) => $v !== null && $v !== ''));
+        }
+        if (is_string($value)) {
+            $trim = trim($value);
+            // Try strict JSON first
+            $decoded = json_decode($trim, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                return array_values(array_filter($decoded, fn($v) => $v !== null && $v !== ''));
+            }
+            // Normalize common legacy patterns: single quotes, escaped quotes, bracketed lists
+            $normalized = $trim;
+            // Replace single quotes with double quotes when it looks like a JSON-like array
+            if (preg_match('/^\s*\[.*\]\s*$/', $normalized)) {
+                $normalized = preg_replace("/'/", '"', $normalized);
+                $decoded2 = json_decode($normalized, true);
+                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded2)) {
+                    return array_values(array_filter($decoded2, fn($v) => $v !== null && $v !== ''));
+                }
+            }
+            // Fallback: comma-separated list
+            $parts = array_filter(array_map(function ($p) {
+                $p = trim($p);
+                return trim($p, "\"' ");
+            }, explode(',', $trim)));
+            if (!empty($parts)) {
+                return array_values($parts);
+            }
+            // Final fallback: single token as array
+            return $trim !== '' ? [$trim] : [];
+        }
+        // Unknown type
+        return [];
+    }
+
+    /**
+     * Ensure request_type is stored as JSON array consistently.
+     */
+    public function setRequestTypeAttribute($value): void
+    {
+        if (is_array($value)) {
+            $this->attributes['request_type'] = json_encode(array_values(array_filter($value, fn($v) => $v !== null && $v !== '')));
+            return;
+        }
+        if (is_string($value)) {
+            $trim = trim($value);
+            $decoded = json_decode($trim, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                $this->attributes['request_type'] = json_encode(array_values(array_filter($decoded, fn($v) => $v !== null && $v !== '')));
+                return;
+            }
+            // Normalize legacy bracket list with single quotes
+            if (preg_match('/^\s*\[.*\]\s*$/', $trim)) {
+                $normalized = preg_replace("/'/", '"', $trim);
+                $decoded2 = json_decode($normalized, true);
+                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded2)) {
+                    $this->attributes['request_type'] = json_encode(array_values(array_filter($decoded2, fn($v) => $v !== null && $v !== '')));
+                    return;
+                }
+            }
+            // CSV fallback
+            $parts = array_filter(array_map(function ($p) {
+                $p = trim($p);
+                return trim($p, "\"' ");
+            }, explode(',', $trim)));
+            $this->attributes['request_type'] = json_encode(array_values($parts));
+            return;
+        }
+        // Unknown type, store empty array
+        $this->attributes['request_type'] = json_encode([]);
     }
     
     /**

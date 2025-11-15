@@ -239,12 +239,15 @@
                       >
                     </div>
 
-                    <!-- Divisional signature area: show red 'Stage Skipped' badge when applicable -->
+                    <!-- HOD/Divisional signature area: show red 'Stage Skipped' badge when applicable -->
                     <div
                       v-if="
-                        step.id === 'divisional' &&
-                        (timelineData?.request?.divisional_status === 'skipped' ||
-                          step.statusLabel === 'Skipped')
+                        (step.id === 'divisional' &&
+                          (timelineData?.request?.divisional_status === 'skipped' ||
+                            step.statusLabel === 'Skipped')) ||
+                        (step.id === 'hod' &&
+                          (timelineData?.request?.hod_status === 'skipped' ||
+                            step.statusLabel === 'Skipped'))
                       "
                       class="flex items-center gap-2"
                     >
@@ -252,7 +255,11 @@
                       <span
                         class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-red-900/30 text-red-300 border border-red-500/40"
                       >
-                        No Divisional Director — Stage Skipped
+                        {{
+                          step.id === 'divisional'
+                            ? 'No Divisional Director — Stage Skipped'
+                            : 'No HOD — Stage Skipped'
+                        }}
                       </span>
                     </div>
 
@@ -522,6 +529,22 @@
       normalizedRequest() {
         const r = this.timelineData?.request || this.timelineData?.request_info || null
         if (!r) return null
+        // Debug once per load to see available fields (non-breaking)
+        if (process.env.NODE_ENV === 'development') {
+          try {
+            console.log('🔍 RequestTimeline normalizedRequest source:', {
+              keys: Object.keys(r || {}),
+              sample: {
+                staff_name: r.staff_name,
+                pf_number: r.pf_number,
+                department: r.department,
+                department_name: r.department_name
+              }
+            })
+          } catch (e) {
+            // ignore logging errors
+          }
+        }
         const requestTypes = Array.isArray(r.request_types)
           ? r.request_types
           : Array.isArray(r.request_type)
@@ -535,9 +558,44 @@
         return {
           id: r.id || r.request_id,
           display_id: r.request_id || (r.id ? `REQ-${String(r.id).padStart(6, '0')}` : ''),
-          staff_name: r.staff_name || r.user?.name || r.full_name || '',
-          pf_number: r.pf_number || r.pfNumber || r.pf_number_display || '',
-          department_name: r.department?.name || r.department_name || r.department || '',
+          // Be very defensive: support multiple backend field names used across views
+          staff_name:
+            r.staff_name ||
+            r.staffName ||
+            r.full_name ||
+            r.name ||
+            r.employee_name ||
+            r.applicant_name ||
+            r.user_name ||
+            r.requester_name ||
+            r.requester?.name ||
+            r.profile?.staff_name ||
+            r.profile?.full_name ||
+            r.user?.name ||
+            '',
+          pf_number:
+            r.pf_number ||
+            r.pfNumber ||
+            r.PF_NUMBER ||
+            r.pf ||
+            r.employee_id ||
+            r.employee_no ||
+            r.employeeNumber ||
+            r.profile?.pf_number ||
+            r.profile?.employee_id ||
+            r.pf_number_display ||
+            '',
+          department_name:
+            (r.department && (r.department.name || r.department.department_name || r.department.label)) ||
+            r.department_name ||
+            r.departmentLabel ||
+            r.department_label ||
+            r.department ||
+            r.dept ||
+            r.profile?.department_name ||
+            r.profile?.department ||
+            r.department_id ||
+            '',
           request_type_name: requestTypeName,
           access_type_name: r.access_type_name || r.access_type || '',
           created_at: r.created_at || r.submission_date || r.createdAt || null
@@ -646,14 +704,25 @@
 
         // 2. HOD Approval
         const hodStatus = this.getApprovalStatus('hod', request)
+        const hodActor =
+          request.hod_name ||
+          request.hod_approved_by_name ||
+          request.approved_by_name ||
+          'Head of Department'
+        const hodTimestamp =
+          request.hod_approved_at ||
+          request.hod_rejected_at ||
+          request.updated_at ||
+          request.created_at ||
+          null
         steps.push({
           id: 'hod',
           title: 'HOD/BM Approval',
           status: hodStatus.status,
           statusLabel: hodStatus.label,
-          actor: request.hod_name,
+          actor: hodActor,
           position: 'Head of Department',
-          timestamp: request.hod_approved_at,
+          timestamp: hodTimestamp,
           comments: request.hod_comments,
           hasSignature: !!request.hod_signature_path
         })
@@ -840,8 +909,8 @@
           this.loadTimeline()
         }
       },
-      requestId(newVal) {
-        if (this.show && newVal) {
+      requestId(newVal, oldVal) {
+        if (this.show && newVal && newVal !== oldVal) {
           this.loadTimeline()
         }
       }
@@ -849,6 +918,16 @@
     methods: {
       async loadTimeline() {
         if (!this.requestId) return
+
+        // If we already have timeline data for this request and no error, avoid refetching
+        if (
+          this.timelineData?.request?.id &&
+          String(this.timelineData.request.id) === String(this.requestId) &&
+          !this.loading &&
+          !this.error
+        ) {
+          return
+        }
 
         this.loading = true
         this.error = null
@@ -864,10 +943,15 @@
 
           const id = this.requestId // snapshot to avoid prop changes (e.g., modal close) causing null
 
-          // Build a small failover chain: primary -> combinedAccessService -> ictOfficerService
+          // Build a small failover chain: primary -> optional HOD timeline -> ictOfficerService
           const chain = []
           chain.push(this.currentService)
-          if (this.currentService !== combinedAccessService) chain.push(combinedAccessService)
+
+          // ICT Officers do not have access to HOD /combinedAccessService timeline endpoints, so skip them
+          if (!this.isIctOfficer && this.currentService !== combinedAccessService) {
+            chain.push(combinedAccessService)
+          }
+
           if (this.currentService !== ictOfficerService) chain.push(ictOfficerService)
 
           let loaded = false
@@ -1080,8 +1164,8 @@
 
         if (status === 'rejected') {
           result = { status: 'rejected', label: 'Rejected' }
-        } else if (status === 'skipped' && stage === 'divisional') {
-          // Divisional stage was intentionally skipped (no divisional director for this department)
+        } else if (status === 'skipped' && (stage === 'divisional' || stage === 'hod')) {
+          // Stage intentionally skipped (e.g., ICT Officer-origin request)
           result = { status: 'completed', label: 'Skipped' }
         } else if (
           status === 'approved' ||

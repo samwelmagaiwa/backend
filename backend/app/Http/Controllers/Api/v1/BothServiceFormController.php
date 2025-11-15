@@ -720,8 +720,9 @@ class BothServiceFormController extends Controller
                             ->orWhere('divisional_status', 'pending');
                       });
             } else if (array_intersect($userRoles, ['ict_director'])) {
-                // ICT directors see divisional-approved requests
-                $query->where('divisional_status', 'approved')
+                // ICT directors see HOD+Divisional approved requests; allow 'skipped' for ICT Officer-origin
+                $query->whereIn('hod_status', ['approved', 'skipped'])
+                      ->whereIn('divisional_status', ['approved', 'skipped'])
                       ->where(function($q) {
                           $q->whereNull('ict_director_status')
                             ->orWhere('ict_director_status', 'pending');
@@ -1259,11 +1260,15 @@ class BothServiceFormController extends Controller
             // Get user access record
             $userAccess = UserAccess::findOrFail($userAccessId);
             
-            // Verify request is in correct status (must be Divisional approved)
-            if ($userAccess->divisional_status !== 'approved') {
+            // Verify request is in correct status
+            // Primary flow: require HOD and Divisional approved
+            // Secondary flow (ICT Officer-origin): allow 'skipped' for HOD and Divisional
+            $hodOk = in_array($userAccess->hod_status, ['approved', 'skipped'], true);
+            $divOk = in_array($userAccess->divisional_status, ['approved', 'skipped'], true);
+            if (!$hodOk || !$divOk) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Request must be Divisional Director approved before ICT Director can approve it.'
+                    'message' => 'Request must have HOD and Divisional Director approval (or be marked as skipped) before ICT Director can approve it.'
                 ], 422);
             }
             
@@ -1333,7 +1338,9 @@ class BothServiceFormController extends Controller
 'ict_director_signature_path' => null,
                 'ict_director_approved_at' => $validated['approved_date'],
                 'ict_director_comments' => $validated['comments'] ?? null,
-                'ict_director_status' => 'approved' // Set the new ict_director_status column
+                'ict_director_status' => 'approved', // Set the new ict_director_status column
+                // Advance workflow to Head of IT stage
+                'head_it_status' => $userAccess->head_it_status === null ? 'pending' : $userAccess->head_it_status
             ];
             
             Log::info('🔄 Updating user access record for ICT Director approval', [
@@ -1491,11 +1498,13 @@ class BothServiceFormController extends Controller
             // Get user access record
             $userAccess = UserAccess::findOrFail($userAccessId);
             
-            // Verify request is in correct status (must be Divisional approved)
-            if ($userAccess->divisional_status !== 'approved') {
+            // Verify request is in correct status
+            $hodOk = in_array($userAccess->hod_status, ['approved', 'skipped'], true);
+            $divOk = in_array($userAccess->divisional_status, ['approved', 'skipped'], true);
+            if (!$hodOk || !$divOk) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Request must be Divisional Director approved before ICT Director can reject it.'
+                    'message' => 'Request must have HOD and Divisional Director approval (or be marked as skipped) before ICT Director can reject it.'
                 ], 422);
             }
             

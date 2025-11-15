@@ -47,6 +47,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => RoleMiddleware::class,
             'both.service.role' => BothServiceFormRoleMiddleware::class,
             'admin' => App\Http\Middleware\AdminMiddleware::class,
+            'nocache' => App\Http\Middleware\NoCache::class,
             // Additional security aliases for specific use cases
             'auth.throttle' => 'throttle:auth',
             'sensitive.throttle' => 'throttle:sensitive',

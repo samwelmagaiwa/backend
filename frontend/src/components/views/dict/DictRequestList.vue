@@ -346,7 +346,7 @@
     <UnifiedLoadingBanner
       v-if="isLoading"
       :loading-title="'Loading Access Requests'"
-      :loading-subtitle="'Fetching divisional-approved requests awaiting ICT Director review...'"
+      :loading-subtitle="'Fetching requests awaiting ICT Director review...'"
       :department-title="'ICT Director Dashboard'"
     />
 
@@ -575,6 +575,26 @@
             this.requests = items
             console.log('Combined access requests loaded:', this.requests.length)
             console.log('Raw response data:', response.data)
+
+            // Push page-level badge override for DICT route in sidebar
+            try {
+              const pendingCount = (items || []).filter((r) => {
+                const st = String(r.status || '').toLowerCase()
+                const dictSt = String(r.ict_director_status || r.dict_status || '').toLowerCase()
+                return st === 'pending' || dictSt === 'pending'
+              }).length
+              if (window.sidebarInstance?.setNotificationCount) {
+                window.sidebarInstance.setNotificationCount(
+                  '/dict-dashboard/combined-requests',
+                  pendingCount
+                )
+                console.log('🔔 DictRequestList: Set sidebar pending badge to', pendingCount)
+              }
+              // Also expose a generic page override used by ModernSidebar fallback
+              window.accessRequestsPendingCount = pendingCount
+            } catch (e) {
+              console.warn('DictRequestList: Failed to set sidebar badge override', e)
+            }
 
             // Initialize auto-retry on freshly loaded list
             this.$nextTick(() => this.initAutoRetryForList())
@@ -893,7 +913,7 @@
 
       positionDropdown(requestId) {
         // Find the button element for this request
-        const button = document.querySelector(`[aria-label*="${requestId}"]`)
+        const button = document.querySelector(`[aria-label*='${requestId}']`)
         if (!button) return
 
         const rect = button.getBoundingClientRect()
@@ -1195,6 +1215,11 @@
       },
       async retrySendSms(request) {
         if (!request) return
+        // Do not attempt resend if feature is disabled
+        if (!notificationService.isResendEnabled || !notificationService.isResendEnabled()) {
+          console.warn('DictRequestList: SMS resend disabled by feature flag; skipping retry loop')
+          return
+        }
         const id = request.id
         if (!this.retryAttempts[id]) this.retryAttempts[id] = 0
         if (this.isRetrying(id)) return
@@ -1236,6 +1261,11 @@
         }, delay)
       },
       initAutoRetryForList() {
+        // Do not start auto-retry scheduler if resend is disabled
+        if (!notificationService.isResendEnabled || !notificationService.isResendEnabled()) {
+          console.log('DictRequestList: Auto-retry disabled (resend feature off)')
+          return
+        }
         ;(this.requests || []).forEach((r) => {
           const st = this.getRelevantSmsStatus(r)
           if (['failed', 'pending'].includes(st)) {

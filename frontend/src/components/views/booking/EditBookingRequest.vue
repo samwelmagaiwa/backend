@@ -477,9 +477,9 @@
         return minDate.value
       })
 
-      // Guard this route - only staff can access
+      // Guard this route - staff and ICT Officers can access
       onMounted(() => {
-        requireRole([ROLES.STAFF])
+        requireRole([ROLES.STAFF, ROLES.ICT_OFFICER])
         checkUserBookings() // Debug: Check what bookings user can access
         loadBookingRequest()
         loadFormOptions()

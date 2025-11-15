@@ -978,8 +978,19 @@
           console.error('❌ UserDashboard: Error fetching dashboard stats:', error)
           statsError.value = error.message || 'Failed to load dashboard statistics'
 
-          // Use mock data as fallback
-          dashboardStats.value = dashboardService.getMockStats()
+          // Use zeroed data as fallback (no mock numbers in production)
+          dashboardStats.value = {
+            processing: 0,
+            underReview: 0,
+            completed: 0,
+            grantedAccess: 0,
+            revision: 0,
+            needsRevision: 0,
+            total: 0,
+            processingPercentage: 0,
+            completedPercentage: 0,
+            revisionPercentage: 0
+          }
         } finally {
           isLoadingStats.value = false
         }
@@ -1036,7 +1047,7 @@
       // Guard this route - only staff can access
       onMounted(async () => {
         console.log('UserDashboard mounted successfully')
-        requireRole([ROLES.STAFF])
+        requireRole([ROLES.STAFF, ROLES.ICT_OFFICER])
 
         // Fetch dashboard statistics and check for pending requests in parallel
         await Promise.allSettled([

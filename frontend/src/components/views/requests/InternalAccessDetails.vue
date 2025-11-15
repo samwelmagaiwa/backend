@@ -190,7 +190,9 @@
                                 ? 'bg-green-500'
                                 : getCombinedApprovalStatus('hod') === 'rejected'
                                   ? 'bg-red-500'
-                                  : 'bg-yellow-500'
+                                  : getCombinedApprovalStatus('hod') === 'skipped'
+                                    ? 'bg-blue-500'
+                                    : 'bg-yellow-500'
                             "
                             class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1"
                           >
@@ -214,7 +216,9 @@
                                 ? 'bg-green-500'
                                 : getCombinedApprovalStatus('divisional') === 'rejected'
                                   ? 'bg-red-500'
-                                  : 'bg-yellow-500'
+                                  : getCombinedApprovalStatus('divisional') === 'skipped'
+                                    ? 'bg-blue-500'
+                                    : 'bg-yellow-500'
                             "
                             class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1"
                           >
@@ -1005,6 +1009,8 @@
 
         switch (stage) {
           case 'hod':
+            // Respect explicit granular status if present
+            if (requestData.value?.hodApprovalStatus === 'skipped') return 'skipped'
             if (
               [
                 'hod_approved',
@@ -1023,6 +1029,8 @@
             return 'pending'
 
           case 'divisional':
+            // Respect explicit granular status if present
+            if (requestData.value?.divisionalStatus === 'skipped') return 'skipped'
             if (
               [
                 'divisional_approved',

@@ -122,6 +122,7 @@ export const ROLE_PERMISSIONS = {
     routes: [
       '/ict-dashboard',
       '/ict-dashboard/access-requests',
+      '/ict-dashboard/access-service',
       '/user-security-access/:id',
       '/ict-approval/requests',
       '/ict-approval/requests-simple',

@@ -194,7 +194,7 @@
                 <h2
                   class="text-sm font-bold text-blue-100 tracking-wide drop-shadow-md animate-fade-in-delay"
                 >
-                  {{ isReviewMode ? 'REQUEST REVIEW - ' + getRequestId : 'UNIFIED SERVICES FORM' }}
+                  {{ isReviewMode ? 'REQUEST REVIEW - ' + displayRequestId : 'UNIFIED SERVICES FORM' }}
                 </h2>
               </div>
 
@@ -888,13 +888,7 @@
                           class="text-xs px-2 py-0.5 bg-amber-500/30 rounded-full text-amber-200 font-medium"
                         >
                           {{ (previousComments && previousComments.length) || 0 }}
-                          <!-- DEBUG: Force previousComments execution -->
-                          {{
-                            console.log(
-                              'TEMPLATE DEBUG - previousComments length:',
-                              previousComments && previousComments.length
-                            ) || ''
-                          }}</span>
+                        </span>
                       </div>
                       <h3 class="text-xs font-bold text-white flex items-center">
                         <i class="fas fa-history mr-1 text-amber-300 text-xs"></i>
@@ -1418,6 +1412,13 @@
                             Completed
                           </span>
                           <span
+                            v-else-if="isHodSkipped"
+                            class="text-base px-2 py-1 bg-red-500/30 rounded-full text-red-300"
+                          >
+                            <i class="fas fa-ban text-base mr-1"></i>
+                            Skipped
+                          </span>
+                          <span
                             v-else-if="!isHodApprovalEditable && isReviewMode"
                             class="text-base px-2 py-1 bg-gray-500/30 rounded-full text-gray-300"
                           >
@@ -1499,6 +1500,23 @@
                                       title="Signature on file"
                                     ></i>
                                   </div>
+                                </div>
+                              </div>
+
+                              <!-- Skipped indicator for HOD when request is from ICT Officer -->
+                              <div
+                                v-else-if="isHodSkipped"
+                                class="w-full px-3 py-2 border-2 border-red-400/60 rounded-xl bg-red-500/10 backdrop-blur-sm transition-all duration-300 shadow-lg min-h-[35px] flex items-center justify-center"
+                                title="HOD approval skipped"
+                              >
+                                <div class="text-center">
+                                  <div class="flex items-center justify-center space-x-2 mb-1">
+                                    <div class="w-8 h-8 bg-red-500/20 rounded-full flex items-center justify-center">
+                                      <i class="fas fa-ban text-red-400 text-sm"></i>
+                                    </div>
+                                    <span class="text-red-400 font-semibold text-base">Signature skipped</span>
+                                  </div>
+                                  <p class="text-red-300/80 text-base">HOD approval skipped</p>
                                 </div>
                               </div>
 
@@ -1660,12 +1678,13 @@
                                 v-model="form.approvals.hod.date"
                                 type="date"
                                 :readonly="true"
-                                :class="[
+:class="[
                                   'medical-input w-full px-3 py-2 bg-white/30 border-2 rounded-lg focus:outline-none text-white backdrop-blur-sm cursor-not-allowed font-medium',
                                   shouldShowHodSignedIndicator
                                     ? 'border-green-400/60 ring-1 ring-green-300/40'
                                     : '',
                                   shouldShowHodNoSignatureIndicator ? 'border-red-400/40' : '',
+                                  isHodSkipped ? 'border-red-400/60 bg-red-500/10' : '',
                                   isIctDirectorApprovalActive && shouldShowHodSignedIndicator
                                     ? 'font-semibold text-green-200'
                                     : ''
@@ -1673,7 +1692,12 @@
                               />
                               <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
                                 <i
-                                  v-if="shouldShowHodSignedIndicator"
+                                  v-if="isHodSkipped"
+                                  class="fas fa-ban text-red-400 text-xs"
+                                  title="HOD approval skipped"
+                                ></i>
+                                <i
+                                  v-else-if="shouldShowHodSignedIndicator"
                                   class="fas fa-check text-green-400 text-xs"
                                   title="HOD has signed - date populated from approval"
                                 ></i>
@@ -1735,6 +1759,13 @@
                           >
                             <i class="fas fa-check text-base mr-1"></i>
                             Completed
+                          </span>
+                          <span
+                            v-else-if="isDivisionalSkipped"
+                            class="text-base px-2 py-1 bg-red-500/30 rounded-full text-red-300"
+                          >
+                            <i class="fas fa-ban text-base mr-1"></i>
+                            Skipped
                           </span>
                           <span
                             v-else-if="!isDivisionalApprovalEditable && isReviewMode"
@@ -1803,6 +1834,25 @@
                                     ]"
                                   >
                                     Approved at: {{ getApprovalDateFormatted('divisional') }}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <!-- Divisional Director skipped indicator -->
+                              <div
+                                v-else-if="isDivisionalSkipped"
+                                class="w-full px-3 py-2 border-2 border-red-400/60 rounded-xl bg-red-500/10 backdrop-blur-sm transition-all duration-300 shadow-lg min-h-[35px] flex items-center justify-center"
+                                title="Divisional Director approval skipped"
+                              >
+                                <div class="text-center">
+                                  <div class="flex items-center justify-center space-x-2 mb-1">
+                                    <div class="w-8 h-8 bg-red-500/20 rounded-full flex items-center justify-center">
+                                      <i class="fas fa-ban text-red-400 text-sm"></i>
+                                    </div>
+                                    <span class="text-red-400 font-semibold text-base">Signature skipped</span>
+                                  </div>
+                                  <p class="text-red-300/80 text-base">
+                                    Divisional Director approval skipped
                                   </p>
                                 </div>
                               </div>
@@ -1922,7 +1972,7 @@
                                 v-model="form.approvals.divisionalDirector.date"
                                 type="date"
                                 :readonly="true"
-                                :class="[
+:class="[
                                   'medical-input w-full px-3 py-2 bg-white/15 border rounded-lg focus:outline-none text-white backdrop-blur-sm cursor-not-allowed',
                                   shouldShowDivisionalSignedIndicator
                                     ? 'border-green-400/60 ring-1 ring-green-300/40'
@@ -1930,6 +1980,7 @@
                                   shouldShowDivisionalNoSignatureIndicator
                                     ? 'border-red-400/40'
                                     : '',
+                                  isDivisionalSkipped ? 'border-red-400/60 bg-red-500/10' : '',
                                   isIctDirectorApprovalActive && shouldShowDivisionalSignedIndicator
                                     ? 'font-semibold text-green-200'
                                     : ''
@@ -1937,7 +1988,12 @@
                               />
                               <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
                                 <i
-                                  v-if="shouldShowDivisionalSignedIndicator"
+                                  v-if="isDivisionalSkipped"
+                                  class="fas fa-ban text-red-400 text-xs"
+                                  title="Divisional Director approval skipped"
+                                ></i>
+                                <i
+                                  v-else-if="shouldShowDivisionalSignedIndicator"
                                   class="fas fa-check text-green-400 text-xs"
                                   title="Divisional Director has signed - date populated from approval"
                                 ></i>
@@ -2149,7 +2205,7 @@
                                     type="button"
                                     @click="signCurrentDocument"
                                     :disabled="isSigning || !isReviewMode"
-                                    class="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/50"
+                                    class="px-3 py-1.5 bg-gradient-to-r from-green-600 to-emerald-600 text-white text-xs font-semibold rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-300 flex items-center gap-1 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 border border-green-400/50"
                                   >
                                     <i class="fas fa-pen-alt"></i>
                                     Sign Document
@@ -2510,7 +2566,7 @@
                                 v-if="
                                   !ictOfficerSignaturePreview &&
                                   !isImplementationAlreadyCompleted &&
-                                  !(hasUserSigned || (currentUser?.name && historyHasSigner(currentUser.name)) || shouldShowIctOfficerSignedIndicator)
+                                  !(shouldShowIctOfficerSignedIndicator || (viewerStage() === 'ict_officer' && (hasUserSigned || (currentUser?.name && historyHasSigner(currentUser.name)))))
                                 "
                                 class="w-full px-2 py-1 border-2 border-dashed border-blue-300/40 rounded-lg focus-within:border-blue-400 bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/20 min-h-[20px] flex items-center justify-center hover:bg-white/20"
                               >
@@ -2540,7 +2596,10 @@
 
                               <!-- Show existing signature when implementation is completed or when digitally signed -->
                               <div
-                                v-else-if="shouldShowIctOfficerSignedIndicator || hasUserSigned || (currentUser?.name && historyHasSigner(currentUser.name))"
+                                v-else-if="
+                                  shouldShowIctOfficerSignedIndicator ||
+                                  (viewerStage() === 'ict_officer' && (hasUserSigned || (currentUser?.name && historyHasSigner(currentUser.name))))
+                                "
                                 class="w-full px-3 py-2 border-2 border-green-300/40 rounded-xl bg-white/15 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-green-500/20 min-h-[35px] flex items-center justify-center relative"
                                 :title="getSignedByYouTooltip('ict_officer')"
                               >
@@ -4004,9 +4063,36 @@
         return this.getRequestId != null
       },
 
-      // Get effective request ID (prop takes priority over route params)
+      // Get effective request ID (prefer route param, then loaded record id; ignore stale query if params present)
       getRequestId() {
-        return this.requestId || this.$route.params.id || this.$route.query.id || null
+        const propId = this.requestId
+        const paramId = this.$route?.params?.id
+        const queryId = this.$route?.query?.id
+        // Coerce to numeric string if possible
+        const norm = (v) => (v == null ? null : String(v).trim())
+        let id = norm(propId) || norm(paramId) || null
+        // If we have loaded requestData.id and it differs, trust the loaded record id
+        const loadedId = norm(this.requestData?.id)
+        if (!id && norm(queryId)) {
+          id = norm(queryId)
+        }
+        if (loadedId && id && loadedId !== id) {
+          // Prefer backend-loaded record id to avoid mismatches
+          id = loadedId
+        } else if (!id && loadedId) {
+          id = loadedId
+        }
+        return id
+      },
+
+      // Formatted display id like REQ-000065; prefer backend-provided request_id if present
+      displayRequestId() {
+        const backendRef = this.requestData?.request_id || this.requestData?.requestId
+        if (backendRef) return String(backendRef)
+        const raw = this.getRequestId
+        if (!raw) return ''
+        const num = String(raw).replace(/\D+/g, '')
+        return 'REQ-' + (num ? num.padStart(6, '0') : String(raw))
       },
 
       currentTab() {
@@ -4075,7 +4161,7 @@
           }
 
           return null
-        } catch (_) {
+        } catch (e) {
           return null
         }
       },
@@ -4194,7 +4280,7 @@
       currentApprovalStage() {
         if (!this.requestData) return 'pending'
 
-        const status = this.requestData.status || 'pending'
+        const status = (this.requestData.status || 'pending').toLowerCase()
         const stageMap = {
           pending: 'hod',
           pending_hod: 'hod',
@@ -4202,12 +4288,16 @@
           pending_divisional: 'divisional',
           divisional_approved: 'ict_director',
           pending_ict_director: 'ict_director',
+          pending_dict: 'ict_director', // synonym sometimes used in DICT endpoints
           ict_director_approved: 'head_it',
+          dict_approved: 'head_it', // synonym
           pending_head_it: 'head_it',
           head_it_approved: 'ict_officer',
           pending_ict_officer: 'ict_officer',
+          implementation_in_progress: 'ict_officer',
           implemented: 'completed',
           approved: 'completed',
+          completed: 'completed',
           hod_rejected: 'completed',
           // Rejected statuses - requests go back to HOD for revision
           divisional_rejected: 'hod', // Divisional rejected - back to HOD
@@ -4217,7 +4307,59 @@
           cancelled: 'completed'
         }
 
-        return stageMap[status] || 'hod'
+        // Primary: map by overall status
+        let stageFromStatus = stageMap[status]
+
+        // Secondary: infer from per-stage statuses (works for ICT Officer-origin with skipped HOD/DIV)
+        const hod = (this.requestData.hod_status || '').toLowerCase()
+        const div = (this.requestData.divisional_status || '').toLowerCase()
+        const dict = (
+          this.requestData.ict_director_status ||
+          this.requestData.dict_status ||
+          ''
+        ).toLowerCase()
+        const head = (this.requestData.head_it_status || '').toLowerCase()
+        const impl = (this.requestData.ict_officer_status || '').toLowerCase()
+
+        let stageFromStages = null
+        if (['implemented', 'approved', 'completed'].includes(impl)) {
+          stageFromStages = 'completed'
+        } else if (
+          !['approved', 'rejected'].includes(head) &&
+          ['approved', 'skipped'].includes(dict)
+        ) {
+          // Head IT stage when DICT has processed
+          stageFromStages = 'head_it'
+        } else if (
+          !['approved', 'rejected'].includes(dict) &&
+          ['approved', 'skipped'].includes(hod) &&
+          ['approved', 'skipped'].includes(div)
+        ) {
+          // ICT Director stage when HOD/DIV done (approved/skipped) and DICT pending/empty
+          stageFromStages = 'ict_director'
+        } else if (!['approved', 'rejected'].includes(div) && hod === 'approved') {
+          stageFromStages = 'divisional'
+        } else if (!['approved', 'rejected'].includes(hod)) {
+          stageFromStages = 'hod'
+        }
+
+        // Reconcile: choose the later stage between status-based and per-stage inference
+        const rank = {
+          hod: 1,
+          divisional: 2,
+          ict_director: 3,
+          head_it: 4,
+          ict_officer: 5,
+          completed: 6
+        }
+        const pick = (a, b) => {
+          if (!a) return b
+          if (!b) return a
+          return (rank[b] || 0) > (rank[a] || 0) ? b : a
+        }
+
+        const finalStage = pick(stageFromStatus, stageFromStages) || 'hod'
+        return finalStage
       },
 
       // Determine if approval sections should be readonly based on current stage
@@ -4567,8 +4709,25 @@
       },
 
       isIctDirectorApprovalEditable() {
-        // Use the new enhanced logic for ICT Director approval
-        return !this.isReviewMode || this.isIctDirectorApprovalActive
+        // Allow editing when the request is at or effectively at the ICT Director stage
+        if (!this.isReviewMode) return true
+        if (this.currentApprovalStage === 'ict_director') return true
+        // Fallback: infer from per-stage statuses
+        try {
+          const hod = (this.requestData?.hod_status || '').toLowerCase()
+          const div = (this.requestData?.divisional_status || '').toLowerCase()
+          const dict = (
+            this.requestData?.ict_director_status ||
+            this.requestData?.dict_status ||
+            ''
+          ).toLowerCase()
+          const isPreDictDone =
+            ['approved', 'skipped'].includes(hod) && ['approved', 'skipped'].includes(div)
+          const isDictPending = !['approved', 'rejected'].includes(dict)
+          return isPreDictDone && isDictPending
+        } catch {
+          return false
+        }
       },
 
       isHeadItApprovalEditable() {
@@ -4855,7 +5014,11 @@
           head_it: ['head_it', 'head_of_it']
         }
 
-        const requiresSignature = !!roleMap[stage] && roleMap[stage].includes(userRole)
+        // Ensure signature is required at ICT Director stage regardless of role string mismatches
+        let requiresSignature = stage === 'ict_director'
+        if (!requiresSignature) {
+          requiresSignature = !!roleMap[stage] && roleMap[stage].includes(userRole)
+        }
         if (!requiresSignature) return false
 
         const currentUserName = this.currentUser?.name || ''
@@ -5447,11 +5610,22 @@
           this.isReviewMode && this.viewerAfter('divisional') && !this.hasStageSigned('divisional')
         )
       },
+      // Skipped-state helpers for HOD and Divisional Director
+      isHodSkipped() {
+        const v = (this.requestData?.hod_status || '').toString().toLowerCase()
+        return v === 'skipped'
+      },
+      isDivisionalSkipped() {
+        const v = (this.requestData?.divisional_status || '').toString().toLowerCase()
+        return v === 'skipped'
+      },
       shouldShowIctDirectorSignedIndicator() {
         // Show green signed state whenever an ICT Director signature exists in DB
         return this.isReviewMode && this.hasStageSigned('ict_director')
       },
       shouldShowIctDirectorNoSignatureIndicator() {
+        // Show 'no signature' only when NOT the ICT Director stage for the viewer.
+        if (this.isIctDirectorApprovalEditable) return false
         return (
           this.isReviewMode &&
           this.viewerAfter('ict_director') &&
@@ -5975,6 +6149,18 @@
                     signature_status: 'Signed',
                     signature_display: 'Digitally signed'
                   }
+                  // Auto-capture date for ICT Director when signing
+                  try {
+                    const today = this.formatDateForInput(new Date())
+                    if (!this.form?.approvals?.directorICT?.date) {
+                      this.form.approvals.directorICT.date = today
+                    }
+                    if (!this.requestData.approvals.directorICT.date) {
+                      this.requestData.approvals.directorICT.date = today
+                    }
+                  } catch (e) {
+                    /* no-op */
+                  }
                 } else if (stage === 'head_it') {
                   this.requestData.implementation = this.requestData.implementation || {}
                   this.requestData.implementation.headIT = {
@@ -5989,6 +6175,12 @@
               console.warn('Signature optimistic update failed:', err)
             }
             this.$forceUpdate()
+            // Ensure date input reflects immediately for DICT stage
+            try {
+              this.ensureIctDirectorDateAutoFill()
+            } catch (e) {
+              /* no-op */
+            }
             setTimeout(() => (this.toast.show = false), 4000)
           } else {
             this.showToast(res?.message || 'Failed to sign document', 'error')
@@ -6017,6 +6209,35 @@
         } catch (e) {
           console.warn('Failed to load signature history:', e?.message || e)
           this.signatureHistory = []
+        } finally {
+          // After loading signature history, ensure DICT date is filled if viewer is ICT Director
+          this.$nextTick(() => {
+            try {
+              this.ensureIctDirectorDateAutoFill()
+            } catch (e) {
+              /* no-op */
+            }
+          })
+        }
+      },
+
+      // Auto-fill DICT date when signed/pending at DICT stage
+      ensureIctDirectorDateAutoFill() {
+        try {
+          if (this.viewerStage() !== 'ict_director') return
+          const hasDigital =
+            !!this.hasUserSigned ||
+            (this.currentUser?.name && this.historyHasSigner(this.currentUser.name))
+          const atDictStage = this.currentApprovalStage === 'ict_director'
+          if ((hasDigital || this.shouldShowIctDirectorSignedIndicator) && atDictStage) {
+            const empty = !this.form?.approvals?.directorICT?.date
+            if (empty) {
+              this.form.approvals.directorICT.date = this.formatDateForInput(new Date())
+              this.$forceUpdate()
+            }
+          }
+        } catch (e) {
+          /* no-op */
         }
       },
 
@@ -7103,6 +7324,13 @@
             // After mapping, load digital signature history for this request
             await this.fetchSignatureHistory()
 
+            // Ensure DICT date is set if we are at DICT stage
+            try {
+              this.ensureIctDirectorDateAutoFill()
+            } catch (e) {
+              /* no-op */
+            }
+
             // Check if data is in the 'shared' object (as returned by backend API)
             if (this.requestData.shared) {
               if (this.isDevelopment) {
@@ -7392,9 +7620,21 @@
             console.log(
               '🛡️ ICT Officer detected - attempting graceful degradation instead of complete failure'
             )
-            this.toast = {
-              show: true,
-              message: 'Some data could not be loaded, but you can still view the form.'
+            // Only show toast if essential data is missing; otherwise, degrade silently
+            const essentialOk = !!(this.requestData && this.requestData.id)
+            if (!essentialOk) {
+              this.toast = {
+                show: true,
+                message: 'Some data could not be loaded, but you can still view the form.'
+              }
+            } else {
+              try {
+                console.warn(
+                  'BothServiceForm: Partial load for ICT Officer (non-critical data missing); suppressing toast'
+                )
+              } catch (e) {
+                /* noop */
+              }
             }
           } else {
             this.toast = {
@@ -7467,10 +7707,51 @@
           return status === 'hod_approved' || status === 'pending_divisional'
         }
 
-        if (stage === 'ict_director' && ictDirectorRoles.includes(userRole)) {
-          // Allow if request is Divisional approved and ICT Director approval is pending
-          const status = this.requestData.status || 'pending'
-          return status === 'divisional_approved' || status === 'pending_ict_director'
+        if (stage === 'ict_director') {
+          // Only ICT Director users should see the action bar for this stage
+          const isDictUser =
+            ictDirectorRoles.includes(userRole) || this.viewerStage() === 'ict_director'
+
+          if (!isDictUser) return false
+
+          // If the ICT Director section is active or explicitly editable, show action bar
+          if (this.isIctDirectorApprovalActive || this.isIctDirectorApprovalEditable) return true
+
+          // Fallbacks for older payloads and generic statuses
+          const status = (
+            this.requestData.status ||
+            this.requestData.dict_status ||
+            ''
+          ).toLowerCase()
+          const dictStagePending =
+            (
+              this.requestData.ict_director_status ||
+              this.requestData.dict_status ||
+              ''
+            ).toLowerCase() === 'pending'
+
+          const result =
+            ['divisional_approved', 'pending_ict_director', 'pending_dict'].includes(status) ||
+            dictStagePending
+
+          if (this.isDevelopment) {
+            try {
+              console.log('🔎 canApproveAtStage (DICT):', {
+                stage,
+                userRole,
+                isDictUser,
+                isIctDirectorApprovalActive: this.isIctDirectorApprovalActive,
+                isIctDirectorApprovalEditable: this.isIctDirectorApprovalEditable,
+                status,
+                dictStagePending,
+                result
+              })
+            } catch (e) {
+              /* no-op: debug log suppressed */
+            }
+          }
+
+          return result
         }
 
         // Head IT roles check

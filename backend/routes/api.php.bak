@@ -606,17 +606,17 @@ Route::prefix('hod')->middleware('role:head_of_department,divisional_director,ic
 
     // ICT Director Combined Access Request routes (ICT Director and Head of IT)
     Route::prefix('ict-director')->middleware('role:ict_director,head_of_it,admin')->group(function () {
-        Route::get('combined-access-requests', [DictCombinedAccessController::class, 'index'])
+        Route::get('combined-access-requests', [\App\Http\Controllers\Api\v1\DictCombinedAccessController::class, 'index'])
             ->name('ict-director.combined-access-requests.index');
-        Route::get('combined-access-requests/statistics', [DictCombinedAccessController::class, 'statistics'])
+        Route::get('combined-access-requests/statistics', [\App\Http\Controllers\Api\v1\DictCombinedAccessController::class, 'statistics'])
             ->name('ict-director.combined-access-requests.statistics');
-        Route::get('combined-access-requests/{id}', [DictCombinedAccessController::class, 'show'])
+        Route::get('combined-access-requests/{id}', [\App\Http\Controllers\Api\v1\DictCombinedAccessController::class, 'show'])
             ->name('ict-director.combined-access-requests.show');
-        Route::post('combined-access-requests/{id}/approve', [DictCombinedAccessController::class, 'updateApproval'])
+        Route::post('combined-access-requests/{id}/approve', [\App\Http\Controllers\Api\v1\DictCombinedAccessController::class, 'updateApproval'])
             ->name('ict-director.combined-access-requests.approve');
-        Route::post('combined-access-requests/{id}/cancel', [DictCombinedAccessController::class, 'cancel'])
+        Route::post('combined-access-requests/{id}/cancel', [\App\Http\Controllers\Api\v1\DictCombinedAccessController::class, 'cancel'])
             ->name('ict-director.combined-access-requests.cancel');
-        Route::get('combined-access-requests/{id}/timeline', [DictCombinedAccessController::class, 'getAccessRequestTimeline'])
+        Route::get('combined-access-requests/{id}/timeline', [\App\Http\Controllers\Api\v1\DictCombinedAccessController::class, 'getAccessRequestTimeline'])
             ->name('ict-director.combined-access-requests.timeline');
     });
 
@@ -655,13 +655,13 @@ Route::prefix('hod')->middleware('role:head_of_department,divisional_director,ic
             ->name('head-of-it.cancel-task');
             
         // Head of IT ICT Director Recommendations
-        Route::get('ict-director-recommendations', [HeadOfItDictRecommendationsController::class, 'getDictRecommendations'])
+        Route::get('ict-director-recommendations', [\App\Http\Controllers\Api\v1\HeadOfItDictRecommendationsController::class, 'getDictRecommendations'])
             ->middleware('role:head_of_it')
             ->name('head-of-it.ict-director-recommendations.list');
-        Route::get('ict-director-recommendations/stats', [HeadOfItDictRecommendationsController::class, 'getRecommendationStats'])
+        Route::get('ict-director-recommendations/stats', [\App\Http\Controllers\Api\v1\HeadOfItDictRecommendationsController::class, 'getRecommendationStats'])
             ->middleware('role:head_of_it')
             ->name('head-of-it.ict-director-recommendations.stats');
-        Route::get('ict-director-recommendations/{userAccessId}/details', [HeadOfItDictRecommendationsController::class, 'getRequestDetails'])
+        Route::get('ict-director-recommendations/{userAccessId}/details', [\App\Http\Controllers\Api\v1\HeadOfItDictRecommendationsController::class, 'getRequestDetails'])
             ->middleware('role:head_of_it')
             ->name('head-of-it.ict-director-recommendations.details');
             
@@ -691,49 +691,49 @@ Route::prefix('hod')->middleware('role:head_of_department,divisional_director,ic
     // ICT Officer routes (ICT Officer only)
     Route::prefix('ict-officer')->middleware('role:ict_officer,admin')->group(function () {
         // Dashboard
-        Route::get('dashboard', [IctOfficerController::class, 'getDashboard'])
+        Route::get('dashboard', [\App\Http\Controllers\Api\v1\IctOfficerController::class, 'getDashboard'])
             ->name('ict-officer.dashboard');
         
         // Task management (legacy IctTaskAssignment system)
-        Route::get('tasks', [IctOfficerController::class, 'getAssignedTasks'])
+        Route::get('tasks', [\App\Http\Controllers\Api\v1\IctOfficerController::class, 'getAssignedTasks'])
             ->name('ict-officer.tasks');
-        Route::get('tasks/{assignmentId}', [IctOfficerController::class, 'getTaskDetails'])
+        Route::get('tasks/{assignmentId}', [\App\Http\Controllers\Api\v1\IctOfficerController::class, 'getTaskDetails'])
             ->name('ict-officer.task-details');
         
         // Task actions (legacy system)
-        Route::post('tasks/{assignmentId}/start', [IctOfficerController::class, 'startTask'])
+        Route::post('tasks/{assignmentId}/start', [\App\Http\Controllers\Api\v1\IctOfficerController::class, 'startTask'])
             ->name('ict-officer.start-task');
-        Route::post('tasks/{assignmentId}/progress', [IctOfficerController::class, 'updateTaskProgress'])
+        Route::post('tasks/{assignmentId}/progress', [\App\Http\Controllers\Api\v1\IctOfficerController::class, 'updateTaskProgress'])
             ->name('ict-officer.update-progress');
-        Route::post('tasks/{assignmentId}/complete', [IctOfficerController::class, 'completeTask'])
+        Route::post('tasks/{assignmentId}/complete', [\App\Http\Controllers\Api\v1\IctOfficerController::class, 'completeTask'])
             ->name('ict-officer.complete-task');
         
         // Access Request Management (new system for Head of IT approved requests)
-        Route::get('access-requests', [IctOfficerController::class, 'getAccessRequests'])
+        Route::get('access-requests', [\\App\\Http\\Controllers\\Api\\v1\\IctOfficerController::class, 'getAccessRequests'])
             ->middleware('nocache')
             ->name('ict-officer.access-requests');
-        Route::get('access-requests/{requestId}', [IctOfficerController::class, 'getAccessRequestById'])
+        Route::get('access-requests/{requestId}', [\\App\\Http\\Controllers\\Api\\v1\\IctOfficerController::class, 'getAccessRequestById'])
             ->middleware('nocache')
             ->name('ict-officer.access-request-details');
-        Route::get('access-requests/{requestId}/timeline', [IctOfficerController::class, 'getAccessRequestTimeline'])
+        Route::get('access-requests/{requestId}/timeline', [\\App\\Http\\Controllers\\Api\\v1\\IctOfficerController::class, 'getAccessRequestTimeline'])
             ->middleware('nocache')
             ->name('ict-officer.access-request-timeline');
-        Route::post('access-requests/{requestId}/assign', [IctOfficerController::class, 'assignAccessRequestToSelf'])
+        Route::post('access-requests/{requestId}/assign', [\App\Http\Controllers\Api\v1\IctOfficerController::class, 'assignAccessRequestToSelf'])
             ->name('ict-officer.assign-access-request');
-        Route::put('access-requests/{requestId}/progress', [IctOfficerController::class, 'updateAccessRequestProgress'])
+        Route::put('access-requests/{requestId}/progress', [\App\Http\Controllers\Api\v1\IctOfficerController::class, 'updateAccessRequestProgress'])
             ->name('ict-officer.update-access-request-progress');
-        Route::post('access-requests/{requestId}/cancel', [IctOfficerController::class, 'cancelAccessRequestTask'])
+        Route::post('access-requests/{requestId}/cancel', [\App\Http\Controllers\Api\v1\IctOfficerController::class, 'cancelAccessRequestTask'])
             ->name('ict-officer.cancel-access-request');
-        Route::post('access-requests/{requestId}/complete', [IctOfficerController::class, 'updateAccessRequestProgress'])
+        Route::post('access-requests/{requestId}/complete', [\App\Http\Controllers\Api\v1\IctOfficerController::class, 'updateAccessRequestProgress'])
             ->name('ict-officer.complete-access-request');
-        Route::post('access-requests/{requestId}/grant-access', [IctOfficerController::class, 'grantAccess'])
+        Route::post('access-requests/{requestId}/grant-access', [\App\Http\Controllers\Api\v1\IctOfficerController::class, 'grantAccess'])
             ->name('ict-officer.grant-access');
         
         // Statistics
-        Route::get('statistics', [IctOfficerController::class, 'getTaskStatistics'])
+        Route::get('statistics', [\\App\\Http\\Controllers\\Api\\v1\\IctOfficerController::class, 'getTaskStatistics'])
             ->middleware('nocache')
             ->name('ict-officer.statistics');
-        Route::get('pending-count', [IctOfficerController::class, 'getPendingRequestsCount'])
+        Route::get('pending-count', [\\App\\Http\\Controllers\\Api\\v1\\IctOfficerController::class, 'getPendingRequestsCount'])
             ->middleware('nocache')
             ->name('ict-officer.pending-count');
     });
@@ -793,10 +793,10 @@ Route::prefix('hod')->middleware('role:head_of_department,divisional_director,ic
 
     // Notification routes (Universal for all authenticated users)
     Route::prefix('notifications')->group(function () {
-        Route::get('pending-count', [\App\Http\Controllers\Api\v1\NotificationController::class, 'getPendingRequestsCount'])
+        Route::get('pending-count', [\\App\\Http\\Controllers\\Api\\v1\\NotificationController::class, 'getPendingRequestsCount'])
             ->middleware('nocache')
             ->name('notifications.pending-count');
-        Route::get('breakdown', [\App\Http\Controllers\Api\v1\NotificationController::class, 'getPendingRequestsBreakdown'])
+        Route::get('breakdown', [\\App\\Http\\Controllers\\Api\\v1\\NotificationController::class, 'getPendingRequestsBreakdown'])
             ->middleware('role:admin')
             ->middleware('nocache')
             ->name('notifications.breakdown');

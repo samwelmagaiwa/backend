@@ -96,10 +96,10 @@
 
               <!-- Loading Text -->
               <div class="text-center">
-                <div class="text-white text-xl font-bold tracking-wide mb-1 drop-shadow-md">
+                <div class="text-white text-2xl font-bold tracking-wide mb-1 drop-shadow-md">
                   {{ loadingTitle }}
                 </div>
-                <div class="text-blue-100 text-sm animate-pulse">{{ loadingSubtitle }}</div>
+                <div class="text-blue-100 text-lg animate-pulse">{{ loadingSubtitle }}</div>
               </div>
             </div>
 
@@ -129,7 +129,7 @@
             >
               MUHIMBILI NATIONAL HOSPITAL
             </div>
-            <div class="text-teal-200 text-sm font-semibold tracking-wider">
+            <div class="text-teal-200 text-base font-semibold tracking-wider">
               {{ departmentTitle }}
             </div>
           </div>

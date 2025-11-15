@@ -78,22 +78,32 @@
             v-if="!isLoading && requestInfo?.assigned_ict_officer_id"
             class="medical-glass-card rounded-none border-t-0 border-b border-blue-300/30"
           >
-            <div class="p-4 bg-blue-600/20 border border-blue-400/30 rounded-lg flex items-start gap-3">
-              <div class="w-8 h-8 rounded-full bg-blue-500/30 flex items-center justify-center flex-shrink-0">
+            <div
+              class="p-4 bg-blue-600/20 border border-blue-400/30 rounded-lg flex items-start gap-3"
+            >
+              <div
+                class="w-8 h-8 rounded-full bg-blue-500/30 flex items-center justify-center flex-shrink-0"
+              >
                 <i class="fas fa-user-check text-blue-300"></i>
               </div>
               <div class="flex-1">
                 <h3 class="font-bold text-lg text-blue-200">Currently assigned to</h3>
                 <p class="text-blue-100 text-base">
-                  <span class="font-semibold">{{ currentAssignee?.name || 'ICT Officer #' + requestInfo.assigned_ict_officer_id }}</span>
-                  <span v-if="currentAssignee?.pf_number" class="ml-2 text-blue-200/80">(PF: {{ currentAssignee.pf_number }})</span>
-                  <span v-if="requestInfo.task_assigned_at" class="ml-2">— since {{ new Date(requestInfo.task_assigned_at).toLocaleString('en-GB') }}</span>
+                  <span class="font-semibold">{{
+                    currentAssignee?.name || 'ICT Officer #' + requestInfo.assigned_ict_officer_id
+                  }}</span>
+                  <span v-if="currentAssignee?.pf_number" class="ml-2 text-blue-200/80"
+                    >(PF: {{ currentAssignee.pf_number }})</span
+                  >
+                  <span v-if="requestInfo.task_assigned_at" class="ml-2"
+                    >— since
+                    {{ new Date(requestInfo.task_assigned_at).toLocaleString('en-GB') }}</span
+                  >
                 </p>
               </div>
               <div>
                 <button
-                  @click="openCancelModal(currentAssignee)
-                  "
+                  @click="openCancelModal(currentAssignee)"
                   :disabled="isAssigning"
                   class="px-4 py-2 bg-red-600/30 hover:bg-red-600/50 text-red-100 rounded-lg transition-colors border border-red-400/30 text-base flex items-center"
                   title="Cancel current assignment"
@@ -476,7 +486,9 @@
         >
           <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden">
             <!-- Header -->
-            <div class="bg-gradient-to-r from-red-600 via-red-700 to-red-800 p-6 text-center shadow-lg">
+            <div
+              class="bg-gradient-to-r from-red-600 via-red-700 to-red-800 p-6 text-center shadow-lg"
+            >
               <div
                 class="w-16 h-16 bg-red-500/30 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm border border-red-300/40 shadow-lg"
               >
@@ -489,7 +501,10 @@
             <div class="p-6 text-center">
               <p class="text-gray-700 text-lg mb-6">
                 Are you sure you want to cancel the task assigned to
-                <span class="font-semibold text-red-600">{{ cancelTarget?.name || 'Current ICT Officer' }}</span>?
+                <span class="font-semibold text-red-600">{{
+                  cancelTarget?.name || 'Current ICT Officer'
+                }}</span
+                >?
               </p>
 
               <div class="flex gap-3">
@@ -564,8 +579,16 @@
               <span class="font-semibold">Assign Task</span>
             </button>
             <button
-              v-if="hasActiveIctAssignment && ictOfficers.find((o) => o.id === openDropdownId)?.status !== 'Assigned'"
-              @click.stop="confirmAssignTask(ictOfficers.find((o) => o.id === openDropdownId), { reassign: true })"
+              v-if="
+                hasActiveIctAssignment &&
+                ictOfficers.find((o) => o.id === openDropdownId)?.status !== 'Assigned'
+              "
+              @click.stop="
+                confirmAssignTask(
+                  ictOfficers.find((o) => o.id === openDropdownId),
+                  { reassign: true }
+                )
+              "
               class="w-full text-left px-4 py-3 text-xl bg-amber-50 text-amber-800 border-b border-amber-200 hover:bg-amber-100 focus:bg-amber-100 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-inset transition-all duration-200 flex items-center space-x-3 group"
             >
               <i class="fas fa-exchange-alt text-amber-600 w-4 h-4"></i>
@@ -644,7 +667,10 @@
         )
       },
       hasActiveIctAssignment() {
-        return !!(this.requestInfo?.assigned_ict_officer_id || this.ictOfficers.some((o) => o.status === 'Assigned'))
+        return !!(
+          this.requestInfo?.assigned_ict_officer_id ||
+          this.ictOfficers.some((o) => o.status === 'Assigned')
+        )
       },
       filteredOfficers() {
         let filtered = [...this.ictOfficers]
@@ -820,7 +846,10 @@
       },
 
       openCancelModal(officer) {
-        this.cancelTarget = officer || { id: this.requestInfo?.assigned_ict_officer_id, name: 'Current ICT Officer' }
+        this.cancelTarget = officer || {
+          id: this.requestInfo?.assigned_ict_officer_id,
+          name: 'Current ICT Officer'
+        }
         this.showCancelModal = true
       },
 

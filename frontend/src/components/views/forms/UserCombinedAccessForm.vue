@@ -124,7 +124,8 @@
 
               <!-- Applicant Details Section -->
               <div
-                class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-3 rounded-xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group relative overflow-hidden"
+                class="medical-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-3 rounded-xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group relative"
+                style="overflow: visible"
               >
                 <!-- Animated Background Layers -->
                 <div
@@ -408,7 +409,7 @@
                       <!-- Access Rights Section (Middle) -->
                       <div class="flex flex-col h-full">
                         <div
-                          class="bg-gradient-to-br from-blue-500/15 to-indigo-500/15 rounded-xl border-2 border-blue-400/40 p-2 w-full min-h-[85px] flex flex-col justify-center shadow-lg backdrop-blur-sm"
+                          class="bg-gradient-to-br from-blue-500/15 to-indigo-500/15 rounded-xl border-2 border-blue-400/40 p-2 w-full min-h-[85px] flex flex-col justify-center shadow-lg backdrop-blur-sm relative z-[2000] overflow-visible"
                         >
                           <label
                             class="block text-lg font-bold text-blue-100 mb-1.5 text-center flex items-center justify-center"
@@ -423,12 +424,18 @@
                           <div class="space-y-1">
                             <!-- Permanent Option -->
                             <label
-                              class="flex items-center cursor-pointer p-1.5 rounded-lg transition-all duration-300 border-2"
+                              class="flex items-center cursor-pointer p-1.5 rounded-lg transition-all duration-300 border-2 ring-1 ring-transparent hover:ring-blue-400/40 ux-clickable"
                               :class="
                                 accessType === 'permanent'
                                   ? 'bg-green-500/20 border-green-400/50 shadow-md ring-2 ring-green-400/30'
                                   : 'bg-white/5 border-blue-300/20 hover:bg-white/10 hover:border-blue-400/40'
                               "
+                              role="button"
+                              :aria-pressed="String(accessType === 'permanent')"
+                              tabindex="0"
+                              title="Click to select permanent access"
+                              @keydown.enter.prevent="accessType = 'permanent'"
+                              @keydown.space.prevent="accessType = 'permanent'"
                             >
                               <input
                                 v-model="accessType"
@@ -436,21 +443,30 @@
                                 value="permanent"
                                 class="w-4 h-4 text-green-600 mr-2 accent-green-500"
                               />
-                              <div class="flex items-center flex-1">
-                                <i class="fas fa-infinity mr-2 text-green-400 text-base"></i>
-                                <span class="text-white font-semibold text-base">Permanent</span>
+                              <div class="flex items-center flex-1 justify-between">
+                                <div class="flex items-center">
+                                  <i class="fas fa-infinity mr-2 text-green-400 text-base"></i>
+                                  <span class="text-white font-semibold text-base">Permanent</span>
+                                </div>
+                                <span class="ux-hint hidden sm:inline">click here &larr;</span>
                               </div>
                             </label>
 
                             <!-- Temporary Option -->
                             <label
-                              @click="accessType === 'temporary' && openDatePickerModal()"
-                              class="flex items-center cursor-pointer p-1.5 rounded-lg transition-all duration-300 border-2"
+                              @click="accessType === 'temporary' && openDateDropdown()"
+                              class="flex items-center cursor-pointer p-1.5 rounded-lg transition-all duration-300 border-2 relative ring-1 ring-transparent hover:ring-blue-400/40 ux-clickable"
                               :class="
                                 accessType === 'temporary'
                                   ? 'bg-amber-500/20 border-amber-400/50 shadow-md ring-2 ring-amber-400/30'
                                   : 'bg-white/5 border-blue-300/20 hover:bg-white/10 hover:border-blue-400/40'
                               "
+                              role="button"
+                              :aria-pressed="String(accessType === 'temporary')"
+                              tabindex="0"
+                              title="Click to select temporary access and choose end date"
+                              @keydown.enter.prevent="accessType = 'temporary'; openDateDropdown()"
+                              @keydown.space.prevent="accessType = 'temporary'; openDateDropdown()"
                             >
                               <input
                                 v-model="accessType"
@@ -458,6 +474,7 @@
                                 value="temporary"
                                 class="w-4 h-4 text-amber-600 mr-2 accent-amber-500"
                                 @click.stop
+                                @change="onAccessTypeChange"
                               />
                               <div class="flex items-center flex-1 justify-between">
                                 <div class="flex items-center">
@@ -476,7 +493,7 @@
                                   }}</span>
                                   <button
                                     type="button"
-                                    @click.stop="openDatePickerModal"
+                                    @click.stop="openDateDropdown"
                                     class="text-amber-300 hover:text-amber-100 transition-colors"
                                     title="Change date"
                                   >
@@ -486,11 +503,74 @@
                                 <button
                                   v-else-if="accessType === 'temporary'"
                                   type="button"
-                                  @click.stop="openDatePickerModal"
+                                  @click.stop="openDateDropdown"
                                   class="text-sm text-amber-300 hover:text-amber-100 font-bold underline"
                                 >
                                   Select Date
                                 </button>
+                                <span v-else class="ux-hint hidden sm:inline"
+                                  >click here &larr;</span
+                                >
+                              </div>
+
+                              <!-- Inline dropdown date card -->
+                              <div
+                                v-if="accessType === 'temporary' && showDateDropdown"
+                                ref="dateDropdown"
+                                class="absolute right-2 top-full mt-2 z-[9999] w-96"
+                                @click.stop
+                              >
+                                <div
+                                  class="bg-white rounded-xl p-3 shadow-2xl border border-amber-300/40"
+                                >
+                                  <label
+                                    class="block text-sm font-bold text-gray-800 mb-2 flex items-center"
+                                  >
+                                    <i class="fas fa-hourglass-half mr-2 text-amber-500"></i>
+                                    Temporary Access Period
+                                  </label>
+                                  <div class="grid grid-cols-2 gap-2">
+                                    <div>
+                                      <span class="text-xs font-semibold text-gray-600">Start</span>
+                                      <input
+                                        v-model="temporaryStart"
+                                        type="date"
+                                        :min="tomorrowDate"
+                                        class="w-full px-3 py-2 border-2 border-amber-300/60 rounded-lg focus:outline-none focus:border-amber-500 text-gray-800"
+                                      />
+                                    </div>
+                                    <div>
+                                      <span class="text-xs font-semibold text-gray-600">End</span>
+                                      <input
+                                        v-model="temporaryUntil"
+                                        type="date"
+                                        :min="minEndDate"
+                                        class="w-full px-3 py-2 border-2 border-amber-300/60 rounded-lg focus:outline-none focus:border-amber-500 text-gray-800"
+                                        @change="updateDisplayDate"
+                                      />
+                                    </div>
+                                  </div>
+                                  <p class="text-[11px] text-gray-600 mt-1">
+                                    Note: For compatibility the system stores the end date.
+                                  </p>
+                                  <div class="flex justify-end gap-2 mt-3">
+                                    <button
+                                      type="button"
+                                      @click="closeDateDropdown"
+                                      class="px-3 py-1.5 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold"
+                                    >
+                                      Cancel
+                                    </button>
+                                    <button
+                                      type="button"
+                                      :disabled="!temporaryUntil"
+                                      @click="applyDateSelection"
+                                      class="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white font-semibold"
+                                    >
+                                      Apply
+                                    </button>
+                                  </div>
+                                </div>
                               </div>
                             </label>
                             <!-- Validation error message for temporary without date -->
@@ -1161,7 +1241,10 @@
         accessType: '', // No default - user must select
         temporaryUntil: '',
         temporaryUntilDisplay: '', // DD/MM/YYYY format for display
-        showDatePickerModal: false,
+        showDatePickerModal: false, // legacy modal (kept for fallback)
+        showDateDropdown: false,
+        // Local start date for UI only (DB stores end date only)
+        temporaryStart: '',
         formData: {
           // Applicant Details
           pfNumber: '',
@@ -1222,14 +1305,40 @@
         const dd = String(d.getDate()).padStart(2, '0')
         return `${yyyy}-${mm}-${dd}`
       },
+      // min end date depends on chosen start (fallback: tomorrow)
+      minEndDate() {
+        if (!this.temporaryStart) return this.tomorrowDate
+        const d = new Date(this.temporaryStart)
+        d.setDate(d.getDate() + 1)
+        const yyyy = d.getFullYear()
+        const mm = String(d.getMonth() + 1).padStart(2, '0')
+        const dd = String(d.getDate()).padStart(2, '0')
+        return `${yyyy}-${mm}-${dd}`
+      },
       formattedDateDisplay() {
-        if (!this.temporaryUntil) return ''
-        const [year, month, day] = this.temporaryUntil.split('-')
-        return `${day}/${month}/${year}`
+        // Prefer showing a range when start is available; storage remains end-date only
+        if (this.temporaryStart && this.temporaryUntil) {
+          const [sy, sm, sd] = this.temporaryStart.split('-')
+          const [ey, em, ed] = this.temporaryUntil.split('-')
+          return `${sd}/${sm}/${sy} - ${ed}/${em}/${ey}`
+        }
+        if (this.temporaryUntil) {
+          const [year, month, day] = this.temporaryUntil.split('-')
+          return `${day}/${month}/${year}`
+        }
+        return ''
       }
     },
 
     watch: {
+      // Open dropdown automatically when switching to temporary
+      accessType(newVal) {
+        if (newVal === 'temporary') {
+          this.$nextTick(() => this.openDateDropdown())
+        } else {
+          this.closeDateDropdown()
+        }
+      },
       // Auto-set services based on module selections
       'formData.selectedWellsoft': {
         handler(newVal) {
@@ -1993,6 +2102,37 @@
         }
       },
 
+      // New dropdown calendar behaviour
+      openDateDropdown() {
+        this.showDateDropdown = true
+        // Close on outside click and Escape
+        this.$nextTick(() => {
+          document.addEventListener('mousedown', this.onOutsideClick)
+          document.addEventListener('keydown', this.onEsc)
+        })
+      },
+      onAccessTypeChange(e) {
+        // If user just selected Temporary, open the dropdown immediately
+        if (e && e.target && e.target.value === 'temporary' && e.target.checked) {
+          this.$nextTick(() => this.openDateDropdown())
+        }
+      },
+      closeDateDropdown() {
+        this.showDateDropdown = false
+        document.removeEventListener('mousedown', this.onOutsideClick)
+        document.removeEventListener('keydown', this.onEsc)
+      },
+      onOutsideClick(e) {
+        const dd = this.$refs.dateDropdown
+        if (dd && !dd.contains(e.target)) {
+          this.closeDateDropdown()
+        }
+      },
+      onEsc(e) {
+        if (e.key === 'Escape') this.closeDateDropdown()
+      },
+
+      // Legacy modal open/close kept for compatibility (not used now)
       openDatePickerModal() {
         this.showDatePickerModal = true
       },
@@ -2002,8 +2142,12 @@
       },
 
       updateDisplayDate() {
-        // This is called when the date picker value changes
-        // The computed property formattedDateDisplay will automatically update
+        // Computed formattedDateDisplay updates automatically
+      },
+      applyDateSelection() {
+        // Persist end date only to keep existing backend flow
+        // Close dropdown after applying
+        this.closeDateDropdown()
       },
 
       async signCurrentDocument() {
@@ -2103,6 +2247,24 @@
 </script>
 
 <style scoped>
+  .ux-clickable {
+    cursor: pointer;
+  }
+  .ux-clickable:active {
+    transform: scale(0.995);
+  }
+  .ux-clickable:focus-visible {
+    outline: 3px solid rgba(59, 130, 246, 0.75);
+    outline-offset: 2px;
+    border-radius: 0.5rem;
+  }
+  .ux-hint {
+    color: rgba(191, 219, 254, 0.95);
+    font-weight: 700;
+    font-size: 1.2rem;
+    line-height: 1.35rem;
+    letter-spacing: 0.02em;
+  }
   /* Medical Glass morphism effects */
   .medical-glass-card {
     background: rgba(59, 130, 246, 0.15);

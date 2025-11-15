@@ -411,6 +411,26 @@ class UserAccessController extends Controller
                 'jeeva_modules_count' => count($selectedJeeva)
             ]);
             
+            // Determine initial workflow based on submitter role (ICT Officer skips HOD/Divisional)
+            $isIctOfficer = false;
+            try {
+                if (method_exists($user, 'roles')) {
+                    $isIctOfficer = $user->roles()->where('name', 'ict_officer')->exists();
+                }
+                if (!$isIctOfficer && property_exists($user, 'role') && isset($user->role->name)) {
+                    $isIctOfficer = strtolower($user->role->name) === 'ict_officer';
+                }
+                if (!$isIctOfficer && method_exists($user, 'getPrimaryRoleName')) {
+                    $isIctOfficer = strtolower($user->getPrimaryRoleName()) === 'ict_officer';
+                }
+            } catch (\Throwable $e) {
+                $isIctOfficer = false;
+            }
+
+            $initialStatus = $isIctOfficer ? 'pending_ict_director' : 'pending';
+            $initialHod = $isIctOfficer ? 'skipped' : 'pending';
+            $initialDiv = $isIctOfficer ? 'skipped' : 'pending';
+
             // Create the combined access request - store multiple services in one row
             $userAccess = UserAccess::create([
                 'user_id' => $user->id,
@@ -418,13 +438,13 @@ class UserAccessController extends Controller
                 'staff_name' => $validatedData['staff_name'],
                 'phone_number' => $validatedData['phone_number'],
                 'department_id' => $validatedData['department_id'],
-'signature_path' => $signaturePath, // legacy field kept for response shape, set to null
+                'signature_path' => $signaturePath, // legacy field kept for response shape, set to null
                 'request_type' => $selectedServices, // Array stored as JSON
-                'status' => 'pending',
+                'status' => $initialStatus,
                 
                 // Initialize new status columns
-                'hod_status' => 'pending',
-                'divisional_status' => 'pending',
+                'hod_status' => $initialHod,
+                'divisional_status' => $initialDiv,
                 'ict_director_status' => 'pending',
                 'head_it_status' => 'pending',
                 'ict_officer_status' => 'pending',
@@ -515,7 +535,7 @@ class UserAccessController extends Controller
             $userAccess->signature_url = $this->signatureService->getSignatureUrl($userAccess->signature_path);
             $userAccess->signature_info = $this->signatureService->getSignatureInfo($userAccess->signature_path);
             
-            // Forward to appropriate queues for each service type
+            // Forward to appropriate queues for each service type (keep legacy behavior)
             foreach ($selectedServices as $serviceType) {
                 $this->forwardToHodQueue($userAccess, $serviceType);
             }
@@ -529,68 +549,59 @@ class UserAccessController extends Controller
                 'has_purposes' => !empty($purposes)
             ]);
             
-            // Send SMS notification to HOD BEFORE commit
+            // Send initial SMS BEFORE commit
             try {
-                $hod = User::whereHas('departmentsAsHOD', function($q) use ($userAccess) {
-                    $q->where('departments.id', $userAccess->department_id);
-                })->first();
-                
-                if ($hod && $hod->phone) {
-                    // Determine request type - handle all variations
-                    $types = [];
-                    if (in_array('jeeva_access_request', $selectedServices) || in_array('jeeva_access', $selectedServices) || in_array('jeeva', $selectedServices)) $types[] = 'Jeeva';
-                    if (in_array('wellsoft_access_request', $selectedServices) || in_array('wellsoft_access', $selectedServices) || in_array('wellsoft', $selectedServices)) $types[] = 'Wellsoft';
-                    if (in_array('internet_access_request', $selectedServices) || in_array('internet_access', $selectedServices) || in_array('internet', $selectedServices)) $types[] = 'Internet';
-                    $requestType = implode(' & ', $types) ?: 'Access';
-                    $requestId = 'MLG-REQ' . str_pad($userAccess->id, 6, '0', STR_PAD_LEFT);
-                    
-                    try {
-                        $sms = app(SmsModule::class);
+                // Build request type label once
+                $types = [];
+                if (in_array('jeeva_access_request', $selectedServices) || in_array('jeeva_access', $selectedServices) || in_array('jeeva', $selectedServices)) $types[] = 'Jeeva';
+                if (in_array('wellsoft_access_request', $selectedServices) || in_array('wellsoft_access', $selectedServices) || in_array('wellsoft', $selectedServices)) $types[] = 'Wellsoft';
+                if (in_array('internet_access_request', $selectedServices) || in_array('internet_access', $selectedServices) || in_array('internet', $selectedServices)) $types[] = 'Internet';
+                $requestType = implode(' & ', $types) ?: 'Access';
+                $requestId = 'MLG-REQ' . str_pad($userAccess->id, 6, '0', STR_PAD_LEFT);
+
+                $sms = app(SmsModule::class);
+
+                if ($isIctOfficer) {
+                    // ICT Officer submission: notify ICT Director(s)
+                    $ictDirectors = User::whereHas('roles', function($q) { $q->where('name', 'ict_director'); })
+                        ->whereNotNull('phone')->get();
+                    if ($ictDirectors->count() > 0) {
                         $message = "PENDING APPROVAL: {$requestType} request from {$userAccess->staff_name} requires your review. Ref: {$requestId}. Please check the system. - EABMS";
-                        $smsResult = $sms->sendSms($hod->phone, $message, 'pending_notification');
-                        
-                        // Update SMS status using direct DB query for immediate persistence
-                        if ($smsResult['success']) {
-                            DB::table('user_access')
-                                ->where('id', $userAccess->id)
-                                ->update([
-                                    'sms_sent_to_hod_at' => now(),
-                                    'sms_to_hod_status' => 'sent',
-                                    'updated_at' => now()
-                                ]);
-                            Log::info('SMS sent to HOD successfully', [
-                                'hod_name' => $hod->name, 
-                                'request_id' => $userAccess->id,
-                                'status_updated' => 'sent',
-                                'update_method' => 'direct_db_query'
-                            ]);
-                        } else {
-                            DB::table('user_access')
-                                ->where('id', $userAccess->id)
-                                ->update([
-                                    'sms_to_hod_status' => 'failed',
-                                    'updated_at' => now()
-                                ]);
-                            Log::warning('SMS to HOD failed', [
-                                'error' => $smsResult['message'],
-                                'status_updated' => 'failed'
-                            ]);
-                        }
-                    } catch (\Exception $smsException) {
+                        $result = $sms->sendBulkSms($ictDirectors->toArray(), $message, 'pending_notification');
+                        $sent = ($result['sent'] ?? 0) > 0;
                         DB::table('user_access')
                             ->where('id', $userAccess->id)
                             ->update([
-                                'sms_to_hod_status' => 'failed',
+                                'sms_sent_to_ict_director_at' => $sent ? now() : null,
+                                'sms_to_ict_director_status' => $sent ? 'sent' : 'failed',
                                 'updated_at' => now()
                             ]);
-                        Log::warning('SMS to HOD exception', [
-                            'error' => $smsException->getMessage(),
-                            'status_updated' => 'failed'
+                        Log::info('Initial SMS to ICT Director(s) processed', [
+                            'request_id' => $userAccess->id,
+                            'recipients' => $ictDirectors->count(),
+                            'sent' => $sent
                         ]);
+                    }
+                } else {
+                    // Normal staff flow: notify HOD of the department
+                    $hod = User::whereHas('departmentsAsHOD', function($q) use ($userAccess) {
+                        $q->where('departments.id', $userAccess->department_id);
+                    })->first();
+
+                    if ($hod && $hod->phone) {
+                        $message = "PENDING APPROVAL: {$requestType} request from {$userAccess->staff_name} requires your review. Ref: {$requestId}. Please check the system. - EABMS";
+                        $smsResult = $sms->sendSms($hod->phone, $message, 'pending_notification');
+                        DB::table('user_access')
+                            ->where('id', $userAccess->id)
+                            ->update([
+                                'sms_sent_to_hod_at' => $smsResult['success'] ? now() : null,
+                                'sms_to_hod_status' => $smsResult['success'] ? 'sent' : 'failed',
+                                'updated_at' => now()
+                            ]);
                     }
                 }
             } catch (\Exception $e) {
-                Log::warning('Failed to process HOD notification', [
+                Log::warning('Failed to process initial SMS', [
                     'error' => $e->getMessage(),
                     'request_id' => $userAccess->id
                 ]);

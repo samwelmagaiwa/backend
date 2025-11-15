@@ -269,7 +269,9 @@ const headOfItService = {
         const status = err?.response?.status
         // Fallback on 404/405/501 style errors (route not found or not allowed)
         if (status === 404 || status === 405 || status === 501) {
-          console.warn('HeadOfItService: New assignment endpoint unavailable, falling back to legacy')
+          console.warn(
+            'HeadOfItService: New assignment endpoint unavailable, falling back to legacy'
+          )
           response = await tryLegacyEndpoint()
         } else {
           throw err
@@ -345,8 +347,10 @@ const headOfItService = {
       console.log('🔄 HeadOfItService: Canceling task assignment for request:', requestId)
 
       // Try new endpoint first (UserAccess system), fallback to legacy
-      const tryNewEndpoint = () => axiosInstance.post(`/head-of-it/ict-tasks/${requestId}/cancel`, null, { timeout: 15000 })
-      const tryLegacyEndpoint = () => axiosInstance.post(`/head-of-it/tasks/${requestId}/cancel`, null, { timeout: 15000 })
+      const tryNewEndpoint = () =>
+        axiosInstance.post(`/head-of-it/ict-tasks/${requestId}/cancel`, null, { timeout: 15000 })
+      const tryLegacyEndpoint = () =>
+        axiosInstance.post(`/head-of-it/tasks/${requestId}/cancel`, null, { timeout: 15000 })
 
       let response
       try {

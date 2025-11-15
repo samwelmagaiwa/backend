@@ -36,13 +36,36 @@ class RequestStatusController extends Controller
             $user = Auth::user();
             $requests = collect();
 
-            // Get user access requests
+            // Get user access requests submitted by the current user
             $accessRequests = UserAccess::with(['user', 'department'])
                 ->where('user_id', $user->id)
-                ->get()
-                ->map(function ($accessRequest) {
-                    return $this->transformAccessRequest($accessRequest);
-                });
+                ->get();
+
+            // If the current user is an ICT Officer, also include requests they are implementing (assigned/in_progress/completed)
+            $isIctOfficer = false;
+            try {
+                if (method_exists($user, 'roles')) {
+                    $isIctOfficer = $user->roles()->where('name', 'ict_officer')->exists();
+                }
+                if (!$isIctOfficer && method_exists($user, 'getPrimaryRoleName')) {
+                    $isIctOfficer = strtolower($user->getPrimaryRoleName()) === 'ict_officer';
+                }
+            } catch (\Throwable $e) {
+                $isIctOfficer = false;
+            }
+
+            if ($isIctOfficer) {
+                $officerRelated = UserAccess::with(['user', 'department'])
+                    ->where('ict_officer_user_id', $user->id)
+                    ->whereIn('ict_officer_status', ['assigned', 'in_progress', 'implemented'])
+                    ->get();
+                // Merge and de-duplicate by id
+                $accessRequests = $accessRequests->concat($officerRelated)->unique('id')->values();
+            }
+
+            $accessRequests = $accessRequests->map(function ($accessRequest) {
+                return $this->transformAccessRequest($accessRequest);
+            });
 
             // Get booking service requests
             $bookingRequests = BookingService::with(['user', 'departmentInfo', 'approvedBy'])
@@ -323,7 +346,13 @@ class RequestStatusController extends Controller
             'updated_at' => $accessRequest->updated_at->toISOString(),
             'staff_name' => $accessRequest->staff_name,
             'department' => $accessRequest->department ? $accessRequest->department->name : 'Unknown',
+            // Expose granular statuses for small visual indicators in UI
+            'hod_status' => $accessRequest->hod_status,
+            'divisional_status' => $accessRequest->divisional_status,
+            // SMS statuses (normalize to sms_status for UI)
             'sms_to_hod_status' => $accessRequest->sms_to_hod_status ?? 'pending',
+            'sms_to_ict_director_status' => $accessRequest->sms_to_ict_director_status ?? null,
+            'sms_status' => $accessRequest->sms_to_ict_director_status ?: ($accessRequest->sms_to_hod_status ?? 'pending'),
         ];
     }
 
@@ -639,8 +668,8 @@ class RequestStatusController extends Controller
         if ($accessRequest->ict_officer_status === 'implemented') return 6; // Complete at ICT Officer
         if ($accessRequest->head_it_status === 'approved') return 6; // ICT Officer Implementation
         if ($accessRequest->ict_director_status === 'approved') return 5; // Head IT Review
-        if ($accessRequest->divisional_status === 'approved') return 4; // ICT Director Review
-        if ($accessRequest->hod_status === 'approved') return 3; // Divisional Director Review
+        if (in_array($accessRequest->divisional_status, ['approved','skipped'], true)) return 4; // ICT Director Review
+        if (in_array($accessRequest->hod_status, ['approved','skipped'], true)) return 3; // Divisional Director Review
         
         return 2; // HOD Review (default)
     }

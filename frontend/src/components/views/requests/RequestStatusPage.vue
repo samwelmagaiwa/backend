@@ -371,6 +371,27 @@
                               >
                               <span v-else>Step {{ request.current_step }} of 6</span>
                             </div>
+                            <div
+                              v-if="
+                                request.type === 'combined_access' &&
+                                (request.hod_status === 'skipped' ||
+                                  request.divisional_status === 'skipped')
+                              "
+                              class="flex items-center gap-2 mt-1"
+                            >
+                              <span
+                                v-if="request.hod_status === 'skipped'"
+                                class="px-2 py-0.5 text-xs rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-200"
+                              >
+                                HOD skipped
+                              </span>
+                              <span
+                                v-if="request.divisional_status === 'skipped'"
+                                class="px-2 py-0.5 text-xs rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-200"
+                              >
+                                Divisional skipped
+                              </span>
+                            </div>
                           </td>
                           <td class="py-3 px-3">
                             <div class="text-white text-2xl">
@@ -457,13 +478,21 @@
                             <div class="flex items-center space-x-2">
                               <div
                                 class="w-3 h-3 rounded-full"
-                                :class="getSmsStatusColor(request.sms_to_hod_status)"
+                                :class="
+                                  getSmsStatusColor(request.sms_status || request.sms_to_hod_status)
+                                "
                               ></div>
                               <span
                                 class="text-xl font-semibold"
-                                :class="getSmsStatusTextColor(request.sms_to_hod_status)"
+                                :class="
+                                  getSmsStatusTextColor(
+                                    request.sms_status || request.sms_to_hod_status
+                                  )
+                                "
                               >
-                                {{ getSmsStatusText(request.sms_to_hod_status) }}
+                                {{
+                                  getSmsStatusText(request.sms_status || request.sms_to_hod_status)
+                                }}
                               </span>
                               <button
                                 v-if="['failed', 'pending'].includes(request.sms_to_hod_status)"
@@ -600,6 +629,27 @@
                             >
                             <span v-else>(Step {{ request.current_step }} of 6)</span>
                           </span>
+                          <div
+                            v-if="
+                              request.type === 'combined_access' &&
+                              (request.hod_status === 'skipped' ||
+                                request.divisional_status === 'skipped')
+                            "
+                            class="flex items-center gap-1 mt-1"
+                          >
+                            <span
+                              v-if="request.hod_status === 'skipped'"
+                              class="px-1.5 py-0.5 text-[10px] rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-200"
+                            >
+                              HOD skipped
+                            </span>
+                            <span
+                              v-if="request.divisional_status === 'skipped'"
+                              class="px-1.5 py-0.5 text-[10px] rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-200"
+                            >
+                              Divisional skipped
+                            </span>
+                          </div>
                         </div>
 
                         <div class="text-blue-300 text-xs">
@@ -826,9 +876,9 @@
         }
       ]
 
-      // Guard this route - only staff can access
+      // Guard this route - staff and ICT Officers can access
       onMounted(() => {
-        requireRole([ROLES.STAFF])
+        requireRole([ROLES.STAFF, ROLES.ICT_OFFICER])
 
         // Close dropdown when clicking outside
         document.addEventListener('click', closeActionsMenu)

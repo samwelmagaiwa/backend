@@ -12,12 +12,22 @@ const axiosInstance = axios.create({
   }
 })
 
-// Add auth token to requests
+// Add auth token to requests and append cache-busting param for GETs
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('auth_token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
+    }
+    if (config.method && config.method.toLowerCase() === 'get') {
+      try {
+        const url = new URL(config.url, config.baseURL)
+        url.searchParams.set('_cb', String(Date.now()))
+        config.url = url.pathname + url.search
+      } catch (e) {
+        const sep = (config.url || '').includes('?') ? '&' : '?'
+        config.url = `${config.url}${sep}_cb=${Date.now()}`
+      }
     }
     return config
   },

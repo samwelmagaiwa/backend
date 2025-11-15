@@ -333,7 +333,9 @@
             @click="handleMenuAction('downloadPdf', selectedRequest)"
             class="w-full text-left px-4 py-3 text-lg bg-rose-50 text-rose-800 hover:bg-rose-100 focus:bg-rose-100 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
           >
-            <i class="fas fa-file-pdf mr-3 text-rose-600 group-hover:text-rose-700 group-focus:text-rose-700 transition-colors duration-200 text-lg"></i>
+            <i
+              class="fas fa-file-pdf mr-3 text-rose-600 group-hover:text-rose-700 group-focus:text-rose-700 transition-colors duration-200 text-lg"
+            ></i>
             <span class="font-semibold">Download PDF</span>
           </button>
         </template>
@@ -364,7 +366,9 @@
             @click="handleMenuAction('downloadPdf', selectedRequest)"
             class="w-full text-left px-4 py-3 text-lg bg-rose-50 text-rose-800 hover:bg-rose-100 focus:bg-rose-100 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
           >
-            <i class="fas fa-file-pdf mr-3 text-rose-600 group-hover:text-rose-700 group-focus:text-rose-700 transition-colors duration-200 text-lg"></i>
+            <i
+              class="fas fa-file-pdf mr-3 text-rose-600 group-hover:text-rose-700 group-focus:text-rose-700 transition-colors duration-200 text-lg"
+            ></i>
             <span class="font-semibold">Download PDF</span>
           </button>
         </template>
@@ -397,7 +401,9 @@
             @click="handleMenuAction('downloadPdf', selectedRequest)"
             class="w-full text-left px-4 py-3 text-lg bg-rose-50 text-rose-800 hover:bg-rose-100 focus:bg-rose-100 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
           >
-            <i class="fas fa-file-pdf mr-3 text-rose-600 group-hover:text-rose-700 group-focus:text-rose-700 transition-colors duration-200 text-lg"></i>
+            <i
+              class="fas fa-file-pdf mr-3 text-rose-600 group-hover:text-rose-700 group-focus:text-rose-700 transition-colors duration-200 text-lg"
+            ></i>
             <span class="font-semibold">Download PDF</span>
           </button>
         </template>
@@ -433,7 +439,9 @@
             @click="handleMenuAction('downloadPdf', selectedRequest)"
             class="w-full text-left px-4 py-3 text-lg bg-rose-50 text-rose-800 hover:bg-rose-100 focus:bg-rose-100 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
           >
-            <i class="fas fa-file-pdf mr-3 text-rose-600 group-hover:text-rose-700 group-focus:text-rose-700 transition-colors duration-200"></i>
+            <i
+              class="fas fa-file-pdf mr-3 text-rose-600 group-hover:text-rose-700 group-focus:text-rose-700 transition-colors duration-200"
+            ></i>
             <span class="font-semibold">Download PDF</span>
           </button>
         </template>
@@ -464,6 +472,41 @@
     </Teleport>
 
     <AppFooter />
+
+    <!-- PDF Download Progress Banner (dismissible safety) -->
+    <div
+      v-if="downloadingPdf"
+      class="fixed inset-0 z-[100002] flex items-center justify-center bg-black/40"
+      @click.self="downloadingPdf = false"
+    >
+      <div class="bg-white/90 rounded-xl shadow-2xl p-6 w-full max-w-md border border-blue-200">
+        <div class="flex items-center gap-3 mb-3">
+          <i class="fas fa-file-pdf text-rose-600 text-2xl"></i>
+          <div class="text-lg font-semibold text-gray-800">
+            Downloading PDF… {{ downloadPercent }}%
+          </div>
+        </div>
+        <div class="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+          <div
+            class="h-full bg-gradient-to-r from-rose-500 to-blue-600"
+            :style="{ width: downloadPercent + '%' }"
+          ></div>
+        </div>
+        <div class="text-sm text-gray-700 mt-3 font-semibold">
+          Please keep this tab open until the download completes.
+        </div>
+        <div class="mt-4 flex justify-end">
+          <button
+            type="button"
+            class="px-3 py-1.5 text-sm rounded-md bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold"
+            @click="downloadingPdf = false"
+            title="Dismiss overlay"
+          >
+            Dismiss
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- Centered MNH Loading Banner -->
     <div
@@ -654,6 +697,8 @@
   const searchQuery = ref('')
   const statusFilter = ref('')
   const isLoading = ref(false)
+  const downloadingPdf = ref(false)
+  const downloadPercent = ref(0)
   const stats = reactive({ unassigned: 0, assigned: 0, inProgress: 0, total: 0 })
   const error = ref(null)
   const pagination = reactive({ total: 0, currentPage: 1, perPage: 20 })
@@ -1138,8 +1183,19 @@
         alert('Missing request id')
         return
       }
+      downloadingPdf.value = true
+      downloadPercent.value = 0
       const res = await apiClient.get(`/both-service-form/${request.id}/export-pdf`, {
-        responseType: 'blob'
+        responseType: 'blob',
+        onDownloadProgress: (evt) => {
+          if (evt.total) {
+            downloadPercent.value = Math.min(100, Math.round((evt.loaded * 100) / evt.total))
+          } else {
+            // If total is not provided, show an animated fallback
+            const next = downloadPercent.value + 3
+            downloadPercent.value = next >= 95 ? 95 : next
+          }
+        }
       })
       const blob = new Blob([res.data], { type: 'application/pdf' })
       const url = URL.createObjectURL(blob)
@@ -1150,8 +1206,12 @@
       link.click()
       URL.revokeObjectURL(url)
       link.remove()
+      downloadPercent.value = 100
+      setTimeout(() => (downloadingPdf.value = false), 400)
     } catch (e) {
       console.error('Failed to download PDF:', e)
+      downloadingPdf.value = false
+      downloadPercent.value = 0
       alert('Failed to download PDF. Please try again.')
     }
   }
@@ -1381,16 +1441,35 @@
   onMounted(async () => {
     try {
       console.log('IctAccessRequests: Component mounted, initializing...')
+      // Safety: ensure stale overlays are cleared on mount
+      isLoading.value = false
+      downloadingPdf.value = false
+
       requireRole([ROLES.ICT_OFFICER])
       await fetchAccessRequests()
       console.log('IctAccessRequests: Component initialized successfully')
       refreshNotificationBadge()
       initAutoRetryForList()
       document.addEventListener('click', handleClickOutside)
+
+      // Extra safety: auto-clear loading overlays if they persist too long
+      setTimeout(() => {
+        if (isLoading.value) {
+          console.warn('IctAccessRequests: Forcing isLoading=false after timeout')
+          isLoading.value = false
+        }
+      }, 10000)
+      setTimeout(() => {
+        if (downloadingPdf.value && downloadPercent.value === 0) {
+          console.warn('IctAccessRequests: Forcing downloadingPdf=false after timeout')
+          downloadingPdf.value = false
+        }
+      }, 30000)
     } catch (e) {
       console.error('IctAccessRequests: Error during mount:', e)
       error.value = 'Failed to initialize component: ' + e.message
       isLoading.value = false
+      downloadingPdf.value = false
     }
   })
 
@@ -1399,147 +1478,6 @@
   })
 </script>
 
-async assignTask(request) { console.log('📋 IctAccessRequests: Assigning task for request:',
-request.id) try { const result = await ictOfficerService.assignTaskToSelf( request.id, 'Task
-assigned by ICT Officer' ) if (result.success) { // Refresh the requests list to show updated status
-await this.fetchAccessRequests() // Trigger notification badge refresh
-this.refreshNotificationBadge() // Show success message (you could use a toast notification here)
-alert('Task assigned successfully!') } else { alert('Failed to assign task: ' + result.message) } }
-catch (error) { console.error('Error assigning task:', error) alert('Network error while assigning
-task') } }, async updateProgress(request) { console.log('📈 IctAccessRequests: Updating progress for
-request:', request.id) // For now, just set to in progress status // In a real application, you
-might want to show a modal to capture progress details try { const result = await
-ictOfficerService.updateProgress( request.id, 'implementation_in_progress', 'Implementation started'
-) if (result.success) { // Refresh the requests list to show updated status await
-this.fetchAccessRequests() // Trigger notification badge refresh this.refreshNotificationBadge()
-alert('Progress updated successfully!') } else { alert('Failed to update progress: ' +
-result.message) } } catch (error) { console.error('Error updating progress:', error) alert('Network
-error while updating progress') } }, async cancelTask(request) { console.log('❌ IctAccessRequests:
-Canceling task for request:', request.id) // Show confirmation dialog and handle cancellation const
-reason = prompt('Please provide a reason for canceling this task:') if (reason && reason.trim()) {
-try { const result = await ictOfficerService.cancelTask(request.id, reason) if (result.success) { //
-Refresh the requests list to show updated status await this.fetchAccessRequests() // Trigger
-notification badge refresh this.refreshNotificationBadge() alert('Task canceled successfully!') }
-else { alert('Failed to cancel task: ' + result.message) } } catch (error) { console.error('Error
-canceling task:', error) alert('Network error while canceling task') } } }, isUnassigned(status) {
-// Status indicating request is available for assignment return status === 'head_of_it_approved' ||
-!status }, hasService(request, serviceType) { // Check if request includes a specific service type
-if (serviceType === 'jeeva') { return ( request.jeeva_access_required || (request.request_types &&
-request.request_types.includes('jeeva')) ) } if (serviceType === 'wellsoft') { return (
-request.wellsoft_access_required || (request.request_types &&
-request.request_types.includes('wellsoft')) ) } if (serviceType === 'internet') { return (
-request.internet_access_required || (request.request_types &&
-request.request_types.includes('internet')) ) } return false }, getRequestType(request) { const
-services = [] if (this.hasService(request, 'jeeva')) services.push('Jeeva') if
-(this.hasService(request, 'wellsoft')) services.push('Wellsoft') if (this.hasService(request,
-'internet')) services.push('Internet') return services.length > 0 ? services.join(' + ') : 'Access
-Request' }, getStatusBadgeClass(status) { const statusClasses = { head_of_it_approved:
-'bg-yellow-500 text-yellow-900', assigned_to_ict: 'bg-blue-500 text-blue-900',
-implementation_in_progress: 'bg-purple-500 text-purple-900', completed: 'bg-emerald-500
-text-emerald-900', implemented: 'bg-green-500 text-green-900', // Add styling for 'implemented'
-status cancelled: 'bg-red-500 text-red-900' } return statusClasses[status] || 'bg-gray-500
-text-gray-900' }, getStatusText(status) { const statusTexts = { head_of_it_approved: 'Available for
-Assignment', assigned_to_ict: 'Assigned to ICT Officer', implementation_in_progress: 'Implementation
-in Progress', completed: 'Implementation Completed', implemented: 'Access Granted', // Add mapping
-for 'implemented' status cancelled: 'Task Cancelled' } return ( statusTexts[status] ||
-status?.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'Unknown Status' ) },
-viewTimeline(request) { console.log('📅 IctAccessRequests: Opening timeline for request:',
-request.id) this.selectedRequestId = request.id this.selectedRequest = request this.showTimeline =
-true }, closeTimeline() { console.log('📅 IctAccessRequests: Closing timeline modal')
-this.showTimeline = false this.selectedRequestId = null this.selectedRequest = null
-this.showUpdateProgress = false }, async handleTimelineUpdate() { console.log('🔄 IctAccessRequests:
-Timeline updated, refreshing requests list...') await this.fetchAccessRequests() // Also refresh the
-notification badge this.refreshNotificationBadge() }, openUpdateProgress(request) { console.log( '📝
-IctAccessRequests: Opening update progress section for request:', request?.id ) if (request &&
-this.canShowUpdateProgress(request)) { this.selectedRequest = request this.selectedRequestId =
-request.id this.showUpdateProgress = true } }, closeUpdateProgress() { console.log('📝
-IctAccessRequests: Closing update progress section') this.showUpdateProgress = false }, async
-handleUpdateProgressUpdate() { console.log('🔄 IctAccessRequests: Progress updated, refreshing
-data...') // Refresh the requests list await this.fetchAccessRequests() // Force immediate
-notification badge refresh this.refreshNotificationBadge() // Close both timeline and update
-progress this.closeTimeline() // Additional delayed refresh to ensure backend sync setTimeout(() =>
-{ console.log('⏰ IctAccessRequests: Delayed refresh after progress update')
-this.refreshNotificationBadge() }, 3000) // Extra refresh specifically for implemented/completed
-status changes setTimeout(() => { console.log( '🔄 IctAccessRequests: Final refresh to ensure
-implemented/completed requests are excluded from badge count' ) this.refreshNotificationBadge() },
-5000) }, canShowUpdateProgress(request) { // Only show update progress for ICT Officer assigned
-requests that are not completed if (!request) return false // Get current user from auth const {
-user } = useAuth() const currentUserId = user.value?.id return ( request.ict_officer_user_id &&
-request.ict_officer_user_id === currentUserId && !request.ict_officer_implemented_at &&
-request.ict_officer_status !== 'implemented' && request.ict_officer_status !== 'rejected' &&
-!['implemented', 'completed'].includes(request.status) && // Don't allow updates for completed
-requests (request.status === 'assigned_to_ict' || request.status === 'implementation_in_progress') )
-}, // Dropdown functionality toggleDropdown(requestId, event) { this.activeDropdown =
-this.activeDropdown === requestId ? null : requestId if (this.activeDropdown === requestId && event)
-{ // Store the button position for dropdown positioning const button =
-event.target.closest('button') if (button) { const rect = button.getBoundingClientRect()
-this.dropdownPosition = { top: rect.bottom + window.scrollY + 4, right: window.innerWidth -
-rect.right - window.scrollX } } } }, getDropdownPosition() { if (this.dropdownPosition) { // Check
-if dropdown would go off screen const dropdownWidth = 192 // w-48 = 12rem = 192px const
-dropdownHeight = 200 // estimated height for dropdown let { top, right } = this.dropdownPosition //
-Adjust horizontal position if too close to left edge if (right + dropdownWidth > window.innerWidth)
-{ right = Math.max(4, window.innerWidth - dropdownWidth - 4) } // Adjust vertical position if too
-close to bottom if (top + dropdownHeight > window.innerHeight + window.scrollY) { top = Math.max(4,
-top - dropdownHeight - 32) // 32px for button height } return { top: `${top}px`, right:
-`${right}px`, left: 'auto' } } // Fallback positioning return { top: '100%', right: '0', left:
-'auto', position: 'absolute' } }, handleClickOutside(event) { // Close dropdown if clicking outside
-the dropdown or three-dot button if ( this.activeDropdown &&
-!event.target.closest('[style*="z-index: 9999"]') && !event.target.closest('button[title*="Actions
-for"]') ) { this.activeDropdown = null this.dropdownPosition = null } }, handleMenuAction(action,
-request) { // Close dropdown first this.activeDropdown = null this.dropdownPosition = null //
-Execute the appropriate action switch (action) { case 'viewRequest': this.viewRequest(request) break
-case 'viewTimeline': this.viewTimeline(request) break case 'assignTask': this.assignTask(request)
-break case 'updateProgress': this.updateProgress(request) break case 'cancelTask':
-this.cancelTask(request) break default: console.warn('Unknown action:', action) } },
-formatDate(dateString) { if (!dateString) return 'N/A' try { return new
-Date(dateString).toLocaleDateString('en-GB') } catch { return 'Invalid Date' } },
-formatTime(dateString) { if (!dateString) return 'N/A' try { return new
-Date(dateString).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) } catch {
-return 'Invalid Time' } }, // Refresh notification badge in sidebar refreshNotificationBadge() { try
-{ console.log('🔔 AccessRequests: Triggering notification badge refresh') // Method -1: Update our
-override count first const currentPendingCount = this.accessRequests.filter((r) =>
-this.isUnassigned(r.status) ).length this.setPendingCountOverride(currentPendingCount) // Method 0:
-Clear notification service cache first this.clearNotificationCache() // Method 1: Trigger force
-refresh event for immediate update if (window.dispatchEvent) { const event = new
-CustomEvent('force-refresh-notifications', { detail: { source: 'AccessRequests', reason:
-'request_updated', timestamp: Date.now() } }) window.dispatchEvent(event) console.log('🚀
-AccessRequests: Dispatched force-refresh-notifications event') } // Method 2: Direct call to sidebar
-instance with force flag if (window.sidebarInstance &&
-window.sidebarInstance.fetchNotificationCounts) { console.log('📞 AccessRequests: Calling sidebar
-fetchNotificationCounts directly') window.sidebarInstance.fetchNotificationCounts(true) // force
-refresh } } catch (error) { console.warn('Failed to refresh notification badge:', error) } }, //
-Clear notification cache to ensure fresh data clearNotificationCache() { try { // Import and clear
-notification service cache dynamically import('@/services/notificationService').then((module) => {
-module.default.clearCache() console.log('🗑️ AccessRequests: Cleared notification service cache') })
-} catch (error) { console.warn('Failed to clear notification cache:', error) } }, // Set global
-pending count override for accurate sidebar badge setPendingCountOverride(count) { try {
-console.log('🎠 AccessRequests: Setting pending count override:', count) // Method 1: Global window
-variable for sidebar to read if (typeof window !== 'undefined') { window.accessRequestsPendingCount
-= count } // Method 2: Custom event for real-time updates if (window.dispatchEvent) { const event =
-new CustomEvent('ict-access-requests-pending-count', { detail: { count, source: 'AccessRequests',
-timestamp: Date.now() } }) window.dispatchEvent(event) } // Method 3: Direct global sidebar method
-call if (window.sidebarInstance && window.sidebarInstance.setNotificationCount) {
-window.sidebarInstance.setNotificationCount('/ict-dashboard/access-requests', count) }
-console.log('📻 AccessRequests: Emitted pending count override event') } catch (error) {
-console.warn('Failed to set pending count override:', error) } }, // DIAGNOSTIC: Compare
-notification APIs to find discrepancy async diagnoseNotificationDiscrepancy() { try {
-console.log('🔍 DIAGNOSTIC: Comparing notification APIs...') // Get universal notification count
-const notificationService = (await import('@/services/notificationService')).default const
-universalResult = await notificationService.getPendingRequestsCount(true) // Get ICT Officer
-specific count const ictResult = await ictOfficerService.getPendingRequestsCount() // Get current
-page data const pageStatuses = this.accessRequests.map((r) => ({ id: r.id, status: r.status,
-request_id: r.request_id || `REQ-${r.id.toString().padStart(6, '0')}` })) if (process.env.NODE_ENV
-=== 'development') { console.log('🔴 NOTIFICATION API COMPARISON:', { universal_api: { endpoint:
-'/notifications/pending-count', count: universalResult.total_pending, full_response: universalResult
-}, ict_specific_api: { endpoint: '/ict-officer/pending-count', count: ictResult.total_pending ||
-ictResult, full_response: ictResult }, page_data: { total_requests: this.accessRequests.length,
-pending_requests: this.accessRequests.filter((r) => this.isUnassigned(r.status)) .length,
-completed_requests: this.accessRequests.filter((r) => ['completed',
-'implemented'].includes(r.status) ).length, all_statuses: pageStatuses }, analysis: {
-universal_vs_ict: universalResult.total_pending === (ictResult.total_pending || ictResult) ? 'MATCH'
-: 'MISMATCH', badge_vs_page: universalResult.total_pending === this.accessRequests.filter((r) =>
-this.isUnassigned(r.status)).length ? 'CONSISTENT' : 'INCONSISTENT' } }) } } catch (error) {
-console.error('🚫 DIAGNOSTIC ERROR:', error) }
 <style scoped>
   .sidebar-narrow {
     flex-shrink: 0;

@@ -1236,9 +1236,7 @@
           (request.head_it_status && String(request.head_it_status).toLowerCase() === 'approved')
         ) {
           const requesterSentTs =
-            request.sms_sent_to_requester_at ||
-            request.requester_sms_sent_at ||
-            null
+            request.sms_sent_to_requester_at || request.requester_sms_sent_at || null
           if (requesterSentTs) {
             if (this.lastSmsStatusCache[request.id] !== 'sent') {
               this.lastSmsStatusCache[request.id] = 'sent'

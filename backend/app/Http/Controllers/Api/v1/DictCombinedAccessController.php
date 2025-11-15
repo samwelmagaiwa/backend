@@ -67,8 +67,9 @@ class DictCombinedAccessController extends Controller
 
             $query = UserAccess::with(['user', 'department'])
                 ->whereNotNull('request_type')
-                ->where('hod_status', 'approved') // Must have HOD approval
-                ->where('divisional_status', 'approved'); // Must have Divisional approval
+                // Must have HOD and Divisional approved, but allow 'skipped' for ICT Officer submissions
+                ->whereIn('hod_status', ['approved', 'skipped'])
+                ->whereIn('divisional_status', ['approved', 'skipped']);
 
             if ($isHeadOfIT) {
                 // Head of IT sees requests that ICT Director has approved and are pending Head IT approval
@@ -279,8 +280,10 @@ class DictCombinedAccessController extends Controller
                 }
             } else {
                 // ICT Director approval requirements
-                if ($userAccessRequest->hod_status !== 'approved' || 
-                    $userAccessRequest->divisional_status !== 'approved' ||
+                $hodOk = in_array($userAccessRequest->hod_status, ['approved','skipped'], true);
+                $divOk = in_array($userAccessRequest->divisional_status, ['approved','skipped'], true);
+                if (!$hodOk || 
+                    !$divOk ||
                     $userAccessRequest->ict_director_status !== 'pending') {
                         
                     Log::warning('ICT Director Approval Denied: Invalid approval workflow state', [

@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 use Carbon\Carbon;
 
 class IctOfficerController extends Controller
@@ -549,23 +550,55 @@ class IctOfficerController extends Controller
 
             $baseQuery = IctTaskAssignment::forIctOfficer($user->id);
 
+            // Compute assignment-based counts
+            $assignedCount = (clone $baseQuery)->withStatus(IctTaskAssignment::STATUS_ASSIGNED)->count();
+            $inProgressCount = (clone $baseQuery)->withStatus(IctTaskAssignment::STATUS_IN_PROGRESS)->count();
+            $completedAssignments = (clone $baseQuery)->withStatus(IctTaskAssignment::STATUS_COMPLETED);
+            $completedAssignCount = $completedAssignments->count();
+            $cancelledCount = (clone $baseQuery)->withStatus(IctTaskAssignment::STATUS_CANCELLED)->count();
+
+            // Also include UserAccess records implemented by this officer even if no assignment row exists (secondary flow/self-origin cases)
+            $completedUAQuery = \App\Models\UserAccess::where('ict_officer_user_id', $user->id)
+                ->where('ict_officer_status', 'implemented');
+            // Exclude those that already have a completed assignment to avoid double counting
+            $completedUAQuery->whereDoesntHave('ictTaskAssignments', function ($q) use ($user) {
+                $q->where('ict_officer_user_id', $user->id)
+                  ->where('status', IctTaskAssignment::STATUS_COMPLETED);
+            });
+            $completedUaOnlyCount = $completedUAQuery->count();
+
+            $allTimeTotal = $baseQuery->count();
+            $allTimeCompleted = $completedAssignCount + $completedUaOnlyCount;
+
             $statistics = [
                 'all_time' => [
-                    'total' => $baseQuery->count(),
-                    'assigned' => (clone $baseQuery)->withStatus(IctTaskAssignment::STATUS_ASSIGNED)->count(),
-                    'in_progress' => (clone $baseQuery)->withStatus(IctTaskAssignment::STATUS_IN_PROGRESS)->count(),
-                    'completed' => (clone $baseQuery)->withStatus(IctTaskAssignment::STATUS_COMPLETED)->count(),
-                    'cancelled' => (clone $baseQuery)->withStatus(IctTaskAssignment::STATUS_CANCELLED)->count(),
+                    'total' => $allTimeTotal,
+                    'assigned' => $assignedCount,
+                    'in_progress' => $inProgressCount,
+                    'completed' => $allTimeCompleted,
+                    'cancelled' => $cancelledCount,
                 ],
                 'this_month' => [
                     'total' => (clone $baseQuery)->whereMonth('assigned_at', now()->month)->count(),
                     'completed' => (clone $baseQuery)->withStatus(IctTaskAssignment::STATUS_COMPLETED)
-                        ->whereMonth('completed_at', now()->month)->count(),
+                        ->whereMonth('completed_at', now()->month)->count() + \App\Models\UserAccess::where('ict_officer_user_id', $user->id)
+                        ->where('ict_officer_status', 'implemented')
+                        ->whereMonth('ict_officer_implemented_at', now()->month)
+                        ->whereDoesntHave('ictTaskAssignments', function ($q) use ($user) {
+                            $q->where('ict_officer_user_id', $user->id)
+                              ->where('status', IctTaskAssignment::STATUS_COMPLETED);
+                        })->count(),
                 ],
                 'this_week' => [
                     'total' => (clone $baseQuery)->whereBetween('assigned_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
                     'completed' => (clone $baseQuery)->withStatus(IctTaskAssignment::STATUS_COMPLETED)
-                        ->whereBetween('completed_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
+                        ->whereBetween('completed_at', [now()->startOfWeek(), now()->endOfWeek()])->count() + \App\Models\UserAccess::where('ict_officer_user_id', $user->id)
+                        ->where('ict_officer_status', 'implemented')
+                        ->whereBetween('ict_officer_implemented_at', [now()->startOfWeek(), now()->endOfWeek()])
+                        ->whereDoesntHave('ictTaskAssignments', function ($q) use ($user) {
+                            $q->where('ict_officer_user_id', $user->id)
+                              ->where('status', IctTaskAssignment::STATUS_COMPLETED);
+                        })->count(),
                 ]
             ];
 
@@ -1236,6 +1269,7 @@ class IctOfficerController extends Controller
 
     /**
      * Get detailed timeline for a specific access request
+     * Optimized: minimal column selection, constrained eager-loading, and short server-side caching
      */
     public function getAccessRequestTimeline($requestId)
     {
@@ -1254,123 +1288,145 @@ class IctOfficerController extends Controller
                 'request_id' => $requestId
             ]);
 
-            // Find the access request with all related data
-            // Allow access to requests that have reached ICT Director stage (pending or approved by Head of IT)
-            $request = UserAccess::with([
-                'department',
-                'user',
-                'ictTaskAssignments.ictOfficer',
-                'ictTaskAssignments.assignedBy'
-            ])
-            ->where('id', $requestId)
-            ->where(function ($query) {
-                $query->where('ict_director_status', 'approved') // Must be approved by ICT Director
-                      ->whereNotNull('ict_director_approved_at');
-            })
-            ->firstOrFail();
+            $cacheKey = "ict_officer.timeline.{$requestId}";
+            $timelineData = Cache::remember($cacheKey, 10, function () use ($requestId) {
+                // Fetch only the fields we actually need
+                $request = UserAccess::select([
+                        'id','user_id','department_id','staff_name','pf_number','phone_number','signature_path',
+                        // request_type_name and access_type_name are accessors, not DB columns
+                        'request_type','access_type','temporary_until',
+                        'internet_purposes','wellsoft_modules_selected','jeeva_modules_selected',
+                        'hod_status','hod_name','hod_comments','hod_signature_path','hod_approved_at','hod_approved_by','hod_approved_by_name',
+                        'divisional_status','divisional_director_name','divisional_director_comments','divisional_director_signature_path','divisional_approved_at',
+                        'ict_director_status','ict_director_name','ict_director_comments','ict_director_signature_path','ict_director_approved_at','ict_director_rejection_reasons',
+                        'head_it_status','head_it_name','head_it_comments','head_it_signature_path','head_it_approved_at',
+                        'ict_officer_status','ict_officer_name','ict_officer_user_id','ict_officer_assigned_at','ict_officer_started_at','ict_officer_implemented_at','ict_officer_comments','ict_officer_signature_path',
+                        'implementation_comments','cancelled_at','cancelled_by','cancellation_reason',
+                        'created_at','updated_at'
+                    ])
+                    ->with([
+                        'department:id,name,code',
+                        // users table does not have staff_name column; keep real columns only
+                        'user:id,name,email,pf_number,phone,department_id',
+                        'ictTaskAssignments' => function ($q) {
+                            $q->select([
+                                'id','user_access_id','ict_officer_user_id','assigned_by_user_id','status',
+                                'assigned_at','started_at','completed_at','assignment_notes','progress_notes','completion_notes',
+                                'created_at','updated_at'
+                            ])->with([
+                                'ictOfficer:id,name,email',
+                                'assignedBy:id,name,email',
+                            ]);
+                        }
+                    ])
+                    ->where('id', $requestId)
+                    // ICT Officer access is already role-gated; allow any request that exists
+                    // (including head_of_it_approved, assigned_to_ict, implemented, etc.)
+                    ->firstOrFail();
 
-            // Build comprehensive request data for timeline
-            $timelineData = [
-                'request' => [
-                    'id' => $request->id,
-                    'staff_name' => $request->staff_name,
-                    'pf_number' => $request->pf_number,
-                    'phone_number' => $request->phone_number,
-                    'department' => [
-                        'id' => $request->department->id ?? null,
-                        'name' => $request->department->name ?? 'Unknown Department'
+                return [
+                    'request' => [
+                        'id' => $request->id,
+                        'staff_name' => $request->staff_name,
+                        'pf_number' => $request->pf_number,
+                        'phone_number' => $request->phone_number,
+'department' => [
+                            'id' => $request->department->id ?? null,
+                            'name' => $request->department->name ?? 'Unknown Department',
+                            'code' => $request->department->code ?? null,
+                        ],
+                        'user' => $request->relationLoaded('user') && $request->user ? [
+                            'id' => $request->user->id,
+                            'name' => $request->user->name,
+                            'email' => $request->user->email,
+                            'pf_number' => $request->user->pf_number,
+                            'staff_name' => $request->user->staff_name,
+                            'phone' => $request->user->phone,
+                            'department_id' => $request->user->department_id,
+                        ] : null,
+                        'signature_path' => $request->signature_path,
+                        // Request details
+                        'request_type' => $request->request_type,
+                        'request_type_name' => $request->request_type_name,
+                        'access_type' => $request->access_type,
+                        'access_type_name' => $request->access_type_name,
+                        'temporary_until' => $request->temporary_until,
+                        'internet_purposes' => $request->internet_purposes,
+                        'wellsoft_modules_selected' => $request->wellsoft_modules_selected,
+                        'jeeva_modules_selected' => $request->jeeva_modules_selected,
+                        // HOD approval stage
+                        'hod_status' => $request->hod_status,
+                        'hod_name' => $request->hod_name,
+                        'hod_comments' => $request->hod_comments,
+                        'hod_signature_path' => $request->hod_signature_path,
+                        'hod_approved_at' => $request->hod_approved_at,
+                        'hod_approved_by' => $request->hod_approved_by,
+                        'hod_approved_by_name' => $request->hod_approved_by_name,
+                        // Divisional Director approval stage
+                        'divisional_status' => $request->divisional_status,
+                        'divisional_director_name' => $request->divisional_director_name,
+                        'divisional_director_comments' => $request->divisional_director_comments,
+                        'divisional_director_signature_path' => $request->divisional_director_signature_path,
+                        'divisional_approved_at' => $request->divisional_approved_at,
+                        // ICT Director approval stage
+                        'ict_director_status' => $request->ict_director_status,
+                        'ict_director_name' => $request->ict_director_name,
+                        'ict_director_comments' => $request->ict_director_comments,
+                        'ict_director_signature_path' => $request->ict_director_signature_path,
+                        'ict_director_approved_at' => $request->ict_director_approved_at,
+                        'ict_director_rejection_reasons' => $request->ict_director_rejection_reasons,
+                        // Head of IT approval stage
+                        'head_it_status' => $request->head_it_status,
+                        'head_it_name' => $request->head_it_name,
+                        'head_it_comments' => $request->head_it_comments,
+                        'head_it_signature_path' => $request->head_it_signature_path,
+                        'head_it_approved_at' => $request->head_it_approved_at,
+                        // ICT Officer implementation stage
+                        'ict_officer_status' => $request->ict_officer_status,
+                        'ict_officer_name' => $request->ict_officer_name,
+                        'ict_officer_user_id' => $request->ict_officer_user_id,
+                        'ict_officer_assigned_at' => $request->ict_officer_assigned_at,
+                        'ict_officer_started_at' => $request->ict_officer_started_at,
+                        'ict_officer_implemented_at' => $request->ict_officer_implemented_at,
+                        'ict_officer_comments' => $request->ict_officer_comments,
+                        'ict_officer_signature_path' => $request->ict_officer_signature_path,
+                        'implementation_comments' => $request->implementation_comments,
+                        // Cancellation/rejection info
+                        'cancelled_at' => $request->cancelled_at,
+                        'cancelled_by' => $request->cancelled_by,
+                        'cancellation_reason' => $request->cancellation_reason,
+                        // Timestamps
+                        'created_at' => $request->created_at,
+                        'updated_at' => $request->updated_at
                     ],
-                    'signature_path' => $request->signature_path,
-                    
-                    // Request details
-                    'request_type' => $request->request_type,
-                    'request_type_name' => $request->request_type_name,
-                    'access_type' => $request->access_type,
-                    'access_type_name' => $request->access_type_name,
-                    'temporary_until' => $request->temporary_until,
-                    'internet_purposes' => $request->internet_purposes,
-                    'wellsoft_modules_selected' => $request->wellsoft_modules_selected,
-                    'jeeva_modules_selected' => $request->jeeva_modules_selected,
-                    
-                    // HOD approval stage
-                    'hod_status' => $request->hod_status,
-                    'hod_name' => $request->hod_name,
-                    'hod_comments' => $request->hod_comments,
-                    'hod_signature_path' => $request->hod_signature_path,
-                    'hod_approved_at' => $request->hod_approved_at,
-                    'hod_approved_by' => $request->hod_approved_by,
-                    'hod_approved_by_name' => $request->hod_approved_by_name,
-                    
-                    // Divisional Director approval stage
-                    'divisional_status' => $request->divisional_status,
-                    'divisional_director_name' => $request->divisional_director_name,
-                    'divisional_director_comments' => $request->divisional_director_comments,
-                    'divisional_director_signature_path' => $request->divisional_director_signature_path,
-                    'divisional_approved_at' => $request->divisional_approved_at,
-                    
-                    // ICT Director approval stage
-                    'ict_director_status' => $request->ict_director_status,
-                    'ict_director_name' => $request->ict_director_name,
-                    'ict_director_comments' => $request->ict_director_comments,
-                    'ict_director_signature_path' => $request->ict_director_signature_path,
-                    'ict_director_approved_at' => $request->ict_director_approved_at,
-                    'ict_director_rejection_reasons' => $request->ict_director_rejection_reasons,
-                    
-                    // Head of IT approval stage
-                    'head_it_status' => $request->head_it_status,
-                    'head_it_name' => $request->head_it_name,
-                    'head_it_comments' => $request->head_it_comments,
-                    'head_it_signature_path' => $request->head_it_signature_path,
-                    'head_it_approved_at' => $request->head_it_approved_at,
-                    
-                    // ICT Officer implementation stage
-                    'ict_officer_status' => $request->ict_officer_status,
-                    'ict_officer_name' => $request->ict_officer_name,
-                    'ict_officer_user_id' => $request->ict_officer_user_id,
-                    'ict_officer_assigned_at' => $request->ict_officer_assigned_at,
-                    'ict_officer_started_at' => $request->ict_officer_started_at,
-                    'ict_officer_implemented_at' => $request->ict_officer_implemented_at,
-                    'ict_officer_comments' => $request->ict_officer_comments,
-                    'ict_officer_signature_path' => $request->ict_officer_signature_path,
-                    'implementation_comments' => $request->implementation_comments,
-                    
-                    // Cancellation/rejection info
-                    'cancelled_at' => $request->cancelled_at,
-                    'cancelled_by' => $request->cancelled_by,
-                    'cancellation_reason' => $request->cancellation_reason,
-                    
-                    // Timestamps
-                    'created_at' => $request->created_at,
-                    'updated_at' => $request->updated_at
-                ],
-                
-                // ICT Task Assignment details (for more detailed implementation tracking)
-                'ict_assignments' => $request->ictTaskAssignments->map(function ($assignment) {
-                    return [
-                        'id' => $assignment->id,
-                        'status' => $assignment->status,
-                        'status_label' => $assignment->status_label,
-                        'ict_officer' => [
-                            'id' => $assignment->ictOfficer->id ?? null,
-                            'name' => $assignment->ictOfficer->name ?? 'Unknown Officer',
-                            'email' => $assignment->ictOfficer->email ?? null
-                        ],
-                        'assigned_by' => [
-                            'id' => $assignment->assignedBy->id ?? null,
-                            'name' => $assignment->assignedBy->name ?? 'System',
-                            'email' => $assignment->assignedBy->email ?? null
-                        ],
-                        'assigned_at' => $assignment->assigned_at,
-                        'started_at' => $assignment->started_at,
-                        'completed_at' => $assignment->completed_at,
-                        'assignment_notes' => $assignment->assignment_notes,
-                        'progress_notes' => $assignment->progress_notes,
-                        'completion_notes' => $assignment->completion_notes,
-                        'created_at' => $assignment->created_at,
-                        'updated_at' => $assignment->updated_at
-                    ];
-                })->values()
-            ];
+                    // ICT Task Assignment details
+                    'ict_assignments' => $request->ictTaskAssignments->map(function ($assignment) {
+                        return [
+                            'id' => $assignment->id,
+                            'status' => $assignment->status,
+                            'status_label' => $assignment->status_label,
+                            'ict_officer' => [
+                                'id' => $assignment->ictOfficer->id ?? null,
+                                'name' => $assignment->ictOfficer->name ?? 'Unknown Officer',
+                                'email' => $assignment->ictOfficer->email ?? null
+                            ],
+                            'assigned_by' => [
+                                'id' => $assignment->assignedBy->id ?? null,
+                                'name' => $assignment->assignedBy->name ?? 'System',
+                                'email' => $assignment->assignedBy->email ?? null
+                            ],
+                            'assigned_at' => $assignment->assigned_at,
+                            'started_at' => $assignment->started_at,
+                            'completed_at' => $assignment->completed_at,
+                            'assignment_notes' => $assignment->assignment_notes,
+                            'progress_notes' => $assignment->progress_notes,
+                            'completion_notes' => $assignment->completion_notes,
+                            'created_at' => $assignment->created_at,
+                            'updated_at' => $assignment->updated_at
+                        ];
+                    })->values()
+                ];
+            });
 
             return response()->json([
                 'success' => true,

@@ -1005,6 +1005,13 @@
             category: 'requests-management',
             description: 'Access requests approved by Head of IT'
           },
+          '/ict-dashboard/access-service': {
+            name: 'IctAccessService',
+            displayName: 'Access Service',
+            icon: 'fas fa-tags',
+            category: 'requests-management',
+            description: 'Create new access or booking request'
+          },
           '/head_of_it-dashboard': {
             name: 'HeadOfItDashboard',
             displayName: 'Dashboard',
@@ -1310,6 +1317,82 @@
                 typeof ictResp === 'object' ? (ictResp.total_pending ?? null) : ictResp
             } catch (e) {
               console.warn('⚠️ Failed to fetch ICT-specific pending count:', e?.message || e)
+            }
+          } else if (role === 'ict_director') {
+            // Fallback for ICT Director: prefer DICT statistics first
+            try {
+              const dictService = (await import('@/services/dictAccessService')).default
+              const statsResp = await dictService.getDictStatistics()
+              const s = statsResp?.data || {}
+              const dictPending = Number(
+                s.pendingDict ?? s.pending ?? s.total_pending ?? s.pending_count ?? 0
+              )
+              if (finalPendingCount === 0 && dictPending > 0) {
+                finalPendingCount = dictPending
+              }
+              // Deep fallback: compute from current request list when stats/universal return 0
+              if (finalPendingCount === 0) {
+                const listResp = await dictService.getDictRequests()
+                // Robustly extract an array of records from various API shapes
+                const pickArray = (root) => {
+                  if (!root) return []
+                  const candidates = [
+                    root?.data?.data, // Laravel pagination: { data: { data: [] } }
+                    root?.data?.records, // alternative key
+                    root?.data?.items, // alternative key
+                    root?.data?.rows, // alternative key
+                    root?.data, // sometimes data is already the array
+                    root?.items, // flattened
+                    root?.records,
+                    root?.rows
+                  ]
+                  for (const c of candidates) {
+                    if (Array.isArray(c)) return c
+                  }
+                  // Deep scan: find first array value in one level of nesting
+                  try {
+                    const values = Object.values(root?.data || {})
+                    const firstArray = values.find((v) => Array.isArray(v))
+                    if (Array.isArray(firstArray)) return firstArray
+                  } catch (e) {
+                    /* no-op: safe fallback below */
+                  }
+                  return []
+                }
+                const arr = pickArray(listResp)
+                const count = arr.filter((r) => {
+                  const st = String(r.status || r.dict_status || '').toLowerCase()
+                  const dictSt = String(r.ict_director_status || r.dict_status || '').toLowerCase()
+                  const hodSt = String(r.hod_status || '').toLowerCase()
+                  const divSt = String(r.divisional_status || '').toLowerCase()
+                  const headItSt = String(r.head_it_status || '').toLowerCase()
+                  const implSt = String(r.ict_officer_status || '').toLowerCase()
+
+                  // Legacy overall-status based detection
+                  const legacyPending =
+                    st === 'pending' ||
+                    st === 'divisional_approved' ||
+                    st === 'pending_ict_director' ||
+                    st === 'pending_dict' ||
+                    dictSt === 'pending'
+
+                  // Per-stage inference (covers ICT Officer-origin requests: HOD/DIV skipped)
+                  const preDictDone =
+                    ['approved', 'skipped'].includes(hodSt) &&
+                    ['approved', 'skipped'].includes(divSt)
+                  const notCompleted = !['approved', 'implemented', 'completed'].includes(implSt)
+                  const headItNotTaken = !['approved', 'rejected'].includes(headItSt)
+                  const dictPending = !['approved', 'rejected'].includes(dictSt) // treat empty/null as pending
+
+                  const stageBasedPending =
+                    preDictDone && dictPending && headItNotTaken && notCompleted
+
+                  return legacyPending || stageBasedPending
+                }).length
+                if (count > 0) finalPendingCount = count
+              }
+            } catch (e) {
+              console.warn('⚠️ Failed to fetch DICT pending count:', e?.message || e)
             }
 
             try {
