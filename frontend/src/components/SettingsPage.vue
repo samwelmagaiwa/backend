@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col h-screen">
-    <!-- AppHeader removed -->
+    <AppHeader />
     <div class="flex flex-1 overflow-hidden">
       <ModernSidebar />
       <main class="flex-1 p-6 bg-gray-100 overflow-y-auto">
@@ -84,12 +84,14 @@
 <script>
   import ModernSidebar from './ModernSidebar.vue'
   import AppFooter from './footer.vue'
+  import AppHeader from './AppHeader.vue'
 
   export default {
     name: 'SettingsPage',
     components: {
       ModernSidebar,
-      AppFooter
+      AppFooter,
+      AppHeader
     },
     setup() {
       // Sidebar state now managed by Pinia - no local state needed

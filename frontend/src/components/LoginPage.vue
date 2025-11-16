@@ -109,55 +109,15 @@
             </button>
           </form>
 
-          <!-- Email Memory Info -->
-          <div
-            v-if="email && rememberEmail"
-            class="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200"
-          >
-            <div class="flex items-center text-blue-700">
-              <i class="fas fa-user-check mr-2"></i>
-              <span class="text-sm font-medium">Email Remembered</span>
-            </div>
-            <p class="text-xs text-blue-600 mt-1">
-              Your email will be saved for faster login next time.
-            </p>
-          </div>
-
-          <!-- Backend Connection Info -->
-          <div class="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
-            <div class="flex items-center justify-between text-green-700 mb-2">
-              <div class="flex items-center">
-                <i class="fas fa-check-circle mr-2"></i>
-                <span class="font-semibold">Backend API</span>
-              </div>
-              <button
-                @click="testConnection"
-                :disabled="testingConnection"
-                class="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 disabled:opacity-50"
-              >
-                <OrbitingDots v-if="testingConnection" size="xs" class="mr-1" />
-                <i v-else class="fas fa-plug mr-1"></i>
-                {{ testingConnection ? 'Testing...' : 'Test' }}
-              </button>
-            </div>
-            <p class="text-xs text-green-600 mb-2">
-              Using Laravel backend at
-              <code class="bg-green-100 px-1 rounded">{{ apiUrl }}</code>
-            </p>
-            <div
-              v-if="connectionStatus"
-              class="text-xs"
-              :class="connectionStatus.success ? 'text-green-600' : 'text-red-600'"
+          <!-- Forgot Password Button -->
+          <div class="mt-4 text-center">
+            <button
+              type="button"
+              class="text-sm text-primary hover:underline focus:outline-none"
+              @click="handleForgotPassword"
             >
-              <i
-                :class="connectionStatus.success ? 'fas fa-check-circle' : 'fas fa-times-circle'"
-                class="mr-1"
-              ></i>
-              {{ connectionStatus.message }}
-            </div>
-            <p class="text-xs text-gray-600 mt-1">
-              Please use your registered credentials to login.
-            </p>
+              Forgot your password?
+            </button>
           </div>
         </div>
       </div>
@@ -173,6 +133,9 @@
         Login successful! Redirecting...
       </div>
     </div>
+
+    <!-- Forgot Password Modal -->
+    <ForgotPasswordModal :show="showForgotPassword" @close="showForgotPassword = false" />
   </div>
 </template>
 
@@ -182,19 +145,17 @@
   import { useAuth } from '@/composables/useAuth'
   import loginMemory from '@/utils/loginMemory'
   import OrbitingDots from '@/components/common/OrbitingDots.vue'
+  import ForgotPasswordModal from '@/components/ForgotPasswordModal.vue'
 
   export default {
     name: 'LoginPage',
     components: {
-      OrbitingDots
+      OrbitingDots,
+      ForgotPasswordModal
     },
     setup() {
       const { login, isLoading, error, clearError } = useAuth()
       const route = useRoute()
-
-      // Connection testing
-      const testingConnection = ref(false)
-      const connectionStatus = ref(null)
 
       // Form data with localStorage persistence for email
       const email = ref('')
@@ -202,9 +163,7 @@
       const rememberEmail = ref(true)
       const loading = ref(false)
       const showSuccessSnackbar = ref(false)
-
-      // API URL for display
-      const apiUrl = process.env.VUE_APP_API_URL || 'http://localhost:8000/api'
+      const showForgotPassword = ref(false)
 
       // Load saved email on component mount
       const loadSavedEmail = () => {
@@ -293,44 +252,8 @@
         rememberEmail.value = false
       }
 
-      // Test API connection
-      const testConnection = async () => {
-        try {
-          testingConnection.value = true
-          connectionStatus.value = null
-
-          console.log('🔌 Testing API connection to:', apiUrl)
-
-          // Try to make a simple request to test connectivity
-          const response = await fetch(apiUrl.replace('/api', '/api/user'), {
-            method: 'GET',
-            headers: {
-              Accept: 'application/json',
-              'Content-Type': 'application/json'
-            }
-          })
-
-          if (response.ok || response.status === 401) {
-            // 401 is expected for unauthenticated requests, but means API is reachable
-            connectionStatus.value = {
-              success: true,
-              message: `API is reachable (Status: ${response.status})`
-            }
-          } else {
-            connectionStatus.value = {
-              success: false,
-              message: `API connection failed (Status: ${response.status})`
-            }
-          }
-        } catch (error) {
-          console.error('🔌 API connection test failed:', error)
-          connectionStatus.value = {
-            success: false,
-            message: 'Connection failed - API unreachable'
-          }
-        } finally {
-          testingConnection.value = false
-        }
+      const handleForgotPassword = () => {
+        showForgotPassword.value = true
       }
 
       // Initialize component
@@ -348,10 +271,8 @@
         isLoading,
         handleLogin,
         clearSavedEmail,
-        apiUrl,
-        testConnection,
-        testingConnection,
-        connectionStatus,
+        handleForgotPassword,
+        showForgotPassword,
         showSuccessSnackbar
       }
     }

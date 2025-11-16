@@ -586,7 +586,8 @@
             r.pf_number_display ||
             '',
           department_name:
-            (r.department && (r.department.name || r.department.department_name || r.department.label)) ||
+            (r.department &&
+              (r.department.name || r.department.department_name || r.department.label)) ||
             r.department_name ||
             r.departmentLabel ||
             r.department_label ||

@@ -100,7 +100,6 @@
   import { useRouter } from 'vue-router'
   import { useAuthStore } from '@/stores/auth'
   import authService from '@/services/authService'
-  import { getDefaultDashboard } from '@/utils/permissions'
 
   export default {
     name: 'ForceChangePassword',
@@ -114,8 +113,6 @@
       const submitting = ref(false)
       const errorMessage = ref('')
       const successMessage = ref('')
-
-      const userRole = computed(() => authStore.userRole)
 
       const newPasswordError = computed(() => {
         if (!newPassword.value) return ''
@@ -161,18 +158,18 @@
             return
           }
 
-          // Clear must_change_password flag locally
-          authStore.updateUser({ must_change_password: false })
+          // Backend already revoked tokens; clear local auth and send user to login
+          authStore.clearAuth()
 
-          successMessage.value = 'Password changed successfully. Redirecting to your dashboard...'
+          successMessage.value =
+            'Password changed successfully. Please log in again with your new password.'
 
           currentPassword.value = ''
           newPassword.value = ''
           confirmPassword.value = ''
 
-          const dashboard = getDefaultDashboard(userRole.value) || '/user-dashboard'
           setTimeout(() => {
-            router.push(dashboard)
+            router.push('/login')
           }, 1200)
         } catch (error) {
           console.error('Error changing password:', error)

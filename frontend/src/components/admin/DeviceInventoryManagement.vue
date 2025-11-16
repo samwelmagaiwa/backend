@@ -6,6 +6,13 @@
       <main
         class="flex-1 p-6 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative"
       >
+        <UnifiedLoadingBanner
+          :show="isLoading"
+          loadingTitle="Loading Device Inventory"
+          loadingSubtitle="Synchronizing device list and inventory statistics..."
+          departmentTitle="DEVICE INVENTORY MANAGEMENT"
+          :forceSpin="true"
+        />
         <!-- Background Pattern -->
         <div class="absolute inset-0 overflow-hidden">
           <div class="absolute inset-0 opacity-5">
@@ -491,19 +498,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Loading Modal -->
-    <div
-      v-if="isLoading"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-    >
-      <div class="bg-white rounded-xl shadow-2xl p-8 text-center">
-        <div
-          class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"
-        ></div>
-        <p class="text-gray-600">Loading...</p>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -513,6 +507,7 @@
   import Header from '@/components/header.vue'
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppFooter from '@/components/footer.vue'
+  import UnifiedLoadingBanner from '@/components/common/UnifiedLoadingBanner.vue'
   import deviceInventoryService from '@/services/deviceInventoryService'
 
   export default {
@@ -520,7 +515,8 @@
     components: {
       Header,
       ModernSidebar,
-      AppFooter
+      AppFooter,
+      UnifiedLoadingBanner
     },
     setup() {
       const router = useRouter()

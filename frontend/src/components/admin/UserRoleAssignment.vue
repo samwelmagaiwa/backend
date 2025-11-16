@@ -6,6 +6,13 @@
       <main
         class="flex-1 p-6 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative"
       >
+        <UnifiedLoadingBanner
+          :show="loading"
+          loadingTitle="Loading Users & Roles"
+          loadingSubtitle="Fetching user accounts and role assignments..."
+          departmentTitle="USER ROLE ASSIGNMENT"
+          :forceSpin="true"
+        />
         <!-- Background Pattern -->
         <div class="absolute inset-0 overflow-hidden">
           <div class="absolute inset-0 opacity-5">
@@ -294,6 +301,24 @@
                           >
                             <i class="fas fa-building mr-1"></i>{{ user.department.display_name }}
                           </p>
+
+                          <!-- Account status badge -->
+                          <div class="mt-2 flex flex-wrap items-center gap-2">
+                            <span
+                              v-if="user.is_active === false"
+                              class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-500/25 text-red-100 border border-red-400/50"
+                            >
+                              <i class="fas fa-lock mr-1 text-[11px]"></i>
+                              Locked account
+                            </span>
+                            <span
+                              v-else
+                              class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-100 border border-emerald-400/40"
+                            >
+                              <i class="fas fa-circle mr-1 text-[9px] text-emerald-300"></i>
+                              Active account
+                            </span>
+                          </div>
                         </div>
                       </div>
 
@@ -370,6 +395,26 @@
                               <div class="font-medium text-base">Delete Roles</div>
                               <div class="text-base text-gray-300 group-hover/item:text-gray-200">
                                 Remove all user roles
+                              </div>
+                            </div>
+                          </button>
+
+                          <!-- Lock User -->
+                          <button
+                            @click.stop="confirmLockUser(user)"
+                            class="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-indigo-500/20 transition-colors duration-200 text-white group/item border-t border-blue-400/20"
+                          >
+                            <div
+                              class="w-8 h-8 bg-indigo-500/30 rounded-lg flex items-center justify-center group-hover/item:bg-indigo-500/50 transition-colors duration-200"
+                            >
+                              <i
+                                class="fas fa-lock text-indigo-300 text-base group-hover/item:text-indigo-200"
+                              ></i>
+                            </div>
+                            <div class="flex-1">
+                              <div class="font-medium text-base">Lock User</div>
+                              <div class="text-base text-gray-300 group-hover/item:text-gray-200">
+                                Temporarily block system access
                               </div>
                             </div>
                           </button>
@@ -1807,27 +1852,117 @@
                 </div>
               </div>
             </div>
+
+            <div class="flex justify-end space-x-3">
+              <button
+                @click="closeDeleteRoleModal"
+                class="px-4 py-2 bg-gray-600 text-white rounded-lg font-medium hover:bg-gray-700 transition-colors duration-200 flex items-center space-x-2"
+              >
+                <i class="fas fa-times text-base"></i>
+                <span>Cancel</span>
+              </button>
+              <button
+                @click="deleteUserRoles"
+                :disabled="deletingRoles"
+                class="px-4 py-2 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+              >
+                <i
+                  :class="
+                    deletingRoles
+                      ? 'fas fa-spinner fa-spin text-base'
+                      : 'fas fa-shield-alt text-base'
+                  "
+                ></i>
+                <span>{{ deletingRoles ? 'Removing...' : 'Remove All Roles' }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lock User Confirmation Modal -->
+    <div
+      v-if="showLockUserModal && userToLock"
+      class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      @click="closeLockUserModal"
+    >
+      <div
+        class="bg-blue-900/95 rounded-2xl shadow-2xl w-full max-w-md border border-blue-400/30"
+        @click.stop
+      >
+        <!-- Modal Header -->
+        <div class="bg-blue-800/70 p-6 rounded-t-2xl border-b border-blue-400/30">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+              <div class="w-12 h-12 bg-blue-500/30 rounded-xl flex items-center justify-center">
+                <i class="fas fa-lock text-blue-200 text-xl"></i>
+              </div>
+              <div>
+                <h2 class="text-xl font-bold text-white">Lock User Account</h2>
+                <p class="text-blue-100 text-base">
+                  Are you sure you want to lock {{ userToLock.name }} from using this system?
+                </p>
+              </div>
+            </div>
+            <button
+              @click="closeLockUserModal"
+              class="w-8 h-8 bg-white/10 hover:bg-white/20 rounded-lg transition-colors duration-200 flex items-center justify-center"
+            >
+              <i class="fas fa-times text-white text-base"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="p-6">
+          <div class="mb-6">
+            <div class="flex items-center space-x-4 mb-4">
+              <div
+                class="w-12 h-12 bg-gradient-to-br from-teal-500 to-blue-600 rounded-full flex items-center justify-center"
+              >
+                <span class="text-white font-bold text-base">{{
+                  getInitials(userToLock.name)
+                }}</span>
+              </div>
+              <div>
+                <h3 class="font-bold text-white">{{ userToLock.name }}</h3>
+                <p class="text-blue-200 text-base">{{ userToLock.email }}</p>
+              </div>
+            </div>
+
+            <div class="bg-blue-500/20 border border-blue-400/30 rounded-lg p-4 mb-4">
+              <div class="flex items-start space-x-3">
+                <i class="fas fa-circle-exclamation text-blue-200 text-lg mt-0.5"></i>
+                <div>
+                  <h4 class="font-semibold text-blue-100 mb-2">What locking this user means</h4>
+                  <ul class="text-blue-100 text-base mt-1 space-y-1 list-disc list-inside pl-4">
+                    <li>The user will no longer be able to sign in to this system</li>
+                    <li>Existing sessions may be terminated or blocked from performing actions</li>
+                    <li>You can unlock this account later by marking the user as active again</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="flex justify-end space-x-3">
             <button
-              @click="closeDeleteRoleModal"
+              @click="closeLockUserModal"
               class="px-4 py-2 bg-gray-600 text-white rounded-lg font-medium hover:bg-gray-700 transition-colors duration-200 flex items-center space-x-2"
             >
               <i class="fas fa-times text-base"></i>
               <span>Cancel</span>
             </button>
             <button
-              @click="deleteUserRoles"
-              :disabled="deletingRoles"
-              class="px-4 py-2 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+              @click="lockUser"
+              :disabled="lockingUser"
+              class="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
             >
               <i
-                :class="
-                  deletingRoles ? 'fas fa-spinner fa-spin text-base' : 'fas fa-shield-alt text-base'
-                "
+                :class="lockingUser ? 'fas fa-spinner fa-spin text-base' : 'fas fa-lock text-base'"
               ></i>
-              <span>{{ deletingRoles ? 'Removing...' : 'Remove All Roles' }}</span>
+              <span>{{ lockingUser ? 'Locking...' : 'Yes, Lock User' }}</span>
             </button>
           </div>
         </div>
@@ -1835,12 +1970,12 @@
     </div>
   </div>
 </template>
-
 <script>
   import { ref, computed, onMounted } from 'vue'
   import { debounce } from 'lodash'
   import AppHeader from '@/components/AppHeader.vue'
   import ModernSidebar from '@/components/ModernSidebar.vue'
+  import UnifiedLoadingBanner from '@/components/common/UnifiedLoadingBanner.vue'
   import _roleAssignmentService from '@/services/roleAssignmentService'
   import adminUserService from '@/services/adminUserService'
 
@@ -1848,7 +1983,8 @@
     name: 'UserRoleAssignment',
     components: {
       AppHeader,
-      ModernSidebar
+      ModernSidebar,
+      UnifiedLoadingBanner
     },
     setup() {
       // Reactive data
@@ -1930,10 +2066,13 @@
       // Delete confirmation modals
       const showDeleteUserModal = ref(false)
       const showDeleteRoleModal = ref(false)
+      const showLockUserModal = ref(false)
       const userToDelete = ref(null)
       const userToRemoveRoles = ref(null)
+      const userToLock = ref(null)
       const deletingUser = ref(false)
       const deletingRoles = ref(false)
+      const lockingUser = ref(false)
 
       // Edit User Modal states
       const showEditUserModal = ref(false)
@@ -2993,6 +3132,22 @@
         closeAllMenus()
       }
 
+      // Lock user confirmation
+      const confirmLockUser = (user) => {
+        // If the user is already inactive, show an informational message instead of toggling
+        if (user && user.is_active === false) {
+          showErrorMessage(
+            `User "${user.name}" is already locked and cannot sign in to the system.`
+          )
+          closeAllMenus()
+          return
+        }
+
+        userToLock.value = user
+        showLockUserModal.value = true
+        closeAllMenus()
+      }
+
       // Close delete modals
       const closeDeleteUserModal = () => {
         showDeleteUserModal.value = false
@@ -3002,6 +3157,11 @@
       const closeDeleteRoleModal = () => {
         showDeleteRoleModal.value = false
         userToRemoveRoles.value = null
+      }
+
+      const closeLockUserModal = () => {
+        showLockUserModal.value = false
+        userToLock.value = null
       }
 
       // Delete user permanently
@@ -3056,6 +3216,34 @@
         }
       }
 
+      // Lock user (set is_active to false)
+      const lockUser = async () => {
+        if (!userToLock.value) return
+
+        lockingUser.value = true
+
+        try {
+          const response = await adminUserService.updateUser(userToLock.value.id, {
+            is_active: false
+          })
+
+          if (response.success) {
+            showSuccessMessage(
+              `User "${userToLock.value.name}" has been locked and can no longer sign in to this system.`
+            )
+            closeLockUserModal()
+            await refreshData()
+          } else {
+            throw new Error(response.message || 'Failed to lock user')
+          }
+        } catch (error) {
+          console.error('Error locking user:', error)
+          showErrorMessage(error.message || 'Failed to lock user')
+        } finally {
+          lockingUser.value = false
+        }
+      }
+
       // Initialize data on mount
       onMounted(() => {
         initializeData()
@@ -3086,6 +3274,7 @@
         showRoleHistoryModal,
         showDeleteUserModal,
         showDeleteRoleModal,
+        showLockUserModal,
         creatingUser,
         creatingRole,
         assigningRoles,
@@ -3096,6 +3285,7 @@
         showConfirmPassword,
         deletingUser,
         deletingRoles,
+        lockingUser,
         showEditUserModal,
         editingUser,
         updatingUser,
@@ -3114,6 +3304,7 @@
         roleAssignmentErrors,
         userToDelete,
         userToRemoveRoles,
+        userToLock,
         openMenuId,
         editUserData,
         editUserFormErrors,
@@ -3161,10 +3352,13 @@
         closeAllMenus,
         confirmDeleteUser,
         confirmDeleteUserRole,
+        confirmLockUser,
         closeDeleteUserModal,
         closeDeleteRoleModal,
+        closeLockUserModal,
         deleteUser,
-        deleteUserRoles
+        deleteUserRoles,
+        lockUser
       }
     }
   }

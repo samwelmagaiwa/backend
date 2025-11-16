@@ -39,12 +39,20 @@
           >
             <!-- User Avatar -->
             <div
-              class="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg border-2 border-blue-300/30 relative overflow-hidden"
+              class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg border-2 border-blue-300/30 relative overflow-hidden"
             >
               <div
                 class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-full"
               ></div>
-              <i class="fas fa-user text-white text-sm relative z-10 drop-shadow-lg"></i>
+              <!-- Actual profile photo if available -->
+              <img
+                v-if="currentUser?.value?.profile_photo_url"
+                :src="currentUser.value.profile_photo_url"
+                alt="Profile photo"
+                class="w-full h-full object-cover rounded-full relative z-10"
+              />
+              <!-- Fallback icon -->
+              <i v-else class="fas fa-user text-white text-sm relative z-10 drop-shadow-lg"></i>
               <!-- Online Status Indicator -->
               <div
                 class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-400 rounded-full border border-white"
@@ -122,7 +130,7 @@
                 <div class="flex items-center space-x-3 relative z-10">
                   <!-- User Avatar Large -->
                   <div
-                    class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center relative overflow-hidden"
+                    class="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center relative overflow-hidden"
                     style="
                       box-shadow:
                         0 8px 20px -4px rgba(59, 130, 246, 0.6),
@@ -135,7 +143,18 @@
                     <div
                       class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-full"
                     ></div>
-                    <i class="fas fa-user text-white text-lg relative z-10 drop-shadow-lg"></i>
+                    <!-- Actual profile photo if available -->
+                    <img
+                      v-if="currentUser?.value?.profile_photo_url"
+                      :src="currentUser.value.profile_photo_url"
+                      alt="Profile photo"
+                      class="w-full h-full object-cover rounded-full relative z-10"
+                    />
+                    <!-- Fallback icon -->
+                    <i
+                      v-else
+                      class="fas fa-user text-white text-lg relative z-10 drop-shadow-lg"
+                    ></i>
                     <!-- Online Status -->
                     <div
                       class="absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white animate-pulse"
@@ -291,43 +310,6 @@
 
                 <!-- Divider -->
                 <div class="border-t border-gray-200 my-2"></div>
-
-                <!-- Help & Support -->
-                <button
-                  @click="showHelp"
-                  class="w-full flex items-center px-4 py-3 text-white bg-blue-600 hover:bg-blue-700 transition-all duration-300 text-left relative overflow-hidden group"
-                  style="
-                    box-shadow:
-                      0 4px 12px rgba(59, 130, 246, 0.3),
-                      inset 0 1px 0 rgba(255, 255, 255, 0.2);
-                    border-top: 1px solid rgba(147, 197, 253, 0.3);
-                    border-bottom: 1px solid rgba(29, 78, 216, 0.3);
-                  "
-                >
-                  <!-- Multi-layer hover effects -->
-                  <div
-                    class="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-blue-700/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  ></div>
-                  <div
-                    class="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  ></div>
-                  <div
-                    class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center mr-3 relative z-10"
-                    style="
-                      box-shadow:
-                        0 4px 8px rgba(29, 78, 216, 0.4),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.3),
-                        inset 0 -1px 0 rgba(29, 78, 216, 0.3);
-                      border: 1px solid rgba(147, 197, 253, 0.4);
-                    "
-                  >
-                    <i class="fas fa-question-circle text-white text-sm"></i>
-                  </div>
-                  <div class="relative z-10">
-                    <p class="font-medium text-sm drop-shadow-sm">Help & Support</p>
-                    <p class="text-xs text-blue-100 drop-shadow-sm">Get assistance</p>
-                  </div>
-                </button>
 
                 <!-- Divider -->
                 <div class="border-t border-gray-200 my-2"></div>

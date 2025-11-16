@@ -6,6 +6,13 @@
       <main
         class="flex-1 p-6 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative"
       >
+        <UnifiedLoadingBanner
+          :show="loading"
+          loadingTitle="Loading Departments"
+          loadingSubtitle="Fetching department list and approver assignments..."
+          departmentTitle="DEPARTMENT MANAGEMENT"
+          :forceSpin="true"
+        />
         <!-- Background Pattern -->
         <div class="absolute inset-0 overflow-hidden">
           <div class="absolute inset-0 opacity-5">
@@ -799,6 +806,7 @@
   import AppHeader from '@/components/AppHeader.vue'
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import OrbitingDots from '@/components/common/OrbitingDots.vue'
+  import UnifiedLoadingBanner from '@/components/common/UnifiedLoadingBanner.vue'
   import departmentService from '@/services/departmentService'
 
   export default {
@@ -806,7 +814,8 @@
     components: {
       AppHeader,
       ModernSidebar,
-      OrbitingDots
+      OrbitingDots,
+      UnifiedLoadingBanner
     },
     setup() {
       // Reactive data

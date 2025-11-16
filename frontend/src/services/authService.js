@@ -181,6 +181,106 @@ export const authService = {
         message: error.response?.data?.message || 'Failed to revoke session'
       }
     }
+  },
+
+  /**
+   * Change password for the currently authenticated user
+   * @param {{ current: string, new: string, confirm: string }} payload
+   * @returns {Promise<Object>} - Change password response
+   */
+  async changePassword(payload) {
+    try {
+      const response = await apiClient.post('/change-password', {
+        current_password: payload.current,
+        password: payload.new,
+        password_confirmation: payload.confirm
+      })
+      return {
+        success: true,
+        data: response.data,
+        message: response.data?.message || 'Password changed successfully.'
+      }
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to change password.',
+        errors: error.response?.data?.errors || {}
+      }
+    }
+  },
+
+  /**
+   * Request password reset OTP by phone (public, no auth)
+   * @param {string} phone
+   * @returns {Promise<Object>}
+   */
+  async requestPasswordResetByPhone(phone) {
+    try {
+      const response = await apiClient.post('/password-reset/request-by-phone', { phone })
+      return {
+        success: true,
+        data: response.data,
+        message: response.data?.message
+      }
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to send OTP.',
+        errors: error.response?.data?.errors || {}
+      }
+    }
+  },
+
+  /**
+   * Verify password reset OTP (phone + otp)
+   * @param {{ phone: string, otp: string }} payload
+   * @returns {Promise<Object>}
+   */
+  async verifyPasswordResetOtp(payload) {
+    try {
+      const response = await apiClient.post('/password-reset/verify-otp', {
+        phone: payload.phone,
+        otp: payload.otp
+      })
+      return {
+        success: true,
+        data: response.data,
+        message: response.data?.message
+      }
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to verify OTP.',
+        errors: error.response?.data?.errors || {}
+      }
+    }
+  },
+
+  /**
+   * Reset password using phone + OTP, returns { user, token }
+   * @param {{ phone: string, otp: string, password: string, password_confirmation: string }} payload
+   * @returns {Promise<Object>}
+   */
+  async resetPasswordWithOtp(payload) {
+    try {
+      const response = await apiClient.post('/password-reset/reset-with-otp', {
+        phone: payload.phone,
+        otp: payload.otp,
+        password: payload.password,
+        password_confirmation: payload.password_confirmation
+      })
+      return {
+        success: true,
+        data: response.data?.data,
+        message: response.data?.message
+      }
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to reset password.',
+        errors: error.response?.data?.errors || {}
+      }
+    }
   }
 }
 

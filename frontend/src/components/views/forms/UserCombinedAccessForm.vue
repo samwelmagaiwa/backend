@@ -465,8 +465,8 @@
                               :aria-pressed="String(accessType === 'temporary')"
                               tabindex="0"
                               title="Click to select temporary access and choose end date"
-                              @keydown.enter.prevent="accessType = 'temporary'; openDateDropdown()"
-                              @keydown.space.prevent="accessType = 'temporary'; openDateDropdown()"
+                              @keydown.enter.prevent="handleTemporaryAccessKeydown"
+                              @keydown.space.prevent="handleTemporaryAccessKeydown"
                             >
                               <input
                                 v-model="accessType"
@@ -1344,10 +1344,6 @@
         handler(newVal) {
           // Automatically set wellsoft service to true if modules are selected
           this.formData.services.wellsoft = newVal && newVal.length > 0
-          console.log('👁️ Wellsoft modules changed:', {
-            count: newVal?.length || 0,
-            service_enabled: this.formData.services.wellsoft
-          })
         },
         deep: true
       },
@@ -1355,10 +1351,6 @@
         handler(newVal) {
           // Automatically set jeeva service to true if modules are selected
           this.formData.services.jeeva = newVal && newVal.length > 0
-          console.log('👁️ Jeeva modules changed:', {
-            count: newVal?.length || 0,
-            service_enabled: this.formData.services.jeeva
-          })
         },
         deep: true
       },
@@ -1367,10 +1359,6 @@
           // Automatically set internet service to true if any purpose is filled
           const hasPurpose = newVal && newVal.some((purpose) => purpose.trim() !== '')
           this.formData.services.internet = hasPurpose
-          console.log('👁️ Internet purposes changed:', {
-            filled_count: newVal?.filter((p) => p.trim() !== '').length || 0,
-            service_enabled: this.formData.services.internet
-          })
         },
         deep: true
       }
@@ -1411,6 +1399,10 @@
         if (v.startsWith('255')) return '+' + v
         if (v.startsWith('0')) return '+255' + v.slice(1)
         return v
+      },
+      handleTemporaryAccessKeydown() {
+        this.accessType = 'temporary'
+        this.openDateDropdown()
       },
       /**
        * Check if the component is in edit mode by examining route query parameters
@@ -1476,14 +1468,8 @@
        * Populate form fields with existing request data
        */
       populateFormWithExistingData(requestData) {
-        console.log('🔄 Populating form with existing data:', requestData)
-        console.log('🔍 Available fields in requestData:', Object.keys(requestData))
-        console.log('🔍 Full requestData structure:', JSON.stringify(requestData, null, 2))
-
-        // Handle nested data if the response is wrapped
+        // Normalize potential wrapper structure
         const data = requestData.data || requestData
-        console.log('🔍 Using data object:', data)
-        console.log('🔍 Available fields in data:', Object.keys(data))
 
         // Basic information - try different possible field names
         this.formData.pfNumber =
@@ -1507,37 +1493,7 @@
           data.department_name ||
           ''
 
-        console.log('🔍 Form field assignments:', {
-          pfNumber: {
-            value: this.formData.pfNumber,
-            sources: [data.pf_number, data.pfNumber, data.PF_NUMBER, data.pf, data.employee_id]
-          },
-          staffName: {
-            value: this.formData.staffName,
-            sources: [
-              data.staff_name,
-              data.staffName,
-              data.name,
-              data.full_name,
-              data.employee_name,
-              data.applicant_name
-            ]
-          },
-          phoneNumber: {
-            value: this.formData.phoneNumber,
-            sources: [data.phone_number, data.phoneNumber, data.phone, data.mobile, data.contact]
-          },
-          department: {
-            value: this.formData.department,
-            sources: [
-              data.department_id,
-              data.departmentId,
-              data.department,
-              data.dept,
-              data.department_name
-            ]
-          }
-        })
+        // At this point core applicant fields are populated; keep behaviour identical
 
         // Services - parse from request_types array or individual fields
         if (data.request_types && Array.isArray(data.request_types)) {
@@ -1588,7 +1544,6 @@
 
         // Internet purposes
         if (data.internet_purposes && Array.isArray(data.internet_purposes)) {
-          console.log('🔍 Internet purposes found:', data.internet_purposes)
           this.formData.internetPurposes = [...data.internet_purposes]
           // Fill remaining slots with empty strings
           while (this.formData.internetPurposes.length < 4) {
@@ -1596,7 +1551,6 @@
           }
         } else if (data.internet_purposes && typeof data.internet_purposes === 'string') {
           // Handle comma-separated string
-          console.log('🔍 Internet purposes as string:', data.internet_purposes)
           const purposes = data.internet_purposes
             .split(',')
             .map((p) => p.trim())
@@ -1609,17 +1563,6 @@
 
         // Note: Signature will need to be re-uploaded in edit mode as we don't store the file
         this.autoPopulated = true
-
-        console.log('✅ Form populated with existing data:', {
-          pfNumber: this.formData.pfNumber,
-          staffName: this.formData.staffName,
-          phoneNumber: this.formData.phoneNumber,
-          department: this.formData.department,
-          services: this.formData.services,
-          selectedWellsoft: this.formData.selectedWellsoft,
-          selectedJeeva: this.formData.selectedJeeva,
-          internetPurposes: this.formData.internetPurposes
-        })
 
         // Validate that essential fields are populated
         const missingFields = []

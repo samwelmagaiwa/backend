@@ -31,6 +31,7 @@ use App\Http\Controllers\Api\SwaggerController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\v1\DocumentController;
+use App\Http\Controllers\Api\v1\PasswordResetController;
 
 Route::get('/', function () {
     return response()->json([
@@ -103,6 +104,12 @@ Route::get('/health/detailed', function () {
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login')->name('login');
 Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:register')->name('register');
 
+// Public password reset (phone + OTP) routes
+Route::prefix('password-reset')->group(function () {
+    Route::post('/request-by-phone', [PasswordResetController::class, 'requestByPhone'])->name('password-reset.request-by-phone');
+    Route::post('/verify-otp', [PasswordResetController::class, 'verifyOtp'])->name('password-reset.verify-otp');
+    Route::post('/reset-with-otp', [PasswordResetController::class, 'resetWithOtp'])->name('password-reset.reset-with-otp');
+});
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -132,6 +139,9 @@ Route::middleware('auth:sanctum')->group(function () {
                 'display_name' => $user->department->getFullNameAttribute()
             ] : null,
             'is_active' => $user->is_active ?? true,
+            'profile_photo_url' => $user->profile_photo_path
+                ? asset('storage/' . $user->profile_photo_path)
+                : null,
             'role' => $primaryRole, // Normalized role field
             'role_name' => $primaryRole, // For backward compatibility
             'primary_role' => $primaryRole, // Explicit primary role
@@ -148,6 +158,7 @@ Route::middleware('auth:sanctum')->group(function () {
             'needs_onboarding' => $user->needsOnboarding(),
             'created_at' => $user->created_at,
             'updated_at' => $user->updated_at,
+            'must_change_password' => (bool) ($user->must_change_password ?? false),
         ];
     });
 
@@ -158,6 +169,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/sessions/revoke', [AuthController::class, 'revokeSession'])->middleware('throttle:sensitive')->name('sessions.revoke');
     Route::get('/current-user', [AuthController::class, 'getCurrentUser'])->name('current-user');
     Route::get('/role-redirect', [AuthController::class, 'getRoleBasedRedirect'])->name('role-redirect');
+    Route::post('/change-password', [AuthController::class, 'changePassword'])->middleware('throttle:sensitive')->name('password.change');
 
     // Module data routes for dynamic loading
     Route::get('/wellsoft-modules', function () {
@@ -789,6 +801,7 @@ Route::prefix('hod')->middleware('role:head_of_department,divisional_director,ic
         Route::post('/lookup-pf', [\App\Http\Controllers\Api\v1\UserProfileController::class, 'getUserByPfNumber'])->name('profile.lookup-pf');
         Route::post('/check-pf', [\App\Http\Controllers\Api\v1\UserProfileController::class, 'checkPfNumberExists'])->name('profile.check-pf');
         Route::get('/departments', [\App\Http\Controllers\Api\v1\UserProfileController::class, 'getDepartments'])->name('profile.departments');
+        Route::post('/avatar', [\App\Http\Controllers\Api\v1\UserProfileController::class, 'uploadAvatar'])->name('profile.avatar');
     });
 
     // Notification routes (Universal for all authenticated users)

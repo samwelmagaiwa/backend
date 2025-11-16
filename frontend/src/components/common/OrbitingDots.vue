@@ -291,14 +291,8 @@
   /* Reduced motion support */
   @media (prefers-reduced-motion: reduce) {
     .orbit {
+      /* Stop the spin animation but keep the dots in their arranged circle */
       animation: none !important;
-      transform: none !important;
-    }
-    .dot {
-      position: static;
-      display: inline-block;
-      margin: 0 1px;
-      transform: none !important;
     }
   }
 </style>

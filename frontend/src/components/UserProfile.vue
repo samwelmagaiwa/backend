@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col h-screen">
-    <!-- AppHeader removed -->
+    <Header />
     <div class="flex flex-1 overflow-hidden">
       <ModernSidebar />
       <main
@@ -45,26 +45,95 @@
           </div>
         </div>
 
-        <div class="max-w-6xl mx-auto relative z-10">
+        <div class="max-w-13xl mx-auto relative z-10">
           <!-- Blue Header Section -->
           <div
             class="medical-glass-card rounded-t-3xl p-8 mb-0 border-b border-blue-300/30 bg-gradient-to-r from-blue-600/30 to-blue-700/30"
           >
             <div class="flex items-center justify-between">
-              <!-- Left: User Avatar and Basic Info -->
+              <!-- Left: Basic Info (name + status only) -->
+              <div>
+                <h1 class="text-3xl font-bold text-white mb-2 flex items-center">
+                  <i class="fas fa-user-circle mr-3 text-blue-300"></i>
+                  {{ user?.name || 'User Profile' }}
+                </h1>
+                <div class="flex items-center space-x-4">
+                  <span
+                    class="bg-green-500/20 text-green-200 px-3 py-1 rounded-full text-sm font-medium border border-green-400/30"
+                  >
+                    <i class="fas fa-check-circle mr-1"></i>
+                    Active
+                  </span>
+                </div>
+              </div>
+
+              <!-- Right: Quick Actions + Avatar -->
               <div class="flex items-center space-x-6">
+                <div class="flex items-center space-x-3">
+                  <button
+                    @click="editMode = !editMode"
+                    class="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-300 font-medium flex items-center shadow-lg hover:shadow-xl transform hover:scale-105"
+                  >
+                    <i :class="editMode ? 'fas fa-times' : 'fas fa-edit'" class="mr-2"></i>
+                    {{ editMode ? 'Cancel' : 'Edit Profile' }}
+                  </button>
+                  <button
+                    v-if="editMode"
+                    @click="saveProfile"
+                    :disabled="isSaving"
+                    class="px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-all duration-300 font-medium flex items-center shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50"
+                  >
+                    <i
+                      :class="isSaving ? 'fas fa-spinner fa-spin' : 'fas fa-save'"
+                      class="mr-2"
+                    ></i>
+                    {{ isSaving ? 'Saving...' : 'Save Changes' }}
+                  </button>
+                </div>
+
+                <!-- Avatar moved to the right side -->
                 <div class="relative">
-                  <div
-                    class="w-24 h-24 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-xl border-4 border-white/20 relative overflow-hidden"
+                  <button
+                    type="button"
+                    @click="editMode && triggerAvatarUpload()"
+                    :class="[
+                      'w-24 h-24 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-xl border-4 border-white/20 relative overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-300',
+                      editMode
+                        ? 'cursor-pointer hover:scale-105 transition-transform duration-200'
+                        : 'cursor-default'
+                    ]"
                   >
                     <div
                       class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-full"
                     ></div>
-                    <i class="fas fa-user text-white text-3xl relative z-10 drop-shadow-lg"></i>
+                    <img
+                      v-if="user?.profile_photo_url"
+                      :src="user.profile_photo_url"
+                      alt="Profile avatar"
+                      class="w-full h-full object-cover rounded-full relative z-10"
+                    />
+                    <i
+                      v-else
+                      class="fas fa-user text-white text-3xl relative z-10 drop-shadow-lg"
+                    ></i>
                     <div
                       class="absolute top-2 right-2 w-2 h-2 bg-green-400 rounded-full animate-pulse border border-white"
                     ></div>
-                  </div>
+                    <div
+                      v-if="editMode"
+                      class="absolute inset-0 bg-black/30 flex items-center justify-center z-20"
+                    >
+                      <i class="fas fa-camera text-white text-lg"></i>
+                    </div>
+                  </button>
+                  <!-- hidden file input for avatar upload -->
+                  <input
+                    ref="avatarInput"
+                    type="file"
+                    accept="image/*"
+                    class="hidden"
+                    @change="handleAvatarSelected"
+                  />
                   <!-- Status Indicator -->
                   <div
                     class="absolute -bottom-1 -right-1 bg-green-500 text-white text-sm px-2 py-1 rounded-full font-bold shadow-lg"
@@ -72,47 +141,6 @@
                     Online
                   </div>
                 </div>
-
-                <div>
-                  <h1 class="text-3xl font-bold text-white mb-2 flex items-center">
-                    <i class="fas fa-user-circle mr-3 text-blue-300"></i>
-                    {{ user?.name || 'User Profile' }}
-                  </h1>
-                  <div class="flex items-center space-x-4">
-                    <span
-                      class="bg-blue-500/20 text-blue-200 px-3 py-1 rounded-full text-sm font-medium border border-blue-400/30"
-                    >
-                      <i class="fas fa-id-badge mr-1"></i>
-                      {{ user?.role || 'Staff' }}
-                    </span>
-                    <span
-                      class="bg-green-500/20 text-green-200 px-3 py-1 rounded-full text-sm font-medium border border-green-400/30"
-                    >
-                      <i class="fas fa-check-circle mr-1"></i>
-                      Active
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Right: Quick Actions -->
-              <div class="flex items-center space-x-3">
-                <button
-                  @click="editMode = !editMode"
-                  class="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-300 font-medium flex items-center shadow-lg hover:shadow-xl transform hover:scale-105"
-                >
-                  <i :class="editMode ? 'fas fa-times' : 'fas fa-edit'" class="mr-2"></i>
-                  {{ editMode ? 'Cancel' : 'Edit Profile' }}
-                </button>
-                <button
-                  v-if="editMode"
-                  @click="saveProfile"
-                  :disabled="isSaving"
-                  class="px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-all duration-300 font-medium flex items-center shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50"
-                >
-                  <i :class="isSaving ? 'fas fa-spinner fa-spin' : 'fas fa-save'" class="mr-2"></i>
-                  {{ isSaving ? 'Saving...' : 'Save Changes' }}
-                </button>
               </div>
             </div>
           </div>
@@ -251,98 +279,6 @@
                         Department information is managed by administrators
                       </p>
                     </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Account Settings Section -->
-              <div
-                class="medical-card bg-gradient-to-r from-teal-600/25 to-green-600/25 border-2 border-teal-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-teal-500/20 transition-all duration-500 group relative overflow-hidden"
-              >
-                <!-- Animated Background Layers -->
-                <div
-                  class="absolute inset-0 bg-gradient-to-r from-teal-500/10 via-green-500/5 to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"
-                ></div>
-                <div
-                  class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-teal-400/20 to-transparent rounded-full blur-2xl group-hover:scale-150 transition-transform duration-1000"
-                ></div>
-
-                <div class="relative z-10">
-                  <div class="flex items-center space-x-4 mb-6">
-                    <div
-                      class="w-16 h-16 bg-gradient-to-br from-teal-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-teal-300/50 relative overflow-hidden"
-                    >
-                      <div
-                        class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-xl"
-                      ></div>
-                      <i class="fas fa-cogs text-white text-xl relative z-10 drop-shadow-lg"></i>
-                    </div>
-                    <div>
-                      <h3 class="text-2xl font-bold text-white flex items-center">
-                        <i class="fas fa-sliders-h mr-3 text-teal-300"></i>
-                        Account Settings
-                      </h3>
-                      <p class="text-sm text-teal-100/80">
-                        Configure your account preferences and security
-                      </p>
-                    </div>
-                  </div>
-
-                  <div class="space-y-4">
-                    <!-- Email Notifications -->
-                    <div
-                      class="flex items-center justify-between p-4 bg-white/10 rounded-xl backdrop-blur-sm border border-teal-300/20"
-                    >
-                      <div class="flex items-center space-x-3">
-                        <div
-                          class="w-10 h-10 bg-teal-500/30 rounded-lg flex items-center justify-center"
-                        >
-                          <i class="fas fa-bell text-teal-300"></i>
-                        </div>
-                        <div>
-                          <h4 class="font-semibold text-white">Email Notifications</h4>
-                          <p class="text-sm text-teal-200/70">
-                            Receive updates about your requests
-                          </p>
-                        </div>
-                      </div>
-                      <label class="relative inline-flex items-center cursor-pointer">
-                        <input
-                          v-model="profileData.emailNotifications"
-                          type="checkbox"
-                          class="sr-only peer"
-                          :disabled="!editMode"
-                        />
-                        <div
-                          class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-teal-300 dark:peer-focus:ring-teal-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-teal-600"
-                        ></div>
-                      </label>
-                    </div>
-
-                    <!-- Two-Factor Authentication -->
-                    <div
-                      class="flex items-center justify-between p-4 bg-white/10 rounded-xl backdrop-blur-sm border border-teal-300/20"
-                    >
-                      <div class="flex items-center space-x-3">
-                        <div
-                          class="w-10 h-10 bg-teal-500/30 rounded-lg flex items-center justify-center"
-                        >
-                          <i class="fas fa-shield-alt text-teal-300"></i>
-                        </div>
-                        <div>
-                          <h4 class="font-semibold text-white">Two-Factor Authentication</h4>
-                          <p class="text-sm text-teal-200/70">Add extra security to your account</p>
-                        </div>
-                      </div>
-                      <button
-                        class="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors text-sm font-medium"
-                        :disabled="!editMode"
-                      >
-                        Configure
-                      </button>
-                    </div>
-
-                    <!-- Password Change -->
                     <div
                       class="flex items-center justify-between p-4 bg-white/10 rounded-xl backdrop-blur-sm border border-teal-300/20"
                     >
@@ -367,75 +303,7 @@
                   </div>
                 </div>
               </div>
-
               <!-- Activity Summary -->
-              <div
-                class="medical-card bg-gradient-to-r from-purple-600/25 to-indigo-600/25 border-2 border-purple-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-500 group relative overflow-hidden"
-              >
-                <div class="relative z-10">
-                  <div class="flex items-center space-x-4 mb-6">
-                    <div
-                      class="w-16 h-16 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-purple-300/50 relative overflow-hidden"
-                    >
-                      <div
-                        class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-xl"
-                      ></div>
-                      <i
-                        class="fas fa-chart-line text-white text-xl relative z-10 drop-shadow-lg"
-                      ></i>
-                    </div>
-                    <div>
-                      <h3 class="text-2xl font-bold text-white flex items-center">
-                        <i class="fas fa-activity mr-3 text-purple-300"></i>
-                        Activity Summary
-                      </h3>
-                      <p class="text-sm text-purple-100/80">Your recent activity and statistics</p>
-                    </div>
-                  </div>
-
-                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <!-- Total Requests -->
-                    <div
-                      class="bg-white/10 p-4 rounded-xl backdrop-blur-sm border border-purple-300/20 text-center"
-                    >
-                      <div
-                        class="w-12 h-12 bg-purple-500/30 rounded-lg flex items-center justify-center mx-auto mb-3"
-                      >
-                        <i class="fas fa-file-alt text-purple-300 text-xl"></i>
-                      </div>
-                      <div class="text-2xl font-bold text-white mb-1">12</div>
-                      <div class="text-sm text-purple-200/70">Total Requests</div>
-                    </div>
-
-                    <!-- Pending Requests -->
-                    <div
-                      class="bg-white/10 p-4 rounded-xl backdrop-blur-sm border border-purple-300/20 text-center"
-                    >
-                      <div
-                        class="w-12 h-12 bg-orange-500/30 rounded-lg flex items-center justify-center mx-auto mb-3"
-                      >
-                        <i class="fas fa-clock text-orange-300 text-xl"></i>
-                      </div>
-                      <div class="text-2xl font-bold text-white mb-1">3</div>
-                      <div class="text-sm text-orange-200/70">Pending Requests</div>
-                    </div>
-
-                    <!-- Last Login -->
-                    <div
-                      class="bg-white/10 p-4 rounded-xl backdrop-blur-sm border border-purple-300/20 text-center"
-                    >
-                      <div
-                        class="w-12 h-12 bg-green-500/30 rounded-lg flex items-center justify-center mx-auto mb-3"
-                      >
-                        <i class="fas fa-sign-in-alt text-green-300 text-xl"></i>
-                      </div>
-                      <div class="text-sm font-bold text-white mb-1">Today</div>
-                      <div class="text-sm text-green-200/70">Last Login</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
               <!-- Action Buttons -->
               <div class="flex justify-between items-center pt-6">
                 <button
@@ -490,9 +358,14 @@
                 v-model="passwordData.current"
                 type="password"
                 required
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                :class="passwordErrors.current ? 'border-red-500' : 'border-gray-300'"
                 placeholder="Enter current password"
               />
+              <p v-if="passwordErrors.current" class="mt-1 text-xs text-red-600 flex items-center">
+                <i class="fas fa-exclamation-circle mr-1"></i>
+                {{ passwordErrors.current }}
+              </p>
             </div>
 
             <div>
@@ -501,9 +374,14 @@
                 v-model="passwordData.new"
                 type="password"
                 required
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                :class="passwordErrors.new ? 'border-red-500' : 'border-gray-300'"
                 placeholder="Enter new password"
               />
+              <p v-if="passwordErrors.new" class="mt-1 text-xs text-red-600 flex items-center">
+                <i class="fas fa-exclamation-circle mr-1"></i>
+                {{ passwordErrors.new }}
+              </p>
             </div>
 
             <div>
@@ -514,9 +392,14 @@
                 v-model="passwordData.confirm"
                 type="password"
                 required
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                :class="passwordErrors.confirm ? 'border-red-500' : 'border-gray-300'"
                 placeholder="Confirm new password"
               />
+              <p v-if="passwordErrors.confirm" class="mt-1 text-xs text-red-600 flex items-center">
+                <i class="fas fa-exclamation-circle mr-1"></i>
+                {{ passwordErrors.confirm }}
+              </p>
             </div>
 
             <div class="flex space-x-3 pt-4">
@@ -559,21 +442,23 @@
 </template>
 
 <script>
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import { useAuth } from '@/composables/useAuth'
   import ModernSidebar from './ModernSidebar.vue'
+  import Header from './header.vue'
   import AppFooter from './footer.vue'
 
   export default {
     name: 'UserProfile',
     components: {
+      Header,
       ModernSidebar,
       AppFooter
     },
     setup() {
       const router = useRouter()
-      const { user } = useAuth()
+      const { user, updateUser } = useAuth()
 
       // Reactive data
       // Sidebar state now managed by Pinia - no local state needed
@@ -584,6 +469,8 @@
       const showMessage = ref(false)
       const message = ref('')
       const messageType = ref('success')
+      const avatarInput = ref(null)
+      const isUploadingAvatar = ref(false)
 
       // Profile data
       const profileData = ref({
@@ -601,14 +488,63 @@
         confirm: ''
       })
 
+      const passwordErrors = ref({
+        current: '',
+        new: '',
+        confirm: ''
+      })
+
+      const validatePasswordFields = () => {
+        // Keep any existing backend error for current password, reset others
+        passwordErrors.value = {
+          current: passwordErrors.value.current,
+          new: '',
+          confirm: ''
+        }
+
+        if (!passwordData.value.new) {
+          passwordErrors.value.new = 'New password is required.'
+        } else if (passwordData.value.new.length < 8) {
+          passwordErrors.value.new = 'New password must be at least 8 characters.'
+        }
+
+        if (!passwordData.value.confirm) {
+          passwordErrors.value.confirm = 'Please confirm your new password.'
+        } else if (passwordData.value.new !== passwordData.value.confirm) {
+          passwordErrors.value.confirm = 'Passwords do not match.'
+        }
+      }
+
+      watch(
+        () => ({ ...passwordData.value }),
+        () => {
+          validatePasswordFields()
+        }
+      )
+
       // Initialize profile data
       onMounted(() => {
         if (user.value) {
+          // Normalize department into a human-readable string
+          const dept = user.value.department
+          const departmentLabel =
+            (dept &&
+              (dept.display_name ||
+                dept.full_name ||
+                dept.name ||
+                dept.code ||
+                dept.abbreviation)) ||
+            user.value.department_display_name ||
+            user.value.department_full_name ||
+            user.value.department_name ||
+            user.value.department_code ||
+            'Not specified'
+
           profileData.value = {
             name: user.value.name || '',
             email: user.value.email || '',
             phone: normalizePhoneNumber(user.value.phone || ''),
-            department: user.value.department || 'Not specified',
+            department: departmentLabel,
             emailNotifications: user.value.email_notifications ?? true
           }
         }
@@ -622,6 +558,58 @@
         if (v.startsWith('255')) return '+' + v
         if (v.startsWith('0')) return '+255' + v.slice(1)
         return v
+      }
+
+      const triggerAvatarUpload = () => {
+        if (avatarInput.value && editMode.value && !isUploadingAvatar.value) {
+          avatarInput.value.click()
+        }
+      }
+
+      const handleAvatarSelected = async (event) => {
+        const file = event.target.files?.[0]
+        if (!file) return
+
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+        if (!allowedTypes.includes(file.type)) {
+          showNotification('Please upload a valid image (JPEG, PNG, GIF, WEBP).', 'error')
+          event.target.value = ''
+          return
+        }
+        const maxSizeBytes = 2 * 1024 * 1024
+        if (file.size > maxSizeBytes) {
+          showNotification('Image is too large. Maximum size is 2MB.', 'error')
+          event.target.value = ''
+          return
+        }
+
+        isUploadingAvatar.value = true
+        try {
+          const { default: profileService } = await import('@/services/profileService')
+          const result = await profileService.uploadAvatar(file)
+
+          if (result.success) {
+            const data = result.data?.data || {}
+            const newUrl = data.profile_photo_url
+            if (newUrl) {
+              updateUser({ profile_photo_url: newUrl })
+            }
+            showNotification('Profile picture updated successfully!', 'success')
+          } else {
+            const firstErrorKey = Object.keys(result.errors || {})[0]
+            const firstErrorMessage = firstErrorKey
+              ? result.errors[firstErrorKey][0]
+              : result.message
+            showNotification(firstErrorMessage || 'Failed to upload profile picture.', 'error')
+          }
+        } catch (error) {
+          showNotification('Failed to upload profile picture. Please try again.', 'error')
+        } finally {
+          isUploadingAvatar.value = false
+          if (event.target) {
+            event.target.value = ''
+          }
+        }
       }
 
       const saveProfile = async () => {
@@ -643,19 +631,68 @@
       }
 
       const changePassword = async () => {
-        if (passwordData.value.new !== passwordData.value.confirm) {
-          showNotification('New passwords do not match!', 'error')
+        // reset local errors
+        passwordErrors.value = { current: '', new: '', confirm: '' }
+
+        // basic frontend validation
+        if (!passwordData.value.current) {
+          passwordErrors.value.current = 'Current password is required.'
+        }
+
+        // reuse live validation for new/confirm
+        validatePasswordFields()
+
+        if (
+          passwordErrors.value.current ||
+          passwordErrors.value.new ||
+          passwordErrors.value.confirm
+        ) {
           return
         }
 
         isChangingPassword.value = true
         try {
-          // Simulate API call
-          await new Promise((resolve) => setTimeout(resolve, 1000))
+          const { authService } = await import('@/services/authService')
+          const result = await authService.changePassword({
+            current: passwordData.value.current,
+            new: passwordData.value.new,
+            confirm: passwordData.value.confirm
+          })
 
-          showNotification('Password changed successfully!', 'success')
-          showPasswordModal.value = false
-          passwordData.value = { current: '', new: '', confirm: '' }
+          if (result.success) {
+            showNotification('Password changed successfully! You will be logged out.', 'success')
+            showPasswordModal.value = false
+            passwordData.value = { current: '', new: '', confirm: '' }
+
+            // Clear auth and redirect to login so user must log in with new password
+            try {
+              const { authService: asyncAuthService } = await import('@/services/authService')
+              await asyncAuthService.logout()
+            } catch (e) {
+              // ignore logout API error, still clear local auth
+            }
+            const { useAuthStore } = await import('@/stores/auth')
+            const authStore = useAuthStore()
+            authStore.clearAuth()
+            router.push('/login')
+          } else {
+            const fieldErrors = result.errors || {}
+
+            if (fieldErrors.current_password && fieldErrors.current_password[0]) {
+              passwordErrors.value.current = fieldErrors.current_password[0]
+            }
+            if (fieldErrors.password && fieldErrors.password[0]) {
+              passwordErrors.value.new = fieldErrors.password[0]
+              passwordErrors.value.confirm = fieldErrors.password[0]
+            }
+
+            const firstErrorKey = Object.keys(fieldErrors)[0]
+            const firstErrorMessage = firstErrorKey ? fieldErrors[firstErrorKey][0] : result.message
+            showNotification(
+              firstErrorMessage || 'Failed to change password. Please try again.',
+              'error'
+            )
+          }
         } catch (error) {
           showNotification('Failed to change password. Please try again.', 'error')
         } finally {
@@ -714,12 +751,17 @@
         messageType,
         profileData,
         passwordData,
+        passwordErrors,
         saveProfile,
         changePassword,
         exportProfile,
         goBack,
         showNotification,
-        normalizePhoneNumber
+        normalizePhoneNumber,
+        triggerAvatarUpload,
+        handleAvatarSelected,
+        avatarInput,
+        isUploadingAvatar
       }
     }
   }

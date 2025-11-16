@@ -114,13 +114,27 @@
               <!-- User Avatar -->
               <div class="relative">
                 <div
-                  class="w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg border-2 border-white/20 group-hover:scale-110 transition-transform duration-300 relative overflow-hidden"
+                  class="w-14 h-14 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg border-2 border-white/20 group-hover:scale-110 transition-transform duration-300 relative overflow-hidden"
                 >
                   <!-- Avatar background layers -->
                   <div
                     class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"
                   ></div>
-                  <span class="text-white font-bold text-lg relative z-10 drop-shadow-lg">{{
+                  <!-- Actual profile photo if available -->
+                  <img
+                    v-if="
+                      currentUser?.value?.profile_photo_url ||
+                      piniaAuthStore?.user?.profile_photo_url
+                    "
+                    :src="
+                      currentUser?.value?.profile_photo_url ||
+                      piniaAuthStore?.user?.profile_photo_url
+                    "
+                    alt="Profile photo"
+                    class="w-full h-full object-cover rounded-full relative z-10"
+                  />
+                  <!-- Fallback to initials -->
+                  <span v-else class="text-white font-bold text-lg relative z-10 drop-shadow-lg">{{
                     userInitials
                   }}</span>
                   <!-- Online indicator -->
@@ -171,11 +185,24 @@
           >
             <div class="relative group cursor-pointer">
               <div
-                class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg border-2 border-white/20 group-hover:scale-110 transition-transform duration-300 relative overflow-hidden"
+                class="w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg border-2 border-white/20 group-hover:scale-110 transition-transform duration-300 relative overflow-hidden"
               >
                 <!-- Avatar background layers -->
                 <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
+                <!-- Actual profile photo if available -->
+                <img
+                  v-if="
+                    currentUser?.value?.profile_photo_url || piniaAuthStore?.user?.profile_photo_url
+                  "
+                  :src="
+                    currentUser?.value?.profile_photo_url || piniaAuthStore?.user?.profile_photo_url
+                  "
+                  alt="Profile photo"
+                  class="w-full h-full object-cover rounded-full relative z-10"
+                />
+                <!-- Fallback to initials -->
                 <span
+                  v-else
                   class="text-white font-bold responsive-profile-name relative z-10 drop-shadow-lg"
                   >{{ userInitials }}</span
                 >

@@ -6,6 +6,13 @@
       <main
         class="flex-1 p-6 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-900 overflow-y-auto relative"
       >
+        <UnifiedLoadingBanner
+          :show="isLoadingStats"
+          loadingTitle="Loading Admin Dashboard"
+          loadingSubtitle="Fetching latest system statistics and summary..."
+          departmentTitle="ADMIN DASHBOARD"
+          :forceSpin="true"
+        />
         <!-- Medical Background Pattern -->
         <div class="absolute inset-0 overflow-hidden">
           <!-- Medical Cross Pattern -->
@@ -203,6 +210,7 @@
   import { ref, onMounted } from 'vue'
   import Header from '@/components/header.vue'
   import ModernSidebar from '@/components/ModernSidebar.vue'
+  import UnifiedLoadingBanner from '@/components/common/UnifiedLoadingBanner.vue'
   import { useAuth } from '@/composables/useAuth'
   import dashboardService from '@/services/dashboardService'
 
@@ -210,7 +218,8 @@
     name: 'AdminDashboard',
     components: {
       Header,
-      ModernSidebar
+      ModernSidebar,
+      UnifiedLoadingBanner
     },
     setup() {
       const { userName, ROLES, requireRole } = useAuth()

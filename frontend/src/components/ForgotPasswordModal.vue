@@ -13,9 +13,7 @@
         <i class="fas fa-times"></i>
       </button>
 
-      <h2 class="text-xl font-semibold text-gray-800 mb-2 text-center">
-        Reset Password
-      </h2>
+      <h2 class="text-xl font-semibold text-gray-800 mb-2 text-center">Reset Password</h2>
       <p class="text-xs text-gray-500 mb-4 text-center">
         Follow the steps below to securely reset your password using your registered phone number.
       </p>
@@ -32,17 +30,32 @@
       <!-- Step indicators -->
       <div class="flex items-center justify-center mb-4 text-xs">
         <div class="flex items-center space-x-2">
-          <div :class="['w-6 h-6 rounded-full flex items-center justify-center text-white', step >= 1 ? 'bg-blue-600' : 'bg-gray-300']">
+          <div
+            :class="[
+              'w-6 h-6 rounded-full flex items-center justify-center text-white',
+              step >= 1 ? 'bg-blue-600' : 'bg-gray-300'
+            ]"
+          >
             1
           </div>
           <span class="text-gray-600">Phone</span>
           <div class="w-6 h-px bg-gray-300 mx-1"></div>
-          <div :class="['w-6 h-6 rounded-full flex items-center justify-center text-white', step >= 2 ? 'bg-blue-600' : 'bg-gray-300']">
+          <div
+            :class="[
+              'w-6 h-6 rounded-full flex items-center justify-center text-white',
+              step >= 2 ? 'bg-blue-600' : 'bg-gray-300'
+            ]"
+          >
             2
           </div>
           <span class="text-gray-600">OTP</span>
           <div class="w-6 h-px bg-gray-300 mx-1"></div>
-          <div :class="['w-6 h-6 rounded-full flex items-center justify-center text-white', step >= 3 ? 'bg-blue-600' : 'bg-gray-300']">
+          <div
+            :class="[
+              'w-6 h-6 rounded-full flex items-center justify-center text-white',
+              step >= 3 ? 'bg-blue-600' : 'bg-gray-300'
+            ]"
+          >
             3
           </div>
           <span class="text-gray-600">New Password</span>
@@ -51,7 +64,9 @@
 
       <!-- Step 1: Phone number input -->
       <div v-if="step === 1">
-        <label class="block text-xs font-semibold text-gray-700 mb-1">Registered Phone Number</label>
+        <label class="block text-xs font-semibold text-gray-700 mb-1"
+          >Registered Phone Number</label
+        >
         <input
           v-model="phoneNumber"
           type="tel"
@@ -60,7 +75,8 @@
           :disabled="loading"
         />
         <p class="mt-1 text-[11px] text-gray-500">
-          Enter the phone number that is registered in the system. A 6-digit OTP code will be sent to this number.
+          Enter the phone number that is registered in the system. A 6-digit OTP code will be sent
+          to this number.
         </p>
 
         <button
@@ -78,13 +94,15 @@
       <div v-else-if="step === 2">
         <p class="text-xs text-gray-600 mb-1">
           Enter the 6-digit OTP sent to your phone number ending with
-          <span class="font-semibold">{{ phoneSuffix }}</span>.
+          <span class="font-semibold">{{ phoneSuffix }}</span
+          >.
         </p>
         <p v-if="otpCountdownLabel" class="text-[11px] text-blue-600">
           Code expires in {{ otpCountdownLabel }}
         </p>
         <p class="text-[11px] text-gray-500 mb-2">
-          You have up to <span class="font-semibold">5 attempts</span> before this code locks and you must request a new one.
+          You have up to <span class="font-semibold">5 attempts</span> before this code locks and
+          you must request a new one.
         </p>
         <label class="block text-xs font-semibold text-gray-700 mb-1">OTP Code</label>
         <input
@@ -141,12 +159,16 @@
           {{ newPasswordError }}
         </p>
 
-        <label class="block text-xs font-semibold text-gray-700 mb-1 mt-3">Confirm New Password</label>
+        <label class="block text-xs font-semibold text-gray-700 mb-1 mt-3"
+          >Confirm New Password</label
+        >
         <input
           v-model="confirmPassword"
           type="password"
           class="w-full p-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-          :class="{ 'border-red-500 focus:ring-red-500 focus:border-red-500': confirmPasswordError }"
+          :class="{
+            'border-red-500 focus:ring-red-500 focus:border-red-500': confirmPasswordError
+          }"
           placeholder="Re-enter new password"
           :disabled="loading"
         />
@@ -187,7 +209,7 @@
     },
     emits: ['close'],
     setup(props, { emit }) {
-      const { completeLogin } = useAuth()
+      const auth = useAuth()
 
       const step = ref(1)
       const phoneNumber = ref('')
@@ -278,10 +300,12 @@
               response.message.toLowerCase().includes('not') &&
               response.message.toLowerCase().includes('found')
             ) {
-              errorMessage.value = 'Phone number not found. Please enter the phone number registered in the system.'
+              errorMessage.value =
+                'Phone number not found. Please enter the phone number registered in the system.'
             } else {
               errorMessage.value =
-                response.message || 'Failed to send OTP. Please make sure the phone number is correct.'
+                response.message ||
+                'Failed to send OTP. Please make sure the phone number is correct.'
             }
             return
           }
@@ -326,7 +350,8 @@
             } else if (response.message && response.message.toLowerCase().includes('expired')) {
               errorMessage.value = 'Your OTP has expired. Please request a new code and try again.'
             } else {
-              errorMessage.value = response.message || 'The OTP you entered is incorrect. Please try again.'
+              errorMessage.value =
+                response.message || 'The OTP you entered is incorrect. Please try again.'
             }
             return
           }
@@ -368,15 +393,20 @@
             } else if (errors.otp && Array.isArray(errors.otp) && errors.otp.length) {
               errorMessage.value = errors.otp[0]
             } else {
-              errorMessage.value = response.message || 'Failed to update password. Please try again.'
+              errorMessage.value =
+                response.message || 'Failed to update password. Please try again.'
             }
             return
           }
 
           const { user, token } = response.data
 
-          // Reuse existing login flow so redirect follows role rules
-          await completeLogin(user, token)
+          // Set auth store directly and reuse normal redirect logic
+          auth.updateUser(user)
+          // Persist token in auth store
+          const authStoreModule = await import('@/stores/auth')
+          const authStore = authStoreModule.useAuthStore()
+          authStore.setAuthData({ user, token })
 
           resetState()
           emit('close')

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 use App\Models\Department;
 
@@ -348,6 +349,82 @@ class UserProfileController extends Controller
                 'success' => false,
                 'message' => 'Failed to update profile',
                 'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
+            ], 500);
+        }
+    }
+
+    /**
+     * Upload and update the current user's avatar image.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function uploadAvatar(Request $request)
+    {
+        try {
+            $user = Auth::user();
+
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User not authenticated'
+                ], 401);
+            }
+
+            $request->validate([
+                'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            ]);
+
+            $file = $request->file('avatar');
+
+            // Delete old avatar if it exists
+            if ($user->profile_photo_path) {
+                try {
+                    Storage::disk('public')->delete($user->profile_photo_path);
+                } catch (\Exception $e) {
+                    Log::warning('Failed to delete old profile photo', [
+                        'user_id' => $user->id,
+                        'path' => $user->profile_photo_path,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+
+            // Store new avatar
+            $path = $file->store('avatars', 'public');
+            $user->profile_photo_path = $path;
+            $user->save();
+
+            $profilePhotoUrl = asset('storage/' . $path);
+
+            Log::info('User avatar updated', [
+                'user_id' => $user->id,
+                'path' => $path,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Profile picture updated successfully.',
+                'data' => [
+                    'profile_photo_url' => $profilePhotoUrl,
+                ],
+            ], 200);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid image upload data',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error('Error uploading user avatar: ' . $e->getMessage(), [
+                'user_id' => Auth::id(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to upload profile picture',
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error',
             ], 500);
         }
     }

@@ -194,6 +194,9 @@ class AuthController extends Controller
                 'email' => $user->email,
                 'phone' => $user->phone,
                 'pf_number' => $user->pf_number,
+                'profile_photo_url' => $user->profile_photo_path
+                    ? asset('storage/' . $user->profile_photo_path)
+                    : null,
                 'role_id' => null,
                 'role' => $primaryRole, // Normalized role field
                 'role_name' => $primaryRole, // For backward compatibility
@@ -202,6 +205,7 @@ class AuthController extends Controller
                 'permissions' => $user->getAllPermissions(),
                 'needs_onboarding' => $user->needsOnboarding(),
                 'onboarding_step' => $onboarding->current_step,
+                'must_change_password' => (bool) ($user->must_change_password ?? false),
             ],
             'token' => $token,
             'token_name' => $tokenName,
@@ -624,7 +628,10 @@ class AuthController extends Controller
                 'email' => $user->email,
                 'phone' => $user->phone,
                 'pf_number' => $user->pf_number,
-'role_id' => null,
+                'profile_photo_url' => $user->profile_photo_path
+                    ? asset('storage/' . $user->profile_photo_path)
+                    : null,
+                'role_id' => null,
                 'role' => $primaryRole, // Normalized role field
                 'role_name' => $primaryRole, // For backward compatibility
                 'primary_role' => $primaryRole, // Explicit primary role
@@ -632,6 +639,7 @@ class AuthController extends Controller
                 'permissions' => $user->getAllPermissions(),
                 'needs_onboarding' => $user->needsOnboarding(),
                 'onboarding_step' => $onboarding->current_step,
+                'must_change_password' => (bool) ($user->must_change_password ?? false),
             ];
             
             Log::info('getCurrentUser called', [
@@ -655,6 +663,79 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to retrieve user data'
+            ], 500);
+        }
+    }
+
+/**
+     * Change password for the currently authenticated user.
+     */
+    public function changePassword(Request $request)
+    {
+        try {
+            $user = $request->user();
+
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No authenticated user found'
+                ], 401);
+            }
+
+            // Validate using frontend field names
+            $validated = $request->validate([
+                'current_password' => 'required|string',
+                'password' => 'required|string|min:8|confirmed',
+            ]);
+
+            if (!Hash::check($validated['current_password'], $user->password)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Current password is incorrect.',
+                    'errors' => [
+                        'current_password' => ['The current password you entered is incorrect.'],
+                    ],
+                ], 422);
+            }
+
+        // Update password and clear must_change_password flag if present
+        $user->password = Hash::make($validated['password']);
+        if (isset($user->must_change_password)) {
+            $user->must_change_password = false;
+        }
+        $user->save();
+
+        // Revoke all tokens so user must log in again with the new password
+        $revokedTokens = $user->tokens()->count();
+        $user->tokens()->delete();
+
+        Log::info('Password changed successfully and tokens revoked', [
+            'user_id' => $user->id,
+            'user_email' => $user->email,
+            'tokens_revoked' => $revokedTokens,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Password changed successfully. Please log in again.',
+            'logged_out' => true,
+            'tokens_revoked' => $revokedTokens,
+        ], 200);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'The given data was invalid.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error('changePassword error', [
+                'user_id' => $request->user() ? $request->user()->id : null,
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to change password.',
             ], 500);
         }
     }
