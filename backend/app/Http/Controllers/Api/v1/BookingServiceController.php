@@ -1250,14 +1250,16 @@ class BookingServiceController extends Controller
                         if (!empty($issuing['functionality'])) {
                             $parts[] = 'Function: ' . ($labels['functionality'][$issuing['functionality']] ?? ucfirst(str_replace('_',' ', $issuing['functionality'])));
                         }
-                        if (isset($issuing['accessories_complete'])) {
-                            $parts[] = 'Accessories: ' . ($issuing['accessories_complete'] ? 'Complete' : 'Incomplete');
+                        // Accessories: only include when explicitly marked as complete
+                        if (array_key_exists('accessories_complete', $issuing) && $issuing['accessories_complete']) {
+                            $parts[] = 'Accessories: Complete';
                         }
-                        if (isset($issuing['visible_damage'])) {
-                            if ($issuing['visible_damage'] && !empty($issuing['damage_description'])) {
+                        // Damage: only include when visible_damage is true
+                        if (!empty($issuing['visible_damage'])) {
+                            if (!empty($issuing['damage_description'])) {
                                 $parts[] = 'Damage: ' . trim($issuing['damage_description']);
                             } else {
-                                $parts[] = 'Damage: ' . ($issuing['visible_damage'] ? 'Yes' : 'None');
+                                $parts[] = 'Damage: Yes';
                             }
                         }
                         if (!empty($parts)) {

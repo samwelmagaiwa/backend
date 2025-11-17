@@ -5,6 +5,7 @@ namespace App\Listeners;
 use App\Events\ApprovalStatusChanged;
 use App\Events\ApprovalRequestSubmitted;
 use App\Services\SmsModule;
+use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
@@ -109,17 +110,130 @@ class SendSmsNotification implements ShouldQueue
 
         $reference = $event->request->reference ?? $event->request->id;
 
+        // Normalize status keys for SMS templates
+        $statusKey = $event->newStatus;
+        if ($event->requestType === 'device_booking') {
+            if ($statusKey === 'ict_approved') {
+                $statusKey = 'approved';
+            } elseif ($statusKey === 'ict_rejected') {
+                $statusKey = 'rejected';
+            }
+        }
+
         // Notify the requester about the status change
         if ($event->user && $event->user->phone) {
-            $message = $this->buildApprovalMessage(
-                $event->user->name ?? 'User',
-                $event->requestType,
-                $event->newStatus,
-                [
-                    'reference' => $reference,
-                    'reason' => $event->reason ?? 'Not specified'
-                ]
-            );
+            // Specialised message for device booking approvals
+            if ($event->requestType === 'device_booking' && $statusKey === 'approved') {
+                $deviceName = $event->request->device_display_name
+                    ?? $event->request->device_name
+                    ?? ucfirst(str_replace('_', ' ', $event->request->device_type ?? 'device'));
+
+                // Extract issuing assessment details (physical condition & functionality)
+                $physicalText = null;
+                $functionalityText = null;
+                try {
+                    $issuing = $event->request->device_condition_issuing ?? null;
+                    if (is_string($issuing)) {
+                        $issuing = json_decode($issuing, true);
+                    }
+                    if (is_array($issuing)) {
+                        $physicalMap = [
+                            'excellent' => 'Excellent',
+                            'good' => 'Good',
+                            'fair' => 'Fair',
+                            'poor' => 'Poor',
+                        ];
+                        $functionalityMap = [
+                            'fully_functional' => 'Fully Functional',
+                            'partially_functional' => 'Partially Functional',
+                            'not_functional' => 'Not Functional',
+                        ];
+                        if (!empty($issuing['physical_condition'])) {
+                            $code = strtolower($issuing['physical_condition']);
+                            $physicalText = $physicalMap[$code] ?? ucfirst(str_replace('_', ' ', $code));
+                        }
+                        if (!empty($issuing['functionality'])) {
+                            $code = strtolower($issuing['functionality']);
+                            $functionalityText = $functionalityMap[$code] ?? ucfirst(str_replace('_', ' ', $code));
+                        }
+                    }
+                } catch (\Exception $e) {
+                    Log::warning('Failed to read issuing assessment for SMS', [
+                        'booking_id' => $event->request->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+
+                // Build due time string
+                $dueString = null;
+                try {
+                    if (!empty($event->request->return_date_time)) {
+                        $due = $event->request->return_date_time instanceof Carbon
+                            ? $event->request->return_date_time
+                            : Carbon::parse($event->request->return_date_time);
+                        $dueString = $due->format('d M Y \a\t H:i');
+                    } elseif (!empty($event->request->return_date) || !empty($event->request->return_time)) {
+                        $datePart = !empty($event->request->return_date)
+                            ? Carbon::parse($event->request->return_date)->format('d M Y')
+                            : null;
+                        $timePart = !empty($event->request->return_time)
+                            ? ( $event->request->return_time instanceof Carbon
+                                ? $event->request->return_time->format('H:i')
+                                : Carbon::parse($event->request->return_time)->format('H:i') )
+                            : null;
+                        if ($datePart && $timePart) {
+                            $dueString = $datePart . ' at ' . $timePart;
+                        } elseif ($datePart) {
+                            $dueString = $datePart;
+                        } elseif ($timePart) {
+                            $dueString = 'the agreed time (' . $timePart . ')';
+                        }
+                    }
+                } catch (\Exception $e) {
+                    Log::warning('Failed to format booking return date/time for SMS', [
+                        'booking_id' => $event->request->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+
+                $duePart = $dueString
+                    ? ' Please ensure it is returned by ' . $dueString . ' in good condition.'
+                    : ' Please ensure the device is returned on time and kept safe at all times.';
+
+                // Append condition summary if available
+                $conditionPart = '';
+                if ($physicalText || $functionalityText) {
+                    $pieces = [];
+                    if ($physicalText) {
+                        $pieces[] = 'Physical: ' . $physicalText;
+                    }
+                    if ($functionalityText) {
+                        $pieces[] = 'Functionality: ' . $functionalityText;
+                    }
+                    $conditionPart = ' Current condition - ' . implode('; ', $pieces) . '.';
+                }
+
+                $message = sprintf(
+                    'Dear %s, your device booking request for %s has been APPROVED. Reference: %s.%s%s - MNH IT',
+                    $event->user->name ?? 'User',
+                    $deviceName,
+                    $reference,
+                    $duePart,
+                    $conditionPart
+                );
+            } else {
+                // Generic message for other request types/statuses
+                $message = $this->buildApprovalMessage(
+                    $event->user->name ?? 'User',
+                    $event->requestType,
+                    $statusKey,
+                    [
+                        'reference' => $reference,
+                        'reason' => $event->reason ?? 'Not specified'
+                    ]
+                );
+            }
+
             $this->sms->sendSms($event->user->phone, $message, 'approval');
         } else {
             Log::warning('Requester has no phone number for status change SMS', [
@@ -128,7 +242,7 @@ class SendSmsNotification implements ShouldQueue
         }
 
         // If approved and there are additional stakeholders to notify
-        if ($event->newStatus === 'approved' && !empty($event->additionalNotifyUsers)) {
+        if ($statusKey === 'approved' && !empty($event->additionalNotifyUsers)) {
             $message = $this->buildAdditionalApprovalMessage(
                 $event->user,
                 $event->requestType,
@@ -172,9 +286,9 @@ class SendSmsNotification implements ShouldQueue
     protected function buildApprovalMessage(string $name, string $requestType, string $status, array $additionalData): string
     {
         $templates = [
-            'pending' => "Dear {name}, your {type} request has been submitted and is pending approval. Reference: {ref}. You will be notified once reviewed. - MNH IT",
-            'approved' => "Dear {name}, your {type} request has been APPROVED. Reference: {ref}. You can now proceed with access. - MNH IT",
-            'rejected' => "Dear {name}, your {type} request has been REJECTED. Reference: {ref}. Reason: {reason}. Contact IT for assistance. - MNH IT"
+            'pending' => "Dear {name}, your {type} request has been submitted and is pending approval. Reference: {ref}. You will be notified once reviewed. - ICT MNH-MLOGANZILA",
+            'approved' => "Dear {name}, your {type} request has been APPROVED. Reference: {ref}. You can now proceed with access. - ICT MNH-MLOGANZILA",
+            'rejected' => "Dear {name}, your {type} request has been REJECTED. Reference: {ref}. Reason: {reason}. Contact IT for assistance. - ICT MNH-MLOGANZILA"
         ];
 
         $template = $templates[$status] ?? $templates['pending'];

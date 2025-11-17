@@ -1639,9 +1639,11 @@ class UserAccessController extends Controller
     {
         $data = [
             'id' => $userAccess->id,
+            'requestNumber' => 'MLG-REQ' . str_pad($userAccess->id, 6, '0', STR_PAD_LEFT),
             'pfNumber' => $userAccess->pf_number,
             'staffName' => $userAccess->staff_name,
             'employeeFullName' => $userAccess->staff_name, // Alias for internet users
+            'phoneNumber' => $userAccess->phone_number,
             'department' => $userAccess->department ? $userAccess->department->name : 'N/A',
             'signature' => $userAccess->signature_path ? 'Available' : 'N/A',
             'date' => $userAccess->created_at ? $userAccess->created_at->format('Y-m-d') : 'N/A',

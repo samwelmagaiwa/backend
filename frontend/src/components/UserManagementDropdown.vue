@@ -292,11 +292,13 @@
         ],
         // Columns should mirror each form fields; here's a representative mapping based on current components
         jeevaColumns: [
+          { key: 'requestNumber', label: 'Request ID' },
           { key: 'pfNumber', label: 'PF Number' },
           { key: 'staffName', label: 'Staff Name' },
+          { key: 'phoneNumber', label: 'Phone' },
           { key: 'department', label: 'Department' },
-          { key: 'signature', label: 'signature' },
-          { key: 'date', label: 'date-issued' },
+          { key: 'signature', label: 'Signature' },
+          { key: 'date', label: 'Date Issued' },
           { key: 'requestType', label: 'Action Requested' },
           {
             key: 'selectedModules',
@@ -318,11 +320,13 @@
           { key: 'status', label: 'Status', slot: 'status' }
         ],
         wellsoftColumns: [
+          { key: 'requestNumber', label: 'Request ID' },
           { key: 'pfNumber', label: 'PF Number' },
           { key: 'staffName', label: 'Staff Name' },
+          { key: 'phoneNumber', label: 'Phone' },
           { key: 'department', label: 'Department' },
           { key: 'signature', label: 'Signature' },
-          { key: 'date', label: 'date-issued' },
+          { key: 'date', label: 'Date Issued' },
           { key: 'requestType', label: 'Action Requested' },
           {
             key: 'selectedModules',
@@ -344,8 +348,10 @@
           { key: 'status', label: 'Status', slot: 'status' }
         ],
         internetColumns: [
+          { key: 'requestNumber', label: 'Request ID' },
           { key: 'employeeFullName', label: 'Employee Name' },
           { key: 'pfNumber', label: 'PF Number' },
+          { key: 'phoneNumber', label: 'Phone' },
           { key: 'department', label: 'Department' },
           { key: 'designation', label: 'Designation' },
           {
