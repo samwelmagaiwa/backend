@@ -1192,13 +1192,14 @@
         }
 
         if (this.issuingAssessmentSaved) {
-          // After assessment is saved, mute this button to prevent repeat saves
+          // After assessment is saved, fully mute this button (no further actions)
           return {
             enabled: false,
             text: 'Issuing Assessment Saved',
             icon: 'fas fa-check',
-            classes: 'bg-blue-600 text-white shadow-lg cursor-not-allowed opacity-80',
-            tooltip: 'Assessment saved. Proceed to Device Receiving on the right.'
+            classes:
+              'bg-gray-700 text-gray-300 cursor-not-allowed opacity-70 border border-gray-500/60',
+            tooltip: 'Issuing assessment has been saved. Use the Approve/Reject buttons below to continue.'
           }
         }
 
@@ -2058,7 +2059,7 @@
 
   /* Good condition */
   .assessment-option.good.selected .option-content {
-    @apply border-blue-400/60 bg-blue-500/10 shadow-blue-500/20;
+     @apply border-green-400/60 bg-green-500/10 shadow-green-500/20;
   }
 
   .assessment-option.good.selected .option-icon {

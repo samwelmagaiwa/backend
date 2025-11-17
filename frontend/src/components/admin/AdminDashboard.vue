@@ -53,27 +53,15 @@
         </div>
 
         <div class="max-w-full mx-auto relative z-10">
-          <!-- Header Section -->
-          <div class="medical-glass-card rounded-t-3xl p-4 mb-0 border-b border-blue-300/30">
-            <div class="text-center">
-              <h2
-                class="text-2xl font-bold text-blue-100 tracking-wide drop-shadow-md animate-fade-in-delay"
-              >
-                Welcome, {{ userName }}
-              </h2>
-              <p class="text-base text-teal-300 mt-2">System Administrator Dashboard</p>
-            </div>
-          </div>
-
           <!-- Main Content -->
-          <div class="medical-glass-card rounded-b-3xl overflow-hidden">
-            <div class="p-6">
+          <div class="medical-glass-card rounded-3xl overflow-hidden">
+            <div class="p-4">
               <!-- Statistics Cards -->
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
                 <div
-                  class="medical-card bg-gradient-to-r from-blue-600/25 to-cyan-600/25 border-2 border-blue-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
+                  class="medical-card bg-gradient-to-r from-blue-600/25 to-cyan-600/25 border-2 border-blue-400/40 p-4 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
                 >
-                  <div class="flex items-center mb-4">
+                  <div class="flex items-center mb-3">
                     <div
                       class="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50 mr-4"
                     >
@@ -81,15 +69,15 @@
                     </div>
                     <h3 class="text-xl font-semibold text-white drop-shadow-md">TOTAL USERS</h3>
                   </div>
-                  <p class="text-4xl font-bold text-blue-100 drop-shadow-lg">
+                  <p class="text-3xl font-bold text-blue-100 drop-shadow-lg">
                     {{ stats.totalUsers }}
                   </p>
                 </div>
 
                 <div
-                  class="medical-card bg-gradient-to-r from-green-600/25 to-emerald-600/25 border-2 border-green-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-green-500/20 transition-all duration-500 group"
+                  class="medical-card bg-gradient-to-r from-green-600/25 to-emerald-600/25 border-2 border-green-400/40 p-4 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-green-500/20 transition-all duration-500 group"
                 >
-                  <div class="flex items-center mb-4">
+                  <div class="flex items-center mb-3">
                     <div
                       class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50 mr-4"
                     >
@@ -97,43 +85,93 @@
                     </div>
                     <h3 class="text-xl font-semibold text-white drop-shadow-md">TOTAL REQUESTS</h3>
                   </div>
-                  <p class="text-4xl font-bold text-green-100 drop-shadow-lg">
+                  <p class="text-3xl font-bold text-green-100 drop-shadow-lg">
                     {{ stats.totalRequests }}
                   </p>
                 </div>
 
                 <div
-                  class="medical-card bg-gradient-to-r from-yellow-600/25 to-orange-600/25 border-2 border-yellow-400/40 p-6 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-yellow-500/20 transition-all duration-500 group"
+                  class="medical-card bg-gradient-to-r from-yellow-600/25 to-orange-600/25 border-2 border-yellow-400/40 p-4 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-yellow-500/20 transition-all duration-500 group"
                 >
-                  <div class="flex items-center mb-4">
-                    <div
-                      class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50 mr-4"
-                    >
-                      <i class="fas fa-clock text-white text-2xl"></i>
+                  <div
+                    class="flex flex-col md:flex-row md:items-stretch md:justify-between gap-4"
+                  >
+                    <!-- Pending Requests (left side) -->
+                    <div class="flex-1">
+                      <div class="flex items-center mb-3">
+                        <div
+                          class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50 mr-4"
+                        >
+                          <i class="fas fa-clock text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-white drop-shadow-md">
+                          PENDING REQUESTS
+                        </h3>
+                      </div>
+                      <p class="text-3xl font-bold text-yellow-100 drop-shadow-lg">
+                        {{ stats.pendingRequests }}
+                      </p>
                     </div>
-                    <h3 class="text-xl font-semibold text-white drop-shadow-md">
-                      PENDING REQUESTS
-                    </h3>
+
+                    <!-- Divider -->
+                    <div
+                      class="hidden md:block w-px h-24 bg-yellow-400/40 self-center"
+                    ></div>
+                    <div
+                      class="block md:hidden h-px w-full bg-yellow-400/40 opacity-60"
+                    ></div>
+
+                    <!-- SMS Counter (right side) -->
+                    <div class="flex-1 md:pl-4 pt-2 md:pt-0">
+                      <div class="flex items-center mb-2">
+                        <div class="flex items-center space-x-2">
+                          <i class="fas fa-sms text-yellow-200 text-lg"></i>
+                          <h4 class="text-lg font-semibold text-white drop-shadow-md">
+                            Total SMS Sent
+                          </h4>
+                        </div>
+                      </div>
+                      <p class="text-2xl font-bold text-yellow-100 drop-shadow-lg mb-3">
+                        {{ stats.totalSmsSent }}
+                      </p>
+                      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div class="flex flex-col">
+                          <label class="text-xs text-yellow-100/80 mb-1">From</label>
+                          <input
+                            type="date"
+                            v-model="smsFromDate"
+                            @change="onSmsDateChange"
+                            class="w-full rounded-lg bg-black/20 border border-yellow-300/30 text-yellow-50 text-sm px-2 py-1 focus:outline-none focus:ring-1 focus:ring-yellow-300/70 focus:border-yellow-300/70 placeholder-yellow-200/50"
+                          />
+                        </div>
+                        <div class="flex flex-col">
+                          <label class="text-xs text-yellow-100/80 mb-1">To</label>
+                          <input
+                            type="date"
+                            v-model="smsToDate"
+                            @change="onSmsDateChange"
+                            class="w-full rounded-lg bg-black/20 border border-yellow-300/30 text-yellow-50 text-sm px-2 py-1 focus:outline-none focus:ring-1 focus:ring-yellow-300/70 focus:border-yellow-300/70 placeholder-yellow-200/50"
+                          />
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <p class="text-4xl font-bold text-yellow-100 drop-shadow-lg">
-                    {{ stats.pendingRequests }}
-                  </p>
                 </div>
               </div>
 
               <!-- Quick Actions Section -->
-              <div class="mb-8">
-                <h3 class="text-2xl font-bold text-white mb-4 flex items-center">
+              <div class="mb-6">
+                <h3 class="text-2xl font-bold text-white mb-3 flex items-center">
                   <i class="fas fa-bolt mr-2 text-yellow-400"></i>
                   Quick Actions
                 </h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                   <router-link
                     v-for="action in quickActions"
                     :key="action.title"
                     :to="action.route"
                     @click="handleQuickActionClick(action)"
-                    class="medical-card bg-gradient-to-r from-blue-600/25 to-cyan-600/25 border-2 border-blue-400/40 p-4 rounded-xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-300 group text-center cursor-pointer"
+                    class="medical-card bg-gradient-to-r from-blue-600/25 to-cyan-600/25 border-2 border-blue-400/40 p-3 rounded-xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-300 group text-center cursor-pointer"
                   >
                     <div class="flex flex-col items-center">
                       <div
@@ -149,10 +187,10 @@
               </div>
 
               <!-- Management Sections -->
-              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
                 <!-- User Management -->
                 <div
-                  class="medical-card bg-gradient-to-r from-teal-600/25 to-cyan-600/25 border-2 border-teal-400/40 p-6 rounded-2xl backdrop-blur-sm"
+                  class="medical-card bg-gradient-to-r from-teal-600/25 to-cyan-600/25 border-2 border-teal-400/40 p-4 rounded-2xl backdrop-blur-sm"
                 >
                   <h3 class="text-2xl font-bold text-white mb-4 flex items-center">
                     <i class="fas fa-users-cog mr-2 text-teal-300"></i>
@@ -181,7 +219,7 @@
 
                 <!-- System Information Section -->
                 <div
-                  class="medical-card bg-gradient-to-r from-purple-600/25 to-indigo-600/25 border-2 border-purple-400/40 p-6 rounded-2xl backdrop-blur-sm"
+                  class="medical-card bg-gradient-to-r from-purple-600/25 to-indigo-600/25 border-2 border-purple-400/40 p-4 rounded-2xl backdrop-blur-sm"
                 >
                   <h3 class="text-2xl font-bold text-white mb-4 flex items-center">
                     <i class="fas fa-info-circle mr-2 text-purple-300"></i>
@@ -231,8 +269,12 @@
       const stats = ref({
         totalUsers: 0,
         totalRequests: 0,
-        pendingRequests: 0
+        pendingRequests: 0,
+        totalSmsSent: 0
       })
+
+      const smsFromDate = ref('')
+      const smsToDate = ref('')
 
       // Loading state
       const isLoadingStats = ref(false)
@@ -304,23 +346,46 @@
       // Guard this route - only Admins can access
       onMounted(() => {
         requireRole([ROLES.ADMIN])
+        // Initial load without filters; backend will return full-range SMS
+        // plus the date of the very first SMS sent, which we use for "From".
         loadStats()
       })
 
       const loadStats = async () => {
         try {
           isLoadingStats.value = true
-          console.log('📊 Loading admin dashboard statistics...')
+          console.log('📊 Loading admin dashboard statistics...', {
+            sms_from_date: smsFromDate.value,
+            sms_to_date: smsToDate.value
+          })
 
-          const result = await dashboardService.getAdminDashboardStats()
+          const params = {}
+          if (smsFromDate.value) params.sms_from_date = smsFromDate.value
+          if (smsToDate.value) params.sms_to_date = smsToDate.value
+
+          const result = await dashboardService.getAdminDashboardStats(params)
 
           if (result.success) {
             // Update stats with live data from backend
             stats.value = {
               totalUsers: result.data.totalUsers,
               totalRequests: result.data.totalRequests,
-              pendingRequests: result.data.pendingRequests
+              pendingRequests: result.data.pendingRequests,
+              totalSmsSent: result.data.totalSmsSent
             }
+
+            // If backend echoes back the date range, keep local refs in sync
+            if (result.data.smsFromDate) {
+              smsFromDate.value = result.data.smsFromDate
+            } else if (!smsFromDate.value && result.data.smsFirstDate) {
+              // Default "From" to the first ever SMS date when not yet set
+              smsFromDate.value = result.data.smsFirstDate
+            }
+
+            if (result.data.smsToDate) {
+              smsToDate.value = result.data.smsToDate
+            }
+
             console.log('✅ Admin dashboard stats loaded successfully:', stats.value)
           } else {
             console.warn('⚠️ Failed to load stats, using fallback data:', result.error)
@@ -328,7 +393,18 @@
             stats.value = {
               totalUsers: result.data.totalUsers,
               totalRequests: result.data.totalRequests,
-              pendingRequests: result.data.pendingRequests
+              pendingRequests: result.data.pendingRequests,
+              totalSmsSent: result.data.totalSmsSent
+            }
+
+            if (result.data.smsFromDate) {
+              smsFromDate.value = result.data.smsFromDate
+            } else if (!smsFromDate.value && result.data.smsFirstDate) {
+              smsFromDate.value = result.data.smsFirstDate
+            }
+
+            if (result.data.smsToDate) {
+              smsToDate.value = result.data.smsToDate
             }
           }
         } catch (error) {
@@ -337,11 +413,23 @@
           stats.value = {
             totalUsers: 156,
             totalRequests: 1247,
-            pendingRequests: 23
+            pendingRequests: 23,
+            totalSmsSent: 0
           }
         } finally {
           isLoadingStats.value = false
         }
+      }
+
+      const onSmsDateChange = () => {
+        // Simple guard: if both dates are set and in the wrong order, swap them
+        if (smsFromDate.value && smsToDate.value && smsFromDate.value > smsToDate.value) {
+          const tmp = smsFromDate.value
+          smsFromDate.value = smsToDate.value
+          smsToDate.value = tmp
+        }
+
+        loadStats()
       }
 
       const handleQuickActionClick = (action) => {
@@ -352,10 +440,13 @@
       return {
         userName,
         stats,
+        smsFromDate,
+        smsToDate,
         isLoadingStats,
         quickActions,
         userManagementActions,
-        handleQuickActionClick
+        handleQuickActionClick,
+        onSmsDateChange
       }
     }
   }

@@ -6,6 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Role;
 use App\Models\Department;
+use App\Models\SmsLog;
+use App\Models\UserAccess;
+use App\Models\BookingService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -13,8 +17,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use App\Models\UserAccess;
-use App\Models\BookingService;
 
 class AdminUserController extends Controller
 {
@@ -444,6 +446,9 @@ class AdminUserController extends Controller
             ], 404);
         }
 
+        // Track previous active status so we can detect lock events
+        $previousIsActive = $user->is_active ?? true;
+
         // Prevent editing super admin users
         if ($user->hasRole('super_admin') && $user->id !== $request->user()->id) {
             return response()->json([
@@ -480,6 +485,23 @@ class AdminUserController extends Controller
             }
 
             $user->update($updateData);
+
+            // If the user was active and has just been locked (is_active explicitly set to false),
+            // revoke all active Sanctum tokens so they are logged out from all sessions.
+            $becameInactive = array_key_exists('is_active', $updateData)
+                && $previousIsActive !== false
+                && $updateData['is_active'] === false;
+
+            if ($becameInactive) {
+                $tokenCount = $user->tokens()->count();
+                $user->tokens()->delete();
+
+                Log::info('User tokens revoked due to account lock by admin', [
+                    'admin_id' => $request->user()->id,
+                    'user_id' => $user->id,
+                    'revoked_tokens' => $tokenCount,
+                ]);
+            }
 
             DB::commit();
 
@@ -639,6 +661,19 @@ class AdminUserController extends Controller
         try {
             $newStatus = !($user->is_active ?? true);
             $user->update(['is_active' => $newStatus]);
+
+            // When toggling to inactive, revoke all Sanctum tokens so the user
+            // is logged out from all active sessions immediately.
+            if ($newStatus === false) {
+                $tokenCount = $user->tokens()->count();
+                $user->tokens()->delete();
+
+                Log::info('User tokens revoked due to status toggle to inactive', [
+                    'admin_id' => $request->user()->id,
+                    'user_id' => $userId,
+                    'revoked_tokens' => $tokenCount,
+                ]);
+            }
 
             Log::info('User status toggled by admin', [
                 'admin_id' => $request->user()->id,
@@ -886,6 +921,44 @@ class AdminUserController extends Controller
             $completionRate = $totalRequests > 0 
                 ? round(($completedRequests / $totalRequests) * 100, 1) 
                 : 0;
+
+            // SMS statistics (from sms_logs table with optional date filters)
+            $totalSmsSent = 0;
+            $smsFromDate = request()->query('sms_from_date');
+            $smsToDate = request()->query('sms_to_date');
+            $firstSmsDate = null;
+
+            try {
+                $smsQuery = SmsLog::successful();
+
+                // Determine the date of the very first successful SMS
+                $firstSms = SmsLog::successful()
+                    ->orderBy('created_at', 'asc')
+                    ->value('created_at');
+                if ($firstSms) {
+                    $firstSmsDate = Carbon::parse($firstSms)->toDateString();
+                }
+
+                if (!empty($smsFromDate)) {
+                    $from = Carbon::parse($smsFromDate)->startOfDay();
+                    $smsQuery->where('created_at', '>=', $from);
+                }
+
+                if (!empty($smsToDate)) {
+                    $to = Carbon::parse($smsToDate)->endOfDay();
+                    $smsQuery->where('created_at', '<=', $to);
+                }
+
+                $totalSmsSent = $smsQuery->count();
+
+                Log::info('SmsLog stats retrieved for admin dashboard', [
+                    'total_sms_sent' => $totalSmsSent,
+                    'from' => $smsFromDate,
+                    'to' => $smsToDate,
+                ]);
+            } catch (\Exception $e) {
+                Log::warning('Failed to get SmsLog statistics', ['error' => $e->getMessage()]);
+            }
             
             $stats = [
                 'total_users' => $totalUsers,
@@ -895,6 +968,10 @@ class AdminUserController extends Controller
                 'todays_requests' => $todaysRequests,
                 'completed_requests' => $completedRequests,
                 'completion_rate' => $completionRate,
+                'total_sms_sent' => $totalSmsSent,
+                'sms_from_date' => $smsFromDate,
+                'sms_to_date' => $smsToDate,
+                'sms_first_date' => $firstSmsDate,
                 'generated_at' => now()->toISOString()
             ];
             

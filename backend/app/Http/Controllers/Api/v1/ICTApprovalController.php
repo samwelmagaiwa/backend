@@ -9,6 +9,7 @@ use App\Models\BookingService;
 use App\Models\User;
 use App\Models\Department;
 use App\Models\DeviceAssessment;
+use App\Models\Signature;
 use App\Events\ApprovalStatusChanged;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -775,6 +776,16 @@ class ICTApprovalController extends Controller
         $user = $booking->user;
         $department = $user->department ?? $booking->departmentInfo;
 
+        // Determine digital signature status using the same synthetic document_id
+        // convention used during booking submission (see BookingServiceRequest).
+        $hasDigitalSignature = false;
+        if ($booking->user_id) {
+            $syntheticDocId = 910000000 + (int) $booking->user_id;
+            $hasDigitalSignature = Signature::where('document_id', $syntheticDocId)
+                ->where('user_id', $booking->user_id)
+                ->exists();
+        }
+
         $data = [
             // Core request data
             'id' => $booking->id,
@@ -805,11 +816,12 @@ class ICTApprovalController extends Controller
             'return_time' => $booking->return_time,
             'purpose' => $booking->reason,
             
-            // Signature details
-            'signature' => $booking->signature_path ? true : false,
+            // Signature details (support both legacy file-based and new digital token signatures)
+            'signature' => $booking->signature_path ? true : $hasDigitalSignature,
             'signature_path' => $booking->signature_path,
             'signature_url' => $booking->signature_url,
-            'has_signature' => !empty($booking->signature_path),
+            'has_signature' => !empty($booking->signature_path) || $hasDigitalSignature,
+            'digital_signature' => $hasDigitalSignature,
             
             // Status and approval
             'status' => $booking->status,

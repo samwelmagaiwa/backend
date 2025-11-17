@@ -498,6 +498,16 @@ export const deviceBorrowingService = {
         request.assessment_receiving
     )
 
+    // Determine signature presence:
+    // - Prefer explicit has_signature flag from backend (supports digital signatures)
+    // - Fallback to legacy "signature" boolean
+    // - Finally, use presence of signature_path
+    const hasSignatureBackend = typeof request.has_signature !== 'undefined'
+      ? !!request.has_signature
+      : typeof request.signature !== 'undefined'
+        ? !!request.signature
+        : !!request.signature_path
+
     return {
       // Core request data
       id: request.id,
@@ -538,7 +548,7 @@ export const deviceBorrowingService = {
       // Signature details
       signature_path: request.signature_path,
       signature_url: request.signature_url,
-      has_signature: !!request.signature_path,
+      has_signature: hasSignatureBackend,
 
       // Status and approval
       status: request.status || 'pending',

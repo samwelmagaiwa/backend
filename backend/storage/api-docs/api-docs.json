@@ -3405,6 +3405,43 @@
                 ]
             }
         },
+        "/api/change-password": {
+            "post": {
+                "tags": [
+                    "Change Password"
+                ],
+                "summary": "Post /api/change-password",
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/current-user": {
             "get": {
                 "tags": [
@@ -7775,6 +7812,117 @@
                 }
             }
         },
+        "/api/password-reset/request-by-phone": {
+            "post": {
+                "tags": [
+                    "Password Reset"
+                ],
+                "summary": "Post /api/password-reset/request-by-phone",
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/password-reset/reset-with-otp": {
+            "post": {
+                "tags": [
+                    "Password Reset"
+                ],
+                "summary": "Post /api/password-reset/reset-with-otp",
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/password-reset/verify-otp": {
+            "post": {
+                "tags": [
+                    "Password Reset"
+                ],
+                "summary": "Post /api/password-reset/verify-otp",
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/postman-collection": {
             "get": {
                 "tags": [
@@ -7797,6 +7945,43 @@
                         "bearerAuth": []
                     }
                 ]
+            }
+        },
+        "/api/profile/avatar": {
+            "post": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Post /api/profile/avatar",
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                }
             }
         },
         "/api/profile/check-pf": {

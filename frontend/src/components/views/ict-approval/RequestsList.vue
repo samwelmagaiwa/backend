@@ -390,7 +390,7 @@
                         </span>
                         <span
                           :class="getStatusBadgeClass(request.ict_approve || 'pending')"
-                          class="inline-flex items-center px-3 py-2 rounded text-lg font-bold"
+                          class="inline-flex items-center px-2 py-0.5 rounded text-sm font-semibold"
                         >
                           {{ getStatusText(request.ict_approve || 'pending') }}
                         </span>
@@ -401,7 +401,7 @@
                         :class="
                           getReturnStatusBadgeClass(request.return_status || 'not_yet_returned')
                         "
-                        class="inline-flex items-center px-3 py-2 rounded text-lg font-bold"
+                        class="inline-flex items-center px-2 py-0.5 rounded text-sm font-semibold"
                       >
                         {{ getReturnStatusText(request.return_status || 'not_yet_returned') }}
                       </span>
@@ -409,7 +409,7 @@
                     <td class="px-1 py-3 text-xl text-center">
                       <span
                         :class="getSMSStatusBadgeClass(request.sms_status || 'not_sent')"
-                        class="inline-flex items-center px-3 py-2 rounded text-lg font-bold"
+                        class="inline-flex items-center px-2 py-0.5 rounded text-sm font-semibold"
                       >
                         {{ getSMSStatusText(request.sms_status || 'not_sent') }}
                       </span>
@@ -460,7 +460,8 @@
                         >
                           <div
                             v-if="openDropdown === request.id"
-                            class="absolute right-full mr-2 top-0 w-52 bg-gradient-to-br from-white via-gray-50 to-blue-50 rounded-xl shadow-xl border border-blue-200/50 z-[99999] overflow-hidden backdrop-blur-sm"
+                            class="absolute right-0 w-52 bg-gradient-to-br from-white via-gray-50 to-blue-50 rounded-xl shadow-xl border border-blue-200/50 z-[99999] overflow-hidden backdrop-blur-sm"
+                            :class="getDropdownPositionClass(request.id)"
                             style="
                               box-shadow:
                                 0 10px 25px -5px rgba(0, 0, 0, 0.15),

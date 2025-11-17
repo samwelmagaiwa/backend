@@ -36,6 +36,31 @@ axiosInstance.interceptors.request.use(
   }
 )
 
+// Centralized response handling so locked / unauthenticated users are
+// sent back to login instead of leaving the ICT dashboard in a broken state.
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error.response?.status
+    if (status === 401 || status === 403) {
+      // Clear any stale auth data
+      localStorage.removeItem('auth_token')
+      localStorage.removeItem('user_data')
+      localStorage.removeItem('session_data')
+
+      // Redirect to login/root if not already there
+      if (typeof window !== 'undefined') {
+        const path = window.location.pathname || ''
+        if (path !== '/' && path !== '/login') {
+          window.location.href = '/'
+        }
+      }
+    }
+
+    return Promise.reject(error)
+  }
+)
+
 const ictOfficerService = {
   /**
    * Get all access requests approved by Head of IT and available for ICT Officer implementation

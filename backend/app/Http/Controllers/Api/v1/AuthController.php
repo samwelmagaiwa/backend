@@ -134,7 +134,7 @@ class AuthController extends Controller
         ]);
         
         // Find user by email with eager loading to reduce queries
-        $user = User::with(['roles', 'onboarding'])
+        $user = User::with(['roles', 'onboarding', 'department'])
                    ->where('email', $request->email)
                    ->first();
         
@@ -162,6 +162,19 @@ class AuthController extends Controller
         }
         
         Log::info('Password verification successful for user: ' . $request->email);
+        
+        // Block login for inactive/locked users
+        // We only treat an explicit false as locked so that null remains backwards-compatible
+        if ($user->is_active === false) {
+            Log::warning('Login blocked for inactive user', [
+                'user_id' => $user->id,
+                'user_email' => $user->email,
+            ]);
+
+            return response()->json([
+                'message' => 'Your account has been locked. Please contact the system administrator.'
+            ], 403);
+        }
         
         // Relationships already loaded with eager loading above
         
@@ -197,6 +210,13 @@ class AuthController extends Controller
                 'profile_photo_url' => $user->profile_photo_path
                     ? asset('storage/' . $user->profile_photo_path)
                     : null,
+                // Department information for auto-populating booking forms and other UIs
+                'department_id' => $user->department_id,
+                'department' => $user->department ? [
+                    'id' => $user->department->id,
+                    'name' => $user->department->name,
+                    'code' => $user->department->code,
+                ] : null,
                 'role_id' => null,
                 'role' => $primaryRole, // Normalized role field
                 'role_name' => $primaryRole, // For backward compatibility

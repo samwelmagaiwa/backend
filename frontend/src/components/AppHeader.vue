@@ -46,8 +46,8 @@
               ></div>
               <!-- Actual profile photo if available -->
               <img
-                v-if="currentUser?.value?.profile_photo_url"
-                :src="currentUser.value.profile_photo_url"
+                v-if="currentUser?.profile_photo_url"
+                :src="currentUser.profile_photo_url"
                 alt="Profile photo"
                 class="w-full h-full object-cover rounded-full relative z-10"
               />
@@ -145,8 +145,8 @@
                     ></div>
                     <!-- Actual profile photo if available -->
                     <img
-                      v-if="currentUser?.value?.profile_photo_url"
-                      :src="currentUser.value.profile_photo_url"
+                      v-if="currentUser?.profile_photo_url"
+                      :src="currentUser.profile_photo_url"
                       alt="Profile photo"
                       class="w-full h-full object-cover rounded-full relative z-10"
                     />

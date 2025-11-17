@@ -53,7 +53,7 @@
       <!-- Body -->
       <div class="relative z-10 p-6 space-y-4">
         <div
-          class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-blue-800/20 border border-blue-400/30 rounded-xl p-4"
+          class="grid grid-cols-1 sm:grid-cols-2 gap-3 border border-blue-400/30 rounded-xl p-4"
         >
           <div class="flex items-center justify-between">
             <span class="text-blue-200 text-sm font-medium flex items-center"
@@ -70,7 +70,7 @@
             }}</span>
           </div>
         </div>
-        <div class="flex items-start gap-3 bg-blue-500/10 border border-blue-400/30 rounded-xl p-4">
+        <div class="flex items-start gap-3 border border-blue-400/30 rounded-xl p-4">
           <div class="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center mt-0.5">
             <i class="fas fa-info text-blue-300 text-xs"></i>
           </div>

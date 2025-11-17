@@ -52,11 +52,11 @@
 
         <div class="max-w-full mx-auto relative z-10">
           <!-- Header Section -->
-          <div class="medical-glass-card rounded-t-3xl p-6 mb-0 border-b border-blue-300/30">
+          <div class="medical-glass-card rounded-t-3xl p-4 mb-0 border-b border-blue-300/30">
             <div class="flex justify-between items-center">
               <!-- Left Logo -->
               <div
-                class="w-24 h-24 mr-6 transform hover:scale-110 transition-transform duration-300"
+                class="w-20 h-20 mr-6 transform hover:scale-110 transition-transform duration-300"
               >
                 <div
                   class="w-full h-full bg-gradient-to-br from-blue-500/20 to-teal-500/20 rounded-2xl backdrop-blur-sm border-2 border-blue-300/40 flex items-center justify-center shadow-2xl hover:shadow-blue-500/25"
@@ -95,7 +95,7 @@
 
               <!-- Right Logo -->
               <div
-                class="w-24 h-24 ml-6 transform hover:scale-110 transition-transform duration-300"
+                class="w-20 h-20 ml-6 transform hover:scale-110 transition-transform duration-300"
               >
                 <div
                   class="w-full h-full bg-gradient-to-br from-teal-500/20 to-blue-500/20 rounded-2xl backdrop-blur-sm border-2 border-teal-300/40 flex items-center justify-center shadow-2xl hover:shadow-teal-500/25"

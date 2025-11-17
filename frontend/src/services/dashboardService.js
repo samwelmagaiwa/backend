@@ -169,19 +169,24 @@ class DashboardService {
       activeUsers: 5,
       todaysRequests: 45,
       completedRequests: 1224,
-      completionRate: 98
+      completionRate: 98,
+      totalSmsSent: 0,
+      smsFromDate: null,
+      smsToDate: null,
+      smsFirstDate: null
     }
   }
 
   /**
    * Fetch admin dashboard statistics
+   * @param {Object} params - Optional query parameters (e.g., SMS date range)
    * @returns {Promise<Object>} Admin dashboard statistics including total users, requests, etc.
    */
-  async getAdminDashboardStats() {
+  async getAdminDashboardStats(params = {}) {
     try {
-      console.log('📊 Fetching admin dashboard statistics...')
+      console.log('📊 Fetching admin dashboard statistics...', params)
 
-      const response = await apiClient.get('/admin/dashboard-stats')
+      const response = await apiClient.get('/admin/dashboard-stats', { params })
 
       if (response.data && response.data.success) {
         console.log('✅ Admin dashboard stats fetched successfully:', response.data.data)
@@ -194,7 +199,11 @@ class DashboardService {
             activeUsers: response.data.data.active_users || 0,
             todaysRequests: response.data.data.todays_requests || 0,
             completedRequests: response.data.data.completed_requests || 0,
-            completionRate: response.data.data.completion_rate || 0
+            completionRate: response.data.data.completion_rate || 0,
+            totalSmsSent: response.data.data.total_sms_sent || 0,
+            smsFromDate: response.data.data.sms_from_date || null,
+            smsToDate: response.data.data.sms_to_date || null,
+            smsFirstDate: response.data.data.sms_first_date || null
           }
         }
       } else {

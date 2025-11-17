@@ -28,21 +28,8 @@
         </div>
 
         <div class="max-w-13xl mx-auto relative z-10">
-          <!-- Header Section -->
-          <div class="medical-glass-card rounded-t-3xl p-3 mb-0 border-b border-blue-300/30">
-            <div class="text-center">
-              <h1 class="text-3xl font-bold text-white mb-1 tracking-wide drop-shadow-lg">
-                <i class="fas fa-users-cog mr-3 text-blue-300"></i>
-                User Role Assignment System
-              </h1>
-              <p class="text-blue-100 text-base">
-                Manage users and assign roles with department integration
-              </p>
-            </div>
-          </div>
-
           <!-- Main Content -->
-          <div class="medical-glass-card rounded-b-3xl overflow-hidden">
+          <div class="medical-glass-card rounded-3xl overflow-hidden">
             <div class="p-6 space-y-8">
               <!-- Statistics Cards -->
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -276,7 +263,8 @@
                   <div
                     v-for="user in filteredUsers"
                     :key="user.id || user.email || Math.random()"
-                    class="bg-white/15 p-6 rounded-xl backdrop-blur-sm border border-teal-300/30 hover:bg-white/20 transition-all duration-300 hover:shadow-lg hover:shadow-teal-500/20 group"
+                    class="relative z-0 bg-white/15 p-6 rounded-xl backdrop-blur-sm border border-teal-300/30 hover:bg-white/20 transition-all duration-300 hover:shadow-lg hover:shadow-teal-500/20 group"
+                    :class="{ 'z-40': openMenuId === user.id }"
                   >
                     <div class="flex items-start justify-between mb-4">
                       <div class="flex items-center space-x-3 flex-1">
@@ -325,7 +313,7 @@
                       <!-- Three-dot menu -->
                       <div class="relative" data-dropdown-menu>
                         <button
-                          @click.stop="toggleUserMenu(user.id)"
+                          @click.stop="toggleUserMenu(user.id, $event)"
                           class="w-8 h-8 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110 group/menu"
                           :class="{ 'bg-white/20': openMenuId === user.id }"
                         >
@@ -337,7 +325,8 @@
                         <!-- Dropdown menu -->
                         <div
                           v-if="openMenuId === user.id"
-                          class="absolute right-0 top-10 w-48 bg-blue-900/95 backdrop-blur-lg border border-blue-400/30 rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+                          class="absolute right-0 w-48 bg-blue-900/95 backdrop-blur-lg border border-blue-400/30 rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+                          :class="menuOpensUp ? 'bottom-10' : 'top-10'"
                         >
                           <!-- Edit User -->
                           <button
@@ -399,22 +388,47 @@
                             </div>
                           </button>
 
-                          <!-- Lock User -->
+                          <!-- Lock / Unlock User -->
                           <button
-                            @click.stop="confirmLockUser(user)"
+                            @click.stop="user.is_active === false ? confirmUnlockUser(user) : confirmLockUser(user)"
                             class="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-indigo-500/20 transition-colors duration-200 text-white group/item border-t border-blue-400/20"
                           >
                             <div
                               class="w-8 h-8 bg-indigo-500/30 rounded-lg flex items-center justify-center group-hover/item:bg-indigo-500/50 transition-colors duration-200"
                             >
                               <i
-                                class="fas fa-lock text-indigo-300 text-base group-hover/item:text-indigo-200"
+                                :class="[
+                                  'text-base',
+                                  user.is_active === false
+                                    ? 'fas fa-lock-open text-indigo-200'
+                                    : 'fas fa-lock text-indigo-300 group-hover/item:text-indigo-200'
+                                ]"
                               ></i>
                             </div>
                             <div class="flex-1">
-                              <div class="font-medium text-base">Lock User</div>
-                              <div class="text-base text-gray-300 group-hover/item:text-gray-200">
-                                Temporarily block system access
+                              <div class="flex items-center justify-between">
+                                <div class="font-medium text-base">
+                                  {{ user.is_active === false ? 'Unlock User' : 'Lock User' }}
+                                </div>
+                                <span
+                                  v-if="user.is_active === false"
+                                  class="ml-2 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-red-500/30 text-red-100 border border-red-400/50"
+                                >
+                                  Locked
+                                </span>
+                                <span
+                                  v-else
+                                  class="ml-2 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/25 text-emerald-100 border border-emerald-400/50"
+                                >
+                                  Active
+                                </span>
+                              </div>
+                              <div class="text-base text-gray-300 group-hover/item:text-gray-200 mt-0.5">
+                                {{
+                                  user.is_active === false
+                                    ? 'Restore system access'
+                                    : 'Temporarily block system access'
+                                }}
                               </div>
                             </div>
                           </button>
@@ -1938,7 +1952,7 @@
                   <h4 class="font-semibold text-blue-100 mb-2">What locking this user means</h4>
                   <ul class="text-blue-100 text-base mt-1 space-y-1 list-disc list-inside pl-4">
                     <li>The user will no longer be able to sign in to this system</li>
-                    <li>Existing sessions may be terminated or blocked from performing actions</li>
+                    <li>All current sessions will be terminated immediately</li>
                     <li>You can unlock this account later by marking the user as active again</li>
                   </ul>
                 </div>
@@ -1963,6 +1977,94 @@
                 :class="lockingUser ? 'fas fa-spinner fa-spin text-base' : 'fas fa-lock text-base'"
               ></i>
               <span>{{ lockingUser ? 'Locking...' : 'Yes, Lock User' }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Unlock User Confirmation Modal -->
+    <div
+      v-if="showUnlockUserModal && userToUnlock"
+      class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      @click="closeUnlockUserModal"
+    >
+      <div
+        class="bg-blue-900/95 rounded-2xl shadow-2xl w-full max-w-md border border-blue-400/30"
+        @click.stop
+      >
+        <!-- Modal Header -->
+        <div class="bg-blue-800/70 p-6 rounded-t-2xl border-b border-blue-400/30">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+              <div class="w-12 h-12 bg-blue-500/30 rounded-xl flex items-center justify-center">
+                <i class="fas fa-lock-open text-blue-200 text-xl"></i>
+              </div>
+              <div>
+                <h2 class="text-xl font-bold text-white">Unlock User Account</h2>
+                <p class="text-blue-100 text-base">
+                  Are you sure you want to restore access for {{ userToUnlock.name }}?
+                </p>
+              </div>
+            </div>
+            <button
+              @click="closeUnlockUserModal"
+              class="w-8 h-8 bg-white/10 hover:bg-white/20 rounded-lg transition-colors duration-200 flex items-center justify-center"
+            >
+              <i class="fas fa-times text-white text-base"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="p-6">
+          <div class="mb-6">
+            <div class="flex items-center space-x-4 mb-4">
+              <div
+                class="w-12 h-12 bg-gradient-to-br from-teal-500 to-blue-600 rounded-full flex items-center justify-center"
+              >
+                <span class="text-white font-bold text-base">{{
+                  getInitials(userToUnlock.name)
+                }}</span>
+              </div>
+              <div>
+                <h3 class="font-bold text-white">{{ userToUnlock.name }}</h3>
+                <p class="text-blue-200 text-base">{{ userToUnlock.email }}</p>
+              </div>
+            </div>
+
+            <div class="bg-blue-500/20 border border-blue-400/30 rounded-lg p-4 mb-4">
+              <div class="flex items-start space-x-3">
+                <i class="fas fa-circle-info text-blue-200 text-lg mt-0.5"></i>
+                <div>
+                  <h4 class="font-semibold text-blue-100 mb-2">What unlocking this user means</h4>
+                  <ul class="text-blue-100 text-base mt-1 space-y-1 list-disc list-inside pl-4">
+                    <li>The user will be able to sign in to this system again</li>
+                    <li>They will still need to log in with valid credentials</li>
+                    <li>No sessions are automatically created on unlock</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-end space-x-3">
+            <button
+              @click="closeUnlockUserModal"
+              class="px-4 py-2 bg-gray-600 text-white rounded-lg font-medium hover:bg-gray-700 transition-colors duration-200 flex items-center space-x-2"
+            >
+              <i class="fas fa-times text-base"></i>
+              <span>Cancel</span>
+            </button>
+            <button
+              @click="unlockUser"
+              :disabled="unlockingUser"
+              class="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+            >
+              <i
+                :class="unlockingUser ? 'fas fa-spinner fa-spin text-base' : 'fas fa-lock-open text-base'"
+              ></i>
+              <span>{{ unlockingUser ? 'Unlocking...' : 'Yes, Unlock User' }}</span>
             </button>
           </div>
         </div>
@@ -2062,17 +2164,21 @@
 
       // Three-dot menu state
       const openMenuId = ref(null)
+      const menuOpensUp = ref(false)
 
       // Delete confirmation modals
       const showDeleteUserModal = ref(false)
       const showDeleteRoleModal = ref(false)
       const showLockUserModal = ref(false)
+      const showUnlockUserModal = ref(false)
       const userToDelete = ref(null)
       const userToRemoveRoles = ref(null)
       const userToLock = ref(null)
+      const userToUnlock = ref(null)
       const deletingUser = ref(false)
       const deletingRoles = ref(false)
       const lockingUser = ref(false)
+      const unlockingUser = ref(false)
 
       // Edit User Modal states
       const showEditUserModal = ref(false)
@@ -2182,9 +2288,18 @@
         const groups = {}
 
         availablePermissions.value.forEach((permission) => {
-          // Try to determine category from permission name
-          const parts = permission.name.split('.')
-          const category = parts.length > 1 ? parts[0] : 'general'
+          // Prefer explicit category from backend if present
+          let category = permission.category
+
+          // Fallback: derive category from permission name prefix (e.g. users.view -> users)
+          if (!category && permission.name) {
+            const parts = permission.name.split('.')
+            category = parts.length > 1 ? parts[0] : 'general'
+          }
+
+          if (!category) {
+            category = 'general'
+          }
 
           if (!groups[category]) {
             groups[category] = []
@@ -2500,21 +2615,55 @@
           availablePermissions.value = response.data || []
         } catch (error) {
           console.error('Error fetching permissions:', error)
-          // Fallback to default permissions if API fails
+          // Fallback to default permissions if API fails - mirror backend RoleController::getPermissions
           availablePermissions.value = [
-            { id: 1, name: 'users.view', display_name: 'View Users' },
-            { id: 2, name: 'users.create', display_name: 'Create Users' },
-            { id: 3, name: 'users.edit', display_name: 'Edit Users' },
-            { id: 4, name: 'users.delete', display_name: 'Delete Users' },
-            { id: 5, name: 'roles.view', display_name: 'View Roles' },
-            { id: 6, name: 'roles.create', display_name: 'Create Roles' },
-            { id: 7, name: 'roles.edit', display_name: 'Edit Roles' },
-            { id: 8, name: 'roles.delete', display_name: 'Delete Roles' },
-            { id: 9, name: 'departments.view', display_name: 'View Departments' },
-            { id: 10, name: 'departments.manage', display_name: 'Manage Departments' },
-            { id: 11, name: 'requests.view', display_name: 'View Requests' },
-            { id: 12, name: 'requests.approve', display_name: 'Approve Requests' },
-            { id: 13, name: 'admin.full_access', display_name: 'Full Admin Access' }
+            // User Management
+            { id: 1, name: 'users.view', display_name: 'View Users', category: 'users' },
+            { id: 2, name: 'users.create', display_name: 'Create Users', category: 'users' },
+            { id: 3, name: 'users.edit', display_name: 'Edit Users', category: 'users' },
+            { id: 4, name: 'users.delete', display_name: 'Delete Users', category: 'users' },
+            { id: 5, name: 'users.assign_roles', display_name: 'Assign User Roles', category: 'users' },
+
+            // Role Management
+            { id: 6, name: 'roles.view', display_name: 'View Roles', category: 'roles' },
+            { id: 7, name: 'roles.create', display_name: 'Create Roles', category: 'roles' },
+            { id: 8, name: 'roles.edit', display_name: 'Edit Roles', category: 'roles' },
+            { id: 9, name: 'roles.delete', display_name: 'Delete Roles', category: 'roles' },
+
+            // Department Management
+            { id: 10, name: 'departments.view', display_name: 'View Departments', category: 'departments' },
+            { id: 11, name: 'departments.create', display_name: 'Create Departments', category: 'departments' },
+            { id: 12, name: 'departments.edit', display_name: 'Edit Departments', category: 'departments' },
+            { id: 13, name: 'departments.delete', display_name: 'Delete Departments', category: 'departments' },
+            { id: 14, name: 'departments.assign_hod', display_name: 'Assign Department HOD', category: 'departments' },
+
+            // Access Request Management
+            { id: 15, name: 'requests.view_all', display_name: 'View All Requests', category: 'requests' },
+            { id: 16, name: 'requests.approve', display_name: 'Approve Requests', category: 'requests' },
+            { id: 17, name: 'requests.reject', display_name: 'Reject Requests', category: 'requests' },
+            { id: 18, name: 'requests.cancel', display_name: 'Cancel Requests', category: 'requests' },
+
+            // Device Management
+            { id: 19, name: 'devices.view', display_name: 'View Device Inventory', category: 'devices' },
+            { id: 20, name: 'devices.create', display_name: 'Add Devices', category: 'devices' },
+            { id: 21, name: 'devices.edit', display_name: 'Edit Devices', category: 'devices' },
+            { id: 22, name: 'devices.delete', display_name: 'Delete Devices', category: 'devices' },
+            { id: 23, name: 'devices.approve_booking', display_name: 'Approve Device Bookings', category: 'devices' },
+
+            // System Administration
+            { id: 24, name: 'admin.full_access', display_name: 'Full Admin Access', category: 'admin' },
+            { id: 25, name: 'admin.view_logs', display_name: 'View System Logs', category: 'admin' },
+            { id: 26, name: 'admin.manage_settings', display_name: 'Manage System Settings', category: 'admin' },
+
+            // Onboarding Management
+            { id: 27, name: 'onboarding.view', display_name: 'View Onboarding Status', category: 'onboarding' },
+            { id: 28, name: 'onboarding.reset', display_name: 'Reset User Onboarding', category: 'onboarding' },
+
+            // ICT Operations
+            { id: 29, name: 'ict.view_tasks', display_name: 'View ICT Tasks', category: 'ict' },
+            { id: 30, name: 'ict.assign_tasks', display_name: 'Assign ICT Tasks', category: 'ict' },
+            { id: 31, name: 'ict.complete_tasks', display_name: 'Complete ICT Tasks', category: 'ict' },
+            { id: 32, name: 'ict.grant_access', display_name: 'Grant System Access', category: 'ict' }
           ]
         } finally {
           loadingPermissions.value = false
@@ -3094,11 +3243,22 @@
       }
 
       // Three-dot menu methods
-      const toggleUserMenu = (userId) => {
+      const toggleUserMenu = (userId, event) => {
         if (openMenuId.value === userId) {
           openMenuId.value = null
+          menuOpensUp.value = false
         } else {
           openMenuId.value = userId
+
+          // Decide whether to open the menu upwards or downwards based on available viewport space
+          if (event && event.currentTarget) {
+            const rect = event.currentTarget.getBoundingClientRect()
+            const spaceBelow = window.innerHeight - rect.bottom
+            const estimatedMenuHeight = 260 // approximate height of the dropdown
+            menuOpensUp.value = spaceBelow < estimatedMenuHeight
+          } else {
+            menuOpensUp.value = false
+          }
         }
       }
 
@@ -3115,6 +3275,7 @@
 
         if (!isClickInsideDropdown) {
           openMenuId.value = null
+          menuOpensUp.value = false
         }
       }
 
@@ -3134,17 +3295,19 @@
 
       // Lock user confirmation
       const confirmLockUser = (user) => {
-        // If the user is already inactive, show an informational message instead of toggling
-        if (user && user.is_active === false) {
-          showErrorMessage(
-            `User "${user.name}" is already locked and cannot sign in to the system.`
-          )
-          closeAllMenus()
-          return
-        }
+        if (!user) return
 
         userToLock.value = user
         showLockUserModal.value = true
+        closeAllMenus()
+      }
+
+      // Unlock user confirmation
+      const confirmUnlockUser = (user) => {
+        if (!user) return
+
+        userToUnlock.value = user
+        showUnlockUserModal.value = true
         closeAllMenus()
       }
 
@@ -3162,6 +3325,11 @@
       const closeLockUserModal = () => {
         showLockUserModal.value = false
         userToLock.value = null
+      }
+
+      const closeUnlockUserModal = () => {
+        showUnlockUserModal.value = false
+        userToUnlock.value = null
       }
 
       // Delete user permanently
@@ -3244,6 +3412,34 @@
         }
       }
 
+      // Unlock user (set is_active to true)
+      const unlockUser = async () => {
+        if (!userToUnlock.value) return
+
+        unlockingUser.value = true
+
+        try {
+          const response = await adminUserService.updateUser(userToUnlock.value.id, {
+            is_active: true
+          })
+
+          if (response.success) {
+            showSuccessMessage(
+              `User "${userToUnlock.value.name}" has been unlocked and can sign in again.`
+            )
+            closeUnlockUserModal()
+            await refreshData()
+          } else {
+            throw new Error(response.message || 'Failed to unlock user')
+          }
+        } catch (error) {
+          console.error('Error unlocking user:', error)
+          showErrorMessage(error.message || 'Failed to unlock user')
+        } finally {
+          unlockingUser.value = false
+        }
+      }
+
       // Initialize data on mount
       onMounted(() => {
         initializeData()
@@ -3275,6 +3471,7 @@
         showDeleteUserModal,
         showDeleteRoleModal,
         showLockUserModal,
+        showUnlockUserModal,
         creatingUser,
         creatingRole,
         assigningRoles,
@@ -3286,6 +3483,7 @@
         deletingUser,
         deletingRoles,
         lockingUser,
+        unlockingUser,
         showEditUserModal,
         editingUser,
         updatingUser,
@@ -3305,7 +3503,9 @@
         userToDelete,
         userToRemoveRoles,
         userToLock,
+        userToUnlock,
         openMenuId,
+        menuOpensUp,
         editUserData,
         editUserFormErrors,
 
@@ -3353,12 +3553,15 @@
         confirmDeleteUser,
         confirmDeleteUserRole,
         confirmLockUser,
+        confirmUnlockUser,
         closeDeleteUserModal,
         closeDeleteRoleModal,
         closeLockUserModal,
+        closeUnlockUserModal,
         deleteUser,
         deleteUserRoles,
-        lockUser
+        lockUser,
+        unlockUser
       }
     }
   }
@@ -3378,7 +3581,8 @@
 
   .medical-card {
     position: relative;
-    overflow: hidden;
+    /* Allow dropdown menus and overlays to extend outside the card without being clipped */
+    overflow: visible;
     background: rgba(59, 130, 246, 0.1);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
