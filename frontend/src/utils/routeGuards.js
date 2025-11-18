@@ -153,7 +153,17 @@ export async function checkRouteAccess(route) {
         route.meta.roles.includes(userRole) ||
         userRoles.some((role) => route.meta.roles.includes(role))
 
+      // Fallback: permission-based access for dynamic roles not listed in meta.roles
+      let hasPermissionBasedAccess = false
       if (!hasRequiredRole) {
+        const effectiveRole = userRole || (userRoles.length > 0 ? userRoles[0] : null)
+        if (effectiveRole) {
+          const { hasRouteAccess } = await import('./permissions')
+          hasPermissionBasedAccess = hasRouteAccess(effectiveRole, route.path)
+        }
+      }
+
+      if (!hasRequiredRole && !hasPermissionBasedAccess) {
         if (DEBUG)
           console.log('🚫 Route Guard: Role mismatch:', {
             userRole,

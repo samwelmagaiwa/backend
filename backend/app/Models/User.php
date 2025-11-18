@@ -391,11 +391,34 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user is ICT Officer
+     * Check if user is ICT Officer (includes Secretary ICT and permission-based fallback)
      */
     public function isIctOfficer(): bool
     {
-        return $this->hasRole('ict_officer');
+        // Primary check: explicit ICT Officer role
+        if ($this->hasRole('ict_officer')) {
+            return true;
+        }
+
+        // Treat Secretary ICT as ICT Officer-equivalent for implementation workflows
+        if ($this->hasRole('secretary_ict')) {
+            return true;
+        }
+
+        // Conservative fallback: if user has device booking implementation/approval permissions,
+        // consider them ICT Officer-like. This avoids hard-coding every future ICT-like role.
+        if (
+            method_exists($this, 'hasPermission') &&
+            (
+                $this->hasPermission('approve_device_bookings') ||
+                $this->hasPermission('view_device_bookings') ||
+                $this->hasPermission('manage_device_inventory')
+            )
+        ) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

@@ -502,11 +502,12 @@ export const deviceBorrowingService = {
     // - Prefer explicit has_signature flag from backend (supports digital signatures)
     // - Fallback to legacy "signature" boolean
     // - Finally, use presence of signature_path
-    const hasSignatureBackend = typeof request.has_signature !== 'undefined'
-      ? !!request.has_signature
-      : typeof request.signature !== 'undefined'
-        ? !!request.signature
-        : !!request.signature_path
+    const hasSignatureBackend =
+      typeof request.has_signature !== 'undefined'
+        ? !!request.has_signature
+        : typeof request.signature !== 'undefined'
+          ? !!request.signature
+          : !!request.signature_path
 
     return {
       // Core request data

@@ -910,14 +910,18 @@ class ICTApprovalController extends Controller
             'user_permissions' => $user->getAllPermissions()
         ]);
         
-        // Check for specific view_device_bookings permission first
-        if ($user->hasPermission('view_device_bookings')) {
-            Log::info('User has view_device_bookings permission');
+        // Check for specific booking-related permissions first
+        if (
+            $user->hasPermission('view_device_bookings') ||
+            $user->hasPermission('approve_device_bookings') ||
+            $user->hasPermission('manage_device_inventory')
+        ) {
+            Log::info('User has device booking permissions for ICT approval');
             return true;
         }
         
         // Fallback to role-based checking for backward compatibility
-        $allowedRoles = ['ict_officer', 'admin', 'ict_director'];
+        $allowedRoles = ['ict_officer', 'secretary_ict', 'admin', 'ict_director'];
         
         // Support both old single role system and new multi-role system
         if ($user->role && $user->role->name) {

@@ -6,6 +6,7 @@
 
 import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
+import { inferDynamicPermissionsForUser } from '@/utils/permissions'
 
 const AUTH_STORAGE_KEY = 'auth_state_pinia'
 const USER_STORAGE_KEY = 'user_data'
@@ -86,6 +87,13 @@ export const useAuthStore = defineStore('auth', () => {
         userRoles.value = userData.roles || []
         userPermissions.value = userData.permissions || []
         isAuthenticated.value = true
+
+        // Ensure dynamic role permissions are registered on page reload
+        try {
+          inferDynamicPermissionsForUser(userData)
+        } catch (e) {
+          console.warn('Pinia Auth: Failed to infer dynamic permissions on init:', e)
+        }
 
         console.log('✅ Pinia Auth: Restored authentication state:', {
           userName: userData.name,
@@ -181,6 +189,14 @@ export const useAuthStore = defineStore('auth', () => {
 
     userRoles.value = rolesArray
     userPermissions.value = authData.user?.permissions || []
+
+    // Register dynamic permissions for custom roles (if any)
+    try {
+      inferDynamicPermissionsForUser(authData.user)
+    } catch (e) {
+      console.warn('Auth: Failed to infer dynamic permissions for user role:', e)
+    }
+
     isAuthenticated.value = true
     error.value = null
 

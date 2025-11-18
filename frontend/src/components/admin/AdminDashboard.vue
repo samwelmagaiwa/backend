@@ -93,9 +93,7 @@
                 <div
                   class="medical-card bg-gradient-to-r from-yellow-600/25 to-orange-600/25 border-2 border-yellow-400/40 p-4 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-yellow-500/20 transition-all duration-500 group"
                 >
-                  <div
-                    class="flex flex-col md:flex-row md:items-stretch md:justify-between gap-4"
-                  >
+                  <div class="flex flex-col md:flex-row md:items-stretch md:justify-between gap-4">
                     <!-- Pending Requests (left side) -->
                     <div class="flex-1">
                       <div class="flex items-center mb-3">
@@ -114,12 +112,8 @@
                     </div>
 
                     <!-- Divider -->
-                    <div
-                      class="hidden md:block w-px h-24 bg-yellow-400/40 self-center"
-                    ></div>
-                    <div
-                      class="block md:hidden h-px w-full bg-yellow-400/40 opacity-60"
-                    ></div>
+                    <div class="hidden md:block w-px h-24 bg-yellow-400/40 self-center"></div>
+                    <div class="block md:hidden h-px w-full bg-yellow-400/40 opacity-60"></div>
 
                     <!-- SMS Counter (right side) -->
                     <div class="flex-1 md:pl-4 pt-2 md:pt-0">

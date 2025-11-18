@@ -363,32 +363,32 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('bookings/{bookingService}/approve', [BookingServiceController::class, 'approve'])->name('booking-service.approve');
         Route::post('bookings/{bookingService}/reject', [BookingServiceController::class, 'reject'])->name('booking-service.reject');
 
-        // ICT Officer actions
+        // ICT Officer actions (ICT Officer + Secretary ICT)
         Route::get('ict-approval-requests', [BookingServiceController::class, 'getIctApprovalRequests'])
-            ->middleware('role:ict_officer,admin,ict_director')
+            ->middleware('role:ict_officer,secretary_ict,admin,ict_director')
             ->name('booking-service.ict-approval-requests');
         // Alias for frontend compatibility
         Route::get('ict-pending-approvals', [BookingServiceController::class, 'getIctApprovalRequests'])
-            ->middleware('role:ict_officer,admin,ict_director')
+            ->middleware('role:ict_officer,secretary_ict,admin,ict_director')
             ->name('booking-service.ict-pending-approvals');
         Route::post('bookings/{bookingService}/ict-approve', [BookingServiceController::class, 'ictApprove'])
-            ->middleware('role:ict_officer,admin,ict_director')
+            ->middleware('role:ict_officer,secretary_ict,admin,ict_director')
             ->name('booking-service.ict-approve');
         Route::post('bookings/{bookingService}/ict-reject', [BookingServiceController::class, 'ictReject'])
-            ->middleware('role:ict_officer,admin,ict_director')
+            ->middleware('role:ict_officer,secretary_ict,admin,ict_director')
             ->name('booking-service.ict-reject');
 
         // Device condition assessment routes
         Route::post('bookings/{bookingService}/assessment/issuing', [BookingServiceController::class, 'saveIssuingAssessment'])
-            ->middleware('role:ict_officer,admin,ict_director')
+            ->middleware('role:ict_officer,secretary_ict,admin,ict_director')
             ->name('booking-service.assessment.issuing');
         Route::post('bookings/{bookingService}/assessment/receiving', [BookingServiceController::class, 'saveReceivingAssessment'])
-            ->middleware('role:ict_officer,admin,ict_director')
+            ->middleware('role:ict_officer,secretary_ict,admin,ict_director')
             ->name('booking-service.assessment.receiving');
     });
 
-    // ICT Approval routes (ICT Officer only)
-    Route::prefix('ict-approval')->middleware('role:ict_officer,admin,ict_director')->group(function () {
+    // ICT Approval routes (ICT Officer + Secretary ICT)
+    Route::prefix('ict-approval')->middleware('role:ict_officer,secretary_ict,admin,ict_director')->group(function () {
 // Statistics (must be before parameterized routes)
         Route::get('device-requests/statistics', [ICTApprovalController::class, 'getDeviceBorrowingStatistics'])->name('ict-approval.statistics');
 
@@ -700,8 +700,8 @@ Route::prefix('hod')->middleware('role:head_of_department,divisional_director,ic
             ->name('head-of-it.cancel-ict-task');
     });
 
-    // ICT Officer routes (ICT Officer only)
-    Route::prefix('ict-officer')->middleware('role:ict_officer,admin')->group(function () {
+    // ICT Officer routes (ICT Officer + Secretary ICT)
+    Route::prefix('ict-officer')->middleware('role:ict_officer,secretary_ict,admin')->group(function () {
         // Dashboard
         Route::get('dashboard', [IctOfficerController::class, 'getDashboard'])
             ->name('ict-officer.dashboard');

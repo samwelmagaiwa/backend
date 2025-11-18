@@ -17,7 +17,7 @@ export const ROLES = {
   SECRETARY_ICT: 'secretary_ict'
 }
 
-// Define route permissions for each role
+// Static route permissions for known system roles (default configuration)
 export const ROLE_PERMISSIONS = {
   [ROLES.ADMIN]: {
     routes: [
@@ -152,7 +152,9 @@ export const ROLE_PERMISSIONS = {
     requestsManagement: ['ict-dashboard/access-requests', 'user-security-access/:id']
   },
 
-  // ICT Secretary role: shares dashboard/routes with ICT Officer but has permissions configured server-side
+  // ICT Secretary role: shares most dashboard/routes with ICT Officer but typically has only
+  // device-booking permissions. Access Requests visibility will be refined dynamically in the
+  // sidebar based on permissions.
   [ROLES.SECRETARY_ICT]: {
     routes: [
       '/ict-dashboard',
@@ -203,6 +205,9 @@ export const ROLE_PERMISSIONS = {
   }
 }
 
+// Dynamic role permissions registry (populated at runtime from backend roles/permissions)
+const DYNAMIC_ROLE_PERMISSIONS = {}
+
 // Public routes that don't require authentication
 export const PUBLIC_ROUTES = ['/', '/login', '/ict-policy', '/terms-of-service']
 
@@ -211,6 +216,45 @@ export const ONBOARDING_ROUTES = ['/onboarding']
 
 // Settings routes (accessible to all authenticated users)
 export const SETTINGS_ROUTES = ['/settings']
+
+/**
+ * Internal helper: get permissions definition for a role
+ * Prefers dynamic registry, then falls back to static ROLE_PERMISSIONS
+ */
+function getPermissionsForRole(userRole) {
+  return DYNAMIC_ROLE_PERMISSIONS[userRole] || ROLE_PERMISSIONS[userRole] || null
+}
+
+/**
+ * Register or extend dynamic permissions for a role at runtime.
+ * This does NOT remove any static permissions; it merges routes/dashboards.
+ * @param {string} roleName
+ * @param {{routes?: string[], dashboards?: string[], forms?: string[], userManagement?: string[], deviceManagement?: string[], requestsManagement?: string[]}} dynamicDef
+ */
+export function registerDynamicRolePermissions(roleName, dynamicDef = {}) {
+  if (!roleName) return
+
+  const base = getPermissionsForRole(roleName) || {
+    routes: [],
+    dashboards: [],
+    forms: [],
+    userManagement: [],
+    deviceManagement: [],
+    requestsManagement: []
+  }
+
+  const merged = {
+    ...base,
+    ...dynamicDef,
+    routes: Array.from(new Set([...(base.routes || []), ...(dynamicDef.routes || [])])),
+    dashboards:
+      dynamicDef.dashboards && dynamicDef.dashboards.length > 0
+        ? dynamicDef.dashboards
+        : base.dashboards || []
+  }
+
+  DYNAMIC_ROLE_PERMISSIONS[roleName] = merged
+}
 
 /**
  * Check if a user role has access to a specific route
@@ -234,8 +278,8 @@ export function hasRouteAccess(userRole, routePath) {
     return true
   }
 
-  // Check if user role exists and has permissions
-  const permissions = ROLE_PERMISSIONS[userRole]
+  // Check if user role exists and has permissions (dynamic or static)
+  const permissions = getPermissionsForRole(userRole)
   if (!permissions) {
     return false
   }
@@ -250,12 +294,12 @@ export function hasRouteAccess(userRole, routePath) {
  * @returns {string[]} - Array of allowed route paths
  */
 export function getAllowedRoutes(userRole) {
-  const permissions = ROLE_PERMISSIONS[userRole]
+  const permissions = getPermissionsForRole(userRole)
   if (!permissions) {
     return PUBLIC_ROUTES
   }
 
-  let allowedRoutes = [...PUBLIC_ROUTES, ...permissions.routes]
+  let allowedRoutes = [...PUBLIC_ROUTES, ...(permissions.routes || [])]
 
   // Add onboarding routes for non-admin users
   if (userRole !== ROLES.ADMIN) {
@@ -276,8 +320,8 @@ export function getAllowedRoutes(userRole) {
  * @returns {string|null} - Default dashboard route or null
  */
 export function getDefaultDashboard(userRole) {
-  const permissions = ROLE_PERMISSIONS[userRole]
-  if (!permissions || !permissions.dashboards.length) {
+  const permissions = getPermissionsForRole(userRole)
+  if (!permissions || !permissions.dashboards || !permissions.dashboards.length) {
     return null
   }
 
@@ -292,7 +336,7 @@ export function getDefaultDashboard(userRole) {
  * @returns {boolean} - Whether the user can manage users
  */
 export function hasUserManagementAccess(userRole) {
-  const permissions = ROLE_PERMISSIONS[userRole]
+  const permissions = getPermissionsForRole(userRole)
   return permissions && permissions.userManagement.length > 0
 }
 
@@ -304,7 +348,9 @@ const DASHBOARD_ROUTES = {
   'hod-dashboard': '/hod-dashboard',
   'divisional-dashboard': '/divisional-dashboard',
   'ict-dashboard': '/ict-dashboard',
-  'head_of_it-dashboard': '/head_of_it-dashboard'
+  'head_of_it-dashboard': '/head_of_it-dashboard',
+  // Synthetic dashboard for booking-only dynamic roles: go straight to device requests
+  'device-dashboard': '/ict-approval/requests'
 }
 
 /**
@@ -315,7 +361,7 @@ export function getAllDashboardRoutes() {
   const dashboardRoutes = new Set()
 
   // Extract all dashboard routes from role permissions
-  Object.values(ROLE_PERMISSIONS).forEach((permissions) => {
+  Object.values({ ...ROLE_PERMISSIONS, ...DYNAMIC_ROLE_PERMISSIONS }).forEach((permissions) => {
     if (permissions.dashboards) {
       permissions.dashboards.forEach((dashboardName) => {
         const route = DASHBOARD_ROUTES[dashboardName]
@@ -361,4 +407,68 @@ export function getDashboardRoutesForRole(userRole) {
  */
 export function isValidRole(role) {
   return Object.values(ROLES).includes(role)
+}
+
+/**
+ * Infer and register dynamic permissions for a user based on backend permissions.
+ * This is a conservative heuristic: unknown roles become either staff-like or ICT-like.
+ * It does NOT alter existing system roles.
+ * @param {Object} user - Authenticated user object from backend
+ */
+export function inferDynamicPermissionsForUser(user) {
+  if (!user || typeof user !== 'object') return
+
+  const primaryRole = user.role || user.role_name || user.primary_role
+  if (!primaryRole) return
+
+  // Do not override explicit static configuration for known system roles
+  if (ROLE_PERMISSIONS[primaryRole]) {
+    return
+  }
+
+  const permissions = Array.isArray(user.permissions) ? user.permissions : []
+
+  const hasBookingApproval = permissions.some((p) =>
+    [
+      'approve_device_bookings',
+      'view_device_bookings',
+      'view_booking_statistics',
+      'manage_device_inventory'
+    ].includes(p)
+  )
+
+  if (hasBookingApproval) {
+    // ICT-like role focused on device bookings ONLY (no user-access workflow).
+    // Show a device-centric dashboard and hide ICT Access Requests from sidebar/routes.
+    registerDynamicRolePermissions(primaryRole, {
+      routes: [
+        // Device booking approval/monitoring
+        '/ict-approval/requests',
+        '/ict-approval/request/:id',
+
+        // Staff-facing booking flows
+        '/booking-service',
+        '/request-status',
+        '/request-details',
+
+        // Onboarding remains accessible for all non-admin roles
+        '/onboarding'
+      ],
+      // Use synthetic "device-dashboard" so default dashboard is the device requests page
+      dashboards: ['device-dashboard']
+    })
+  } else {
+    // Default to staff-like experience
+    registerDynamicRolePermissions(primaryRole, {
+      routes: [
+        '/user-dashboard',
+        '/user-combined-form',
+        '/booking-service',
+        '/request-status',
+        '/request-details',
+        '/onboarding'
+      ],
+      dashboards: ['user-dashboard']
+    })
+  }
 }

@@ -759,7 +759,7 @@
 <script>
   import { computed, ref, watch, onMounted, onUnmounted, nextTick } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
-  import { ROLE_PERMISSIONS, ROLES } from '../utils/permissions'
+  import { ROLES, getAllowedRoutes } from '../utils/permissions'
   import { useAuth } from '../composables/useAuth'
   import { useSidebar } from '../composables/useSidebar'
   import { useAuthStore } from '../stores/auth'
@@ -1110,13 +1110,16 @@
           }
 
           console.log('🔍 Menu items: Using role:', role)
-          const permissions = ROLE_PERMISSIONS[role]
-          if (!permissions || !permissions.routes) {
-            console.log('🔍 Menu items: No permissions found for role:', role)
+
+          // Use unified permission helper so dynamic roles (from /admin/user-roles)
+          // get their menus without hardcoding entries here.
+          const routes = getAllowedRoutes(role) || []
+          if (!routes.length) {
+            console.log('🔍 Menu items: No allowed routes found for role:', role)
             return []
           }
 
-          const items = permissions.routes
+          const items = routes
             .map((route) => {
               try {
                 const metadata = getRouteMetadata(route)
@@ -1129,6 +1132,7 @@
                 return null
               }
             })
+            // Only keep routes that have metadata configured
             .filter((item) => item && item.name)
 
           console.log('🔍 Menu items computed:', items.length, 'items for role:', role)
@@ -1173,6 +1177,42 @@
         } catch (error) {
           console.warn('Error filtering requests management items:', error)
           return []
+        }
+      })
+
+      // Decide if Access Requests should be hidden dynamically based on role/permissions
+      const shouldHideAccessRequests = computed(() => {
+        try {
+          const role = piniaAuthStore?.userRole || userRole?.value || stableUserRole?.value
+          const perms = piniaAuthStore?.userPermissions || []
+
+          // Always hide Access Requests from Secretary ICT in UI unless they clearly have
+          // user-access permissions (not just booking permissions).
+          const hasBookingPerm = perms.some((p) =>
+            [
+              'approve_device_bookings',
+              'view_device_bookings',
+              'view_booking_statistics',
+              'manage_device_inventory'
+            ].includes(p)
+          )
+
+          const hasUserAccessPerm = perms.some((p) =>
+            [
+              'view_user_access_requests',
+              'manage_user_access_requests',
+              'ict_view_access_requests'
+            ].includes(p)
+          )
+
+          if (role === ROLES.SECRETARY_ICT && hasBookingPerm && !hasUserAccessPerm) {
+            return true
+          }
+
+          return false
+        } catch (error) {
+          console.warn('Error computing shouldHideAccessRequests:', error)
+          return false
         }
       })
 
@@ -1221,9 +1261,17 @@
 
       const filteredRequestsManagementItems = computed(() => {
         try {
-          if (!searchQuery?.value) return requestsManagementItems?.value || []
+          let items = requestsManagementItems?.value || []
+
+          // Dynamically hide Access Requests for booking-only roles (e.g., Secretary ICT)
+          if (shouldHideAccessRequests.value) {
+            items = items.filter((item) => item.path !== '/ict-dashboard/access-requests')
+          }
+
+          if (!searchQuery?.value) return items
+
           return (
-            requestsManagementItems?.value?.filter((item) =>
+            items?.filter((item) =>
               item?.displayName?.toLowerCase().includes(searchQuery.value.toLowerCase())
             ) || []
           )

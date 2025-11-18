@@ -52,9 +52,7 @@
 
       <!-- Body -->
       <div class="relative z-10 p-6 space-y-4">
-        <div
-          class="grid grid-cols-1 sm:grid-cols-2 gap-3 border border-blue-400/30 rounded-xl p-4"
-        >
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 border border-blue-400/30 rounded-xl p-4">
           <div class="flex items-center justify-between">
             <span class="text-blue-200 text-sm font-medium flex items-center"
               ><i class="fas fa-hashtag mr-2 text-blue-300"></i>Request</span

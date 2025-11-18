@@ -585,7 +585,7 @@
 <script>
   import { computed, ref, watch, onMounted, nextTick } from 'vue'
   import { useRouter } from 'vue-router'
-  import { ROLE_PERMISSIONS, ROLES } from '../utils/permissions'
+  import { ROLES, getAllowedRoutes } from '../utils/permissions'
   import { useAuth } from '../composables/useAuth'
   import auth from '../utils/auth'
   import { logoutGuard } from '@/utils/logoutGuard'
@@ -676,10 +676,9 @@
         const role = stableUserRole.value || userRole.value
         if (!role) return []
 
-        const permissions = ROLE_PERMISSIONS[role]
-        if (!permissions) return []
+        const routes = getAllowedRoutes(role) || []
 
-        return permissions.routes
+        return routes
           .map((route) => {
             const metadata = getRouteMetadata(route)
             return {

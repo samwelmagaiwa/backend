@@ -307,7 +307,7 @@ class BookingServiceController extends Controller
                     'device_inventory_id' => $booking->device_inventory_id
                 ]);
 
-                // Trigger SMS to all ICT Officers about pending booking request
+                // Trigger SMS to all ICT Officers (and Secretary ICT) about pending booking request
                 try {
                     $smsModule = app(SmsModule::class);
 
@@ -318,7 +318,15 @@ class BookingServiceController extends Controller
                             $q->whereIn('name', ['head_of_department', 'divisional_director', 'ict_director', 'head_of_it', 'admin']);
                         })
                         ->get(['id','name','phone']);
-                    $phoneNumbers = $ictOfficers->pluck('phone')->filter()->unique()->values()->all();
+
+                    // Fetch Secretary ICT users who should also receive pending booking SMS
+                    $secretaryIctUsers = User::active()
+                        ->withRole('secretary_ict')
+                        ->get(['id','name','phone']);
+
+                    // Merge recipients and build a unique list of phone numbers
+                    $allRecipients = $ictOfficers->concat($secretaryIctUsers);
+                    $phoneNumbers = $allRecipients->pluck('phone')->filter()->unique()->values()->all();
 
                     if (!empty($phoneNumbers)) {
                         $deviceName = $booking->getDeviceDisplayNameAttribute();
@@ -336,16 +344,18 @@ class BookingServiceController extends Controller
                             'sms_to_hod_status' => $anySent ? 'sent' : 'failed',
                         ]);
 
-                        Log::info('ICT Officers SMS dispatch result for booking', [
+                        Log::info('ICT Officers/Secretary ICT SMS dispatch result for booking', [
                             'booking_id' => $booking->id,
-                            'officers_count' => count($phoneNumbers),
+                            'officers_count' => $ictOfficers->count(),
+                            'secretary_ict_count' => $secretaryIctUsers->count(),
+                            'unique_recipients' => count($phoneNumbers),
                             'result' => $bulkResult
                         ]);
                     } else {
-                        Log::warning('No ICT officers with phone numbers found for SMS notification');
+                        Log::warning('No ICT officers or Secretary ICT users with phone numbers found for SMS notification');
                     }
                 } catch (\Exception $e) {
-                    Log::error('Failed to send SMS to ICT officers for booking', [
+                    Log::error('Failed to send SMS to ICT officers/Secretary ICT for booking', [
                         'booking_id' => $booking->id,
                         'error' => $e->getMessage()
                     ]);
@@ -1074,8 +1084,18 @@ class BookingServiceController extends Controller
     public function getIctApprovalRequests(Request $request): JsonResponse
     {
         try {
-            // Check if user has ICT officer role
-            if (!$request->user()->hasAnyRole(['ict_officer', 'admin', 'ict_director'])) {
+            $user = $request->user();
+
+            // Allow ICT Officer, Secretary ICT, admin, ICT Director, or any role
+            // with explicit device booking permissions.
+            if (
+                !$user->hasAnyRole(['ict_officer', 'secretary_ict', 'admin', 'ict_director']) &&
+                !(
+                    $user->hasPermission('view_device_bookings') ||
+                    $user->hasPermission('approve_device_bookings') ||
+                    $user->hasPermission('manage_device_inventory')
+                )
+            ) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Unauthorized. ICT officer access required.'
@@ -1160,8 +1180,17 @@ class BookingServiceController extends Controller
     public function ictApprove(Request $request, BookingService $bookingService): JsonResponse
     {
         try {
-            // Check if user has ICT officer role
-            if (!$request->user()->hasAnyRole(['ict_officer', 'admin', 'ict_director'])) {
+            $user = $request->user();
+
+            // Allow ICT Officer, Secretary ICT, admin, ICT Director, or any role
+            // with explicit device booking permissions.
+            if (
+                !$user->hasAnyRole(['ict_officer', 'secretary_ict', 'admin', 'ict_director']) &&
+                !(
+                    $user->hasPermission('approve_device_bookings') ||
+                    $user->hasPermission('manage_device_inventory')
+                )
+            ) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Unauthorized. ICT officer access required.'
@@ -1325,8 +1354,17 @@ class BookingServiceController extends Controller
     public function ictReject(Request $request, BookingService $bookingService): JsonResponse
     {
         try {
-            // Check if user has ICT officer role
-            if (!$request->user()->hasAnyRole(['ict_officer', 'admin', 'ict_director'])) {
+            $user = $request->user();
+
+            // Allow ICT Officer, Secretary ICT, admin, ICT Director, or any role
+            // with explicit device booking permissions.
+            if (
+                !$user->hasAnyRole(['ict_officer', 'secretary_ict', 'admin', 'ict_director']) &&
+                !(
+                    $user->hasPermission('approve_device_bookings') ||
+                    $user->hasPermission('manage_device_inventory')
+                )
+            ) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Unauthorized. ICT officer access required.'
@@ -1731,8 +1769,17 @@ class BookingServiceController extends Controller
     public function saveIssuingAssessment(Request $request, BookingService $bookingService): JsonResponse
     {
         try {
-            // Check if user has ICT officer role
-            if (!$request->user()->hasAnyRole(['ict_officer', 'admin', 'ict_director'])) {
+            $user = $request->user();
+
+            // Allow ICT Officer, Secretary ICT, admin, ICT Director, or any role
+            // with explicit device booking permissions.
+            if (
+                !$user->hasAnyRole(['ict_officer', 'secretary_ict', 'admin', 'ict_director']) &&
+                !(
+                    $user->hasPermission('approve_device_bookings') ||
+                    $user->hasPermission('manage_device_inventory')
+                )
+            ) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Unauthorized. ICT officer access required.'
@@ -1940,8 +1987,17 @@ class BookingServiceController extends Controller
     public function saveReceivingAssessment(Request $request, BookingService $bookingService): JsonResponse
     {
         try {
-            // Check if user has ICT officer role
-            if (!$request->user()->hasAnyRole(['ict_officer', 'admin', 'ict_director'])) {
+            $user = $request->user();
+
+            // Allow ICT Officer, Secretary ICT, admin, ICT Director, or any role
+            // with explicit device booking permissions.
+            if (
+                !$user->hasAnyRole(['ict_officer', 'secretary_ict', 'admin', 'ict_director']) &&
+                !(
+                    $user->hasPermission('approve_device_bookings') ||
+                    $user->hasPermission('manage_device_inventory')
+                )
+            ) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Unauthorized. ICT officer access required.'

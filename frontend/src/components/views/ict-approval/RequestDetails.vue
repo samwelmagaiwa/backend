@@ -1199,7 +1199,8 @@
             icon: 'fas fa-check',
             classes:
               'bg-gray-700 text-gray-300 cursor-not-allowed opacity-70 border border-gray-500/60',
-            tooltip: 'Issuing assessment has been saved. Use the Approve/Reject buttons below to continue.'
+            tooltip:
+              'Issuing assessment has been saved. Use the Approve/Reject buttons below to continue.'
           }
         }
 
@@ -2059,7 +2060,7 @@
 
   /* Good condition */
   .assessment-option.good.selected .option-content {
-     @apply border-green-400/60 bg-green-500/10 shadow-green-500/20;
+    @apply border-green-400/60 bg-green-500/10 shadow-green-500/20;
   }
 
   .assessment-option.good.selected .option-icon {

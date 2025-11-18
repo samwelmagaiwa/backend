@@ -390,7 +390,11 @@
 
                           <!-- Lock / Unlock User -->
                           <button
-                            @click.stop="user.is_active === false ? confirmUnlockUser(user) : confirmLockUser(user)"
+                            @click.stop="
+                              user.is_active === false
+                                ? confirmUnlockUser(user)
+                                : confirmLockUser(user)
+                            "
                             class="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-indigo-500/20 transition-colors duration-200 text-white group/item border-t border-blue-400/20"
                           >
                             <div
@@ -423,7 +427,9 @@
                                   Active
                                 </span>
                               </div>
-                              <div class="text-base text-gray-300 group-hover/item:text-gray-200 mt-0.5">
+                              <div
+                                class="text-base text-gray-300 group-hover/item:text-gray-200 mt-0.5"
+                              >
                                 {{
                                   user.is_active === false
                                     ? 'Restore system access'
@@ -2062,7 +2068,9 @@
               class="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
             >
               <i
-                :class="unlockingUser ? 'fas fa-spinner fa-spin text-base' : 'fas fa-lock-open text-base'"
+                :class="
+                  unlockingUser ? 'fas fa-spinner fa-spin text-base' : 'fas fa-lock-open text-base'
+                "
               ></i>
               <span>{{ unlockingUser ? 'Unlocking...' : 'Yes, Unlock User' }}</span>
             </button>
@@ -2622,7 +2630,12 @@
             { id: 2, name: 'users.create', display_name: 'Create Users', category: 'users' },
             { id: 3, name: 'users.edit', display_name: 'Edit Users', category: 'users' },
             { id: 4, name: 'users.delete', display_name: 'Delete Users', category: 'users' },
-            { id: 5, name: 'users.assign_roles', display_name: 'Assign User Roles', category: 'users' },
+            {
+              id: 5,
+              name: 'users.assign_roles',
+              display_name: 'Assign User Roles',
+              category: 'users'
+            },
 
             // Role Management
             { id: 6, name: 'roles.view', display_name: 'View Roles', category: 'roles' },
@@ -2631,39 +2644,129 @@
             { id: 9, name: 'roles.delete', display_name: 'Delete Roles', category: 'roles' },
 
             // Department Management
-            { id: 10, name: 'departments.view', display_name: 'View Departments', category: 'departments' },
-            { id: 11, name: 'departments.create', display_name: 'Create Departments', category: 'departments' },
-            { id: 12, name: 'departments.edit', display_name: 'Edit Departments', category: 'departments' },
-            { id: 13, name: 'departments.delete', display_name: 'Delete Departments', category: 'departments' },
-            { id: 14, name: 'departments.assign_hod', display_name: 'Assign Department HOD', category: 'departments' },
+            {
+              id: 10,
+              name: 'departments.view',
+              display_name: 'View Departments',
+              category: 'departments'
+            },
+            {
+              id: 11,
+              name: 'departments.create',
+              display_name: 'Create Departments',
+              category: 'departments'
+            },
+            {
+              id: 12,
+              name: 'departments.edit',
+              display_name: 'Edit Departments',
+              category: 'departments'
+            },
+            {
+              id: 13,
+              name: 'departments.delete',
+              display_name: 'Delete Departments',
+              category: 'departments'
+            },
+            {
+              id: 14,
+              name: 'departments.assign_hod',
+              display_name: 'Assign Department HOD',
+              category: 'departments'
+            },
 
             // Access Request Management
-            { id: 15, name: 'requests.view_all', display_name: 'View All Requests', category: 'requests' },
-            { id: 16, name: 'requests.approve', display_name: 'Approve Requests', category: 'requests' },
-            { id: 17, name: 'requests.reject', display_name: 'Reject Requests', category: 'requests' },
-            { id: 18, name: 'requests.cancel', display_name: 'Cancel Requests', category: 'requests' },
+            {
+              id: 15,
+              name: 'requests.view_all',
+              display_name: 'View All Requests',
+              category: 'requests'
+            },
+            {
+              id: 16,
+              name: 'requests.approve',
+              display_name: 'Approve Requests',
+              category: 'requests'
+            },
+            {
+              id: 17,
+              name: 'requests.reject',
+              display_name: 'Reject Requests',
+              category: 'requests'
+            },
+            {
+              id: 18,
+              name: 'requests.cancel',
+              display_name: 'Cancel Requests',
+              category: 'requests'
+            },
 
             // Device Management
-            { id: 19, name: 'devices.view', display_name: 'View Device Inventory', category: 'devices' },
+            {
+              id: 19,
+              name: 'devices.view',
+              display_name: 'View Device Inventory',
+              category: 'devices'
+            },
             { id: 20, name: 'devices.create', display_name: 'Add Devices', category: 'devices' },
             { id: 21, name: 'devices.edit', display_name: 'Edit Devices', category: 'devices' },
             { id: 22, name: 'devices.delete', display_name: 'Delete Devices', category: 'devices' },
-            { id: 23, name: 'devices.approve_booking', display_name: 'Approve Device Bookings', category: 'devices' },
+            {
+              id: 23,
+              name: 'devices.approve_booking',
+              display_name: 'Approve Device Bookings',
+              category: 'devices'
+            },
 
             // System Administration
-            { id: 24, name: 'admin.full_access', display_name: 'Full Admin Access', category: 'admin' },
-            { id: 25, name: 'admin.view_logs', display_name: 'View System Logs', category: 'admin' },
-            { id: 26, name: 'admin.manage_settings', display_name: 'Manage System Settings', category: 'admin' },
+            {
+              id: 24,
+              name: 'admin.full_access',
+              display_name: 'Full Admin Access',
+              category: 'admin'
+            },
+            {
+              id: 25,
+              name: 'admin.view_logs',
+              display_name: 'View System Logs',
+              category: 'admin'
+            },
+            {
+              id: 26,
+              name: 'admin.manage_settings',
+              display_name: 'Manage System Settings',
+              category: 'admin'
+            },
 
             // Onboarding Management
-            { id: 27, name: 'onboarding.view', display_name: 'View Onboarding Status', category: 'onboarding' },
-            { id: 28, name: 'onboarding.reset', display_name: 'Reset User Onboarding', category: 'onboarding' },
+            {
+              id: 27,
+              name: 'onboarding.view',
+              display_name: 'View Onboarding Status',
+              category: 'onboarding'
+            },
+            {
+              id: 28,
+              name: 'onboarding.reset',
+              display_name: 'Reset User Onboarding',
+              category: 'onboarding'
+            },
 
             // ICT Operations
             { id: 29, name: 'ict.view_tasks', display_name: 'View ICT Tasks', category: 'ict' },
             { id: 30, name: 'ict.assign_tasks', display_name: 'Assign ICT Tasks', category: 'ict' },
-            { id: 31, name: 'ict.complete_tasks', display_name: 'Complete ICT Tasks', category: 'ict' },
-            { id: 32, name: 'ict.grant_access', display_name: 'Grant System Access', category: 'ict' }
+            {
+              id: 31,
+              name: 'ict.complete_tasks',
+              display_name: 'Complete ICT Tasks',
+              category: 'ict'
+            },
+            {
+              id: 32,
+              name: 'ict.grant_access',
+              display_name: 'Grant System Access',
+              category: 'ict'
+            }
           ]
         } finally {
           loadingPermissions.value = false

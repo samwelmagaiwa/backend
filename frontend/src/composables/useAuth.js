@@ -169,7 +169,7 @@ export function useAuth() {
    * @param {string} role - Role to get display name for
    * @returns {string} - Display name for the role
    */
-    const getRoleDisplayName = (role) => {
+  const getRoleDisplayName = (role) => {
     if (!role) return 'User'
 
     const roleNames = {
