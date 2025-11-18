@@ -320,14 +320,23 @@ const routes = [
     }
   },
 
-  // ICT Approval routes (ICT Officer only)
+  // ICT Approval routes (ICT Officer & Secretary, with separate entry points)
   {
     path: '/ict-approval/requests',
     name: 'RequestsList',
     component: () => import('../components/views/ict-approval/RequestsList.vue'),
     meta: {
       requiresAuth: true,
-      roles: [ROLES.ICT_OFFICER, ROLES.SECRETARY_ICT]
+      roles: [ROLES.ICT_OFFICER]
+    }
+  },
+  {
+    path: '/secretary-approval/requests',
+    name: 'SecretaryRequestsList',
+    component: () => import('../components/views/ict-approval/RequestsList.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: [ROLES.SECRETARY_ICT]
     }
   },
   // ICT Officer review route for combined both-service form
@@ -337,7 +346,7 @@ const routes = [
     component: () => import('../components/views/forms/both-service-form.vue'),
     meta: {
       requiresAuth: true,
-      roles: [ROLES.ICT_OFFICER, ROLES.SECRETARY_ICT]
+      roles: [ROLES.ICT_OFFICER]
     }
   },
   {
@@ -346,7 +355,7 @@ const routes = [
     component: () => import('../components/views/ict-officer/AccessRequests.vue'),
     meta: {
       requiresAuth: true,
-      roles: [ROLES.ICT_OFFICER, ROLES.SECRETARY_ICT]
+      roles: [ROLES.ICT_OFFICER]
     }
   },
   {
@@ -391,7 +400,16 @@ const routes = [
     component: () => import('../components/views/ict-approval/RequestDetails.vue'),
     meta: {
       requiresAuth: true,
-      roles: [ROLES.ICT_OFFICER, ROLES.SECRETARY_ICT]
+      roles: [ROLES.ICT_OFFICER]
+    }
+  },
+  {
+    path: '/secretary-approval/request/:id',
+    name: 'SecretaryRequestDetails',
+    component: () => import('../components/views/ict-approval/RequestDetails.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: [ROLES.SECRETARY_ICT]
     }
   },
   // Internal Access Requests Dashboard (for approvers) - Redirect to new combined requests
@@ -792,11 +810,12 @@ router.beforeEach(async (to, from, next) => {
 
     // If invalid, keep showing current request (cancel navigation), or redirect to a safe page
     if (from && from.path && from.path.includes('/both-service-form/')) return next(false)
-    return next('/ict-dashboard/access-requests')
+    // Redirect to a safe, generic dashboard instead of ICT Access Requests
+    return next('/user-dashboard')
   } catch (e) {
     // On error, prefer to keep user on existing page
     if (from && from.path && from.path.includes('/both-service-form/')) return next(false)
-    return next('/ict-dashboard/access-requests')
+    return next('/user-dashboard')
   }
 })
 

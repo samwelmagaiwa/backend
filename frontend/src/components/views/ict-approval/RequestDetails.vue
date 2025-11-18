@@ -718,7 +718,7 @@
                       Retry
                     </button>
                     <button
-                      @click="$router.push('/ict-approval/requests')"
+                      @click="goBack()"
                       class="px-5 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors duration-200"
                     >
                       <i class="fas fa-list mr-2"></i>
@@ -819,6 +819,12 @@
     },
     data() {
       return {
+        // List route base depends on whether this is ICT Officer or Secretary ICT view
+        listRouteBase:
+          typeof window !== 'undefined' &&
+          window.location.pathname.startsWith('/secretary-approval/')
+            ? '/secretary-approval/requests'
+            : '/ict-approval/requests',
         request: {},
         isLoading: false,
         isProcessing: false,
@@ -1430,7 +1436,7 @@
 
             // Redirect back to requests list promptly after success
             this.showApprovalModal = false
-            this.$router.push('/ict-approval/requests')
+            this.$router.push(this.listRouteBase)
           } else {
             throw new Error(response.message || 'Failed to approve request')
           }
@@ -1497,7 +1503,7 @@
             })
 
             // Automatically redirect to requests list
-            this.$router.push('/ict-approval/requests')
+            this.$router.push(this.listRouteBase)
           } else {
             throw new Error(response.message || 'Failed to reject request')
           }
@@ -1510,7 +1516,7 @@
       },
 
       goBack() {
-        this.$router.push('/ict-approval/requests')
+        this.$router.push(this.listRouteBase)
       },
 
       getDeviceDisplayName(deviceType, customDevice) {

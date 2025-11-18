@@ -227,6 +227,8 @@ export function preloadRouteBasedImages(routePath) {
     '/booking-service',
     '/ict-approval/requests',
     '/ict-approval/request',
+    '/secretary-approval/requests',
+    '/secretary-approval/request',
     '/onboarding'
   ]
 

@@ -700,8 +700,8 @@ Route::prefix('hod')->middleware('role:head_of_department,divisional_director,ic
             ->name('head-of-it.cancel-ict-task');
     });
 
-    // ICT Officer routes (ICT Officer + Secretary ICT)
-    Route::prefix('ict-officer')->middleware('role:ict_officer,secretary_ict,admin')->group(function () {
+    // ICT Officer routes (ICT Officer only; Secretary ICT handles device bookings via ict-approval)
+    Route::prefix('ict-officer')->middleware('role:ict_officer,admin')->group(function () {
         // Dashboard
         Route::get('dashboard', [IctOfficerController::class, 'getDashboard'])
             ->name('ict-officer.dashboard');

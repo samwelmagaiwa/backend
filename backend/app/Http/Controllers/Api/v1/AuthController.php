@@ -789,6 +789,7 @@ class AuthController extends Controller
                 'ict_director' => '/dict-dashboard',
                 'head_of_it' => '/head-it-dashboard',
                 'ict_officer' => '/ict-dashboard',
+                'secretary_ict' => '/secretary-approval/requests',
                 'staff' => '/user-dashboard'
             ];
             

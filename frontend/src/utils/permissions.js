@@ -156,30 +156,30 @@ export const ROLE_PERMISSIONS = {
   // device-booking permissions. Access Requests visibility will be refined dynamically in the
   // sidebar based on permissions.
   [ROLES.SECRETARY_ICT]: {
+    // ICT Secretary: focused on device booking approvals and basic user dashboard.
+    // Explicitly exclude ICT Access Requests dashboard (/ict-dashboard/access-requests).
     routes: [
-      '/ict-dashboard',
-      '/ict-dashboard/access-requests',
-      '/ict-dashboard/access-service',
-      '/user-security-access/:id',
-      '/ict-approval/requests',
+      '/user-dashboard',
+      // Device booking approval/monitoring (separate SPA route for secretary)
+      '/secretary-approval/requests',
+      // Shared detail and utility views
       '/ict-approval/requests-simple',
       '/ict-approval/requests-original',
       '/ict-approval/request/:id',
-      '/user-security-access/:id',
+      // Staff-facing booking flows
       '/booking-service',
       '/request-status',
       '/request-details',
+      // Onboarding remains accessible for all non-admin roles
       '/onboarding'
     ],
-    dashboards: ['ict-dashboard'],
+    // Use a dedicated secretary device dashboard as primary landing page
+    dashboards: ['secretary-device-dashboard', 'user-dashboard'],
     forms: [],
     userManagement: [],
-    deviceManagement: [
-      'ict-approval/requests',
-      'ict-approval/request/:id',
-      'user-security-access/:id'
-    ],
-    requestsManagement: ['ict-dashboard/access-requests', 'user-security-access/:id']
+    deviceManagement: ['ict-approval/requests', 'ict-approval/request/:id'],
+    // No access to ICT Access Requests dashboard for secretary role
+    requestsManagement: []
   },
 
   [ROLES.HEAD_OF_IT]: {
@@ -349,8 +349,10 @@ const DASHBOARD_ROUTES = {
   'divisional-dashboard': '/divisional-dashboard',
   'ict-dashboard': '/ict-dashboard',
   'head_of_it-dashboard': '/head_of_it-dashboard',
-  // Synthetic dashboard for booking-only dynamic roles: go straight to device requests
-  'device-dashboard': '/ict-approval/requests'
+  // Synthetic dashboard for booking-only dynamic roles: go straight to ICT device requests
+  'device-dashboard': '/ict-approval/requests',
+  // Dedicated dashboard for ICT Secretary: secretary-specific device requests view
+  'secretary-device-dashboard': '/secretary-approval/requests'
 }
 
 /**

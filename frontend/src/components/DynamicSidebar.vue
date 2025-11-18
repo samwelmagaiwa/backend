@@ -865,13 +865,20 @@
             description: 'Book devices and equipment'
           },
 
-          // Device Management (ICT Officer only)
+          // Device Management
           '/ict-approval/requests': {
             name: 'RequestsList',
             displayName: 'Device Requests',
             icon: 'fas fa-clipboard-list',
             category: 'device-management',
-            description: 'Manage device borrowing requests'
+            description: 'Manage device borrowing requests (ICT Officer)'
+          },
+          '/secretary-approval/requests': {
+            name: 'SecretaryRequestsList',
+            displayName: 'Device Requests',
+            icon: 'fas fa-clipboard-list',
+            category: 'device-management',
+            description: 'Manage device borrowing requests (Secretary ICT)'
           },
 
           // Requests Management (for approvers)

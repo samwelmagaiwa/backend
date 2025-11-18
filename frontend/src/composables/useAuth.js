@@ -54,8 +54,21 @@ export function useAuth() {
         await router.push(redirectPath)
         return { success: true, user }
       } else {
-        // Handle failed login - set error message from authService response
-        const errorMessage = result.message || 'Login failed'
+        // Handle failed login - prefer specific field errors (e.g. password min length)
+        // then fall back to backend message like "Invalid email or password."
+        let errorMessage = result.message || 'Login failed'
+
+        if (result.errors && typeof result.errors === 'object') {
+          const fieldOrder = ['email', 'password']
+          for (const field of fieldOrder) {
+            const fieldErrors = result.errors[field]
+            if (Array.isArray(fieldErrors) && fieldErrors.length > 0) {
+              errorMessage = fieldErrors[0]
+              break
+            }
+          }
+        }
+
         console.error('❌ Login failed:', errorMessage)
         authStore.setError(errorMessage)
         return {

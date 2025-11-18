@@ -30,13 +30,24 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      // Token expired or invalid
-      localStorage.removeItem('auth_token')
-      localStorage.removeItem('user_data')
-      localStorage.removeItem('session_data')
-      window.location.href = '/login'
+    const status = error.response?.status
+    const method = (error.config?.method || '').toString().toLowerCase()
+    const url = (error.config?.url || '').toString()
+
+    if (status === 401) {
+      // IMPORTANT: Do NOT auto-redirect on login failures, so the login
+      // page can display "Invalid email or password" in the shared error banner.
+      const isLoginRequest = method === 'post' && url.includes('/login')
+
+      if (!isLoginRequest) {
+        // Token expired or invalid on authenticated routes
+        localStorage.removeItem('auth_token')
+        localStorage.removeItem('user_data')
+        localStorage.removeItem('session_data')
+        window.location.href = '/login'
+      }
     }
+
     return Promise.reject(error)
   }
 )

@@ -471,7 +471,7 @@
                           >
                             <!-- Compact View Action -->
                             <router-link
-                              :to="`/ict-approval/request/${request.id}`"
+                              :to="`${detailRouteBase}/request/${request.id}`"
                               @click="closeDropdown"
                               class="relative flex items-center px-2 py-1.5 text-sm bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 transition-all duration-200 group overflow-hidden border-b border-blue-400/30 rounded-sm"
                             >
@@ -631,6 +631,16 @@
       }
     },
     computed: {
+      // Base path for detail routes, depends on whether current list is ICT Officer
+      // or Secretary ICT.
+      detailRouteBase() {
+        const path = this.$route.path || ''
+        if (path.startsWith('/secretary-approval/')) {
+          return '/secretary-approval'
+        }
+        return '/ict-approval'
+      },
+
       filteredRequests() {
         let filtered = this.requests
 
@@ -771,7 +781,7 @@
       },
 
       viewRequest(requestId) {
-        this.$router.push(`/ict-approval/request/${requestId}`)
+        this.$router.push(`${this.detailRouteBase}/request/${requestId}`)
       },
 
       getDeviceDisplayName(deviceType, customDevice) {

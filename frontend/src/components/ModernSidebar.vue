@@ -1056,13 +1056,20 @@
             description: 'Manage granted services'
           },
 
-          // Device Management (ICT Officer only)
+          // Device Management
           '/ict-approval/requests': {
             name: 'RequestsList',
             displayName: 'Device Requests',
             icon: 'fas fa-clipboard-list',
             category: 'device-management',
-            description: 'Manage device borrowing requests'
+            description: 'Manage device borrowing requests (ICT Officer)'
+          },
+          '/secretary-approval/requests': {
+            name: 'SecretaryRequestsList',
+            displayName: 'Device Requests',
+            icon: 'fas fa-clipboard-list',
+            category: 'device-management',
+            description: 'Manage device borrowing requests (Secretary ICT)'
           },
 
           // Requests Management (for approvers)
@@ -1184,28 +1191,10 @@
       const shouldHideAccessRequests = computed(() => {
         try {
           const role = piniaAuthStore?.userRole || userRole?.value || stableUserRole?.value
-          const perms = piniaAuthStore?.userPermissions || []
 
-          // Always hide Access Requests from Secretary ICT in UI unless they clearly have
-          // user-access permissions (not just booking permissions).
-          const hasBookingPerm = perms.some((p) =>
-            [
-              'approve_device_bookings',
-              'view_device_bookings',
-              'view_booking_statistics',
-              'manage_device_inventory'
-            ].includes(p)
-          )
-
-          const hasUserAccessPerm = perms.some((p) =>
-            [
-              'view_user_access_requests',
-              'manage_user_access_requests',
-              'ict_view_access_requests'
-            ].includes(p)
-          )
-
-          if (role === ROLES.SECRETARY_ICT && hasBookingPerm && !hasUserAccessPerm) {
+          // Business rule: ICT Secretary should never see the ICT Access Requests dashboard
+          // in the sidebar. Their focus is device bookings only.
+          if (role === ROLES.SECRETARY_ICT) {
             return true
           }
 
