@@ -557,6 +557,16 @@ export const deviceBorrowingService = {
       ict_notes: request.ict_notes,
       ict_approved_by: request.ict_approved_by,
 
+      // SMS status (normalized for UI)
+      sms_to_requester_status: request.sms_to_requester_status,
+      sms_to_hod_status: request.sms_to_hod_status,
+      sms_sent_to_requester_at: request.sms_sent_to_requester_at,
+      sms_status:
+        request.sms_status ||
+        request.sms_to_requester_status ||
+        request.sms_to_hod_status ||
+        'pending',
+
       // Return status
       return_status: request.return_status || 'not_yet_returned',
 

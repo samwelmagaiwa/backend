@@ -390,7 +390,7 @@
                         </span>
                         <span
                           :class="getStatusBadgeClass(request.ict_approve || 'pending')"
-                          class="inline-flex items-center px-2 py-0.5 rounded text-sm font-semibold"
+                          class="inline-flex items-center px-2 py-0.5 rounded text-sm font-semibold self-start"
                         >
                           {{ getStatusText(request.ict_approve || 'pending') }}
                         </span>
@@ -415,7 +415,7 @@
                       </span>
                     </td>
                     <td class="px-2 py-2 text-center">
-                      <div class="relative inline-block z-[100000]">
+                      <div class="relative inline-block">
                         <!-- Compact Actions Dropdown Button -->
                         <button
                           @click="toggleActionsDropdown(request.id)"
@@ -494,12 +494,9 @@
 
                             <!-- Compact Reject Action -->
                             <button
+                              v-if="shouldShowRejectButton(request)"
                               @click="rejectRequest(request.id)"
                               class="relative w-full flex items-center px-2 py-1.5 text-sm bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 transition-all duration-200 group overflow-hidden border-b border-orange-400/30 rounded-sm"
-                              :disabled="request.ict_approve === 'rejected'"
-                              :class="{
-                                'opacity-50 cursor-not-allowed': request.ict_approve === 'rejected'
-                              }"
                             >
                               <!-- Shimmer Effect -->
                               <div
@@ -520,12 +517,9 @@
 
                             <!-- Compact Delete Action -->
                             <button
+                              v-if="shouldShowDeleteButton(request)"
                               @click="deleteRequest(request.id)"
                               class="relative w-full flex items-center px-2 py-1.5 text-sm bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 transition-all duration-200 group overflow-hidden rounded-sm"
-                              :disabled="!canDeleteRequest(request)"
-                              :class="{
-                                'opacity-50 cursor-not-allowed': !canDeleteRequest(request)
-                              }"
                             >
                               <!-- Shimmer Effect -->
                               <div
@@ -843,16 +837,33 @@
           return 'top-full mt-2' // Default to below if element not found
         }
 
-        // Get viewport and element positioning
-        const rect = rowElement.getBoundingClientRect()
-        const viewportHeight = window.innerHeight
-        const dropdownHeight = 120 // Approximate height of dropdown
-        const spaceBelow = viewportHeight - rect.bottom
-        const spaceAbove = rect.top
+        // The dropdown is clipped by the card that has overflow-hidden, not by the
+        // window viewport. Measure available space relative to that container so
+        // that rows near the bottom flip the menu above the button.
+        const dropdownHeight = 150 // Slightly larger than menu to account for padding
+        const rowRect = rowElement.getBoundingClientRect()
 
-        // If there's not enough space below and there's more space above, show above
-        if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
-          return 'bottom-full mb-2'
+        // Find the closest overflow container (the main requests card)
+        let container = rowElement.closest('.bg-white\\/10.rounded-lg.overflow-hidden')
+
+        if (container) {
+          const containerRect = container.getBoundingClientRect()
+          const spaceBelow = containerRect.bottom - rowRect.bottom
+          const spaceAbove = rowRect.top - containerRect.top
+
+          // If there is not enough space inside the card below the row, but
+          // there is more space above, render the dropdown above the button.
+          if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
+            return 'bottom-full mb-2'
+          }
+        } else {
+          // Fallback: use viewport measurements if container selector fails
+          const viewportHeight = window.innerHeight
+          const spaceBelow = viewportHeight - rowRect.bottom
+          const spaceAbove = rowRect.top
+          if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
+            return 'bottom-full mb-2'
+          }
         }
 
         // Default to showing below
@@ -874,6 +885,30 @@
           return
         }
         this.openDropdown = null
+      },
+
+      // Dynamic visibility helpers for actions
+      shouldShowRejectButton(request) {
+        const ictStatus = (request.ict_approve || '').toLowerCase()
+        const returnStatus = (request.return_status || '').toLowerCase()
+        const isReturned = ['returned', 'returned_but_compromised'].includes(returnStatus)
+
+        // Hide reject when already approved/rejected or when device has been returned
+        if (isReturned) return false
+        if (ictStatus === 'approved' || ictStatus === 'rejected') return false
+        return true
+      },
+      shouldShowDeleteButton(request) {
+        const ictStatus = (request.ict_approve || '').toLowerCase()
+        const returnStatus = (request.return_status || '').toLowerCase()
+        const isReturned = ['returned', 'returned_but_compromised'].includes(returnStatus)
+
+        // Hide delete when device is already returned or ICT has approved
+        if (isReturned) return false
+        if (ictStatus === 'approved') return false
+
+        // Also respect existing deletion rules
+        return this.canDeleteRequest(request)
       },
 
       // Action methods
@@ -1168,14 +1203,11 @@
   /* Dropdown positioning fixes */
   .relative.inline-block {
     position: relative !important;
-    z-index: 100000;
+    z-index: auto; /* do not create a new stacking context per row */
   }
 
-  /* Ensure dropdown appears above all content including footer */
-  .absolute.right-0.mt-2 {
-    z-index: 100001 !important;
-    position: absolute !important;
-  }
+  /* High z-index is applied directly on the dropdown element via Tailwind
+     (z-[99999]), so we don't need an extra per-row z-index rule here. */
 
   /* Fix dropdown positioning at bottom of page */
   .overflow-x-auto {
@@ -1183,16 +1215,20 @@
     z-index: 0;
   }
 
-  /* Ensure table rows maintain relative positioning for dropdowns */
+  /* Ensure table rows maintain relative positioning for dropdowns
+     NOTE: Do NOT give rows a non-auto z-index, otherwise each row becomes its
+     own stacking context and later rows will visually sit above earlier rows,
+     causing their Action buttons to overlap open dropdowns from rows above. */
   tbody tr {
     position: relative;
-    z-index: 1;
+    z-index: auto; /* allow dropdowns with high z-index to float above all rows */
   }
 
-  /* Table cells with dropdowns need higher z-index */
+  /* Table cells with dropdowns should not create their own stacking context,
+     otherwise later rows can sit visually above earlier dropdowns. */
   tbody tr td:last-child {
     position: relative;
-    z-index: 10;
+    z-index: auto;
   }
 
   /* Pagination should have lower z-index */

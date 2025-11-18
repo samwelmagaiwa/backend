@@ -93,7 +93,7 @@ const routes = [
     component: () => import('../components/UserDashboard.vue'),
     meta: {
       requiresAuth: true,
-      roles: [ROLES.STAFF, ROLES.ICT_OFFICER]
+      roles: [ROLES.STAFF, ROLES.ICT_OFFICER, ROLES.SECRETARY_ICT]
     }
   },
   {
@@ -280,7 +280,7 @@ const routes = [
     component: () => import('../components/views/forms/UserCombinedAccessForm.vue'),
     meta: {
       requiresAuth: true,
-      roles: [ROLES.STAFF, ROLES.ICT_OFFICER]
+      roles: [ROLES.STAFF, ROLES.ICT_OFFICER, ROLES.SECRETARY_ICT]
     }
   },
   {
@@ -289,7 +289,7 @@ const routes = [
     component: () => import('../components/views/booking/BookingService.vue'),
     meta: {
       requiresAuth: true,
-      roles: [ROLES.STAFF, ROLES.ICT_OFFICER]
+      roles: [ROLES.STAFF, ROLES.ICT_OFFICER, ROLES.SECRETARY_ICT]
     }
   },
   {
@@ -298,7 +298,7 @@ const routes = [
     component: () => import('../components/views/booking/EditBookingRequest.vue'),
     meta: {
       requiresAuth: true,
-      roles: [ROLES.STAFF, ROLES.ICT_OFFICER]
+      roles: [ROLES.STAFF, ROLES.ICT_OFFICER, ROLES.SECRETARY_ICT]
     }
   },
   {
@@ -307,7 +307,7 @@ const routes = [
     component: () => import('../components/views/requests/RequestStatusPage.vue'),
     meta: {
       requiresAuth: true,
-      roles: [ROLES.STAFF, ROLES.ICT_OFFICER]
+      roles: [ROLES.STAFF, ROLES.ICT_OFFICER, ROLES.SECRETARY_ICT]
     }
   },
   {
@@ -316,7 +316,7 @@ const routes = [
     component: () => import('../components/views/requests/InternalAccessDetails.vue'),
     meta: {
       requiresAuth: true,
-      roles: [ROLES.STAFF, ROLES.ICT_OFFICER]
+      roles: [ROLES.STAFF, ROLES.ICT_OFFICER, ROLES.SECRETARY_ICT]
     }
   },
 
@@ -327,7 +327,7 @@ const routes = [
     component: () => import('../components/views/ict-approval/RequestsList.vue'),
     meta: {
       requiresAuth: true,
-      roles: [ROLES.ICT_OFFICER]
+      roles: [ROLES.ICT_OFFICER, ROLES.SECRETARY_ICT]
     }
   },
   // ICT Officer review route for combined both-service form
@@ -337,7 +337,7 @@ const routes = [
     component: () => import('../components/views/forms/both-service-form.vue'),
     meta: {
       requiresAuth: true,
-      roles: [ROLES.ICT_OFFICER]
+      roles: [ROLES.ICT_OFFICER, ROLES.SECRETARY_ICT]
     }
   },
   {
@@ -346,7 +346,7 @@ const routes = [
     component: () => import('../components/views/ict-officer/AccessRequests.vue'),
     meta: {
       requiresAuth: true,
-      roles: [ROLES.ICT_OFFICER]
+      roles: [ROLES.ICT_OFFICER, ROLES.SECRETARY_ICT]
     }
   },
   {
@@ -355,7 +355,7 @@ const routes = [
     redirect: '/user-dashboard',
     meta: {
       requiresAuth: true,
-      roles: [ROLES.ICT_OFFICER]
+      roles: [ROLES.ICT_OFFICER, ROLES.SECRETARY_ICT]
     }
   },
   {
@@ -364,7 +364,7 @@ const routes = [
     component: () => import('../components/views/UserSecurityAccess.vue'),
     meta: {
       requiresAuth: true,
-      roles: [ROLES.ICT_OFFICER, ROLES.STAFF] // ICT Officers can grant access, Staff can view read-only
+      roles: [ROLES.ICT_OFFICER, ROLES.STAFF, ROLES.SECRETARY_ICT] // ICT Officers/Secretary ICT can grant access, Staff can view read-only
     }
   },
   {
@@ -373,7 +373,7 @@ const routes = [
     component: () => import('../components/views/ict-approval/RequestsListSimple.vue'),
     meta: {
       requiresAuth: true,
-      roles: [ROLES.ICT_OFFICER]
+      roles: [ROLES.ICT_OFFICER, ROLES.SECRETARY_ICT]
     }
   },
   {
@@ -382,7 +382,7 @@ const routes = [
     component: () => import('../components/views/ict-approval/RequestsList.vue'),
     meta: {
       requiresAuth: true,
-      roles: [ROLES.ICT_OFFICER]
+      roles: [ROLES.ICT_OFFICER, ROLES.SECRETARY_ICT]
     }
   },
   {
@@ -391,7 +391,7 @@ const routes = [
     component: () => import('../components/views/ict-approval/RequestDetails.vue'),
     meta: {
       requiresAuth: true,
-      roles: [ROLES.ICT_OFFICER]
+      roles: [ROLES.ICT_OFFICER, ROLES.SECRETARY_ICT]
     }
   },
   // Internal Access Requests Dashboard (for approvers) - Redirect to new combined requests

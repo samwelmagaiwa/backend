@@ -453,7 +453,12 @@
                     </div>
                     <div>
                       <p class="text-blue-200 text-lg">ICT Status:</p>
-                      <p class="font-semibold text-xl">{{ requestData?.ictStatus || 'Pending' }}</p>
+                      <p
+                        class="font-semibold text-xl"
+                        :class="getApprovalStatusTextClass()"
+                      >
+                        {{ requestData?.ictStatus || 'Pending' }}
+                      </p>
                     </div>
                     <!-- Return Status for Booking Service -->
                     <div v-if="isBookingService">

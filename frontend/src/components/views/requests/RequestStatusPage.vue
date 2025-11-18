@@ -495,7 +495,10 @@
                                 }}
                               </span>
                               <button
-                                v-if="['failed', 'pending'].includes(request.sms_to_hod_status)"
+                                v-if="
+                                  request.type === 'combined_access' &&
+                                  ['failed', 'pending'].includes(request.sms_to_hod_status)
+                                "
                                 @click.stop="retrySendSms(request)"
                                 :disabled="isRetrying(request.id)"
                                 class="ml-2 px-2 py-1 text-xs rounded border border-blue-300/50 text-blue-100 hover:bg-blue-700/40 disabled:opacity-50"
@@ -876,9 +879,9 @@
         }
       ]
 
-      // Guard this route - staff and ICT Officers can access
+      // Guard this route - staff and ICT Officers/ICT Secretary can access
       onMounted(() => {
-        requireRole([ROLES.STAFF, ROLES.ICT_OFFICER])
+        requireRole([ROLES.STAFF, ROLES.ICT_OFFICER, ROLES.SECRETARY_ICT])
 
         // Close dropdown when clicking outside
         document.addEventListener('click', closeActionsMenu)
@@ -1511,6 +1514,8 @@
       const getRetryAttempts = (id) => retryAttempts.value[id] || 0
       const isRetrying = (id) => !!retryTimers.value[id]
       const scheduleNextRetry = (id, request) => {
+        // Only schedule auto-retry for combined access (HOD-based) requests
+        if (!request || request.type !== 'combined_access') return
         retryAttempts.value[id] = (retryAttempts.value[id] || 0) + 1
         if (retryAttempts.value[id] > maxRetryAttempts) return
         const delay = retryDelays[Math.min(retryAttempts.value[id] - 1, retryDelays.length - 1)]
@@ -1521,7 +1526,7 @@
         }, delay)
       }
       const retrySendSms = async (request) => {
-        if (!request) return
+        if (!request || request.type !== 'combined_access') return
         const id = request.id
         if (!retryAttempts.value[id]) retryAttempts.value[id] = 0
         if (isRetrying(id)) return
@@ -1552,6 +1557,8 @@
       }
       const initAutoRetryForList = () => {
         ;(requests.value || []).forEach((r) => {
+          // Auto-retry applies only to combined access requests where HOD SMS is relevant
+          if (!r || r.type !== 'combined_access') return
           const st = r.sms_to_hod_status || 'pending'
           if (['failed', 'pending'].includes(st)) {
             if (!retryTimers.value[r.id] && (retryAttempts.value[r.id] || 0) === 0) {

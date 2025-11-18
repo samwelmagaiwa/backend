@@ -169,7 +169,7 @@ export function useAuth() {
    * @param {string} role - Role to get display name for
    * @returns {string} - Display name for the role
    */
-  const getRoleDisplayName = (role) => {
+    const getRoleDisplayName = (role) => {
     if (!role) return 'User'
 
     const roleNames = {
@@ -179,7 +179,8 @@ export function useAuth() {
       [ROLES.ICT_DIRECTOR]: 'ICT Director',
       [ROLES.HEAD_OF_IT]: 'Head of IT',
       [ROLES.STAFF]: 'D. IN MEDICINE',
-      [ROLES.ICT_OFFICER]: 'ICT Officer'
+      [ROLES.ICT_OFFICER]: 'ICT Officer',
+      [ROLES.SECRETARY_ICT]: 'Secretary ICT'
     }
     return roleNames[role] || role
   }

@@ -776,6 +776,26 @@ class ICTApprovalController extends Controller
         $user = $booking->user;
         $department = $user->department ?? $booking->departmentInfo;
 
+        // Normalize return status for legacy records where accessories flags
+        // incorrectly downgraded the booking to "returned_but_compromised" even
+        // when the physical condition and functionality were good and there was
+        // no damage recorded.
+        $normalizedReturnStatus = $booking->return_status ?? 'not_yet_returned';
+        if ($normalizedReturnStatus === 'returned_but_compromised' && !empty($booking->device_condition_receiving)) {
+            $receiving = json_decode($booking->device_condition_receiving, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($receiving)) {
+                $visibleDamage = $receiving['visible_damage'] ?? false;
+                $functionality = $receiving['functionality'] ?? 'fully_functional';
+                $physical = $receiving['physical_condition'] ?? 'excellent';
+
+                if ($visibleDamage === false && $functionality === 'fully_functional' && $physical !== 'poor') {
+                    // Treat as a clean return; keep the original value in the
+                    // database, but surface it to the UI as "returned".
+                    $normalizedReturnStatus = 'returned';
+                }
+            }
+        }
+
         // Determine digital signature status using the same synthetic document_id
         // convention used during booking submission (see BookingServiceRequest).
         $hasDigitalSignature = false;
@@ -831,9 +851,14 @@ class ICTApprovalController extends Controller
             'ict_notes' => $booking->ict_notes,
             'ict_approved_by' => $booking->ict_approved_by,
             'ict_approved_by_name' => $booking->ictApprovedBy?->name,
+
+            // SMS tracking (normalized for UI) - only requester-level for bookings
+            'sms_to_requester_status' => $booking->sms_to_requester_status ?? null,
+            'sms_sent_to_requester_at' => $booking->sms_sent_to_requester_at,
+            'sms_status' => $booking->sms_to_requester_status ?? 'pending',
             
             // Return status
-            'return_status' => $booking->return_status ?? 'not_yet_returned',
+            'return_status' => $normalizedReturnStatus,
             'device_returned_at' => $booking->device_returned_at?->format('Y-m-d H:i:s'),
             
             // Device condition assessment
@@ -1258,9 +1283,11 @@ class ICTApprovalController extends Controller
             if (
                 ($validatedData['visible_damage'] ?? false) === true ||
                 ($validatedData['functionality'] ?? 'fully_functional') !== 'fully_functional' ||
-                ($validatedData['physical_condition'] ?? 'excellent') === 'poor' ||
-                ($validatedData['accessories_complete'] ?? true) === false
+                ($validatedData['physical_condition'] ?? 'excellent') === 'poor'
             ) {
+                // Mark as compromised only when there is actual damage, reduced
+                // functionality, or poor physical condition. Accessories being
+                // unchecked/omitted should not on its own downgrade the status.
                 $returnStatus = 'returned_but_compromised';
             }
 

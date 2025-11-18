@@ -1445,7 +1445,7 @@
       isLoading.value = false
       downloadingPdf.value = false
 
-      requireRole([ROLES.ICT_OFFICER])
+      requireRole([ROLES.ICT_OFFICER, ROLES.SECRETARY_ICT])
       await fetchAccessRequests()
       console.log('IctAccessRequests: Component initialized successfully')
       refreshNotificationBadge()

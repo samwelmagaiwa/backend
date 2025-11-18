@@ -473,89 +473,51 @@
               <div
                 class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-2 md:gap-3"
               >
-                <!-- Signature Upload -->
+                <!-- Digital Signature Action -->
                 <div class="md:col-span-2 xl:col-span-3 2xl:col-span-5">
                   <label class="block text-sm font-bold text-blue-100 mb-1">
                     Signature <span class="text-red-400">*</span>
                   </label>
 
-                  <div class="relative">
-                    <div
-                      v-if="!signaturePreview"
-                      class="w-full px-2 py-1 border-2 border-dashed border-blue-400/60 rounded-lg focus-within:border-blue-500 bg-blue-500/20 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/30 min-h-[28px] flex items-center justify-center hover:bg-blue-500/30"
+                  <div
+                    class="w-full px-2 py-1 border-2 border-blue-400/60 rounded-lg bg-blue-500/20 backdrop-blur-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:bg-blue-500/30 min-h-[32px] flex flex-col sm:flex-row sm:items-center gap-2"
+                  >
+                    <button
+                      type="button"
+                      @click="signDeclaration"
+                      :disabled="isSigning || hasUserSigned"
+                      class="px-2.5 py-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs sm:text-sm font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-2 shadow hover:shadow-lg transform hover:scale-105 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none border border-blue-400/60 focus:ring-1 focus:ring-blue-300"
+                      :aria-label="
+                        hasUserSigned
+                          ? 'Declaration already signed'
+                          : 'Digitally sign this declaration'
+                      "
                     >
-                      <div class="text-center">
-                        <div class="flex items-center gap-2">
-                          <i class="fas fa-signature text-blue-300 text-xs"></i>
-                          <p class="text-blue-100 text-xs">No signature</p>
-                          <button
-                            type="button"
-                            @click="loadSignature"
-                            @keydown.enter="loadSignature"
-                            @keydown.space.prevent="loadSignature"
-                            class="px-1.5 py-0.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-semibold rounded hover:from-blue-600 hover:to-blue-700 transition-all duration-300 flex items-center gap-1 shadow hover:shadow-lg transform hover:scale-105 border border-blue-400/50 focus:ring-1 focus:ring-blue-300"
-                            aria-label="Upload digital signature file"
-                          >
-                            <i class="fas fa-download text-xs" aria-hidden="true"></i>
-                            Load
-                          </button>
-                        </div>
-                      </div>
+                      <OrbitingDots v-if="isSigning" size="xs" />
+                      <i
+                        v-else
+                        :class="hasUserSigned ? 'fas fa-check' : 'fas fa-pen-fancy'"
+                        class="text-xs"
+                      ></i>
+                      <span>
+                        {{ hasUserSigned ? 'Signed' : 'Click to Sign Digitally' }}
+                      </span>
+                    </button>
+
+                    <div class="flex-1 text-xs leading-snug">
+                      <p v-if="hasUserSigned" class="text-green-300 font-medium">
+                        Signed on {{ formattedSignedAt }}
+                      </p>
+                      <p v-else class="text-blue-100/80">
+                        You must digitally sign this declaration before submitting.
+                      </p>
+                      <p
+                        v-if="signatureToken"
+                        class="text-[10px] text-blue-200/80 mt-0.5 break-all"
+                      >
+                        Token: {{ signatureTokenPreview }}
+                      </p>
                     </div>
-
-                    <div
-                      v-else
-                      class="w-full px-2 py-1 border-2 border-blue-400/60 rounded-lg bg-blue-500/20 backdrop-blur-sm transition-all duration-300 shadow-sm hover:shadow-md hover:bg-blue-500/30 min-h-[28px] flex items-center justify-center relative"
-                    >
-                      <div v-if="isImage(signaturePreview)" class="text-center">
-                        <img
-                          :src="signaturePreview"
-                          alt="Digital Signature"
-                          class="max-h-[20px] max-w-full object-contain mx-auto"
-                        />
-                        <p class="text-xs text-blue-100 truncate mt-0.5">
-                          {{ signatureFileName }}
-                        </p>
-                      </div>
-                      <div v-else class="text-center">
-                        <div
-                          class="w-5 h-5 bg-red-500/20 rounded-lg flex items-center justify-center mx-auto mb-1"
-                        >
-                          <i class="fas fa-file-pdf text-red-400 text-xs"></i>
-                        </div>
-                        <p class="text-xs text-blue-100 truncate">
-                          {{ signatureFileName }}
-                        </p>
-                      </div>
-
-                      <div class="absolute top-0.5 right-0.5 flex gap-0.5">
-                        <button
-                          type="button"
-                          @click="loadSignature"
-                          class="w-4 h-4 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-blue-600 transition-colors duration-200"
-                          title="Change signature"
-                        >
-                          <i class="fas fa-edit text-xs"></i>
-                        </button>
-                        <button
-                          type="button"
-                          @click="clearSignature"
-                          class="w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors duration-200"
-                          title="Remove signature"
-                        >
-                          <i class="fas fa-times text-xs"></i>
-                        </button>
-                      </div>
-                    </div>
-
-                    <input
-                      ref="signatureInput"
-                      type="file"
-                      accept="image/png,image/jpeg,image/jpg,application/pdf"
-                      @change="onSignatureChange"
-                      class="sr-only"
-                      aria-label="Upload digital signature file"
-                    />
                   </div>
                 </div>
 
@@ -657,6 +619,7 @@
   import userProfileService from '../../../services/userProfileService'
   import SimpleLoadingBanner from '../../common/SimpleLoadingBanner.vue'
   import OrbitingDots from '../../common/OrbitingDots.vue'
+  import signatureService from '@/services/signatureService'
 
   // Constants for better maintainability
   const FORM_CONSTANTS = {
@@ -728,6 +691,12 @@
     data() {
       return {
         isSubmitting: false,
+        // Digital signature state
+        isSigning: false,
+        hasUserSigned: false,
+        signatureToken: '',
+        signedAt: null,
+        // Legacy preview fields (kept for backward compatibility, not used in UI)
         signaturePreview: '',
         signatureFileName: '',
         // Auto-population states
@@ -784,7 +753,7 @@
         const hasJobTitle = !!this.formData.jobTitle
         const hasDate = !!this.formData.date
         const hasAgreement = !!this.formData.agreement
-        const hasSignature = !!(this.formData.signature || this.signaturePreview)
+        const hasSignature = !!this.hasUserSigned
 
         return {
           isValid:
@@ -802,9 +771,24 @@
             !hasJobTitle && 'Job Title',
             !hasDate && 'Date',
             !hasAgreement && 'Agreement',
-            !hasSignature && 'Signature'
+            !hasSignature && 'Digital Signature'
           ].filter(Boolean)
         }
+      },
+
+      formattedSignedAt() {
+        if (!this.signedAt) return ''
+        try {
+          return new Date(this.signedAt).toLocaleString()
+        } catch (e) {
+          return this.signedAt
+        }
+      },
+
+      signatureTokenPreview() {
+        if (!this.signatureToken) return ''
+        if (this.signatureToken.length <= 16) return this.signatureToken
+        return `${this.signatureToken.slice(0, 10)}…${this.signatureToken.slice(-4)}`
       }
     },
 
@@ -900,69 +884,31 @@
         }
       },
 
-      loadSignature() {
-        this.$refs.signatureInput.click()
-      },
+      async signDeclaration() {
+        try {
+          if (this.isSigning) return
+          this.isSigning = true
 
-      onSignatureChange(e) {
-        const file = e.target.files[0]
-        this.formData.signature = file || null
+          // Use a synthetic document id for declaration onboarding; backend maps this
+          const res = await signatureService.sign('declaration')
 
-        if (!file) {
-          this.signaturePreview = ''
-          this.signatureFileName = ''
-          return
-        }
+          if (res && (res.success || res.data)) {
+            this.hasUserSigned = true
+            this.signedAt = res?.data?.signed_at || res?.signed_at || new Date().toISOString()
+            this.signatureToken = res?.data?.signature_hash || res?.signature_hash || ''
 
-        // Enhanced security validation
-        const securityChecks = this.validateFileSecurity(file)
-        if (!securityChecks.isValid) {
-          this.showNotification(securityChecks.error, 'error')
-          this.clearSignature()
-          return
-        }
-
-        // Sanitize filename to prevent XSS
-        this.signatureFileName = file.name.replace(/[<>"'&]/g, '')
-
-        if (file.type.startsWith('image/')) {
-          const reader = new FileReader()
-
-          // Add to set for cleanup tracking
-          this.fileReaders.add(reader)
-
-          reader.onload = () => {
-            this.signaturePreview = reader.result
-            // Remove from tracking set once complete
-            this.fileReaders.delete(reader)
+            this.showNotification(
+              `Declaration signed on ${new Date(this.signedAt).toLocaleString()}`,
+              'success'
+            )
+          } else {
+            this.showNotification(res?.message || 'Failed to sign declaration', 'error')
           }
-
-          reader.onerror = () => {
-            console.error('File reader error')
-            this.fileReaders.delete(reader)
-            this.showNotification('Error reading signature file', 'error')
-          }
-
-          reader.onabort = () => {
-            this.fileReaders.delete(reader)
-          }
-
-          reader.readAsDataURL(file)
-        } else {
-          this.signaturePreview = 'pdf'
-        }
-      },
-
-      isImage(preview) {
-        return typeof preview === 'string' && preview !== 'pdf'
-      },
-
-      clearSignature() {
-        this.formData.signature = null
-        this.signaturePreview = ''
-        this.signatureFileName = ''
-        if (this.$refs.signatureInput) {
-          this.$refs.signatureInput.value = ''
+        } catch (error) {
+          console.error('Error signing declaration:', error)
+          this.showNotification(error.message || 'Failed to sign declaration', 'error')
+        } finally {
+          this.isSigning = false
         }
       },
 
@@ -1164,10 +1110,14 @@
             department: this.formData.department,
             jobTitle: this.formData.jobTitle,
             date: this.formData.date,
-            agreement: this.formData.agreement
+            agreement: this.formData.agreement,
+            // Optional metadata about the digital signature token
+            signatureMethod: 'digital_token',
+            signatureHash: this.signatureToken || null,
+            signedAt: this.signedAt || null
           }
 
-          // Create FormData for file upload if signature exists
+          // Create FormData for compatibility with existing backend (even without files)
           const formData = new FormData()
 
           // Add declaration data with proper type conversion
@@ -1177,19 +1127,16 @@
             if (typeof value === 'boolean') {
               value = value ? '1' : '0' // Use 1/0 instead of true/false for better backend handling
             }
-            formData.append(key, value)
+            if (value !== null && value !== undefined) {
+              formData.append(key, value)
+            }
           })
 
           // Log the form data for debugging
           console.log('Form data being sent:', {
             ...declarationData,
-            hasSignature: !!this.formData.signature
+            hasDigitalSignature: this.hasUserSigned
           })
-
-          // Add signature file if present
-          if (this.formData.signature) {
-            formData.append('signature', this.formData.signature)
-          }
 
           // Import API client and submit
           const { authAPI } = await import('../../../utils/apiClient')
@@ -1236,6 +1183,9 @@
         }
         this.signaturePreview = ''
         this.signatureFileName = ''
+        this.hasUserSigned = false
+        this.signatureToken = ''
+        this.signedAt = null
         this.showNotification('Form has been reset', 'info')
       },
 
@@ -1351,8 +1301,8 @@
           errors.push('You must agree to the terms and conditions')
         }
 
-        // Signature validation
-        if (!this.formData.signature && !this.signaturePreview) {
+        // Signature validation - require digital token based signature
+        if (!this.hasUserSigned) {
           errors.push('Digital signature is required')
         }
 

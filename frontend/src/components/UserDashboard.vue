@@ -1044,10 +1044,10 @@
         }
       }
 
-      // Guard this route - only staff can access
+      // Guard this route - only staff-like roles can access
       onMounted(async () => {
         console.log('UserDashboard mounted successfully')
-        requireRole([ROLES.STAFF, ROLES.ICT_OFFICER])
+        requireRole([ROLES.STAFF, ROLES.ICT_OFFICER, ROLES.SECRETARY_ICT])
 
         // Fetch dashboard statistics and check for pending requests in parallel
         await Promise.allSettled([

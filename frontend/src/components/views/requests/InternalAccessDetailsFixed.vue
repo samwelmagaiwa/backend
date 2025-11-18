@@ -204,7 +204,12 @@
                     </div>
                     <div>
                       <p class="text-blue-200 text-sm">ICT Status:</p>
-                      <p class="font-semibold">{{ requestData?.ictStatus || 'Pending' }}</p>
+                      <p
+                        class="font-semibold"
+                        :class="getApprovalStatusTextClass()"
+                      >
+                        {{ requestData?.ictStatus || 'Pending' }}
+                      </p>
                     </div>
                   </div>
                 </div>

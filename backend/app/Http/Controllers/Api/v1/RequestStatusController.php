@@ -384,6 +384,22 @@ class RequestStatusController extends Controller
             $isDeviceOutOfStock = $deviceAvailabilityInfo && !$deviceAvailabilityInfo['is_available'] && $deviceAvailabilityInfo['status'] === 'out_of_stock';
         }
 
+        // Normalize return status for legacy records where accessories flags
+        // alone downgraded the booking to "returned_but_compromised".
+        $normalizedReturnStatus = $booking->return_status ?? 'not_yet_returned';
+        if ($normalizedReturnStatus === 'returned_but_compromised' && !empty($booking->device_condition_receiving)) {
+            $receiving = json_decode($booking->device_condition_receiving, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($receiving)) {
+                $visibleDamage = $receiving['visible_damage'] ?? false;
+                $functionality = $receiving['functionality'] ?? 'fully_functional';
+                $physical = $receiving['physical_condition'] ?? 'excellent';
+
+                if ($visibleDamage === false && $functionality === 'fully_functional' && $physical !== 'poor') {
+                    $normalizedReturnStatus = 'returned';
+                }
+            }
+        }
+
         // Determine appropriate status and current step
         $status = $this->getBookingStatusForUser($booking, $isDeviceOutOfStock);
         $currentStep = $this->getBookingCurrentStep($status, $isDeviceOutOfStock);
@@ -400,12 +416,10 @@ class RequestStatusController extends Controller
             'staff_name' => $booking->borrower_name,
             'department' => $departmentName,
             'device_availability' => $deviceAvailabilityInfo,
-            'return_status' => $booking->return_status ?? 'not_yet_returned',
-            // expose both raw statuses
-            'sms_to_hod_status' => $booking->sms_to_hod_status ?? 'pending',
+            'return_status' => $normalizedReturnStatus,
+            // SMS status: for bookings we only track requester-level notifications
             'sms_to_requester_status' => $booking->sms_to_requester_status ?? 'pending',
-            // normalized sms status for UI: prefer requester status when available
-            'sms_status' => ($booking->sms_to_requester_status ?? null) ?: ($booking->sms_to_hod_status ?? 'pending'),
+            'sms_status' => $booking->sms_to_requester_status ?? 'pending',
         ];
     }
 

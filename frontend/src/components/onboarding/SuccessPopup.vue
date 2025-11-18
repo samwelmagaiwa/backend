@@ -1,20 +1,21 @@
 <template>
   <div
-    class="fixed inset-0 bg-gradient-to-br from-blue-900/80 via-blue-800/80 to-blue-700/80 backdrop-blur-md flex items-center justify-center z-50 p-4"
+    class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm"
     style="backdrop-filter: blur(12px)"
   >
     <div
-      class="bg-gradient-to-br from-blue-700 via-blue-600 to-blue-800 rounded-none w-full max-w-xl min-h-[520px] transform transition-all duration-500 scale-100 animate-slideUp border border-blue-300/30 shadow-2xl"
+      class="bg-white rounded-2xl w-full max-w-xl min-h-[520px] transform transition-all duration-500 scale-100 animate-slideUp border border-blue-100 shadow-2xl overflow-hidden"
       style="
         box-shadow:
-          0 25px 50px -12px rgba(29, 78, 216, 0.6),
-          0 15px 35px -12px rgba(59, 130, 246, 0.4),
-          0 0 0 1px rgba(255, 255, 255, 0.1),
-          inset 0 2px 0 rgba(255, 255, 255, 0.2);
+          0 25px 50px -12px rgba(30, 64, 175, 0.45),
+          0 15px 35px -12px rgba(37, 99, 235, 0.35),
+          0 0 0 1px rgba(255, 255, 255, 0.8);
       "
     >
       <!-- Header -->
-      <div class="text-center p-8 relative overflow-hidden">
+      <div
+        class="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 p-8 text-center shadow-lg"
+      >
         <!-- Trophy Icon -->
         <div
           class="w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-md flex items-center justify-center mx-auto mb-4 shadow-lg animate-pulse"
@@ -27,7 +28,7 @@
       </div>
 
       <!-- Body -->
-      <div class="px-8 pb-8">
+      <div class="px-8 pb-8 bg-blue-50/40">
         <!-- User Name -->
         <div class="text-center mb-6">
           <h3 class="text-2xl font-bold text-white mb-3 drop-shadow-sm">

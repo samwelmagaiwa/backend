@@ -477,9 +477,9 @@
         return minDate.value
       })
 
-      // Guard this route - staff and ICT Officers can access
+      // Guard this route - staff and ICT Officers/ICT Secretary can access
       onMounted(() => {
-        requireRole([ROLES.STAFF, ROLES.ICT_OFFICER])
+        requireRole([ROLES.STAFF, ROLES.ICT_OFFICER, ROLES.SECRETARY_ICT])
         checkUserBookings() // Debug: Check what bookings user can access
         loadBookingRequest()
         loadFormOptions()

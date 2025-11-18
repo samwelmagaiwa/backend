@@ -722,7 +722,8 @@
 
           [ROLES.ICT_DIRECTOR]: 'ICT Director',
           [ROLES.STAFF]: 'Staff Member',
-          [ROLES.ICT_OFFICER]: 'ICT Officer'
+          [ROLES.ICT_OFFICER]: 'ICT Officer',
+          [ROLES.SECRETARY_ICT]: 'Secretary ICT'
         }
         return roleNames[role] || role
       }

@@ -79,9 +79,9 @@
       // Local state
       // Sidebar state now managed by Pinia - no local state needed
 
-      // Guard this route - only ICT Officers can access
+      // Guard this route - ICT Officers and ICT Secretary can access
       onMounted(() => {
-        requireRole([ROLES.ICT_OFFICER])
+        requireRole([ROLES.ICT_OFFICER, ROLES.SECRETARY_ICT])
       })
 
       return {

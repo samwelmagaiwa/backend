@@ -23,9 +23,7 @@ return [
     */
     
     // Use test endpoint for development, production endpoint for live
-    'api_url' => env('SMS_TEST_MODE', true) 
-        ? 'https://messaging-service.co.tz/api/sms/v1/test/text/single'
-        : 'https://messaging-service.co.tz/api/sms/v1/text/single',
+    'api_url' => env('SMS_TEST_MODE', true)  ? 'https://messaging-service.co.tz/api/sms/v1/test/text/single' : 'https://messaging-service.co.tz/api/sms/v1/text/single',
     'api_key' => env('SMS_API_KEY', 'beneth'),
     'secret_key' => env('SMS_SECRET_KEY', 'Beneth@1701'),
     'sender_id' => env('SMS_SENDER_ID', 'KODA TECH'),

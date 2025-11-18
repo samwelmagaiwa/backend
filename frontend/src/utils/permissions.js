@@ -13,7 +13,8 @@ export const ROLES = {
   ICT_DIRECTOR: 'ict_director',
   HEAD_OF_IT: 'head_of_it',
   STAFF: 'staff',
-  ICT_OFFICER: 'ict_officer'
+  ICT_OFFICER: 'ict_officer',
+  SECRETARY_ICT: 'secretary_ict'
 }
 
 // Define route permissions for each role
@@ -142,6 +143,34 @@ export const ROLE_PERMISSIONS = {
     ],
     dashboards: ['ict-dashboard'],
     forms: ['jeeva-access', 'wellsoft-access', 'internet-access', 'both-service-form'],
+    userManagement: [],
+    deviceManagement: [
+      'ict-approval/requests',
+      'ict-approval/request/:id',
+      'user-security-access/:id'
+    ],
+    requestsManagement: ['ict-dashboard/access-requests', 'user-security-access/:id']
+  },
+
+  // ICT Secretary role: shares dashboard/routes with ICT Officer but has permissions configured server-side
+  [ROLES.SECRETARY_ICT]: {
+    routes: [
+      '/ict-dashboard',
+      '/ict-dashboard/access-requests',
+      '/ict-dashboard/access-service',
+      '/user-security-access/:id',
+      '/ict-approval/requests',
+      '/ict-approval/requests-simple',
+      '/ict-approval/requests-original',
+      '/ict-approval/request/:id',
+      '/user-security-access/:id',
+      '/booking-service',
+      '/request-status',
+      '/request-details',
+      '/onboarding'
+    ],
+    dashboards: ['ict-dashboard'],
+    forms: [],
     userManagement: [],
     deviceManagement: [
       'ict-approval/requests',
