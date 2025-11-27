@@ -1122,7 +1122,7 @@
 </template>
 
 <script>
-  import { debounce } from 'lodash'
+  import debounce from 'lodash/debounce'
   import AppHeader from '@/components/AppHeader.vue'
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import AppFooter from '@/components/footer.vue'

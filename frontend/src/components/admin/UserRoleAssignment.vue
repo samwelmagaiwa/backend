@@ -2082,7 +2082,7 @@
 </template>
 <script>
   import { ref, computed, onMounted } from 'vue'
-  import { debounce } from 'lodash'
+  import debounce from 'lodash/debounce'
   import AppHeader from '@/components/AppHeader.vue'
   import ModernSidebar from '@/components/ModernSidebar.vue'
   import UnifiedLoadingBanner from '@/components/common/UnifiedLoadingBanner.vue'
