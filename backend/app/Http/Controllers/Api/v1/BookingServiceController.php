@@ -163,6 +163,29 @@ class BookingServiceController extends Controller
                 'user_id' => $user->id
             ]);
         }
+
+            // Normalize multi-device selection (if provided) into device_inventory_ids and primary device_inventory_id
+            $rawDeviceIds = $request->input('device_inventory_ids', []);
+            if (is_string($rawDeviceIds)) {
+                $rawDeviceIds = array_filter(explode(',', $rawDeviceIds));
+            }
+            if (is_array($rawDeviceIds)) {
+                $normalizedIds = [];
+                foreach ($rawDeviceIds as $id) {
+                    if ($id === null || $id === '' || $id === 'others') {
+                        continue;
+                    }
+                    $normalizedIds[] = (int) $id;
+                }
+                $normalizedIds = array_values(array_unique(array_filter($normalizedIds)));
+
+                if (!empty($normalizedIds)) {
+                    $validatedData['device_inventory_ids'] = $normalizedIds;
+                    if (empty($validatedData['device_inventory_id'])) {
+                        $validatedData['device_inventory_id'] = $normalizedIds[0];
+                    }
+                }
+            }
             
             // Combine return_date and return_time into return_date_time
             if (isset($validatedData['return_date']) && isset($validatedData['return_time'])) {
@@ -173,10 +196,12 @@ class BookingServiceController extends Controller
             
             Log::info('Validated data:', $validatedData);
 
-            // Handle device inventory if device_inventory_id is provided
+            // Handle device inventory if device_inventory_id / device_inventory_ids are provided
             $deviceAvailabilityInfo = null;
-            if (isset($validatedData['device_inventory_id']) && $validatedData['device_inventory_id']) {
-                $deviceInventory = DeviceInventory::find($validatedData['device_inventory_id']);
+            $primaryInventoryId = $validatedData['device_inventory_id'] ?? null;
+
+            if ($primaryInventoryId) {
+                $deviceInventory = DeviceInventory::find($primaryInventoryId);
                 
                 if (!$deviceInventory) {
                     return response()->json([
@@ -185,11 +210,11 @@ class BookingServiceController extends Controller
                     ], 400);
                 }
                 
-                // Auto-determine device_type from inventory device
+                // Auto-determine device_type from primary inventory device
                 $autoDetectedDeviceType = $this->mapInventoryDeviceToType($deviceInventory);
                 if ($autoDetectedDeviceType) {
                     $validatedData['device_type'] = $autoDetectedDeviceType;
-                    Log::info('Auto-detected device_type from inventory', [
+                    Log::info('Auto-detected device_type from primary inventory', [
                         'device_inventory_id' => $deviceInventory->id,
                         'device_name' => $deviceInventory->device_name,
                         'device_code' => $deviceInventory->device_code,
@@ -198,8 +223,8 @@ class BookingServiceController extends Controller
                     ]);
                 }
                 
-                // Check device availability using new enhanced logic
-                $availabilityCheck = BookingService::checkDeviceAvailability($validatedData['device_inventory_id']);
+                // Check device availability using existing logic
+                $availabilityCheck = BookingService::checkDeviceAvailability($primaryInventoryId);
                 
                 if (!$availabilityCheck['can_request']) {
                     return response()->json([
@@ -208,22 +233,59 @@ class BookingServiceController extends Controller
                     ], 400);
                 }
                 
-                // Don't reserve device on booking creation - only when ICT approves
-                // Just log the availability check result
                 if ($availabilityCheck['available']) {
-                    Log::info('Device available for booking request', [
+                    Log::info('Primary device available for booking request', [
                         'device_id' => $deviceInventory->id,
                         'device_name' => $deviceInventory->device_name,
                         'available_quantity' => $deviceInventory->available_quantity
                     ]);
                 } else {
-                    // Device is out of stock but request is allowed
-                    $deviceAvailabilityInfo = $availabilityCheck;
-                    Log::info('Booking request submitted for out-of-stock device', [
+                    Log::info('Booking request submitted for out-of-stock primary device', [
                         'device_id' => $deviceInventory->id,
                         'device_name' => $deviceInventory->device_name,
                         'availability_message' => $availabilityCheck['message']
                     ]);
+                }
+
+                $deviceAvailabilityInfo = $availabilityCheck;
+
+                // If there are additional inventory devices, check their availability too
+                if (!empty($validatedData['device_inventory_ids']) && is_array($validatedData['device_inventory_ids'])) {
+                    $extraIds = array_filter($validatedData['device_inventory_ids'], function ($id) use ($primaryInventoryId) {
+                        return (int) $id !== (int) $primaryInventoryId;
+                    });
+
+                    if (!empty($extraIds)) {
+                        $perDevice = [
+                            (int) $primaryInventoryId => $availabilityCheck,
+                        ];
+
+                        foreach ($extraIds as $extraId) {
+                            $check = BookingService::checkDeviceAvailability((int) $extraId);
+                            $perDevice[(int) $extraId] = $check;
+
+                            if (!$check['can_request']) {
+                                return response()->json([
+                                    'success' => false,
+                                    'message' => $check['message']
+                                ], 400);
+                            }
+                        }
+
+                        $allAvailable = collect($perDevice)->every(function ($info) {
+                            return $info['available'];
+                        });
+
+                        $deviceAvailabilityInfo = [
+                            'multiple' => true,
+                            'available' => $allAvailable,
+                            'can_request' => true,
+                            'message' => $allAvailable
+                                ? 'All selected devices are currently available for booking.'
+                                : 'One or more selected devices are currently unavailable. Your request has been queued based on return schedules.',
+                            'per_device' => $perDevice,
+                        ];
+                    }
                 }
             }
 
@@ -329,19 +391,52 @@ class BookingServiceController extends Controller
                     $phoneNumbers = $allRecipients->pluck('phone')->filter()->unique()->values()->all();
 
                     if (!empty($phoneNumbers)) {
-                        $deviceName = $booking->getDeviceDisplayNameAttribute();
+                        // Build human-readable list of all selected devices
+                        $deviceNames = [];
+
+                        // Prefer explicit inventory list if present
+                        if (is_array($booking->device_inventory_ids) && !empty($booking->device_inventory_ids)) {
+                            $inventoryDevices = DeviceInventory::whereIn('id', $booking->device_inventory_ids)
+                                ->pluck('device_name', 'id');
+
+                            foreach ($booking->device_inventory_ids as $id) {
+                                if (isset($inventoryDevices[$id])) {
+                                    $deviceNames[] = $inventoryDevices[$id];
+                                }
+                            }
+                        }
+
+                        // Fallback to primary inventory device if list is empty
+                        if (empty($deviceNames) && $booking->deviceInventory && $booking->deviceInventory->device_name) {
+                            $deviceNames[] = $booking->deviceInventory->device_name;
+                        }
+
+                        // Handle custom "others" device name
+                        if (in_array($booking->device_type, ['others', 'other']) && $booking->custom_device) {
+                            $deviceNames[] = $booking->custom_device;
+                        }
+
+                        // Absolute fallback to existing accessor (keeps project flow intact)
+                        if (empty($deviceNames)) {
+                            $deviceNames[] = $booking->getDeviceDisplayNameAttribute();
+                        }
+
+                        $deviceLabel = implode(' & ', array_unique(array_filter($deviceNames)));
                         $departmentName = $booking->departmentInfo->name ?? 'N/A';
                         $ref = 'BOOK-' . str_pad($booking->id, 6, '0', STR_PAD_LEFT);
 
-                        $message = "PENDING DEVICE BOOKING: {$booking->borrower_name} ({$departmentName}) requested {$deviceName}. Ref: {$ref}. Please review in the system. - EARBMS";
+                        $message = "PENDING DEVICE BOOKING: {$booking->borrower_name} ({$departmentName}) requested {$deviceLabel}. Ref: {$ref}. Please review in the system. - EARBMS";
 
                         $bulkResult = $smsModule->sendBulkSms($phoneNumbers, $message, 'device_booking_pending');
                         $anySent = (($bulkResult['sent'] ?? 0) > 0);
 
-                        // Update SMS status used by /request-status UI
+                        // Update normalized SMS status used by /request-status UI
+                        // For booking requests we only track a single requester-level SMS flag
+                        // (field is reused here to indicate that at least one notification SMS
+                        // about this booking has been sent successfully).
                         $booking->update([
-                            'sms_sent_to_hod_at' => $anySent ? now() : null,
-                            'sms_to_hod_status' => $anySent ? 'sent' : 'failed',
+                            'sms_sent_to_requester_at' => $anySent ? now() : null,
+                            'sms_to_requester_status' => $anySent ? 'sent' : 'failed',
                         ]);
 
                         Log::info('ICT Officers/Secretary ICT SMS dispatch result for booking', [
@@ -660,9 +755,11 @@ class BookingServiceController extends Controller
                 $validatedData['return_date_time'] = $returnDate . ' ' . $returnTime;
             }
 
-            // Handle device inventory if device_inventory_id is provided
-            if (isset($validatedData['device_inventory_id']) && $validatedData['device_inventory_id']) {
-                $deviceInventory = DeviceInventory::find($validatedData['device_inventory_id']);
+            // Handle device inventory if device_inventory_id / device_inventory_ids are provided
+            $primaryId = $validatedData['device_inventory_id'] ?? null;
+
+            if ($primaryId) {
+                $deviceInventory = DeviceInventory::find($primaryId);
                 
                 if (!$deviceInventory) {
                     return response()->json([
@@ -677,14 +774,30 @@ class BookingServiceController extends Controller
                     $validatedData['device_type'] = $autoDetectedDeviceType;
                 }
 
-                // Check device availability
-                $availabilityCheck = BookingService::checkDeviceAvailability($validatedData['device_inventory_id']);
+                // Check device availability for primary device
+                $availabilityCheck = BookingService::checkDeviceAvailability($primaryId);
                 
                 if (!$availabilityCheck['can_request']) {
                     return response()->json([
                         'success' => false,
                         'message' => $availabilityCheck['message']
                     ], 400);
+                }
+
+                // If extra devices supplied, ensure they can be requested too
+                if (!empty($validatedData['device_inventory_ids']) && is_array($validatedData['device_inventory_ids'])) {
+                    foreach ($validatedData['device_inventory_ids'] as $extraId) {
+                        if ((int) $extraId === (int) $primaryId) {
+                            continue;
+                        }
+                        $check = BookingService::checkDeviceAvailability((int) $extraId);
+                        if (!$check['can_request']) {
+                            return response()->json([
+                                'success' => false,
+                                'message' => $check['message']
+                            ], 400);
+                        }
+                    }
                 }
             }
 

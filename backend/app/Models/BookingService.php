@@ -26,7 +26,8 @@ class BookingService extends Model
         'borrower_name',
         'device_type',
         'custom_device',
-        'device_inventory_id', // Link to device inventory
+        'device_inventory_id', // Link to primary device inventory (for backward compatibility)
+        'device_inventory_ids', // Optional list of all selected inventory devices
         'department',
         'phone_number',
         'return_date',
@@ -61,6 +62,13 @@ class BookingService extends Model
     ];
 
     /**
+     * Accessors that should be appended to array / JSON form.
+     */
+    protected $appends = [
+        'all_device_names',
+    ];
+
+    /**
      * The attributes that should be cast.
      */
     protected $casts = [
@@ -76,6 +84,7 @@ class BookingService extends Model
         'device_issued_at' => 'datetime',
         'device_condition_receiving' => 'array',
         'device_condition_issuing' => 'array',
+        'device_inventory_ids' => 'array',
     ];
 
     /**
@@ -227,7 +236,7 @@ class BookingService extends Model
     }
 
     /**
-     * Get the device display name.
+     * Get the device display name (primary label).
      */
     public function getDeviceDisplayNameAttribute(): string
     {
@@ -235,27 +244,69 @@ class BookingService extends Model
         if (in_array($this->device_type, ['others', 'other']) && $this->custom_device) {
             return $this->custom_device;
         }
-        
-        // Get current device types
+
+        // Map current enum / legacy types to readable names
         $deviceTypes = self::getDeviceTypes();
-        
-        // Check current device types first
+        $baseName = null;
+
         if (isset($deviceTypes[$this->device_type])) {
-            return $deviceTypes[$this->device_type];
+            $baseName = $deviceTypes[$this->device_type];
+        } else {
+            $legacyDeviceTypes = [
+                'tv_remote'  => 'TV Remote',
+                'hdmi_cable' => 'HDMI Cable',
+                'monitor'    => 'Monitor',
+                'cpu'        => 'CPU',
+                'keyboard'   => 'Keyboard',
+                'pc'         => 'PC',
+                'other'      => 'Other Device', // Legacy support
+            ];
+            $baseName = $legacyDeviceTypes[$this->device_type] ?? null;
         }
-        
-        // Backward compatibility for old device types
-        $legacyDeviceTypes = [
-            'tv_remote' => 'TV Remote',
-            'hdmi_cable' => 'HDMI Cable',
-            'monitor' => 'Monitor',
-            'cpu' => 'CPU',
-            'keyboard' => 'Keyboard',
-            'pc' => 'PC',
-            'other' => 'Other Device' // Legacy support
-        ];
-        
-        return $legacyDeviceTypes[$this->device_type] ?? ucwords(str_replace('_', ' ', $this->device_type));
+
+        if ($baseName !== null) {
+            return $baseName;
+        }
+
+        // Final fallback: humanized enum value
+        return ucwords(str_replace('_', ' ', (string) $this->device_type));
+    }
+
+    /**
+     * Get all device names (including additional inventory devices and custom).
+     */
+    public function getAllDeviceNamesAttribute(): array
+    {
+        $names = [];
+
+        // From explicit inventory list
+        if (is_array($this->device_inventory_ids) && !empty($this->device_inventory_ids)) {
+            $inventoryDevices = DeviceInventory::whereIn('id', $this->device_inventory_ids)
+                ->pluck('device_name', 'id');
+
+            foreach ($this->device_inventory_ids as $id) {
+                if (isset($inventoryDevices[$id])) {
+                    $names[] = $inventoryDevices[$id];
+                }
+            }
+        }
+
+        // Fallback to primary inventory device
+        if (empty($names) && $this->deviceInventory && $this->deviceInventory->device_name) {
+            $names[] = $this->deviceInventory->device_name;
+        }
+
+        // Include custom device when using "others"
+        if (in_array($this->device_type, ['others', 'other']) && $this->custom_device) {
+            $names[] = $this->custom_device;
+        }
+
+        // Final fallback: use single display name
+        if (empty($names)) {
+            $names[] = $this->device_display_name;
+        }
+
+        return array_values(array_unique(array_filter($names)));
     }
 
     /**

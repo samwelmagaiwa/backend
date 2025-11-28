@@ -115,12 +115,12 @@
             v-else-if="!hasPendingRequest"
             class="booking-glass-card rounded-b-3xl overflow-hidden animate-slide-up"
           >
-            <form @submit.prevent="submitBooking" class="p-4 space-y-4">
+            <form @submit.prevent="submitBooking" class="p-3 space-y-3">
               <!-- Booking Information Section -->
               <div
-                class="booking-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-4 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
+                class="booking-card bg-gradient-to-r from-blue-600/25 to-blue-700/25 border-2 border-blue-400/40 p-3 rounded-2xl backdrop-blur-sm hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group"
               >
-                <div class="flex items-center space-x-3 mb-3">
+                <div class="flex items-center space-x-3 mb-2">
                   <div
                     class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
                   >
@@ -132,9 +132,9 @@
                   </h3>
                 </div>
 
-                <div class="space-y-3">
+                <div class="space-y-1.5">
                   <!-- Row 1: Name of Borrower & Booking Date -->
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-1.5">
                     <!-- Name of Borrower -->
                     <div class="group">
                       <label class="block text-xl font-bold text-blue-100 mb-1 flex items-center">
@@ -168,10 +168,6 @@
                         <i class="fas fa-exclamation-circle mr-1"></i>
                         {{ errors.borrowerName }}
                       </div>
-                      <p class="text-base text-blue-200/60 mt-1 italic flex items-center">
-                        <i class="fas fa-info-circle mr-1"></i>
-                        Automatically filled from your account information
-                      </p>
                     </div>
 
                     <!-- Booking Date -->
@@ -204,57 +200,44 @@
                   </div>
 
                   <!-- Row 2: Device Type & Department -->
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <!-- Type of Device -->
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-1.5">
+                    <!-- Type of Device (checkbox list only) -->
                     <div class="group">
                       <label class="block text-xl font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-laptop mr-2 text-blue-300"></i>
                         Type of Device Borrowed
                         <span class="text-red-400 ml-1">*</span>
                       </label>
-                      <div class="relative">
-                        <select
-                          v-model="formData.deviceInventoryId"
-                          @change="handleDeviceTypeChange"
-                          :disabled="isLoadingDevices"
-                          class="w-full px-3 py-2 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white text-lg bg-blue-600/80 focus:bg-blue-600/90 transition-all backdrop-blur-sm group-hover:border-blue-400/50 appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                          required
+
+                      <!-- Checkbox list for available devices -->
+                      <div
+                        class="mt-1 max-h-40 overflow-y-auto bg-blue-900/60 border border-blue-400/60 rounded-xl p-2 space-y-1"
+                      >
+                        <label
+                          v-for="device in availableDevices"
+                          :key="`chk-` + device.id"
+                          class="flex items-center space-x-2 text-sm text-blue-100"
                         >
-                          <option value="" class="bg-blue-800 text-blue-300">
-                            {{ isLoadingDevices ? 'Loading devices...' : 'Select Device Type' }}
-                          </option>
-                          <option
-                            v-for="device in availableDevices"
-                            :key="device.id"
-                            :value="device.id"
-                            :class="
-                              device.available_quantity > 0
-                                ? 'bg-blue-800 text-white'
-                                : 'bg-yellow-700 text-yellow-200'
-                            "
-                          >
-                            {{ device.device_name }} -
+                          <input
+                            type="checkbox"
+                            :value="String(device.id)"
+                            v-model="formData.deviceInventoryIds"
+                            @change="handleDeviceTypeChange"
+                            :disabled="isLoadingDevices"
+                            class="h-4 w-4 text-blue-500 rounded border-blue-300 bg-blue-900/60 focus:ring-blue-400"
+                          />
+                          <span class="flex-1">
+                            {{ device.device_name }}
                             <span v-if="device.available_quantity > 0" class="text-green-300">
-                              {{ device.available_quantity }} available
+                              - {{ device.available_quantity }} available
                             </span>
                             <span v-else class="text-orange-300">
-                              Out of Stock (Can still request)
+                              - Out of Stock (Can still request)
                             </span>
-                          </option>
-                          <option value="others" class="bg-blue-800 text-white">
-                            Others (Not in inventory)
-                          </option>
-                        </select>
-                        <div
-                          class="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-300/50 pointer-events-none"
-                        >
-                          <i
-                            :class="
-                              isLoadingDevices ? 'fas fa-spinner fa-spin' : 'fas fa-chevron-down'
-                            "
-                          ></i>
-                        </div>
+                          </span>
+                        </label>
                       </div>
+
                       <div
                         v-if="errors.deviceType"
                         class="text-red-400 text-sm mt-1 flex items-center"
@@ -307,10 +290,6 @@
                         <i class="fas fa-exclamation-circle mr-1"></i>
                         {{ errors.department }}
                       </div>
-                      <p class="text-sm text-blue-200/60 mt-1 italic flex items-center">
-                        <i class="fas fa-info-circle mr-1"></i>
-                        Automatically filled from your account information
-                      </p>
                     </div>
                   </div>
 
@@ -344,7 +323,7 @@
 
                   <!-- Custom Device Input (if Others selected) -->
                   <div
-                    v-if="formData.deviceInventoryId === 'others'"
+                    v-if="showCustomDeviceField"
                     class="group animate-slide-down"
                   >
                     <label class="block text-lg font-bold text-blue-100 mb-1 flex items-center">
@@ -374,7 +353,7 @@
                   </div>
 
                   <!-- Row 3: Phone Number & Collection Date -->
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-1.5">
                     <!-- Phone Number -->
                     <div class="group">
                       <label class="block text-xl font-bold text-blue-100 mb-1 flex items-center">
@@ -407,10 +386,6 @@
                         <i class="fas fa-exclamation-circle mr-1"></i>
                         {{ errors.phoneNumber }}
                       </div>
-                      <p class="text-base text-blue-200/60 mt-1 italic flex items-center">
-                        <i class="fas fa-info-circle mr-1"></i>
-                        Automatically filled from your account information
-                      </p>
                     </div>
 
                     <!-- Date of Collection -->
@@ -444,7 +419,7 @@
                   </div>
 
                   <!-- Return Time -->
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-1.5">
                     <div class="group">
                       <label class="block text-lg font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-clock mr-2 text-blue-300"></i>
@@ -477,26 +452,13 @@
                         <i class="fas fa-exclamation-circle mr-1"></i>
                         {{ errors.returnTime }}
                       </div>
-                      <p class="text-base text-blue-200/60 mt-1 italic flex items-center">
-                        <i class="fas fa-info-circle mr-1"></i>
-                        Select the time when you plan to return the device
-                      </p>
                     </div>
                   </div>
 
                   <!-- Combined Row: Digital Signature & Reason for Borrowing -->
-                  <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                  <div class="grid grid-cols-1 lg:grid-cols-2 gap-1.5">
                     <!-- Digital Signature Section (Left) -->
                     <div class="group">
-                      <div class="flex items-center space-x-2 mb-1">
-                        <div
-                          class="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 border border-blue-300/50"
-                        >
-                          <i class="fas fa-signature text-white text-sm"></i>
-                        </div>
-                        <h3 class="text-lg font-bold text-white">Digital Signature</h3>
-                      </div>
-
                       <label class="block text-xl font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-signature mr-2 text-blue-300"></i>
                         Signature <span class="text-red-400 ml-1">*</span>
@@ -529,7 +491,7 @@
                               type="button"
                               @click="signDocument"
                               :disabled="hasUserSigned || isSubmitting"
-                              class="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-medium rounded-lg hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/30"
+                              class="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-green-500 to-green-600 text-white text-sm font-medium rounded-lg hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105 border border-blue-400/30"
                             >
                               <i
                                 :class="
@@ -557,10 +519,6 @@
                           {{ errors.digital_signature }}
                         </div>
 
-                        <p class="text-sm text-blue-300/80 italic mt-1">
-                          Click “Sign Document” to digitally sign before submitting. No file upload
-                          is required.
-                        </p>
                       </div>
                     </div>
 
@@ -1007,7 +965,8 @@
         formData: {
           bookingDate: '',
           borrowerName: '',
-          deviceInventoryId: '', // Changed from deviceType to deviceInventoryId
+          deviceInventoryId: '', // Primary device (for backward compatibility)
+          deviceInventoryIds: [], // NEW: allow selecting multiple devices
           deviceType: '', // Keep for backward compatibility
           customDevice: '',
           reason: '',
@@ -1021,7 +980,9 @@
           conditionReturnedIssues: '',
           status: ''
         },
-        selectedDeviceInfo: null, // Store selected device info for display
+        selectedDeviceInfo: null, // Store primary device info for display
+        selectedDevicesCount: 0, // NEW: number of selected inventory devices
+        showCustomDeviceField: false, // NEW: whether to show custom device input
         errors: {},
         isSubmitting: false,
         showSuccessModal: false,
@@ -1573,51 +1534,55 @@
         }
       },
       handleDeviceTypeChange() {
-        console.log('Device type changed:', this.formData.deviceInventoryId)
+        // Normalize selection
+        const rawSelection = this.formData.deviceInventoryIds || []
+        const selection = Array.isArray(rawSelection)
+          ? rawSelection
+          : [rawSelection].filter(Boolean)
 
-        if (this.formData.deviceInventoryId !== 'others') {
+        const inventoryIds = selection.filter((v) => v !== 'others')
+        const hasOthers = selection.includes('others')
+
+        this.selectedDevicesCount = inventoryIds.length
+        this.showCustomDeviceField = hasOthers
+
+        // Determine primary inventory device (for backward compatibility)
+        const primaryId =
+          inventoryIds.length > 0 ? inventoryIds[0] : hasOthers ? 'others' : ''
+        this.formData.deviceInventoryId = primaryId
+
+        if (primaryId && primaryId !== 'others') {
           this.formData.customDevice = ''
 
-          // If a device from inventory is selected
-          if (this.formData.deviceInventoryId) {
-            const selectedDevice = this.availableDevices.find(
-              (d) => d.id == this.formData.deviceInventoryId
-            )
-            if (selectedDevice) {
-              // Store device info for later display
-              this.selectedDeviceInfo = {
-                id: selectedDevice.id,
-                name: selectedDevice.device_name,
-                code: selectedDevice.device_code
-              }
-
-              // Use device_code first, then fallback to device_name mapping
-              this.formData.deviceType = this.mapDeviceToType(selectedDevice)
-              console.log('Selected inventory device:', {
-                name: selectedDevice.device_name,
-                code: selectedDevice.device_code,
-                mappedType: this.formData.deviceType
-              })
+          const selectedDevice = this.availableDevices.find(
+            (d) => String(d.id) === String(primaryId)
+          )
+          if (selectedDevice) {
+            this.selectedDeviceInfo = {
+              id: selectedDevice.id,
+              name: selectedDevice.device_name,
+              code: selectedDevice.device_code
             }
+
+            // Use device_code first, then fallback to device_name mapping
+            this.formData.deviceType = this.mapDeviceToType(selectedDevice)
           } else {
-            // No device selected
             this.formData.deviceType = ''
             this.selectedDeviceInfo = null
           }
-        } else {
-          // Others selected
+        } else if (hasOthers) {
           this.formData.deviceType = 'others'
-          console.log('Others selected')
+          this.selectedDeviceInfo = null
+        } else {
+          this.formData.deviceType = ''
+          this.selectedDeviceInfo = null
         }
 
-        console.log('Final device type:', this.formData.deviceType)
-
-        // Run real-time validation
+        // Validate + availability for primary device
         this.validateDeviceType()
 
-        // Check device availability if inventory device is selected
-        if (this.formData.deviceInventoryId && this.formData.deviceInventoryId !== 'others') {
-          this.checkDeviceAvailability(this.formData.deviceInventoryId)
+        if (primaryId && primaryId !== 'others') {
+          this.checkDeviceAvailability(primaryId)
         } else {
           this.deviceAvailabilityInfo = null
           this.showAvailabilityWarning = false
@@ -1625,9 +1590,20 @@
       },
 
       validateDeviceType() {
-        if (!this.formData.deviceInventoryId) {
+        const selection = this.formData.deviceInventoryIds || []
+        const inventoryIds = Array.isArray(selection)
+          ? selection.filter((v) => v !== 'others')
+          : this.formData.deviceInventoryId
+          ? [this.formData.deviceInventoryId]
+          : []
+        const hasOthers = Array.isArray(selection) && selection.includes('others')
+        const primaryId =
+          this.formData.deviceInventoryId ||
+          (inventoryIds.length > 0 ? inventoryIds[0] : hasOthers ? 'others' : '')
+
+        if (!primaryId && !hasOthers) {
           this.errors.deviceType = 'Device type is required'
-        } else if (this.formData.deviceInventoryId && !this.formData.deviceType) {
+        } else if (primaryId && primaryId !== 'others' && !this.formData.deviceType) {
           this.errors.deviceType = 'Device type validation error'
         } else {
           // Validate that device_type is a valid ENUM value
@@ -1811,12 +1787,24 @@
           this.errors.borrowerName = 'Borrower name is required'
         }
 
-        if (!this.formData.deviceInventoryId) {
+        const selection = this.formData.deviceInventoryIds || []
+        const inventoryIds = Array.isArray(selection)
+          ? selection.filter((v) => v !== 'others')
+          : this.formData.deviceInventoryId
+          ? [this.formData.deviceInventoryId]
+          : []
+        const hasOthers = Array.isArray(selection) && selection.includes('others')
+
+        if (inventoryIds.length === 0 && !hasOthers) {
           this.errors.deviceType = 'Device type is required'
         }
 
-        // Ensure device_type is set when deviceInventoryId is selected
-        if (this.formData.deviceInventoryId && !this.formData.deviceType) {
+        // Ensure device_type is set when a primary inventory device is selected
+        if (
+          this.formData.deviceInventoryId &&
+          this.formData.deviceInventoryId !== 'others' &&
+          !this.formData.deviceType
+        ) {
           this.errors.deviceType = 'Device type validation error'
         }
 
@@ -1939,12 +1927,28 @@
             reason: this.formData.reason
           }
 
-          // Add device inventory ID if selected from inventory
+          // Normalize device selections
+          const selection = this.formData.deviceInventoryIds || []
+          const inventoryIds = Array.isArray(selection)
+            ? selection.filter((v) => v !== 'others')
+            : this.formData.deviceInventoryId && this.formData.deviceInventoryId !== 'others'
+            ? [this.formData.deviceInventoryId]
+            : []
+          const hasOthers = Array.isArray(selection) && selection.includes('others')
+
+          // Primary inventory device for backward compatibility
           if (this.formData.deviceInventoryId && this.formData.deviceInventoryId !== 'others') {
             payload.device_inventory_id = this.formData.deviceInventoryId
+          } else if (inventoryIds.length > 0) {
+            payload.device_inventory_id = inventoryIds[0]
           }
 
-          if (this.formData.deviceInventoryId === 'others' && this.formData.customDevice) {
+          // Full list of selected inventory devices (new field)
+          if (inventoryIds.length > 0) {
+            payload.device_inventory_ids = inventoryIds
+          }
+
+          if (hasOthers && this.formData.customDevice) {
             payload.custom_device = this.formData.customDevice
           }
 
@@ -2019,6 +2023,7 @@
           bookingDate: '',
           borrowerName: '',
           deviceInventoryId: '',
+          deviceInventoryIds: [],
           deviceType: '',
           customDevice: '',
           reason: '',

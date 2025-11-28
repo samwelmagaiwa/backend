@@ -512,24 +512,6 @@
                   </div>
                 </div>
 
-                <!-- Additional Notes -->
-                <div class="bg-indigo-800/20 rounded-lg p-2 mb-2">
-                  <label class="flex items-center gap-2 mb-1">
-                    <div class="w-4 h-4 bg-indigo-600 rounded-sm flex items-center justify-center">
-                      <i class="fas fa-sticky-note text-white text-sm"></i>
-                    </div>
-                    <span class="text-lg font-bold text-white">Additional Notes</span>
-                    <span class="text-lg text-indigo-300">(Optional)</span>
-                  </label>
-                  <textarea
-                    v-model="currentAssessmentNotes"
-                    rows="1"
-                    :disabled="isReadOnly"
-                    class="w-full px-1 py-1 bg-indigo-900/30 border border-indigo-600/40 rounded text-white text-sm placeholder-indigo-300 resize-none focus:outline-none focus:border-indigo-500 disabled:opacity-60"
-                    placeholder="Special instructions, warranty info..."
-                  ></textarea>
-                </div>
-
                 <!-- Compact Button Layout -->
                 <div
                   v-if="!isReadOnly"
@@ -743,7 +725,12 @@
         request_id: request.request_id || `REQ-${String(request.id).padStart(6, '0')}`,
         borrower: request.borrower_name || 'Unknown',
         device:
-          request.device_name || getDeviceDisplayName(request.device_type, request.custom_device),
+          request.device_name ||
+            getDeviceDisplayName(
+              request.device_type,
+              request.custom_device,
+              request.device_inventory_ids || request._raw?.device_inventory_ids
+            ),
         return_time: request.return_time || request.returnTime
       }"
       @confirm="confirmApproveRequest"
@@ -755,7 +742,12 @@
       :requestData="{
         request_id: request.request_id || `REQ-${String(request.id).padStart(6, '0')}`,
         device:
-          request.device_name || getDeviceDisplayName(request.device_type, request.custom_device)
+          request.device_name ||
+            getDeviceDisplayName(
+              request.device_type,
+              request.custom_device,
+              request.device_inventory_ids || request._raw?.device_inventory_ids
+            )
       }"
       @approve="
         () => {
@@ -784,7 +776,12 @@
       :requestData="{
         request_id: request.request_id || `REQ-${String(request.id).padStart(6, '0')}`,
         device:
-          request.device_name || getDeviceDisplayName(request.device_type, request.custom_device)
+          request.device_name ||
+            getDeviceDisplayName(
+              request.device_type,
+              request.custom_device,
+              request.device_inventory_ids || request._raw?.device_inventory_ids
+            )
       }"
       @confirm="confirmReceive"
       @cancel="() => (showReceiveModal = false)"
@@ -1519,8 +1516,12 @@
         this.$router.push(this.listRouteBase)
       },
 
-      getDeviceDisplayName(deviceType, customDevice) {
-        return deviceBorrowingService.getDeviceDisplayName(deviceType, customDevice)
+      getDeviceDisplayName(deviceType, customDevice, deviceInventoryIds = []) {
+        return deviceBorrowingService.getDeviceDisplayName(
+          deviceType,
+          customDevice,
+          deviceInventoryIds
+        )
       },
 
       formatDate(dateString) {

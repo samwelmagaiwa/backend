@@ -361,10 +361,18 @@ class RequestStatusController extends Controller
      */
     private function transformBookingRequest(BookingService $booking): array
     {
-        // Get device display name
+        // Get device display name (primary label)
         $deviceDisplayName = $booking->device_type === 'others' && $booking->custom_device 
             ? $booking->custom_device 
             : (BookingService::getDeviceTypes()[$booking->device_type] ?? $booking->device_type);
+
+        // Build services list from all selected devices (supports multi-device bookings)
+        // Prefer the model's all_device_names accessor which aggregates primary and
+        // additional inventory devices, then fall back to single display name.
+        $services = $booking->all_device_names ?? [];
+        if (empty($services)) {
+            $services = [$deviceDisplayName];
+        }
 
         // Get department name
         $departmentName = 'Unknown Department';
@@ -408,7 +416,7 @@ class RequestStatusController extends Controller
             'id' => 'BOOK-' . str_pad($booking->id, 6, '0', STR_PAD_LEFT),
             'original_id' => $booking->id,
             'type' => 'booking_service',
-            'services' => [$deviceDisplayName],
+            'services' => $services,
             'status' => $status,
             'current_step' => $currentStep,
             'created_at' => $booking->created_at->toISOString(),

@@ -283,7 +283,7 @@
           </div>
 
           <!-- Requests Table -->
-          <div class="bg-white/10 rounded-lg overflow-hidden">
+          <div class="bg-white/10 rounded-lg">
             <div class="relative z-0">
               <table class="w-full table-fixed">
                 <thead class="bg-blue-800/50">
@@ -355,7 +355,8 @@
                           request.device_name ||
                           getDeviceDisplayName(
                             request.device_type || request.deviceType,
-                            request.custom_device || request.customDevice
+                            request.custom_device || request.customDevice,
+                            request.device_inventory_ids || request._raw?.device_inventory_ids
                           )
                         }}
                       </div>
@@ -655,7 +656,8 @@
                 request.device_name ||
                 this.getDeviceDisplayName(
                   request.device_type || request.deviceType,
-                  request.custom_device || request.customDevice
+                  request.custom_device || request.customDevice,
+                  request.device_inventory_ids || request._raw?.device_inventory_ids
                 )
               )
                 .toLowerCase()
@@ -784,8 +786,12 @@
         this.$router.push(`${this.detailRouteBase}/request/${requestId}`)
       },
 
-      getDeviceDisplayName(deviceType, customDevice) {
-        return deviceBorrowingService.getDeviceDisplayName(deviceType, customDevice)
+      getDeviceDisplayName(deviceType, customDevice, deviceInventoryIds = []) {
+        return deviceBorrowingService.getDeviceDisplayName(
+          deviceType,
+          customDevice,
+          deviceInventoryIds
+        )
       },
 
       formatDate(dateString) {

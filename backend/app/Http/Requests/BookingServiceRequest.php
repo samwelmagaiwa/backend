@@ -43,8 +43,16 @@ class BookingServiceRequest extends FormRequest
                 'string'
                 // Remove the Rule::in validation to allow inventory device codes
             ],
-            'device_inventory_id' => [
+'device_inventory_id' => [
                 'nullable',
+                'integer',
+                'exists:device_inventory,id'
+            ],
+            'device_inventory_ids' => [
+                'nullable',
+                'array',
+            ],
+            'device_inventory_ids.*' => [
                 'integer',
                 'exists:device_inventory,id'
             ],
@@ -132,6 +140,9 @@ class BookingServiceRequest extends FormRequest
             'reason.min' => 'Reason must be at least 10 characters.',
             'reason.max' => 'Reason cannot exceed 1000 characters.',
 
+            'device_inventory_ids.array' => 'Selected devices must be a valid list.',
+            'device_inventory_ids.*.exists' => 'One or more selected devices were not found in inventory.',
+
             // Digital signature messages
             'digital_signature.required' => 'Digital signature is required. Please click “Sign Document” before submitting.'
         ];
@@ -195,6 +206,35 @@ class BookingServiceRequest extends FormRequest
             $this->merge([
                 'department' => (int) $this->department
             ]);
+        }
+
+        // Normalize multi-device selection to a clean array (keep original single id for BC)
+        if ($this->has('device_inventory_ids')) {
+            $ids = $this->input('device_inventory_ids');
+            if (is_string($ids)) {
+                $ids = array_filter(explode(',', $ids));
+            }
+            if (is_array($ids)) {
+                $normalized = [];
+                foreach ($ids as $id) {
+                    if ($id === null || $id === '' || $id === 'others') {
+                        continue;
+                    }
+                    $normalized[] = (int) $id;
+                }
+                $normalized = array_values(array_unique(array_filter($normalized)));
+
+                $this->merge([
+                    'device_inventory_ids' => $normalized,
+                ]);
+
+                // Preserve first element as primary device_inventory_id when not explicitly set
+                if (!$this->has('device_inventory_id') && !empty($normalized)) {
+                    $this->merge([
+                        'device_inventory_id' => $normalized[0],
+                    ]);
+                }
+            }
         }
         
         \Log::info('prepareForValidation - After processing:', $this->all());
@@ -273,14 +313,20 @@ class BookingServiceRequest extends FormRequest
                 }
             }
 
-            // Validate custom device when device_type is 'others' AND no device_inventory_id is provided
-            if ($this->device_type === 'others' && !$this->device_inventory_id && empty(trim($this->custom_device ?? ''))) {
+            // Validate custom device when device_type is 'others' AND no inventory devices are provided
+            $hasInventoryList = is_array($this->device_inventory_ids) && !empty($this->device_inventory_ids);
+            if (
+                $this->device_type === 'others' &&
+                !$this->device_inventory_id &&
+                !$hasInventoryList &&
+                empty(trim($this->custom_device ?? ''))
+            ) {
                 $validator->errors()->add('custom_device', 'Please specify the device when "Others" is selected.');
                 \Log::info('Validation error: Custom device required for others');
             }
             
-            // If device_inventory_id is provided, we don't need custom_device even if device_type is 'others'
-            if ($this->device_inventory_id && $this->device_type === 'others') {
+            // If device inventory (single or list) is provided, we don't need custom_device even if device_type is 'others'
+            if (($this->device_inventory_id || $hasInventoryList) && $this->device_type === 'others') {
                 \Log::info('Device inventory provided with others type - this is acceptable', [
                     'device_inventory_id' => $this->device_inventory_id,
                     'device_type' => $this->device_type
@@ -310,7 +356,7 @@ class BookingServiceRequest extends FormRequest
             return;
         }
         
-        // If device_inventory_id is provided, validate the inventory device
+        // If device_inventory_id is provided, validate the primary inventory device
         if ($this->device_inventory_id) {
             $deviceInventory = \App\Models\DeviceInventory::find($this->device_inventory_id);
             if (!$deviceInventory) {
@@ -335,6 +381,30 @@ class BookingServiceRequest extends FormRequest
                 'device_inventory_id' => $this->device_inventory_id,
                 'device_name' => $deviceInventory->device_name,
                 'mapped_device_type' => $this->device_type
+            ]);
+        }
+
+        // If additional inventory devices are provided, ensure they exist and are active
+        if (is_array($this->device_inventory_ids) && !empty($this->device_inventory_ids)) {
+            foreach ($this->device_inventory_ids as $extraId) {
+                if ($this->device_inventory_id && (int) $extraId === (int) $this->device_inventory_id) {
+                    continue; // already validated as primary
+                }
+                $extraDevice = \App\Models\DeviceInventory::find($extraId);
+                if (!$extraDevice) {
+                    $validator->errors()->add('device_type', 'One of the selected devices was not found in inventory.');
+                    \Log::info('Validation error: Extra device inventory not found', ['device_inventory_id' => $extraId]);
+                    return;
+                }
+                if (!$extraDevice->is_active) {
+                    $validator->errors()->add('device_type', 'One of the selected devices is not active.');
+                    \Log::info('Validation error: Extra device inventory not active', ['device_inventory_id' => $extraId]);
+                    return;
+                }
+            }
+
+            \Log::info('All extra device inventory items validated', [
+                'device_inventory_ids' => $this->device_inventory_ids
             ]);
         }
         

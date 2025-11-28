@@ -822,11 +822,14 @@ class ICTApprovalController extends Controller
             'department_id' => $department->id ?? null,
             'department' => $department->name ?? 'Unknown Department',
             
-            // Device details
+            // Device details (support multi-device bookings)
             'device_type' => $booking->device_type,
             'custom_device' => $booking->custom_device,
             'device_name' => $this->getDeviceDisplayName($booking->device_type, $booking->custom_device, $booking->deviceInventory),
             'device_inventory_id' => $booking->device_inventory_id,
+            // All selected inventory devices and their human-readable names
+            'device_inventory_ids' => $booking->device_inventory_ids ?? [],
+            'all_device_names' => $booking->all_device_names ?? [],
             'device_available' => $booking->deviceInventory ? $booking->deviceInventory->is_active : false,
             
             // Booking details

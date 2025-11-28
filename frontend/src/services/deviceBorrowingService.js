@@ -533,8 +533,15 @@ export const deviceBorrowingService = {
       // Device details
       device_type: request.device_type,
       custom_device: request.custom_device,
-      device_name: this.getDeviceDisplayName(request.device_type, request.custom_device),
+      device_name:
+        Array.isArray(request.all_device_names) && request.all_device_names.length
+          ? request.all_device_names.join(' & ')
+          : this.getDeviceDisplayName(request.device_type, request.custom_device, request.device_inventory_ids),
       device_inventory_id: request.device_inventory_id,
+      device_inventory_ids: request.device_inventory_ids || [],
+      all_device_names: Array.isArray(request.all_device_names)
+        ? request.all_device_names
+        : [],
       device_available:
         typeof request.device_available !== 'undefined' ? request.device_available : null,
 
@@ -599,23 +606,32 @@ export const deviceBorrowingService = {
    * @param {string} customDevice - Custom device name
    * @returns {string} - Display name
    */
-  getDeviceDisplayName(deviceType, customDevice) {
+  getDeviceDisplayName(deviceType, customDevice, deviceInventoryIds = []) {
+    // Base name from type/custom
+    let baseName
     if (deviceType === 'others' && customDevice) {
-      return customDevice
+      baseName = customDevice
+    } else {
+      const deviceTypes = {
+        projector: 'Projector',
+        tv_remote: 'TV Remote',
+        hdmi_cable: 'HDMI Cable',
+        monitor: 'Monitor',
+        cpu: 'CPU',
+        keyboard: 'Keyboard',
+        pc: 'PC',
+        others: 'Others'
+      }
+      baseName = deviceTypes[deviceType] || deviceType || 'Unknown Device'
     }
 
-    const deviceTypes = {
-      projector: 'Projector',
-      tv_remote: 'TV Remote',
-      hdmi_cable: 'HDMI Cable',
-      monitor: 'Monitor',
-      cpu: 'CPU',
-      keyboard: 'Keyboard',
-      pc: 'PC',
-      others: 'Others'
+    const ids = Array.isArray(deviceInventoryIds) ? deviceInventoryIds.filter(Boolean) : []
+    if (ids.length > 1) {
+      const extra = ids.length - 1
+      return `${baseName} + ${extra} more device${extra > 1 ? 's' : ''}`
     }
 
-    return deviceTypes[deviceType] || deviceType || 'Unknown Device'
+    return baseName
   },
 
   /**
