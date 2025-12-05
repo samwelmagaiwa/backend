@@ -23,6 +23,7 @@ use App\Http\Controllers\Api\v1\AccessRightsApprovalController;
 use App\Http\Controllers\Api\v1\ImplementationWorkflowController;
 use App\Http\Controllers\Api\v1\HeadOfItController;
 use App\Http\Controllers\Api\v1\HeadOfItDictRecommendationsController;
+use App\Http\Controllers\Api\v1\HodUserController;
 use App\Http\Controllers\Api\v1\IctOfficerController;
 use App\Http\Controllers\Api\v1\RoleController;
 use App\Http\Controllers\Api\HealthController;
@@ -554,7 +555,10 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
 // HOD Combined Access Request routes (HOD only) - LEGACY
-Route::prefix('hod')->middleware('role:head_of_department,divisional_director,ict_director,admin')->group(function () {
+Route::prefix('hod')->middleware('role:head_of_department,divisional_director,ict_director,head_of_it,admin')->group(function () {
+    Route::post('users', [HodUserController::class, 'store'])
+        ->middleware('role:head_of_department,head_of_it,admin')
+        ->name('hod.users.store');
     Route::get('combined-access-requests', [HodCombinedAccessController::class, 'index'])
         ->name('hod.combined-access-requests.index');
     Route::get('combined-access-requests/statistics', [HodCombinedAccessController::class, 'statistics'])
