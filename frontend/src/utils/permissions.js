@@ -59,6 +59,7 @@ export const ROLE_PERMISSIONS = {
   [ROLES.HEAD_OF_DEPARTMENT]: {
     routes: [
       '/hod-dashboard',
+      '/hod-dashboard/create-user',
       '/hod-dashboard/request-list',
       '/hod-dashboard/combined-requests',
       '/hod-dashboard/divisional-recommendations',

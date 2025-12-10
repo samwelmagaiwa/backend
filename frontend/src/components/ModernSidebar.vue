@@ -1775,7 +1775,8 @@
         getRoleDisplayName,
         handleLogout,
         getNotificationCount,
-        fetchNotificationCounts
+        fetchNotificationCounts,
+        piniaAuthStore
       }
     },
     directives: {

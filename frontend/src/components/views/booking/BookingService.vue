@@ -322,10 +322,7 @@
                   </div>
 
                   <!-- Custom Device Input (if Others selected) -->
-                  <div
-                    v-if="showCustomDeviceField"
-                    class="group animate-slide-down"
-                  >
+                  <div v-if="showCustomDeviceField" class="group animate-slide-down">
                     <label class="block text-lg font-bold text-blue-100 mb-1 flex items-center">
                       <i class="fas fa-edit mr-2 text-blue-300"></i>
                       Specify Device <span class="text-red-400 ml-1">*</span>
@@ -518,7 +515,6 @@
                           <i class="fas fa-exclamation-circle mr-1"></i>
                           {{ errors.digital_signature }}
                         </div>
-
                       </div>
                     </div>
 
@@ -1547,8 +1543,7 @@
         this.showCustomDeviceField = hasOthers
 
         // Determine primary inventory device (for backward compatibility)
-        const primaryId =
-          inventoryIds.length > 0 ? inventoryIds[0] : hasOthers ? 'others' : ''
+        const primaryId = inventoryIds.length > 0 ? inventoryIds[0] : hasOthers ? 'others' : ''
         this.formData.deviceInventoryId = primaryId
 
         if (primaryId && primaryId !== 'others') {
@@ -1594,8 +1589,8 @@
         const inventoryIds = Array.isArray(selection)
           ? selection.filter((v) => v !== 'others')
           : this.formData.deviceInventoryId
-          ? [this.formData.deviceInventoryId]
-          : []
+            ? [this.formData.deviceInventoryId]
+            : []
         const hasOthers = Array.isArray(selection) && selection.includes('others')
         const primaryId =
           this.formData.deviceInventoryId ||
@@ -1791,8 +1786,8 @@
         const inventoryIds = Array.isArray(selection)
           ? selection.filter((v) => v !== 'others')
           : this.formData.deviceInventoryId
-          ? [this.formData.deviceInventoryId]
-          : []
+            ? [this.formData.deviceInventoryId]
+            : []
         const hasOthers = Array.isArray(selection) && selection.includes('others')
 
         if (inventoryIds.length === 0 && !hasOthers) {
@@ -1932,8 +1927,8 @@
           const inventoryIds = Array.isArray(selection)
             ? selection.filter((v) => v !== 'others')
             : this.formData.deviceInventoryId && this.formData.deviceInventoryId !== 'others'
-            ? [this.formData.deviceInventoryId]
-            : []
+              ? [this.formData.deviceInventoryId]
+              : []
           const hasOthers = Array.isArray(selection) && selection.includes('others')
 
           // Primary inventory device for backward compatibility

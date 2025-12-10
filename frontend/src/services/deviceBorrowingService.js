@@ -536,12 +536,14 @@ export const deviceBorrowingService = {
       device_name:
         Array.isArray(request.all_device_names) && request.all_device_names.length
           ? request.all_device_names.join(' & ')
-          : this.getDeviceDisplayName(request.device_type, request.custom_device, request.device_inventory_ids),
+          : this.getDeviceDisplayName(
+              request.device_type,
+              request.custom_device,
+              request.device_inventory_ids
+            ),
       device_inventory_id: request.device_inventory_id,
       device_inventory_ids: request.device_inventory_ids || [],
-      all_device_names: Array.isArray(request.all_device_names)
-        ? request.all_device_names
-        : [],
+      all_device_names: Array.isArray(request.all_device_names) ? request.all_device_names : [],
       device_available:
         typeof request.device_available !== 'undefined' ? request.device_available : null,
 

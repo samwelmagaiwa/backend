@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\Api\v1\AuthController;
-use App\Http\Controllers\SecurityTestController;
 use App\Http\Controllers\Api\v1\OnboardingController;
 use App\Http\Controllers\Api\v1\AdminController;
 use App\Http\Controllers\Api\v1\UserAccessController;
@@ -15,7 +14,6 @@ use App\Http\Controllers\Api\v1\DeviceInventoryController;
 use App\Http\Controllers\Api\v1\HodCombinedAccessController;
 use App\Http\Controllers\Api\v1\DivisionalCombinedAccessController;
 use App\Http\Controllers\Api\v1\DictCombinedAccessController;
-use App\Http\Controllers\Api\v1\HodDivisionalRecommendationsController;
 use App\Http\Controllers\Api\v1\ModuleAccessApprovalController;
 use App\Http\Controllers\Api\v1\ModuleRequestController;
 use App\Http\Controllers\Api\v1\JeevaModuleRequestController;
@@ -26,8 +24,6 @@ use App\Http\Controllers\Api\v1\HeadOfItDictRecommendationsController;
 use App\Http\Controllers\Api\v1\HodUserController;
 use App\Http\Controllers\Api\v1\IctOfficerController;
 use App\Http\Controllers\Api\v1\RoleController;
-use App\Http\Controllers\Api\HealthController;
-use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Api\SwaggerController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;

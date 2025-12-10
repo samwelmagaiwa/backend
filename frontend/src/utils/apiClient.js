@@ -26,6 +26,8 @@ const apiClient = axios.create({
   }
 })
 
+console.log('🚀 Axios Instance Created with BaseURL:', API_CONFIG.BASE_URL)
+
 // Request interceptor to add auth token
 apiClient.interceptors.request.use(
   (config) => {

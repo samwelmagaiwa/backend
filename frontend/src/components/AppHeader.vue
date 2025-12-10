@@ -268,6 +268,41 @@
                   </div>
                 </button>
 
+                <!-- Create Staff User (Head of Department and Head of IT) -->
+                <button
+                  v-if="
+                    currentUser?.role === 'head_of_department' || currentUser?.role === 'head_of_it'
+                  "
+                  @click="goToHodCreateUser"
+                  class="w-full flex items-center px-4 py-3 text-white bg-blue-600 hover:bg-blue-700 transition-all duration-300 text-left relative overflow-hidden group"
+                  style="
+                    box-shadow:
+                      0 4px 12px rgba(59, 130, 246, 0.3),
+                      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+                    border-top: 1px solid rgba(147, 197, 253, 0.3);
+                    border-bottom: 1px solid rgba(29, 78, 216, 0.3);
+                  "
+                >
+                  <div
+                    class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center mr-3 relative z-10"
+                    style="
+                      box-shadow:
+                        0 4px 8px rgba(22, 163, 74, 0.4),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                        inset 0 -1px 0 rgba(21, 128, 61, 0.3);
+                      border: 1px solid rgba(74, 222, 128, 0.6);
+                    "
+                  >
+                    <i class="fas fa-user-plus text-white text-sm"></i>
+                  </div>
+                  <div class="relative z-10">
+                    <p class="font-medium text-sm drop-shadow-sm">Create Staff User</p>
+                    <p class="text-xs text-blue-100 drop-shadow-sm">
+                      Register new staff in your department
+                    </p>
+                  </div>
+                </button>
+
                 <!-- Reset Onboarding (Admin only) -->
                 <button
                   v-if="currentUser?.role === 'admin'"
@@ -517,6 +552,11 @@
         router.push('/profile')
       }
 
+      const goToHodCreateUser = () => {
+        closeProfileDropdown()
+        router.push('/hod-dashboard/create-user')
+      }
+
       const openOnboardingReset = () => {
         closeProfileDropdown()
         router.push('/admin/onboarding-reset')
@@ -568,6 +608,7 @@
         formatRole,
         goToDashboard,
         goToProfile,
+        goToHodCreateUser,
         openOnboardingReset,
         showHelp,
         logout

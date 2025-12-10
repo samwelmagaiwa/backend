@@ -726,11 +726,11 @@
         borrower: request.borrower_name || 'Unknown',
         device:
           request.device_name ||
-            getDeviceDisplayName(
-              request.device_type,
-              request.custom_device,
-              request.device_inventory_ids || request._raw?.device_inventory_ids
-            ),
+          getDeviceDisplayName(
+            request.device_type,
+            request.custom_device,
+            request.device_inventory_ids || request._raw?.device_inventory_ids
+          ),
         return_time: request.return_time || request.returnTime
       }"
       @confirm="confirmApproveRequest"
@@ -743,11 +743,11 @@
         request_id: request.request_id || `REQ-${String(request.id).padStart(6, '0')}`,
         device:
           request.device_name ||
-            getDeviceDisplayName(
-              request.device_type,
-              request.custom_device,
-              request.device_inventory_ids || request._raw?.device_inventory_ids
-            )
+          getDeviceDisplayName(
+            request.device_type,
+            request.custom_device,
+            request.device_inventory_ids || request._raw?.device_inventory_ids
+          )
       }"
       @approve="
         () => {
@@ -777,11 +777,11 @@
         request_id: request.request_id || `REQ-${String(request.id).padStart(6, '0')}`,
         device:
           request.device_name ||
-            getDeviceDisplayName(
-              request.device_type,
-              request.custom_device,
-              request.device_inventory_ids || request._raw?.device_inventory_ids
-            )
+          getDeviceDisplayName(
+            request.device_type,
+            request.custom_device,
+            request.device_inventory_ids || request._raw?.device_inventory_ids
+          )
       }"
       @confirm="confirmReceive"
       @cancel="() => (showReceiveModal = false)"

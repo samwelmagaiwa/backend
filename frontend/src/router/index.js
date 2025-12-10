@@ -115,6 +115,15 @@ const routes = [
     }
   },
   {
+    path: '/hod-dashboard/create-user',
+    name: 'HodCreateUser',
+    component: () => import('../components/views/hod/HodCreateUser.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: [ROLES.HEAD_OF_DEPARTMENT]
+    }
+  },
+  {
     path: '/divisional-dashboard',
     name: 'DivisionalDashboard',
     component: () => import('../components/DivisionalDashboard.vue'),
@@ -578,47 +587,6 @@ const routes = [
   {
     path: '/internal-access/list',
     redirect: '/hod-dashboard/request-list'
-  },
-
-  // Module Request Test Page
-  {
-    path: '/module-request-test',
-    name: 'ModuleRequestTest',
-    component: () => import('../components/views/ModuleRequestTestPage.vue'),
-    meta: {
-      requiresAuth: true,
-      roles: Object.values(ROLES)
-    }
-  },
-  // Module Requests Test Page (Both Wellsoft and Jeeva)
-  {
-    path: '/module-requests-test',
-    name: 'ModuleRequestsTest',
-    component: () => import('../components/views/ModuleRequestsTestPage.vue'),
-    meta: {
-      requiresAuth: true,
-      roles: Object.values(ROLES)
-    }
-  },
-  // Access Rights and Approval Workflow Test Page
-  {
-    path: '/access-rights-approval-test',
-    name: 'AccessRightsApprovalTest',
-    component: () => import('../components/views/AccessRightsApprovalTestPage.vue'),
-    meta: {
-      requiresAuth: true,
-      roles: Object.values(ROLES)
-    }
-  },
-  // Implementation Workflow Test Page
-  {
-    path: '/implementation-workflow-test',
-    name: 'ImplementationWorkflowTest',
-    component: () => import('../components/views/ImplementationWorkflowTestPage.vue'),
-    meta: {
-      requiresAuth: true,
-      roles: Object.values(ROLES)
-    }
   },
 
   // Admin User Management routes

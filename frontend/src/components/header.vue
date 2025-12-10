@@ -240,6 +240,30 @@
                   </div>
                 </button>
 
+                <!-- Create Staff User (Head of Department only) -->
+                <button
+                  v-if="isHeadOfDepartment"
+                  @click="goToHodCreateUser"
+                  class="w-full flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 transition-all duration-300 text-left relative overflow-hidden group"
+                >
+                  <div
+                    class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center mr-3 relative z-10"
+                    style="
+                      box-shadow:
+                        0 4px 8px rgba(22, 163, 74, 0.4),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                        inset 0 -1px 0 rgba(21, 128, 61, 0.3);
+                      border: 1px solid rgba(74, 222, 128, 0.6);
+                    "
+                  >
+                    <i class="fas fa-user-plus text-white text-sm"></i>
+                  </div>
+                  <div class="relative z-10">
+                    <p class="font-medium text-sm">Create Staff User</p>
+                    <p class="text-xs text-gray-500">Register new staff in your department</p>
+                  </div>
+                </button>
+
                 <!-- Reset Onboarding (Admin only) -->
                 <button
                   v-if="isAdmin"
@@ -452,6 +476,18 @@
         }
       })
 
+      const isHeadOfDepartment = computed(() => {
+        try {
+          const user = safeCurrentUser.value
+          const role = user?.role || user?.role_name || user?.primary_role
+          const roles = Array.isArray(user?.roles) ? user.roles : []
+          return role === 'head_of_department' || roles.includes('head_of_department')
+        } catch (error) {
+          console.warn('Error in isHeadOfDepartment computed:', error)
+          return false
+        }
+      })
+
       // Methods
       const toggleProfileDropdown = () => {
         showProfileDropdown.value = !showProfileDropdown.value
@@ -522,6 +558,11 @@
         router.push('/profile')
       }
 
+      const goToHodCreateUser = () => {
+        closeProfileDropdown()
+        router.push('/hod-dashboard/create-user')
+      }
+
       const openOnboardingReset = () => {
         closeProfileDropdown()
         router.push('/admin/onboarding-reset')
@@ -571,11 +612,13 @@
         profileDropdown,
         isDevelopment,
         isAdmin,
+        isHeadOfDepartment,
         toggleProfileDropdown,
         closeProfileDropdown,
         formatRole,
         goToDashboard,
         goToProfile,
+        goToHodCreateUser,
         openOnboardingReset,
         showHelp,
         logout

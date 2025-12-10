@@ -4,9 +4,25 @@
  */
 
 // API Configuration
+// API Configuration
 export const API_CONFIG = {
-  BASE_URL: process.env.VUE_APP_API_URL || 'http://127.0.0.1:8000/api',
+  // Force localhost:8000 if VUE_APP_API_URL is missing, empty, or relative (starts with /)
+  // This ensures we don't accidentally use relative paths in development
+  BASE_URL:
+    !process.env.VUE_APP_API_URL ||
+    process.env.VUE_APP_API_URL.startsWith('/') ||
+    process.env.VUE_APP_API_URL === ''
+      ? 'http://127.0.0.1:8000/api'
+      : process.env.VUE_APP_API_URL,
   TIMEOUT: parseInt(process.env.VUE_APP_API_TIMEOUT) || 10000
+}
+
+// Debug log to verify what's actually being used
+if (typeof window !== 'undefined') {
+  console.log('🔧 API Config Loaded:', {
+    rawEnvVar: process.env.VUE_APP_API_URL,
+    resolvedBaseURL: API_CONFIG.BASE_URL
+  })
 }
 
 // Application Configuration
