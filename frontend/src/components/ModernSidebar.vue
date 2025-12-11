@@ -5,7 +5,7 @@
       isCollapsed ? 'w-16 sidebar-collapsed' : 'sidebar-expanded',
       !shouldShowSidebar ? 'invisible pointer-events-none opacity-0' : 'opacity-100'
     ]"
-    :style="!isCollapsed ? 'width: 20rem;' : ''"
+    :style="!isCollapsed ? 'width: 16rem;' : ''"
     aria-label="Sidebar navigation"
     style="
       background: linear-gradient(
@@ -151,12 +151,12 @@
               <!-- User Info -->
               <div class="flex-1 min-w-0">
                 <h3
-                  class="text-white font-bold responsive-profile-name truncate group-hover:text-orange-100 transition-colors duration-300"
+                  class="text-white font-bold responsive-profile-name truncate group-hover:text-orange-100 transition-colors duration-300 text-sm"
                 >
                   {{ userName || 'JOHN DOE' }}
                 </h3>
                 <p
-                  class="text-blue-100 responsive-profile-role truncate opacity-80 group-hover:opacity-100 transition-opacity duration-300"
+                  class="text-blue-100 responsive-profile-role truncate opacity-80 group-hover:opacity-100 transition-opacity duration-300 text-xs"
                 >
                   {{ userDepartmentOrRole }}
                 </p>
@@ -226,7 +226,7 @@
         <div v-if="filteredDashboardItems.length > 0" class="mb-2">
           <div
             v-if="!isCollapsed"
-            class="flex items-center justify-between px-4 py-2 responsive-section-header font-bold text-blue-200 uppercase tracking-wider cursor-pointer hover:text-white transition-colors duration-200 section-header"
+            class="flex items-center justify-between px-4 py-2 responsive-section-header font-bold text-blue-200 uppercase tracking-wider cursor-pointer hover:text-white transition-colors duration-200 section-header text-xs"
             @click="toggleSectionLocal('dashboard')"
           >
             <span>Dashboard</span>
@@ -261,7 +261,7 @@
               v-for="item in filteredDashboardItems"
               :key="item.path"
               :to="item.path"
-              class="group flex items-center px-4 py-3 responsive-nav-item font-medium rounded-lg transition-all duration-200 relative ml-2 shadow-sm nav-item"
+              class="group flex items-center px-4 py-3 responsive-nav-item font-medium rounded-lg transition-all duration-200 relative ml-2 shadow-sm nav-item text-xs"
               :class="[
                 route.path === item.path
                   ? 'bg-white text-blue-600 shadow-lg transform scale-105'
@@ -312,7 +312,7 @@
         <div v-if="filteredUserManagementItems.length > 0" class="mb-2">
           <div
             v-if="!isCollapsed"
-            class="flex items-center justify-between px-4 py-2 responsive-section-header font-bold text-blue-200 uppercase tracking-wider cursor-pointer hover:text-white transition-colors duration-200 section-header"
+            class="flex items-center justify-between px-4 py-2 responsive-section-header font-bold text-blue-200 uppercase tracking-wider cursor-pointer hover:text-white transition-colors duration-200 section-header text-xs"
             @click="toggleSectionLocal('userManagement')"
           >
             <span>User Management</span>
@@ -347,7 +347,7 @@
               v-for="item in filteredUserManagementItems"
               :key="item.path"
               :to="item.path"
-              class="group flex items-center px-4 py-3 responsive-nav-item font-medium rounded-lg transition-all duration-200 relative ml-2 shadow-sm nav-item"
+              class="group flex items-center px-4 py-3 responsive-nav-item font-medium rounded-lg transition-all duration-200 relative ml-2 shadow-sm nav-item text-xs"
               :class="[
                 route.path === item.path
                   ? 'bg-white text-blue-600 shadow-lg transform scale-105'
@@ -394,7 +394,7 @@
         <div v-if="filteredRequestsManagementItems.length > 0" class="mb-2">
           <div
             v-if="!isCollapsed"
-            class="flex items-center justify-between px-4 py-2 responsive-section-header font-bold text-blue-200 uppercase tracking-wider cursor-pointer hover:text-white transition-colors duration-200 section-header"
+            class="flex items-center justify-between px-4 py-2 responsive-section-header font-bold text-blue-200 uppercase tracking-wider cursor-pointer hover:text-white transition-colors duration-200 section-header text-xs"
             @click="toggleSectionLocal('requestsManagement')"
           >
             <span>Requests</span>
@@ -433,7 +433,7 @@
               v-for="item in filteredRequestsManagementItems"
               :key="item.path"
               :to="item.path"
-              class="group flex items-center px-4 py-3 responsive-nav-item font-medium rounded-lg transition-all duration-200 relative ml-2 shadow-sm nav-item"
+              class="group flex items-center px-4 py-3 responsive-nav-item font-medium rounded-lg transition-all duration-200 relative ml-2 shadow-sm nav-item text-xs"
               :class="[
                 route.path === item.path
                   ? 'bg-white text-blue-600 shadow-lg transform scale-105'
@@ -480,7 +480,7 @@
         <div v-if="filteredDeviceManagementItems.length > 0" class="mb-2">
           <div
             v-if="!isCollapsed"
-            class="flex items-center justify-between px-4 py-2 responsive-section-header font-bold text-blue-200 uppercase tracking-wider cursor-pointer hover:text-white transition-colors duration-200 section-header"
+            class="flex items-center justify-between px-4 py-2 responsive-section-header font-bold text-blue-200 uppercase tracking-wider cursor-pointer hover:text-white transition-colors duration-200 section-header text-xs"
             @click="toggleSectionLocal('deviceManagement')"
           >
             <span>Device Management</span>
@@ -515,7 +515,7 @@
               v-for="item in filteredDeviceManagementItems"
               :key="item.path"
               :to="item.path"
-              class="group flex items-center px-4 py-3 responsive-nav-item font-medium rounded-lg transition-all duration-200 relative ml-2 shadow-sm nav-item"
+              class="group flex items-center px-4 py-3 responsive-nav-item font-medium rounded-lg transition-all duration-200 relative ml-2 shadow-sm nav-item text-xs"
               :class="[
                 route.path === item.path
                   ? 'bg-white text-blue-600 shadow-lg transform scale-105'

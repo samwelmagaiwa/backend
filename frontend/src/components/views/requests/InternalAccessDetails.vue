@@ -10,18 +10,18 @@
           <!-- Header Section -->
           <div class="medical-glass-card rounded-t-3xl p-2 mb-0 border-b border-blue-300/30">
             <div class="text-center">
-              <h1 class="text-2xl font-bold text-white mb-1 tracking-wide drop-shadow-lg">
+              <h1 class="text-xl font-bold text-white mb-1 tracking-wide drop-shadow-lg">
                 MUHIMBILI NATIONAL HOSPITAL
               </h1>
               <div class="flex justify-center mb-1">
                 <div
-                  class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-1.5 rounded-full text-base font-bold shadow-lg inline-flex items-center gap-2"
+                  class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-lg inline-flex items-center gap-2"
                 >
-                  <i class="fas fa-clipboard-list text-base"></i>
+                  <i class="fas fa-clipboard-list text-sm"></i>
                   REQUEST DETAILS
                 </div>
               </div>
-              <h2 class="text-lg font-bold text-blue-100 tracking-wide drop-shadow-md mt-1">
+              <h2 class="text-base font-bold text-blue-100 tracking-wide drop-shadow-md mt-1">
                 Internal Access Management
               </h2>
             </div>
@@ -53,7 +53,7 @@
                     >
                       <i class="fas fa-route text-white text-sm"></i>
                     </div>
-                    <h3 class="text-3xl font-bold text-white flex items-center">
+                    <h3 class="text-xl font-bold text-white flex items-center">
                       <i class="fas fa-clipboard-check mr-2 text-blue-300"></i>
                       Approval Trail
                     </h3>
@@ -207,7 +207,7 @@
                               class="text-white text-sm"
                             ></i>
                           </div>
-                          <p class="text-2xl text-white">HOD</p>
+                          <p class="text-base text-white">HOD</p>
                         </div>
                         <div class="text-center">
                           <div
@@ -233,7 +233,7 @@
                               class="text-white text-sm"
                             ></i>
                           </div>
-                          <p class="text-2xl text-white">Divisional</p>
+                          <p class="text-base text-white">Divisional</p>
                         </div>
                         <div class="text-center">
                           <div
@@ -257,7 +257,7 @@
                               class="text-white text-sm"
                             ></i>
                           </div>
-                          <p class="text-2xl text-white">DICT</p>
+                          <p class="text-base text-white">DICT</p>
                         </div>
                         <div class="text-center">
                           <div
@@ -281,7 +281,7 @@
                               class="text-white text-sm"
                             ></i>
                           </div>
-                          <p class="text-2xl text-white">Head IT</p>
+                          <p class="text-base text-white">Head IT</p>
                         </div>
                         <div class="text-center">
                           <div
@@ -305,7 +305,7 @@
                               class="text-white text-sm"
                             ></i>
                           </div>
-                          <p class="text-2xl text-white">ICT Officer</p>
+                          <p class="text-base text-white">ICT Officer</p>
                         </div>
                       </div>
                     </div>
@@ -411,9 +411,7 @@
                             v-if="getCombinedIctOfficerComment()"
                             class="bg-teal-500/10 rounded-lg p-3 border border-teal-400/20 flex-1"
                           >
-                            <p
-                              class="text-white text-2xl leading-relaxed font-extrabold tracking-wide"
-                            >
+                            <p class="text-white text-base leading-relaxed font-bold tracking-wide">
                               {{ getCombinedIctOfficerComment() }}
                             </p>
                           </div>
@@ -421,7 +419,7 @@
                             v-else
                             class="bg-gray-500/10 rounded-lg p-3 border border-gray-400/20 flex-1 flex items-center justify-center"
                           >
-                            <p class="text-gray-300 text-xl italic font-bold">
+                            <p class="text-gray-300 text-base italic font-bold">
                               No comments available yet.
                             </p>
                           </div>
@@ -435,25 +433,25 @@
                 <div
                   class="bg-gradient-to-br from-blue-600/30 to-blue-700/30 border-2 border-blue-400/60 shadow-blue-500/25 p-4 rounded-2xl backdrop-blur-sm"
                 >
-                  <h3 class="text-3xl font-bold text-white mb-2">Request Information</h3>
+                  <h3 class="text-xl font-bold text-white mb-2">Request Information</h3>
                   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-white">
                     <div>
-                      <p class="text-blue-200 text-lg">Request ID:</p>
-                      <p class="font-semibold text-xl">{{ formattedRequestId }}</p>
+                      <p class="text-blue-200 text-xs">Request ID:</p>
+                      <p class="font-semibold text-sm">{{ formattedRequestId }}</p>
                     </div>
                     <div>
-                      <p class="text-blue-200 text-lg">Request Type:</p>
-                      <p class="font-semibold text-xl">{{ formattedRequestType }}</p>
+                      <p class="text-blue-200 text-xs">Request Type:</p>
+                      <p class="font-semibold text-sm">{{ formattedRequestType }}</p>
                     </div>
                     <div>
-                      <p class="text-blue-200 text-lg">Status:</p>
-                      <p class="font-semibold text-xl" :class="getCurrentStatusTextClass()">
+                      <p class="text-blue-200 text-xs">Status:</p>
+                      <p class="font-semibold text-sm" :class="getCurrentStatusTextClass()">
                         {{ formattedCurrentStatus }}
                       </p>
                     </div>
                     <div>
-                      <p class="text-blue-200 text-lg">ICT Status:</p>
-                      <p class="font-semibold text-xl" :class="getApprovalStatusTextClass()">
+                      <p class="text-blue-200 text-xs">ICT Status:</p>
+                      <p class="font-semibold text-sm" :class="getApprovalStatusTextClass()">
                         {{ requestData?.ictStatus || 'Pending' }}
                       </p>
                     </div>

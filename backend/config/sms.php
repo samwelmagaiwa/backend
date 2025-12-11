@@ -22,11 +22,17 @@ return [
     |
     */
     
-    // Use test endpoint for development, production endpoint for live
-    'api_url' => env('SMS_TEST_MODE', true)  ? 'https://messaging.kilakona.co.tz/api/v1/vendor/message/send' : 'https://messaging.kilakona.co.tz/api/v1/vendor/message/send',
+    // Kilakona provider endpoints and credentials
+    'base_url' => env('SMS_BASE_URL', 'https://messaging.kilakona.co.tz/'),
+    'api_url' => env('SMS_API_URL', 'https://messaging.kilakona.co.tz/api/v1/vendor/message/send'),
     'api_key' => env('SMS_API_KEY', 'chimwege'),
-    'secret_key' => env('SMS_SECRET_KEY', 'f5IZEc5o8PeXi9l5ilOo'),
+    'api_secret' => env('SMS_API_SECRET', 'f5IZEc5o8PeXi9l5ilOo'),
+    // Keep legacy secret_key for backward compatibility if referenced in code
+    'secret_key' => env('SMS_SECRET_KEY', env('SMS_API_SECRET', 'f5IZEc5o8PeXi9l5ilOo')),
     'sender_id' => env('SMS_SENDER_ID', 'MLG'),
+    'sender_name' => env('SMS_SENDER_NAME', 'MLG'),
+    'message_type' => env('SMS_MESSAGE_TYPE', 'text'),
+    'delivery_report_url' => env('SMS_DELIVERY_REPORT_URL'),
     'test_mode' => env('SMS_TEST_MODE', true),
 
     /*
@@ -40,6 +46,7 @@ return [
 
     'enabled' => env('SMS_ENABLED', false),
     'timeout' => env('SMS_TIMEOUT', 30), // seconds
+    'verify_ssl' => env('SMS_VERIFY_SSL', false),
     'retry_attempts' => env('SMS_RETRY_ATTEMPTS', 3),
     'retry_delay' => env('SMS_RETRY_DELAY', 60), // seconds
 

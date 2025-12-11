@@ -12,11 +12,11 @@
             v-if="error"
             class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"
           >
-            <h3 class="font-bold text-2xl">Error</h3>
-            <p class="text-xl">{{ error }}</p>
+            <h3 class="font-bold text-xl">Error</h3>
+            <p class="text-lg">{{ error }}</p>
             <button
               @click="fetchAccessRequests"
-              class="mt-2 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 text-lg font-medium"
+              class="mt-2 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 text-base font-medium"
             >
               Retry
             </button>
@@ -25,20 +25,20 @@
           <!-- Stats -->
           <div class="grid grid-cols-4 gap-4 mb-6">
             <div class="bg-green-600/25 border border-green-400/40 p-4 rounded-lg">
-              <h3 class="text-green-200 text-xl font-semibold">Available for Assignment</h3>
-              <p class="text-white text-4xl font-bold">{{ stats.unassigned }}</p>
+              <h3 class="text-green-200 text-base font-semibold">Available for Assignment</h3>
+              <p class="text-white text-3xl font-bold">{{ stats.unassigned }}</p>
             </div>
             <div class="bg-blue-600/25 border border-blue-400/40 p-4 rounded-lg">
-              <h3 class="text-blue-200 text-xl font-semibold">Assigned to ICT</h3>
-              <p class="text-white text-4xl font-bold">{{ stats.assigned }}</p>
+              <h3 class="text-blue-200 text-base font-semibold">Assigned to ICT</h3>
+              <p class="text-white text-3xl font-bold">{{ stats.assigned }}</p>
             </div>
             <div class="bg-purple-600/25 border border-purple-400/40 p-4 rounded-lg">
-              <h3 class="text-purple-200 text-xl font-semibold">In Progress</h3>
-              <p class="text-white text-4xl font-bold">{{ stats.inProgress }}</p>
+              <h3 class="text-purple-200 text-base font-semibold">In Progress</h3>
+              <p class="text-white text-3xl font-bold">{{ stats.inProgress }}</p>
             </div>
             <div class="bg-teal-600/25 border border-teal-400/40 p-4 rounded-lg">
-              <h3 class="text-teal-200 text-xl font-semibold">Total Requests</h3>
-              <p class="text-white text-4xl font-bold">{{ stats.total }}</p>
+              <h3 class="text-teal-200 text-base font-semibold">Total Requests</h3>
+              <p class="text-white text-3xl font-bold">{{ stats.total }}</p>
             </div>
           </div>
 
@@ -49,11 +49,11 @@
                 v-model="searchQuery"
                 type="text"
                 placeholder="Search by staff name, PF number, or department..."
-                class="flex-1 px-3 py-2 bg-white/20 border border-blue-300/30 rounded text-white placeholder-blue-200/60 text-lg"
+                class="flex-1 px-3 py-2 bg-white/20 border border-blue-300/30 rounded text-white placeholder-blue-200/60 text-sm"
               />
               <select
                 v-model="statusFilter"
-                class="px-3 py-2 bg-white/20 border border-blue-300/30 rounded text-white text-lg status-select"
+                class="px-3 py-2 bg-white/20 border border-blue-300/30 rounded text-white text-sm status-select"
               >
                 <option value="">All Requests</option>
                 <option value="unassigned">Available for Assignment</option>
@@ -63,7 +63,7 @@
               </select>
               <button
                 @click="refreshRequests"
-                class="px-6 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 text-lg font-medium"
+                class="px-6 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 text-sm font-medium"
               >
                 Refresh
               </button>
@@ -76,26 +76,26 @@
               <table class="w-full">
                 <thead class="bg-blue-800/50">
                   <tr>
-                    <th class="px-4 py-3 text-left text-blue-100 text-lg font-semibold">
+                    <th class="px-4 py-3 text-left text-blue-100 text-sm font-semibold">
                       Request ID
                     </th>
-                    <th class="px-4 py-3 text-left text-blue-100 text-lg font-semibold">
+                    <th class="px-4 py-3 text-left text-blue-100 text-sm font-semibold">
                       Request Type
                     </th>
-                    <th class="px-4 py-3 text-left text-blue-100 text-lg font-semibold">
+                    <th class="px-4 py-3 text-left text-blue-100 text-sm font-semibold">
                       Requested Modules
                     </th>
-                    <th class="px-4 py-3 text-left text-blue-100 text-lg font-semibold">
+                    <th class="px-4 py-3 text-left text-blue-100 text-sm font-semibold">
                       Requester Name & PF Number
                     </th>
-                    <th class="px-4 py-3 text-left text-blue-100 text-lg font-semibold">
+                    <th class="px-4 py-3 text-left text-blue-100 text-sm font-semibold">
                       Head of IT Approval Date
                     </th>
-                    <th class="px-4 py-3 text-left text-blue-100 text-lg font-semibold">Status</th>
-                    <th class="px-4 py-3 text-left text-blue-100 text-lg font-semibold">
+                    <th class="px-4 py-3 text-left text-blue-100 text-sm font-semibold">Status</th>
+                    <th class="px-4 py-3 text-left text-blue-100 text-sm font-semibold">
                       SMS Status
                     </th>
-                    <th class="px-4 py-3 text-center text-blue-100 text-lg font-semibold">
+                    <th class="px-4 py-3 text-center text-blue-100 text-sm font-semibold">
                       Actions
                     </th>
                   </tr>
@@ -128,22 +128,22 @@
                           ></i>
                         </div>
                         <div>
-                          <div class="text-white font-medium text-lg">
+                          <div class="text-white font-medium text-sm">
                             {{
                               request.request_id || `REQ-${request.id.toString().padStart(6, '0')}`
                             }}
                           </div>
-                          <div class="text-purple-300 text-base">ID: {{ request.id }}</div>
+                          <div class="text-purple-300 text-xs">ID: {{ request.id }}</div>
                         </div>
                       </div>
                     </td>
 
                     <!-- Request Type -->
                     <td class="px-4 py-3">
-                      <div class="text-white font-medium text-lg">
+                      <div class="text-white font-medium text-sm">
                         {{ getRequestType(request) }}
                       </div>
-                      <div class="text-blue-300 text-base">
+                      <div class="text-blue-300 text-xs">
                         {{ request.department_name || request.department || 'Unknown Dept' }}
                       </div>
                     </td>
@@ -153,19 +153,19 @@
                       <div class="flex flex-nowrap gap-1">
                         <span
                           v-if="hasService(request, 'jeeva')"
-                          class="px-2 py-1 rounded text-base bg-blue-100 text-blue-800 whitespace-nowrap"
+                          class="px-2 py-1 rounded text-xs bg-blue-100 text-blue-800 whitespace-nowrap"
                         >
                           Jeeva
                         </span>
                         <span
                           v-if="hasService(request, 'wellsoft')"
-                          class="px-2 py-1 rounded text-base bg-green-100 text-green-800 whitespace-nowrap"
+                          class="px-2 py-1 rounded text-xs bg-green-100 text-green-800 whitespace-nowrap"
                         >
                           Wellsoft
                         </span>
                         <span
                           v-if="hasService(request, 'internet')"
-                          class="px-2 py-1 rounded text-base bg-cyan-100 text-cyan-800 whitespace-nowrap"
+                          class="px-2 py-1 rounded text-xs bg-cyan-100 text-cyan-800 whitespace-nowrap"
                         >
                           Internet
                         </span>
@@ -174,27 +174,27 @@
 
                     <!-- Requester Name & PF Number -->
                     <td class="px-4 py-3">
-                      <div class="text-white font-medium text-lg">
+                      <div class="text-white font-medium text-sm">
                         {{ request.staff_name || request.full_name || 'Unknown User' }}
                       </div>
-                      <div class="text-blue-300 text-base">
+                      <div class="text-blue-300 text-xs">
                         {{ request.phone || request.phone_number || 'No phone' }}
                       </div>
-                      <div v-if="request.pf_number" class="text-teal-300 text-base">
+                      <div v-if="request.pf_number" class="text-teal-300 text-xs">
                         PF: {{ request.pf_number }}
                       </div>
                     </td>
 
                     <!-- Head of IT Approval Date -->
                     <td class="px-4 py-3">
-                      <div class="text-white font-medium text-lg">
+                      <div class="text-white font-medium text-sm">
                         {{
                           formatDate(
                             request.head_of_it_approval_date || request.head_of_it_approved_at
                           )
                         }}
                       </div>
-                      <div class="text-blue-300 text-base">
+                      <div class="text-blue-300 text-xs">
                         {{
                           formatTime(
                             request.head_of_it_approval_date || request.head_of_it_approved_at
@@ -208,7 +208,7 @@
                       <div class="flex flex-col">
                         <span
                           :class="getStatusBadgeClass(request.status)"
-                          class="rounded text-lg font-medium inline-block whitespace-nowrap"
+                          class="rounded text-sm font-medium inline-block whitespace-nowrap"
                           :style="{ padding: '6px 12px', width: 'fit-content' }"
                         >
                           {{ getStatusText(request.status) }}
@@ -224,7 +224,7 @@
                           :class="getSmsStatusColor(getRelevantSmsStatus(request))"
                         ></div>
                         <span
-                          class="text-base font-medium"
+                          class="text-sm font-medium"
                           :class="getSmsStatusTextColor(getRelevantSmsStatus(request))"
                         >
                           {{ getSmsStatusText(getRelevantSmsStatus(request)) }}
@@ -265,7 +265,7 @@
                             (request.request_id || 'REQ-' + request.id.toString().padStart(6, '0'))
                           "
                         >
-                          <i class="fas fa-ellipsis-v text-lg"></i>
+                          <i class="fas fa-ellipsis-v text-sm"></i>
                         </button>
                       </div>
                     </td>
@@ -311,7 +311,7 @@
           <!-- Available for Assignment - show Approve and View Timeline -->
           <button
             @click="handleMenuAction('viewRequest', selectedRequest)"
-            class="w-full text-left px-4 py-3 text-lg bg-green-50 text-green-800 border-b border-green-200 hover:bg-green-100 focus:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset transition-all duration-200 flex items-center group first:rounded-t-lg"
+            class="w-full text-left px-4 py-3 text-sm bg-green-50 text-green-800 border-b border-green-200 hover:bg-green-100 focus:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset transition-all duration-200 flex items-center group first:rounded-t-lg"
           >
             <i
               class="fas fa-check mr-3 text-green-600 group-hover:text-green-700 group-focus:text-green-700 transition-colors duration-200 text-lg"
@@ -321,7 +321,7 @@
 
           <button
             @click="handleMenuAction('viewTimeline', selectedRequest)"
-            class="w-full text-left px-4 py-3 text-lg bg-indigo-50 text-indigo-800 border-b border-indigo-200 hover:bg-indigo-100 focus:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset transition-all duration-200 flex items-center group"
+            class="w-full text-left px-4 py-3 text-sm bg-indigo-50 text-indigo-800 border-b border-indigo-200 hover:bg-indigo-100 focus:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset transition-all duration-200 flex items-center group"
           >
             <i
               class="fas fa-history mr-3 text-indigo-600 group-hover:text-indigo-700 group-focus:text-indigo-700 transition-colors duration-200 text-lg"
@@ -331,7 +331,7 @@
 
           <button
             @click="handleMenuAction('downloadPdf', selectedRequest)"
-            class="w-full text-left px-4 py-3 text-lg bg-rose-50 text-rose-800 hover:bg-rose-100 focus:bg-rose-100 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
+            class="w-full text-left px-4 py-3 text-sm bg-rose-50 text-rose-800 hover:bg-rose-100 focus:bg-rose-100 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-inset transition-all duration-200 flex items-center group last:rounded-b-lg"
           >
             <i
               class="fas fa-file-pdf mr-3 text-rose-600 group-hover:text-rose-700 group-focus:text-rose-700 transition-colors duration-200 text-lg"
@@ -417,7 +417,7 @@
           <!-- Completed/Implemented - show View Request (read-only) and View Timeline -->
           <button
             @click="handleMenuAction('viewRequest', selectedRequest)"
-            class="w-full text-left px-4 py-3 text-lg bg-blue-50 text-blue-800 border-b border-blue-200 hover:bg-blue-100 focus:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset transition-all duration-200 flex items-center group first:rounded-t-lg"
+            class="w-full text-left px-4 py-3 text-sm bg-blue-50 text-blue-800 border-b border-blue-200 hover:bg-blue-100 focus:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset transition-all duration-200 flex items-center group first:rounded-t-lg"
           >
             <i
               class="fas fa-eye mr-3 text-blue-600 group-hover:text-blue-700 group-focus:text-blue-700 transition-colors duration-200"

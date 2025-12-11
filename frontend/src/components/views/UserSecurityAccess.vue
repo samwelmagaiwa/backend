@@ -84,7 +84,7 @@
                 Back
               </button>
               <div class="text-center">
-                <h1 class="text-2xl font-bold text-blue-100 mb-1">User Security Access</h1>
+                <h1 class="text-xl font-bold text-blue-100 mb-1">User Security Access</h1>
                 <p class="text-blue-200 text-sm">Request ID: {{ requestId }}</p>
               </div>
               <div class="text-right">
@@ -112,7 +112,7 @@
               <!-- Error State -->
               <div v-else-if="error" class="p-8 text-center">
                 <div class="text-red-400 mb-4">
-                  <i class="fas fa-exclamation-triangle text-4xl"></i>
+                  <i class="fas fa-exclamation-triangle text-3xl"></i>
                 </div>
                 <h3 class="text-xl font-semibold text-white mb-2">Error Loading Request</h3>
                 <p class="text-blue-200 mb-4">{{ error }}</p>

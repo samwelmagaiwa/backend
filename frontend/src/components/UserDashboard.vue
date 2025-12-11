@@ -44,7 +44,7 @@
         </div>
 
         <div class="max-w-7xl mx-auto relative z-10">
-          <h1 class="text-4xl font-bold text-white mb-8 drop-shadow-lg">User Dashboard</h1>
+          <h1 class="text-2xl font-bold text-white mb-6 drop-shadow-lg">User Dashboard</h1>
 
           <!-- Enhanced Multi-Layer Welcome Section -->
           <div
@@ -75,16 +75,16 @@
                   <div
                     class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"
                   ></div>
-                  <i class="fas fa-home text-white text-2xl relative z-10 drop-shadow-lg" />
+                  <i class="fas fa-home text-white text-xl relative z-10 drop-shadow-lg" />
                   <div
                     class="absolute top-1 right-1 w-2 h-2 bg-white/60 rounded-full animate-ping"
                   ></div>
                 </div>
                 <div>
-                  <h2 class="text-4xl font-bold text-white mb-2 drop-shadow-lg">
+                  <h2 class="text-xl font-bold text-white mb-1 drop-shadow-lg">
                     Welcome to ICT Access Portal
                   </h2>
-                  <p class="text-blue-100 text-xl drop-shadow-sm opacity-90">
+                  <p class="text-blue-100 text-sm drop-shadow-sm opacity-90">
                     Streamline your system access and equipment requests
                   </p>
                 </div>
@@ -113,9 +113,9 @@
                     <div
                       class="w-8 h-8 bg-blue-400/40 rounded-lg flex items-center justify-center mr-3 group-hover/btn:scale-110 transition-transform duration-300"
                     >
-                      <i class="fas fa-list-alt text-white text-xl drop-shadow-sm" />
+                      <i class="fas fa-list-alt text-white text-base drop-shadow-sm" />
                     </div>
-                    <span class="text-xl drop-shadow-sm">Track My Applications</span>
+                    <span class="text-sm font-medium drop-shadow-sm">Track My Applications</span>
                   </div>
                 </button>
 
@@ -167,15 +167,15 @@
                     >
                       <i
                         v-if="isCheckingPendingRequests"
-                        class="fas fa-spinner fa-spin text-white text-xl drop-shadow-sm"
+                        class="fas fa-spinner fa-spin text-white text-base drop-shadow-sm"
                       />
                       <i
                         v-else-if="hasPendingBookingRequest || hasPendingCombinedRequest"
-                        class="fas fa-eye text-white text-xl drop-shadow-sm"
+                        class="fas fa-eye text-white text-base drop-shadow-sm"
                       />
-                      <i v-else class="fas fa-plus text-white text-xl drop-shadow-sm" />
+                      <i v-else class="fas fa-plus text-white text-base drop-shadow-sm" />
                     </div>
-                    <span class="text-xl drop-shadow-sm">
+                    <span class="text-sm font-medium drop-shadow-sm">
                       <template v-if="isCheckingPendingRequests">Checking...</template>
                       <template v-else-if="hasPendingBookingRequest || hasPendingCombinedRequest"
                         >View Pending Request</template
@@ -320,7 +320,7 @@
                         style="background-color: rgba(255, 0, 0, 0.8)"
                       ></div>
                       <span
-                        class="text-sm font-medium tracking-wide"
+                        class="text-xs font-medium tracking-wide"
                         style="color: rgba(255, 255, 255, 0.9)"
                         >Processing</span
                       >
@@ -335,7 +335,7 @@
 
                 <!-- Enhanced Title -->
                 <h3
-                  class="text-3xl font-bold text-white mb-4 drop-shadow-lg transition-colors duration-300"
+                  class="text-base font-bold text-white mb-2 drop-shadow-lg transition-colors duration-300"
                 >
                   Under Review
                 </h3>
@@ -343,7 +343,7 @@
                 <!-- Enhanced Number Display -->
                 <div class="relative mb-6">
                   <div
-                    class="text-6xl font-bold drop-shadow-lg relative group-hover:scale-105 transition-transform duration-300"
+                    class="text-3xl font-bold drop-shadow-lg relative group-hover:scale-105 transition-transform duration-300"
                     style="color: #ffffff"
                   >
                     <span v-if="isLoadingStats" class="animate-pulse">--</span>
@@ -539,7 +539,7 @@
                         style="background-color: rgba(37, 99, 235, 0.8)"
                       ></div>
                       <span
-                        class="text-sm font-medium tracking-wide"
+                        class="text-xs font-medium tracking-wide"
                         style="color: rgba(255, 255, 255, 0.9)"
                         >Completed</span
                       >
@@ -554,7 +554,7 @@
 
                 <!-- Enhanced Title -->
                 <h3
-                  class="text-3xl font-bold text-white mb-4 drop-shadow-lg transition-colors duration-300"
+                  class="text-base font-bold text-white mb-2 drop-shadow-lg transition-colors duration-300"
                 >
                   Granted Access
                 </h3>
@@ -562,7 +562,7 @@
                 <!-- Enhanced Number Display -->
                 <div class="relative mb-6">
                   <div
-                    class="text-6xl font-bold drop-shadow-lg relative group-hover:scale-105 transition-transform duration-300"
+                    class="text-3xl font-bold drop-shadow-lg relative group-hover:scale-105 transition-transform duration-300"
                     style="color: #ffffff"
                   >
                     <span v-if="isLoadingStats" class="animate-pulse">--</span>
@@ -762,7 +762,7 @@
                         style="background-color: rgba(220, 38, 38, 0.8)"
                       ></div>
                       <span
-                        class="text-sm font-medium tracking-wide"
+                        class="text-xs font-medium tracking-wide"
                         style="color: rgba(255, 255, 255, 0.9)"
                         >Reviewed</span
                       >
@@ -777,7 +777,7 @@
 
                 <!-- Enhanced Title -->
                 <h3
-                  class="text-3xl font-bold text-white mb-4 drop-shadow-lg transition-colors duration-300"
+                  class="text-base font-bold text-white mb-2 drop-shadow-lg transition-colors duration-300"
                 >
                   Needs Revision
                 </h3>
@@ -785,7 +785,7 @@
                 <!-- Enhanced Number Display -->
                 <div class="relative mb-6">
                   <div
-                    class="text-6xl font-bold drop-shadow-lg relative group-hover:scale-105 transition-transform duration-300"
+                    class="text-3xl font-bold drop-shadow-lg relative group-hover:scale-105 transition-transform duration-300"
                     style="color: #ffffff"
                   >
                     <span v-if="isLoadingStats" class="animate-pulse">--</span>

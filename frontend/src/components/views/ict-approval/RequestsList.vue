@@ -117,10 +117,12 @@
 
                     <!-- Loading Text -->
                     <div class="text-center">
-                      <div class="text-white text-xl font-bold tracking-wide mb-1 drop-shadow-md">
+                      <div
+                        class="text-white font-medium text-sm font-bold tracking-wide mb-1 drop-shadow-md"
+                      >
                         Loading Device Requests
                       </div>
-                      <div class="text-blue-100 text-sm animate-pulse">Please wait...</div>
+                      <div class="text-blue-300 text-xs animate-pulse">Please wait...</div>
                     </div>
                   </div>
 
@@ -145,7 +147,7 @@
                 <!-- Hospital Name and Department -->
                 <div class="text-center border-t border-blue-300/30 pt-4">
                   <div
-                    class="text-lg font-black tracking-widest mb-1 drop-shadow-sm"
+                    class="text-sm font-black tracking-widest mb-1 drop-shadow-sm"
                     style="color: #ff0000"
                   >
                     MUHIMBILI NATIONAL HOSPITAL
@@ -199,19 +201,19 @@
           <div class="grid grid-cols-4 gap-4 mb-6">
             <div class="bg-yellow-600/25 border border-yellow-400/40 p-4 rounded-lg">
               <h3 class="text-yellow-200 text-lg font-bold">Pending</h3>
-              <p class="text-white text-4xl font-bold">{{ stats.pending }}</p>
+              <p class="text-white text-3xl font-bold">{{ stats.pending }}</p>
             </div>
             <div class="bg-green-600/25 border border-green-400/40 p-4 rounded-lg">
               <h3 class="text-green-200 text-lg font-bold">Approved</h3>
-              <p class="text-white text-4xl font-bold">{{ stats.approved }}</p>
+              <p class="text-white text-3xl font-bold">{{ stats.approved }}</p>
             </div>
             <div class="bg-red-600/25 border border-red-400/40 p-4 rounded-lg">
               <h3 class="text-red-200 text-lg font-bold">Rejected</h3>
-              <p class="text-white text-4xl font-bold">{{ stats.rejected }}</p>
+              <p class="text-white text-3xl font-bold">{{ stats.rejected }}</p>
             </div>
             <div class="bg-blue-600/25 border border-blue-400/40 p-4 rounded-lg">
               <h3 class="text-blue-200 text-lg font-bold">Total Requests</h3>
-              <p class="text-white text-4xl font-bold">{{ stats.total }}</p>
+              <p class="text-white text-3xl font-bold">{{ stats.total }}</p>
             </div>
           </div>
 
@@ -222,11 +224,11 @@
                 v-model="searchQuery"
                 type="text"
                 placeholder="Search by borrower name, department, or device..."
-                class="flex-1 px-4 py-3 bg-white/20 border border-blue-300/30 rounded text-white placeholder-blue-200/60 text-lg"
+                class="flex-1 px-4 py-3 bg-white/20 border border-blue-300/30 rounded text-white placeholder-blue-200/60 text-base"
               />
               <select
                 v-model="ictStatusFilter"
-                class="px-4 py-3 bg-white/20 border border-blue-300/30 rounded text-white text-lg"
+                class="px-4 py-3 bg-white/20 border border-blue-300/30 rounded text-white text-base"
               >
                 <option value="">All ICT Status</option>
                 <option value="pending">Pending ICT</option>
@@ -235,7 +237,7 @@
               </select>
               <button
                 @click="refreshRequests"
-                class="px-6 py-3 bg-teal-600 text-white rounded hover:bg-teal-700 text-lg font-bold"
+                class="px-6 py-3 bg-teal-600 text-white rounded hover:bg-teal-700 text-base font-bold"
               >
                 <i class="fas fa-sync-alt mr-2"></i>
                 Refresh
@@ -254,7 +256,7 @@
                   <i class="fas fa-trash text-white"></i>
                 </div>
                 <div>
-                  <h3 class="text-lg font-bold text-white">
+                  <h3 class="text-sm font-bold text-white">
                     {{ selectedRequests.length }} Request{{
                       selectedRequests.length > 1 ? 's' : ''
                     }}
@@ -288,21 +290,21 @@
               <table class="w-full table-fixed">
                 <thead class="bg-blue-800/50">
                   <tr>
-                    <th class="px-1 py-3 text-left text-blue-100 text-xl font-bold w-12">Select</th>
-                    <th class="px-1 py-3 text-left text-blue-100 text-xl font-bold w-24">ID</th>
-                    <th class="px-1 py-3 text-left text-blue-100 text-xl font-bold w-32">
+                    <th class="px-1 py-3 text-left text-blue-100 text-sm font-bold w-12">Select</th>
+                    <th class="px-1 py-3 text-left text-blue-100 text-sm font-bold w-24">ID</th>
+                    <th class="px-1 py-3 text-left text-blue-100 text-sm font-bold w-32">
                       Borrower
                     </th>
-                    <th class="px-1 py-3 text-left text-blue-100 text-xl font-bold w-24">
+                    <th class="px-1 py-3 text-left text-blue-100 text-sm font-bold w-24">
                       Department
                     </th>
-                    <th class="px-1 py-3 text-left text-blue-100 text-xl font-bold w-20">Device</th>
-                    <th class="px-1 py-3 text-left text-blue-100 text-xl font-bold w-20">Date</th>
-                    <th class="px-1 py-3 text-left text-blue-100 text-xl font-bold w-16">Sign</th>
-                    <th class="px-1 py-3 text-left text-blue-100 text-xl font-bold w-20">Status</th>
-                    <th class="px-1 py-3 text-left text-blue-100 text-xl font-bold w-20">Return</th>
-                    <th class="px-1 py-3 text-left text-blue-100 text-xl font-bold w-16">SMS</th>
-                    <th class="px-1 py-3 text-center text-blue-100 text-xl font-bold w-20">
+                    <th class="px-1 py-3 text-left text-blue-100 text-sm font-bold w-20">Device</th>
+                    <th class="px-1 py-3 text-left text-blue-100 text-sm font-bold w-20">Date</th>
+                    <th class="px-1 py-3 text-left text-blue-100 text-sm font-bold w-16">Sign</th>
+                    <th class="px-1 py-3 text-left text-blue-100 text-sm font-bold w-20">Status</th>
+                    <th class="px-1 py-3 text-left text-blue-100 text-sm font-bold w-20">Return</th>
+                    <th class="px-1 py-3 text-left text-blue-100 text-sm font-bold w-16">SMS</th>
+                    <th class="px-1 py-3 text-center text-blue-100 text-sm font-bold w-20">
                       Actions
                     </th>
                   </tr>
@@ -331,25 +333,25 @@
                         />
                       </div>
                     </td>
-                    <td class="px-1 py-3 text-xl">
+                    <td class="px-1 py-3 text-sm">
                       <div class="truncate text-white font-bold">
                         {{ request.request_id || `REQ-${request.id.toString().padStart(4, '0')}` }}
                       </div>
                     </td>
-                    <td class="px-1 py-3 text-xl">
+                    <td class="px-1 py-3 text-sm">
                       <div class="truncate text-white font-bold">
                         {{ request.borrower_name || request.borrowerName || 'Unknown' }}
                       </div>
-                      <div class="truncate text-blue-300 text-lg">
+                      <div class="truncate text-blue-300 text-xs">
                         {{ request.borrower_phone || request.phoneNumber || 'No phone' }}
                       </div>
                     </td>
-                    <td class="px-1 py-3 text-xl">
+                    <td class="px-1 py-3 text-sm">
                       <div class="truncate text-white font-bold">
                         {{ request.department || 'Unknown' }}
                       </div>
                     </td>
-                    <td class="px-1 py-3 text-xl">
+                    <td class="px-1 py-3 text-sm">
                       <div class="truncate text-white font-bold">
                         {{
                           request.device_name ||
@@ -361,56 +363,56 @@
                         }}
                       </div>
                     </td>
-                    <td class="px-1 py-3 text-xl">
+                    <td class="px-1 py-3 text-sm">
                       <div class="truncate text-white font-bold">
                         {{ formatDate(request.booking_date || request.bookingDate) }}
                       </div>
                     </td>
-                    <td class="px-1 py-3 text-xl text-center">
+                    <td class="px-1 py-3 text-sm text-center">
                       <div class="flex flex-col items-center space-y-1">
                         <i
                           v-if="request.has_signature || request.signature"
-                          class="fas fa-check-circle text-green-400 text-2xl"
+                          class="fas fa-check-circle text-green-400 text-lg"
                         ></i>
-                        <i v-else class="fas fa-times-circle text-red-400 text-2xl"></i>
+                        <i v-else class="fas fa-times-circle text-red-400 text-lg"></i>
                         <span
                           v-if="request.has_signature || request.signature"
-                          class="px-2 py-0.5 rounded text-xs font-semibold bg-emerald-900/30 text-emerald-300 border border-emerald-500/40"
+                          class="px-1.5 py-0.5 rounded-[10px] text-[10px] font-semibold bg-emerald-900/30 text-emerald-300 border border-emerald-500/40"
                         >
                           Digitally signed
                         </span>
                       </div>
                     </td>
-                    <td class="px-1 py-3 text-xl">
+                    <td class="px-1 py-3 text-sm">
                       <div class="flex flex-col space-y-1">
                         <span
                           v-if="request.divisional_status === 'skipped'"
-                          class="inline-flex items-center px-2 py-1 rounded text-base font-semibold bg-red-900/30 text-red-300 border border-red-500/40"
+                          class="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-red-900/30 text-red-300 border border-red-500/40"
                         >
                           No Divisional Director — Stage Skipped
                         </span>
                         <span
                           :class="getStatusBadgeClass(request.ict_approve || 'pending')"
-                          class="inline-flex items-center px-2 py-0.5 rounded text-sm font-semibold self-start"
+                          class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold self-start"
                         >
                           {{ getStatusText(request.ict_approve || 'pending') }}
                         </span>
                       </div>
                     </td>
-                    <td class="px-1 py-3 text-xl">
+                    <td class="px-1 py-3 text-sm">
                       <span
                         :class="
                           getReturnStatusBadgeClass(request.return_status || 'not_yet_returned')
                         "
-                        class="inline-flex items-center px-2 py-0.5 rounded text-sm font-semibold"
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold"
                       >
                         {{ getReturnStatusText(request.return_status || 'not_yet_returned') }}
                       </span>
                     </td>
-                    <td class="px-1 py-3 text-xl text-center">
+                    <td class="px-1 py-3 text-sm text-center">
                       <span
                         :class="getSMSStatusBadgeClass(request.sms_status || 'not_sent')"
-                        class="inline-flex items-center px-2 py-0.5 rounded text-sm font-semibold"
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold"
                       >
                         {{ getSMSStatusText(request.sms_status || 'not_sent') }}
                       </span>

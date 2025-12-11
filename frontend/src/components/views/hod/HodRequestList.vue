@@ -26,22 +26,22 @@
           <div class="grid grid-cols-4 gap-4 mb-6">
             <div class="bg-yellow-600/25 border border-yellow-400/40 p-4 rounded-lg">
               <h3 class="text-yellow-200 text-lg font-bold">Pending HOD Approval</h3>
-              <p class="text-white text-4xl font-bold">{{ stats.pendingHod }}</p>
+              <p class="text-white text-3xl font-bold">{{ stats.pendingHod }}</p>
             </div>
 
             <div class="bg-green-600/25 border border-green-400/40 p-4 rounded-lg">
               <h3 class="text-green-200 text-lg font-bold">HOD Approved</h3>
-              <p class="text-white text-4xl font-bold">{{ stats.hodApproved }}</p>
+              <p class="text-white text-3xl font-bold">{{ stats.hodApproved }}</p>
             </div>
 
             <div class="bg-red-600/25 border border-red-400/40 p-4 rounded-lg">
               <h3 class="text-red-200 text-lg font-bold">HOD Rejected</h3>
-              <p class="text-white text-4xl font-bold">{{ stats.hodRejected }}</p>
+              <p class="text-white text-3xl font-bold">{{ stats.hodRejected }}</p>
             </div>
 
             <div class="bg-blue-600/25 border border-blue-400/40 p-4 rounded-lg">
               <h3 class="text-blue-200 text-lg font-bold">Total Requests</h3>
-              <p class="text-white text-4xl font-bold">{{ stats.total }}</p>
+              <p class="text-white text-3xl font-bold">{{ stats.total }}</p>
             </div>
           </div>
 
@@ -52,11 +52,11 @@
                 v-model="searchQuery"
                 type="text"
                 placeholder="Search by staff name, PF number, or department..."
-                class="flex-1 px-4 py-3 bg-white/20 border border-blue-300/30 rounded text-white placeholder-blue-200/60 text-lg"
+                class="flex-1 px-4 py-3 bg-white/20 border border-blue-300/30 rounded text-white placeholder-blue-200/60 text-base"
               />
               <select
                 v-model="statusFilter"
-                class="px-4 py-3 bg-white/20 border border-blue-300/30 rounded text-white text-lg status-select"
+                class="px-4 py-3 bg-white/20 border border-blue-300/30 rounded text-white text-base status-select"
               >
                 <option value="">All Statuses</option>
                 <option value="pending">Pending Submission</option>
@@ -72,7 +72,7 @@
               </select>
               <button
                 @click="refreshRequests"
-                class="px-6 py-3 bg-teal-600 text-white rounded hover:bg-teal-700 text-lg font-bold"
+                class="px-6 py-3 bg-teal-600 text-white rounded hover:bg-teal-700 text-base font-bold"
               >
                 Refresh
               </button>
@@ -84,19 +84,19 @@
             <table class="w-full">
               <thead class="bg-blue-800/50">
                 <tr>
-                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">Request ID</th>
-                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">Request Type</th>
-                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
+                  <th class="px-4 py-3 text-left text-blue-100 text-sm font-bold">Request ID</th>
+                  <th class="px-4 py-3 text-left text-blue-100 text-sm font-bold">Request Type</th>
+                  <th class="px-4 py-3 text-left text-blue-100 text-sm font-bold">
                     Personal Information
                   </th>
-                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
+                  <th class="px-4 py-3 text-left text-blue-100 text-sm font-bold">
                     Submission Date
                   </th>
-                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">
+                  <th class="px-4 py-3 text-left text-blue-100 text-sm font-bold">
                     Current Status
                   </th>
-                  <th class="px-4 py-4 text-left text-blue-100 text-lg font-bold">SMS Status</th>
-                  <th class="px-4 py-4 text-center text-blue-100 text-lg font-bold">Actions</th>
+                  <th class="px-4 py-3 text-left text-blue-100 text-sm font-bold">SMS Status</th>
+                  <th class="px-4 py-3 text-center text-blue-100 text-sm font-bold">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -106,11 +106,11 @@
                   class="border-t border-blue-300/20 hover:bg-blue-700/30"
                 >
                   <!-- Request ID -->
-                  <td class="px-4 py-4">
-                    <div class="text-white font-bold text-lg">
+                  <td class="px-4 py-3">
+                    <div class="text-white font-bold text-sm">
                       {{ request.request_id || `REQ-${request.id.toString().padStart(6, '0')}` }}
                     </div>
-                    <div class="text-purple-300 text-base">ID: {{ request.id }}</div>
+                    <div class="text-purple-300 text-xs">ID: {{ request.id }}</div>
                   </td>
 
                   <!-- Request Type -->
@@ -118,19 +118,19 @@
                     <div class="flex flex-wrap gap-1">
                       <span
                         v-if="hasService(request, 'jeeva')"
-                        class="px-3 py-1.5 rounded text-base font-bold bg-blue-100 text-blue-800"
+                        class="px-2 py-1 rounded text-xs font-bold bg-blue-100 text-blue-800"
                       >
                         Jeeva
                       </span>
                       <span
                         v-if="hasService(request, 'wellsoft')"
-                        class="px-3 py-1.5 rounded text-base font-bold bg-green-100 text-green-800"
+                        class="px-2 py-1 rounded text-xs font-bold bg-green-100 text-green-800"
                       >
                         Wellsoft
                       </span>
                       <span
                         v-if="hasService(request, 'internet')"
-                        class="px-3 py-1.5 rounded text-base font-bold bg-cyan-100 text-cyan-800"
+                        class="px-2 py-1 rounded text-xs font-bold bg-cyan-100 text-cyan-800"
                       >
                         Internet
                       </span>
@@ -138,27 +138,27 @@
                   </td>
 
                   <!-- Personal Information -->
-                  <td class="px-4 py-4">
-                    <div class="text-white font-bold text-lg">
+                  <td class="px-4 py-3">
+                    <div class="text-white font-bold text-sm">
                       {{ request.staff_name || request.full_name || 'Unknown User' }}
                     </div>
-                    <div class="text-blue-300 text-base">
+                    <div class="text-blue-300 text-xs">
                       {{ request.phone || request.phone_number || 'No phone' }}
                     </div>
-                    <div v-if="request.pf_number" class="text-teal-300 text-base">
+                    <div v-if="request.pf_number" class="text-teal-300 text-xs">
                       PF: {{ request.pf_number }}
                     </div>
-                    <div class="text-blue-200 text-base">
+                    <div class="text-blue-200 text-xs">
                       Dept: {{ request.department || 'Unknown' }}
                     </div>
                   </td>
 
                   <!-- Submission Date -->
-                  <td class="px-4 py-4">
-                    <div class="text-white font-bold text-lg">
+                  <td class="px-4 py-3">
+                    <div class="text-white font-bold text-sm">
                       {{ formatDate(request.created_at || request.submission_date) }}
                     </div>
-                    <div class="text-blue-300 text-base">
+                    <div class="text-blue-300 text-xs">
                       {{ formatTime(request.created_at || request.submission_date) }}
                     </div>
                   </td>
@@ -168,7 +168,7 @@
                     <div class="flex flex-col">
                       <span
                         v-if="request.divisional_status === 'skipped'"
-                        class="mb-1 rounded text-sm font-semibold inline-block bg-red-900/30 text-red-300 border border-red-500/40 px-2 py-1"
+                        class="mb-1 rounded text-xs font-semibold inline-block bg-red-900/30 text-red-300 border border-red-500/40 px-2 py-0.5"
                         :style="{ width: 'fit-content' }"
                       >
                         No Divisional Director — Stage Skipped
@@ -177,14 +177,14 @@
                         :class="
                           getStatusBadgeClass(request.hod_status || request.status || 'pending_hod')
                         "
-                        class="rounded text-base font-bold inline-block"
-                        :style="{ padding: '6px 12px', width: 'fit-content' }"
+                        class="rounded text-sm font-bold inline-block"
+                        :style="{ padding: '4px 8px', width: 'fit-content' }"
                       >
                         {{ getStatusText(request.hod_status || request.status || 'pending_hod') }}
                       </span>
                       <span
                         v-if="request.has_signature || request.signature"
-                        class="mt-1 px-2 py-0.5 rounded text-xs font-semibold bg-emerald-900/30 text-emerald-300 border border-emerald-500/40 w-fit"
+                        class="mt-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-900/30 text-emerald-300 border border-emerald-500/40 w-fit"
                       >
                         Digitally signed
                       </span>
@@ -199,7 +199,7 @@
                         :class="getSmsStatusColor(getRelevantSmsStatus(request))"
                       ></div>
                       <span
-                        class="text-base font-medium"
+                        class="text-sm font-medium"
                         :class="getSmsStatusTextColor(getRelevantSmsStatus(request))"
                       >
                         {{ getSmsStatusText(getRelevantSmsStatus(request)) }}

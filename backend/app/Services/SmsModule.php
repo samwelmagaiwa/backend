@@ -27,14 +27,17 @@ class SmsModule
     public function __construct()
     {
         $this->testMode = config('sms.test_mode', true);
-        $this->apiUrl = $this->testMode 
-            ? 'https://messaging-service.co.tz/api/sms/v1/test/text/single'
-            : 'https://messaging-service.co.tz/api/sms/v1/text/single';
-        $this->apiKey = config('sms.api_key', 'beneth');
-        $this->secretKey = config('sms.secret_key', 'Beneth@1701');
-        $this->senderId = config('sms.sender_id', 'KODA TECH');
+        // Use configured Kilakona endpoint; no hardcoding of provider URLs
+        $this->apiUrl = config('sms.api_url');
+        $this->apiKey = config('sms.api_key');
+        // Prefer api_secret but keep secret_key for backward compatibility
+        $this->secretKey = config('sms.api_secret', config('sms.secret_key'));
+        $this->senderId = config('sms.sender_id');
         $this->enabled = config('sms.enabled', false);
         $this->timeout = config('sms.timeout', 30);
+        $this->verifySsl = config('sms.verify_ssl', false);
+        $this->messageType = config('sms.message_type', 'text');
+        $this->deliveryReportUrl = config('sms.delivery_report_url');
     }
 
     // ==================== CORE SENDING FUNCTIONS ====================
@@ -458,29 +461,32 @@ class SmsModule
                 return $this->buildResponse(true, 'SMS sent (test mode - disabled)', ['test_mode' => true]);
             }
 
-            // Encode credentials for Basic Auth
-            $auth = base64_encode($this->apiKey . ':' . $this->secretKey);
-
-            // Prepare payload
+            // Prepare Kilakona payload
             $payload = [
-                "from" => $this->senderId,
-                "to" => $phoneNumber,
-                "text" => $message,
-                "reference" => uniqid("ref_")
+                'senderId' => $this->senderId,
+                'messageType' => $this->messageType,
+                'message' => $message,
+                'contacts' => $phoneNumber,
             ];
+            if (!empty($this->deliveryReportUrl)) {
+                $payload['deliveryReportUrl'] = $this->deliveryReportUrl;
+            }
 
             // Initialize cURL
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $this->apiUrl);
+            $ch = curl_init($this->apiUrl);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                "Authorization: Basic " . $auth,
-                "Content-Type: application/json",
-                "Accept: application/json"
+                'Content-Type: application/json',
+                'api_key: ' . $this->apiKey,
+                'api_secret: ' . $this->secretKey,
             ]);
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+
+            // SSL verification per config
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verifySsl ? 1 : 0);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $this->verifySsl ? 2 : 0);
 
             // Execute
             $response = curl_exec($ch);
@@ -507,18 +513,21 @@ class SmsModule
                 return $this->buildResponse(false, 'Invalid JSON response');
             }
 
-            // Check for success
-            if (isset($data['messages']) && is_array($data['messages'])) {
-                Log::info('SMS sent successfully', ['count' => count($data['messages'])]);
+            // Adjust success detection for Kilakona response structure
+            // If provider documents specific success indicator, check it here.
+            // Fallback: HTTP 200 with a non-empty JSON is success.
+            if ($httpCode === 200 && is_array($data)) {
+                Log::info('SMS sent successfully via Kilakona', ['response' => $data]);
                 return $this->buildResponse(true, 'SMS sent successfully', $data);
             }
 
-            // Check for errors
-            if (isset($data['error'])) {
-                return $this->buildResponse(false, 'API Error: ' . ($data['error']['message'] ?? 'Unknown'), $data);
+            // Check for errors field if present
+            if (isset($data['error']) || isset($data['errors'])) {
+                $msg = isset($data['error']) ? (is_array($data['error']) ? json_encode($data['error']) : (string)$data['error']) : json_encode($data['errors']);
+                return $this->buildResponse(false, 'API Error: ' . $msg, $data);
             }
 
-            return $this->buildResponse(true, 'SMS processed', $data);
+            return $this->buildResponse(false, 'Unexpected API response', $data);
 
         } catch (Exception $e) {
             Log::error('SMS API Exception', ['error' => $e->getMessage()]);

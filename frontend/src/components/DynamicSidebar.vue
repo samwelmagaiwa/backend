@@ -35,11 +35,11 @@
           </div>
           <div v-show="!isCollapsed" class="flex flex-col">
             <span
-              class="text-base font-bold tracking-wide text-white drop-shadow-lg bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent"
+              class="text-xs font-bold tracking-wide text-white drop-shadow-lg bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent"
             >
               Muhimbili
             </span>
-            <span class="text-xs text-slate-300 font-semibold tracking-wider">
+            <span class="text-[10px] text-slate-300 font-semibold tracking-wider">
               National Hospital
             </span>
             <div class="flex items-center gap-1 mt-0.5">
@@ -71,7 +71,7 @@
           <li class="tree-node">
             <!-- Dashboard Root Node -->
             <div
-              class="relative flex items-center px-4 py-2 text-sm transition-all duration-300 cursor-pointer backdrop-blur-sm group"
+              class="relative flex items-center px-4 py-2 text-xs transition-all duration-300 cursor-pointer backdrop-blur-sm group"
               :class="[
                 isCollapsed ? 'justify-center' : '',
                 'text-slate-200 hover:bg-gradient-to-r hover:from-blue-600/20 hover:via-teal-600/20 hover:to-cyan-600/20 hover:text-white'
@@ -126,7 +126,7 @@
                 <li v-for="item in dashboardItems" :key="item.path" class="tree-leaf">
                   <router-link
                     :to="item.path"
-                    class="relative flex items-center rounded-lg px-3 py-2 text-sm transition-all duration-300 backdrop-blur-sm group overflow-hidden"
+                    class="relative flex items-center rounded-lg px-3 py-2 text-xs transition-all duration-300 backdrop-blur-sm group overflow-hidden"
                     :class="[
                       $route.path === item.path
                         ? 'bg-gradient-to-r from-blue-500/40 via-teal-500/40 to-cyan-500/40 text-white shadow-xl border border-blue-400/50'
@@ -168,7 +168,7 @@
         <!-- User Management Section (Admin only) -->
         <li v-if="userManagementItems.length > 0" class="mt-6">
           <div v-show="!isCollapsed" class="px-3 py-2">
-            <h3 class="text-sm font-semibold text-blue-200 uppercase tracking-wider drop-shadow-sm">
+            <h3 class="text-xs font-semibold text-blue-200 uppercase tracking-wider drop-shadow-sm">
               User Management
             </h3>
           </div>
@@ -180,7 +180,7 @@
           >
             <div class="flex items-center flex-1">
               <div
-                class="flex items-center rounded-md mx-2 px-3 py-2 text-sm transition-colors cursor-pointer flex-1 backdrop-blur-sm"
+                class="flex items-center rounded-md mx-2 px-3 py-2 text-xs transition-colors cursor-pointer flex-1 backdrop-blur-sm"
                 :class="[
                   isCollapsed ? 'justify-center' : '',
                   'text-blue-100 hover:bg-blue-700/30 hover:text-white'
@@ -274,7 +274,7 @@
           <li class="tree-node mt-4">
             <!-- Requests Management Root Node -->
             <div
-              class="relative flex items-center px-4 py-2 text-sm transition-all duration-300 cursor-pointer backdrop-blur-sm group"
+              class="relative flex items-center px-4 py-2 text-xs transition-all duration-300 cursor-pointer backdrop-blur-sm group"
               :class="[
                 isCollapsed ? 'justify-center' : '',
                 $route.path.startsWith('/hod-dashboard/request-list') ||
@@ -342,7 +342,7 @@
                 <li class="tree-leaf">
                   <router-link
                     to="/hod-dashboard/request-list"
-                    class="relative flex items-center rounded-lg px-3 py-2 text-sm transition-all duration-300 backdrop-blur-sm group overflow-hidden"
+                    class="relative flex items-center rounded-lg px-3 py-2 text-xs transition-all duration-300 backdrop-blur-sm group overflow-hidden"
                     :class="[
                       $route.path === '/hod-dashboard/request-list'
                         ? 'bg-gradient-to-r from-orange-500/40 via-amber-500/40 to-yellow-500/40 text-white shadow-xl border border-orange-400/50'
@@ -425,7 +425,7 @@
           <li class="tree-node mt-4">
             <!-- Device Management Root Node -->
             <div
-              class="relative flex items-center px-4 py-2 text-sm transition-all duration-300 cursor-pointer backdrop-blur-sm group"
+              class="relative flex items-center px-4 py-2 text-xs transition-all duration-300 cursor-pointer backdrop-blur-sm group"
               :class="[
                 isCollapsed ? 'justify-center' : '',
                 $route.path.startsWith('/ict-approval')
@@ -489,7 +489,7 @@
                 <li class="tree-leaf">
                   <router-link
                     to="/ict-approval/requests"
-                    class="relative flex items-center rounded-lg px-3 py-2 text-sm transition-all duration-300 backdrop-blur-sm group overflow-hidden"
+                    class="relative flex items-center rounded-lg px-3 py-2 text-xs transition-all duration-300 backdrop-blur-sm group overflow-hidden"
                     :class="[
                       $route.path === '/ict-approval/requests'
                         ? 'bg-gradient-to-r from-teal-500/40 via-cyan-500/40 to-emerald-500/40 text-white shadow-xl border border-teal-400/50'
@@ -547,7 +547,7 @@
 
       <button
         @click="handleLogout"
-        class="relative w-full flex items-center rounded-xl px-4 py-3 text-sm text-red-300 hover:bg-gradient-to-r hover:from-red-500/30 hover:via-orange-500/30 hover:to-red-500/30 hover:text-white transition-all duration-300 backdrop-blur-sm group hover:shadow-xl transform hover:scale-105 overflow-hidden"
+        class="relative w-full flex items-center rounded-xl px-4 py-3 text-xs text-red-300 hover:bg-gradient-to-r hover:from-red-500/30 hover:via-orange-500/30 hover:to-red-500/30 hover:text-white transition-all duration-300 backdrop-blur-sm group hover:shadow-xl transform hover:scale-105 overflow-hidden"
         :class="isCollapsed ? 'justify-center' : ''"
         :title="isCollapsed ? 'Logout' : ''"
       >
@@ -669,7 +669,7 @@
         set: (value) => emit('update:collapsed', value)
       })
 
-      const containerWidthClass = computed(() => (isCollapsed.value ? 'w-16' : 'w-72'))
+      const containerWidthClass = computed(() => (isCollapsed.value ? 'w-16' : 'w-64'))
 
       // Get menu items based on stable user role
       const menuItems = computed(() => {
@@ -946,7 +946,9 @@
   }
 
   /* Active route indicator */
+  /* Active route indicator */
   .router-link-active {
-    @apply bg-indigo-100 text-indigo-700;
+    background-color: #e0e7ff; /* bg-indigo-100 */
+    color: #4338ca; /* text-indigo-700 */
   }
 </style>

@@ -30,11 +30,11 @@
           <div class="bg-white/10 rounded-t-lg p-2 mb-0 border-b border-blue-300/30">
             <div class="flex justify-between items-center">
               <div class="text-center flex-1">
-                <h1 class="text-3xl font-bold text-white mb-1 tracking-wide drop-shadow-lg">
-                  <i class="fas fa-clipboard-check mr-3 text-blue-300"></i>
+                <h1 class="text-xl font-bold text-white mb-1 tracking-wide drop-shadow-lg">
+                  <i class="fas fa-clipboard-check mr-2 text-blue-300"></i>
                   REQUEST STATUS & TRACKING
                 </h1>
-                <p class="text-blue-100/80 text-lg">
+                <p class="text-blue-100/80 text-sm">
                   Track your submitted requests and view approval status
                 </p>
               </div>
@@ -56,7 +56,7 @@
                     <i class="fas fa-ban text-white text-2xl"></i>
                   </div>
                   <div class="flex-1">
-                    <h3 class="text-2xl font-bold text-white mb-2">
+                    <h3 class="text-base font-bold text-white mb-2">
                       <i class="fas fa-layer-group mr-2 text-red-300"></i>
                       Access Request Blocked
                     </h3>
@@ -71,12 +71,12 @@
                         v-if="pendingAccessRequestId"
                         class="bg-red-500/20 px-3 py-1 rounded-full border border-red-400/30"
                       >
-                        <span class="text-red-300 text-base font-medium">
+                        <span class="text-red-300 text-sm font-medium">
                           Pending Request: {{ pendingAccessRequestId }}
                         </span>
                       </div>
                       <div class="bg-red-500/20 px-3 py-1 rounded-full border border-red-400/30">
-                        <span class="text-red-300 text-base font-medium">
+                        <span class="text-red-300 text-sm font-medium">
                           Policy: One pending access request at a time
                         </span>
                       </div>
@@ -85,7 +85,7 @@
                   <div class="flex flex-col space-y-2">
                     <button
                       @click="refreshRequests"
-                      class="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 rounded-lg text-red-300 text-base font-medium transition-colors"
+                      class="px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 rounded-lg text-red-300 text-sm font-medium transition-colors"
                     >
                       <i class="fas fa-sync-alt mr-1"></i>
                       Refresh Status
@@ -112,7 +112,7 @@
                     <i class="fas fa-exclamation-triangle text-white text-2xl"></i>
                   </div>
                   <div class="flex-1">
-                    <h3 class="text-2xl font-bold text-white mb-2">
+                    <h3 class="text-base font-bold text-white mb-2">
                       Pending Booking Request Restriction
                     </h3>
                     <p class="text-yellow-100/90 text-base mb-3">
@@ -123,7 +123,7 @@
                       <div
                         class="bg-yellow-500/20 px-3 py-1 rounded-full border border-yellow-400/30"
                       >
-                        <span class="text-yellow-300 text-base font-medium">
+                        <span class="text-yellow-300 text-sm font-medium">
                           Policy: One pending booking at a time
                         </span>
                       </div>
@@ -133,7 +133,7 @@
                     <button
                       v-if="pendingBookingId"
                       @click="viewPendingBookingDetails"
-                      class="px-4 py-2 bg-yellow-500/20 hover:bg-yellow-500/30 border border-yellow-400/30 rounded-lg text-yellow-300 text-base font-medium transition-colors"
+                      class="px-3 py-1.5 bg-yellow-500/20 hover:bg-yellow-500/30 border border-yellow-400/30 rounded-lg text-yellow-300 text-sm font-medium transition-colors"
                     >
                       <i class="fas fa-eye mr-1"></i>
                       View Pending Request
@@ -160,7 +160,7 @@
                     <i class="fas fa-check-circle text-white text-xl"></i>
                   </div>
                   <div class="flex-1">
-                    <h3 class="text-2xl font-bold text-white mb-1">
+                    <h3 class="text-lg font-bold text-white mb-1">
                       Request Submitted Successfully!
                     </h3>
                     <p class="text-green-100/90 text-base mb-2">
@@ -170,14 +170,14 @@
                       <div
                         class="bg-green-500/20 px-3 py-1 rounded-full border border-green-400/30"
                       >
-                        <span class="text-green-300 text-base font-medium">
+                        <span class="text-green-300 text-sm font-medium">
                           Request ID: #{{ latestRequestId }}
                         </span>
                       </div>
                       <div
                         class="bg-green-500/20 px-3 py-1 rounded-full border border-green-400/30"
                       >
-                        <span class="text-green-300 text-base font-medium">
+                        <span class="text-green-300 text-sm font-medium">
                           Status: Pending Review
                         </span>
                       </div>
@@ -202,22 +202,22 @@
                       <i class="fas fa-list-alt text-white text-base"></i>
                     </div>
                     <div>
-                      <h3 class="text-2xl font-bold text-white">My Requests</h3>
-                      <p class="text-blue-100/80 text-lg">View all your submitted requests</p>
+                      <h3 class="text-lg font-bold text-white">My Requests</h3>
+                      <p class="text-blue-100/80 text-xs">View all your submitted requests</p>
                     </div>
                   </div>
                   <div class="flex items-center space-x-3">
                     <button
                       @click="refreshRequests"
                       :disabled="loading"
-                      class="px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-lg text-blue-300 text-lg font-medium transition-colors"
+                      class="px-3 py-1.5 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-lg text-blue-300 text-sm font-medium transition-colors"
                     >
                       <OrbitingDots v-if="loading" size="xs" class="mr-2" />
                       <i v-else class="fas fa-sync-alt mr-2"></i>
                       Refresh
                     </button>
                     <div class="bg-blue-500/20 px-3 py-1.5 rounded-full border border-blue-400/30">
-                      <span class="text-blue-300 text-lg font-medium">
+                      <span class="text-blue-300 text-sm font-medium">
                         Total: {{ totalRequests }}
                       </span>
                     </div>
@@ -259,14 +259,14 @@
                     <table class="w-full relative">
                       <thead class="bg-blue-800/50">
                         <tr class="border-b border-blue-300/20">
-                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-xl">
+                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-xs">
                             Request ID
                           </th>
-                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-xl">Type</th>
-                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-xl">
+                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-xs">Type</th>
+                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-xs">
                             Services
                           </th>
-                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-lg">
+                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-xs">
                             <div class="flex items-center space-x-2">
                               <span
                                 :class="
@@ -277,26 +277,26 @@
                               </span>
                               <i
                                 v-if="hasImplementedOrApproved"
-                                class="fas fa-check-circle text-green-400 text-sm"
+                                class="fas fa-check-circle text-green-400 text-xs"
                               ></i>
                             </div>
                           </th>
-                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-xl">
+                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-xs">
                             Current Step
                           </th>
-                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-xl">
+                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-xs">
                             Submitted
                           </th>
-                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-xl">
+                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-xs">
                             Device Status
                           </th>
-                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-xl">
+                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-xs">
                             Return Status
                           </th>
-                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-xl">
+                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-xs">
                             SMS Status
                           </th>
-                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-xl">
+                          <th class="text-left py-3 px-3 text-blue-100 font-bold text-xs">
                             Actions
                           </th>
                         </tr>
@@ -308,10 +308,10 @@
                           class="border-t border-blue-300/20 hover:bg-blue-700/30 transition-colors"
                         >
                           <td class="py-3 px-3">
-                            <div class="font-medium text-white text-2xl">
+                            <div class="font-medium text-white text-sm">
                               {{ formatRequestId(request.id) }}
                             </div>
-                            <div class="text-blue-300 text-xl mt-1">
+                            <div class="text-blue-300 text-xs mt-1">
                               {{ getRequestTypeLabel(request) }}
                             </div>
                           </td>
@@ -319,9 +319,9 @@
                             <div class="flex items-center space-x-2">
                               <i
                                 :class="getRequestTypeIcon(request.type)"
-                                class="text-blue-400 text-lg"
+                                class="text-blue-400 text-sm"
                               ></i>
-                              <span class="text-white text-2xl">{{
+                              <span class="text-white text-sm">{{
                                 getRequestTypeName(request.type)
                               }}</span>
                             </div>
@@ -331,7 +331,7 @@
                               <span
                                 v-for="service in request.services"
                                 :key="service"
-                                class="px-3 py-1 bg-blue-500/20 text-blue-300 text-xl rounded-full border border-blue-400/30"
+                                class="px-2 py-0.5 bg-blue-500/20 text-blue-300 text-xs rounded-full border border-blue-400/30"
                               >
                                 {{ service }}
                               </span>
@@ -340,11 +340,11 @@
                           <td class="py-3 px-3">
                             <div class="flex items-center space-x-2">
                               <div
-                                class="w-3 h-3 rounded-full"
+                                class="w-2.5 h-2.5 rounded-full"
                                 :class="getStatusColor(request.status)"
                               ></div>
                               <span
-                                class="text-2xl font-semibold flex items-center space-x-2"
+                                class="text-sm font-semibold flex items-center space-x-2"
                                 :class="getStatusTextColor(request.status)"
                               >
                                 <span>{{ getStatusText(request.status) }}</span>
@@ -359,10 +359,10 @@
                             </div>
                           </td>
                           <td class="py-3 px-3">
-                            <div class="text-white text-2xl">
+                            <div class="text-white text-sm">
                               {{ getCurrentStepText(request.current_step, request.type) }}
                             </div>
-                            <div class="text-blue-300 text-xl">
+                            <div class="text-blue-300 text-xs">
                               <span v-if="request.current_step === 0"
                                 >Waiting from another user</span
                               >
@@ -394,10 +394,10 @@
                             </div>
                           </td>
                           <td class="py-3 px-3">
-                            <div class="text-white text-2xl">
+                            <div class="text-white text-sm">
                               {{ formatDate(request.created_at) }}
                             </div>
-                            <div class="text-blue-300 text-xl">
+                            <div class="text-blue-300 text-xs">
                               {{ formatTime(request.created_at) }}
                             </div>
                           </td>
@@ -412,7 +412,7 @@
                                 class="flex items-center space-x-2"
                               >
                                 <div class="w-3 h-3 rounded-full bg-green-500"></div>
-                                <span class="text-green-300 text-xl font-semibold">Available</span>
+                                <span class="text-green-300 text-xs font-semibold">Available</span>
                               </div>
                               <div
                                 v-else-if="request.device_availability.status === 'out_of_stock'"
@@ -420,14 +420,14 @@
                               >
                                 <div class="flex items-center space-x-2">
                                   <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
-                                  <span class="text-yellow-300 text-xl font-semibold">In Use</span>
+                                  <span class="text-yellow-300 text-xs font-semibold">In Use</span>
                                 </div>
                                 <div
                                   v-if="
                                     request.device_availability.current_users &&
                                     request.device_availability.current_users.length > 0
                                   "
-                                  class="text-xl text-blue-200"
+                                  class="text-xs text-blue-200"
                                 >
                                   By:
                                   {{
@@ -438,52 +438,52 @@
                                 </div>
                                 <div
                                   v-if="request.device_availability.nearest_return"
-                                  class="text-xl text-orange-300"
+                                  class="text-xs text-orange-300"
                                 >
                                   Available:
                                   {{ request.device_availability.nearest_return.relative_time }}
                                 </div>
                                 <div
                                   v-if="request.device_availability.nearest_return"
-                                  class="text-lg text-blue-300"
+                                  class="text-xs text-blue-300"
                                 >
                                   {{ request.device_availability.nearest_return.date_time }}
                                 </div>
                               </div>
                               <div v-else class="flex items-center space-x-2">
                                 <div class="w-3 h-3 rounded-full bg-red-500"></div>
-                                <span class="text-red-300 text-xl font-semibold">Unavailable</span>
+                                <span class="text-red-300 text-xs font-semibold">Unavailable</span>
                               </div>
                             </div>
-                            <div v-else class="text-gray-400 text-xl">N/A</div>
+                            <div v-else class="text-gray-400 text-sm">N/A</div>
                           </td>
                           <td class="py-3 px-3">
                             <div v-if="request.type === 'booking_service'">
                               <div class="flex items-center space-x-2">
                                 <div
-                                  class="w-3 h-3 rounded-full"
+                                  class="w-2.5 h-2.5 rounded-full"
                                   :class="getReturnStatusColor(request.return_status)"
                                 ></div>
                                 <span
-                                  class="text-xl font-semibold"
+                                  class="text-sm font-semibold"
                                   :class="getReturnStatusTextColor(request.return_status)"
                                 >
                                   {{ getReturnStatusText(request.return_status) }}
                                 </span>
                               </div>
                             </div>
-                            <div v-else class="text-gray-400 text-xl">N/A</div>
+                            <div v-else class="text-gray-400 text-sm">N/A</div>
                           </td>
                           <td class="py-3 px-3">
                             <div class="flex items-center space-x-2">
                               <div
-                                class="w-3 h-3 rounded-full"
+                                class="w-2.5 h-2.5 rounded-full"
                                 :class="
                                   getSmsStatusColor(request.sms_status || request.sms_to_hod_status)
                                 "
                               ></div>
                               <span
-                                class="text-xl font-semibold"
+                                class="text-sm font-semibold"
                                 :class="
                                   getSmsStatusTextColor(
                                     request.sms_status || request.sms_to_hod_status
@@ -522,9 +522,9 @@
                               <!-- Three-dot menu button -->
                               <button
                                 @click.stop="toggleActionsMenu(request.id)"
-                                class="px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-lg text-blue-300 transition-colors"
+                                class="px-2 py-1 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-lg text-blue-300 transition-colors"
                               >
-                                <i class="fas fa-ellipsis-v text-lg"></i>
+                                <i class="fas fa-ellipsis-v text-sm"></i>
                               </button>
 
                               <!-- Dropdown menu -->

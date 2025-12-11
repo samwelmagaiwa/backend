@@ -32,8 +32,8 @@
                   <i class="fas fa-arrow-left text-blue-300 hover:text-white"></i>
                 </router-link>
                 <div>
-                  <h2 class="text-2xl font-bold text-blue-100 tracking-wide drop-shadow-md">
-                    <i class="fas fa-redo text-orange-400 mr-3"></i>
+                  <h2 class="text-xl font-bold text-blue-100 tracking-wide drop-shadow-md">
+                    <i class="fas fa-redo text-orange-400 mr-2"></i>
                     Resubmit Request
                   </h2>
                   <p class="text-sm text-teal-300 mt-1">
@@ -58,7 +58,7 @@
                 <div class="mb-6">
                   <i class="fas fa-exclamation-triangle text-6xl text-red-400 mb-4"></i>
                 </div>
-                <h3 class="text-xl font-semibold text-white mb-2">Error Loading Request</h3>
+                <h3 class="text-lg font-semibold text-white mb-2">Error Loading Request</h3>
                 <p class="text-red-300 max-w-md mx-auto mb-6">{{ error }}</p>
                 <button
                   @click="fetchRequestDetails"

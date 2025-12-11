@@ -366,7 +366,7 @@
                       >
                         <!-- Request ID -->
                         <td class="px-4 py-3 whitespace-nowrap">
-                          <div class="text-base font-medium text-white">#{{ request.id }}</div>
+                          <div class="text-sm font-medium text-white">#{{ request.id }}</div>
                           <div class="text-sm text-blue-300">
                             {{ getRequestPriority(request) }}
                           </div>
@@ -381,7 +381,7 @@
                             >
                               <i :class="getTypeIcon(request.type)" class="text-white text-sm"></i>
                             </div>
-                            <div class="text-base text-white">
+                            <div class="text-sm text-white">
                               <div class="font-medium">
                                 {{ getRequestTypeCode(request.type) }}
                               </div>
@@ -394,7 +394,7 @@
 
                         <!-- Personal Information -->
                         <td class="px-4 py-3">
-                          <div class="text-base text-white">
+                          <div class="text-sm text-white">
                             <div class="font-medium">
                               {{ request.staffName }}
                             </div>
@@ -420,7 +420,7 @@
 
                         <!-- Submission Date (FIFO) -->
                         <td class="px-4 py-3 whitespace-nowrap">
-                          <div class="text-base text-white font-medium">
+                          <div class="text-sm text-white font-medium">
                             {{ formatDate(request.submissionDate) }}
                           </div>
                           <div class="text-sm text-blue-300">
