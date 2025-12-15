@@ -21,8 +21,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Log security features activation with colorized console output
-        $this->logSecurityFeaturesEnabled();
+        // Best practice: avoid logging noisy health checks on every HTTP request.
+        // Only log these details in console commands or when APP_DEBUG=true.
+        if ($this->app->runningInConsole() || (bool) config('app.debug')) {
+            $this->logSecurityFeaturesEnabled();
+        }
     }
     
     /**
@@ -40,27 +43,31 @@ class AppServiceProvider extends ServiceProvider
         $allOk = collect($checks)->every(fn ($r) => $r['ok'] === true);
 
         // Structured log to laravel.log (no ANSI colors)
-        Log::info('🔒 Security features enabled', [
+        // DEBUG level to avoid bloating production logs.
+        Log::debug('🔒 Security features enabled', [
             'overall_ok' => $allOk,
-            'checks' => $checks,
+            // checks can be large; include only counts in logs
+            'checks_count' => is_array($checks) ? count($checks) : null,
         ]);
 
-        // Colorized console output
-        $GREEN = "\e[32m"; // green
-        $RED   = "\e[31m"; // red
-        $RESET = "\e[0m";  // reset
+        // Colorized console output only when running in console
+        if ($this->app->runningInConsole()) {
+            $GREEN = "\e[32m"; // green
+            $RED   = "\e[31m"; // red
+            $RESET = "\e[0m";  // reset
 
-        $prefix = $allOk ? "{$GREEN}[SECURITY]{$RESET}" : "{$RED}[SECURITY]{$RESET}";
-        error_log($prefix . ' Boot checks: ' . ($allOk ? ($GREEN . 'OK' . $RESET) : ($RED . 'FAIL' . $RESET)));
+            $prefix = $allOk ? "{$GREEN}[SECURITY]{$RESET}" : "{$RED}[SECURITY]{$RESET}";
+            error_log($prefix . ' Boot checks: ' . ($allOk ? ($GREEN . 'OK' . $RESET) : ($RED . 'FAIL' . $RESET)));
 
-        foreach ($checks as $name => $result) {
-            $color = $result['ok'] ? $GREEN : $RED;
-            $status = $result['ok'] ? 'OK' : 'FAIL';
-            error_log(sprintf('%s %s: %s - %s%s', $prefix, $name, $status, $color, $result['message'] . $RESET));
-        }
+            foreach ($checks as $name => $result) {
+                $color = $result['ok'] ? $GREEN : $RED;
+                $status = $result['ok'] ? 'OK' : 'FAIL';
+                error_log(sprintf('%s %s: %s - %s%s', $prefix, $name, $status, $color, $result['message'] . $RESET));
+            }
 
-        if (!$allOk) {
-            error_log($RED . '[SECURITY] One or more security checks failed. Review configuration before proceeding to production.' . $RESET);
+            if (!$allOk) {
+                error_log($RED . '[SECURITY] One or more security checks failed. Review configuration before proceeding to production.' . $RESET);
+            }
         }
     }
 }

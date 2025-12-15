@@ -23,7 +23,7 @@ class HeadOfItController extends Controller
     public function getAllRequests(Request $request)
     {
         try {
-            Log::info('HeadOfItController: Getting all requests for Head of IT');
+            Log::debug('HeadOfItController: Getting all requests for Head of IT');
             
             // Get requests that are approved by ICT Director (all that have reached Head of IT stage)
             // Include pending, approved, and rejected requests
@@ -113,7 +113,7 @@ class HeadOfItController extends Controller
     public function getRequestById($id)
     {
         try {
-            Log::info('HeadOfItController: Getting request by ID', ['request_id' => $id]);
+            Log::debug('HeadOfItController: Getting request by ID', ['request_id' => $id]);
             
             $request = UserCombinedAccessRequest::with(['user', 'department'])
                 ->findOrFail($id);
@@ -192,7 +192,7 @@ class HeadOfItController extends Controller
         DB::beginTransaction();
         
         try {
-            Log::info('HeadOfItController: Approving request', ['request_id' => $id]);
+            Log::debug('HeadOfItController: Approving request', ['request_id' => $id]);
             
             $accessRequest = UserCombinedAccessRequest::findOrFail($id);
             

@@ -74,9 +74,10 @@ class BookingServiceController extends Controller
     public function store(BookingServiceRequest $request): JsonResponse
     {
         try {
-            Log::info('BookingService store method called', [
+            Log::debug('BookingService store method called', [
                 'user_id' => $request->user()->id,
-                'request_data' => $request->except(['signature'])
+                // Avoid logging full form payload (can include lots of data)
+                'request_keys' => array_keys($request->except(['signature']))
             ]);
             
             // Check if user can submit a new request (prevent duplicates)
@@ -85,7 +86,7 @@ class BookingServiceController extends Controller
             if (!$canSubmitCheck['can_submit']) {
                 $activeRequest = $canSubmitCheck['active_request'];
                 
-                Log::info('User attempted to create booking with existing active request', [
+                Log::debug('User attempted to create booking with existing active request', [
                     'user_id' => $request->user()->id,
                     'existing_request_id' => $activeRequest->id,
                     'existing_request_status' => $activeRequest->status,
@@ -116,7 +117,7 @@ class BookingServiceController extends Controller
             }
             
             $validatedData = $request->validated();
-            Log::info('Validation passed successfully', [
+            Log::debug('Validation passed successfully', [
                 'user_id' => $request->user()->id,
                 'validated_fields' => array_keys($validatedData)
             ]);
@@ -154,9 +155,8 @@ class BookingServiceController extends Controller
         $user = $request->user();
         if ($user->phone) {
             $validatedData['phone_number'] = $user->phone;
-            Log::info('Auto-captured phone number from users table', [
-                'user_id' => $user->id,
-                'phone_number' => $user->phone
+            Log::debug('Auto-captured phone number from users table', [
+                'user_id' => $user->id
             ]);
         } else {
             Log::warning('User does not have phone number in profile', [
@@ -194,7 +194,10 @@ class BookingServiceController extends Controller
                 $validatedData['return_date_time'] = $returnDate . ' ' . $returnTime;
             }
             
-            Log::info('Validated data:', $validatedData);
+            Log::debug('Validated booking data (keys)', [
+                'user_id' => $request->user()->id,
+                'keys' => array_keys($validatedData)
+            ]);
 
             // Handle device inventory if device_inventory_id / device_inventory_ids are provided
             $deviceAvailabilityInfo = null;
@@ -214,10 +217,8 @@ class BookingServiceController extends Controller
                 $autoDetectedDeviceType = $this->mapInventoryDeviceToType($deviceInventory);
                 if ($autoDetectedDeviceType) {
                     $validatedData['device_type'] = $autoDetectedDeviceType;
-                    Log::info('Auto-detected device_type from primary inventory', [
+                    Log::debug('Auto-detected device_type from primary inventory', [
                         'device_inventory_id' => $deviceInventory->id,
-                        'device_name' => $deviceInventory->device_name,
-                        'device_code' => $deviceInventory->device_code,
                         'detected_type' => $autoDetectedDeviceType,
                         'original_frontend_type' => $request->input('device_type')
                     ]);
@@ -234,15 +235,13 @@ class BookingServiceController extends Controller
                 }
                 
                 if ($availabilityCheck['available']) {
-                    Log::info('Primary device available for booking request', [
+                    Log::debug('Primary device available for booking request', [
                         'device_id' => $deviceInventory->id,
-                        'device_name' => $deviceInventory->device_name,
                         'available_quantity' => $deviceInventory->available_quantity
                     ]);
                 } else {
-                    Log::info('Booking request submitted for out-of-stock primary device', [
+                    Log::debug('Booking request submitted for out-of-stock primary device', [
                         'device_id' => $deviceInventory->id,
-                        'device_name' => $deviceInventory->device_name,
                         'availability_message' => $availabilityCheck['message']
                     ]);
                 }

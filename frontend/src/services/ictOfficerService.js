@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { devLog } from '../utils/devLogger'
 
 const API_BASE_URL = process.env.VUE_APP_API_URL || 'http://127.0.0.1:8000/api'
 
@@ -70,18 +71,18 @@ const ictOfficerService = {
    */
   async getAccessRequests() {
     try {
-      console.log('🔄 IctOfficerService: Fetching access requests...')
+      devLog.debug('🔄 IctOfficerService: Fetching access requests...')
       const response = await axiosInstance.get('/ict-officer/access-requests')
 
       if (response.data.success) {
-        console.log('✅ IctOfficerService: Access requests loaded successfully')
+        devLog.debug('✅ IctOfficerService: Access requests loaded successfully')
         return {
           success: true,
           data: response.data.data,
           message: response.data.message
         }
       } else {
-        console.error(
+        devLog.error(
           '❌ IctOfficerService: Failed to load access requests:',
           response.data.message
         )
@@ -91,7 +92,7 @@ const ictOfficerService = {
         }
       }
     } catch (error) {
-      console.error('❌ IctOfficerService: Error fetching access requests:', error)
+      devLog.error('❌ IctOfficerService: Error fetching access requests:', error)
       return {
         success: false,
         message: error.response?.data?.message || 'Network error while loading access requests'
@@ -104,25 +105,25 @@ const ictOfficerService = {
    */
   async getAccessRequestById(requestId) {
     try {
-      console.log('🔄 IctOfficerService: Fetching access request by ID:', requestId)
+      devLog.debug('🔄 IctOfficerService: Fetching access request by ID:', requestId)
       const response = await axiosInstance.get(`/ict-officer/access-requests/${requestId}`)
 
       if (response.data.success) {
-        console.log('✅ IctOfficerService: Access request loaded successfully')
+        devLog.debug('✅ IctOfficerService: Access request loaded successfully')
         return {
           success: true,
           data: response.data.data,
           message: response.data.message
         }
       } else {
-        console.error('❌ IctOfficerService: Failed to load access request:', response.data.message)
+        devLog.error('❌ IctOfficerService: Failed to load access request:', response.data.message)
         return {
           success: false,
           message: response.data.message || 'Failed to load access request'
         }
       }
     } catch (error) {
-      console.error('❌ IctOfficerService: Error fetching access request:', error)
+      devLog.error('❌ IctOfficerService: Error fetching access request:', error)
       return {
         success: false,
         message: error.response?.data?.message || 'Network error while loading access request'
@@ -135,7 +136,7 @@ const ictOfficerService = {
    */
   async assignTaskToSelf(requestId, notes = '') {
     try {
-      console.log('🔄 IctOfficerService: Assigning task to self:', requestId)
+      devLog.debug('🔄 IctOfficerService: Assigning task to self:', requestId)
 
       const response = await axiosInstance.post(
         `/ict-officer/access-requests/${requestId}/assign`,
@@ -145,21 +146,21 @@ const ictOfficerService = {
       )
 
       if (response.data.success) {
-        console.log('✅ IctOfficerService: Task assigned successfully')
+        devLog.debug('✅ IctOfficerService: Task assigned successfully')
         return {
           success: true,
           data: response.data.data,
           message: response.data.message
         }
       } else {
-        console.error('❌ IctOfficerService: Failed to assign task:', response.data.message)
+        devLog.error('❌ IctOfficerService: Failed to assign task:', response.data.message)
         return {
           success: false,
           message: response.data.message || 'Failed to assign task'
         }
       }
     } catch (error) {
-      console.error('❌ IctOfficerService: Error assigning task:', error)
+      devLog.error('❌ IctOfficerService: Error assigning task:', error)
       return {
         success: false,
         message: error.response?.data?.message || 'Network error while assigning task'
@@ -172,7 +173,7 @@ const ictOfficerService = {
    */
   async updateProgress(requestId, status, notes = '') {
     try {
-      console.log('🔄 IctOfficerService: Updating progress:', requestId, status)
+      devLog.debug('🔄 IctOfficerService: Updating progress:', requestId, status)
 
       const response = await axiosInstance.put(
         `/ict-officer/access-requests/${requestId}/progress`,
@@ -183,21 +184,21 @@ const ictOfficerService = {
       )
 
       if (response.data.success) {
-        console.log('✅ IctOfficerService: Progress updated successfully')
+        devLog.debug('✅ IctOfficerService: Progress updated successfully')
         return {
           success: true,
           data: response.data.data,
           message: response.data.message
         }
       } else {
-        console.error('❌ IctOfficerService: Failed to update progress:', response.data.message)
+        devLog.error('❌ IctOfficerService: Failed to update progress:', response.data.message)
         return {
           success: false,
           message: response.data.message || 'Failed to update progress'
         }
       }
     } catch (error) {
-      console.error('❌ IctOfficerService: Error updating progress:', error)
+      devLog.error('❌ IctOfficerService: Error updating progress:', error)
       return {
         success: false,
         message: error.response?.data?.message || 'Network error while updating progress'
@@ -210,7 +211,7 @@ const ictOfficerService = {
    */
   async updateImplementationProgress(requestId, status, comments = '') {
     try {
-      console.log('🔄 IctOfficerService: Updating implementation progress:', requestId, status)
+      devLog.debug('🔄 IctOfficerService: Updating implementation progress:', requestId, status)
 
       const payload = {
         implementation_status: status,
@@ -230,14 +231,14 @@ const ictOfficerService = {
       )
 
       if (response.data.success) {
-        console.log('✅ IctOfficerService: Implementation progress updated successfully')
+        devLog.debug('✅ IctOfficerService: Implementation progress updated successfully')
         return {
           success: true,
           data: response.data.data,
           message: response.data.message || 'Implementation progress updated successfully'
         }
       } else {
-        console.error(
+        devLog.error(
           '❌ IctOfficerService: Failed to update implementation progress:',
           response.data.message
         )
@@ -247,7 +248,7 @@ const ictOfficerService = {
         }
       }
     } catch (error) {
-      console.error('❌ IctOfficerService: Error updating implementation progress:', error)
+      devLog.error('❌ IctOfficerService: Error updating implementation progress:', error)
       return {
         success: false,
         message:
@@ -261,7 +262,7 @@ const ictOfficerService = {
    */
   async cancelTask(requestId, reason) {
     try {
-      console.log('🔄 IctOfficerService: Canceling task:', requestId)
+      devLog.debug('🔄 IctOfficerService: Canceling task:', requestId)
 
       const response = await axiosInstance.post(
         `/ict-officer/access-requests/${requestId}/cancel`,
@@ -271,21 +272,21 @@ const ictOfficerService = {
       )
 
       if (response.data.success) {
-        console.log('✅ IctOfficerService: Task canceled successfully')
+        devLog.debug('✅ IctOfficerService: Task canceled successfully')
         return {
           success: true,
           data: response.data.data,
           message: response.data.message
         }
       } else {
-        console.error('❌ IctOfficerService: Failed to cancel task:', response.data.message)
+        devLog.error('❌ IctOfficerService: Failed to cancel task:', response.data.message)
         return {
           success: false,
           message: response.data.message || 'Failed to cancel task'
         }
       }
     } catch (error) {
-      console.error('❌ IctOfficerService: Error canceling task:', error)
+      devLog.error('❌ IctOfficerService: Error canceling task:', error)
       return {
         success: false,
         message: error.response?.data?.message || 'Network error while canceling task'
@@ -298,7 +299,7 @@ const ictOfficerService = {
    */
   async completeImplementation(requestId, notes = '', signatureFile = null) {
     try {
-      console.log('🔄 IctOfficerService: Completing implementation:', requestId)
+      devLog.debug('🔄 IctOfficerService: Completing implementation:', requestId)
 
       const formData = new FormData()
       formData.append('notes', notes)
@@ -317,14 +318,14 @@ const ictOfficerService = {
       )
 
       if (response.data.success) {
-        console.log('✅ IctOfficerService: Implementation completed successfully')
+        devLog.debug('✅ IctOfficerService: Implementation completed successfully')
         return {
           success: true,
           data: response.data.data,
           message: response.data.message
         }
       } else {
-        console.error(
+        devLog.error(
           '❌ IctOfficerService: Failed to complete implementation:',
           response.data.message
         )
@@ -334,7 +335,7 @@ const ictOfficerService = {
         }
       }
     } catch (error) {
-      console.error('❌ IctOfficerService: Error completing implementation:', error)
+      devLog.error('❌ IctOfficerService: Error completing implementation:', error)
       return {
         success: false,
         message: error.response?.data?.message || 'Network error while completing implementation'
@@ -347,21 +348,21 @@ const ictOfficerService = {
    */
   async getRequestTimeline(requestId) {
     try {
-      console.log('🔄 IctOfficerService: Fetching request timeline:', requestId)
+      devLog.debug('🔄 IctOfficerService: Fetching request timeline:', requestId)
       const response = await axiosInstance.get(`/ict-officer/access-requests/${requestId}/timeline`)
 
       if (response.data.success) {
-        console.log('✅ IctOfficerService: Request timeline loaded successfully')
+        devLog.debug('✅ IctOfficerService: Request timeline loaded successfully')
         return response.data.data
       } else {
-        console.error(
+        devLog.error(
           '❌ IctOfficerService: Failed to load request timeline:',
           response.data.message
         )
         throw new Error(response.data.message || 'Failed to load request timeline')
       }
     } catch (error) {
-      console.error('❌ IctOfficerService: Error fetching request timeline:', error)
+      devLog.error('❌ IctOfficerService: Error fetching request timeline:', error)
       if (error.response) {
         throw new Error(error.response.data?.message || 'Failed to load timeline data')
       } else {
@@ -375,18 +376,18 @@ const ictOfficerService = {
    */
   async getAccessRequestTimeline(requestId) {
     try {
-      console.log('🔄 IctOfficerService: Fetching access request timeline:', requestId)
+      devLog.debug('🔄 IctOfficerService: Fetching access request timeline:', requestId)
       const response = await axiosInstance.get(`/ict-officer/access-requests/${requestId}/timeline`)
 
       if (response.data.success) {
-        console.log('✅ IctOfficerService: Access request timeline loaded successfully')
+        devLog.debug('✅ IctOfficerService: Access request timeline loaded successfully')
         return {
           success: true,
           data: response.data.data,
           message: response.data.message
         }
       } else {
-        console.error(
+        devLog.error(
           '❌ IctOfficerService: Failed to load access request timeline:',
           response.data.message
         )
@@ -396,7 +397,7 @@ const ictOfficerService = {
         }
       }
     } catch (error) {
-      console.error('❌ IctOfficerService: Error fetching access request timeline:', error)
+      devLog.error('❌ IctOfficerService: Error fetching access request timeline:', error)
       return {
         success: false,
         message:
@@ -410,8 +411,8 @@ const ictOfficerService = {
    */
   async grantAccess(requestId, data) {
     try {
-      console.log('🔄 IctOfficerService: Granting access for request:', requestId)
-      console.log('Grant access data:', data)
+      devLog.debug('🔄 IctOfficerService: Granting access for request:', requestId)
+      devLog.debug('Grant access data:', data)
 
       const response = await axiosInstance.post(
         `/ict-officer/access-requests/${requestId}/grant-access`,
@@ -423,21 +424,21 @@ const ictOfficerService = {
       )
 
       if (response.data.success) {
-        console.log('✅ IctOfficerService: Access granted successfully')
+        devLog.debug('✅ IctOfficerService: Access granted successfully')
         return {
           success: true,
           data: response.data.data,
           message: response.data.message || 'Access granted successfully'
         }
       } else {
-        console.error('❌ IctOfficerService: Failed to grant access:', response.data.message)
+        devLog.error('❌ IctOfficerService: Failed to grant access:', response.data.message)
         return {
           success: false,
           message: response.data.message || 'Failed to grant access'
         }
       }
     } catch (error) {
-      console.error('❌ IctOfficerService: Error granting access:', error)
+      devLog.error('❌ IctOfficerService: Error granting access:', error)
       return {
         success: false,
         message: error.response?.data?.message || 'Network error while granting access'
@@ -450,25 +451,25 @@ const ictOfficerService = {
    */
   async getStatistics() {
     try {
-      console.log('🔄 IctOfficerService: Fetching statistics...')
+      devLog.debug('🔄 IctOfficerService: Fetching statistics...')
       const response = await axiosInstance.get('/ict-officer/statistics')
 
       if (response.data.success) {
-        console.log('✅ IctOfficerService: Statistics loaded successfully')
+        devLog.debug('✅ IctOfficerService: Statistics loaded successfully')
         return {
           success: true,
           data: response.data.data,
           message: response.data.message
         }
       } else {
-        console.error('❌ IctOfficerService: Failed to load statistics:', response.data.message)
+        devLog.error('❌ IctOfficerService: Failed to load statistics:', response.data.message)
         return {
           success: false,
           message: response.data.message || 'Failed to load statistics'
         }
       }
     } catch (error) {
-      console.error('❌ IctOfficerService: Error fetching statistics:', error)
+      devLog.error('❌ IctOfficerService: Error fetching statistics:', error)
       return {
         success: false,
         message: error.response?.data?.message || 'Network error while loading statistics'
@@ -481,21 +482,21 @@ const ictOfficerService = {
    */
   async getPendingRequestsCount() {
     try {
-      console.log('🔄 IctOfficerService: Fetching pending requests count...')
+      devLog.debug('🔄 IctOfficerService: Fetching pending requests count...')
       const response = await axiosInstance.get('/ict-officer/pending-count')
 
       if (response.data.success) {
         // Success logged only in development mode
         if (process.env.NODE_ENV === 'development') {
-          console.log('✅ IctOfficerService: Pending count loaded successfully')
+          devLog.debug('✅ IctOfficerService: Pending count loaded successfully')
         }
         return response.data.data
       } else {
-        console.error('❌ IctOfficerService: Failed to load pending count:', response.data.message)
+        devLog.error('❌ IctOfficerService: Failed to load pending count:', response.data.message)
         throw new Error(response.data.message || 'Failed to load pending requests count')
       }
     } catch (error) {
-      console.error('❌ IctOfficerService: Error fetching pending count:', error)
+      devLog.error('❌ IctOfficerService: Error fetching pending count:', error)
       if (error.response) {
         throw new Error(error.response.data?.message || 'Failed to load pending count')
       } else {
@@ -510,7 +511,7 @@ const ictOfficerService = {
    */
   async resendRequesterSms(requestId, requesterPhone = null) {
     try {
-      console.log('🔄 IctOfficerService: Retrying requester SMS for:', {
+      devLog.debug('🔄 IctOfficerService: Retrying requester SMS for:', {
         requestId,
         requesterPhone
       })
@@ -564,9 +565,9 @@ const ictOfficerService = {
       let lastError
       for (let i = 0; i < endpoints.length; i++) {
         try {
-          console.log(`🔄 Trying endpoint ${i + 1}/${endpoints.length}: ${endpoints[i]}`)
+          devLog.debug(`🔄 Trying endpoint ${i + 1}/${endpoints.length}: ${endpoints[i]}`)
           response = await axiosInstance.post(endpoints[i], payload)
-          console.log(`✅ Success with endpoint: ${endpoints[i]}`)
+          devLog.debug(`✅ Success with endpoint: ${endpoints[i]}`)
           break
         } catch (e) {
           console.warn(
@@ -576,14 +577,14 @@ const ictOfficerService = {
           )
           lastError = e
           if (i === endpoints.length - 1) {
-            console.error('🚫 All endpoints failed for SMS retry')
+            devLog.error('🚫 All endpoints failed for SMS retry')
             throw lastError
           }
         }
       }
 
       if (response.data?.success) {
-        console.log('✅ IctOfficerService: Requester SMS retry triggered successfully')
+        devLog.debug('✅ IctOfficerService: Requester SMS retry triggered successfully')
         return { success: true, data: response.data.data, message: response.data.message }
       }
 
@@ -592,7 +593,7 @@ const ictOfficerService = {
         message: response.data?.message || 'Failed to trigger SMS retry'
       }
     } catch (error) {
-      console.error('❌ IctOfficerService: Error retrying requester SMS:', error)
+      devLog.error('❌ IctOfficerService: Error retrying requester SMS:', error)
       return {
         success: false,
         message: error.response?.data?.message || 'Network error while retrying SMS'

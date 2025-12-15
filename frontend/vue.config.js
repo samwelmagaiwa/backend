@@ -7,6 +7,10 @@ module.exports = defineConfig({
   transpileDependencies: true,
   runtimeCompiler: true,
   publicPath: process.env.NODE_ENV === 'production' ? '/' : '/',
+
+  // Best practice: do not run ESLint as part of production builds.
+  // Keep linting in dev/CI via `npm run lint`.
+  lintOnSave: process.env.NODE_ENV !== 'production',
   configureWebpack: () => {
     const base = {
       resolve: {
@@ -42,6 +46,31 @@ module.exports = defineConfig({
     // Return object to be merged with Vue CLI's config
     return base
   },
+
+  // Reduce frontend console noise in production bundles (without affecting dev behavior)
+  // Keep console.warn/error for diagnosing production issues.
+  chainWebpack: (config) => {
+    if (process.env.NODE_ENV === 'production') {
+      config.optimization.minimizer('terser').tap((args) => {
+        const opts = args[0] || {}
+        opts.terserOptions = opts.terserOptions || {}
+        opts.terserOptions.compress = opts.terserOptions.compress || {}
+
+        // Remove only log/info/debug (keep warn/error)
+        const pure = opts.terserOptions.compress.pure_funcs || []
+        opts.terserOptions.compress.pure_funcs = Array.from(
+          new Set([].concat(pure, ['console.log', 'console.info', 'console.debug']))
+        )
+
+        // Always safe to remove debugger statements in prod
+        opts.terserOptions.compress.drop_debugger = true
+
+        args[0] = opts
+        return args
+      })
+    }
+  },
+
   devServer: {
     static: {
       directory: path.join(__dirname, 'public'),

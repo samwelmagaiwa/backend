@@ -1,10 +1,11 @@
+import apiClient from '../utils/apiClient'
+import { devLog } from '../utils/devLogger'
+
 /**
  * Device Borrowing Request Service
  *
  * Handles ICT approval of device borrowing requests from booking_service table
  */
-
-import apiClient from '../utils/apiClient'
 
 export const deviceBorrowingService = {
   /**
@@ -23,9 +24,9 @@ export const deviceBorrowingService = {
             per_page: params.per_page || 50
           }
         })
-        console.log('Successfully fetched from ICT approval endpoint')
+        devLog.debug('Successfully fetched from ICT approval endpoint')
       } catch (ictError) {
-        console.log(
+        devLog.debug(
           'ICT approval endpoint failed, trying booking service endpoint:',
           ictError.response?.status,
           ictError.response?.data?.message
@@ -38,7 +39,7 @@ export const deviceBorrowingService = {
             per_page: params.per_page || 50
           }
         })
-        console.log('Successfully fetched from booking service endpoint')
+        devLog.debug('Successfully fetched from booking service endpoint')
       }
 
       const requests = response.data.data?.data || response.data.data || []
@@ -57,7 +58,7 @@ export const deviceBorrowingService = {
         }
       }
     } catch (error) {
-      console.error('Failed to fetch device borrowing requests:', error)
+      devLog.error('Failed to fetch device borrowing requests:', error)
       return {
         success: false,
         message: error.response?.data?.message || 'Failed to fetch requests',
@@ -86,7 +87,7 @@ export const deviceBorrowingService = {
    */
   async getRequestDetails(requestId) {
     try {
-      console.log('🔍 Fetching request details for ID:', requestId)
+      devLog.debug('🔍 Fetching request details for ID:', requestId)
 
       // Try ICT approval endpoint first (for ICT officers)
       let response
@@ -94,9 +95,9 @@ export const deviceBorrowingService = {
       try {
         response = await apiClient.get(`/ict-approval/device-requests/${requestId}`)
         sourceEndpoint = 'ict-approval/device-requests'
-        console.log('✅ Successfully fetched from ICT approval endpoint')
+        devLog.debug('✅ Successfully fetched from ICT approval endpoint')
       } catch (ictError) {
-        console.log(
+        devLog.debug(
           '⚠️ ICT approval endpoint failed, trying booking service endpoint:',
           ictError.response?.status
         )
@@ -104,7 +105,7 @@ export const deviceBorrowingService = {
         // Fallback to booking service endpoint
         response = await apiClient.get(`/booking-service/bookings/${requestId}`)
         sourceEndpoint = 'booking-service/bookings'
-        console.log('✅ Successfully fetched from booking service endpoint')
+        devLog.debug('✅ Successfully fetched from booking service endpoint')
       }
 
       const request = response.data.data || response.data
@@ -112,11 +113,11 @@ export const deviceBorrowingService = {
       request._endpoint = sourceEndpoint
       request._source = sourceEndpoint.includes('booking') ? 'booking_service' : 'ict_approval'
 
-      console.log('📄 Raw request data:', request)
-      console.log('🔍 Source endpoint:', sourceEndpoint)
-      console.log('🔍 Raw reason field:', request.reason)
-      console.log('🔍 Raw purpose field:', request.purpose)
-      console.log('🔍 Raw phone fields:', {
+      devLog.debug('📄 Raw request data:', request)
+      devLog.debug('🔍 Source endpoint:', sourceEndpoint)
+      devLog.debug('🔍 Raw reason field:', request.reason)
+      devLog.debug('🔍 Raw purpose field:', request.purpose)
+      devLog.debug('🔍 Raw phone fields:', {
         phone_number: request.phone_number,
         borrower_phone: request.borrower_phone,
         user_phone: request.user?.phone,
@@ -125,7 +126,7 @@ export const deviceBorrowingService = {
 
       // Check request type before transformation
       const isBooking = this.isBookingRequest(request)
-      console.log('🔍 Request type analysis:', {
+      devLog.debug('🔍 Request type analysis:', {
         requestId: request.id,
         isBookingRequest: isBooking,
         detectedType: isBooking ? 'booking' : 'access'
@@ -136,18 +137,18 @@ export const deviceBorrowingService = {
       }
 
       const transformedRequest = this.transformRequest(request)
-      console.log('🔄 Transformed request data:', transformedRequest)
-      console.log('🔍 Transformed reason field:', transformedRequest.reason)
-      console.log('🔍 Transformed purpose field:', transformedRequest.purpose)
-      console.log('🔍 Transformed phone field:', transformedRequest.borrower_phone)
-      console.log('🔍 Final request type:', transformedRequest.request_type)
+      devLog.debug('🔄 Transformed request data:', transformedRequest)
+      devLog.debug('🔍 Transformed reason field:', transformedRequest.reason)
+      devLog.debug('🔍 Transformed purpose field:', transformedRequest.purpose)
+      devLog.debug('🔍 Transformed phone field:', transformedRequest.borrower_phone)
+      devLog.debug('🔍 Final request type:', transformedRequest.request_type)
 
       return {
         success: true,
         data: transformedRequest
       }
     } catch (error) {
-      console.error('❌ Failed to fetch request details:', {
+      devLog.error('❌ Failed to fetch request details:', {
         requestId,
         error: error.message,
         status: error.response?.status,
@@ -178,7 +179,7 @@ export const deviceBorrowingService = {
    */
   async approveRequest(requestId, notes = '') {
     try {
-      console.log('✅ Approving request ID:', requestId, 'with notes:', notes)
+      devLog.debug('✅ Approving request ID:', requestId, 'with notes:', notes)
 
       // Prefer booking-service endpoint (implemented), then fallback to ICT endpoint
       let response
@@ -186,10 +187,10 @@ export const deviceBorrowingService = {
         response = await apiClient.post(`/booking-service/bookings/${requestId}/ict-approve`, {
           ict_notes: notes
         })
-        console.log('✅ Successfully approved via booking service endpoint')
+        devLog.debug('✅ Successfully approved via booking service endpoint')
       } catch (bsError) {
         const status = bsError.response?.status
-        console.log('⚠️ Booking-service endpoint failed:', status, bsError.response?.data?.message)
+        devLog.debug('⚠️ Booking-service endpoint failed:', status, bsError.response?.data?.message)
         // Fallback to ICT approval endpoint only for missing/not-implemented routes
         const shouldFallback = !status || [404, 405, 501].includes(status)
         if (!shouldFallback) {
@@ -198,7 +199,7 @@ export const deviceBorrowingService = {
         response = await apiClient.post(`/ict-approval/device-requests/${requestId}/approve`, {
           ict_notes: notes
         })
-        console.log('✅ Successfully approved via ICT approval endpoint (fallback)')
+        devLog.debug('✅ Successfully approved via ICT approval endpoint (fallback)')
       }
 
       return {
@@ -207,7 +208,7 @@ export const deviceBorrowingService = {
         message: 'Device borrowing request approved successfully'
       }
     } catch (error) {
-      console.error('❌ Failed to approve request:', {
+      devLog.error('❌ Failed to approve request:', {
         requestId,
         error: error.message,
         status: error.response?.status,
@@ -235,7 +236,7 @@ export const deviceBorrowingService = {
         throw new Error('Rejection reason is required')
       }
 
-      console.log('❌ Rejecting request ID:', requestId, 'with notes:', notes)
+      devLog.debug('❌ Rejecting request ID:', requestId, 'with notes:', notes)
 
       // Try ICT approval endpoint first
       let response
@@ -243,9 +244,9 @@ export const deviceBorrowingService = {
         response = await apiClient.post(`/ict-approval/device-requests/${requestId}/reject`, {
           ict_notes: notes
         })
-        console.log('✅ Successfully rejected via ICT approval endpoint')
+        devLog.debug('✅ Successfully rejected via ICT approval endpoint')
       } catch (ictError) {
-        console.log(
+        devLog.debug(
           '⚠️ ICT approval endpoint failed, trying booking service endpoint:',
           ictError.response?.status
         )
@@ -254,7 +255,7 @@ export const deviceBorrowingService = {
         response = await apiClient.post(`/booking-service/bookings/${requestId}/ict-reject`, {
           ict_notes: notes
         })
-        console.log('✅ Successfully rejected via booking service endpoint')
+        devLog.debug('✅ Successfully rejected via booking service endpoint')
       }
 
       return {
@@ -263,7 +264,7 @@ export const deviceBorrowingService = {
         message: 'Device borrowing request rejected successfully'
       }
     } catch (error) {
-      console.error('❌ Failed to reject request:', {
+      devLog.error('❌ Failed to reject request:', {
         requestId,
         error: error.message,
         status: error.response?.status,
@@ -286,21 +287,21 @@ export const deviceBorrowingService = {
    */
   async deleteRequest(requestId) {
     try {
-      console.log('🗑️ Deleting request ID:', requestId)
+      devLog.debug('🗑️ Deleting request ID:', requestId)
 
       // Try ICT approval endpoint first
       try {
         await apiClient.delete(`/ict-approval/device-requests/${requestId}`)
-        console.log('✅ Successfully deleted via ICT approval endpoint')
+        devLog.debug('✅ Successfully deleted via ICT approval endpoint')
       } catch (ictError) {
-        console.log(
+        devLog.debug(
           '⚠️ ICT approval endpoint failed, trying booking service endpoint:',
           ictError.response?.status
         )
 
         // Fallback to booking service endpoint
         await apiClient.delete(`/booking-service/bookings/${requestId}`)
-        console.log('✅ Successfully deleted via booking service endpoint')
+        devLog.debug('✅ Successfully deleted via booking service endpoint')
       }
 
       return {
@@ -308,7 +309,7 @@ export const deviceBorrowingService = {
         message: 'Device borrowing request deleted successfully'
       }
     } catch (error) {
-      console.error('❌ Failed to delete request:', {
+      devLog.error('❌ Failed to delete request:', {
         requestId,
         error: error.message,
         status: error.response?.status,
@@ -331,7 +332,7 @@ export const deviceBorrowingService = {
    */
   async bulkDeleteRequests(requestIds) {
     try {
-      console.log('🗑️ Bulk deleting request IDs:', requestIds)
+      devLog.debug('🗑️ Bulk deleting request IDs:', requestIds)
 
       // Try ICT approval endpoint first
       let response
@@ -339,9 +340,9 @@ export const deviceBorrowingService = {
         response = await apiClient.post('/ict-approval/device-requests/bulk-delete', {
           request_ids: requestIds
         })
-        console.log('✅ Successfully bulk deleted via ICT approval endpoint')
+        devLog.debug('✅ Successfully bulk deleted via ICT approval endpoint')
       } catch (ictError) {
-        console.log(
+        devLog.debug(
           '⚠️ ICT approval endpoint failed, trying booking service endpoint:',
           ictError.response?.status
         )
@@ -350,7 +351,7 @@ export const deviceBorrowingService = {
         response = await apiClient.post('/booking-service/bookings/bulk-delete', {
           request_ids: requestIds
         })
-        console.log('✅ Successfully bulk deleted via booking service endpoint')
+        devLog.debug('✅ Successfully bulk deleted via booking service endpoint')
       }
 
       return {
@@ -359,7 +360,7 @@ export const deviceBorrowingService = {
         message: response.data.message || 'Requests deleted successfully'
       }
     } catch (error) {
-      console.error('❌ Failed to bulk delete requests:', {
+      devLog.error('❌ Failed to bulk delete requests:', {
         requestIds,
         error: error.message,
         status: error.response?.status,
@@ -427,7 +428,7 @@ export const deviceBorrowingService = {
       request._endpoint?.includes('booking') ||
       request._endpoint?.includes('device-requests')
 
-    console.log('🔍 Request type detection:', {
+    devLog.debug('🔍 Request type detection:', {
       requestId: request.id,
       hasBookingFields: hasBookingFields,
       bookingFieldsFound: bookingIndicators.filter((field) =>
@@ -450,7 +451,7 @@ export const deviceBorrowingService = {
     // Always prioritize phone number from users table for both booking and approval processes
     const phoneNumber = request.user?.phone || request.phone_number || request.borrower_phone
 
-    console.log('📞 Auto-captured phone number from users table:', {
+    devLog.debug('📞 Auto-captured phone number from users table:', {
       requestId: request.id,
       user_phone: request.user?.phone,
       phone_number: request.phone_number,
@@ -779,7 +780,7 @@ export const deviceBorrowingService = {
    */
   async saveIssuingAssessment(requestId, assessmentData) {
     try {
-      console.log('💾 Saving issuing assessment for request ID:', requestId, assessmentData)
+      devLog.debug('💾 Saving issuing assessment for request ID:', requestId, assessmentData)
 
       // Try ICT approval endpoint first (recommended approach)
       let response
@@ -788,22 +789,22 @@ export const deviceBorrowingService = {
           `/ict-approval/device-requests/${requestId}/assessment/issuing`,
           assessmentData
         )
-        console.log('✅ Successfully saved via ICT approval endpoint')
+        devLog.debug('✅ Successfully saved via ICT approval endpoint')
       } catch (ictError) {
         const status = ictError.response?.status
-        console.log('⚠️ ICT approval endpoint failed:', status, ictError.response?.data?.message)
+        devLog.debug('⚠️ ICT approval endpoint failed:', status, ictError.response?.data?.message)
         // Only fallback for missing/not-implemented routes; surface business/validation errors
         const shouldFallback = !status || [404, 405, 501].includes(status)
         if (!shouldFallback) {
           throw ictError
         }
-        console.log('↩️ Falling back to booking-service endpoint...')
+        devLog.debug('↩️ Falling back to booking-service endpoint...')
         // Fallback to booking service endpoint
         response = await apiClient.post(
           `/booking-service/bookings/${requestId}/assessment/issuing`,
           assessmentData
         )
-        console.log('✅ Successfully saved via booking service endpoint')
+        devLog.debug('✅ Successfully saved via booking service endpoint')
       }
 
       return {
@@ -813,7 +814,7 @@ export const deviceBorrowingService = {
           response.data.message || 'Device issued and condition assessment saved successfully'
       }
     } catch (error) {
-      console.error('❌ Failed to save issuing assessment:', {
+      devLog.error('❌ Failed to save issuing assessment:', {
         requestId,
         error: error.message,
         status: error.response?.status,
@@ -837,7 +838,7 @@ export const deviceBorrowingService = {
    */
   async saveReceivingAssessment(requestId, assessmentData) {
     try {
-      console.log('📥 Saving receiving assessment for request ID:', requestId, assessmentData)
+      devLog.debug('📥 Saving receiving assessment for request ID:', requestId, assessmentData)
 
       // Try ICT approval endpoint first (recommended approach)
       let response
@@ -846,21 +847,21 @@ export const deviceBorrowingService = {
           `/ict-approval/device-requests/${requestId}/assessment/receiving`,
           assessmentData
         )
-        console.log('✅ Successfully saved via ICT approval endpoint')
+        devLog.debug('✅ Successfully saved via ICT approval endpoint')
       } catch (ictError) {
         const status = ictError.response?.status
-        console.log('⚠️ ICT approval endpoint failed:', status, ictError.response?.data?.message)
+        devLog.debug('⚠️ ICT approval endpoint failed:', status, ictError.response?.data?.message)
         const shouldFallback = !status || [404, 405, 501].includes(status)
         if (!shouldFallback) {
           throw ictError
         }
-        console.log('↩️ Falling back to booking-service endpoint...')
+        devLog.debug('↩️ Falling back to booking-service endpoint...')
         // Fallback to booking service endpoint
         response = await apiClient.post(
           `/booking-service/bookings/${requestId}/assessment/receiving`,
           assessmentData
         )
-        console.log('✅ Successfully saved via booking service endpoint')
+        devLog.debug('✅ Successfully saved via booking service endpoint')
       }
 
       return {
@@ -869,7 +870,7 @@ export const deviceBorrowingService = {
         message: response.data.message || 'Device received and assessment completed successfully'
       }
     } catch (error) {
-      console.error('❌ Failed to save receiving assessment:', {
+      devLog.error('❌ Failed to save receiving assessment:', {
         requestId,
         error: error.message,
         status: error.response?.status,

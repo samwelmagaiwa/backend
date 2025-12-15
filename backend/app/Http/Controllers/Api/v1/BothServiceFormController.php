@@ -88,7 +88,7 @@ class BothServiceFormController extends Controller
                 ], 403);
             }
             
-            Log::info('🔍 HOD APPROVAL UPDATE START', [
+            Log::debug('🔍 HOD APPROVAL UPDATE START', [
                 'user_access_id' => $userAccessId,
                 'hod_user_id' => $currentUser->id,
                 'request_method' => $request->method(),
@@ -120,8 +120,8 @@ class BothServiceFormController extends Controller
                 'temporary_until.after' => 'End date must be in the future',
             ]);
             
-            Log::info('✅ Validation passed', [
-                'validated_data' => $validated
+            Log::debug('✅ Validation passed', [
+                'validated_keys' => array_keys($validated)
             ]);
             
             // Get user access record
@@ -136,7 +136,7 @@ class BothServiceFormController extends Controller
                 ], 403);
             }
             
-            Log::info('🏢 Department verification passed', [
+            Log::debug('🏢 Department verification passed', [
                 'hod_department_id' => $hodDepartment->id,
                 'request_department_id' => $userAccess->department_id,
                 'department_name' => $hodDepartment->name
@@ -175,8 +175,7 @@ class BothServiceFormController extends Controller
                 if (is_array($wellsoftModules)) {
                     $updateData['wellsoft_modules_selected'] = $wellsoftModules;
                     
-                    Log::info('✅ Wellsoft modules processed', [
-                        'modules' => $wellsoftModules,
+                    Log::debug('✅ Wellsoft modules processed', [
                         'count' => count($wellsoftModules)
                     ]);
                 }
@@ -187,8 +186,7 @@ class BothServiceFormController extends Controller
                 if (is_array($jeevaModules)) {
                     $updateData['jeeva_modules_selected'] = $jeevaModules;
                     
-                    Log::info('✅ Jeeva modules processed', [
-                        'modules' => $jeevaModules,
+                    Log::debug('✅ Jeeva modules processed', [
                         'count' => count($jeevaModules)
                     ]);
                 }
@@ -197,14 +195,14 @@ class BothServiceFormController extends Controller
             if ($request->has('module_requested_for')) {
                 $updateData['module_requested_for'] = $request->input('module_requested_for', 'use');
                 
-                Log::info('✅ Module request type processed', [
+                Log::debug('✅ Module request type processed', [
                     'module_requested_for' => $updateData['module_requested_for']
                 ]);
             }
             
-            Log::info('🔄 Updating user access record', [
+            Log::debug('🔄 Updating user access record', [
                 'user_access_id' => $userAccess->id,
-                'update_data' => Arr::except($updateData, ['hod_signature_path']),
+                'update_keys' => array_keys($updateData),
                 'has_signature_path' => !empty($updateData['hod_signature_path'])
             ]);
             
@@ -214,10 +212,9 @@ class BothServiceFormController extends Controller
             // Verify the update was successful
             $userAccess->refresh();
             
-            Log::info('✅ User access record updated successfully', [
+            Log::debug('✅ User access record updated successfully', [
                 'user_access_id' => $userAccess->id,
                 'hod_name' => $userAccess->hod_name,
-                'hod_signature_path' => $userAccess->hod_signature_path,
                 'hod_approved_at' => $userAccess->hod_approved_at,
                 'access_type' => $userAccess->access_type,
                 'temporary_until' => $userAccess->temporary_until,
@@ -249,7 +246,7 @@ class BothServiceFormController extends Controller
                         $nextApprover
                     );
                     
-                    Log::info('HOD SMS notifications sent', [
+                    Log::debug('HOD SMS notifications sent', [
                         'request_id' => $userAccess->id,
                         'next_approver' => $nextApprover->name
                     ]);
@@ -1611,7 +1608,7 @@ class BothServiceFormController extends Controller
                 ], 403);
             }
             
-            Log::info('🔍 HEAD OF IT APPROVAL START', [
+            Log::debug('🔍 HEAD OF IT APPROVAL START', [
                 'user_access_id' => $userAccessId,
                 'head_it_user_id' => $currentUser->id,
                 'request_method' => $request->method(),
@@ -1631,8 +1628,8 @@ class BothServiceFormController extends Controller
                 'approved_date.date' => 'Please provide a valid approval date',
             ]);
             
-            Log::info('✅ Validation passed', [
-                'validated_data' => Arr::except($validated, ['head_it_signature']),
+            Log::debug('✅ Validation passed', [
+                'validated_keys' => array_keys(Arr::except($validated, ['head_it_signature'])),
                 'has_signature_file' => isset($validated['head_it_signature'])
             ]);
             
@@ -1682,7 +1679,7 @@ class BothServiceFormController extends Controller
                         throw new \Exception('Failed to store signature file');
                     }
                     
-                    Log::info('✅ Head of IT signature uploaded successfully', [
+                    Log::debug('✅ Head of IT signature uploaded successfully', [
                         'original_name' => $signatureFile->getClientOriginalName(),
                         'stored_path' => $headItSignaturePath,
                         'file_size' => $signatureFile->getSize(),
@@ -1717,19 +1714,18 @@ class BothServiceFormController extends Controller
                 'ict_officer_status' => 'pending' // Advance to ICT Officer for implementation
             ];
             
-            Log::info('🔄 Updating user access record for Head of IT approval', [
+            Log::debug('🔄 Updating user access record for Head of IT approval', [
                 'user_access_id' => $userAccess->id,
-                'update_data' => Arr::except($updateData, ['head_it_signature_path']),
+                'update_keys' => array_keys($updateData),
                 'has_signature_path' => !empty($updateData['head_it_signature_path'])
             ]);
             
             $userAccess->update($updateData);
             $userAccess->refresh();
             
-            Log::info('✅ User access record updated successfully for Head of IT approval', [
+            Log::debug('✅ User access record updated successfully for Head of IT approval', [
                 'user_access_id' => $userAccess->id,
                 'head_it_name' => $userAccess->head_it_name,
-                'head_it_signature_path' => $userAccess->head_it_signature_path,
                 'head_it_approved_at' => $userAccess->head_it_approved_at,
                 'calculated_status' => $userAccess->getCalculatedOverallStatus()
             ]);
@@ -1744,7 +1740,7 @@ class BothServiceFormController extends Controller
                     null // No next approver - awaiting ICT Officer assignment by Head of IT
                 );
                 
-                Log::info('✅ SMS notifications sent for Head of IT approval', [
+                Log::debug('✅ SMS notifications sent for Head of IT approval', [
                     'request_id' => $userAccess->id
                 ]);
             } catch (\Exception $e) {
@@ -1823,7 +1819,7 @@ class BothServiceFormController extends Controller
                 ], 403);
             }
 
-            Log::info('🔍 ICT OFFICER IMPLEMENTATION START', [
+            Log::debug('🔍 ICT OFFICER IMPLEMENTATION START', [
                 'user_access_id' => $userAccessId,
                 'ict_officer_user_id' => $currentUser->id,
                 'request_method' => $request->method(),
@@ -1928,7 +1924,7 @@ class BothServiceFormController extends Controller
                 ]);
                 
                 if ($taskUpdateSuccess) {
-                    Log::info('✅ ICT task assignment marked as completed', [
+                    Log::debug('✅ ICT task assignment marked as completed', [
                         'assignment_id' => $latestAssignment->id,
                         'user_access_id' => $userAccess->id,
                         'ict_officer_id' => $currentUser->id
@@ -1953,10 +1949,11 @@ class BothServiceFormController extends Controller
                 $smsModule = app(\App\Services\SmsModule::class);
                 $smsResults = $smsModule->notifyAccessGranted($userAccess, $currentUser, $validated['comments'] ?? null);
                 
-                Log::info('✅ SMS notification sent to requester for access granted', [
+                Log::debug('✅ SMS notification sent to requester for access granted', [
                     'request_id' => $userAccessId,
                     'ict_officer_id' => $currentUser->id,
-                    'sms_results' => $smsResults
+                    // sms_results can be verbose; keep only success flag
+                    'requester_notified' => $smsResults['requester_notified'] ?? null
                 ]);
             } catch (\Exception $smsError) {
                 Log::warning('❌ Failed to send access granted SMS notification', [

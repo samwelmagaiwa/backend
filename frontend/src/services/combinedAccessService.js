@@ -1,4 +1,5 @@
 import apiClient from '../utils/apiClient'
+import { devLog } from '../utils/devLogger'
 
 /**
  * Combined Access Service for HOD request management
@@ -12,7 +13,7 @@ class CombinedAccessService {
    */
   async getHodRequests(filters = {}) {
     try {
-      console.log('🔄 Fetching combined access requests for HOD approval...', filters)
+      devLog.debug('🔄 Fetching combined access requests for HOD approval...', filters)
 
       const params = new URLSearchParams()
 
@@ -25,7 +26,7 @@ class CombinedAccessService {
       const response = await apiClient.get(`/hod/combined-access-requests?${params.toString()}`)
 
       if (response.data && response.data.success) {
-        console.log(
+        devLog.debug(
           '✅ HOD requests retrieved successfully:',
           response.data.data?.length || 0,
           'requests'
@@ -51,7 +52,7 @@ class CombinedAccessService {
         }
       }
 
-      console.error('❌ Error fetching HOD requests:', error)
+      devLog.error('❌ Error fetching HOD requests:', error)
       return {
         success: false,
         error: error.response?.data?.message || error.message || 'Failed to retrieve HOD requests',
@@ -68,12 +69,12 @@ class CombinedAccessService {
    */
   async getRequestById(requestId) {
     try {
-      console.log('🔄 Fetching combined access request (general):', requestId)
+      devLog.debug('🔄 Fetching combined access request (general):', requestId)
 
       const response = await apiClient.get(`/both-service-form/${requestId}`)
 
       if (response.data && response.data.success) {
-        console.log('✅ Request retrieved successfully (general):', requestId)
+        devLog.debug('✅ Request retrieved successfully (general):', requestId)
         return {
           success: true,
           data: response.data.data
@@ -82,7 +83,7 @@ class CombinedAccessService {
         throw new Error(response.data?.message || 'Request not found')
       }
     } catch (error) {
-      console.error('❌ Error fetching request (general):', error)
+      devLog.error('❌ Error fetching request (general):', error)
       return {
         success: false,
         error: error.response?.data?.message || error.message || 'Failed to retrieve request',
@@ -98,12 +99,12 @@ class CombinedAccessService {
    */
   async getHodRequestById(requestId) {
     try {
-      console.log('🔄 Fetching HOD combined access request:', requestId)
+      devLog.debug('🔄 Fetching HOD combined access request:', requestId)
 
       const response = await apiClient.get(`/hod/combined-access-requests/${requestId}`)
 
       if (response.data && response.data.success) {
-        console.log('✅ HOD request retrieved successfully:', requestId)
+        devLog.debug('✅ HOD request retrieved successfully:', requestId)
         return {
           success: true,
           data: response.data.data
@@ -112,7 +113,7 @@ class CombinedAccessService {
         throw new Error(response.data?.message || 'HOD request not found')
       }
     } catch (error) {
-      console.error('❌ Error fetching HOD request:', error)
+      devLog.error('❌ Error fetching HOD request:', error)
       return {
         success: false,
         error: error.response?.data?.message || error.message || 'Failed to retrieve HOD request',
@@ -129,7 +130,7 @@ class CombinedAccessService {
    */
   async updateHodApproval(requestId, approvalData) {
     try {
-      console.log('🔄 Updating HOD approval for request:', requestId, approvalData)
+      devLog.debug('🔄 Updating HOD approval for request:', requestId, approvalData)
 
       const formData = new FormData()
 
@@ -160,7 +161,7 @@ class CombinedAccessService {
       )
 
       if (response.data && response.data.success) {
-        console.log('✅ HOD approval updated successfully:', requestId)
+        devLog.debug('✅ HOD approval updated successfully:', requestId)
         return {
           success: true,
           data: response.data.data,
@@ -170,7 +171,7 @@ class CombinedAccessService {
         throw new Error(response.data?.message || 'Failed to update approval')
       }
     } catch (error) {
-      console.error('❌ Error updating HOD approval:', error)
+      devLog.error('❌ Error updating HOD approval:', error)
       return {
         success: false,
         error: error.response?.data?.message || error.message || 'Failed to update approval',
@@ -187,7 +188,7 @@ class CombinedAccessService {
    */
   async cancelRequest(requestId, reason) {
     try {
-      console.log('🔄 Cancelling combined access request:', requestId)
+      devLog.debug('🔄 Cancelling combined access request:', requestId)
 
       const response = await apiClient.post(`/hod/combined-access-requests/${requestId}/cancel`, {
         reason: reason || 'Cancelled by HOD',
@@ -195,7 +196,7 @@ class CombinedAccessService {
       })
 
       if (response.data && response.data.success) {
-        console.log('✅ Request cancelled successfully:', requestId)
+        devLog.debug('✅ Request cancelled successfully:', requestId)
         return {
           success: true,
           data: response.data.data,
@@ -205,7 +206,7 @@ class CombinedAccessService {
         throw new Error(response.data?.message || 'Failed to cancel request')
       }
     } catch (error) {
-      console.error('❌ Error cancelling request:', error)
+      devLog.error('❌ Error cancelling request:', error)
       return {
         success: false,
         error: error.response?.data?.message || error.message || 'Failed to cancel request'
@@ -219,12 +220,12 @@ class CombinedAccessService {
    */
   async getHodStatistics() {
     try {
-      console.log('🔄 Fetching HOD statistics...')
+      devLog.debug('🔄 Fetching HOD statistics...')
 
       const response = await apiClient.get('/hod/combined-access-requests/statistics')
 
       if (response.data && response.data.success) {
-        console.log('✅ HOD statistics retrieved successfully')
+        devLog.debug('✅ HOD statistics retrieved successfully')
         return {
           success: true,
           data: response.data.data
@@ -256,7 +257,7 @@ class CombinedAccessService {
    */
   async exportHodRequests(filters = {}, format = 'excel') {
     try {
-      console.log('🔄 Exporting HOD requests...', { filters, format })
+      devLog.debug('🔄 Exporting HOD requests...', { filters, format })
 
       const params = new URLSearchParams()
 
@@ -275,7 +276,7 @@ class CombinedAccessService {
         }
       )
 
-      console.log('✅ Export completed successfully')
+      devLog.debug('✅ Export completed successfully')
       return {
         success: true,
         data: response.data,
@@ -284,7 +285,7 @@ class CombinedAccessService {
           `hod_requests_${Date.now()}.${format === 'excel' ? 'xlsx' : 'csv'}`
       }
     } catch (error) {
-      console.error('❌ Error exporting HOD requests:', error)
+      devLog.error('❌ Error exporting HOD requests:', error)
       return {
         success: false,
         error: error.response?.data?.message || error.message || 'Failed to export requests'
@@ -299,12 +300,12 @@ class CombinedAccessService {
    */
   async searchRequests(criteria) {
     try {
-      console.log('🔄 Searching requests with criteria:', criteria)
+      devLog.debug('🔄 Searching requests with criteria:', criteria)
 
       const response = await apiClient.post('/hod/combined-access-requests/search', criteria)
 
       if (response.data && response.data.success) {
-        console.log('✅ Search completed successfully:', response.data.data?.length || 0, 'results')
+        devLog.debug('✅ Search completed successfully:', response.data.data?.length || 0, 'results')
         return {
           success: true,
           data: response.data
@@ -313,7 +314,7 @@ class CombinedAccessService {
         throw new Error(response.data?.message || 'Search failed')
       }
     } catch (error) {
-      console.error('❌ Error searching requests:', error)
+      devLog.error('❌ Error searching requests:', error)
       return {
         success: false,
         error: error.response?.data?.message || error.message || 'Search failed',
@@ -330,7 +331,7 @@ class CombinedAccessService {
    */
   async bulkApprove(requestIds, approvalData) {
     try {
-      console.log('🔄 Bulk approving requests:', requestIds.length)
+      devLog.debug('🔄 Bulk approving requests:', requestIds.length)
 
       const response = await apiClient.post('/hod/combined-access-requests/bulk-approve', {
         request_ids: requestIds,
@@ -340,7 +341,7 @@ class CombinedAccessService {
       })
 
       if (response.data && response.data.success) {
-        console.log('✅ Bulk approval completed successfully')
+        devLog.debug('✅ Bulk approval completed successfully')
         return {
           success: true,
           data: response.data.data,
@@ -350,7 +351,7 @@ class CombinedAccessService {
         throw new Error(response.data?.message || 'Bulk approval failed')
       }
     } catch (error) {
-      console.error('❌ Error in bulk approval:', error)
+      devLog.error('❌ Error in bulk approval:', error)
       return {
         success: false,
         error: error.response?.data?.message || error.message || 'Bulk approval failed',
@@ -366,12 +367,12 @@ class CombinedAccessService {
    */
   async getRequestHistory(requestId) {
     try {
-      console.log('🔄 Fetching request history:', requestId)
+      devLog.debug('🔄 Fetching request history:', requestId)
 
       const response = await apiClient.get(`/hod/combined-access-requests/${requestId}/history`)
 
       if (response.data && response.data.success) {
-        console.log('✅ Request history retrieved successfully')
+        devLog.debug('✅ Request history retrieved successfully')
         return {
           success: true,
           data: response.data.data
@@ -380,7 +381,7 @@ class CombinedAccessService {
         throw new Error(response.data?.message || 'Failed to retrieve request history')
       }
     } catch (error) {
-      console.error('❌ Error fetching request history:', error)
+      devLog.error('❌ Error fetching request history:', error)
       return {
         success: false,
         error:
@@ -532,12 +533,12 @@ class CombinedAccessService {
    */
   async getRequestTimeline(requestId) {
     try {
-      console.log('🔄 CombinedAccessService: Fetching request timeline:', requestId)
+      devLog.debug('🔄 CombinedAccessService: Fetching request timeline:', requestId)
 
       const response = await apiClient.get(`/hod/combined-access-requests/${requestId}/timeline`)
 
       if (response.data && response.data.success) {
-        console.log('✅ CombinedAccessService: Request timeline loaded successfully')
+        devLog.debug('✅ CombinedAccessService: Request timeline loaded successfully')
 
         // Normalize multiple backend formats into the shape expected by RequestTimeline.vue
         // Expected: { request: {...}, ict_assignments?: [], ... }
@@ -615,7 +616,7 @@ class CombinedAccessService {
         throw new Error(response.data?.message || 'Failed to load request timeline')
       }
     } catch (error) {
-      console.error('❌ CombinedAccessService: Error fetching request timeline:', error)
+      devLog.error('❌ CombinedAccessService: Error fetching request timeline:', error)
       return {
         success: false,
         error: error.response?.data?.message || error.message || 'Failed to load request timeline'
@@ -629,7 +630,7 @@ class CombinedAccessService {
    */
   async deleteCancelledRequest(requestId) {
     try {
-      console.log('🗑️ Deleting user-cancelled request as HOD:', requestId)
+      devLog.debug('🗑️ Deleting user-cancelled request as HOD:', requestId)
       const response = await apiClient.delete(`/hod/combined-access-requests/${requestId}`)
       if (response.data && response.data.success) {
         return { success: true, message: response.data.message }
@@ -637,7 +638,7 @@ class CombinedAccessService {
         throw new Error(response.data?.message || 'Failed to delete request')
       }
     } catch (error) {
-      console.error('❌ Error deleting user-cancelled request:', error)
+      devLog.error('❌ Error deleting user-cancelled request:', error)
       return {
         success: false,
         error: error.response?.data?.message || error.message || 'Failed to delete request'
@@ -651,12 +652,12 @@ class CombinedAccessService {
    */
   async getWellsoftModules() {
     try {
-      console.log('🔄 CombinedAccessService: Fetching Wellsoft modules...')
+      devLog.debug('🔄 CombinedAccessService: Fetching Wellsoft modules...')
 
       const response = await apiClient.get('/wellsoft-modules')
 
       if (response.data && response.data.success) {
-        console.log(
+        devLog.debug(
           '✅ CombinedAccessService: Wellsoft modules loaded successfully:',
           response.data.data?.length || 0
         )
@@ -668,7 +669,7 @@ class CombinedAccessService {
         throw new Error(response.data?.message || 'Failed to load Wellsoft modules')
       }
     } catch (error) {
-      console.error('❌ CombinedAccessService: Error fetching Wellsoft modules:', error)
+      devLog.error('❌ CombinedAccessService: Error fetching Wellsoft modules:', error)
       return {
         success: false,
         error: error.response?.data?.message || error.message || 'Failed to load Wellsoft modules',
@@ -683,12 +684,12 @@ class CombinedAccessService {
    */
   async getJeevaModules() {
     try {
-      console.log('🔄 CombinedAccessService: Fetching Jeeva modules...')
+      devLog.debug('🔄 CombinedAccessService: Fetching Jeeva modules...')
 
       const response = await apiClient.get('/jeeva-modules')
 
       if (response.data && response.data.success) {
-        console.log(
+        devLog.debug(
           '✅ CombinedAccessService: Jeeva modules loaded successfully:',
           response.data.data?.length || 0
         )
@@ -700,7 +701,7 @@ class CombinedAccessService {
         throw new Error(response.data?.message || 'Failed to load Jeeva modules')
       }
     } catch (error) {
-      console.error('❌ CombinedAccessService: Error fetching Jeeva modules:', error)
+      devLog.error('❌ CombinedAccessService: Error fetching Jeeva modules:', error)
       return {
         success: false,
         error: error.response?.data?.message || error.message || 'Failed to load Jeeva modules',

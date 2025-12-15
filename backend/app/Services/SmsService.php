@@ -311,8 +311,8 @@ class SmsService
                 return $this->buildResponse(false, 'Connection error: ' . $curlError);
             }
 
-            // Log response for debugging
-            Log::info('SMS API Response', [
+            // Log response for debugging (debug level to avoid high-volume logs)
+            Log::debug('SMS API Response', [
                 'http_code' => $httpCode,
                 'response' => $response,
                 'payload' => $apiPayload

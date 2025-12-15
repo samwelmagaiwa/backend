@@ -8,13 +8,42 @@ The recommended production setup is:
 - Cron for Laravel scheduler
 - Internal DNS name (or `/etc/hosts`) + optional internal TLS
 
+## 0) Quick checklist (recommended order)
+1) Prepare DNS/hostnames and confirm server IP is reachable from MNH internal network
+2) Install packages (Nginx, PHP-FPM, MySQL, Node.js, Composer)
+3) Create Linux user + deploy folder `/var/www/eabms`
+4) Put code on server (git clone / copy)
+5) Create DB + DB user
+6) Configure Laravel `.env`, generate `APP_KEY`, migrate DB, set permissions
+7) Configure frontend `.env.production`, build `frontend/dist`
+8) Configure Nginx vhosts (API + Frontend), reload Nginx
+9) Setup queue worker (Supervisor) + scheduler (cron)
+10) Verify: API responds + frontend loads + login works
+
+## 0.1) What "successful deployment" looks like
+- Visiting `http(s)://eabms.mnh.local` loads the Vue app
+- Vue app API calls go to `http(s)://api.eabms.mnh.local/api/...` (or your chosen URL)
+- API responds with 200 for health checks (example: `/api/user`, `/api/login` depending on auth)
+- Laravel can write to `backend/storage/` (no 500 errors due to permissions)
+- Background jobs run (if your app uses queues for notifications)
+
 ## 1) Target server assumptions
 - Ubuntu Server 22.04/24.04 LTS (similar steps for other Ubuntu versions)
 - Internal hostname examples:
   - Frontend: `eabms.mnh.local`
   - API: `api.eabms.mnh.local`
+- You have sudo access
+- The server can install packages (internet access or internal apt mirror)
 
 If MNH uses an internal DNS, create A records. Otherwise, test using `/etc/hosts` on clients.
+Example client entry:
+```text
+10.10.10.50 eabms.mnh.local api.eabms.mnh.local
+```
+
+Decide early whether you will use:
+- Option A (recommended): **2 hostnames** (frontend + API), or
+- Option B: **single hostname** where API is served from the same domain under `/api`
 
 ## 2) Install system packages
 Update OS:
@@ -26,6 +55,16 @@ Install Nginx + PHP + required PHP extensions + Git + unzip:
 ```bash
 sudo apt -y install nginx git unzip curl
 sudo apt -y install php-fpm php-cli php-mysql php-xml php-mbstring php-curl php-zip php-bcmath php-intl
+
+# optional but helpful
+sudo apt -y install ca-certificates
+```
+
+Confirm PHP version and PHP-FPM service name (you will need it for Nginx config):
+```bash
+php -v
+systemctl list-units --type=service | grep -E 'php.*fpm'
+ls -la /run/php/
 ```
 
 Install MySQL (or MariaDB):
@@ -69,6 +108,13 @@ sudo chown -R eabms:eabms /var/www/eabms
 sudo -u eabms -H bash -lc 'cd /var/www/eabms && git clone <YOUR_REPO_URL> .'
 ```
 
+After cloning, confirm structure:
+```bash
+ls -la /var/www/eabms
+ls -la /var/www/eabms/backend
+ls -la /var/www/eabms/frontend
+```
+
 ### Option B: Copy from your workstation
 Copy project folder into `/var/www/eabms` and ensure ownership:
 ```bash
@@ -76,6 +122,11 @@ sudo chown -R eabms:eabms /var/www/eabms
 ```
 
 ## 5) Database setup (MySQL)
+Harden MySQL basics (recommended):
+```bash
+sudo mysql_secure_installation
+```
+
 Create database and user:
 ```bash
 sudo mysql
@@ -106,6 +157,9 @@ sudo -u eabms -H bash -lc 'cd /var/www/eabms/backend && cp .env.example .env'
 Edit `/var/www/eabms/backend/.env` and set at least:
 - `APP_NAME`, `APP_ENV=production`, `APP_DEBUG=false`
 - `APP_URL=https://api.eabms.mnh.local` (or your internal URL)
+- Logging best practice (keeps logs small in production):
+  - `LOG_CHANNEL=daily`
+  - `LOG_LEVEL=warning`
 - DB settings:
   - `DB_HOST=127.0.0.1`
   - `DB_DATABASE=eabms`
@@ -149,6 +203,11 @@ sudo -u eabms -H bash -lc 'cd /var/www/eabms/backend && php artisan migrate --fo
 sudo -u eabms -H bash -lc 'cd /var/www/eabms/backend && php artisan config:cache && php artisan route:cache && php artisan view:cache'
 ```
 
+(Optional) Verify Laravel can boot and connect to DB:
+```bash
+sudo -u eabms -H bash -lc 'cd /var/www/eabms/backend && php artisan about'
+```
+
 ## 7) Frontend (Vue) setup
 Build the Vue app and serve it with Nginx.
 
@@ -160,25 +219,40 @@ sudo -u eabms -H bash -lc 'cd /var/www/eabms/frontend && npm run build'
 
 This should create a production build (commonly `frontend/dist/`).
 
-### 7.2 Configure frontend API base URL
-Make sure the frontend is configured to call the correct internal API URL.
-Where this is set depends on how your Vue app is written (often `.env` or build-time variables).
-Typical patterns:
-- `.env.production` containing something like `VITE_API_BASE_URL=https://api.eabms.mnh.local`
-- or a config inside `frontend/src/...`
+### 7.2 Configure frontend API base URL (VERY IMPORTANT)
+This project is **Vue CLI**, so production API URL is typically set via `VUE_APP_*` variables.
 
-Confirm this before building, otherwise the UI will point to the wrong backend.
+1) Create `frontend/.env.production` (if it does not exist):
+```bash
+sudo -u eabms -H bash -lc 'cd /var/www/eabms/frontend && (test -f .env.production || touch .env.production)'
+```
+
+2) Set the API base URL (note the `/api` at the end):
+```bash
+# example: API is on a separate hostname
+VUE_APP_API_URL=https://api.eabms.mnh.local/api
+
+# example: single-host deployment (same domain), if you choose that approach
+# VUE_APP_API_URL=https://eabms.mnh.local/api
+```
+
+3) Rebuild after changing `.env.production`:
+```bash
+sudo -u eabms -H bash -lc 'cd /var/www/eabms/frontend && npm run build'
+```
+
+If you deploy frontend and API on different hostnames, ensure backend CORS allows the frontend origin.
 
 ## 8) Nginx configuration
 Recommended: **separate virtual hosts** for frontend and API.
 
 ### 8.1 PHP-FPM socket
-Check PHP-FPM service name and socket:
+Check PHP-FPM service name and socket (the version may differ, e.g. 8.1/8.2/8.3):
 ```bash
-systemctl status php8.2-fpm
+systemctl list-units --type=service | grep -E 'php.*fpm'
 ls -la /run/php/
 ```
-Typical socket: `/run/php/php8.2-fpm.sock`
+Pick the correct socket from `/run/php/` (example: `/run/php/php8.2-fpm.sock`).
 
 ### 8.2 API vhost (Laravel)
 Create:
@@ -202,6 +276,7 @@ server {
 
     location ~ \.php$ {
         include snippets/fastcgi-php.conf;
+        # IMPORTANT: replace with the socket that exists on your server (see section 8.1)
         fastcgi_pass unix:/run/php/php8.2-fpm.sock;
     }
 
@@ -213,9 +288,20 @@ server {
 Enable and reload:
 ```bash
 sudo ln -s /etc/nginx/sites-available/eabms-api /etc/nginx/sites-enabled/
+
+# optional: disable the default site to avoid conflicts
+sudo rm -f /etc/nginx/sites-enabled/default
+
 sudo nginx -t
 sudo systemctl reload nginx
 ```
+
+Quick API test from the server:
+```bash
+curl -I http://127.0.0.1
+curl -I http://api.eabms.mnh.local
+```
+If you have HTTPS enabled, test with `https://...`.
 
 ### 8.3 Frontend vhost (Vue static)
 Create `/etc/nginx/sites-available/eabms-frontend`:
@@ -240,6 +326,51 @@ sudo nginx -t
 sudo systemctl reload nginx
 ```
 
+Quick frontend test:
+```bash
+curl -I http://eabms.mnh.local
+```
+
+### 8.4 Optional: Single-host deployment (frontend + API on same hostname)
+If you prefer one hostname (example: `eabms.mnh.local`) you can serve the Vue build and proxy API requests to Laravel.
+
+High-level idea:
+- Vue app served from `/`
+- Laravel API served from `/api` (proxied to Laravel public index)
+
+Example (replace PHP-FPM socket to match your server):
+```nginx
+server {
+    listen 80;
+    server_name eabms.mnh.local;
+
+    # Frontend
+    root /var/www/eabms/frontend/dist;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # API (Laravel) - served from the backend public folder
+    location /api {
+        alias /var/www/eabms/backend/public;
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \\.php$ {
+        root /var/www/eabms/backend/public;
+        include snippets/fastcgi-php.conf;
+        # IMPORTANT: replace with the socket that exists on your server (see section 8.1)
+        fastcgi_pass unix:/run/php/php8.2-fpm.sock;
+    }
+}
+```
+
+If you use this option, set:
+- Laravel: `APP_URL=https://eabms.mnh.local`
+- Frontend: `VUE_APP_API_URL=https://eabms.mnh.local/api`
+
 ## 9) HTTPS (internal)
 If MNH uses an internal CA, install the CA cert on clients and use real TLS certs.
 If not, you can use a self-signed certificate (clients must trust it).
@@ -250,6 +381,8 @@ Typical approach:
 
 ## 10) Queues (important for notifications)
 Some notifications/listeners implement `ShouldQueue`. Ensure queue worker runs.
+
+If your app does not use queues, you can skip this section.
 
 ### 10.1 Choose queue driver
 In `backend/.env`:
@@ -330,36 +463,103 @@ Tail logs:
 tail -f /var/www/eabms/backend/storage/logs/laravel-*.log
 ```
 
-Restart services:
+Restart services (adjust php-fpm version if needed):
 ```bash
+# example only; replace 8.2 with your PHP version (8.1/8.2/8.3)
 sudo systemctl restart php8.2-fpm
 sudo systemctl reload nginx
 sudo supervisorctl restart eabms-queue:*
 ```
 
 ## 15) Deployment update procedure (safe)
+When updating an existing deployment, follow this order to avoid downtime and weird cache issues.
+
 1) Pull code updates:
 ```bash
 sudo -u eabms -H bash -lc 'cd /var/www/eabms && git pull'
 ```
-2) Backend:
+
+2) Backend (Laravel):
 ```bash
 sudo -u eabms -H bash -lc 'cd /var/www/eabms/backend && composer install --no-dev --optimize-autoloader'
+
+# migrations
 sudo -u eabms -H bash -lc 'cd /var/www/eabms/backend && php artisan migrate --force'
+
+# clear + rebuild caches (important after .env / config changes)
+sudo -u eabms -H bash -lc 'cd /var/www/eabms/backend && php artisan config:clear && php artisan cache:clear && php artisan route:clear && php artisan view:clear'
 sudo -u eabms -H bash -lc 'cd /var/www/eabms/backend && php artisan config:cache && php artisan route:cache && php artisan view:cache'
 ```
-3) Frontend:
+
+3) Frontend (Vue):
 ```bash
 sudo -u eabms -H bash -lc 'cd /var/www/eabms/frontend && npm ci'
 sudo -u eabms -H bash -lc 'cd /var/www/eabms/frontend && npm run build'
 ```
+
 4) Reload services:
 ```bash
 sudo systemctl reload nginx
 sudo supervisorctl restart eabms-queue:*
 ```
 
-## 16) Notes for MNH internal hosting
+5) Quick post-update verification:
+```bash
+curl -I http://eabms.mnh.local
+curl -I http://api.eabms.mnh.local
+```
+
+## 16) Final verification (go-live)
+Do these checks before announcing the system is live:
+
+1) From your workstation browser:
+- Open the frontend: `http(s)://eabms.mnh.local`
+- Log in and load at least:
+  - dashboard
+  - a request list page
+  - a request details page
+
+2) Confirm frontend is calling the correct API:
+- Open DevTools → Network → check requests go to `.../api/...`
+- If you see calls to `127.0.0.1:8000` or a wrong host, fix `frontend/.env.production` and rebuild.
+
+3) From the server:
+```bash
+# nginx is healthy
+sudo nginx -t
+sudo systemctl status nginx --no-pager
+
+# php-fpm is healthy
+systemctl list-units --type=service | grep -E 'php.*fpm'
+
+# queue worker (if enabled)
+sudo supervisorctl status
+```
+
+## 17) Troubleshooting (common issues)
+### 17.1 Frontend loads but API calls fail
+- Confirm `frontend/.env.production` has:
+  - `VUE_APP_API_URL=https://api.eabms.mnh.local/api`
+- Rebuild frontend after edits: `npm run build`
+- If API is on a different hostname, confirm backend CORS allows the frontend origin.
+
+### 17.2 500 errors on API
+- Check Laravel logs:
+```bash
+tail -n 200 /var/www/eabms/backend/storage/logs/laravel-*.log
+```
+- Common causes:
+  - wrong DB credentials
+  - missing `APP_KEY`
+  - permissions on `storage/` or `bootstrap/cache`
+
+### 17.3 Uploads failing (signatures / attachments)
+- Increase limits:
+  - Nginx `client_max_body_size`
+  - PHP `upload_max_filesize` and `post_max_size` in `php.ini` (FPM)
+- Reload services after changes.
+
+## 18) Notes for MNH internal hosting
 - Prefer internal DNS names and internal CA-issued certificates.
 - Keep database backups (nightly) and store them securely.
 - Monitor:

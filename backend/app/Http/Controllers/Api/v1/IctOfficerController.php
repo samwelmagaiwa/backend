@@ -30,7 +30,7 @@ class IctOfficerController extends Controller
                 ], 403);
             }
 
-            Log::info('IctOfficerController: Getting dashboard data for ICT Officer', [
+            Log::debug('IctOfficerController: Getting dashboard data for ICT Officer', [
                 'user_id' => $user->id
             ]);
 
@@ -122,7 +122,7 @@ class IctOfficerController extends Controller
                 ], 403);
             }
 
-            Log::info('IctOfficerController: Getting assigned tasks', [
+            Log::debug('IctOfficerController: Getting assigned tasks', [
                 'user_id' => $user->id
             ]);
 
@@ -643,9 +643,64 @@ class IctOfficerController extends Controller
             ]);
 
             // Base: requests approved by Head of IT (implementation section gate)
-            $query = UserAccess::with(['department', 'ictTaskAssignments.ictOfficer'])
+            // Select only columns needed for the listing response to reduce IO/memory.
+            $query = UserAccess::query()
+                ->select([
+                    'id',
+                    'user_id',
+                    'pf_number',
+                    'staff_name',
+                    'phone_number',
+                    'department_id',
+                    'request_type',
+                    'access_type',
+                    'internet_purposes',
+                    'wellsoft_modules_selected',
+                    'jeeva_modules_selected',
+                    'head_it_status',
+                    'head_it_approved_at',
+                    'sms_to_requester_status',
+                    'sms_sent_to_requester_at',
+                    'created_at',
+                    'updated_at',
+                ])
+                ->with([
+                    'department:id,name',
+                    // Load assignments newest-first so we can pick latest without sorting in PHP.
+                    'ictTaskAssignments' => function ($q) {
+                        $q->select([
+                                'id',
+                                'user_access_id',
+                                'ict_officer_user_id',
+                                'status',
+                                'assignment_notes',
+                                'assigned_at',
+                                'started_at',
+                                'completed_at',
+                                'cancelled_at',
+                                'created_at',
+                                'updated_at',
+                            ])
+                            ->orderByDesc('assigned_at');
+                    },
+                    'ictTaskAssignments.ictOfficer:id,name',
+                ])
                 ->where('head_it_status', 'approved')
                 ->whereNotNull('head_it_approved_at');
+
+            // Optional server-side search (reduces client-side work and payload)
+            if ($request->filled('search')) {
+                $search = trim((string) $request->get('search'));
+                $query->where(function ($q) use ($search) {
+                    $q->where('staff_name', 'like', "%{$search}%")
+                      ->orWhere('pf_number', 'like', "%{$search}%")
+                      ->orWhere('phone_number', 'like', "%{$search}%")
+                      ->orWhere('id', 'like', "%{$search}%")
+                      ->orWhereHas('department', function ($dq) use ($search) {
+                          $dq->where('name', 'like', "%{$search}%");
+                      });
+                });
+            }
 
             // Visibility rules
             // - Completed (implemented) → visible to all ICT officers
@@ -681,18 +736,19 @@ class IctOfficerController extends Controller
 
             if (!$status) {
                 // Default view: own assigned/in-progress + all completed
-                $query->where(function ($q) use ($user) {
-                    // own active (assigned or in_progress)
-                    $q->whereHas('ictTaskAssignments', function ($qa) use ($user) {
-                        $qa->whereIn('status', [
-                                IctTaskAssignment::STATUS_ASSIGNED,
-                                IctTaskAssignment::STATUS_IN_PROGRESS,
-                            ])
-                           ->where('ict_officer_user_id', $user->id);
-                    })
-                    // OR completed by anyone
-                    ->orWhereHas('ictTaskAssignments', function ($qc) {
-                        $qc->where('status', IctTaskAssignment::STATUS_COMPLETED);
+                // Use a single EXISTS subquery (one whereHas) instead of two (whereHas + orWhereHas).
+                $query->whereHas('ictTaskAssignments', function ($qa) use ($user) {
+                    $qa->where(function ($q) use ($user) {
+                        // completed by anyone
+                        $q->where('status', IctTaskAssignment::STATUS_COMPLETED)
+                          // OR own active (assigned or in_progress)
+                          ->orWhere(function ($q2) use ($user) {
+                              $q2->whereIn('status', [
+                                      IctTaskAssignment::STATUS_ASSIGNED,
+                                      IctTaskAssignment::STATUS_IN_PROGRESS,
+                                  ])
+                                  ->where('ict_officer_user_id', $user->id);
+                          });
                     });
                 });
             }
@@ -708,7 +764,8 @@ class IctOfficerController extends Controller
             $accessRequests = $paginated->getCollection()->map(function ($request) {
                 // Determine current status based on ICT task assignments
                 $currentStatus = 'head_of_it_approved'; // Default status
-                $latestAssignment = $request->ictTaskAssignments->sortByDesc('assigned_at')->first();
+                // Assignments are loaded newest-first (orderBy assigned_at desc)
+                $latestAssignment = $request->ictTaskAssignments->first();
                 
                 if ($latestAssignment) {
                     switch ($latestAssignment->status) {

@@ -551,7 +551,7 @@ class SmsModule
             }
 
             if ($providerSuccess && ($validCount === null || $validCount > 0)) {
-                Log::info('SMS submitted successfully via Kilakona', [
+                Log::debug('SMS submitted successfully via Kilakona', [
                     'code' => $data['code'] ?? null,
                     'message' => $data['message'] ?? null,
                     'valid_contacts' => $validCount,

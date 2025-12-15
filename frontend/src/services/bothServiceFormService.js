@@ -1,4 +1,5 @@
 import apiClient from '../utils/apiClient'
+import { devLog } from '../utils/devLogger'
 
 /**
  * Both Service Form Service for combined access requests
@@ -12,7 +13,7 @@ class BothServiceFormService {
    */
   async submitCombinedRequest(formData) {
     try {
-      console.log('🔄 Submitting combined access request...', formData)
+      devLog.debug('🔄 Submitting combined access request...', formData)
 
       // Create FormData for multipart/form-data submission
       const submitData = new FormData()
@@ -31,42 +32,42 @@ class BothServiceFormService {
       }
 
       // Add module selections with explicit debugging
-      console.log('🔍 MODULE SELECTION DEBUG:')
-      console.log(
+      devLog.debug('🔍 MODULE SELECTION DEBUG:')
+      devLog.debug(
         'selectedWellsoft:',
         formData.selectedWellsoft,
         'length:',
         formData.selectedWellsoft?.length
       )
-      console.log(
+      devLog.debug(
         'selectedJeeva:',
         formData.selectedJeeva,
         'length:',
         formData.selectedJeeva?.length
       )
-      console.log('selectedWellsoft type:', typeof formData.selectedWellsoft)
-      console.log('selectedJeeva type:', typeof formData.selectedJeeva)
-      console.log('selectedWellsoft isArray:', Array.isArray(formData.selectedWellsoft))
-      console.log('selectedJeeva isArray:', Array.isArray(formData.selectedJeeva))
+      devLog.debug('selectedWellsoft type:', typeof formData.selectedWellsoft)
+      devLog.debug('selectedJeeva type:', typeof formData.selectedJeeva)
+      devLog.debug('selectedWellsoft isArray:', Array.isArray(formData.selectedWellsoft))
+      devLog.debug('selectedJeeva isArray:', Array.isArray(formData.selectedJeeva))
 
       if (formData.selectedWellsoft && formData.selectedWellsoft.length > 0) {
-        console.log('✅ Adding Wellsoft modules to FormData:', formData.selectedWellsoft)
+        devLog.debug('✅ Adding Wellsoft modules to FormData:', formData.selectedWellsoft)
         formData.selectedWellsoft.forEach((module, index) => {
           submitData.append(`selectedWellsoft[${index}]`, module)
-          console.log(`  Added selectedWellsoft[${index}]:`, module)
+          devLog.debug(`  Added selectedWellsoft[${index}]:`, module)
         })
       } else {
-        console.log('⚠️ No Wellsoft modules to add - array is empty or undefined')
+        devLog.debug('⚠️ No Wellsoft modules to add - array is empty or undefined')
       }
 
       if (formData.selectedJeeva && formData.selectedJeeva.length > 0) {
-        console.log('✅ Adding Jeeva modules to FormData:', formData.selectedJeeva)
+        devLog.debug('✅ Adding Jeeva modules to FormData:', formData.selectedJeeva)
         formData.selectedJeeva.forEach((module, index) => {
           submitData.append(`selectedJeeva[${index}]`, module)
-          console.log(`  Added selectedJeeva[${index}]:`, module)
+          devLog.debug(`  Added selectedJeeva[${index}]:`, module)
         })
       } else {
-        console.log('⚠️ No Jeeva modules to add - array is empty or undefined')
+        devLog.debug('⚠️ No Jeeva modules to add - array is empty or undefined')
       }
 
       // Add request type (use/revoke)
@@ -192,9 +193,9 @@ class BothServiceFormService {
       }
 
       // Debug: Log FormData contents
-      console.log('FormData contents:')
+      devLog.debug('FormData contents:')
       for (let [key, value] of submitData.entries()) {
-        console.log(`${key}:`, value)
+        devLog.debug(`${key}:`, value)
       }
 
       const response = await apiClient.post('/both-service-form', submitData, {
@@ -204,7 +205,7 @@ class BothServiceFormService {
       })
 
       if (response.data && response.data.success) {
-        console.log('✅ Combined access request submitted successfully:', response.data.data?.id)
+        devLog.debug('✅ Combined access request submitted successfully:', response.data.data?.id)
         return {
           success: true,
           data: response.data.data,
@@ -215,7 +216,7 @@ class BothServiceFormService {
         throw new Error(response.data?.message || 'Failed to submit combined access request')
       }
     } catch (error) {
-      console.error('❌ Error submitting combined access request:', error)
+      devLog.error('❌ Error submitting combined access request:', error)
 
       // Handle validation errors
       if (error.response?.status === 422) {
@@ -244,12 +245,12 @@ class BothServiceFormService {
    */
   async getUserInfo() {
     try {
-      console.log('🔄 Fetching user info for form pre-population...')
+      devLog.debug('🔄 Fetching user info for form pre-population...')
 
       const response = await apiClient.get('/both-service-form/user/info')
 
       if (response.data && response.data.success) {
-        console.log('✅ User info retrieved successfully')
+        devLog.debug('✅ User info retrieved successfully')
         return {
           success: true,
           data: response.data.data
@@ -258,7 +259,7 @@ class BothServiceFormService {
         throw new Error(response.data?.message || 'Failed to retrieve user information')
       }
     } catch (error) {
-      console.error('❌ Error fetching user info:', error)
+      devLog.error('❌ Error fetching user info:', error)
       return {
         success: false,
         error:
@@ -274,12 +275,12 @@ class BothServiceFormService {
    */
   async getDepartments() {
     try {
-      console.log('🔄 Fetching departments...')
+      devLog.debug('🔄 Fetching departments...')
 
       const response = await apiClient.get('/both-service-form/departments/list')
 
       if (response.data && response.data.success) {
-        console.log('✅ Departments retrieved successfully:', response.data.data?.length || 0)
+        devLog.debug('✅ Departments retrieved successfully:', response.data.data?.length || 0)
         return {
           success: true,
           data: response.data.data
@@ -288,7 +289,7 @@ class BothServiceFormService {
         throw new Error(response.data?.message || 'Failed to retrieve departments')
       }
     } catch (error) {
-      console.error('❌ Error fetching departments:', error)
+      devLog.error('❌ Error fetching departments:', error)
       return {
         success: false,
         error: error.response?.data?.message || error.message || 'Failed to retrieve departments',
@@ -304,12 +305,12 @@ class BothServiceFormService {
    */
   async getRequest(requestId) {
     try {
-      console.log('🔄 Fetching combined access request:', requestId)
+      devLog.debug('🔄 Fetching combined access request:', requestId)
 
       const response = await apiClient.get(`/both-service-form/${requestId}`)
 
       if (response.data && response.data.success) {
-        console.log('✅ Combined access request retrieved successfully')
+        devLog.debug('✅ Combined access request retrieved successfully')
         return {
           success: true,
           data: response.data.data,
@@ -319,7 +320,7 @@ class BothServiceFormService {
         throw new Error(response.data?.message || 'Failed to retrieve request')
       }
     } catch (error) {
-      console.error('❌ Error fetching combined access request:', error)
+      devLog.error('❌ Error fetching combined access request:', error)
       return {
         success: false,
         error: error.response?.data?.message || error.message || 'Failed to retrieve request',
@@ -429,7 +430,7 @@ class BothServiceFormService {
    */
   async updateRequest(requestId, formData) {
     try {
-      console.log('🔄 Updating combined access request:', requestId, formData)
+      devLog.debug('🔄 Updating combined access request:', requestId, formData)
 
       // Create FormData for multipart/form-data submission (same as submitCombinedRequest)
       const submitData = new FormData()
@@ -495,9 +496,9 @@ class BothServiceFormService {
       })
 
       // Debug: Log FormData contents
-      console.log('Update FormData contents:')
+      devLog.debug('Update FormData contents:')
       for (let [key, value] of submitData.entries()) {
-        console.log(`${key}:`, value)
+        devLog.debug(`${key}:`, value)
       }
 
       // Use POST with method spoofing for multipart/form-data
@@ -508,7 +509,7 @@ class BothServiceFormService {
       })
 
       if (response.data && response.data.success) {
-        console.log('✅ Combined access request updated successfully:', requestId)
+        devLog.debug('✅ Combined access request updated successfully:', requestId)
         return {
           success: true,
           data: response.data.data,
@@ -519,7 +520,7 @@ class BothServiceFormService {
         throw new Error(response.data?.message || 'Failed to update combined access request')
       }
     } catch (error) {
-      console.error('❌ Error updating combined access request:', error)
+      devLog.error('❌ Error updating combined access request:', error)
 
       // Handle validation errors
       if (error.response?.status === 422) {
@@ -548,7 +549,7 @@ class BothServiceFormService {
    */
   async hodApproveModuleRequest(requestId, payload) {
     try {
-      console.log(
+      devLog.debug(
         '🔄 HOD approving module request via BothServiceFormController:',
         requestId,
         payload
@@ -580,12 +581,12 @@ class BothServiceFormService {
       )
 
       if (res.data?.success) {
-        console.log('✅ HOD approval saved successfully:', res.data)
+        devLog.debug('✅ HOD approval saved successfully:', res.data)
         return { success: true, data: res.data.data, message: res.data.message }
       }
       throw new Error(res.data?.message || 'Failed to save HOD approval')
     } catch (error) {
-      console.error('❌ Error in hodApproveModuleRequest:', error)
+      devLog.error('❌ Error in hodApproveModuleRequest:', error)
       return {
         success: false,
         error: error.response?.data?.message || error.message || 'Failed to save HOD approval',
@@ -602,7 +603,7 @@ class BothServiceFormService {
    */
   async divisionalDirectorApprove(requestId, payload) {
     try {
-      console.log('🔄 Divisional Director approving request:', requestId, payload)
+      devLog.debug('🔄 Divisional Director approving request:', requestId, payload)
 
       // Build JSON payload (digital signature only)
       const data = {
@@ -618,12 +619,12 @@ class BothServiceFormService {
       )
 
       if (res.data?.success) {
-        console.log('✅ Divisional Director approval saved successfully:', res.data)
+        devLog.debug('✅ Divisional Director approval saved successfully:', res.data)
         return { success: true, data: res.data.data, message: res.data.message }
       }
       throw new Error(res.data?.message || 'Failed to save Divisional Director approval')
     } catch (error) {
-      console.error('❌ Error in divisionalDirectorApprove:', error)
+      devLog.error('❌ Error in divisionalDirectorApprove:', error)
       return {
         success: false,
         error:
@@ -643,7 +644,7 @@ class BothServiceFormService {
    */
   async divisionalDirectorReject(requestId, payload) {
     try {
-      console.log('🔄 Divisional Director rejecting request:', requestId, payload)
+      devLog.debug('🔄 Divisional Director rejecting request:', requestId, payload)
 
       const data = {
         divisional_director_name: payload.divisionalDirectorName || '',
@@ -658,12 +659,12 @@ class BothServiceFormService {
       )
 
       if (res.data?.success) {
-        console.log('✅ Divisional Director rejection saved successfully:', res.data)
+        devLog.debug('✅ Divisional Director rejection saved successfully:', res.data)
         return { success: true, data: res.data.data, message: res.data.message }
       }
       throw new Error(res.data?.message || 'Failed to save Divisional Director rejection')
     } catch (error) {
-      console.error('❌ Error in divisionalDirectorReject:', error)
+      devLog.error('❌ Error in divisionalDirectorReject:', error)
       return {
         success: false,
         error:
@@ -683,7 +684,7 @@ class BothServiceFormService {
    */
   async ictDirectorApprove(requestId, payload) {
     try {
-      console.log('🔄 ICT Director approving request:', requestId, payload)
+      devLog.debug('🔄 ICT Director approving request:', requestId, payload)
 
       // Build JSON payload (digital signature only)
       const data = {
@@ -699,12 +700,12 @@ class BothServiceFormService {
       )
 
       if (res.data?.success) {
-        console.log('✅ ICT Director approval saved successfully:', res.data)
+        devLog.debug('✅ ICT Director approval saved successfully:', res.data)
         return { success: true, data: res.data.data, message: res.data.message }
       }
       throw new Error(res.data?.message || 'Failed to save ICT Director approval')
     } catch (error) {
-      console.error('❌ Error in ictDirectorApprove:', error)
+      devLog.error('❌ Error in ictDirectorApprove:', error)
       return {
         success: false,
         error:
@@ -722,7 +723,7 @@ class BothServiceFormService {
    */
   async ictDirectorReject(requestId, payload) {
     try {
-      console.log('🔄 ICT Director rejecting request:', requestId, payload)
+      devLog.debug('🔄 ICT Director rejecting request:', requestId, payload)
 
       const data = {
         ict_director_name: payload.ictDirectorName || '',
@@ -737,12 +738,12 @@ class BothServiceFormService {
       )
 
       if (res.data?.success) {
-        console.log('✅ ICT Director rejection saved successfully:', res.data)
+        devLog.debug('✅ ICT Director rejection saved successfully:', res.data)
         return { success: true, data: res.data.data, message: res.data.message }
       }
       throw new Error(res.data?.message || 'Failed to save ICT Director rejection')
     } catch (error) {
-      console.error('❌ Error in ictDirectorReject:', error)
+      devLog.error('❌ Error in ictDirectorReject:', error)
       return {
         success: false,
         error:
@@ -760,7 +761,7 @@ class BothServiceFormService {
    */
   async headItApprove(requestId, payload) {
     try {
-      console.log('🔄 Head IT approving request:', requestId, payload)
+      devLog.debug('🔄 Head IT approving request:', requestId, payload)
 
       // Build JSON payload (digital signature only)
       const data = {
@@ -776,12 +777,12 @@ class BothServiceFormService {
       )
 
       if (res.data?.success) {
-        console.log('✅ Head IT approval saved successfully:', res.data)
+        devLog.debug('✅ Head IT approval saved successfully:', res.data)
         return { success: true, data: res.data.data, message: res.data.message }
       }
       throw new Error(res.data?.message || 'Failed to save Head IT approval')
     } catch (error) {
-      console.error('❌ Error in headItApprove:', error)
+      devLog.error('❌ Error in headItApprove:', error)
       return {
         success: false,
         error: error.response?.data?.message || error.message || 'Failed to save Head IT approval',
@@ -798,7 +799,7 @@ class BothServiceFormService {
    */
   async headItReject(requestId, payload) {
     try {
-      console.log('🔄 Head IT rejecting request:', requestId, payload)
+      devLog.debug('🔄 Head IT rejecting request:', requestId, payload)
 
       const data = {
         head_it_name: payload.headItName || '',
@@ -813,12 +814,12 @@ class BothServiceFormService {
       )
 
       if (res.data?.success) {
-        console.log('✅ Head IT rejection saved successfully:', res.data)
+        devLog.debug('✅ Head IT rejection saved successfully:', res.data)
         return { success: true, data: res.data.data, message: res.data.message }
       }
       throw new Error(res.data?.message || 'Failed to save Head IT rejection')
     } catch (error) {
-      console.error('❌ Error in headItReject:', error)
+      devLog.error('❌ Error in headItReject:', error)
       return {
         success: false,
         error: error.response?.data?.message || error.message || 'Failed to save Head IT rejection',
@@ -835,7 +836,7 @@ class BothServiceFormService {
    */
   async ictOfficerApprove(requestId, payload) {
     try {
-      console.log('🔄 ICT Officer implementing request:', requestId, payload)
+      devLog.debug('🔄 ICT Officer implementing request:', requestId, payload)
 
       // Build JSON payload (digital signature only)
       const data = {
@@ -855,12 +856,12 @@ class BothServiceFormService {
       )
 
       if (res.data?.success) {
-        console.log('✅ ICT Officer implementation saved successfully:', res.data)
+        devLog.debug('✅ ICT Officer implementation saved successfully:', res.data)
         return { success: true, data: res.data.data, message: res.data.message }
       }
       throw new Error(res.data?.message || 'Failed to save ICT Officer implementation')
     } catch (error) {
-      console.error('❌ Error in ictOfficerApprove:', error)
+      devLog.error('❌ Error in ictOfficerApprove:', error)
       return {
         success: false,
         error:

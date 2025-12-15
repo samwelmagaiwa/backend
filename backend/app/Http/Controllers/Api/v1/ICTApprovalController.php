@@ -135,13 +135,14 @@ class ICTApprovalController extends Controller
         try {
             $user = $request->user();
             
-            // Debug user information
-            Log::info('ICT Approval Request - User Info', [
-                'user_id' => $user->id,
-                'user_name' => $user->name,
-                'user_roles' => $user->roles->pluck('name')->toArray(),
-                'user_permissions' => $user->getAllPermissions()
-            ]);
+            // Debug user information (avoid expensive permission listing unless APP_DEBUG=true)
+            if ((bool) config('app.debug')) {
+                Log::debug('ICT Approval Request - User Info', [
+                    'user_id' => $user->id,
+                    'user_name' => $user->name,
+                    'user_roles' => $user->roles->pluck('name')->toArray(),
+                ]);
+            }
 
             // Verify ICT officer permissions with detailed logging
             if (!$this->hasICTPermissions($user)) {
@@ -163,9 +164,9 @@ class ICTApprovalController extends Controller
                 ], 403);
             }
 
-            // Check if booking_service table has any records
+            // Check if booking_service table has any records (debug only)
             $totalBookings = BookingService::count();
-            Log::info('Total booking records in database', ['count' => $totalBookings]);
+            Log::debug('Total booking records in database', ['count' => $totalBookings]);
 
             $query = BookingService::with([
                 'user:id,name,email,phone,pf_number,department_id',
@@ -199,7 +200,7 @@ class ICTApprovalController extends Controller
             $perPage = $request->get('per_page', 50);
             $bookings = $query->orderBy('created_at', 'desc')->paginate($perPage);
 
-            Log::info('Booking query results', [
+            Log::debug('Booking query results', [
                 'total_found' => $bookings->total(),
                 'current_page' => $bookings->currentPage(),
                 'per_page' => $bookings->perPage(),
@@ -230,7 +231,7 @@ class ICTApprovalController extends Controller
             // Replace collection with transformed data
             $bookings->setCollection($transformedData);
 
-            Log::info('ICT device borrowing requests retrieved successfully', [
+            Log::debug('ICT device borrowing requests retrieved successfully', [
                 'total' => $bookings->total(),
                 'current_page' => $bookings->currentPage(),
                 'per_page' => $bookings->perPage(),

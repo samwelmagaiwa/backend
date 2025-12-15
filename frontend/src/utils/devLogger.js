@@ -37,9 +37,17 @@ export const devLog = {
     console.error(...args)
   },
 
-  // Debug messages with emoji prefixes for better visibility
-  debug: (category, message, data = null) => {
-    if (isDevelopment) {
+  // Debug messages
+  // Supports two call styles:
+  // 1) Tagged: devLog.debug('api', 'Request started', { ... })
+  // 2) Console-style: devLog.debug('any', obj, otherArgs...)
+  debug: (...args) => {
+    if (!isDevelopment) return
+
+    // Tagged format: (category: string, message: string, data?: any)
+    if (args.length >= 2 && typeof args[0] === 'string' && typeof args[1] === 'string') {
+      const [category, message, data = null] = args
+
       const emoji = {
         auth: '🔐',
         api: '🌐',
@@ -63,8 +71,12 @@ export const devLog = {
       }
 
       const prefix = emoji[category] || '🔍'
-      console.log(`${prefix} [${category.toUpperCase()}]`, message, data || '')
+      console.debug(`${prefix} [${category.toUpperCase()}]`, message, data || '')
+      return
     }
+
+    // Console-style format
+    console.debug(...args)
   },
 
   // Performance timing
