@@ -1032,8 +1032,10 @@
   }
 
   function getSmsStatusText(smsStatus) {
+    // NOTE: "sent" here means "submitted to provider".
+    // We only know "delivered" if we receive provider delivery reports.
     const statusMap = {
-      sent: 'Delivered',
+      sent: 'Submitted',
       pending: 'Pending',
       failed: 'Failed'
     }

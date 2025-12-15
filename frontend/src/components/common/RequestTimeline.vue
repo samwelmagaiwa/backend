@@ -687,7 +687,9 @@
       timelineSteps() {
         if (!this.timelineData) return []
 
-        const request = this.timelineData.request
+        const request = this.timelineData.request || this.timelineData.request_info
+        if (!request) return []
+
         const steps = []
 
         // 1. Request Submission

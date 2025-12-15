@@ -79,7 +79,7 @@ class BookingServiceRequest extends FormRequest
             'return_date' => [
                 'required',
                 'date',
-                'after:booking_date'
+                'after_or_equal:booking_date'
             ],
             'return_time' => [
                 'required',
@@ -131,7 +131,7 @@ class BookingServiceRequest extends FormRequest
             
             'return_date.required' => 'Return date is required.',
             'return_date.date' => 'Please provide a valid return date.',
-            'return_date.after' => 'Return date must be after the booking date.',
+            'return_date.after_or_equal' => 'Return date cannot be before the booking date.',
             
             'return_time.required' => 'Return time is required.',
             'return_time.regex' => 'Please provide a valid time in HH:MM format (24-hour format).',
@@ -295,18 +295,9 @@ class BookingServiceRequest extends FormRequest
                         \Log::info('Validation error: Return time before booking time');
                     }
                     
-                    // Only check 1 hour rule if it's the same day
-                    if ($this->booking_date === $this->return_date) {
-                        $diffInMinutes = $returnDateTime->diffInMinutes($bookingDateTime);
-                        \Log::info('Same day booking - checking 1 hour rule', [
-                            'diff_in_minutes' => $diffInMinutes
-                        ]);
-                        
-                        if ($diffInMinutes < 60) {
-                            $validator->errors()->add('return_time', 'Return time must be at least 1 hour after booking date when returning same day.');
-                            \Log::info('Validation error: Return time less than 1 hour after booking');
-                        }
-                    }
+                    // NOTE: We do not enforce any minimum-hours rule for same-day returns.
+                    // The system only captures booking_date (no booking_time), so enforcing a 1-hour
+                    // delta from midnight is incorrect and blocks valid same-day returns.
                 } catch (\Exception $e) {
                     \Log::error('DateTime parsing error', ['error' => $e->getMessage()]);
                     $validator->errors()->add('return_time', 'Invalid date or time format.');

@@ -538,9 +538,77 @@ class CombinedAccessService {
 
       if (response.data && response.data.success) {
         console.log('✅ CombinedAccessService: Request timeline loaded successfully')
+
+        // Normalize multiple backend formats into the shape expected by RequestTimeline.vue
+        // Expected: { request: {...}, ict_assignments?: [], ... }
+        const raw = response.data.data
+        let normalized = raw
+
+        // HOD endpoint format: { request_info, approval_stages, implementation, cancellation, ict_tasks }
+        if (raw && !raw.request && raw.request_info) {
+          const request = {
+            ...raw.request_info,
+
+            // Ensure core fields exist
+            id: raw.request_info.id,
+            staff_name: raw.request_info.staff_name,
+            pf_number: raw.request_info.pf_number,
+            created_at: raw.request_info.created_at,
+
+            // Cancellation (map to fields used by the timeline component)
+            cancelled_at: raw.cancellation?.cancelled_at || null,
+            cancelled_by: raw.cancellation?.cancelled_by || null,
+            cancellation_reason: raw.cancellation?.cancellation_reason || null,
+
+            // Implementation
+            ict_officer_implemented_at: raw.implementation?.implemented_at || null,
+            implementation_comments: raw.implementation?.implementation_notes || null
+          }
+
+          // Map approval stages back into per-column fields used by the component
+          const stages = Array.isArray(raw.approval_stages) ? raw.approval_stages : []
+          for (const s of stages) {
+            const stageName = (s.stage || '').toLowerCase()
+
+            if (stageName.includes('hod')) {
+              request.hod_status = s.status
+              request.hod_name = s.approver_name
+              request.hod_comments = s.comments
+              request.hod_approved_at = s.timestamp
+            } else if (stageName.includes('divisional')) {
+              request.divisional_status = s.status
+              request.divisional_director_name = s.approver_name
+              request.divisional_director_comments = s.comments
+              request.divisional_approved_at = s.timestamp
+            } else if (stageName.includes('ict director')) {
+              request.ict_director_status = s.status
+              request.ict_director_name = s.approver_name
+              request.ict_director_comments = s.comments
+              request.ict_director_approved_at = s.timestamp
+            } else if (stageName.includes('head of it')) {
+              request.head_it_status = s.status
+              request.head_it_name = s.approver_name
+              request.head_it_comments = s.comments
+              request.head_it_approved_at = s.timestamp
+            } else if (stageName.includes('ict officer')) {
+              request.ict_officer_status = s.status
+              request.ict_officer_name = s.approver_name
+              request.ict_officer_comments = s.comments
+              request.ict_officer_approved_at = s.timestamp
+            }
+          }
+
+          normalized = {
+            ...raw,
+            request,
+            // keep compatibility naming; component also supports ict_assignments in some views
+            ict_assignments: Array.isArray(raw.ict_tasks) ? raw.ict_tasks : []
+          }
+        }
+
         return {
           success: true,
-          data: response.data.data,
+          data: normalized,
           message: response.data.message
         }
       } else {

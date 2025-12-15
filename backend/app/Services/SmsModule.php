@@ -294,27 +294,41 @@ class SmsModule
 
             // Get requester name
             $name = $request->staff_name ?? $request->full_name ?? $request->user->name ?? 'User';
-            
+
             // Get request types
             $types = $this->getRequestTypes($request);
-            
+
             // Get reference
             $ref = $request->request_id ?? 'MLG-REQ' . str_pad($request->id, 6, '0', STR_PAD_LEFT);
-            
-            // Build message with ICT Officer's comment if provided
-            $message = "Dear {$name}, your {$types} access has been GRANTED and is now ACTIVE. Ref: {$ref}.";
-            
+
+            // Build message (previous template - no forced 160 char cap)
+            // Avoid "Access access" when getRequestTypes() falls back to "Access".
+            $accessText = (strtolower(trim((string) $types)) === 'access') ? 'access request' : (trim((string) $types) . ' access');
+            $message = "Dear {$name}, your {$accessText} has been GRANTED and is now ACTIVE. Ref: {$ref}.";
+
             if ($comments && trim($comments) !== '') {
-                // Add ICT officer's comment to the message
-                $message .= " Note: {$comments}";
+                $message .= " Note: " . trim($comments);
             }
-            
+
             $message .= " - EABMS";
-            
+
             // Send SMS
             $result = $this->sendSms($phone, $message, 'access_granted');
-            $results['requester_notified'] = $result['success'];
-            
+            $results['requester_notified'] = (bool) ($result['success'] ?? false);
+
+            // IMPORTANT: log the concrete failure reason (otherwise we only see requester_notified=false)
+            if (!$results['requester_notified']) {
+                Log::warning('Access granted SMS failed', [
+                    'request_id' => $request->id,
+                    'ict_officer_id' => $ictOfficer->id,
+                    'phone_source' => $phoneSource,
+                    'phone_masked' => substr((string) $phone, 0, 6) . '***',
+                    'reason' => $result['message'] ?? 'Unknown failure',
+                    // Provider payload may be helpful for debugging but can be large; keep it as-is
+                    'provider_response' => $result['data'] ?? null,
+                ]);
+            }
+
             // Update SMS status tracking
             try {
                 $request->update([
@@ -327,8 +341,8 @@ class SmsModule
                     'error' => $e->getMessage()
                 ]);
             }
-            
-            Log::info('Access granted SMS notification sent', [
+
+            Log::info('Access granted SMS notification processed', [
                 'request_id' => $request->id,
                 'ict_officer_id' => $ictOfficer->id,
                 'results' => $results
@@ -500,8 +514,8 @@ class SmsModule
                 return $this->buildResponse(false, 'Connection error: ' . $curlError);
             }
 
-            // Handle HTTP errors
-            if ($httpCode !== 200) {
+            // Handle HTTP errors (accept any 2xx)
+            if ($httpCode < 200 || $httpCode >= 300) {
                 Log::error('SMS HTTP Error', ['code' => $httpCode, 'response' => $response]);
                 return $this->buildResponse(false, 'HTTP Error: ' . $httpCode);
             }
@@ -513,21 +527,52 @@ class SmsModule
                 return $this->buildResponse(false, 'Invalid JSON response');
             }
 
-            // Adjust success detection for Kilakona response structure
-            // If provider documents specific success indicator, check it here.
-            // Fallback: HTTP 200 with a non-empty JSON is success.
-            if ($httpCode === 200 && is_array($data)) {
-                Log::info('SMS sent successfully via Kilakona', ['response' => $data]);
-                return $this->buildResponse(true, 'SMS sent successfully', $data);
+            // Kilakona success detection
+            // We must NOT treat "any JSON" as success because the provider may return
+            // a 2xx response with success=false or with 0 valid recipients.
+            if (!is_array($data)) {
+                return $this->buildResponse(false, 'Unexpected API response', $data);
             }
 
-            // Check for errors field if present
+            // Provider-reported success flag (observed: { code, success, message, data:{validContacts,...} })
+            $providerSuccess = (isset($data['success']) && $data['success'] === true);
+
+            // If provider returns explicit error fields
             if (isset($data['error']) || isset($data['errors'])) {
-                $msg = isset($data['error']) ? (is_array($data['error']) ? json_encode($data['error']) : (string)$data['error']) : json_encode($data['errors']);
+                $msg = isset($data['error']) ? (is_array($data['error']) ? json_encode($data['error']) : (string) $data['error']) : json_encode($data['errors']);
                 return $this->buildResponse(false, 'API Error: ' . $msg, $data);
             }
 
-            return $this->buildResponse(false, 'Unexpected API response', $data);
+            // If provider has a nested data block with valid/invalid contacts, ensure at least one valid recipient
+            $validCount = null;
+            if (isset($data['data']) && is_array($data['data']) && array_key_exists('validContacts', $data['data'])) {
+                $valid = $data['data']['validContacts'];
+                $validCount = is_array($valid) ? count($valid) : (is_numeric($valid) ? (int) $valid : null);
+            }
+
+            if ($providerSuccess && ($validCount === null || $validCount > 0)) {
+                Log::info('SMS submitted successfully via Kilakona', [
+                    'code' => $data['code'] ?? null,
+                    'message' => $data['message'] ?? null,
+                    'valid_contacts' => $validCount,
+                ]);
+                return $this->buildResponse(true, 'SMS sent successfully', $data);
+            }
+
+            // Provider responded but indicates failure or no valid recipients
+            $failureReason = $data['message'] ?? 'SMS submission failed';
+            if ($validCount === 0) {
+                $failureReason = 'No valid recipient contacts';
+            }
+
+            Log::warning('SMS provider responded with failure', [
+                'code' => $data['code'] ?? null,
+                'success' => $data['success'] ?? null,
+                'message' => $data['message'] ?? null,
+                'valid_contacts' => $validCount,
+            ]);
+
+            return $this->buildResponse(false, $failureReason, $data);
 
         } catch (Exception $e) {
             Log::error('SMS API Exception', ['error' => $e->getMessage()]);
@@ -671,12 +716,13 @@ class SmsModule
     protected function logSms(string $phoneNumber, string $message, string $type, bool $success, array $response): void
     {
         try {
+            // Store provider response as structured JSON (not JSON-encoded string)
             SmsLog::create([
                 'phone_number' => $phoneNumber,
                 'message' => $message,
                 'type' => $type,
                 'status' => $success ? 'sent' : 'failed',
-                'provider_response' => json_encode($response),
+                'provider_response' => $response,
                 'sent_at' => $success ? now() : null
             ]);
         } catch (Exception $e) {

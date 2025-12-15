@@ -1351,12 +1351,26 @@ class BookingServiceController extends Controller
             try {
                 $smsModule = app(SmsModule::class);
 
-                // Determine recipient phone (prefer users table)
-                $recipientPhone = $bookingService->user->phone ?? $bookingService->phone_number;
+                // Determine recipient phone
+                // Prefer the phone number submitted with the booking request (borrower contact for this request).
+                // Fallback to the user's profile phone.
+                $recipientPhone = $bookingService->phone_number ?: ($bookingService->user->phone ?? null);
 
                 if ($recipientPhone) {
                     $name = $bookingService->borrower_name ?: ($bookingService->user->name ?? 'User');
-                    $deviceName = $bookingService->getDeviceDisplayNameAttribute();
+
+                    // Include all selected devices when request contains multiple inventory devices
+                    $deviceNames = [];
+                    try {
+                        $deviceNames = $bookingService->all_device_names ?? [];
+                    } catch (\Exception $e) {
+                        $deviceNames = [];
+                    }
+                    $deviceNames = is_array($deviceNames) ? array_values(array_filter(array_unique($deviceNames))) : [];
+                    $deviceLabel = !empty($deviceNames)
+                        ? implode(' & ', $deviceNames)
+                        : $bookingService->getDeviceDisplayNameAttribute();
+
                     $ref = 'BOOK-' . str_pad($bookingService->id, 6, '0', STR_PAD_LEFT);
 
                     // Build return deadline text
@@ -1410,7 +1424,10 @@ class BookingServiceController extends Controller
                     }
 
                     $assessorName = $bookingService->assessedBy->name ?? $bookingService->ictApprovedBy->name ?? 'ICT Officer';
-                    $message = "Dear {$name}, your device booking for {$deviceName} has been APPROVED. Ref: {$ref}. Please collect the device from ICT Office floor number 3. Return by {$deadline}. Assessed by {$assessorName}.{$conditionSummary} - ICT Office";
+
+                    // Keep message <= 160 chars (better deliverability as single SMS segment)
+                    $deadlineText = $deadline ? "Return by {$deadline}." : '';
+                    $message = "Approved: {$deviceLabel}. Ref {$ref}. Collect ICT Office (Floor 3). {$deadlineText} By {$assessorName}. - ICT";
 
                     $sendResult = $smsModule->sendSms($recipientPhone, $message, 'device_booking_approved');
 

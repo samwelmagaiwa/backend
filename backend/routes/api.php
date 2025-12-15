@@ -96,6 +96,133 @@ Route::get('/health/detailed', function () {
     ]);
 });
 
+// =====================================================
+// SMS Delivery Report Webhook (public)
+// =====================================================
+// Configure `SMS_DELIVERY_REPORT_URL` (e.g. https://your-domain.com/api/sms/delivery-report)
+// so Kilakona can POST delivery receipts back to the system.
+Route::match(['GET', 'POST'], '/sms/delivery-report', function (Request $request) {
+    // Optional shared-secret check (recommended if provider supports custom header/query params)
+    $expectedToken = env('SMS_DELIVERY_REPORT_TOKEN');
+    if (!empty($expectedToken)) {
+        $providedToken = $request->header('X-Webhook-Token')
+            ?? $request->header('X-Sms-Token')
+            ?? $request->query('token')
+            ?? $request->input('token');
+
+        if ($providedToken !== $expectedToken) {
+            \Illuminate\Support\Facades\Log::warning('SMS delivery report rejected (bad token)', [
+                'ip' => $request->ip(),
+            ]);
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+        }
+    }
+
+    // Accept JSON or form payloads
+    $payload = $request->all();
+    if (empty($payload)) {
+        $raw = $request->getContent();
+        if (is_string($raw) && trim($raw) !== '') {
+            $decoded = json_decode($raw, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                $payload = $decoded;
+            }
+        }
+    }
+
+    // Heuristics for Kilakona-style callbacks
+    $shootId = $payload['shootId']
+        ?? $payload['shoot_id']
+        ?? $payload['shootID']
+        ?? $payload['shoot']
+        ?? null;
+
+    $phone = $payload['contact']
+        ?? $payload['phone']
+        ?? $payload['phone_number']
+        ?? $payload['msisdn']
+        ?? $payload['to']
+        ?? null;
+
+    $deliveryStatus = $payload['delivery_status']
+        ?? $payload['deliveryStatus']
+        ?? $payload['status']
+        ?? $payload['state']
+        ?? null;
+
+    // Normalize phone to digits only (and strip leading +)
+    if (is_string($phone)) {
+        $phone = preg_replace('/[^0-9]/', '', $phone);
+    }
+
+    // Find matching SmsLog
+    $smsLog = null;
+    if (!empty($shootId)) {
+        $smsLog = \App\Models\SmsLog::query()
+            ->where(function ($q) use ($shootId) {
+                // For new JSON-object rows
+                $q->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT(provider_response, '$.data.data.shootId')) = ?", [$shootId]);
+                // Backward compatibility: provider_response stored as JSON string
+                $q->orWhere('provider_response', 'like', '%"shootId":"' . $shootId . '"%');
+            })
+            ->orderByDesc('id')
+            ->first();
+    }
+
+    if (!$smsLog && !empty($phone)) {
+        $smsLog = \App\Models\SmsLog::query()
+            ->where('phone_number', $phone)
+            ->orderByDesc('id')
+            ->first();
+    }
+
+    if (!$smsLog) {
+        \Illuminate\Support\Facades\Log::warning('SMS delivery report received but no matching SmsLog found', [
+            'shootId' => $shootId,
+            'phone_last4' => is_string($phone) ? substr($phone, -4) : null,
+        ]);
+
+        return response()->json([
+            'success' => false,
+            'message' => 'No matching SMS log found',
+        ], 404);
+    }
+
+    // Merge delivery data into provider_response (handle both old and new storage formats)
+    $existing = $smsLog->provider_response;
+    if (is_string($existing)) {
+        $decoded = json_decode($existing, true);
+        $existing = (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) ? $decoded : [];
+    }
+    if (!is_array($existing)) {
+        $existing = [];
+    }
+
+    $existing['delivery_report'] = [
+        'received_at' => now()->toISOString(),
+        'shootId' => $shootId,
+        'delivery_status' => $deliveryStatus,
+        'payload' => $payload,
+    ];
+
+    // Promote delivery status to a top-level key for SmsLog::delivery_status accessor
+    if (!empty($deliveryStatus)) {
+        $existing['delivery_status'] = $deliveryStatus;
+    }
+
+    $smsLog->provider_response = $existing;
+    $smsLog->save();
+
+    \Illuminate\Support\Facades\Log::info('SMS delivery report stored', [
+        'sms_log_id' => $smsLog->id,
+        'type' => $smsLog->type,
+        'shootId' => $shootId,
+        'delivery_status' => $deliveryStatus,
+    ]);
+
+    return response()->json(['success' => true]);
+});
+
 
 // Authentication routes
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login')->name('login');
@@ -870,11 +997,11 @@ Route::prefix('hod')->middleware('role:head_of_department,divisional_director,ic
 
     // Notification routes
     Route::prefix('notifications')->group(function () {
-        Route::get('/', [NotificationController::class, 'index'])->name('notifications.index');
-        Route::get('/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unread-count');
-        Route::patch('/{id}/mark-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
-        Route::patch('/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
-        Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
+        Route::get('/', [\App\Http\Controllers\Api\v1\NotificationController::class, 'index'])->name('notifications.index');
+        Route::get('/unread-count', [\App\Http\Controllers\Api\v1\NotificationController::class, 'unreadCount'])->name('notifications.unread-count');
+        Route::patch('/{id}/mark-read', [\App\Http\Controllers\Api\v1\NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
+        Route::patch('/mark-all-read', [\App\Http\Controllers\Api\v1\NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+        Route::delete('/{id}', [\App\Http\Controllers\Api\v1\NotificationController::class, 'destroy'])->name('notifications.destroy');
     });
 
     // Filtered User Access routes (for admin user management)

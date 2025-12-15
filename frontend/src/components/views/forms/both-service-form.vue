@@ -1283,10 +1283,16 @@
                 <textarea
                   v-model="grantAccessComment"
                   class="w-full h-28 bg-white/10 border border-blue-300/30 rounded-lg p-2 text-white placeholder-blue-300/60 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-blue-400"
-                  placeholder="Enter implementation details..."
+                  placeholder="Enter implementation details (max 1000 characters)..."
                   rows="5"
                   required
                 ></textarea>
+                <div class="flex justify-between mt-1">
+                  <span class="text-xs text-blue-200/70">Remaining: {{ Math.max(0, 1000 - (grantAccessComment || '').length) }}</span>
+                  <span class="text-xs text-blue-200/80">
+                    {{ (grantAccessComment || '').length }}/1000
+                  </span>
+                </div>
                 <p v-if="grantAccessError" class="text-red-300 text-xs mt-1">{{ grantAccessError }}</p>
                 
                 <!-- SMS Preview -->
@@ -1297,6 +1303,10 @@
                   </div>
                   <div class="bg-blue-900/50 rounded p-2 text-base text-blue-100 font-mono leading-relaxed">
                     {{ getSmsPreviewText() }}
+                  </div>
+                  <div class="flex justify-between mt-1">
+                    <span class="text-xs text-blue-200/70">Length: {{ getSmsPreviewText().length }} chars</span>
+                    <span class="text-xs text-blue-200/70">(Long messages may be split into multiple SMS parts)</span>
                   </div>
                   <p class="text-blue-300/70 text-base mt-2 italic">
                     <i class="fas fa-info-circle mr-1"></i>
@@ -6385,13 +6395,13 @@
         this.grantAccessError = ''
       },
 
-      // Generate SMS preview text
+      // Generate SMS preview text (matches backend template)
       getSmsPreviewText() {
         const name = this.form.staff_name || 'User'
         const ref =
           this.form.request_id || 'MLG-REQ' + String(this.getRequestId || '').padStart(6, '0')
 
-        // Get access types
+        // Get access types (previous template)
         const accessTypes = []
         if (
           this.form.jeeva_access_request ||
@@ -6415,7 +6425,10 @@
 
         const comment = (this.grantAccessComment || '').trim() || '[YOUR COMMENT HERE]'
 
-        return `Dear ${name}, your ${types} has been GRANTED and is now ACTIVE. Ref: ${ref}. Note: ${comment} - EABMS`
+        // Avoid "Access access" when types falls back to "Access"
+        const accessText = String(types).toLowerCase() === 'access' ? 'access request' : `${types} access`
+
+        return `Dear ${name}, your ${accessText} has been GRANTED and is now ACTIVE. Ref: ${ref}. Note: ${comment} - EABMS`
       },
 
       // Helper to compute row class safely

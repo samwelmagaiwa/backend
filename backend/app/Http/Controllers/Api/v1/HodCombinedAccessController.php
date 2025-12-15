@@ -13,8 +13,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Gate;
 use Carbon\Carbon;
+use Throwable;
 
 class HodCombinedAccessController extends Controller
 {
@@ -634,34 +634,47 @@ class HodCombinedAccessController extends Controller
     public function getAccessRequestTimeline($id)
     {
         try {
-            // Authorize - only HODs can access this endpoint
-            Gate::authorize('isHod');
-            
+            $user = Auth::user();
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthenticated'
+                ], 401);
+            }
+
+            // NOTE: This endpoint is the "HOD timeline" endpoint. Previously it used Gate::authorize('isHod'),
+            // but no such Gate was defined, causing *every* request to fail with 500.
+            if (!$user->hasRole('head_of_department') && !$user->hasRole('admin')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Access denied: User is not a Head of Department'
+                ], 403);
+            }
+
             $request = UserAccess::with([
-                'department', 
-                'requestType',
-                'ictTasks.assignedUser:id,name,email',
-                'ictTasks.approvedByUser:id,name,email'
+                'department',
+                // UserAccess model uses ictTaskAssignments relationship (not ictTasks)
+                'ictTaskAssignments.ictOfficer:id,name,email',
+                'ictTaskAssignments.assignedBy:id,name,email'
             ])->find($id);
-            
+
             if (!$request) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Access request not found'
                 ], 404);
             }
-            
-            // Check if the HOD has authorization to view this request
-            $user = Auth::user();
-            $userDepartments = Department::where('hod_id', $user->id)->pluck('id')->toArray();
-            
-            if (!in_array($request->department_id, $userDepartments)) {
+
+            // DEPARTMENT AUTHORIZATION: Ensure HOD can only access requests from their department(s)
+            $userDepartments = $user->departmentsAsHOD()->pluck('id')->toArray();
+
+            if (empty($userDepartments) || !in_array($request->department_id, $userDepartments)) {
                 return response()->json([
                     'success' => false,
                     'message' => 'You are not authorized to view this request timeline'
                 ], 403);
             }
-            
+
             // Build comprehensive timeline
             $timeline = [
                 'request_info' => [
@@ -698,8 +711,8 @@ class HodCombinedAccessController extends Controller
                 $timeline['approval_stages'][] = [
                     'stage' => 'Divisional Director Approval',
                     'status' => $request->divisional_status,
-                    'approver_name' => $request->divisional_name ?? 'N/A',
-                    'comments' => $request->divisional_comments ?? '',
+                    'approver_name' => $request->divisional_director_name ?? ($request->divisional_name ?? 'N/A'),
+                    'comments' => $request->divisional_director_comments ?? ($request->divisional_comments ?? ''),
                     'timestamp' => $request->divisional_approved_at,
                     'order' => 2
                 ];
@@ -760,29 +773,32 @@ class HodCombinedAccessController extends Controller
                 ];
             }
             
-            // ICT Tasks details
-            if ($request->ictTasks->isNotEmpty()) {
-                foreach ($request->ictTasks as $task) {
+            // ICT Task Assignment details (new system)
+            if ($request->ictTaskAssignments && $request->ictTaskAssignments->isNotEmpty()) {
+                foreach ($request->ictTaskAssignments as $assignment) {
                     $timeline['ict_tasks'][] = [
-                        'id' => $task->id,
-                        'title' => $task->title,
-                        'description' => $task->description,
-                        'status' => $task->status,
-                        'priority' => $task->priority,
-                        'assigned_to' => $task->assignedUser ? [
-                            'id' => $task->assignedUser->id,
-                            'name' => $task->assignedUser->name,
-                            'email' => $task->assignedUser->email
+                        'id' => $assignment->id,
+                        'status' => $assignment->status,
+                        'status_label' => $assignment->status_label,
+                        'assigned_to' => $assignment->ictOfficer ? [
+                            'id' => $assignment->ictOfficer->id,
+                            'name' => $assignment->ictOfficer->name,
+                            'email' => $assignment->ictOfficer->email
                         ] : null,
-                        'approved_by' => $task->approvedByUser ? [
-                            'id' => $task->approvedByUser->id,
-                            'name' => $task->approvedByUser->name,
-                            'email' => $task->approvedByUser->email
+                        'assigned_by' => $assignment->assignedBy ? [
+                            'id' => $assignment->assignedBy->id,
+                            'name' => $assignment->assignedBy->name,
+                            'email' => $assignment->assignedBy->email
                         ] : null,
-                        'due_date' => $task->due_date,
-                        'completed_at' => $task->completed_at,
-                        'created_at' => $task->created_at,
-                        'updated_at' => $task->updated_at
+                        'assigned_at' => $assignment->assigned_at,
+                        'started_at' => $assignment->started_at,
+                        'completed_at' => $assignment->completed_at,
+                        'cancelled_at' => $assignment->cancelled_at,
+                        'assignment_notes' => $assignment->assignment_notes,
+                        'progress_notes' => $assignment->progress_notes,
+                        'completion_notes' => $assignment->completion_notes,
+                        'created_at' => $assignment->created_at,
+                        'updated_at' => $assignment->updated_at
                     ];
                 }
             }
@@ -803,15 +819,18 @@ class HodCombinedAccessController extends Controller
                 'data' => $timeline
             ]);
             
-        } catch (\Exception $e) {
+        } catch (Throwable $e) {
             Log::error('HOD: Error retrieving access request timeline', [
                 'request_id' => $id,
-                'error' => $e->getMessage()
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
-            
+
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to retrieve timeline'
+                'message' => 'Failed to retrieve timeline',
+                'error' => app()->environment('local') ? $e->getMessage() : 'Internal server error'
             ], 500);
         }
     }

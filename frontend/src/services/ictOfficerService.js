@@ -42,7 +42,10 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error.response?.status
-    if (status === 401 || status === 403) {
+
+    // Only force-logout on 401 (invalid/expired token).
+    // 403 is a normal "role doesn't have access" case in this app and should not clear auth.
+    if (status === 401) {
       // Clear any stale auth data
       localStorage.removeItem('auth_token')
       localStorage.removeItem('user_data')

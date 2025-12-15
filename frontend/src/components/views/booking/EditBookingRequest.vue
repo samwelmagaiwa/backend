@@ -260,7 +260,7 @@
                     </div>
                   </div>
 
-                  <!-- Row 3: Department & Return Date -->
+                  <!-- Row 3: Department & Return Date/Time -->
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <!-- Department -->
                     <div class="group">
@@ -289,44 +289,29 @@
                       </div>
                     </div>
 
-                    <!-- Return Date -->
+                    <!-- Return Date & Time (combined) -->
                     <div class="group">
                       <label class="block text-base font-bold text-blue-100 mb-2 flex items-center">
                         <i class="fas fa-calendar-check mr-2 text-blue-300"></i>
-                        Return Date <span class="text-red-400 ml-1">*</span>
+                        Return Date & Time <span class="text-red-400 ml-1">*</span>
                       </label>
                       <div class="relative">
                         <input
-                          v-model="formData.return_date"
-                          type="date"
-                          :min="minReturnDate"
+                          v-model="returnDateTimeModel"
+                          type="datetime-local"
+                          :min="minReturnDateTime"
                           class="booking-input w-full px-3 py-3 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50"
                           required
                         />
                       </div>
-                    </div>
-                  </div>
-
-                  <!-- Row 4: Return Time -->
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <!-- Return Time -->
-                    <div class="group">
-                      <label class="block text-base font-bold text-blue-100 mb-2 flex items-center">
-                        <i class="fas fa-clock mr-2 text-blue-300"></i>
-                        Return Time <span class="text-red-400 ml-1">*</span>
-                      </label>
-                      <div class="relative">
-                        <input
-                          v-model="formData.return_time"
-                          type="time"
-                          class="booking-input w-full px-3 py-3 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50"
-                          required
-                        />
+                      <div
+                        v-if="errors.return_date || errors.return_time"
+                        class="text-red-400 text-xs mt-1 flex items-center"
+                      >
+                        <i class="fas fa-exclamation-circle mr-1"></i>
+                        {{ errors.return_date || errors.return_time }}
                       </div>
                     </div>
-
-                    <!-- Empty space to maintain grid -->
-                    <div></div>
                   </div>
 
                   <!-- Reason for Booking -->
@@ -468,13 +453,27 @@
         return today.toISOString().split('T')[0]
       })
 
-      const minReturnDate = computed(() => {
-        if (formData.value.booking_date) {
-          const bookingDate = new Date(formData.value.booking_date)
-          bookingDate.setDate(bookingDate.getDate() + 1)
-          return bookingDate.toISOString().split('T')[0]
+      const minReturnDateTime = computed(() => {
+        const base = formData.value.booking_date || minDate.value
+        return `${base}T00:00`
+      })
+
+      const returnDateTimeModel = computed({
+        get() {
+          if (!formData.value.return_date) return ''
+          const t = (formData.value.return_time || '00:00').slice(0, 5)
+          return `${formData.value.return_date}T${t}`
+        },
+        set(value) {
+          if (!value) {
+            formData.value.return_date = ''
+            formData.value.return_time = ''
+            return
+          }
+          const parts = String(value).split('T')
+          formData.value.return_date = parts[0] || ''
+          formData.value.return_time = (parts[1] || '').slice(0, 5)
         }
-        return minDate.value
       })
 
       // Guard this route - staff and ICT Officers/ICT Secretary can access
@@ -702,7 +701,8 @@
         deviceTypes,
         departments,
         minDate,
-        minReturnDate,
+        minReturnDateTime,
+        returnDateTimeModel,
         onDeviceTypeChange,
         updateBooking,
         goBack

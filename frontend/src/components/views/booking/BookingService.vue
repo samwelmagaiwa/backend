@@ -349,7 +349,7 @@
                     </div>
                   </div>
 
-                  <!-- Row 3: Phone Number & Collection Date -->
+                  <!-- Row 3: Phone Number & Return Date/Time -->
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-1.5">
                     <!-- Phone Number -->
                     <div class="group">
@@ -385,7 +385,7 @@
                       </div>
                     </div>
 
-                    <!-- Date of Collection -->
+                    <!-- Return Date & Time (combined) -->
                     <div class="group">
                       <label class="block text-lg font-bold text-blue-100 mb-1 flex items-center">
                         <i class="fas fa-calendar-plus mr-2 text-blue-300"></i>
@@ -394,10 +394,11 @@
                       </label>
                       <div class="relative">
                         <input
-                          v-model="formData.collectionDate"
-                          @input="validateReturnDate"
-                          @change="validateReturnDate"
-                          type="date"
+                          v-model="returnDateTimeModel"
+                          @input="validateReturnDateTime"
+                          @change="validateReturnDateTime"
+                          type="datetime-local"
+                          :min="minReturnDateTime"
                           class="booking-input w-full px-3 py-2 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white text-lg backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50"
                           required
                         />
@@ -406,48 +407,11 @@
                         ></div>
                       </div>
                       <div
-                        v-if="errors.collectionDate"
+                        v-if="errors.collectionDate || errors.returnTime"
                         class="text-red-400 text-base mt-1 flex items-center"
                       >
                         <i class="fas fa-exclamation-circle mr-1"></i>
-                        {{ errors.collectionDate }}
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Return Time -->
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-1.5">
-                    <div class="group">
-                      <label class="block text-lg font-bold text-blue-100 mb-1 flex items-center">
-                        <i class="fas fa-clock mr-2 text-blue-300"></i>
-                        Return Time <span class="text-red-400 ml-1">*</span>
-                      </label>
-                      <div class="relative">
-                        <input
-                          v-model="formData.returnTime"
-                          type="time"
-                          @change="handleReturnTimeChange"
-                          @input="validateReturnTime"
-                          @click="handleReturnTimeClick"
-                          class="booking-input w-full px-3 py-2 bg-white/15 border-2 border-blue-300/30 rounded-xl focus:border-blue-400 focus:outline-none text-white text-lg backdrop-blur-sm transition-all duration-300 hover:bg-white/20 focus:bg-white/20 focus:shadow-lg focus:shadow-blue-500/20 group-hover:border-blue-400/50 relative z-10"
-                          style="color-scheme: dark"
-                          required
-                        />
-                        <div
-                          class="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/10 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-0"
-                        ></div>
-                        <div
-                          class="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-300/50 pointer-events-none z-5"
-                        >
-                          <i class="fas fa-clock"></i>
-                        </div>
-                      </div>
-                      <div
-                        v-if="errors.returnTime"
-                        class="text-red-400 text-base mt-1 flex items-center"
-                      >
-                        <i class="fas fa-exclamation-circle mr-1"></i>
-                        {{ errors.returnTime }}
+                        {{ errors.collectionDate || errors.returnTime }}
                       </div>
                     </div>
                   </div>
@@ -1041,6 +1005,29 @@
         if (this.isLoadingDevices) return 'Fetching available devices...'
         if (this.isSubmitting) return 'Please wait while we submit your booking...'
         return 'Please wait...'
+      },
+      // Used by the combined datetime-local input
+      returnDateTimeModel: {
+        get() {
+          if (!this.formData.collectionDate) return ''
+          const t = (this.formData.returnTime || '17:00').slice(0, 5)
+          return `${this.formData.collectionDate}T${t}`
+        },
+        set(value) {
+          if (!value) {
+            this.formData.collectionDate = ''
+            this.formData.returnTime = ''
+            return
+          }
+          const parts = String(value).split('T')
+          this.formData.collectionDate = parts[0] || ''
+          this.formData.returnTime = (parts[1] || '').slice(0, 5)
+        }
+      },
+      minReturnDateTime() {
+        const today = new Date().toISOString().split('T')[0]
+        const base = this.formData.bookingDate || today
+        return `${base}T00:00`
       }
     },
 
@@ -1066,6 +1053,12 @@
           if (!this.formData.returnTime) {
             // Set default return time to 5 PM
             this.formData.returnTime = '17:00'
+          }
+
+          // If return date isn't set, default to booking date (or today)
+          if (!this.formData.collectionDate) {
+            const today = new Date().toISOString().split('T')[0]
+            this.formData.collectionDate = this.formData.bookingDate || today
           }
 
           // Initialize real-time validation
@@ -1397,8 +1390,7 @@
         this.validateBookingDate()
         this.validateDeviceType()
         this.validateDepartment()
-        this.validateReturnDate()
-        this.validateReturnTime()
+        this.validateReturnDateTime()
         this.validateReason()
         // Phone number validation removed since it's auto-populated
       },
@@ -1699,20 +1691,20 @@
         }
       },
 
-      validateReturnDate() {
-        if (!this.formData.collectionDate) {
-          this.errors.collectionDate = 'Return date is required'
-        } else if (
-          this.formData.bookingDate &&
-          this.formData.collectionDate <= this.formData.bookingDate
-        ) {
-          this.errors.collectionDate = 'Return date must be after booking date'
+      validateReturnDateTime() {
+        if (!this.returnDateTimeModel) {
+          this.errors.collectionDate = 'Return date and time is required'
+          this.errors.returnTime = ''
+          return
+        }
+
+        // Basic ordering rule: allow same-day return, but not a return date before booking date
+        if (this.formData.bookingDate && this.formData.collectionDate < this.formData.bookingDate) {
+          this.errors.collectionDate = 'Return date cannot be before booking date'
         } else {
           this.errors.collectionDate = ''
         }
-      },
 
-      validateReturnTime() {
         if (!this.formData.returnTime) {
           this.errors.returnTime = 'Return time is required'
         } else {
@@ -1843,8 +1835,8 @@
           this.errors.department = 'Department is required'
         }
 
-        if (!this.formData.collectionDate) {
-          this.errors.collectionDate = 'Collection date is required'
+        if (!this.returnDateTimeModel) {
+          this.errors.collectionDate = 'Return date and time is required'
         }
 
         if (!this.formData.returnTime) {

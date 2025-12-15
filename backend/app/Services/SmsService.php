@@ -219,15 +219,17 @@ class SmsService
     {
         $key = 'sms_rate_limit:' . $phoneNumber;
         $attempts = Cache::get($key, 0);
-        
-        // Allow maximum 5 SMS per hour per phone number
-        if ($attempts >= 5) {
+
+        // Configurable rate limit (defaults to 5/hour)
+        $maxAttempts = config('sms.rate_limit.max_per_hour_per_number', 5);
+
+        if ($attempts >= $maxAttempts) {
             return true;
         }
 
         // Increment and set expiry
         Cache::put($key, $attempts + 1, now()->addHour());
-        
+
         return false;
     }
 
@@ -454,12 +456,13 @@ class SmsService
     protected function logSms(string $phoneNumber, string $message, string $type, bool $success, array $response): void
     {
         try {
+            // Store provider response as structured JSON (not JSON-encoded string)
             SmsLog::create([
                 'phone_number' => $phoneNumber,
                 'message' => $message,
                 'type' => $type,
                 'status' => $success ? 'sent' : 'failed',
-                'provider_response' => json_encode($response),
+                'provider_response' => $response,
                 'sent_at' => $success ? now() : null
             ]);
         } catch (Exception $e) {

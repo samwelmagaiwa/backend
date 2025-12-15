@@ -110,7 +110,8 @@
 
           <!-- Main Content -->
           <div class="booking-glass-card rounded-b-2xl overflow-hidden animate-slide-up">
-            <div class="p-3 space-y-3">
+            <!-- Add bottom padding so sticky action bar doesn't cover the last form fields -->
+            <div class="p-3 space-y-3 pb-28">
               <!-- Back Button -->
               <div class="mb-2">
                 <button
@@ -512,138 +513,6 @@
                   </div>
                 </div>
 
-                <!-- Compact Button Layout -->
-                <div
-                  v-if="!isReadOnly"
-                  class="flex flex-col sm:flex-row gap-2 pt-3 border-t border-blue-600/30"
-                >
-                  <!-- Save Issuing Assessment Button -->
-                  <button
-                    v-if="showIssuingAssessmentButton"
-                    @click="handleIssuingAssessmentAction"
-                    :disabled="!issuingAssessmentButtonState.enabled"
-                    :title="issuingAssessmentButtonState.tooltip"
-                    :class="[
-                      'flex-1 py-2 px-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-sm',
-                      issuingAssessmentButtonState.classes
-                    ]"
-                  >
-                    <i :class="['text-xs', issuingAssessmentButtonState.icon]"></i>
-                    {{ issuingAssessmentButtonState.text }}
-                  </button>
-
-                  <!-- ICT Action Buttons (Approve/Reject) -->
-                  <div v-if="showApprovalButton" class="flex flex-1 gap-2">
-                    <!-- Approve Request Button -->
-                    <button
-                      @click="approveRequest"
-                      :disabled="
-                        !canTakeAction || isProcessing || requestApproved || !issuingAssessmentSaved
-                      "
-                      :class="[
-                        'flex-1 py-2 px-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-sm',
-                        requestApproved
-                          ? 'bg-blue-600 text-white shadow-lg border-2 border-blue-400'
-                          : canTakeAction && !isProcessing && issuingAssessmentSaved
-                            ? 'bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg hover:from-green-700 hover:to-green-800 border-2 border-green-500/50 hover:border-green-400'
-                            : 'bg-gray-600 text-gray-300 cursor-not-allowed opacity-50'
-                      ]"
-                      :title="getApproveButtonTooltip()"
-                    >
-                      <i
-                        :class="[
-                          'text-xs',
-                          isProcessing
-                            ? 'fas fa-spinner fa-spin'
-                            : requestApproved
-                              ? 'fas fa-check-double'
-                              : 'fas fa-check'
-                        ]"
-                      ></i>
-                      {{
-                        isProcessing
-                          ? 'Approving...'
-                          : requestApproved
-                            ? 'Request Approved'
-                            : !issuingAssessmentSaved
-                              ? 'Save Assessment First'
-                              : 'Approve Request'
-                      }}
-                    </button>
-
-                    <!-- Reject Request Button -->
-                    <button
-                      @click="rejectRequest"
-                      :disabled="!canTakeAction || isProcessing || requestRejected"
-                      :class="[
-                        'flex-1 py-2 px-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-sm',
-                        requestRejected
-                          ? 'bg-gray-600 text-white shadow-lg border-2 border-gray-400'
-                          : canTakeAction && !isProcessing
-                            ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg hover:from-red-700 hover:to-red-800 border-2 border-red-500/50 hover:border-red-400'
-                            : 'bg-gray-600 text-gray-300 cursor-not-allowed opacity-50'
-                      ]"
-                      title="Reject this device borrowing request"
-                    >
-                      <i
-                        :class="[
-                          'text-xs',
-                          isProcessing
-                            ? 'fas fa-spinner fa-spin'
-                            : requestRejected
-                              ? 'fas fa-times-circle'
-                              : 'fas fa-times'
-                        ]"
-                      ></i>
-                      {{
-                        isProcessing
-                          ? 'Rejecting...'
-                          : requestRejected
-                            ? 'Request Rejected'
-                            : 'Reject Request'
-                      }}
-                    </button>
-                  </div>
-
-                  <!-- Receiving Assessment Button (Green) - Only show during receiving phase -->
-                  <button
-                    v-if="showReceivingButton"
-                    @click="receiveDeviceNow"
-                    :disabled="!canReceiveDevice"
-                    class="flex-1 group relative overflow-hidden px-6 py-3 bg-gradient-to-r from-green-600 via-green-700 to-green-800 text-white rounded-xl font-semibold text-lg transition-all duration-300 hover:shadow-xl hover:shadow-green-500/40 border border-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <!-- Background Animation -->
-                    <div
-                      class="absolute inset-0 bg-gradient-to-r from-green-700 via-green-800 to-green-900 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                    ></div>
-
-                    <!-- Button Content -->
-                    <div class="relative z-10 flex items-center justify-center gap-3">
-                      <div
-                        class="flex items-center justify-center w-8 h-8 bg-white/20 rounded-full group-hover:bg-white/30 transition-colors duration-300"
-                      >
-                        <i class="fas fa-check-circle text-xl"></i>
-                      </div>
-                      <div class="flex flex-col items-start">
-                        <span class="text-sm opacity-95 tracking-wide">Final Action</span>
-                        <span class="text-xl font-bold tracking-wide">
-                          {{ isProcessingAssessment ? 'Processing...' : 'Receive Now' }}
-                        </span>
-                      </div>
-                    </div>
-
-                    <!-- Status Indicator -->
-                    <div v-if="deviceReceived" class="absolute top-2 right-2">
-                      <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                    </div>
-
-                    <!-- Shimmer Effect -->
-                    <div
-                      class="absolute inset-0 -skew-x-12 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-shimmer"
-                    ></div>
-                  </button>
-                </div>
-
                 <!-- Read-only notice -->
                 <div v-if="isReadOnly" class="mt-3">
                   <div
@@ -705,6 +574,152 @@
                     >
                       <i class="fas fa-list mr-2"></i>
                       Back to List
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sticky Action Bar (always visible) -->
+              <div
+                v-if="
+                  !isReadOnly &&
+                  !isLoading &&
+                  Object.keys(request).length > 0 &&
+                  (showIssuingAssessmentButton || showApprovalButton || showReceivingButton)
+                "
+                class="sticky bottom-0 z-40 -mx-3"
+              >
+                <div
+                  class="px-3 py-3 bg-blue-950/80 backdrop-blur-md border-t border-blue-400/20 shadow-[0_-8px_24px_rgba(0,0,0,0.35)]"
+                >
+                  <div class="flex flex-col sm:flex-row gap-2">
+                    <!-- Save Issuing Assessment Button -->
+                    <button
+                      v-if="showIssuingAssessmentButton"
+                      @click="handleIssuingAssessmentAction"
+                      :disabled="!issuingAssessmentButtonState.enabled"
+                      :title="issuingAssessmentButtonState.tooltip"
+                      :class="[
+                        'flex-1 py-2 px-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-sm',
+                        issuingAssessmentButtonState.classes
+                      ]"
+                    >
+                      <i :class="['text-xs', issuingAssessmentButtonState.icon]"></i>
+                      {{ issuingAssessmentButtonState.text }}
+                    </button>
+
+                    <!-- ICT Action Buttons (Approve/Reject) -->
+                    <div v-if="showApprovalButton" class="flex flex-1 gap-2">
+                      <!-- Approve Request Button -->
+                      <button
+                        @click="approveRequest"
+                        :disabled="
+                          !canTakeAction ||
+                          isProcessing ||
+                          requestApproved ||
+                          !issuingAssessmentSaved
+                        "
+                        :class="[
+                          'flex-1 py-2 px-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-sm',
+                          requestApproved
+                            ? 'bg-blue-600 text-white shadow-lg border-2 border-blue-400'
+                            : canTakeAction && !isProcessing && issuingAssessmentSaved
+                              ? 'bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg hover:from-green-700 hover:to-green-800 border-2 border-green-500/50 hover:border-green-400'
+                              : 'bg-gray-600 text-gray-300 cursor-not-allowed opacity-50'
+                        ]"
+                        :title="getApproveButtonTooltip()"
+                      >
+                        <i
+                          :class="[
+                            'text-xs',
+                            isProcessing
+                              ? 'fas fa-spinner fa-spin'
+                              : requestApproved
+                                ? 'fas fa-check-double'
+                                : 'fas fa-check'
+                          ]"
+                        ></i>
+                        {{
+                          isProcessing
+                            ? 'Approving...'
+                            : requestApproved
+                              ? 'Request Approved'
+                              : !issuingAssessmentSaved
+                                ? 'Save Assessment First'
+                                : 'Approve Request'
+                        }}
+                      </button>
+
+                      <!-- Reject Request Button -->
+                      <button
+                        @click="rejectRequest"
+                        :disabled="!canTakeAction || isProcessing || requestRejected"
+                        :class="[
+                          'flex-1 py-2 px-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-sm',
+                          requestRejected
+                            ? 'bg-gray-600 text-white shadow-lg border-2 border-gray-400'
+                            : canTakeAction && !isProcessing
+                              ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg hover:from-red-700 hover:to-red-800 border-2 border-red-500/50 hover:border-red-400'
+                              : 'bg-gray-600 text-gray-300 cursor-not-allowed opacity-50'
+                        ]"
+                        title="Reject this device borrowing request"
+                      >
+                        <i
+                          :class="[
+                            'text-xs',
+                            isProcessing
+                              ? 'fas fa-spinner fa-spin'
+                              : requestRejected
+                                ? 'fas fa-times-circle'
+                                : 'fas fa-times'
+                          ]"
+                        ></i>
+                        {{
+                          isProcessing
+                            ? 'Rejecting...'
+                            : requestRejected
+                              ? 'Request Rejected'
+                              : 'Reject Request'
+                        }}
+                      </button>
+                    </div>
+
+                    <!-- Receiving Assessment Button (Green) - Only show during receiving phase -->
+                    <button
+                      v-if="showReceivingButton"
+                      @click="receiveDeviceNow"
+                      :disabled="!canReceiveDevice"
+                      class="flex-1 group relative overflow-hidden px-6 py-3 bg-gradient-to-r from-green-600 via-green-700 to-green-800 text-white rounded-xl font-semibold text-lg transition-all duration-300 hover:shadow-xl hover:shadow-green-500/40 border border-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <!-- Background Animation -->
+                      <div
+                        class="absolute inset-0 bg-gradient-to-r from-green-700 via-green-800 to-green-900 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                      ></div>
+
+                      <!-- Button Content -->
+                      <div class="relative z-10 flex items-center justify-center gap-3">
+                        <div
+                          class="flex items-center justify-center w-8 h-8 bg-white/20 rounded-full group-hover:bg-white/30 transition-colors duration-300"
+                        >
+                          <i class="fas fa-check-circle text-xl"></i>
+                        </div>
+                        <div class="flex flex-col items-start">
+                          <span class="text-sm opacity-95 tracking-wide">Final Action</span>
+                          <span class="text-xl font-bold tracking-wide">
+                            {{ isProcessingAssessment ? 'Processing...' : 'Receive Now' }}
+                          </span>
+                        </div>
+                      </div>
+
+                      <!-- Status Indicator -->
+                      <div v-if="deviceReceived" class="absolute top-2 right-2">
+                        <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                      </div>
+
+                      <!-- Shimmer Effect -->
+                      <div
+                        class="absolute inset-0 -skew-x-12 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-shimmer"
+                      ></div>
                     </button>
                   </div>
                 </div>
