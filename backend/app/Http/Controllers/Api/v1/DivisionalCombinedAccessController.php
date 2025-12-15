@@ -49,20 +49,25 @@ class DivisionalCombinedAccessController extends Controller
             
             if (!empty($divisionalDepartmentIds)) {
                 $query->whereIn('department_id', $divisionalDepartmentIds);
-                // Count requests for logging (using separate simpler queries to avoid complex nested issues)
-                $totalRequestsCount = UserAccess::whereNotNull('request_type')->count();
-                $filteredRequestsCount = UserAccess::whereNotNull('request_type')
-                    ->whereIn('department_id', $divisionalDepartmentIds)
-                    ->count();
-                    
-                Log::info('Divisional Department Filter Applied', [
-                    'user_id' => $currentUser->id,
-                    'user_name' => $currentUser->name,
-                    'user_email' => $currentUser->email,
-                    'divisional_department_ids' => $divisionalDepartmentIds,
-                    'requests_before_dept_filter' => $totalRequestsCount,
-                    'requests_after_dept_filter' => $filteredRequestsCount
-                ]);
+
+                // Avoid heavy counting queries on every request; keep extra stats only when debugging.
+                if (config('app.debug')) {
+                    try {
+                        $totalRequestsCount = UserAccess::whereNotNull('request_type')->count();
+                        $filteredRequestsCount = UserAccess::whereNotNull('request_type')
+                            ->whereIn('department_id', $divisionalDepartmentIds)
+                            ->count();
+
+                        Log::debug('Divisional Department Filter Applied', [
+                            'user_id' => $currentUser->id,
+                            'divisional_department_ids' => $divisionalDepartmentIds,
+                            'requests_before_dept_filter' => $totalRequestsCount,
+                            'requests_after_dept_filter' => $filteredRequestsCount
+                        ]);
+                    } catch (\Throwable $e) {
+                        // ignore
+                    }
+                }
             } else {
                 // If user is not Divisional Director of any department, show no requests
                 Log::warning('Divisional Access Attempt: User is not Divisional Director of any department', [

@@ -794,7 +794,15 @@
         stats.total = accessRequests.value.length
 
         setPendingCountOverride(pendingForICT)
-        setTimeout(() => diagnoseNotificationDiscrepancy(), 1000)
+
+        // Diagnostics are expensive (extra API calls). Only run when explicitly enabled.
+        const enableNotificationDiagnostics =
+          process.env.NODE_ENV === 'development' &&
+          typeof localStorage !== 'undefined' &&
+          localStorage.getItem('ENABLE_NOTIFICATION_DIAGNOSTICS') === 'true'
+        if (enableNotificationDiagnostics) {
+          setTimeout(() => diagnoseNotificationDiscrepancy(), 1000)
+        }
       } else {
         console.error('❌ IctAccessRequests: Failed to load requests:', result.message)
         error.value = result.message
@@ -1452,6 +1460,16 @@
       console.log('IctAccessRequests: Component initialized successfully')
       refreshNotificationBadge()
       initAutoRetryForList()
+
+      // Optional diagnostics: enable by running in DevTools:
+      // localStorage.setItem('ENABLE_NOTIFICATION_DIAGNOSTICS','true') then refresh.
+      const enableNotificationDiagnostics =
+        process.env.NODE_ENV === 'development' &&
+        typeof localStorage !== 'undefined' &&
+        localStorage.getItem('ENABLE_NOTIFICATION_DIAGNOSTICS') === 'true'
+      if (enableNotificationDiagnostics) {
+        diagnoseNotificationDiscrepancy()
+      }
       document.addEventListener('click', handleClickOutside)
 
       // Extra safety: auto-clear loading overlays if they persist too long
