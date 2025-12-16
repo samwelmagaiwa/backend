@@ -3,6 +3,8 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
+    "serve": "npm --prefix frontend run serve",
+    "build": "npm --prefix frontend run build",
     "dev": "concurrently \"php backend/artisan serve\" \"php backend/artisan queue:listen --tries=1\" \"npm --prefix frontend run serve\" --names server,queue,frontend",
     "dev:api": "php backend/artisan serve",
     "dev:queue": "php backend/artisan queue:listen --tries=1",
@@ -12,4 +14,3 @@
     "concurrently": "^9.0.1"
   }
 }
-

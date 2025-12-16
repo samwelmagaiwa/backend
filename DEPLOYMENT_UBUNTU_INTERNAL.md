@@ -1,7 +1,7 @@
 # Ubuntu Internal Deployment Guide (MNH On‑Prem)
 This project is a Laravel backend (in `backend/`) and a Vue frontend (in `frontend/`).
 The recommended production setup is:
-- Nginx as reverse proxy / static server
+- Apache (aaPanel-managed) as web server / static server
 - PHP-FPM for Laravel
 - MySQL/MariaDB database
 - Supervisor for Laravel queues
@@ -10,35 +10,37 @@ The recommended production setup is:
 
 ## 0) Quick checklist (recommended order)
 1) Prepare DNS/hostnames and confirm server IP is reachable from MNH internal network
-2) Install packages (Nginx, PHP-FPM, MySQL, Node.js, Composer)
+2) Install packages (Apache, PHP-FPM, MySQL, Node.js, Composer)
 3) Create Linux user + deploy folder `/var/www/eabms`
 4) Put code on server (git clone / copy)
 5) Create DB + DB user
 6) Configure Laravel `.env`, generate `APP_KEY`, migrate DB, set permissions
 7) Configure frontend `.env.production`, build `frontend/dist`
-8) Configure Nginx vhosts (API + Frontend), reload Nginx
+8) Configure Apache sites in aaPanel (API + Frontend)
 9) Setup queue worker (Supervisor) + scheduler (cron)
 10) Verify: API responds + frontend loads + login works
 
 ## 0.1) What "successful deployment" looks like
-- Visiting `http(s)://eabms.mnh.local` loads the Vue app
-- Vue app API calls go to `http(s)://api.eabms.mnh.local/api/...` (or your chosen URL)
+- Visiting `http(s)://eabms.mloganzila.or.tz` loads the Vue app
+- Vue app API calls go to `http(s)://api.eabms.mloganzila.or.tz/api/...` (or your chosen URL)
 - API responds with 200 for health checks (example: `/api/user`, `/api/login` depending on auth)
 - Laravel can write to `backend/storage/` (no 500 errors due to permissions)
 - Background jobs run (if your app uses queues for notifications)
 
 ## 1) Target server assumptions
-- Ubuntu Server 22.04/24.04 LTS (similar steps for other Ubuntu versions)
+- Ubuntu Server 24.04.1 LTS (these steps also work on Ubuntu 22.04 with small version changes)
+- Server is shared (you already have 2+ production systems and this project becomes site #3)
+- You have a GUI hosting panel installed (aaPanel / BT Panel–like) managing Apache, PHP-FPM and sites
 - Internal hostname examples:
-  - Frontend: `eabms.mnh.local`
-  - API: `api.eabms.mnh.local`
+  - Frontend: `eabms.mloganzila.or.tz`
+  - API: `api.eabms.mloganzila.or.tz`
 - You have sudo access
 - The server can install packages (internet access or internal apt mirror)
 
 If MNH uses an internal DNS, create A records. Otherwise, test using `/etc/hosts` on clients.
 Example client entry:
 ```text
-10.10.10.50 eabms.mnh.local api.eabms.mnh.local
+10.10.10.50 eabms.mloganzila.or.tz api.eabms.mloganzila.or.tz
 ```
 
 Decide early whether you will use:
@@ -46,21 +48,33 @@ Decide early whether you will use:
 - Option B: **single hostname** where API is served from the same domain under `/api`
 
 ## 2) Install system packages
+If you use aaPanel/BT Panel, it may already manage Apache/PHP/MySQL/Node for you.
+
+Recommended approach on a shared production server:
+- Prefer installing/upgrading packages **inside the panel**, to avoid breaking existing sites.
+- Only use `apt install` if you are sure it will not change Apache/PHP versions used by other production systems.
+
 Update OS:
 ```bash
 sudo apt update && sudo apt -y upgrade
 ```
 
-Install Nginx + PHP + required PHP extensions + Git + unzip:
-```bash
-sudo apt -y install nginx git unzip curl
-sudo apt -y install php-fpm php-cli php-mysql php-xml php-mbstring php-curl php-zip php-bcmath php-intl
+Install Apache + PHP + required PHP extensions + Git + unzip.
 
-# optional but helpful
-sudo apt -y install ca-certificates
+If aaPanel already installed Apache/PHP for other production sites, do NOT reinstall them with apt unless you know it won’t change versions.
+
+```bash
+# Apache (if not already installed)
+sudo apt -y install apache2
+
+# Common tools
+sudo apt -y install git unzip curl ca-certificates
+
+# PHP + extensions
+sudo apt -y install php-fpm php-cli php-mysql php-xml php-mbstring php-curl php-zip php-bcmath php-intl
 ```
 
-Confirm PHP version and PHP-FPM service name (you will need it for Nginx config):
+Confirm PHP version and PHP-FPM service name (useful for troubleshooting):
 ```bash
 php -v
 systemctl list-units --type=service | grep -E 'php.*fpm'
@@ -91,6 +105,8 @@ composer --version
 ```
 
 ## 3) Create app user + directories
+On a shared server (3+ sites), keep every app isolated.
+
 Create a dedicated Linux user:
 ```bash
 sudo adduser --disabled-password --gecos "" eabms
@@ -122,6 +138,9 @@ sudo chown -R eabms:eabms /var/www/eabms
 ```
 
 ## 5) Database setup (MySQL)
+On a shared server, each system must have its own database + DB user.
+Never reuse the database user/password from other production systems.
+
 Harden MySQL basics (recommended):
 ```bash
 sudo mysql_secure_installation
@@ -156,7 +175,7 @@ sudo -u eabms -H bash -lc 'cd /var/www/eabms/backend && cp .env.example .env'
 
 Edit `/var/www/eabms/backend/.env` and set at least:
 - `APP_NAME`, `APP_ENV=production`, `APP_DEBUG=false`
-- `APP_URL=https://api.eabms.mnh.local` (or your internal URL)
+- `APP_URL=https://api.eabms.mloganzila.or.tz` (or your internal URL)
 - Logging best practice (keeps logs small in production):
   - `LOG_CHANNEL=daily`
   - `LOG_LEVEL=warning`
@@ -173,7 +192,7 @@ Edit `/var/www/eabms/backend/.env` and set at least:
   - `SMS_API_SECRET=...`
   - `SMS_SENDER_ID=...`
   - (optional) delivery reports:
-    - `SMS_DELIVERY_REPORT_URL=https://api.eabms.mnh.local/api/sms/delivery-report`
+    - `SMS_DELIVERY_REPORT_URL=https://api.eabms.mloganzila.or.tz/api/sms/delivery-report`
     - `SMS_DELIVERY_REPORT_TOKEN=...`
 
 Generate application key:
@@ -209,7 +228,7 @@ sudo -u eabms -H bash -lc 'cd /var/www/eabms/backend && php artisan about'
 ```
 
 ## 7) Frontend (Vue) setup
-Build the Vue app and serve it with Nginx.
+Build the Vue app and serve it with Apache.
 
 ### 7.1 Install dependencies and build
 ```bash
@@ -230,10 +249,10 @@ sudo -u eabms -H bash -lc 'cd /var/www/eabms/frontend && (test -f .env.productio
 2) Set the API base URL (note the `/api` at the end):
 ```bash
 # example: API is on a separate hostname
-VUE_APP_API_URL=https://api.eabms.mnh.local/api
+VUE_APP_API_URL=https://api.eabms.mloganzila.or.tz/api
 
 # example: single-host deployment (same domain), if you choose that approach
-# VUE_APP_API_URL=https://eabms.mnh.local/api
+# VUE_APP_API_URL=https://eabms.mloganzila.or.tz/api
 ```
 
 3) Rebuild after changing `.env.production`:
@@ -243,141 +262,140 @@ sudo -u eabms -H bash -lc 'cd /var/www/eabms/frontend && npm run build'
 
 If you deploy frontend and API on different hostnames, ensure backend CORS allows the frontend origin.
 
-## 8) Nginx configuration
-Recommended: **separate virtual hosts** for frontend and API.
+## 8) Apache configuration (aaPanel) — two hostnames (recommended)
+Because aaPanel on your server is running **Apache** (not Nginx) and the server already hosts other production systems, the lowest-risk setup is:
+- Frontend site: `eabms.mloganzila.or.tz`
+- API site: `api.eabms.mloganzila.or.tz`
 
-### 8.1 PHP-FPM socket
-Check PHP-FPM service name and socket (the version may differ, e.g. 8.1/8.2/8.3):
+### 8.0 aaPanel multi-site notes (IMPORTANT)
+1) In aaPanel, confirm your existing sites so you don’t reuse a hostname already mapped to another system.
+2) Create TWO new websites in aaPanel:
+   - Site A: `eabms.mloganzila.or.tz`
+   - Site B: `api.eabms.mloganzila.or.tz`
+3) Do not change global Apache/PHP settings that could affect the other production sites.
+4) Prefer enabling extensions / changing PHP version for **only this site** using aaPanel’s per-site PHP settings.
+
+### 8.1 Frontend site (Vue static)
+In aaPanel → Website → Add Site:
+- Domain: `eabms.mloganzila.or.tz`
+- Document Root: `/var/www/eabms/frontend/dist`
+- PHP: **Static** (no PHP)
+
+Vue is an SPA (single page app). Ensure Apache rewrites unknown routes to `index.html`.
+Create `/var/www/eabms/frontend/dist/.htaccess`:
+```apache
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # If the request is a real file or directory, serve it
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Otherwise, send everything to the SPA entry
+  RewriteRule ^ index.html [L]
+</IfModule>
+```
+
+### 8.2 API site (Laravel)
+In aaPanel → Website → Add Site:
+- Domain: `api.eabms.mloganzila.or.tz`
+- Document Root: `/var/www/eabms/backend/public`
+- PHP Version: PHP 8.3 (Ubuntu 24.04 default is commonly 8.3)
+
+aaPanel/Apache must allow Laravel’s `.htaccess` to work.
+Make sure Apache modules are enabled (aaPanel usually handles this):
+- `rewrite`
+- PHP handler (php-fpm)
+
+Laravel’s rewrite rules are already included in `backend/public/.htaccess`.
+
+### 8.3 Upload limits (important for signatures/attachments)
+In the **API site** configuration:
+- Increase upload size limits if needed:
+  - Apache: `LimitRequestBody` (if you set it)
+  - PHP: `upload_max_filesize`, `post_max_size`, `max_execution_time`
+
+### 8.4 Quick verification
+From the server:
 ```bash
-systemctl list-units --type=service | grep -E 'php.*fpm'
-ls -la /run/php/
+curl -I http://eabms.mloganzila.or.tz
+curl -I http://api.eabms.mloganzila.or.tz
 ```
-Pick the correct socket from `/run/php/` (example: `/run/php/php8.2-fpm.sock`).
+If using HTTPS, test with `https://...`.
 
-### 8.2 API vhost (Laravel)
-Create:
-- `/etc/nginx/sites-available/eabms-api`
-- then symlink to `sites-enabled/`
+## 9) HTTPS (internal) — Self-signed (your choice)
+Because you are using **self-signed certificates**, client devices/browsers must trust the certificate; otherwise you will see:
+- browser "Not secure" warnings
+- API calls failing due to TLS errors (especially if the browser blocks mixed content)
 
-Example config:
-```nginx
-server {
-    listen 80;
-    server_name api.eabms.mnh.local;
+### 9.1 Create self-signed certificates (recommended: one cert per hostname)
+You can create certificates on the server using OpenSSL.
 
-    root /var/www/eabms/backend/public;
-    index index.php;
-
-    client_max_body_size 20M;
-
-    location / {
-        try_files $uri $uri/ /index.php?$query_string;
-    }
-
-    location ~ \.php$ {
-        include snippets/fastcgi-php.conf;
-        # IMPORTANT: replace with the socket that exists on your server (see section 8.1)
-        fastcgi_pass unix:/run/php/php8.2-fpm.sock;
-    }
-
-    location ~ /\.ht {
-        deny all;
-    }
-}
-```
-Enable and reload:
+Frontend cert:
 ```bash
-sudo ln -s /etc/nginx/sites-available/eabms-api /etc/nginx/sites-enabled/
-
-# optional: disable the default site to avoid conflicts
-sudo rm -f /etc/nginx/sites-enabled/default
-
-sudo nginx -t
-sudo systemctl reload nginx
+sudo mkdir -p /etc/ssl/localcerts
+sudo openssl req -x509 -nodes -newkey rsa:2048 -days 825 \
+  -keyout /etc/ssl/localcerts/eabms.mloganzila.or.tz.key \
+  -out /etc/ssl/localcerts/eabms.mloganzila.or.tz.crt \
+  -subj "/C=TZ/ST=Dar/L=Dar/O=Mloganzila/OU=ICT/CN=eabms.mloganzila.or.tz"
 ```
 
-Quick API test from the server:
+API cert:
 ```bash
-curl -I http://127.0.0.1
-curl -I http://api.eabms.mnh.local
+sudo openssl req -x509 -nodes -newkey rsa:2048 -days 825 \
+  -keyout /etc/ssl/localcerts/api.eabms.mloganzila.or.tz.key \
+  -out /etc/ssl/localcerts/api.eabms.mloganzila.or.tz.crt \
+  -subj "/C=TZ/ST=Dar/L=Dar/O=Mloganzila/OU=ICT/CN=api.eabms.mloganzila.or.tz"
 ```
-If you have HTTPS enabled, test with `https://...`.
 
-### 8.3 Frontend vhost (Vue static)
-Create `/etc/nginx/sites-available/eabms-frontend`:
-```nginx
-server {
-    listen 80;
-    server_name eabms.mnh.local;
+### 9.2 Install/enable SSL in aaPanel (Apache)
+In aaPanel, for each website:
+1) Open the site settings
+2) SSL → enable SSL
+3) Choose **Other certificate** / **Custom certificate**
+4) Paste:
+   - Certificate (CRT content)
+   - Private key (KEY content)
+5) Enable **Force HTTPS** if available (recommended)
 
-    root /var/www/eabms/frontend/dist;
-    index index.html;
+Do this for BOTH:
+- `eabms.mloganzila.or.tz`
+- `api.eabms.mloganzila.or.tz`
 
-    # Vue SPA routing
-    location / {
-        try_files $uri $uri/ /index.html;
-    }
-}
-```
-Enable and reload:
+### 9.3 Trust the self-signed cert on client devices (required)
+Each client machine must trust the cert(s). Options:
+- Best: import the `.crt` into the OS/browser trust store
+- Alternative: accept the warning in browser (not recommended; some browsers still block API calls)
+
+Windows (quick idea):
+- Double-click `.crt` → Install Certificate → Local Machine → Trusted Root Certification Authorities
+
+### 9.4 Application configuration for HTTPS
+- Backend (`backend/.env`):
+  - `APP_URL=https://api.eabms.mloganzila.or.tz`
+- Frontend (`frontend/.env.production`):
+  - `VUE_APP_API_URL=https://api.eabms.mloganzila.or.tz/api`
+
+After editing backend `.env`, run:
 ```bash
-sudo ln -s /etc/nginx/sites-available/eabms-frontend /etc/nginx/sites-enabled/
-sudo nginx -t
-sudo systemctl reload nginx
+cd /var/www/eabms/backend
+php artisan config:clear
+php artisan config:cache
 ```
 
-Quick frontend test:
+### 9.5 Verify HTTPS
+From a client (recommended):
+- Open `https://eabms.mloganzila.or.tz` (should load)
+- Open `https://api.eabms.mloganzila.or.tz` (should respond)
+
+From the server:
 ```bash
-curl -I http://eabms.mnh.local
+curl -k -I https://eabms.mloganzila.or.tz
+curl -k -I https://api.eabms.mloganzila.or.tz
 ```
-
-### 8.4 Optional: Single-host deployment (frontend + API on same hostname)
-If you prefer one hostname (example: `eabms.mnh.local`) you can serve the Vue build and proxy API requests to Laravel.
-
-High-level idea:
-- Vue app served from `/`
-- Laravel API served from `/api` (proxied to Laravel public index)
-
-Example (replace PHP-FPM socket to match your server):
-```nginx
-server {
-    listen 80;
-    server_name eabms.mnh.local;
-
-    # Frontend
-    root /var/www/eabms/frontend/dist;
-    index index.html;
-
-    location / {
-        try_files $uri $uri/ /index.html;
-    }
-
-    # API (Laravel) - served from the backend public folder
-    location /api {
-        alias /var/www/eabms/backend/public;
-        try_files $uri $uri/ /index.php?$query_string;
-    }
-
-    location ~ \\.php$ {
-        root /var/www/eabms/backend/public;
-        include snippets/fastcgi-php.conf;
-        # IMPORTANT: replace with the socket that exists on your server (see section 8.1)
-        fastcgi_pass unix:/run/php/php8.2-fpm.sock;
-    }
-}
-```
-
-If you use this option, set:
-- Laravel: `APP_URL=https://eabms.mnh.local`
-- Frontend: `VUE_APP_API_URL=https://eabms.mnh.local/api`
-
-## 9) HTTPS (internal)
-If MNH uses an internal CA, install the CA cert on clients and use real TLS certs.
-If not, you can use a self-signed certificate (clients must trust it).
-
-Typical approach:
-- Terminate TLS at Nginx for both `eabms.mnh.local` and `api.eabms.mnh.local`.
-- Update `APP_URL` and frontend API base URL to `https://...`.
+Note: `-k` ignores certificate validation (server-side test only).
 
 ## 10) Queues (important for notifications)
 Some notifications/listeners implement `ShouldQueue`. Ensure queue worker runs.
@@ -440,7 +458,7 @@ Add:
 If UFW is used:
 ```bash
 sudo ufw allow OpenSSH
-sudo ufw allow 'Nginx Full'
+sudo ufw allow 'Apache Full'
 sudo ufw enable
 sudo ufw status
 ```
@@ -465,9 +483,9 @@ tail -f /var/www/eabms/backend/storage/logs/laravel-*.log
 
 Restart services (adjust php-fpm version if needed):
 ```bash
-# example only; replace 8.2 with your PHP version (8.1/8.2/8.3)
-sudo systemctl restart php8.2-fpm
-sudo systemctl reload nginx
+# example only; replace 8.3 with your PHP version if different
+sudo systemctl restart php8.3-fpm
+sudo systemctl reload apache2
 sudo supervisorctl restart eabms-queue:*
 ```
 
@@ -499,21 +517,21 @@ sudo -u eabms -H bash -lc 'cd /var/www/eabms/frontend && npm run build'
 
 4) Reload services:
 ```bash
-sudo systemctl reload nginx
+sudo systemctl reload apache2
 sudo supervisorctl restart eabms-queue:*
 ```
 
 5) Quick post-update verification:
 ```bash
-curl -I http://eabms.mnh.local
-curl -I http://api.eabms.mnh.local
+curl -I http://eabms.mloganzila.or.tz
+curl -I http://api.eabms.mloganzila.or.tz
 ```
 
 ## 16) Final verification (go-live)
 Do these checks before announcing the system is live:
 
 1) From your workstation browser:
-- Open the frontend: `http(s)://eabms.mnh.local`
+- Open the frontend: `http(s)://eabms.mloganzila.or.tz`
 - Log in and load at least:
   - dashboard
   - a request list page
@@ -525,9 +543,9 @@ Do these checks before announcing the system is live:
 
 3) From the server:
 ```bash
-# nginx is healthy
-sudo nginx -t
-sudo systemctl status nginx --no-pager
+# apache is healthy
+sudo apache2ctl -t
+sudo systemctl status apache2 --no-pager
 
 # php-fpm is healthy
 systemctl list-units --type=service | grep -E 'php.*fpm'
@@ -539,7 +557,7 @@ sudo supervisorctl status
 ## 17) Troubleshooting (common issues)
 ### 17.1 Frontend loads but API calls fail
 - Confirm `frontend/.env.production` has:
-  - `VUE_APP_API_URL=https://api.eabms.mnh.local/api`
+  - `VUE_APP_API_URL=https://api.eabms.mloganzila.or.tz/api`
 - Rebuild frontend after edits: `npm run build`
 - If API is on a different hostname, confirm backend CORS allows the frontend origin.
 
@@ -555,15 +573,17 @@ tail -n 200 /var/www/eabms/backend/storage/logs/laravel-*.log
 
 ### 17.3 Uploads failing (signatures / attachments)
 - Increase limits:
-  - Nginx `client_max_body_size`
+  - Apache (optional) `LimitRequestBody` if set
   - PHP `upload_max_filesize` and `post_max_size` in `php.ini` (FPM)
 - Reload services after changes.
 
 ## 18) Notes for MNH internal hosting
 - Prefer internal DNS names and internal CA-issued certificates.
+- This server hosts multiple systems: apply change control (schedule maintenance windows) to avoid affecting the other 2+ production sites.
 - Keep database backups (nightly) and store them securely.
 - Monitor:
-  - Nginx access/error logs
+  - Apache access/error logs
   - Laravel logs
   - Queue worker logs
   - Disk usage for `storage/` and database
+  - CPU/RAM usage (3 systems on one server)
