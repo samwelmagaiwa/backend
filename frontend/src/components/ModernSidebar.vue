@@ -638,7 +638,7 @@
         @click="showHelpModal = false"
       >
         <div
-          class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all duration-300 scale-100 overflow-hidden"
+          class="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 transform transition-all duration-300 scale-100 overflow-hidden max-h-[85vh] overflow-y-auto"
           @click.stop
         >
           <!-- Header -->
@@ -655,14 +655,15 @@
                 />
               </svg>
             </div>
-            <h3 class="text-xl font-bold text-white mb-2">Help & Support</h3>
+            <h3 class="text-xl font-bold text-white mb-1">Help & Support</h3>
+            <p class="text-blue-100 text-sm">Quick help based on your role</p>
           </div>
 
           <!-- Body -->
           <div class="p-6">
             <div class="space-y-4">
               <div
-                class="flex items-center p-3 rounded-lg shadow-sm border bg-blue-50 border-blue-100"
+                class="flex items-center p-4 rounded-lg shadow-sm border bg-blue-50 border-blue-100"
               >
                 <div
                   class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3 shadow-md"
@@ -683,12 +684,14 @@
                 </div>
                 <div>
                   <p class="font-medium text-gray-800">ICT Support</p>
-                  <p class="text-sm text-gray-600">+255 123 456 789</p>
+                  <a class="text-sm text-gray-600 hover:text-blue-700" href="tel:+255222215701">
+                    +255222215701
+                  </a>
                 </div>
               </div>
 
               <div
-                class="flex items-center p-3 rounded-lg shadow-sm border bg-blue-50 border-blue-100"
+                class="flex items-center p-4 rounded-lg shadow-sm border bg-blue-50 border-blue-100"
               >
                 <div
                   class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3 shadow-md"
@@ -709,34 +712,84 @@
                 </div>
                 <div>
                   <p class="font-medium text-gray-800">Email Support</p>
-                  <p class="text-sm text-gray-600">ict@mnh.or.tz</p>
+                  <a class="text-sm text-gray-600 hover:text-blue-700" href="mailto:ict@mnh.or.tz">
+                    ict@mnh.or.tz
+                  </a>
                 </div>
               </div>
 
-              <div
-                class="flex items-center p-3 rounded-lg shadow-sm border bg-blue-50 border-blue-100"
-              >
-                <div
-                  class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3 shadow-md"
+              <!-- User Guide (Role-based dropdown) -->
+              <div class="rounded-lg shadow-sm border bg-blue-50 border-blue-100">
+                <button
+                  type="button"
+                  @click="showUserGuide = !showUserGuide"
+                  class="w-full flex items-center p-4 text-left"
                 >
-                  <svg
-                    class="w-5 h-5 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                  <div
+                    class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3 shadow-md flex-shrink-0"
                   >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <p class="font-medium text-gray-800">User Guide</p>
-                  <p class="text-sm text-gray-600">Access system documentation</p>
-                </div>
+                    <svg
+                      class="w-5 h-5 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                      />
+                    </svg>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="font-medium text-gray-800">User Guide</p>
+                    <p class="text-sm text-gray-600">Access system documentation</p>
+                  </div>
+                  <div
+                    class="w-8 h-8 rounded-lg bg-white/80 border border-blue-100 flex items-center justify-center"
+                  >
+                    <svg
+                      class="w-4 h-4 text-blue-700 transition-transform duration-200"
+                      :class="showUserGuide ? 'rotate-180' : ''"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </div>
+                </button>
+
+                <transition
+                  enter-active-class="transition duration-200 ease-out"
+                  enter-from-class="transform opacity-0 -translate-y-1"
+                  enter-to-class="transform opacity-100 translate-y-0"
+                  leave-active-class="transition duration-150 ease-in"
+                  leave-from-class="transform opacity-100 translate-y-0"
+                  leave-to-class="transform opacity-0 -translate-y-1"
+                >
+                  <div v-if="showUserGuide" class="px-4 pb-4">
+                    <div class="bg-white rounded-xl border border-blue-100 p-4">
+                      <p class="text-xs text-gray-500 mb-2">
+                        Showing guidance for: <span class="font-medium">{{ userGuideRoleLabel }}</span>
+                      </p>
+                      <div class="space-y-3">
+                        <div v-for="(section, idx) in userGuideSections" :key="idx">
+                          <p class="text-sm font-semibold text-gray-800 mb-1">{{ section.title }}</p>
+                          <ul class="list-disc pl-5 text-sm text-gray-700 space-y-1">
+                            <li v-for="(item, i) in section.items" :key="i">{{ item }}</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </transition>
               </div>
             </div>
 
@@ -802,6 +855,7 @@
       const stableUserRole = ref(null)
       const searchQuery = ref('')
       const showHelpModal = ref(false)
+      const showUserGuide = ref(false)
       // expandedSections now comes from useSidebar composable
 
       // Debug logging for Head of IT
@@ -1280,6 +1334,155 @@
         toggleSection(section)
       }
 
+      const roleForGuide = computed(() => {
+        return (
+          piniaAuthStore?.userRole || userRole?.value || stableUserRole?.value || ROLES.STAFF
+        )
+      })
+
+      const userGuideRoleLabel = computed(() => {
+        return getRoleDisplayName(roleForGuide.value)
+      })
+
+      const userGuideSections = computed(() => {
+        const role = roleForGuide.value
+
+        switch (role) {
+          case ROLES.ADMIN:
+            return [
+              {
+                title: 'Admin: setup & maintenance',
+                items: [
+                  'Open Admin Dashboard to manage users, roles, and departments.',
+                  'Correct role + department assignment controls which menus/forms a user can access.'
+                ]
+              },
+              {
+                title: 'Admin: user support',
+                items: [
+                  'If a user cannot see expected pages, verify their role assignment first.',
+                  'Use onboarding reset when a user must re-accept terms/ICT policy or restart onboarding.'
+                ]
+              }
+            ]
+          case ROLES.STAFF:
+            return [
+              {
+                title: 'Staff: submit a request',
+                items: [
+                  'Open User Dashboard and select the required form (Jeeva / Wellsoft / Internet / Combined).',
+                  'Complete all fields accurately (request type, justification, user details) then submit.'
+                ]
+              },
+              {
+                title: 'Staff: follow up',
+                items: [
+                  'Track your request status from your dashboard.',
+                  'If clarification is requested by approvers, update/re-submit promptly.'
+                ]
+              }
+            ]
+          case ROLES.HEAD_OF_DEPARTMENT:
+            return [
+              {
+                title: 'HOD: review & recommend',
+                items: [
+                  'Use HOD Dashboard → Access Requests to review submissions from your department.',
+                  'Approve/Reject (recommend) with clear comments and forward to the next approval stage.'
+                ]
+              },
+              {
+                title: 'HOD: data quality',
+                items: [
+                  'Ensure staff details and department information are correct for routing.',
+                  'If details are missing, reject with reasons so the user can correct and re-submit.'
+                ]
+              }
+            ]
+          case ROLES.DIVISIONAL_DIRECTOR:
+            return [
+              {
+                title: 'Divisional Director: approval stage',
+                items: [
+                  'Use Divisional Dashboard → Combined Requests to review escalated requests.',
+                  'Approve/Reject with clear audit comments (who/what/why) to keep workflow moving.'
+                ]
+              }
+            ]
+          case ROLES.HEAD_OF_IT:
+            return [
+              {
+                title: 'Head of IT: routing & oversight',
+                items: [
+                  'Use Head of IT Dashboard → Combined Requests to review and route requests.',
+                  'Forward tasks to the ICT team for implementation and track bottlenecks.'
+                ]
+              },
+              {
+                title: 'Head of IT: escalation',
+                items: [
+                  'Escalate high-impact or policy-sensitive requests to ICT Director.',
+                  'Coordinate with departments when submitted information is incomplete.'
+                ]
+              }
+            ]
+          case ROLES.ICT_OFFICER:
+            return [
+              {
+                title: 'ICT Officer: implement requests',
+                items: [
+                  'Open ICT Dashboard → Access Requests to view items forwarded for implementation.',
+                  'Validate request details and implement the required service or reject with reasons.'
+                ]
+              },
+              {
+                title: 'ICT Officer: update status',
+                items: [
+                  'Update the request status after action is taken so users/approvers can track progress.',
+                  'Escalate exceptions to Head of IT / ICT Director.'
+                ]
+              }
+            ]
+          case ROLES.SECRETARY_ICT:
+            return [
+              {
+                title: 'ICT Secretary: device bookings',
+                items: [
+                  'Use Device Requests to review device borrowing/booking requests.',
+                  'Confirm availability and booking dates before approving/declining.'
+                ]
+              },
+              {
+                title: 'ICT Secretary: coordination',
+                items: [
+                  'Escalate technical implementation tasks to ICT Officer.',
+                  'Use ICT Support contacts for communication and issue logging.'
+                ]
+              }
+            ]
+          case ROLES.ICT_DIRECTOR:
+            return [
+              {
+                title: 'ICT Director: final oversight',
+                items: [
+                  'Use ICT Director Dashboard to review escalated / high-impact requests.',
+                  'Approve/Reject based on ICT policy and ensure the ICT team follows through.'
+                ]
+              }
+            ]
+          default:
+            return [
+              {
+                title: 'General guidance',
+                items: [
+                  'Your menus and forms are displayed based on your role and permissions.',
+                  'If you cannot find a page you need, contact ICT Support or request role verification from Admin.'
+                ]
+              }
+            ]
+        }
+      })
+
       function showHelp() {
         showHelpModal.value = true
       }
@@ -1294,7 +1497,8 @@
           [ROLES.ICT_DIRECTOR]: 'ICT Director',
           [ROLES.HEAD_OF_IT]: 'Head of IT',
           [ROLES.STAFF]: 'Staff Member',
-          [ROLES.ICT_OFFICER]: 'ICT Officer'
+          [ROLES.ICT_OFFICER]: 'ICT Officer',
+          [ROLES.SECRETARY_ICT]: 'ICT Secretary'
         }
         return roleNames[role] || role
       }
@@ -1743,6 +1947,9 @@
         isCollapsed,
         searchQuery,
         showHelpModal,
+        showUserGuide,
+        userGuideRoleLabel,
+        userGuideSections,
         stableUserRole,
         expandedSections,
 

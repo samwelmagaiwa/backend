@@ -329,7 +329,7 @@
       class="fixed inset-0 bg-black/60 flex items-center justify-center z-[9998] backdrop-blur-sm"
     >
       <div
-        class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all duration-300 scale-100 overflow-hidden"
+        class="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 transform transition-all duration-300 scale-100 overflow-hidden max-h-[85vh] overflow-y-auto"
       >
         <!-- Header -->
         <div
@@ -340,14 +340,15 @@
           >
             <i class="fas fa-question-circle text-white text-2xl"></i>
           </div>
-          <h3 class="text-xl font-bold text-white mb-2">Help & Support</h3>
+          <h3 class="text-xl font-bold text-white mb-1">Help & Support</h3>
+          <p class="text-blue-100 text-sm">Quick help based on your role</p>
         </div>
 
         <!-- Body -->
         <div class="p-6">
           <div class="space-y-4">
             <div
-              class="flex items-center p-3 bg-blue-50 rounded-lg shadow-sm border border-blue-100"
+              class="flex items-center p-4 bg-blue-50 rounded-lg shadow-sm border border-blue-100"
             >
               <div
                 class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3 shadow-md"
@@ -356,12 +357,14 @@
               </div>
               <div>
                 <p class="font-medium text-gray-800">ICT Support</p>
-                <p class="text-sm text-gray-600">+255 123 456 789</p>
+                <a class="text-sm text-gray-600 hover:text-blue-700" href="tel:+255222215701">
+                  +255222215701
+                </a>
               </div>
             </div>
 
             <div
-              class="flex items-center p-3 bg-blue-50 rounded-lg shadow-sm border border-blue-100"
+              class="flex items-center p-4 bg-blue-50 rounded-lg shadow-sm border border-blue-100"
             >
               <div
                 class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3 shadow-md"
@@ -370,22 +373,63 @@
               </div>
               <div>
                 <p class="font-medium text-gray-800">Email Support</p>
-                <p class="text-sm text-gray-600">ict@mnh.or.tz</p>
+                <a class="text-sm text-gray-600 hover:text-blue-700" href="mailto:ict@mnh.or.tz">
+                  ict@mnh.or.tz
+                </a>
               </div>
             </div>
 
-            <div
-              class="flex items-center p-3 bg-blue-50 rounded-lg shadow-sm border border-blue-100"
-            >
-              <div
-                class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3 shadow-md"
+            <!-- User Guide (Role-based dropdown) -->
+            <div class="bg-blue-50 rounded-lg shadow-sm border border-blue-100">
+              <button
+                type="button"
+                @click="showUserGuide = !showUserGuide"
+                class="w-full flex items-center p-4 text-left"
               >
-                <i class="fas fa-book text-white"></i>
-              </div>
-              <div>
-                <p class="font-medium text-gray-800">User Guide</p>
-                <p class="text-sm text-gray-600">Access system documentation</p>
-              </div>
+                <div
+                  class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3 shadow-md flex-shrink-0"
+                >
+                  <i class="fas fa-book text-white"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="font-medium text-gray-800">User Guide</p>
+                  <p class="text-sm text-gray-600">Access system documentation</p>
+                </div>
+                <div
+                  class="w-8 h-8 rounded-lg bg-white/80 border border-blue-100 flex items-center justify-center"
+                >
+                  <i
+                    class="fas fa-chevron-down text-blue-700 text-sm transition-transform duration-200"
+                    :class="showUserGuide ? 'rotate-180' : ''"
+                  ></i>
+                </div>
+              </button>
+
+              <transition
+                enter-active-class="transition duration-200 ease-out"
+                enter-from-class="transform opacity-0 -translate-y-1"
+                enter-to-class="transform opacity-100 translate-y-0"
+                leave-active-class="transition duration-150 ease-in"
+                leave-from-class="transform opacity-100 translate-y-0"
+                leave-to-class="transform opacity-0 -translate-y-1"
+              >
+                <div v-if="showUserGuide" class="px-4 pb-4">
+                  <div class="bg-white rounded-xl border border-blue-100 p-4">
+                    <p class="text-xs text-gray-500 mb-2">
+                      Showing guidance for:
+                      <span class="font-medium">{{ userGuideRoleLabel }}</span>
+                    </p>
+                    <div class="space-y-3">
+                      <div v-for="(section, idx) in userGuideSections" :key="idx">
+                        <p class="text-sm font-semibold text-gray-800 mb-1">{{ section.title }}</p>
+                        <ul class="list-disc pl-5 text-sm text-gray-700 space-y-1">
+                          <li v-for="(item, i) in section.items" :key="i">{{ item }}</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </transition>
             </div>
           </div>
 
@@ -419,7 +463,174 @@
       // Reactive state
       const showProfileDropdown = ref(false)
       const showHelpModal = ref(false)
+      const showUserGuide = ref(false)
       const profileDropdown = ref(null)
+
+      const normalizedUserRole = computed(() => {
+        try {
+          const user = safeCurrentUser.value
+          const role = user?.role || user?.role_name || user?.primary_role
+          return role || 'staff'
+        } catch (error) {
+          console.warn('Error determining user role:', error)
+          return 'staff'
+        }
+      })
+
+      const userGuideRoleLabel = computed(() => {
+        const role = normalizedUserRole.value
+        const roleMap = {
+          admin: 'Administrator',
+          ict_officer: 'ICT Officer',
+          secretary_ict: 'ICT Secretary',
+          head_of_department: 'Head of Department',
+          divisional_director: 'Divisional Director',
+          ict_director: 'ICT Director',
+          head_of_it: 'Head of IT',
+          staff: 'Staff Member'
+        }
+
+        return roleMap[role] || role.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())
+      })
+
+      const userGuideSections = computed(() => {
+        const role = normalizedUserRole.value
+
+        switch (role) {
+          case 'admin':
+            return [
+              {
+                title: 'Admin: setup & maintenance',
+                items: [
+                  'Go to Admin Dashboard to manage the system configuration.',
+                  'Assign correct roles and departments to users so the right menus/forms appear.'
+                ]
+              },
+              {
+                title: 'Admin: support actions',
+                items: [
+                  'Use User Roles / Departments modules when a user cannot see expected pages.',
+                  'Use Onboarding Reset when a user needs to re-accept terms/ICT policy or restart onboarding.'
+                ]
+              }
+            ]
+          case 'staff':
+            return [
+              {
+                title: 'Staff: submit a request',
+                items: [
+                  'Open User Dashboard and choose the relevant form (Jeeva / Wellsoft / Internet / Combined).',
+                  'Fill in accurate details (service needed, user info, justification) then submit.'
+                ]
+              },
+              {
+                title: 'Staff: track progress',
+                items: [
+                  'Monitor the status of your submitted requests in your dashboard views.',
+                  'If you are blocked or the request is delayed, contact ICT Support using the phone/email above.'
+                ]
+              }
+            ]
+          case 'head_of_department':
+            return [
+              {
+                title: 'HOD: review & recommend',
+                items: [
+                  'Open HOD Dashboard → Access Requests to review submissions from your department.',
+                  'Approve/Reject (or Recommend) with clear comments, then forward to the next approver.'
+                ]
+              },
+              {
+                title: 'HOD: departmental user actions',
+                items: [
+                  'Create users for your department (if enabled) and ensure correct department details.',
+                  'Incorrect department/role assignment may prevent the user from seeing the correct forms.'
+                ]
+              }
+            ]
+          case 'divisional_director':
+            return [
+              {
+                title: 'Divisional Director: approval stage',
+                items: [
+                  'Open Divisional Dashboard → Combined Requests / Access Requests to review escalations.',
+                  'Approve/Reject with audit-ready comments (who/what/why) to keep the workflow moving.'
+                ]
+              }
+            ]
+          case 'head_of_it':
+            return [
+              {
+                title: 'Head of IT: routing & oversight',
+                items: [
+                  'Open Head of IT Dashboard → Combined Requests to review and route requests.',
+                  'Ensure the request reaches the correct implementation team (ICT Officer) promptly.'
+                ]
+              },
+              {
+                title: 'Head of IT: escalation',
+                items: [
+                  'Escalate high-impact or policy-sensitive cases to ICT Director.',
+                  'Coordinate with departments if a request is missing required details.'
+                ]
+              }
+            ]
+          case 'ict_officer':
+            return [
+              {
+                title: 'ICT Officer: implement requests',
+                items: [
+                  'Open ICT Dashboard → Access Requests to view requests forwarded for implementation.',
+                  'Validate the request details, then proceed with implementation or reject with reasons.'
+                ]
+              },
+              {
+                title: 'ICT Officer: update status',
+                items: [
+                  'After completing the task, update the request status so approvers/users can track progress.',
+                  'If policy approval is required, escalate to Head of IT / ICT Director.'
+                ]
+              }
+            ]
+          case 'secretary_ict':
+            return [
+              {
+                title: 'ICT Secretary: device bookings',
+                items: [
+                  'Open Device Requests to review device borrowing/booking requests.',
+                  'Confirm device availability, dates, and borrower details before approving/declining.'
+                ]
+              },
+              {
+                title: 'ICT Secretary: coordination',
+                items: [
+                  'If a request requires technical implementation, route/escalate it to ICT Officer.',
+                  'Use ICT Support contacts above for user communication and issue logging.'
+                ]
+              }
+            ]
+          case 'ict_director':
+            return [
+              {
+                title: 'ICT Director: final oversight',
+                items: [
+                  'Open ICT Director Dashboard to review escalated / high-impact requests.',
+                  'Approve/Reject based on ICT policy, then ensure the ICT team completes implementation.'
+                ]
+              }
+            ]
+          default:
+            return [
+              {
+                title: 'General guidance',
+                items: [
+                  'Your menus and forms are displayed based on your role and permissions.',
+                  'If you cannot find a page you need, contact ICT Support or request role verification from Admin.'
+                ]
+              }
+            ]
+        }
+      })
 
       // Environment check using Vue CLI's process.env - safely handle undefined
       const isDevelopment = computed(() => {
@@ -609,6 +820,9 @@
         safeCurrentUser,
         showProfileDropdown,
         showHelpModal,
+        showUserGuide,
+        userGuideRoleLabel,
+        userGuideSections,
         profileDropdown,
         isDevelopment,
         isAdmin,
