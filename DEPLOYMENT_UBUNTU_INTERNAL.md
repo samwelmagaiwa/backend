@@ -518,6 +518,329 @@ sudo -u eabms -H bash -lc 'cd /var/www/eabms/frontend && npm run build'
 4) Reload services:
 ```bash
 sudo systemctl reload apache2
+```
+
+## 16) Docker-based deployment (alternative)
+If you prefer to isolate this system from other applications on the server, you can deploy it using Docker instead of installing Apache/PHP/MySQL directly.
+
+> NOTE: The Docker `.env` examples in this section contain placeholders like `base64:********************************`, `CHANGE_ME_API_KEY`, and `CHANGE_ME_STRONG_RANDOM_TOKEN`.
+> On a real server, you **must** replace these with strong, unique values and keep the actual `.env.docker` files out of version control.
+
+The repository already contains a `docker-compose.yml` at the project root and Dockerfiles for `backend/` and `frontend/`.
+
+### 16.1 When to use Docker
+- You have a **dedicated VM/server** (recommended) or clear port planning so Docker does not clash with other services.
+- You want a reproducible environment (same versions of PHP/MySQL/Node everywhere).
+- You are comfortable managing Docker containers instead of Apache vhosts directly.
+
+If this server already runs other critical systems (via aaPanel/Apache), consider using **another VM** for the Docker stack to avoid port and resource conflicts.
+
+### 16.2 Prerequisites
+On the target Ubuntu server:
+
+```bash
+sudo apt update
+sudo apt install -y ca-certificates curl gnupg
+
+# Install Docker Engine (summary only; follow official docs for details)
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# Allow your deployment user to run docker without sudo (optional)
+sudo usermod -aG docker eabms
+newgrp docker
+```
+
+Verify:
+
+```bash
+docker --version
+docker compose version   # or: docker-compose --version
+```
+
+### 16.3 Directory layout (same as non‑Docker)
+- Clone or copy the project to `/var/www/eabms` as before.
+
+```bash
+sudo mkdir -p /var/www/eabms
+sudo chown -R eabms:eabms /var/www/eabms
+sudo -u eabms -H bash -lc 'cd /var/www/eabms && git clone <YOUR_REPO_URL> .'
+```
+
+You should have:
+- `/var/www/eabms/backend`
+- `/var/www/eabms/frontend`
+- `/var/www/eabms/docker-compose.yml`
+
+### 16.4 Configure Docker environment files
+
+#### 16.4.1 Backend (`backend/.env.docker`)
+This file is used **only** by the Docker backend containers.
+
+- Start from `backend/.env` or `.env.example` and create `backend/.env.docker`.
+- Ensure at least:
+
+```env
+APP_NAME=LaravelDocker
+APP_ENV=local
+APP_KEY=base64:********************************    # generate with: php artisan key:generate
+APP_DEBUG=true                                   # or false for production
+APP_URL=http://localhost:8000                   # or http://api.your-domain/internal
+
+APP_LOCALE=en
+APP_FALLBACK_LOCALE=en
+APP_FAKER_LOCALE=en_US
+
+APP_MAINTENANCE_DRIVER=file
+PHP_CLI_SERVER_WORKERS=4
+BCRYPT_ROUNDS=12
+
+LOG_CHANNEL=daily
+LOG_STACK=daily
+LOG_LEVEL=warning
+LOG_DAILY_DAYS=7
+
+DB_CONNECTION=mysql
+DB_HOST=db
+DB_PORT=3306
+DB_DATABASE=backend-api-vue
+DB_USERNAME=eabms_db
+DB_PASSWORD=secret
+
+SESSION_DRIVER=database
+SESSION_LIFETIME=120
+SESSION_ENCRYPT=false
+SESSION_PATH=/
+SESSION_DOMAIN=null
+
+BROADCAST_CONNECTION=log
+FILESYSTEM_DISK=local
+QUEUE_CONNECTION=database
+CACHE_STORE=database
+
+MEMCACHED_HOST=memcached
+
+REDIS_CLIENT=phpredis
+REDIS_HOST=redis
+REDIS_PASSWORD=null
+REDIS_PORT=6379
+
+MAIL_MAILER=log
+MAIL_SCHEME=null
+MAIL_HOST=127.0.0.1
+MAIL_PORT=2525
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_FROM_ADDRESS="hello@example.com"
+MAIL_FROM_NAME="${APP_NAME}"
+
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_DEFAULT_REGION=us-east-1
+AWS_BUCKET=
+AWS_USE_PATH_STYLE_ENDPOINT=false
+
+VITE_APP_NAME="${APP_NAME}"
+
+CORS_ALLOWED_ORIGINS="http://localhost:8080,http://127.0.0.1:8080,http://localhost:8081,http://127.0.0.1:8081,http://localhost:3000,http://127.0.0.1:3000"
+CORS_SUPPORTS_CREDENTIALS=true
+
+# SMS Service Configuration - Kilakona
+SMS_ENABLED=true
+SMS_API_URL=https://messaging.kilakona.co.tz/api/v1/vendor/message/send
+SMS_API_KEY=CHANGE_ME_API_KEY
+# Provide both API_SECRET (preferred) and SECRET_KEY (backward compatibility)
+SMS_API_SECRET=CHANGE_ME_API_SECRET
+SMS_SECRET_KEY=CHANGE_ME_SECRET_KEY
+SMS_SENDER_ID=MLG
+SMS_SENDER_NAME=MLG
+SMS_BASE_URL=https://messaging.kilakona.co.tz/
+SMS_DELIVERY_REPORT_URL=https://YOUR_PUBLIC_DOMAIN/api/sms/delivery-report
+# optional but recommended:
+SMS_DELIVERY_REPORT_TOKEN=CHANGE_ME_STRONG_RANDOM_TOKEN
+SMS_TEST_MODE=false
+SMS_MESSAGE_TYPE=text
+# SSL verification control for cURL (false for Kilakona if required)
+SMS_VERIFY_SSL=false
+
+# Service Settings
+SMS_TIMEOUT=30
+SMS_RETRY_ATTEMPTS=3
+SMS_RETRY_DELAY=60
+
+# Rate Limiting
+SMS_RATE_LIMIT_PER_HOUR=10
+SMS_MAX_BULK_SIZE=100
+SMS_BULK_DELAY=0.1
+
+# Logging
+SMS_LOGGING_ENABLED=true
+SMS_LOG_SUCCESSFUL=true
+SMS_LOG_FAILED=true
+SMS_LOG_LEVEL=info
+
+# Queue Settings
+SMS_QUEUE_ENABLED=true
+SMS_QUEUE_NAME=sms
+SMS_MAX_TRIES=3
+
+# Development/Testing
+SMS_FAKE_SEND=false
+SMS_LOG_TO_FILE=false
+SMS_MOCK_RESPONSES=false
+
+# Emergency Settings
+SMS_FALLBACK_ENABLED=false
+```
+
+> IMPORTANT: do **not** commit real secrets (`APP_KEY`, DB password, SMS keys) to git. Commit only a template like `.env.docker.example`.
+
+If you want SMS integrations to work from Docker, copy the `SMS_*` values as well; for a safe dev environment you can set:
+
+```env
+SMS_ENABLED=false
+SMS_TEST_MODE=true
+```
+
+#### 16.4.2 Frontend (`frontend/.env.docker`)
+This file controls the API URL seen by the Vue app running in Docker.
+
+For a simple "all on one host" setup:
+
+```env
+# Vue CLI Environment Variables
+# API Configuration
+VUE_APP_API_URL=http://localhost:8000/api
+
+# Application Configuration
+VUE_APP_NAME=Mnh Access and booking Management System
+VUE_APP_VERSION=1.0.0
+
+# Development Configuration
+VUE_APP_DEBUG=true
+VUE_APP_LOG_LEVEL=debug
+
+# Optional: API timeout (in milliseconds)
+VUE_APP_API_TIMEOUT=30000
+```
+
+If you later put the Docker stack behind an internal reverse proxy (e.g. `https://api.eabms.mloganzila.or.tz`), change `VUE_APP_API_URL` accordingly.
+
+### 16.5 Docker services overview
+The `docker-compose.yml` in this project defines:
+
+- `db`       – MySQL 8.0 (data persisted in `dbdata` volume)
+- `backend`  – PHP‑FPM container running the Laravel app
+- `queue`    – background queue worker (`php artisan queue:work`)
+- `nginx`    – Nginx serving `backend/public` and proxying PHP to `backend`
+- `frontend` – Vue dev server (Node) for the SPA
+
+Default published ports (can be adjusted):
+
+- `8080` → frontend (Vue dev server)
+- `8000` → nginx (Laravel API)
+- `3307` → MySQL (optional host access; DB is also accessible inside the Docker network as `db:3306`)
+
+Make sure these host ports are free, or change them in `docker-compose.yml` before starting.
+
+### 16.6 Start the Docker stack
+From `/var/www/eabms`:
+
+```bash
+cd /var/www/eabms
+docker compose up -d --build
+```
+
+If your system uses the legacy `docker-compose` binary, run:
+
+```bash
+docker-compose up -d --build
+```
+
+Verify containers:
+
+```bash
+docker compose ps
+```
+
+### 16.7 Run Laravel one-time tasks inside containers
+The first time you deploy, run migrations and storage link **inside** the backend container:
+
+```bash
+cd /var/www/eabms
+
+docker compose exec backend php artisan migrate --force
+docker compose exec backend php artisan storage:link
+```
+
+You can also run `php artisan about` to confirm environment details:
+
+```bash
+docker compose exec backend php artisan about
+```
+
+### 16.8 Scheduler (cron) with Docker
+Laravel scheduler must still run every minute. Instead of calling `php` directly, call into the `backend` container.
+
+Edit root crontab:
+
+```bash
+sudo crontab -e
+```
+
+Add:
+
+```cron
+* * * * * cd /var/www/eabms && docker compose exec -T backend php artisan schedule:run >> /var/log/eabms-scheduler.log 2>&1
+```
+
+The `-T` flag disables TTY allocation (required in cron).
+
+### 16.9 Logs and troubleshooting in Docker
+
+- See container logs:
+
+```bash
+cd /var/www/eabms
+docker compose logs -f nginx
+docker compose logs -f backend
+docker compose logs -f frontend
+docker compose logs -f queue
+```
+
+- Check application logs inside the backend container:
+
+```bash
+docker compose exec backend ls storage/logs
+docker compose exec backend tail -f storage/logs/laravel-*.log
+```
+
+### 16.10 Updating a Docker deployment
+When deploying a new version with Docker:
+
+```bash
+cd /var/www/eabms
+
+# 1) Pull code
+sudo -u eabms -H bash -lc 'cd /var/www/eabms && git pull'
+
+# 2) Rebuild images (if Dockerfiles or dependencies changed)
+docker compose build backend frontend
+
+# 3) Apply changes
+docker compose up -d
+
+# 4) Run database migrations (if needed)
+docker compose exec backend php artisan migrate --force
+```
+
+If you change environment variables in `backend/.env.docker` or `frontend/.env.docker`, restart the affected services:
+
+```bash
+docker compose up -d backend frontend nginx
+```
 sudo supervisorctl restart eabms-queue:*
 ```
 

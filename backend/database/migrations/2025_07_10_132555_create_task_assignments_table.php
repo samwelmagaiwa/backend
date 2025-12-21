@@ -11,6 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // In some environments the task_assignments table may already exist
+        // (for example when importing a pre-migrated database). In that case
+        // we want this migration to be treated as "already applied" instead of
+        // throwing a "table already exists" error.
+        if (Schema::hasTable('task_assignments')) {
+            return;
+        }
+
         Schema::create('task_assignments', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('request_id');

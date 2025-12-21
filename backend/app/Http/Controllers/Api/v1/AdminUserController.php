@@ -859,9 +859,9 @@ class AdminUserController extends Controller
                 $userAccessCount = UserAccess::count();
                 $totalRequests += $userAccessCount;
                 
+                // Pending = any stage still pending (new workflow columns)
                 $pendingUserAccess = UserAccess::where(function ($query) {
-                    $query->where('status', 'pending')
-                        ->orWhere('hod_status', 'pending')
+                    $query->where('hod_status', 'pending')
                         ->orWhere('divisional_status', 'pending')
                         ->orWhere('ict_director_status', 'pending')
                         ->orWhere('head_it_status', 'pending')
@@ -869,7 +869,13 @@ class AdminUserController extends Controller
                 })->count();
                 $pendingRequests += $pendingUserAccess;
                 
-                $completedUserAccess = UserAccess::where('status', 'completed')->count();
+                // Completed = all stages approved/implemented (same definition as HandlesStatusQueries::getCompletedRequests)
+                $completedUserAccess = UserAccess::where('hod_status', 'approved')
+                    ->where('divisional_status', 'approved')
+                    ->where('ict_director_status', 'approved')
+                    ->where('head_it_status', 'approved')
+                    ->where('ict_officer_status', 'implemented')
+                    ->count();
                 $completedRequests += $completedUserAccess;
                 
                 $todayUserAccess = UserAccess::whereDate('created_at', today())->count();

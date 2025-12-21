@@ -105,16 +105,16 @@ class UserSeeder extends Seeder
                 'roles' => ['staff']
             ],
             
-            // HR Department Users
+            // Nursing Department Users
             [
-                'name' => 'HR Director',
-                'email' => 'hr.director@mnh.go.tz',
-                'phone' => '+255700000004',
-                'pf_number' => 'PF6372',
-                'department_id' => $departments['HR']?->id,
+                'name' => 'Chief Nursing Officer',
+                'email' => 'cno@mnh.go.tz',
+                'phone' => '+255700000007',
+                'pf_number' => 'PF7891', // distinct PF to satisfy unique index
+                'department_id' => $departments['NURS']?->id,
                 'password' => Hash::make('12345678'),
                 'is_active' => true,
-                'roles' => ['divisional_director']
+                'roles' => ['head_of_department']
             ],
             [
                 'name' => 'Head of HR Department',
