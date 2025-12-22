@@ -31,10 +31,10 @@
       <div class="px-8 pb-8 bg-blue-50/40">
         <!-- User Name -->
         <div class="text-center mb-6">
-          <h3 class="text-2xl font-bold text-white mb-3 drop-shadow-sm">
+          <h3 class="text-2xl font-bold text-blue mb-3 drop-shadow-sm">
             {{ userName }}
           </h3>
-          <p class="text-blue-100 text-lg leading-relaxed font-medium opacity-90">
+          <p class="text-blue text-lg leading-relaxed font-medium opacity-90">
             You have successfully completed the onboarding process. Now you can proceed with your
             requests.
           </p>
@@ -50,7 +50,7 @@
             >
               <i class="fas fa-check text-white text-sm"></i>
             </div>
-            <span class="text-white font-medium text-base">Terms of Service Accepted</span>
+            <span class="text-blue font-medium text-base">Terms of Service Accepted</span>
           </div>
 
           <div
@@ -61,7 +61,7 @@
             >
               <i class="fas fa-check text-white text-sm"></i>
             </div>
-            <span class="text-white font-medium text-base">ICT Policy Acknowledged</span>
+            <span class="text-blue font-medium text-base">ICT Policy Acknowledged</span>
           </div>
 
           <div
@@ -72,14 +72,14 @@
             >
               <i class="fas fa-check text-white text-sm"></i>
             </div>
-            <span class="text-white font-medium text-base">Declaration Form Submitted</span>
+            <span class="text-blue font-medium text-base">Declaration Form Submitted</span>
           </div>
         </div>
 
         <!-- Action Button -->
         <button
           @click="handleContinue"
-          class="w-full bg-gradient-to-r from-white/20 to-white/10 hover:from-white/30 hover:to-white/20 text-white py-4 px-6 rounded-none font-semibold text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-white/50 border border-white/30 backdrop-blur-sm relative overflow-hidden group"
+          class="w-full bg-gradient-to-r from-blue/20 to-blue/10 hover:from-white/30 hover:to-blue/20 text-blue py-4 px-6 rounded-none font-semibold text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-white/50 border border-white/30 backdrop-blur-sm relative overflow-hidden group"
         >
           <div class="relative z-10 flex items-center justify-center">
             <i class="fas fa-arrow-right mr-2 text-lg"></i>
