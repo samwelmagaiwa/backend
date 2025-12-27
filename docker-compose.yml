@@ -13,7 +13,7 @@ services:
             SERVICE_NAME: backend
             SERVICE_TAGS: dev
         env_file:
-            - ./backend/.env.docker
+            - ./backend/.env.docker.dev
         working_dir: /var/www
         volumes:
             - ./backend:/var/www
@@ -29,7 +29,7 @@ services:
         container_name: lara_queue
         restart: unless-stopped
         env_file:
-            - ./backend/.env.docker
+            - ./backend/.env.docker.dev
         working_dir: /var/www
         volumes:
             - ./backend:/var/www
@@ -51,6 +51,7 @@ services:
         volumes:
             - ./backend:/var/www
             - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+            - ./backend/public/frontend:/var/www/html/public/frontend
         networks:
             - app-network
         depends_on:

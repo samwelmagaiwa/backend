@@ -1,912 +1,676 @@
-# Ubuntu Internal Deployment Guide (MNH Onâ€‘Prem)
-This project is a Laravel backend (in `backend/`) and a Vue frontend (in `frontend/`).
-The recommended production setup is:
-- Apache (aaPanel-managed) as web server / static server
-- PHP-FPM for Laravel
-- MySQL/MariaDB database
-- Supervisor for Laravel queues
-- Cron for Laravel scheduler
-- Internal DNS name (or `/etc/hosts`) + optional internal TLS
-
-## 0) Quick checklist (recommended order)
-1) Prepare DNS/hostnames and confirm server IP is reachable from MNH internal network
-2) Install packages (Apache, PHP-FPM, MySQL, Node.js, Composer)
-3) Create Linux user + deploy folder `/var/www/eabms`
-4) Put code on server (git clone / copy)
-5) Create DB + DB user
-6) Configure Laravel `.env`, generate `APP_KEY`, migrate DB, set permissions
-7) Configure frontend `.env.production`, build `frontend/dist`
-8) Configure Apache sites in aaPanel (API + Frontend)
-9) Setup queue worker (Supervisor) + scheduler (cron)
-10) Verify: API responds + frontend loads + login works
-
-## 0.1) What "successful deployment" looks like
-- Visiting `http(s)://eabms.mloganzila.or.tz` loads the Vue app
-- Vue app API calls go to `http(s)://api.eabms.mloganzila.or.tz/api/...` (or your chosen URL)
-- API responds with 200 for health checks (example: `/api/user`, `/api/login` depending on auth)
-- Laravel can write to `backend/storage/` (no 500 errors due to permissions)
-- Background jobs run (if your app uses queues for notifications)
-
-## 1) Target server assumptions
-- Ubuntu Server 24.04.1 LTS (these steps also work on Ubuntu 22.04 with small version changes)
-- Server is shared (you already have 2+ production systems and this project becomes site #3)
-- You have a GUI hosting panel installed (aaPanel / BT Panelâ€“like) managing Apache, PHP-FPM and sites
-- Internal hostname examples:
-  - Frontend: `eabms.mloganzila.or.tz`
-  - API: `api.eabms.mloganzila.or.tz`
-- You have sudo access
-- The server can install packages (internet access or internal apt mirror)
-
-If MNH uses an internal DNS, create A records. Otherwise, test using `/etc/hosts` on clients.
-Example client entry:
-```text
-10.10.10.50 eabms.mloganzila.or.tz api.eabms.mloganzila.or.tz
-```
-
-Decide early whether you will use:
-- Option A (recommended): **2 hostnames** (frontend + API), or
-- Option B: **single hostname** where API is served from the same domain under `/api`
-
-## 2) Install system packages
-If you use aaPanel/BT Panel, it may already manage Apache/PHP/MySQL/Node for you.
-
-Recommended approach on a shared production server:
-- Prefer installing/upgrading packages **inside the panel**, to avoid breaking existing sites.
-- Only use `apt install` if you are sure it will not change Apache/PHP versions used by other production systems.
-
-Update OS:
-```bash
-sudo apt update && sudo apt -y upgrade
-```
-
-Install Apache + PHP + required PHP extensions + Git + unzip.
-
-If aaPanel already installed Apache/PHP for other production sites, do NOT reinstall them with apt unless you know it wonâ€™t change versions.
-
-```bash
-# Apache (if not already installed)
-sudo apt -y install apache2
-
-# Common tools
-sudo apt -y install git unzip curl ca-certificates
-
-# PHP + extensions
-sudo apt -y install php-fpm php-cli php-mysql php-xml php-mbstring php-curl php-zip php-bcmath php-intl
-```
-
-Confirm PHP version and PHP-FPM service name (useful for troubleshooting):
-```bash
-php -v
-systemctl list-units --type=service | grep -E 'php.*fpm'
-ls -la /run/php/
-```
-
-Install MySQL (or MariaDB):
-```bash
-sudo apt -y install mysql-server
-```
-
-Install Node.js (choose one approach):
-- Option A (recommended): NodeSource LTS
-- Option B: Ubuntu repo packages
-
-Example (NodeSource LTS):
-```bash
-curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
-sudo apt -y install nodejs
-```
-
-Install Composer:
-```bash
-cd /tmp
-curl -sS https://getcomposer.org/installer | php
-sudo mv composer.phar /usr/local/bin/composer
-composer --version
-```
-
-## 3) Create app user + directories
-On a shared server (3+ sites), keep every app isolated.
-
-Create a dedicated Linux user:
-```bash
-sudo adduser --disabled-password --gecos "" eabms
-```
-
-Create app directory:
-```bash
-sudo mkdir -p /var/www/eabms
-sudo chown -R eabms:eabms /var/www/eabms
-```
-
-## 4) Get the code onto the server
-### Option A: Git clone (recommended)
-```bash
-sudo -u eabms -H bash -lc 'cd /var/www/eabms && git clone <YOUR_REPO_URL> .'
-```
-
-After cloning, confirm structure:
-```bash
-ls -la /var/www/eabms
-ls -la /var/www/eabms/backend
-ls -la /var/www/eabms/frontend
-```
-
-### Option B: Copy from your workstation
-Copy project folder into `/var/www/eabms` and ensure ownership:
-```bash
-sudo chown -R eabms:eabms /var/www/eabms
-```
-
-## 5) Database setup (MySQL)
-On a shared server, each system must have its own database + DB user.
-Never reuse the database user/password from other production systems.
-
-Harden MySQL basics (recommended):
-```bash
-sudo mysql_secure_installation
-```
-
-Create database and user:
-```bash
-sudo mysql
-```
-Inside MySQL shell:
-```sql
-CREATE DATABASE eabms CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'eabms_user'@'localhost' IDENTIFIED BY 'CHANGE_ME_STRONG_PASSWORD';
-GRANT ALL PRIVILEGES ON eabms.* TO 'eabms_user'@'localhost';
-FLUSH PRIVILEGES;
-EXIT;
-```
-
-## 6) Backend (Laravel) setup
-All Laravel commands below are executed inside `backend/`.
-
-### 6.1 Install PHP dependencies
-```bash
-sudo -u eabms -H bash -lc 'cd /var/www/eabms/backend && composer install --no-dev --optimize-autoloader'
-```
-
-### 6.2 Configure environment
-Create `.env`:
-```bash
-sudo -u eabms -H bash -lc 'cd /var/www/eabms/backend && cp .env.example .env'
-```
-
-Edit `/var/www/eabms/backend/.env` and set at least:
-- `APP_NAME`, `APP_ENV=production`, `APP_DEBUG=false`
-- `APP_URL=https://api.eabms.mloganzila.or.tz` (or your internal URL)
-- Logging best practice (keeps logs small in production):
-  - `LOG_CHANNEL=daily`
-  - `LOG_LEVEL=warning`
-- DB settings:
-  - `DB_HOST=127.0.0.1`
-  - `DB_DATABASE=eabms`
-  - `DB_USERNAME=eabms_user`
-  - `DB_PASSWORD=...`
-- SMS settings (example):
-  - `SMS_ENABLED=true`
-  - `SMS_TEST_MODE=false`
-  - `SMS_API_URL=...`
-  - `SMS_API_KEY=...`
-  - `SMS_API_SECRET=...`
-  - `SMS_SENDER_ID=...`
-  - (optional) delivery reports:
-    - `SMS_DELIVERY_REPORT_URL=https://api.eabms.mloganzila.or.tz/api/sms/delivery-report`
-    - `SMS_DELIVERY_REPORT_TOKEN=...`
-
-Generate application key:
-```bash
-sudo -u eabms -H bash -lc 'cd /var/www/eabms/backend && php artisan key:generate'
-```
-
-### 6.3 Storage + permissions
-Create storage symlink:
-```bash
-sudo -u eabms -H bash -lc 'cd /var/www/eabms/backend && php artisan storage:link'
-```
-
-Ensure writable directories:
-```bash
-sudo chown -R eabms:www-data /var/www/eabms/backend/storage /var/www/eabms/backend/bootstrap/cache
-sudo chmod -R 775 /var/www/eabms/backend/storage /var/www/eabms/backend/bootstrap/cache
-```
-
-### 6.4 Run migrations
-```bash
-sudo -u eabms -H bash -lc 'cd /var/www/eabms/backend && php artisan migrate --force'
-```
-
-### 6.5 Optimize for production
-```bash
-sudo -u eabms -H bash -lc 'cd /var/www/eabms/backend && php artisan config:cache && php artisan route:cache && php artisan view:cache'
-```
-
-(Optional) Verify Laravel can boot and connect to DB:
-```bash
-sudo -u eabms -H bash -lc 'cd /var/www/eabms/backend && php artisan about'
-```
-
-## 7) Frontend (Vue) setup
-Build the Vue app and serve it with Apache.
-
-### 7.1 Install dependencies and build
-```bash
-sudo -u eabms -H bash -lc 'cd /var/www/eabms/frontend && npm ci'
-sudo -u eabms -H bash -lc 'cd /var/www/eabms/frontend && npm run build'
-```
-
-This should create a production build (commonly `frontend/dist/`).
-
-### 7.2 Configure frontend API base URL (VERY IMPORTANT)
-This project is **Vue CLI**, so production API URL is typically set via `VUE_APP_*` variables.
-
-1) Create `frontend/.env.production` (if it does not exist):
-```bash
-sudo -u eabms -H bash -lc 'cd /var/www/eabms/frontend && (test -f .env.production || touch .env.production)'
-```
-
-2) Set the API base URL (note the `/api` at the end):
-```bash
-# example: API is on a separate hostname
-VUE_APP_API_URL=https://api.eabms.mloganzila.or.tz/api
-
-# example: single-host deployment (same domain), if you choose that approach
-# VUE_APP_API_URL=https://eabms.mloganzila.or.tz/api
-```
-
-3) Rebuild after changing `.env.production`:
-```bash
-sudo -u eabms -H bash -lc 'cd /var/www/eabms/frontend && npm run build'
-```
-
-If you deploy frontend and API on different hostnames, ensure backend CORS allows the frontend origin.
-
-## 8) Apache configuration (aaPanel) â€” two hostnames (recommended)
-Because aaPanel on your server is running **Apache** (not Nginx) and the server already hosts other production systems, the lowest-risk setup is:
-- Frontend site: `eabms.mloganzila.or.tz`
-- API site: `api.eabms.mloganzila.or.tz`
-
-### 8.0 aaPanel multi-site notes (IMPORTANT)
-1) In aaPanel, confirm your existing sites so you donâ€™t reuse a hostname already mapped to another system.
-2) Create TWO new websites in aaPanel:
-   - Site A: `eabms.mloganzila.or.tz`
-   - Site B: `api.eabms.mloganzila.or.tz`
-3) Do not change global Apache/PHP settings that could affect the other production sites.
-4) Prefer enabling extensions / changing PHP version for **only this site** using aaPanelâ€™s per-site PHP settings.
-
-### 8.1 Frontend site (Vue static)
-In aaPanel â†’ Website â†’ Add Site:
-- Domain: `eabms.mloganzila.or.tz`
-- Document Root: `/var/www/eabms/frontend/dist`
-- PHP: **Static** (no PHP)
-
-Vue is an SPA (single page app). Ensure Apache rewrites unknown routes to `index.html`.
-Create `/var/www/eabms/frontend/dist/.htaccess`:
-```apache
-<IfModule mod_rewrite.c>
-  RewriteEngine On
-  RewriteBase /
-
-  # If the request is a real file or directory, serve it
-  RewriteCond %{REQUEST_FILENAME} -f [OR]
-  RewriteCond %{REQUEST_FILENAME} -d
-  RewriteRule ^ - [L]
-
-  # Otherwise, send everything to the SPA entry
-  RewriteRule ^ index.html [L]
-</IfModule>
-```
-
-### 8.2 API site (Laravel)
-In aaPanel â†’ Website â†’ Add Site:
-- Domain: `api.eabms.mloganzila.or.tz`
-- Document Root: `/var/www/eabms/backend/public`
-- PHP Version: PHP 8.3 (Ubuntu 24.04 default is commonly 8.3)
-
-aaPanel/Apache must allow Laravelâ€™s `.htaccess` to work.
-Make sure Apache modules are enabled (aaPanel usually handles this):
-- `rewrite`
-- PHP handler (php-fpm)
-
-Laravelâ€™s rewrite rules are already included in `backend/public/.htaccess`.
-
-### 8.3 Upload limits (important for signatures/attachments)
-In the **API site** configuration:
-- Increase upload size limits if needed:
-  - Apache: `LimitRequestBody` (if you set it)
-  - PHP: `upload_max_filesize`, `post_max_size`, `max_execution_time`
-
-### 8.4 Quick verification
-From the server:
-```bash
-curl -I http://eabms.mloganzila.or.tz
-curl -I http://api.eabms.mloganzila.or.tz
-```
-If using HTTPS, test with `https://...`.
-
-## 9) HTTPS (internal) â€” Self-signed (your choice)
-Because you are using **self-signed certificates**, client devices/browsers must trust the certificate; otherwise you will see:
-- browser "Not secure" warnings
-- API calls failing due to TLS errors (especially if the browser blocks mixed content)
-
-### 9.1 Create self-signed certificates (recommended: one cert per hostname)
-You can create certificates on the server using OpenSSL.
-
-Frontend cert:
-```bash
-sudo mkdir -p /etc/ssl/localcerts
-sudo openssl req -x509 -nodes -newkey rsa:2048 -days 825 \
-  -keyout /etc/ssl/localcerts/eabms.mloganzila.or.tz.key \
-  -out /etc/ssl/localcerts/eabms.mloganzila.or.tz.crt \
-  -subj "/C=TZ/ST=Dar/L=Dar/O=Mloganzila/OU=ICT/CN=eabms.mloganzila.or.tz"
-```
-
-API cert:
-```bash
-sudo openssl req -x509 -nodes -newkey rsa:2048 -days 825 \
-  -keyout /etc/ssl/localcerts/api.eabms.mloganzila.or.tz.key \
-  -out /etc/ssl/localcerts/api.eabms.mloganzila.or.tz.crt \
-  -subj "/C=TZ/ST=Dar/L=Dar/O=Mloganzila/OU=ICT/CN=api.eabms.mloganzila.or.tz"
-```
-
-### 9.2 Install/enable SSL in aaPanel (Apache)
-In aaPanel, for each website:
-1) Open the site settings
-2) SSL â†’ enable SSL
-3) Choose **Other certificate** / **Custom certificate**
-4) Paste:
-   - Certificate (CRT content)
-   - Private key (KEY content)
-5) Enable **Force HTTPS** if available (recommended)
-
-Do this for BOTH:
-- `eabms.mloganzila.or.tz`
-- `api.eabms.mloganzila.or.tz`
-
-### 9.3 Trust the self-signed cert on client devices (required)
-Each client machine must trust the cert(s). Options:
-- Best: import the `.crt` into the OS/browser trust store
-- Alternative: accept the warning in browser (not recommended; some browsers still block API calls)
-
-Windows (quick idea):
-- Double-click `.crt` â†’ Install Certificate â†’ Local Machine â†’ Trusted Root Certification Authorities
-
-### 9.4 Application configuration for HTTPS
-- Backend (`backend/.env`):
-  - `APP_URL=https://api.eabms.mloganzila.or.tz`
-- Frontend (`frontend/.env.production`):
-  - `VUE_APP_API_URL=https://api.eabms.mloganzila.or.tz/api`
-
-After editing backend `.env`, run:
-```bash
-cd /var/www/eabms/backend
-php artisan config:clear
-php artisan config:cache
-```
-
-### 9.5 Verify HTTPS
-From a client (recommended):
-- Open `https://eabms.mloganzila.or.tz` (should load)
-- Open `https://api.eabms.mloganzila.or.tz` (should respond)
-
-From the server:
-```bash
-curl -k -I https://eabms.mloganzila.or.tz
-curl -k -I https://api.eabms.mloganzila.or.tz
-```
-Note: `-k` ignores certificate validation (server-side test only).
-
-## 10) Queues (important for notifications)
-Some notifications/listeners implement `ShouldQueue`. Ensure queue worker runs.
-
-If your app does not use queues, you can skip this section.
-
-### 10.1 Choose queue driver
-In `backend/.env`:
-- `QUEUE_CONNECTION=database` (common)
-
-If using `database` queue, run:
-```bash
-sudo -u eabms -H bash -lc 'cd /var/www/eabms/backend && php artisan queue:table && php artisan migrate --force'
-```
-(Only if the queue table migration isnâ€™t already present in your project.)
-
-### 10.2 Supervisor
-Install supervisor:
-```bash
-sudo apt -y install supervisor
-```
-
-Create `/etc/supervisor/conf.d/eabms-queue.conf`:
-```ini
-[program:eabms-queue]
-process_name=%(program_name)s_%(process_num)02d
-command=php /var/www/eabms/backend/artisan queue:work --sleep=3 --tries=3 --timeout=120
-autostart=true
-autorestart=true
-user=eabms
-numprocs=1
-redirect_stderr=true
-stdout_logfile=/var/www/eabms/backend/storage/logs/queue-worker.log
-stopwaitsecs=3600
-```
-
-Reload supervisor:
-```bash
-sudo supervisorctl reread
-sudo supervisorctl update
-sudo supervisorctl status
-```
-
-## 11) Scheduler (cron)
-Laravel scheduler should run every minute:
-```bash
-sudo crontab -e
-```
-Add:
-```cron
-* * * * * cd /var/www/eabms/backend && php artisan schedule:run >> /dev/null 2>&1
-```
-
-## 12) File uploads & permissions checklist
-- `backend/storage/` writable
-- `backend/bootstrap/cache/` writable
-- `backend/public/storage` symlink exists
-
-## 13) Firewall / network
-If UFW is used:
-```bash
-sudo ufw allow OpenSSH
-sudo ufw allow 'Apache Full'
-sudo ufw enable
-sudo ufw status
-```
-
-If this is internal-only, ensure routing/firewall rules restrict access to MNH networks.
-
-## 14) Common operational commands
-Clear caches after changing `.env`:
-```bash
-cd /var/www/eabms/backend
-php artisan config:clear
-php artisan cache:clear
-php artisan route:clear
-php artisan view:clear
-php artisan config:cache
-```
-
-Tail logs:
-```bash
-tail -f /var/www/eabms/backend/storage/logs/laravel-*.log
-```
-
-Restart services (adjust php-fpm version if needed):
-```bash
-# example only; replace 8.3 with your PHP version if different
-sudo systemctl restart php8.3-fpm
-sudo systemctl reload apache2
-sudo supervisorctl restart eabms-queue:*
-```
-
-## 15) Deployment update procedure (safe)
-When updating an existing deployment, follow this order to avoid downtime and weird cache issues.
-
-1) Pull code updates:
-```bash
-sudo -u eabms -H bash -lc 'cd /var/www/eabms && git pull'
-```
-
-2) Backend (Laravel):
-```bash
-sudo -u eabms -H bash -lc 'cd /var/www/eabms/backend && composer install --no-dev --optimize-autoloader'
-
-# migrations
-sudo -u eabms -H bash -lc 'cd /var/www/eabms/backend && php artisan migrate --force'
-
-# clear + rebuild caches (important after .env / config changes)
-sudo -u eabms -H bash -lc 'cd /var/www/eabms/backend && php artisan config:clear && php artisan cache:clear && php artisan route:clear && php artisan view:clear'
-sudo -u eabms -H bash -lc 'cd /var/www/eabms/backend && php artisan config:cache && php artisan route:cache && php artisan view:cache'
-```
-
-3) Frontend (Vue):
-```bash
-sudo -u eabms -H bash -lc 'cd /var/www/eabms/frontend && npm ci'
-sudo -u eabms -H bash -lc 'cd /var/www/eabms/frontend && npm run build'
-```
-
-4) Reload services:
-```bash
-sudo systemctl reload apache2
-```
-
-## 16) Docker-based deployment (alternative)
-If you prefer to isolate this system from other applications on the server, you can deploy it using Docker instead of installing Apache/PHP/MySQL directly.
-
-> NOTE: The Docker `.env` examples in this section contain placeholders like `base64:********************************`, `CHANGE_ME_API_KEY`, and `CHANGE_ME_STRONG_RANDOM_TOKEN`.
-> On a real server, you **must** replace these with strong, unique values and keep the actual `.env.docker` files out of version control.
-
-The repository already contains a `docker-compose.yml` at the project root and Dockerfiles for `backend/` and `frontend/`.
-
-### 16.1 When to use Docker
-- You have a **dedicated VM/server** (recommended) or clear port planning so Docker does not clash with other services.
-- You want a reproducible environment (same versions of PHP/MySQL/Node everywhere).
-- You are comfortable managing Docker containers instead of Apache vhosts directly.
-
-If this server already runs other critical systems (via aaPanel/Apache), consider using **another VM** for the Docker stack to avoid port and resource conflicts.
-
-### 16.2 Prerequisites
-On the target Ubuntu server:
-
-```bash
-sudo apt update
-sudo apt install -y ca-certificates curl gnupg
-
-# Install Docker Engine (summary only; follow official docs for details)
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt update
-sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-
-# Allow your deployment user to run docker without sudo (optional)
-sudo usermod -aG docker eabms
-newgrp docker
-```
-
-Verify:
-
-```bash
-docker --version
-docker compose version   # or: docker-compose --version
-```
-
-### 16.3 Directory layout (same as nonâ€‘Docker)
-- Clone or copy the project to `/var/www/eabms` as before.
-
-```bash
-sudo mkdir -p /var/www/eabms
-sudo chown -R eabms:eabms /var/www/eabms
-sudo -u eabms -H bash -lc 'cd /var/www/eabms && git clone <YOUR_REPO_URL> .'
-```
-
-You should have:
-- `/var/www/eabms/backend`
-- `/var/www/eabms/frontend`
-- `/var/www/eabms/docker-compose.yml`
-
-### 16.4 Configure Docker environment files
-
-#### 16.4.1 Backend (`backend/.env.docker`)
-This file is used **only** by the Docker backend containers.
-
-- Start from `backend/.env` or `.env.example` and create `backend/.env.docker`.
-- Ensure at least:
+# Internal Deployment Guide (Ubuntu) – eabms.mloganzila.or.tz
+
+This document describes how to deploy the EABMS frontend (Vue) and backend (Laravel API) on an Ubuntu server using Docker and Nginx, under the domain:
+
+- **Domain**: `eabms.mloganzila.or.tz`
+
+This project is **internal access only**. It will be accessed from within the MNH local network (intranet) and is **not exposed to the public internet**.
+
+The server already hosts other apps on ports **5000, 3000, 3001**.  
+This deployment is designed to **avoid any port conflict** with those services.
+
+---
+
+## 1. Overview of Port Usage (MNH Internal Network)
+
+This setup is internal-only. The application is accessed from within the MNH local network using the hostname `eabms.mloganzila.or.tz`.
+
+To avoid conflicts with existing apps on ports `5000`, `3000`, and `3001`, we use the following scheme:
+
+- **External (LAN-exposed) ports on the MNH server**
+  - **80** – HTTP for `eabms.mloganzila.or.tz` (served by Nginx in Docker, reachable only inside the MNH network)
+  - **443** – HTTPS for `eabms.mloganzila.or.tz` (optional, recommended for secure access on the LAN)
+
+- **Internal (inside Docker network, not visible on host)**
+  - **backend (Laravel)**: `8000`
+  - **frontend (static files)**: served directly by Nginx from `/var/www/frontend` (no extra port)
+  - Internal Docker ports are on a private Docker network and **do not** conflict with host ports `5000`, `3000`, `3001`.
+
+**Important:** Only the Nginx container binds to host port `80` (and optionally `443`).  
+All other containers communicate over an internal Docker network.
+
+---
+
+## 2. Internal DNS / Hostname Configuration (MNH Network)
+
+You must make sure that **all MNH client machines** (PCs, laptops) can resolve:
+
+- `eabms.mloganzila.or.tz` ? the **internal IP** of the Ubuntu server (for example `10.x.x.x` or `192.168.x.x`).
+
+There are two common options:
+
+### Option A – Configure MNH internal DNS (recommended)
+
+1. On the **MNH internal DNS server** (or the Windows Domain Controller / central DNS used by MNH):
+   - Open the DNS management console.
+   - Locate or create the zone for `mloganzila.or.tz`.
+   - Add an **A record**:
+     - Name: `eabms`
+     - Type: `A`
+     - Value: `<INTERNAL_MNH_SERVER_IP>` (IP of the Ubuntu server hosting Docker)
+     - TTL: `300` (or your standard value).
+2. Apply/save the DNS changes.
+3. From a client in the MNH network, verify resolution:
+   - `ping eabms.mloganzila.or.tz`
+   - The ping should resolve to the **internal** IP of your Ubuntu server.
+
+### Option B – Use local hosts file (for a few test machines only)
+
+If you cannot change the central DNS yet and only need testing on a few PCs:
+
+1. On each client machine, edit the hosts file:
+   - **Linux / macOS**: `/etc/hosts`
+   - **Windows**: `C:\Windows\System32\drivers\etc\hosts`
+2. Add a line like:
+
+   ```text
+   <INTERNAL_MNH_SERVER_IP>  eabms.mloganzila.or.tz
+   ```
+
+3. Save the file and test in a browser:
+   - Open `http://eabms.mloganzila.or.tz` from that machine.
+
+> In production for all MNH users, **use Option A (internal DNS)** so that every machine on the network can reach the system without manual hosts changes.
+
+---
+
+## 3. Directory Layout on the Server
+
+On the Ubuntu server, use a single deployment directory:
+
+- `/opt/eabms` – root for all Docker-related files
+
+Inside it:
+
+- `/opt/eabms/docker-compose.yml`
+- `/opt/eabms/nginx/conf.d/eabms.conf` (Nginx virtual host)
+- `/opt/eabms/backend` – Laravel API app (code or built image context)
+- `/opt/eabms/frontend` – Vue app (built assets or build context)
+
+Adjust actual paths if your project is in a different location, but keep them consistent in all configs.
+
+---
+
+## 4. Backend (Laravel) Configuration
+
+### 4.1. Laravel `.env` settings
+
+In the backend `.env`, set values for the production environment:
 
 ```env
-APP_NAME=LaravelDocker
-APP_ENV=local
-APP_KEY=base64:********************************    # generate with: php artisan key:generate
-APP_DEBUG=true                                   # or false for production
-APP_URL=http://localhost:8000                   # or http://api.your-domain/internal
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=http://eabms.mloganzila.or.tz
 
-APP_LOCALE=en
-APP_FALLBACK_LOCALE=en
-APP_FAKER_LOCALE=en_US
+# If using Sanctum / SPA auth
+SESSION_DOMAIN=.mloganzila.or.tz
+SANCTUM_STATEFUL_DOMAINS=eabms.mloganzila.or.tz
 
-APP_MAINTENANCE_DRIVER=file
-PHP_CLI_SERVER_WORKERS=4
-BCRYPT_ROUNDS=12
+# CORS (if using Laravel CORS config)
+FRONTEND_URL=http://eabms.mloganzila.or.tz
 
-LOG_CHANNEL=daily
-LOG_STACK=daily
-LOG_LEVEL=warning
-LOG_DAILY_DAYS=7
-
+# Database, cache, queue, mail etc. as per your environment
 DB_CONNECTION=mysql
-DB_HOST=db
+DB_HOST=your-db-host
 DB_PORT=3306
-DB_DATABASE=backend-api-vue
-DB_USERNAME=eabms_db
-DB_PASSWORD=secret
-
-SESSION_DRIVER=database
-SESSION_LIFETIME=120
-SESSION_ENCRYPT=false
-SESSION_PATH=/
-SESSION_DOMAIN=null
-
-BROADCAST_CONNECTION=log
-FILESYSTEM_DISK=local
-QUEUE_CONNECTION=database
-CACHE_STORE=database
-
-MEMCACHED_HOST=memcached
-
-REDIS_CLIENT=phpredis
-REDIS_HOST=redis
-REDIS_PASSWORD=null
-REDIS_PORT=6379
-
-MAIL_MAILER=log
-MAIL_SCHEME=null
-MAIL_HOST=127.0.0.1
-MAIL_PORT=2525
-MAIL_USERNAME=null
-MAIL_PASSWORD=null
-MAIL_FROM_ADDRESS="hello@example.com"
-MAIL_FROM_NAME="${APP_NAME}"
-
-AWS_ACCESS_KEY_ID=
-AWS_SECRET_ACCESS_KEY=
-AWS_DEFAULT_REGION=us-east-1
-AWS_BUCKET=
-AWS_USE_PATH_STYLE_ENDPOINT=false
-
-VITE_APP_NAME="${APP_NAME}"
-
-CORS_ALLOWED_ORIGINS="http://localhost:8080,http://127.0.0.1:8080,http://localhost:8081,http://127.0.0.1:8081,http://localhost:3000,http://127.0.0.1:3000"
-CORS_SUPPORTS_CREDENTIALS=true
-
-# SMS Service Configuration - Kilakona
-SMS_ENABLED=true
-SMS_API_URL=https://messaging.kilakona.co.tz/api/v1/vendor/message/send
-SMS_API_KEY=CHANGE_ME_API_KEY
-# Provide both API_SECRET (preferred) and SECRET_KEY (backward compatibility)
-SMS_API_SECRET=CHANGE_ME_API_SECRET
-SMS_SECRET_KEY=CHANGE_ME_SECRET_KEY
-SMS_SENDER_ID=MLG
-SMS_SENDER_NAME=MLG
-SMS_BASE_URL=https://messaging.kilakona.co.tz/
-SMS_DELIVERY_REPORT_URL=https://YOUR_PUBLIC_DOMAIN/api/sms/delivery-report
-# optional but recommended:
-SMS_DELIVERY_REPORT_TOKEN=CHANGE_ME_STRONG_RANDOM_TOKEN
-SMS_TEST_MODE=false
-SMS_MESSAGE_TYPE=text
-# SSL verification control for cURL (false for Kilakona if required)
-SMS_VERIFY_SSL=false
-
-# Service Settings
-SMS_TIMEOUT=30
-SMS_RETRY_ATTEMPTS=3
-SMS_RETRY_DELAY=60
-
-# Rate Limiting
-SMS_RATE_LIMIT_PER_HOUR=10
-SMS_MAX_BULK_SIZE=100
-SMS_BULK_DELAY=0.1
-
-# Logging
-SMS_LOGGING_ENABLED=true
-SMS_LOG_SUCCESSFUL=true
-SMS_LOG_FAILED=true
-SMS_LOG_LEVEL=info
-
-# Queue Settings
-SMS_QUEUE_ENABLED=true
-SMS_QUEUE_NAME=sms
-SMS_MAX_TRIES=3
-
-# Development/Testing
-SMS_FAKE_SEND=false
-SMS_LOG_TO_FILE=false
-SMS_MOCK_RESPONSES=false
-
-# Emergency Settings
-SMS_FALLBACK_ENABLED=false
+DB_DATABASE=eabms
+DB_USERNAME=eabms_user
+DB_PASSWORD=your_strong_password
 ```
 
-> IMPORTANT: do **not** commit real secrets (`APP_KEY`, DB password, SMS keys) to git. Commit only a template like `.env.docker.example`.
+> If you enable HTTPS later, change `APP_URL` and `FRONTEND_URL` to `https://eabms.mloganzila.or.tz`.
 
-If you want SMS integrations to work from Docker, copy the `SMS_*` values as well; for a safe dev environment you can set:
+Make sure `storage` and `bootstrap/cache` have correct permissions **inside the container** (the Dockerfile or entrypoint should handle this with `chown`/`chmod`).
+
+---
+
+## 5. Frontend (Vue) Configuration
+
+Before building the production bundle, set the API base URL so that the SPA uses the domain:
 
 ```env
-SMS_ENABLED=false
-SMS_TEST_MODE=true
+VITE_API_BASE_URL=http://eabms.mloganzila.or.tz/api
+# or for Vue CLI:
+# VUE_APP_API_BASE_URL=http://eabms.mloganzila.or.tz/api
 ```
 
-#### 16.4.2 Frontend (`frontend/.env.docker`)
-This file controls the API URL seen by the Vue app running in Docker.
+> If you enable HTTPS later, change this to `https://eabms.mloganzila.or.tz/api`.
 
-For a simple "all on one host" setup:
-
-```env
-# Vue CLI Environment Variables
-# API Configuration
-VUE_APP_API_URL=http://localhost:8000/api
-
-# Application Configuration
-VUE_APP_NAME=Mnh Access and booking Management System
-VUE_APP_VERSION=1.0.0
-
-# Development Configuration
-VUE_APP_DEBUG=true
-VUE_APP_LOG_LEVEL=debug
-
-# Optional: API timeout (in milliseconds)
-VUE_APP_API_TIMEOUT=30000
-```
-
-If you later put the Docker stack behind an internal reverse proxy (e.g. `https://api.eabms.mloganzila.or.tz`), change `VUE_APP_API_URL` accordingly.
-
-### 16.5 Docker services overview
-The `docker-compose.yml` in this project defines:
-
-- `db`       â€“ MySQL 8.0 (data persisted in `dbdata` volume)
-- `backend`  â€“ PHPâ€‘FPM container running the Laravel app
-- `queue`    â€“ background queue worker (`php artisan queue:work`)
-- `nginx`    â€“ Nginx serving `backend/public` and proxying PHP to `backend`
-- `frontend` â€“ Vue dev server (Node) for the SPA
-
-Default published ports (can be adjusted):
-
-- `8080` â†’ frontend (Vue dev server)
-- `8000` â†’ nginx (Laravel API)
-- `3307` â†’ MySQL (optional host access; DB is also accessible inside the Docker network as `db:3306`)
-
-Make sure these host ports are free, or change them in `docker-compose.yml` before starting.
-
-### 16.6 Start the Docker stack
-From `/var/www/eabms`:
+Rebuild the frontend for production:
 
 ```bash
-cd /var/www/eabms
-docker compose up -d --build
+npm install
+npm run build
 ```
 
-If your system uses the legacy `docker-compose` binary, run:
+The build output (e.g. `dist/`) will be copied into the Nginx container and served from `/var/www/frontend`.
+
+---
+
+## 6. Docker Compose Setup
+
+Create `/opt/eabms/docker-compose.yml` with the following content (adapt as needed):
+
+```yaml
+version: "3.8"
+
+services:
+  backend:
+    image: your-registry/eabms-backend:latest
+    # OR use build:
+    # build:
+    #   context: ./backend
+    #   dockerfile: Dockerfile
+    container_name: eabms-backend
+    env_file:
+      - ./backend/.env
+    networks:
+      - eabms-net
+    expose:
+      - "8000"   # internal port only, not mapped to host
+    # Example if you run php-fpm:
+    # command: php-fpm
+    # Or if you have a built-in server in the container:
+    # command: php artisan serve --host=0.0.0.0 --port=8000
+
+  frontend:
+    image: your-registry/eabms-frontend:latest
+    # OR use build:
+    # build:
+    #   context: ./frontend
+    #   dockerfile: Dockerfile
+    container_name: eabms-frontend
+    networks:
+      - eabms-net
+    # This container only prepares static assets;
+    # Nginx will serve from a shared volume.
+    volumes:
+      - frontend-build:/var/www/frontend:ro
+
+  nginx:
+    image: nginx:stable
+    container_name: eabms-nginx
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - eabms-net
+    ports:
+      - "80:80"    # Only port exposed to host; does NOT conflict with 5000/3000/3001
+      # - "443:443"  # Enable if you configure TLS
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - frontend-build:/var/www/frontend:ro
+
+networks:
+  eabms-net:
+    driver: bridge
+
+volumes:
+  frontend-build:
+```
+
+**Key points:**
+
+- Only `nginx` exposes a port to the host: `80:80`.
+- Other containers use internal ports (e.g. `8000`) and are only accessible via `eabms-net`.
+- Existing services on `5000`, `3000`, `3001` remain untouched and conflict-free.
+
+---
+
+## 7. Nginx Virtual Host Configuration
+
+Create directory:  
+`mkdir -p /opt/eabms/nginx/conf.d`
+
+Create `/opt/eabms/nginx/conf.d/eabms.conf`:
+
+```nginx
+server {
+    listen 80;
+    server_name eabms.mloganzila.or.tz;
+
+    # Frontend (Vue SPA) – served as static files
+    root /var/www/frontend;
+    index index.html;
+
+    # Log files (inside container)
+    access_log /var/log/nginx/eabms_access.log;
+    error_log  /var/log/nginx/eabms_error.log;
+
+    # Serve static files and SPA routes
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # API – proxy to Laravel backend
+    location /api/ {
+        proxy_pass         http://backend:8000/;
+        proxy_http_version 1.1;
+        proxy_set_header   Host $host;
+        proxy_set_header   X-Real-IP $remote_addr;
+        proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+    }
+
+    # Optional: increase upload limits
+    client_max_body_size 20M;
+}
+```
+
+**Notes:**
+
+- `server_name` is set to `eabms.mloganzila.or.tz`.
+- `/` serves the Vue app from `/var/www/frontend` (the mounted volume).
+- `/api/` proxies to the `backend` service on port `8000` within the Docker network.
+- No usage of host ports `5000`, `3000`, or `3001`.
+
+---
+
+## 8. Building Docker Images
+
+If you are building images on the same server:
+
+### Backend Dockerfile (example)
+
+```dockerfile
+FROM php:8.2-fpm
+
+# Install system dependencies, php extensions, etc.
+RUN apt-get update && apt-get install -y \
+    git unzip libonig-dev libzip-dev libpq-dev \
+    && docker-php-ext-install pdo pdo_mysql mbstring zip
+
+WORKDIR /var/www
+
+COPY . /var/www
+
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
+    && composer install --no-dev --optimize-autoloader \
+    && php artisan config:cache \
+    && php artisan route:cache \
+    && php artisan view:cache
+
+# Ensure correct permissions for storage and cache
+RUN chown -R www-data:www-data storage bootstrap/cache \
+    && chmod -R ug+rwx storage/bootstrap/cache
+
+EXPOSE 8000
+
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+```
+
+### Frontend Dockerfile (example)
+
+```dockerfile
+FROM node:20-alpine AS build
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+# Nginx-only stage is not strictly needed if using shared volume;
+# you can also copy /app/dist into a volume or build image that Nginx uses.
+```
+
+Tag and push images to your registry (if using one), or reference `build:` in `docker-compose.yml` to build locally.
+
+---
+
+## 9. Deployment Steps (Step-by-Step)
+
+1. **Prepare the Ubuntu server** (internal MNH server)
+   - Install Docker and Docker Compose Plugin.
+   - Ensure the server has a **static internal IP** (e.g. reserved in DHCP or manually configured).
+
+2. **Copy project files** to the server  
+   - Place backend code under `/opt/eabms/backend`  
+   - Place frontend code under `/opt/eabms/frontend`  
+   - Place `.env` for backend at `/opt/eabms/backend/.env` with production settings.
+
+3. **Create Docker Compose and Nginx config**  
+   - Create `/opt/eabms/docker-compose.yml` as shown above.  
+   - Create `/opt/eabms/nginx/conf.d/eabms.conf` with the server configuration.
+
+4. **Configure MNH internal DNS**  
+   - Follow **Section 2 (Internal DNS / Hostname Configuration)** to point `eabms.mloganzila.or.tz` to the server internal IP.
+
+5. **Login to the server** and go to the deployment directory:
+
+   ```bash
+   cd /opt/eabms
+   ```
+
+6. **Build or pull Docker images**  
+   - If using `build:` in `docker-compose.yml`:
+
+     ```bash
+     docker compose build
+     ```
+
+   - If pulling from a registry:
+
+     ```bash
+     docker compose pull
+     ```
+
+7. **Start the stack in detached mode**:
+
+   ```bash
+   docker compose up -d
+   ```
+
+8. **Check container status**:
+
+   ```bash
+   docker compose ps
+   ```
+
+   Ensure `backend`, `frontend`, and `nginx` are `Up`.
+
+9. **Verify Nginx is listening on port 80**:
+
+   ```bash
+   sudo lsof -i:80
+   ```
+
+   You should see the Docker `nginx` process bound to port 80.
+
+10. **Test locally on the server**:
+
+    ```bash
+    curl -I http://localhost
+    curl -I http://eabms.mloganzila.or.tz
+    curl http://eabms.mloganzila.or.tz/api/health  # if you have a health endpoint
+    ```
+
+11. **Test from a client machine inside MNH network**  
+    On a workstation that uses MNH DNS:
+
+    - Open a browser and go to: `http://eabms.mloganzila.or.tz`
+
+    Confirm:
+    - The Vue SPA loads.
+    - Network calls to `/api/...` return `200` and not `500`.
+    - No conflicts or failures on existing apps on ports `5000`, `3000`, `3001`.
+
+---
+
+## 10. Notes on TLS (HTTPS)
+
+For internal use you can initially run over HTTP only. If you later want to secure traffic with HTTPS **inside the MNH network**:
+
+- Option 1: Terminate TLS on the host (e.g. host Nginx or a reverse proxy) and forward to Docker’s Nginx on port 80.
+- Option 2: Use a containerized solution such as `nginx + certbot` or `traefik` with an **internal CA** or self-signed certificates, and configure:
+
+  ```nginx
+  listen 443 ssl;
+  server_name eabms.mloganzila.or.tz;
+
+  ssl_certificate     /etc/letsencrypt/live/eabms.mloganzila.or.tz/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/eabms.mloganzila.or.tz/privkey.pem;
+  ```
+
+Update `APP_URL`, `FRONTEND_URL`, and API base URLs to use `https://` if HTTPS is enabled.
+
+---
+
+## 11. Maintenance
+
+- To view logs:
+
+  ```bash
+  docker compose logs -f nginx
+  docker compose logs -f backend
+  ```
+
+- To restart the stack after code/config changes:
+
+  ```bash
+  docker compose down
+  docker compose up -d --build
+  ```
+
+- Existing services on ports `5000`, `3000`, `3001` remain unaffected as this stack only binds to port `80` (and optionally `443`).
+
+---
+
+## 12. What to upload to the aaPanel server
+
+When deploying to the MNH internal server managed by aaPanel, you do **not** need to upload your entire local working copy. Use this as a guide.
+
+### 12.1. Recommended directory on the server
+
+On the Ubuntu server (SSH or aaPanel file manager), keep all EABMS files in **one directory**, for example:
+
+- `/opt/eabms`  (recommended in this document)
+
+Create it if it does not exist:
 
 ```bash
-docker-compose up -d --build
+sudo mkdir -p /opt/eabms
+sudo chown $USER:$USER /opt/eabms
 ```
 
-Verify containers:
+You will upload project files into `/opt/eabms`.
+
+> If you prefer an aaPanel-style path (e.g. `/www/wwwroot/eabms`), you can use that instead, but keep all paths consistent in `docker-compose.yml` and this document.
+
+### 12.2. Files and folders to upload
+
+From your local project root (`lara-API-vue`), upload **only** the following to the server directory (e.g. `/opt/eabms`):
+
+**Backend (Laravel API)**
+
+- `backend/` directory, including:
+  - `backend/app/`, `backend/bootstrap/`, `backend/config/`, `backend/database/`, `backend/public/`, `backend/resources/`, `backend/routes/`, `backend/storage/`
+  - `backend/composer.json`, `backend/composer.lock`
+  - `backend/Dockerfile`
+  - `backend/.env.production` (or another production `.env` you prepare)
+
+> You do **not** need to upload `backend/vendor/` – it will be created on the server when `composer install` runs inside the container or on the host.
+
+**Frontend (Vue SPA)**
+
+- `frontend/` directory, including:
+  - `frontend/src/`, `frontend/public/`, `frontend/scripts/`
+  - `frontend/package.json`, `frontend/package-lock.json`
+  - `frontend/vue.config.js`, `frontend/tailwind.config.js`, `frontend/postcss.config.js`
+  - `frontend/Dockerfile`
+  - `frontend/.env.production` (for build-time API URL)
+
+> You do **not** need to upload `frontend/node_modules/` – it will be created on the server during the Docker build or `npm install`.
+
+**Docker & deployment files**
+
+- `docker-compose.yml` (or your production variant, e.g. `docker-compose.prod.yml` if you create one)
+- `docker/` directory (especially Nginx configs like `docker/nginx/default.conf` if used)
+- `DEPLOYMENT_UBUNTU_INTERNAL.md` (this guide, for reference on the server)
+
+Optional but useful:
+
+- `.dockerignore` files
+- `.env.example` files (for documentation only)
+
+### 12.3. Files and folders that should NOT be uploaded
+
+These are **local/dev artifacts** and should generally not be uploaded to the production aaPanel server:
+
+- Git metadata:
+  - `.git/`
+  - `.gitignore`
+- Local dependency caches:
+  - Root-level `node_modules/` (if present)
+  - `frontend/node_modules/`
+  - `backend/vendor/` (let the server/composer recreate it)
+- Local and dev env files:
+  - `backend/.env` (local dev secrets)
+  - `backend/.env.docker.dev`
+  - `backend/.env.sms.example`
+  - `frontend/.env`
+  - `frontend/.env.docker`
+  - `frontend/.env.example`
+- Local tooling and editor-only files (optional to upload, not required):
+  - `warp.md`
+  - Any IDE/Editor folders like `.vscode/`, `.idea/` (if they exist)
+
+Only **production-ready** env files (`backend/.env.production`, `frontend/.env.production`) and the actual application source code need to exist on the server for Docker to build and run your containers.
+
+> Keep your real secrets (DB passwords, SMS keys) out of Git. Create or edit the `.env.production` files **on the server** or via secure upload, and never commit them to the repository.
+
+---
+
+## 13. Recommended project structure on the server (step by step)
+
+This section shows how your local project (`lara-API-vue`) should be arranged **on the MNH aaPanel server**, and where each file or folder goes.
+
+We will assume the deployment directory on the server is:
+
+- `/opt/eabms`
+
+If you prefer an aaPanel path like `/www/wwwroot/eabms`, replace `/opt/eabms` with your chosen path consistently.
+
+### 13.1. Final directory tree on the server
+
+The goal is to have this structure on the server:
+
+```text
+/opt/eabms
++-- backend
+¦   +-- app
+¦   +-- bootstrap
+¦   +-- config
+¦   +-- database
+¦   +-- public
+¦   +-- resources
+¦   +-- routes
+¦   +-- storage
+¦   +-- composer.json
+¦   +-- composer.lock
+¦   +-- Dockerfile
+¦   +-- .env        (created from .env.production for production)
+¦
++-- frontend
+¦   +-- src
+¦   +-- public
+¦   +-- scripts
+¦   +-- package.json
+¦   +-- package-lock.json
+¦   +-- vue.config.js
+¦   +-- tailwind.config.js
+¦   +-- postcss.config.js
+¦   +-- Dockerfile
+¦   +-- .env.production
+¦
++-- docker-compose.yml
++-- docker
+¦   +-- nginx
+¦       +-- default.conf    (if you use this Nginx config inside Docker)
+¦
++-- DEPLOYMENT_UBUNTU_INTERNAL.md
++-- .dockerignore           (optional, for root-level Docker builds)
+```
+
+> Note: `backend/vendor/` and `frontend/node_modules/` are **not** copied from local; they will be created on the server by Docker or install commands.
+
+### 13.2. Step-by-step: placing files on the server
+
+**Step 1 – Create base directory**
+
+On the server (SSH or aaPanel terminal):
 
 ```bash
-docker compose ps
+sudo mkdir -p /opt/eabms
+sudo chown $USER:$USER /opt/eabms
 ```
 
-### 16.7 Run Laravel one-time tasks inside containers
-The first time you deploy, run migrations and storage link **inside** the backend container:
+**Step 2 – Upload backend (Laravel API)**
+
+From your local machine, upload the following **into** `/opt/eabms/backend`:
+
+- Folders:
+  - `backend/app/`
+  - `backend/bootstrap/`
+  - `backend/config/`
+  - `backend/database/`
+  - `backend/public/`
+  - `backend/resources/`
+  - `backend/routes/`
+  - `backend/storage/`
+- Files:
+  - `backend/composer.json`
+  - `backend/composer.lock`
+  - `backend/Dockerfile`
+  - `backend/.env.production` (or copy it and rename as `.env` after upload)
+
+On the server, after upload, you should have:
+
+```text
+/opt/eabms/backend/composer.json
+/opt/eabms/backend/composer.lock
+/opt/eabms/backend/Dockerfile
+/opt/eabms/backend/.env.production   (or .env for runtime)
+```
+
+> Do **not** upload `backend/vendor/` – it will be recreated by `composer install` inside the container or on the host.
+
+**Step 3 – Upload frontend (Vue SPA)**
+
+Upload the following into `/opt/eabms/frontend`:
+
+- Folders:
+  - `frontend/src/`
+  - `frontend/public/`
+  - `frontend/scripts/`
+- Files:
+  - `frontend/package.json`
+  - `frontend/package-lock.json`
+  - `frontend/vue.config.js`
+  - `frontend/tailwind.config.js`
+  - `frontend/postcss.config.js`
+  - `frontend/Dockerfile`
+  - `frontend/.env.production`
+
+After upload, you should have:
+
+```text
+/opt/eabms/frontend/package.json
+/opt/eabms/frontend/package-lock.json
+/opt/eabms/frontend/Dockerfile
+/opt/eabms/frontend/.env.production
+```
+
+> Do **not** upload `frontend/node_modules/` – Docker or `npm install` will recreate it.
+
+**Step 4 – Upload Docker and deployment files**
+
+At the root of `/opt/eabms`, upload:
+
+- `docker-compose.yml`  ? `/opt/eabms/docker-compose.yml`
+- `docker/` directory (if you use Docker Nginx configs)  ? `/opt/eabms/docker/...`
+- `DEPLOYMENT_UBUNTU_INTERNAL.md`  ? `/opt/eabms/DEPLOYMENT_UBUNTU_INTERNAL.md`
+- `.dockerignore` (optional)  ? `/opt/eabms/.dockerignore`
+
+This makes it easy to run from `/opt/eabms`:
 
 ```bash
-cd /var/www/eabms
-
-docker compose exec backend php artisan migrate --force
-docker compose exec backend php artisan storage:link
-```
-
-You can also run `php artisan about` to confirm environment details:
-
-```bash
-docker compose exec backend php artisan about
-```
-
-### 16.8 Scheduler (cron) with Docker
-Laravel scheduler must still run every minute. Instead of calling `php` directly, call into the `backend` container.
-
-Edit root crontab:
-
-```bash
-sudo crontab -e
-```
-
-Add:
-
-```cron
-* * * * * cd /var/www/eabms && docker compose exec -T backend php artisan schedule:run >> /var/log/eabms-scheduler.log 2>&1
-```
-
-The `-T` flag disables TTY allocation (required in cron).
-
-### 16.9 Logs and troubleshooting in Docker
-
-- See container logs:
-
-```bash
-cd /var/www/eabms
-docker compose logs -f nginx
-docker compose logs -f backend
-docker compose logs -f frontend
-docker compose logs -f queue
-```
-
-- Check application logs inside the backend container:
-
-```bash
-docker compose exec backend ls storage/logs
-docker compose exec backend tail -f storage/logs/laravel-*.log
-```
-
-### 16.10 Updating a Docker deployment
-When deploying a new version with Docker:
-
-```bash
-cd /var/www/eabms
-
-# 1) Pull code
-sudo -u eabms -H bash -lc 'cd /var/www/eabms && git pull'
-
-# 2) Rebuild images (if Dockerfiles or dependencies changed)
-docker compose build backend frontend
-
-# 3) Apply changes
+cd /opt/eabms
 docker compose up -d
-
-# 4) Run database migrations (if needed)
-docker compose exec backend php artisan migrate --force
 ```
 
-If you change environment variables in `backend/.env.docker` or `frontend/.env.docker`, restart the affected services:
+**Step 5 – Things you should NOT upload**
 
-```bash
-docker compose up -d backend frontend nginx
-```
-sudo supervisorctl restart eabms-queue:*
-```
+From the local project root, do **not** upload these to the aaPanel server (they are dev-only):
 
-5) Quick post-update verification:
-```bash
-curl -I http://eabms.mloganzila.or.tz
-curl -I http://api.eabms.mloganzila.or.tz
-```
+- `node_modules/` (any level)
+- `backend/vendor/`
+- `.git/`, `.gitignore`
+- `backend/.env`, `backend/.env.docker.dev`, `backend/.env.sms.example`
+- `frontend/.env`, `frontend/.env.docker`, `frontend/.env.example`
+- `warp.md` and any editor/IDE directories such as `.vscode/`, `.idea/`
 
-## 16) Final verification (go-live)
-Do these checks before announcing the system is live:
+Keeping these out of the server keeps your deployment clean, smaller, and avoids leaking development secrets.
 
-1) From your workstation browser:
-- Open the frontend: `http(s)://eabms.mloganzila.or.tz`
-- Log in and load at least:
-  - dashboard
-  - a request list page
-  - a request details page
-
-2) Confirm frontend is calling the correct API:
-- Open DevTools â†’ Network â†’ check requests go to `.../api/...`
-- If you see calls to `127.0.0.1:8000` or a wrong host, fix `frontend/.env.production` and rebuild.
-
-3) From the server:
-```bash
-# apache is healthy
-sudo apache2ctl -t
-sudo systemctl status apache2 --no-pager
-
-# php-fpm is healthy
-systemctl list-units --type=service | grep -E 'php.*fpm'
-
-# queue worker (if enabled)
-sudo supervisorctl status
-```
-
-## 17) Troubleshooting (common issues)
-### 17.1 Frontend loads but API calls fail
-- Confirm `frontend/.env.production` has:
-  - `VUE_APP_API_URL=https://api.eabms.mloganzila.or.tz/api`
-- Rebuild frontend after edits: `npm run build`
-- If API is on a different hostname, confirm backend CORS allows the frontend origin.
-
-### 17.2 500 errors on API
-- Check Laravel logs:
-```bash
-tail -n 200 /var/www/eabms/backend/storage/logs/laravel-*.log
-```
-- Common causes:
-  - wrong DB credentials
-  - missing `APP_KEY`
-  - permissions on `storage/` or `bootstrap/cache`
-
-### 17.3 Uploads failing (signatures / attachments)
-- Increase limits:
-  - Apache (optional) `LimitRequestBody` if set
-  - PHP `upload_max_filesize` and `post_max_size` in `php.ini` (FPM)
-- Reload services after changes.
-
-## 18) Notes for MNH internal hosting
-- Prefer internal DNS names and internal CA-issued certificates.
-- This server hosts multiple systems: apply change control (schedule maintenance windows) to avoid affecting the other 2+ production sites.
-- Keep database backups (nightly) and store them securely.
-- Monitor:
-  - Apache access/error logs
-  - Laravel logs
-  - Queue worker logs
-  - Disk usage for `storage/` and database
-  - CPU/RAM usage (3 systems on one server)
+---
